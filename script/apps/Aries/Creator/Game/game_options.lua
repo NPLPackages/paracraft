@@ -170,11 +170,13 @@ function options:OneTimeInit()
 	self:SetMaintainMovieBlockAspectRatio();
 
 	-- error log hook
+	--[[
 	if(System.options.mc and ParaWorldAnalytics) then
 		ParaWorldAnalytics.SetNPLErrorCallback(function(errorMessage, stackInfo)
 			GameLogic.OnCodeError(errorMessage, stackInfo)
 		end)
 	end
+	]]
 end
 
 -- transient options can be modified by game rule and reset when loading a new world.
@@ -839,16 +841,26 @@ function options:GetSavableMaxDist()
 	return 256;
 end
 
-
-function options:SetMaxViewDist(value)
+-- @param bSaveToDisk: true to save to disk
+-- @NOTE: max view dist are not saved to disk by default
+function options:SetMaxViewDist(value, bSaveToDisk)
 	local key = "Paracraft_System_maxViewDist";
 	if(value == nil) then
-		if(self.maxViewDist == nil) then
-			self.maxViewDist = GameLogic.GetPlayerController():LoadLocalData(key,self:GetMaxViewDist(),true);
+		local maxViewDist
+		if(System.os.IsMobilePlatform()) then
+			maxViewDist = 64
+		else
+			maxViewDist = GameLogic.GetPlayerController():LoadLocalData(key,self:GetMaxViewDist(),true);
+		end
+			
+		if(maxViewDist == self:GetSavableMaxDist()) then
+			self.maxViewDist = maxViewDist;
+		else
+			self:SetMaxViewDist(maxViewDist);
 		end
 	elseif(self.maxViewDist ~= value) then
 		LOG.std(nil, "info", "options", "max view dist is set to %d", value);
-		if(value <= self:GetSavableMaxDist()) then
+		if(bSaveToDisk and value <= self:GetSavableMaxDist()) then
 			GameLogic.GetPlayerController():SaveLocalData(key, value, true, true);
 		end
 		self.maxViewDist = value;

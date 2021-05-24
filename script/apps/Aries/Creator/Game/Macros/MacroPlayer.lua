@@ -55,9 +55,11 @@ function MacroPlayer.OnInitEnd()
 	MacroPlayer.ShowDebugInfoWnd(false);
 	local cursorClick = page:FindControl("cursorClick");
 	if(cursorClick) then
-		cursorClick:SetScript("onmousewheel", function()
-			MacroPlayer.OnMouseWheel()
-		end);
+		if not System.os.IsTouchMode() then
+			cursorClick:SetScript("onmousewheel", function()
+				MacroPlayer.OnMouseWheel()
+			end);
+		end
 	end
 	
 	if(GameLogic.IsReadOnly()) then
@@ -172,12 +174,12 @@ function MacroPlayer.ShowPage()
 	end
 
 	if System.options.isDevMode then
-		-- local pro_mcml_node = page:GetNode("root")
-		-- local pro_ui_object = ParaUI.GetUIObject(pro_mcml_node.uiobject_id)
+		local pro_mcml_node = page:GetNode("root")
+		local pro_ui_object = ParaUI.GetUIObject(pro_mcml_node.uiobject_id)
 		
-		-- pro_ui_object:SetScript("onmousedown", function() MacroPlayer.OnMouseDown({type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
-		-- pro_ui_object:SetScript("onmouseup", function() MacroPlayer.OnMouseUp({type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
-		-- pro_ui_object:SetScript("onmousemove", function() MacroPlayer.OnMouseMove({type="WM_POINTERUPDATE", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+		pro_ui_object:SetScript("onmousedown", function() MacroPlayer.OnMouseDown({type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+		pro_ui_object:SetScript("onmouseup", function() MacroPlayer.OnMouseUp({type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+		pro_ui_object:SetScript("onmousemove", function() MacroPlayer.OnMouseMove({type="WM_POINTERUPDATE", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
 	end
 
 end
@@ -217,6 +219,8 @@ function MacroPlayer.OnEndPlay()
 	if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
 		TouchMiniKeyboard:UpdateIconVisible()
 		TouchMiniKeyboard:ClearAllKeyDown()
+		TouchMiniKeyboard:SetTransparency(0.2, true);
+		TouchMiniKeyboard:StopCtrlDrawAnim()
 	end
 end
 
@@ -237,6 +241,11 @@ function MacroPlayer.InvokeTriggerCallback()
 		MacroPlayer.triggerCallbackFunc = nil;
 		callback();
 		MacroPlayer.AutoAdjustControlPosition()
+
+		if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
+			TouchMiniKeyboard:ClearAllKeyDown()
+			TouchMiniKeyboard:StopCtrlDrawAnim()
+		end
 	end
 end
 
@@ -429,7 +438,7 @@ function MacroPlayer.UpdateDebugInfo()
 end
 
 -- @return the number of key buttons to press
-function MacroPlayer.ShowKeyboard(bShow, button)
+function MacroPlayer.ShowKeyboard(bShow, button, is_key_up_hide)
 	local count = 0;
 	if(page) then
 		local parent = MacroPlayer.GetRootUIObject()
@@ -440,13 +449,13 @@ function MacroPlayer.ShowKeyboard(bShow, button)
 			page.keyboardWnd = VirtualKeyboard:new():Init("MacroVirtualKeyboard", nil, 400, 1024);
 		end
 		if(page.keyboardWnd) then
-			page.keyboardWnd:Show(bShow);
+			page.keyboardWnd:Show(bShow, is_key_up_hide);
 		end
 		
 		if(bShow and button and button~="") then
 			count = page.keyboardWnd:ShowButtons(button)
 			if(count == 0) then
-				page.keyboardWnd:Show(false);
+				page.keyboardWnd:Show(false, is_key_up_hide);
 			end
 		end
 	end
@@ -682,8 +691,12 @@ function MacroPlayer.OnClickCursor()
 				GameLogic.AddBBS("Macro", L"请点击鼠标左键, 不是右键", 5000, "255 0 0");
 				Macros.voice("请点击鼠标左键, 不是右键")
 			elseif(MacroPlayer.expectedButton:match("right")) then
-				GameLogic.AddBBS("Macro", L"请点击鼠标右键, 不是左键", 5000, "255 0 0");
-				Macros.voice("请点击鼠标右键, 不是左键")
+				local text = L"请点击鼠标右键, 不是左键"
+				if System.os.IsTouchMode() then
+					text = L"请点击鼠标右键，不是左键，你可以按住右键按钮不要放手，再点击场景。"
+				end
+				GameLogic.AddBBS("Macro", text, 5000, "255 0 0");
+				Macros.voice(text)
 			else
 				GameLogic.AddBBS("Macro", L"请点击正确的鼠标按键", 5000, "255 0 0");
 				Macros.voice("请点击正确的鼠标按键")
@@ -825,7 +838,7 @@ function MacroPlayer.OnKeyDown(event)
 		MacroPlayer.ShowEditBox(false)
 		MacroPlayer.expectedKeyButton = nil;
 		MacroPlayer.ShowKeyPress(false)
-		MacroPlayer.ShowKeyboard(false)
+		MacroPlayer.ShowKeyboard(false, nil, true)
 		MacroPlayer.ShowCursor(false);
 		MacroPlayer.InvokeTriggerCallback()
 	end
@@ -984,10 +997,12 @@ function MacroPlayer.OnDragBegin()
 end
 
 function MacroPlayer.OnDragMove()
+	
 	if(page) then
 		local curPoint = page:FindControl("cursorClick");
 		local endPoint = page:FindControl("endPoint");
 		if(curPoint) then
+			
 			local startX, startY = curPoint:GetAbsPosition();
 			local endX, endY = endPoint:GetAbsPosition();
 			local diffDistance = math.sqrt((endX - startX)^2 + (endY - startY)^2)
@@ -999,6 +1014,17 @@ function MacroPlayer.OnDragMove()
 	if(not MacroPlayer.isDragButtonCorrect) then
 		GameLogic.AddBBS("Macro", L"拖动鼠标时需要同时按下正确的键盘按键", 5000, "255 0 0");
 	end
+end
+
+
+function MacroPlayer.Print(...)
+	local arg={...}
+	local str = ""
+	for index, v in ipairs(arg) do
+		str = str .. ", " .. tostring(v)
+	end
+	str = str .. "   time:" .. os.time()
+	commonlib.echo(str)
 end
 
 function MacroPlayer.OnDragEnd()
@@ -1074,7 +1100,11 @@ end
 function MacroPlayer.SetShowTextPosition(textWnd, position)
 	position = position or "bottom"
 	if(position == "bottom") then
-		textWnd:Reposition("_mb", 0, 80, 0, 60);
+		if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
+			textWnd:Reposition("_mb", 0, 30, 0, 60);
+		else
+			textWnd:Reposition("_mb", 0, 80, 0, 60);
+		end
 	elseif(position == "center") then
 		textWnd:Reposition("_mb", 0, 400, 0, 60);
 	elseif(position == "top") then
@@ -1156,12 +1186,19 @@ function MacroPlayer.SetMouseWheelTrigger(mouseWheelDelta, mouseX, mouseY, callb
 	if(page) then
 		MacroPlayer.CheckDoAutoPlay(callbackFunc)
 		MacroPlayer.expectedMouseWheelDelta = mouseWheelDelta;
+
 		MacroPlayer.SetTriggerCallback(callbackFunc)
 		if(Macros.IsShowButtonTip()) then
 			MacroPlayer.ShowMouseWheel(true, mouseX, mouseY)
 		end
 		MacroPlayer.ShowCursor(true, mouseX, mouseY, "")
 		MacroPlayer.AutoAdjustControlPosition(mouseX, mouseY)
+		if System.os.IsTouchMode() and mouseWheelDelta then
+			commonlib.TimerManager.SetTimeout(function()  
+				MacroPlayer.AutoCompleteTrigger()
+			end, 1000)
+			
+		end
 	end
 end
 

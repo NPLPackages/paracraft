@@ -33,7 +33,7 @@ Other show filters:
 /show movie.controller
 /show desktop.builder.movie
 /show vision   : AI memory vision
-/show keyboard   show keyboard for touch device
+/show touch   show touch device
 /show overlaybuffer    show overlay picking buffer on left top corner
 /show quickselectbar
 ]], 
@@ -67,6 +67,9 @@ Other show filters:
 			end
 			GameLogic.options:SetShowInfoWindow(bIsShow);
 		elseif(name == "touch") then
+			GameLogic.options:ShowTouchPad(true);
+		elseif(name == "mobile") then
+			System.options.IsTouchDevice = true;
 			GameLogic.options:ShowTouchPad(true);
 		elseif(name == "terrain") then
 			if(bIsShow == nil) then
@@ -134,7 +137,7 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|terrain|
+	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|mobile|terrain|
 vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo|camera]], 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
@@ -162,6 +165,9 @@ vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo|camera]],
 		elseif(name == "info") then
 			GameLogic.options:SetShowInfoWindow(false);
 		elseif(name == "touch") then
+			GameLogic.options:ShowTouchPad(false);
+		elseif(name == "mobile") then
+			System.options.IsTouchDevice = false;
 			GameLogic.options:ShowTouchPad(false);
 		elseif(name == "player" or name=="") then
 			EntityManager.GetPlayer():SetVisible(false);

@@ -103,7 +103,7 @@ function TouchVirtualKeyboard:ctor()
 		},
 		{
 			{name="Fn", combo=true, dragcombo=true, col=1, colorid=3},
-			{name="Ctrl", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL},
+			{name="Ctrl", combo=true, dragcombo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL},
 			{name="Alt", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LMENU},
 			{name="Space", char=" ", char2=" ",col=9, vKey = DIK_SCANCODE.DIK_SPACE},
 			{name="Left", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LEFT},
@@ -324,9 +324,14 @@ function TouchVirtualKeyboard:OnTouch(touch)
 		if(keydownBtn) then
 			if(btnItem and btnItem~=keydownBtn and keydownBtn.dragcombo) then
 				self:SetKeyState(btnItem, true);
-				self:SetKeyState(btnItem, false);
+				commonlib.TimerManager.SetTimeout(function()  
+					self:SetKeyState(btnItem, false);
+					self:SetKeyState(keydownBtn, false);
+				end, 100)
+			else
+				self:SetKeyState(keydownBtn, false);
 			end
-			self:SetKeyState(keydownBtn, false);
+			
 		end
 	end
 end

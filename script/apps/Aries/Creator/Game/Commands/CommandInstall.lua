@@ -224,22 +224,64 @@ e.g.
 	end,
 };
 
+Commands["makepkg"] = {
+	name="makepkg", 
+	quick_ref="/makepkg zip_src [pkg_dest]", 
+	desc=[[make src zip file to dest pkg file. If dest is not provided, the src zip file extension is changed to pkg. 
+pkg is an encrpted zip file and can be used interchangably with zip file in paracraft. 
+e.g.
+/makepkg temp/test.zip
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local src, dest;
+		src, cmd_text = CmdParser.ParseFilename(cmd_text);
+		dest, cmd_text = CmdParser.ParseOption(cmd_text);
+		if(src) then
+			if(not dest) then
+				dest = src:gsub("zip$", "pkg")
+			end
+			ParaAsset.GeneratePkgFile(src, dest);
+		end
+	end,
+};
+
 
 Commands["makeapp"] = {
 	name="makeapp", 
-	quick_ref="/makeapp [zip|clean] [-android|windows]", 
+	quick_ref="/makeapp [UImode] [apk|zip|clean] [-android|windows]", 
 	desc=[[make current world into a standalone app.
 It can be windows exe file or android apk file.
 e.g.
 /makeapp 
 /makeapp -android  clean and rebuild android apk file
 /makeapp zip -android  only zip everything under temp/paracraft_android folder
+/makeapp apk  same as zip -android
 /makeapp clean -android  clean everything under temp/paracraft_android folder
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local method, option;
+		local beforeCmdText = cmd_text;
+		UImode, cmd_text = CmdParser.ParseWord(cmd_text);
+
+		if (not UImode or UImode ~='UImode') then
+			cmd_text = beforeCmdText;
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
+			local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+			local task = MyCompany.Aries.Game.Tasks.MakeApp:new()
+
+			task:Run(MakeApp.mode.UI);
+
+			return;
+		end
+
 		method, cmd_text = CmdParser.ParseWord(cmd_text);
 		option, cmd_text = CmdParser.ParseOption(cmd_text);
+
+		if(method == "apk") then
+			method = "zip"
+			option = "android"
+		end
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
 		local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");

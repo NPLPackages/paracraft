@@ -243,6 +243,8 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	end
 	local myHomeWorldName = string.format(L"%s的家园", System.User.keepworkUsername);
 	local currentWorldName = WorldCommon.GetWorldTag("name");
+	echo(myHomeWorldName);
+	echo(currentWorldName);
 	local function uploadMiniWorld(projectId)
 		keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
 			if (data and type(data) == "table") then
@@ -281,13 +283,6 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	
 	if (WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
 		if myHomeWorldName == currentWorldName then
-			showSaveTip()
-		else
-			if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
-				local RealNameTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RealNameTip/RealNameTip.lua") 
-    			RealNameTip.ShowView()
-				return 
-			end
 			showSaveTip()
 		end		
 	end

@@ -911,6 +911,7 @@ function SystemSettingsPage.OnClickChangeRenderDist()
 	GameLogic.options:SetRenderDist(next_dist);
 	SystemSettingsPage.setting_ds["render_dist"] = new_text;
 	WorldCommon.GetWorldInfo().renderdist = tostring(next_dist);
+	GameLogic.options:SetMaxViewDist(next_dist);
 end
 
 function SystemSettingsPage.OnClickChangeSoundVolume()

@@ -120,14 +120,16 @@ function CodeBlockSettings.ClickBlockToolboxBtn()
 	if(page) then page:CloseWindow() end
 	
 	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
+	local language = entity:IsUseCustomBlock() and "UserCustomBlock" or entity:GetLanguageConfigFile();
 	Page.Show({
-		text = entity:GetNplBlocklyToolboxXmlText() or "",
+		XmlText = entity:GetNplBlocklyToolboxXmlText() or "",
+		Language = (language == "npl" or language == "") and "SystemNplBlock" or language,
 		OnConfirm = function(text)
 			entity:SetNplBlocklyToolboxXmlText(text);
 		end
 	}, {
 		draggable = false,
-		url = "%ui%/Blockly/Pages/Toolbox.html",
+		url = "%ui%/Blockly/Pages/CustomToolBox.html",
 	});
 end
 

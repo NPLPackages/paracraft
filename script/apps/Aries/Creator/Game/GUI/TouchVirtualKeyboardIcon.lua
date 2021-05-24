@@ -32,7 +32,7 @@ function TouchVirtualKeyboardIcon:ctor()
 	self.zorder = 1000;
 	self.transparency = 1;
 	self.color = {normal="#ffffff"}
-	self.text = "KB";
+	-- self.text = "KB";
 	self.default_transparency = 0.5;
 end
 
@@ -119,10 +119,10 @@ end
 -- @param width: if width is not specified, use 1/3 height of the screen
 function TouchVirtualKeyboardIcon:SetPosition(left, top, width)
 	width = width or math.floor(Screen:GetHeight() / 12)
-	self.width = width;
+	self.width = 86;
 	self.left = math.floor(left or width * 0.2);
 	self.top = math.floor(top or width*1.5);
-	self.height = width;
+	self.height = 86;
 
 	local bLastVisible = self:isVisible();
 	self:CreateWindow();
@@ -142,14 +142,15 @@ function TouchVirtualKeyboardIcon:GetUIControl()
 	
 	if(not _parent:IsValid()) then
 		_parent = ParaUI.CreateUIObject("container",self.name, self.alignment,self.left,self.top,self.width,self.height);
-		_parent.background = "Texture/whitedot.png";
-		_guihelper.SetUIColor(_parent, self.color.normal);
+		_parent.background = "Texture/Aries/Creator/keepwork/MiniKey/17_86X86_32bits.png;0 0 86 86";
+		-- _guihelper.SetUIColor(_parent, self.color.normal);
 		_parent:AttachToRoot();
 		_parent.zorder = self.zorder;
 		_parent:SetScript("ontouch", function() self:OnTouch(msg) end);
 		_parent:SetScript("onmousedown", function() self:OnMouseDown() end);
 		_parent:SetScript("onmouseup", function() self:OnMouseUp() end);
 		_parent:SetScript("onmousemove", function() self:OnMouseMove() end);
+		-- _guihelper.SetUIColor(_parent, self.color.normal);
 		self.id = _parent.id;
 	else
 		_parent:Reposition(self.alignment,self.left,self.top,self.width,self.height);
@@ -185,7 +186,7 @@ function TouchVirtualKeyboardIcon:ShowKeyboard(bShow)
 		end
 		keyboard:SetTransparency(1);
 		self:SetTransparency(1);
-		self:SetText(L"关闭");
+		-- self:SetText(L"关闭");
 		keyboard:Show(true);
 		local obj = Keyboard:GetKeyFocus();
 		if(obj) then
@@ -201,7 +202,7 @@ function TouchVirtualKeyboardIcon:ShowKeyboard(bShow)
 			keyboard:SetFocusedMode(false);
 		end
 	else
-		self:SetText(self.text);
+		-- self:SetText(self.text);
 		self:SetTransparency(self.default_transparency);
 		keyboard:Show(false);
 
@@ -261,11 +262,15 @@ function TouchVirtualKeyboardIcon:CreateWindow()
 
 	-- text
 	local keyBtn = ParaUI.CreateUIObject("button","text", "_lt", 0,0,self.width,self.height);
-	keyBtn.background = "";
+	keyBtn.background = "Texture/Aries/Creator/keepwork/MiniKey/9_86X86_32bits.png;0 0 86 86";
 	keyBtn.text = self.text;
 	keyBtn.enabled = false;
-	_guihelper.SetButtonFontColor(keyBtn, "#000000");
+	_guihelper.SetUIColor(keyBtn, "#ffffff");
 	_parent:AddChild(keyBtn);
+
+	-- local img = _parent = ParaUI.CreateUIObject("button", "bg_img", "_lt",0,0,self.width,self.height);
+	-- img.background = "Texture/Aries/Creator/keepwork/MiniKey/9_86X86_32bits.png;0 0 86 86";
+	-- _parent:AddChild(img)
 end
 
 

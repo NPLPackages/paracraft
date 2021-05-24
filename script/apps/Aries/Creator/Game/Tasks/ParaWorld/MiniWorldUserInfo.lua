@@ -125,7 +125,13 @@ end
 
 function MiniWorldUserInfo.GetUpdatedTime()
 	function formatTime(datetime)
-		local year,month,day,hour,min,sec = string.match(datetime, "(%d+)%D(%d+)%D(%d+)%D+(%d+)%D(%d+)%D(%d+)");
+		local time_stamp = commonlib.timehelp.GetTimeStampByDateTime(datetime)
+		local year = os.date("%Y", time_stamp)	
+		local month = os.date("%m", time_stamp)
+		local day = os.date("%d", time_stamp)
+		local hour = os.date("%H", time_stamp)
+		local min = os.date("%M", time_stamp)
+		local sec = os.date("%S", time_stamp)
 		local dateTime = string.format("%s-%s-%s %s:%s:%s", year,month,day,hour,min,sec);
 		local date,time = commonlib.timehelp.GetLocalTime();
 		local curDateTime = string.format("%s %s", date, string.gsub(time, "-", ":"));

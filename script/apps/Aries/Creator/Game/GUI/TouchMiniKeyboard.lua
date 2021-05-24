@@ -26,7 +26,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TouchSession.lua");
 NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniRightKeyboard.lua");
-
+NPL.load("(gl)script/ide/Transitions/Tween.lua");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local TouchSession = commonlib.gettable("MyCompany.Aries.Game.Common.TouchSession");
@@ -54,7 +54,7 @@ TouchMiniKeyboard.hover_press_hold_time = 500;
 
 TouchMiniKeyboard.DefaultKeyLayout = {
 	{
-		{name="Shift", col=1, colorid=2, ctrl_name="Shift", is_change_img = false, vKey = DIK_SCANCODE.DIK_LSHIFT, allow_hover_press = true, img="Texture/Aries/Creator/keepwork/MiniKey/zi3_94X88_32bits.png;0 0 94 88", only_read_visible = false},
+		{name="Shift", dragcombo = true, col=1, colorid=2, ctrl_name="Shift", is_change_img = false, vKey = DIK_SCANCODE.DIK_LSHIFT, allow_hover_press = true, img="Texture/Aries/Creator/keepwork/MiniKey/zi3_94X88_32bits.png;0 0 94 88", only_read_visible = false},
 		-- tricky: when W key is pressed, we will assume right mouse button is down, so that the user can simultaneously control player facing
 		{name="W", col=1, vKey = DIK_SCANCODE.DIK_W, auto_mouseup = true, toggleRightMouseButton=false, img="Texture/Aries/Creator/keepwork/MiniKey/shang_94X88_32bits.png;0 0 94 88", only_read_visible = true},
 		{name="RMB", col=1, toggleRightMouseButton=true, colorid=4, allow_hover_press = true, img="Texture/Aries/Creator/keepwork/MiniKey/4_94X88_32bits.png;0 0 94 88", only_read_visible = true, child_button = 
@@ -70,7 +70,7 @@ TouchMiniKeyboard.DefaultKeyLayout = {
 		{name="D", col=1, vKey = DIK_SCANCODE.DIK_D, auto_mouseup = true, toggleRightMouseButton=false, img="Texture/Aries/Creator/keepwork/MiniKey/you_94X88_32bits.png;0 0 94 88", only_read_visible = true},
 	},
 	{
-		{name="Ctrl", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, allow_hover_press = true, img="Texture/Aries/Creator/keepwork/MiniKey/zi1_94X88_32bits.png;0 0 94 88", only_read_visible = false},
+		{name="Ctrl",dragcombo = true, col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, allow_hover_press = true, img="Texture/Aries/Creator/keepwork/MiniKey/zi1_94X88_32bits.png;0 0 94 88", only_read_visible = false},
 		{name="Alt", col=1, ctrl_name="Z", is_change_img = true, colorid=2, vKey = DIK_SCANCODE.DIK_LMENU, allow_hover_press = true, img="Texture/Aries/Creator/keepwork/MiniKey/zi2_94X88_32bits.png;0 0 94 88", only_read_visible = false},
 		{name="E", col=1, vKey = DIK_SCANCODE.DIK_E, auto_mouseup = true, img="Texture/Aries/Creator/keepwork/MiniKey/zi4_94X88_32bits.png;0 0 94 88", only_read_visible = false},
 	},
@@ -95,9 +95,21 @@ TouchMiniKeyboard.ColorMaskList = {
 	gray = "Texture/Aries/Creator/keepwork/MiniKey/3_94X88_32bits.png;0 0 94 88",
 }
 
+TouchMiniKeyboard.DirectionKey = {
+	Up = {"W"},
+	Down ={"S"},
+	Left = {"A"},
+	Right = {"D"},
+	UpLeft = {"W","A"},
+	UpRight = {"W","D"},
+	DownLeft = {"S","A"},
+	DownRight = {"S","D"},
+}
+
 function TouchMiniKeyboard:ctor()
 	self.alignment = "_lt";
 	self.zorder = -10;
+	self.alphaAnimSpeed = 10/256;
 	self.rmb_lock_state = TouchMiniKeyboard.RMBLockStateList.NoLock
 	-- normalBtn, comboBtn, frequentBtn, mouseRight
 	self.colors = { 
@@ -114,7 +126,10 @@ function TouchMiniKeyboard:ctor()
 
 	GameLogic:Connect("WorldLoaded", TouchMiniKeyboard, function()
 		self:UpdateIconVisible()
+		GameLogic.events:AddEventListener("game_mode_change", self.UpdateIconVisible, self, "TouchMiniKeyboard");
 	end, "UniqueConnection");
+
+	
 end
 
 -- @param keyLayout: if nil, it will load the default layout. 
@@ -291,28 +306,37 @@ function TouchMiniKeyboard:OnTouch(touch)
 	local btnItem = self:GetButtonItem(touch.x, touch.y);
 	-- let us track it with an item. 
 
-
 	if(touch.type == "WM_POINTERDOWN") then
-	
-	
 		if(btnItem) then
 			touch_session:SetField("keydownBtn", btnItem);
 			self:SetKeyState(btnItem, true);
 			btnItem.isDragged = nil;
 			if(btnItem.camera_zoom) then
 				touch_session:SetField("cameraDist", GameLogic.options:GetCameraObjectDistance());
-			elseif(btnItem.flyUpDown) then
-				local focus_entity = EntityManager.GetFocus();
-				if(focus_entity) then
-					local x, y, z = focus_entity:GetPosition();
-					touch_session:SetField("cameraPosY", y);
-				end
 			end
 		end
 	elseif(touch.type == "WM_POINTERUPDATE") then
 		local keydownBtn = touch_session:GetField("keydownBtn");
 		if(keydownBtn and touch_session:IsDragging()) then
-		
+			
+			if keydownBtn.name == "W" or keydownBtn.name == "A" or keydownBtn.name == "S" or keydownBtn.name == "D" then
+				if self.cur_move_state == nil then
+					local state = ""
+					for k, v in pairs(TouchMiniKeyboard.DirectionKey) do
+						if #v== 1 and keydownBtn.name == v[1] then
+							state = k
+							break
+						end
+					end
+					self.cur_move_state = state
+					local key_name_list = TouchMiniKeyboard.DirectionKey[self.cur_move_state]
+					self:SetKeyListState(key_name_list, true)
+				else
+					self:ChangeMoveState(touch.x, touch.y)
+				end
+				
+				return
+			end
 			keydownBtn.isDragged = true;
 			local dx, dy = touch_session:GetOffsetFromStartLocation();
 
@@ -327,22 +351,6 @@ function TouchMiniKeyboard:OnTouch(touch)
 						delta = (fingerSize * 5) / (-dy + fingerSize*5);
 					end
 					GameLogic.options:SetCameraObjectDistance(cameraStartDist*delta);
-				end
-			elseif(keydownBtn.flyUpDown) then
-				local cameraPosY = touch_session:GetField("cameraPosY");
-				if(cameraPosY) then
-					local fingerSize = touch_session:GetFingerSize();
-					local delta = dy / fingerSize;
-					local focus_entity = EntityManager.GetFocus();
-					if(focus_entity and not focus_entity:IsControlledExternally()) then
-						keydownBtn.delta = delta;
-						if (not keydownBtn.timer) then
-							keydownBtn.timer = commonlib.Timer:new({callbackFunc = function(timer)
-								focus_entity:MoveEntityByDisplacement(0, -keydownBtn.delta*0.02, 0);
-							end})
-							keydownBtn.timer:Change(0, 30);
-						end
-					end
 				end
 			end
 			keydownBtn.hover_testing_btn = btnItem;
@@ -375,27 +383,31 @@ function TouchMiniKeyboard:OnTouch(touch)
 	elseif(touch.type == "WM_POINTERUP") then
 		local keydownBtn = touch_session:GetField("keydownBtn");
 		if(keydownBtn and keydownBtn.img) then
-			if(keydownBtn.name=="Ctrl" and btnItem and btnItem.ctrl_name) then
-				-- do a combo key.
-				-- TODO: find a better way to send the actual key, instead of calling command directly. 
-
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
-				local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
-				local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-				local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
-
-				if(btnItem.ctrl_name == "S") then
-					GameLogic.QuickSave();
-				elseif(btnItem.ctrl_name == "Y") then
-					if(GameMode:IsAllowGlobalEditorKey()) then
-						UndoManager.Redo();
-					end
-				elseif(btnItem.ctrl_name == "Z") then
-					if(GameMode:IsAllowGlobalEditorKey()) then
-						UndoManager.Undo();
-					end
-				end
+			if self.cur_move_state then
+				self:StopMoveState()
+				return
 			end
+			-- if(keydownBtn.name=="Ctrl" and btnItem and btnItem.ctrl_name) then
+			-- 	-- do a combo key.
+			-- 	-- TODO: find a better way to send the actual key, instead of calling command directly. 
+
+			-- 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
+			-- 	local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
+			-- 	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+			-- 	local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
+
+			-- 	if(btnItem.ctrl_name == "S") then
+			-- 		GameLogic.QuickSave();
+			-- 	elseif(btnItem.ctrl_name == "Y") then
+			-- 		if(GameMode:IsAllowGlobalEditorKey()) then
+			-- 			UndoManager.Redo();
+			-- 		end
+			-- 	elseif(btnItem.ctrl_name == "Z") then
+			-- 		if(GameMode:IsAllowGlobalEditorKey()) then
+			-- 			UndoManager.Undo();
+			-- 		end
+			-- 	end
+			-- end
 
 			if keydownBtn.child_button then
 				local child_item = self:GetChildButtonItem(touch.x, touch.y, keydownBtn.child_button)
@@ -407,12 +419,31 @@ function TouchMiniKeyboard:OnTouch(touch)
 					self:ChangeMouseLockStata("NoLock")
 				end
 			end
-			self:SetKeyState(keydownBtn, false);
+
+			if(btnItem and btnItem~=keydownBtn and keydownBtn.dragcombo) then
+				local name = btnItem.name
+				local vKey = btnItem.vKey
+				if keydownBtn.name == "Ctrl" and btnItem.ctrl_name ~= nil then
+					btnItem.name = btnItem.ctrl_name
+					btnItem.vKey = DIK_SCANCODE["DIK_" .. btnItem.ctrl_name]
+				end
+				self:SetKeyState(btnItem, true);
+				commonlib.TimerManager.SetTimeout(function()  
+					self:SetKeyState(btnItem, false);
+					self:SetKeyState(keydownBtn, false);
+
+					btnItem.name = name
+					btnItem.vKey = vKey
+				end, 100)
+			else
+				self:SetKeyState(keydownBtn, false);
+			end
+			
 		end
 	end
 end
 
-function TouchMiniKeyboard:GetRightMouseButtonItem()
+function TouchMiniKeyboard:GetRMBItem()
 	return self.keylayout[1][3];
 end
 
@@ -420,6 +451,9 @@ function TouchMiniKeyboard:GetCtrlKey()
 	return self.keylayout[4][1];
 end
 
+function TouchMiniKeyboard:GetCneterItem()
+	return self.keylayout[2][2];
+end
 
 function TouchMiniKeyboard:SetKeyState(btnItem, isDown)
 	local parent = self:GetUIControl();
@@ -453,37 +487,37 @@ function TouchMiniKeyboard:SetKeyState(btnItem, isDown)
 	end
 
 	if(btnItem.name == "Ctrl") then
-		for row = 1, #self.keylayout do
-			for _, item in ipairs(self.keylayout[row]) do
-				local keyBtn = parent:GetChild(item.name);
-				if (item.ctrl_name) then
-					if(isDown) then
-						if item.is_change_img then
-							keyBtn.background = string.format("Texture/Aries/Creator/keepwork/MiniKey/%s_94X88_32bits.png;0 0 94 88", item.ctrl_name)
-						end
-						_guihelper.SetUIColor(keyBtn, self.colors[3].normal);
-					else
-						keyBtn.background = item.img
-						_guihelper.SetUIColor(keyBtn, self.colors[item.colorid or 1].normal);
-					end
-				elseif item.name ~= "Ctrl" then
-					if(isDown) then
-						_guihelper.SetUIColor(item.mask_object, self.colors[1].pressed)
-						_guihelper.SetUIColor(keyBtn, self.colors[1].pressed)
-					else
-						_guihelper.SetUIColor(item.mask_object, self.colors[1].normal)
-						_guihelper.SetUIColor(keyBtn, self.colors[1].normal)
-					end
-				end
-			end
-		end
+		-- for row = 1, #self.keylayout do
+		-- 	for _, item in ipairs(self.keylayout[row]) do
+		-- 		local keyBtn = item.key_object;
+		-- 		if (item.ctrl_name) then
+		-- 			if(isDown) then
+		-- 				if item.is_change_img then
+		-- 					keyBtn.background = string.format("Texture/Aries/Creator/keepwork/MiniKey/%s_94X88_32bits.png;0 0 94 88", item.ctrl_name)
+		-- 				end
+		-- 				_guihelper.SetUIColor(keyBtn, self.colors[3].normal);
+		-- 			else
+		-- 				keyBtn.background = item.img
+		-- 				_guihelper.SetUIColor(keyBtn, self.colors[item.colorid or 1].normal);
+		-- 			end
+		-- 		elseif item.name ~= "Ctrl" then
+		-- 			if(isDown) then
+		-- 				_guihelper.SetUIColor(item.mask_object, self.colors[1].pressed)
+		-- 				_guihelper.SetUIColor(keyBtn, self.colors[1].pressed)
+		-- 			else
+		-- 				_guihelper.SetUIColor(item.mask_object, self.colors[1].normal)
+		-- 				_guihelper.SetUIColor(keyBtn, self.colors[1].normal)
+		-- 			end
+		-- 		end
+		-- 	end
+		-- end
+		self:ChangeCtrlPressState(isDown)
 	end
 
 	if(btnItem.child_button) then
 		for key, child_item in pairs(btnItem.child_button) do
 			-- local keyBtn = parent:GetChild(child_item.name);
 			local keyBtn = child_item.key_object
-			-- print("ffffffffff", keyBtn.visible, child_item.name)
 			if(isDown) then
 				keyBtn.visible = true
 				child_item.mask_object.visible = true
@@ -498,7 +532,7 @@ function TouchMiniKeyboard:SetKeyState(btnItem, isDown)
 	end
 
 	if(btnItem.toggleRightMouseButton) then
-		local toggleMouseBtn = self:GetRightMouseButtonItem();
+		local toggleMouseBtn = self:GetRMBItem();
 		if(toggleMouseBtn and toggleMouseBtn~=btnItem) then
 			local keyBtn = parent:GetChild(toggleMouseBtn.name);
 			if(isDown) then
@@ -510,15 +544,13 @@ function TouchMiniKeyboard:SetKeyState(btnItem, isDown)
 		Mouse:SetTouchButtonSwapped(isDown or self.rmb_lock_state == TouchMiniKeyboard.RMBLockStateList.LockRight);
 	end
 
-	if(btnItem.click_only) then
-		-- only send click event
-		if(not isDown and not btnItem.isDragged) then
-			self:SendRawKeyEvent(btnItem, true);
-			self:SendRawKeyEvent(btnItem, false);
-		end
+	if(isDown) then
+		self:SetTransparency(1);
 	else
-		self:SendRawKeyEvent(btnItem, isDown);
+		self:SetTransparency(0.2, true);
 	end
+
+	self:SendRawKeyEvent(btnItem, isDown);
 end
 
 function TouchMiniKeyboard:SendRawKeyEvent(btnItem, isDown)
@@ -556,8 +588,6 @@ end
 function TouchMiniKeyboard:GetChildButtonItem(x, y, child_button)
 	x = x - self.left;
 	y = y - self.top;
--- print("aaaaaaaaaa", x, y)
--- echo(child_button, true)
 	for index, item in pairs(child_button) do
 		
 		if (item.top and y >= item.top and y<=item.bottom and x >= item.left and x<=item.right) then
@@ -641,6 +671,8 @@ function TouchMiniKeyboard:CreateWindow()
 	end
 
 	self:UpdateIconVisible()
+
+	self:SetTransparency(0.2, true)
 end
 
 function TouchMiniKeyboard:ChangeMouseLockStata(lock_name)
@@ -671,10 +703,30 @@ function TouchMiniKeyboard:SetColorMask(item, state)
 
 end
 
+function TouchMiniKeyboard:ShowMacroCircle(item, is_show)
+	if item.circle_object == nil then
+		local off_size = 20
+		local width = item.width + off_size
+		local height = item.height + off_size
+		local circle = ParaUI.CreateUIObject("button",item.name .. "_circle", "_lt", item.pos_x - off_size/2, item.pos_y - off_size/2, width, height);
+		_guihelper.SetUIColor(circle, self.colors[1].normal);
+		circle.enabled = false;
+		
+		circle.background = "Texture/Aries/Common/ThemeTeen/circle_32bits.png"
+		item.circle_object = circle
+		local _parent = self:GetUIControl()
+		_parent:AddChild(circle)
+	end
+	
+	local circle = item.circle_object
+	circle.visible = is_show
+
+end
+
 function TouchMiniKeyboard:UpdateRMBIcon()
 	local lock_state = self:GetRMBLockState()
 	local lock_img = TouchMiniKeyboard.RMBLockStateToImg[lock_state]
-	local btn = self:GetRightMouseButtonItem().key_object
+	local btn = self:GetRMBItem().key_object
 	btn.background = lock_img
 end
 
@@ -685,13 +737,14 @@ function TouchMiniKeyboard:UpdateIconVisible()
 		local left_col = 0;
 		for _, item in ipairs(cols) do
 			if (item.key_object) then
+				
 				if GameLogic.Macros:IsPlaying() then
 					self:SetItemButtonVisible(item, true)
 				else
-					if GameLogic.IsReadOnly() then
-						self:SetItemButtonVisible(item, item.only_read_visible)
-					else
+					if GameLogic.mode == "editor" then
 						self:SetItemButtonVisible(item, true)
+					elseif GameLogic.IsReadOnly() or GameLogic.mode == "game" then
+						self:SetItemButtonVisible(item, item.only_read_visible)
 					end
 				end
 
@@ -711,54 +764,295 @@ function TouchMiniKeyboard:SetItemButtonVisible(item, visible)
 	end
 end
 
-function TouchMiniKeyboard:ChangeKeyShow(btnItem, isDown)
-	local parent = self:GetUIControl();
-	local keyBtn = parent:GetChild(btnItem.name);
-	if(isDown) then
-		self:SetColorMask(btnItem, "pressed")
-		-- _guihelper.SetUIColor(keyBtn, self.colors[btnItem.colorid or 1].pressed);
-	else
-		-- key up event
-		-- _guihelper.SetUIColor(keyBtn, self.colors[btnItem.colorid or 1].normal);
-		self:SetColorMask(btnItem, "normal")
-	end
-
-end
-
 function TouchMiniKeyboard:ShowMacroTip(buttons)
 	if not self:isVisible() then
 		return 0
 	end
-
+	local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 	-- 这几个先暂时使用小键盘
-	if buttons == "ctrl+DIK_Z" or buttons == "ctrl+DIK_Y" or buttons == "ctrl+DIK_S" then
-		return 0
+	-- if buttons == "ctrl+DIK_Z" or buttons == "ctrl+DIK_Y" or buttons == "ctrl+DIK_S" then
+	-- 	return 0
+	-- end
+	local buttons_list = {};
+	local has_ctrl_key = false
+	local has_y_s_z = false
+	for text in buttons:gmatch("([%w_]+)") do
+		text = Macros.ConvertKeyNameToButtonText(text)
+		if text == "CTRL" then
+			has_ctrl_key = true
+		end
+
+		if string.lower(text) == "y" or string.lower(text) == "s" or string.lower(text) == "z" then
+			has_y_s_z = true
+		end
+		buttons_list[#buttons_list+1] = text;
 	end
 
-	local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+	
 	local buttons_low_str = string.lower(buttons)
-	local count = 0
-	for row = 1, #self.keylayout do
-		for _, item in ipairs(self.keylayout[row]) do
-			for text in buttons:gmatch("([%w_]+)") do
-				text = Macros.ConvertKeyNameToButtonText(text)
-				if string.lower(text) == string.lower(item.name) then
-					self:ChangeKeyShow(item, true)
-					count = count + 1
+	local key_count = 0
+	local mouse_count = 0
 
-					break
+	local need_count = 0
+	for text in buttons:gmatch("([%w_]+)") do
+		if text == "right" or text == "left" then
+			if text == "right" and self.rmb_lock_state ~= TouchMiniKeyboard.RMBLockStateList.LockRight or text == "left" and self.rmb_lock_state ~= TouchMiniKeyboard.RMBLockStateList.NoLock  then
+				self:ShowMacroCircle(self:GetRMBItem(), true)
+				mouse_count = mouse_count + 1
+			end
+		else
+			need_count = need_count + 1
+			text = Macros.ConvertKeyNameToButtonText(text)
+
+			for row = 1, #self.keylayout do
+				for _, item in ipairs(self.keylayout[row]) do
+					local lower_text = string.lower(text)
+					if (lower_text == string.lower(item.name)) or (has_ctrl_key and item.ctrl_name and string.lower(item.ctrl_name) == lower_text) then
+						self:ShowMacroCircle(item, true)
+						key_count = key_count + 1
+			
+						break
+					end
 				end
 			end
 		end
 	end
 
-	return count
+	if need_count > key_count then
+		self:ClearAllKeyDown()
+		return 0
+	end
+
+	if has_ctrl_key and need_count == 2 and mouse_count == 0 and has_y_s_z then
+		self:ShowCtrlDrawAnim()
+	end
+
+	if key_count > 0 or mouse_count > 0 then
+		self:SetTransparencyImp(1)
+	end
+
+	return key_count
 end
 
 function TouchMiniKeyboard:ClearAllKeyDown()
 	for row = 1, #self.keylayout do
 		for _, item in ipairs(self.keylayout[row]) do
-			self:ChangeKeyShow(item, false)
+			self:ShowMacroCircle(item, false)
 		end
 	end
+end
+
+function TouchMiniKeyboard:ChangeMoveState(x, y)
+	x = x - self.left;
+	y = y - self.top;
+	local state = self:GetDirectionState(x, y)
+	if state == self.cur_move_state or state == nil then
+		return
+	end
+
+	self:StopMoveState()
+	
+	self.cur_move_state = state
+	local key_name_list = TouchMiniKeyboard.DirectionKey[self.cur_move_state]
+	self:SetKeyListState(key_name_list, true)
+end
+
+function TouchMiniKeyboard:StopMoveState()
+	if self.cur_move_state then
+		local last_key_name_list = TouchMiniKeyboard.DirectionKey[self.cur_move_state]
+		self:SetKeyListState(last_key_name_list, false)
+		self.cur_move_state = nil
+	end
+end
+
+function TouchMiniKeyboard:SetKeyListState(key_name_list, state)
+	for k, v in pairs(key_name_list) do
+		for row = 1, #self.keylayout do
+			for _, item in ipairs(self.keylayout[row]) do
+				if v == item.name then
+					self:SetKeyState(item, state)
+					break
+				end
+			end
+		end
+	end
+end
+
+function TouchMiniKeyboard:GetDirectionState(x, y)
+	local center_item = self:GetCneterItem()
+	local param_y = y - (center_item.pos_y + center_item.height/2)
+	local param_x = x - (center_item.pos_x + center_item.width/2)
+	local rotation = math.atan2(-param_y,  param_x) * 180/math.pi  
+	if rotation < 22.5 and rotation >= -22.5 then
+		return "Right"
+	elseif rotation < -22.5 and rotation >= -67.5 then
+		return "DownRight"
+	elseif rotation < -67.5 and rotation >= -112.5 then
+		return "Down"
+	elseif rotation < -112.5 and rotation >= -157.5 then
+		return "DownLeft"
+	elseif rotation < -157.5 or rotation >= 157.5 then
+		return "Left"
+	elseif rotation < 157.5 and rotation >= 112.5 then
+		return "UpLeft"
+	elseif rotation < 112.5 and rotation >= 67.5 then
+		return "Up"
+	elseif rotation < 67.5 and rotation >= 22.5 then
+		return "UpRight"
+	end
+end
+
+-- @param alpha: 0-1 
+function TouchMiniKeyboard:SetTransparency(alpha, bAnimate)
+	if(self.transparency ~= alpha) then
+		if(bAnimate) then
+			self.target_transparency = alpha;
+			self.timer = self.timer or commonlib.Timer:new({callbackFunc = function(timer)
+				
+				if( math.abs(self.transparency - self.target_transparency) < self.alphaAnimSpeed ) then
+					self:SetTransparencyImp(self.target_transparency);
+					timer:Change();
+				else
+					self:SetTransparencyImp(self.transparency - self.alphaAnimSpeed*math.abs(self.transparency - self.target_transparency)/(self.transparency - self.target_transparency));
+				end
+			end})
+			self.timer:Change(3000, 33);
+		else
+			if(self.timer) then
+				self.timer:Change();
+			end
+			self:SetTransparencyImp(alpha)
+		end
+	end
+	return self;
+end
+
+function TouchMiniKeyboard:SetTransparencyImp(alpha)
+	self.transparency = alpha;
+	local _parent = self:GetUIControl();
+	_guihelper.SetColorMask(_parent, format("255 255 255 %d",math.floor(alpha * 255)))
+	_parent:ApplyAnim();
+
+	TouchMiniRightKeyboard.GetSingleton():SetTransparencyImp(alpha)
+end
+
+function TouchMiniKeyboard:ChangeCtrlPressState(is_press)
+	for row = 1, #self.keylayout do
+		for _, item in ipairs(self.keylayout[row]) do
+			local keyBtn = item.key_object;
+			if (item.ctrl_name) then
+				if(is_press) then
+					if item.is_change_img then
+						keyBtn.background = string.format("Texture/Aries/Creator/keepwork/MiniKey/%s_94X88_32bits.png;0 0 94 88", item.ctrl_name)
+					end
+					_guihelper.SetUIColor(keyBtn, self.colors[3].normal);
+				else
+					keyBtn.background = item.img
+					_guihelper.SetUIColor(keyBtn, self.colors[item.colorid or 1].normal);
+				end
+			elseif item.name ~= "Ctrl" then
+				if(is_press) then
+					_guihelper.SetUIColor(item.mask_object, self.colors[1].pressed)
+					_guihelper.SetUIColor(keyBtn, self.colors[1].pressed)
+				else
+					_guihelper.SetUIColor(item.mask_object, self.colors[1].normal)
+					_guihelper.SetUIColor(keyBtn, self.colors[1].normal)
+				end
+			end
+		end
+	end
+end
+
+function TouchMiniKeyboard:StopCtrlDrawAnim()
+	if self.circle_tween_x and self.circle_tween_y then
+		self.circle_tween_x:Stop()
+		self.circle_tween_y:Stop()
+
+		self.circle_tween_x = nil
+		self.circle_tween_y = nil
+
+		self:ChangeCtrlPressState(false)
+
+		if self.anim_circle_object then
+			self.anim_circle_object.visible = false
+		end
+	end
+
+end
+
+function TouchMiniKeyboard:ShowCtrlDrawAnim()
+	if self.circle_tween_x then
+		return
+	end
+	
+	self:ChangeCtrlPressState(true)
+
+	local start_pos = {}
+	local end_pos = {}
+
+	local item_width
+	for row = 1, #self.keylayout do
+		for _, item in ipairs(self.keylayout[row]) do
+			if item.circle_object and item.circle_object.visible then
+				if item.name == "Ctrl" then
+					start_pos.x = item.pos_x
+					start_pos.y = item.pos_y
+				else
+					end_pos.x = item.pos_x
+					end_pos.y = item.pos_y
+				end
+
+				if item_width == nil then
+					item_width = item.width
+				end
+			end
+		end
+	end
+
+	if start_pos.x == nil or start_pos.y == nil then
+		return
+	end
+
+	if nil == self.anim_circle_object then
+		
+		local off_size = 10
+		local width = item_width - 10
+		local height = item_width - 10
+
+		local circle = ParaUI.CreateUIObject("button","anim_circle", "_lt", start_pos.x, start_pos.x, width, height);
+		_guihelper.SetUIColor(circle, self.colors[1].normal);
+		circle.enabled = false;
+		
+		circle.background = "Texture/Aries/Common/ThemeTeen/circle_32bits.png"
+		self.anim_circle_object = circle
+		local _parent = self:GetUIControl()
+		_parent:AddChild(circle)
+	end
+
+	self.anim_circle_object.visible = true
+
+    self.circle_tween_x=CommonCtrl.Tween:new{
+			obj=self.anim_circle_object,
+			prop="x",
+			begin=start_pos.x,
+			change=end_pos.x - start_pos.x,
+			duration=1.5}
+
+	self.circle_tween_x.func=CommonCtrl.TweenEquations.easeNone;
+	self.circle_tween_x:Start();
+
+    self.circle_tween_y=CommonCtrl.Tween:new{
+		obj=self.anim_circle_object,
+		prop="y",
+		begin=start_pos.y,
+		change=end_pos.y - start_pos.y,
+		duration=1.5,
+		MotionFinish = function()
+			self.circle_tween_x:Start()
+			self.circle_tween_y:Start()
+		end
+	}
+
+	self.circle_tween_y.func=CommonCtrl.TweenEquations.easeNone;
+	self.circle_tween_y:Start();
 end

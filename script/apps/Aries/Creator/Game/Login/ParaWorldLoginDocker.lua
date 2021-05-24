@@ -108,8 +108,8 @@ function ParaWorldLoginDocker.InitParaWorldClient()
 	ParaWorldLoginDocker.isInited = true;
 
 	-- start paraworld analytics
-	ParaWorldAnalytics = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
-	ParaWorldAnalytics:Send("start."..(ParaWorldLoginDocker.GetCurrentAppName() or ""), ParaWorldAnalytics:AppendDateToTag("user"), 0, nil);
+	--ParaWorldAnalytics = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ParaWorldAnalytics.lua");
+	--ParaWorldAnalytics:Send("start."..(ParaWorldLoginDocker.GetCurrentAppName() or ""), ParaWorldAnalytics:AppendDateToTag("user"), 0, nil);
 	
 	
 	NPL.load("npl_packages/ParacraftBuildinMod/");

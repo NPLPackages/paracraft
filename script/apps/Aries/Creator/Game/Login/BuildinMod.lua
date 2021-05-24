@@ -46,7 +46,7 @@ local buildInModList = {
 		package_path = "npl_packages/ParacraftBuildinMod/", 
 		displayName = L"NplBrowser", 
 		text=L"系统内置插件",
-		version = "0.0.19",
+		version = "0.0.21",
 		homepage = "https://github.com/tatfook/NplBrowser",
 	},
 	{
@@ -76,6 +76,7 @@ local buildInModList = {
 		version = "1.0",
 		homepage = "https://github.com/tatfook/CodeBlockEditor",
 	},
+	--[[
 	{
 		name = "LogitowMonitor", 
 		-- package_path = "npl_packages/LogitowMonitor/", 
@@ -94,8 +95,9 @@ local buildInModList = {
 		version = "0.1",
 		homepage = "https://github.com/NPLPackages/PluginBlueTooth",
 		-- load this module when the package is loaded
-		loadOnStartup = true, 
+		-- loadOnStartup = true, 
 	},
+	]]
     {
 		name = "PyRuntime", 
 		package_path = "npl_packages/ParacraftBuildinMod/", 

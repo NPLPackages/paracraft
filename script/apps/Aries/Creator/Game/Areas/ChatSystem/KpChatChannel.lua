@@ -504,7 +504,11 @@ function KpChatChannel.CreateMcmlStrToChatWindow(chatdata)
     local orgAdmin = chatdata.orgAdmin;
     local tLevel = chatdata.tLevel;
     local timestamp = chatdata.timestamp or "";
-
+    local world_id = words:match("ID:(%d+)")
+    if world_id then
+        local str = string.format('<input type="button" value="%s" name="%s" onclick="MyCompany.Aries.Creator.ChatSystem.KpChatHelper.ToWorld" style="float:left;color:#fced4b;background:url()" />', world_id, world_id)
+        words = string.gsub(words, world_id, str)
+    end
 
     local temp_id = KpChatChannel.SetTempChatContent(chatdata)
 

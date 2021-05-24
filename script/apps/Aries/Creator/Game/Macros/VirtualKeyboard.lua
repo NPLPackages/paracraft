@@ -115,11 +115,11 @@ function VirtualKeyboard:ctor()
 			{name="End", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_END, click_only = true},
 		},
 		{
-			{name="CTRL", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, click_only = false},
+			{name="CTRL", combo=true, dragcombo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LCONTROL, click_only = false},
 			{name="ALT", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_LMENU, click_only = true},
 			{name="Space", char=" ", char2=" ",col=7, vKey = DIK_SCANCODE.DIK_SPACE, click_only = true},
 			{name="Alt", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_RMENU, click_only = true},
-			{name="Ctrl", combo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_RCONTROL, click_only = true},
+			{name="Ctrl", combo=true, dragcombo=true, col=1.5, colorid=2, vKey = DIK_SCANCODE.DIK_RCONTROL, click_only = false},
 			{name="←", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_LEFT, click_only = true},
 			{name="↓", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_DOWN, click_only = true},
 			{name="→", col=1, colorid=2, vKey = DIK_SCANCODE.DIK_RIGHT, click_only = true},
@@ -152,7 +152,12 @@ function VirtualKeyboard:Init(name, left, top, width)
 end
 
 -- @bShow: if nil, it will toggle show and hide. 
-function VirtualKeyboard:Show(bShow)
+function VirtualKeyboard:Show(bShow, is_key_up_hide)
+	-- if is_key_up_hide and not bShow then
+	-- 	print("eeeeeeeeeeeeeeeeeeeeeeeeeeeee", is_key_up_hide)
+	-- 	self.is_key_up_hide = is_key_up_hide
+	-- 	return
+	-- end
 	local _parent = self:GetUIControl();
 	if(bShow  == nil) then
 		bShow = not _parent.visible;
@@ -330,17 +335,29 @@ function VirtualKeyboard:OnTouch(touch)
 	if(touch.type == "WM_POINTERDOWN") then
 		if(btnItem) then
 			touch_session:SetField("keydownBtn", btnItem);
-			
+			btnItem.isDragged = nil;
 			self:SetKeyState(btnItem, true);
+		end
+	elseif(touch.type == "WM_POINTERUPDATE") then
+		local keydownBtn = touch_session:GetField("keydownBtn");
+		if(keydownBtn and touch_session:IsDragging()) then
+			keydownBtn.isDragged = true;
 		end
 	elseif(touch.type == "WM_POINTERUP") then
 		local keydownBtn = touch_session:GetField("keydownBtn");
 		if(keydownBtn) then
 			if(btnItem and btnItem~=keydownBtn and keydownBtn.dragcombo) then
+				local is_click_only = btnItem.click_only
+				btnItem.click_only = false
 				self:SetKeyState(btnItem, true);
-				self:SetKeyState(btnItem, false);
+				commonlib.TimerManager.SetTimeout(function()  
+					self:SetKeyState(btnItem, false);
+					self:SetKeyState(keydownBtn, false);
+					btnItem.click_only = is_click_only
+				end, 100)
+			else
+				self:SetKeyState(keydownBtn, false);
 			end
-			self:SetKeyState(keydownBtn, false);
 		end
 	end
 end
@@ -403,7 +420,25 @@ end
 
 function VirtualKeyboard:SendRawKeyEvent(btnItem, isDown)
 	if(btnItem.vKey) then
-		Keyboard:SendKeyEvent(isDown and "keyDownEvent" or "keyUpEvent", btnItem.vKey);
+		if self.key_down_num == nil then
+			self.key_down_num = 0
+		end
+		local event_name = isDown and "keyDownEvent" or "keyUpEvent"
+
+		if event_name == "keyDownEvent" then
+			self.key_down_num = self.key_down_num + 1
+		else
+			self.key_down_num = self.key_down_num - 1
+		end
+		-- print("wwwwwwwwqqqqq", self.key_down_num, self.is_key_up_hide)
+		Keyboard:SendKeyEvent(event_name, btnItem.vKey);
+
+		if self.key_down_num <= 0 and self.is_key_up_hide then
+			self:Show(false)
+
+			self.key_down_num = 0
+			self.is_key_up_hide = nil
+		end
 	end
 end
 
@@ -435,10 +470,7 @@ end
 function VirtualKeyboard:ClearAllKeyDown()
 	for row = 1, #self.keylayout do
 		for _, item in ipairs(self.keylayout[row]) do
-			if (item.isKeyDown) then
-				item.isKeyDown = false;
-				self:SetKeyState(item, false)
-			end
+			self:ShowMacroCircle(item, false)
 		end
 	end
 end
@@ -461,7 +493,12 @@ function VirtualKeyboard:CreateWindow()
 				item.right = item.left+ item.col*self.button_width;
 				item.bottom = item.top + self.button_height;
 
-				local keyBtn = ParaUI.CreateUIObject("button",item.name, "_lt", left_col*self.button_width + btn_margin, (row-1)*self.button_height+btn_margin, item.col*self.button_width-btn_margin*2, self.button_height-btn_margin*2);
+				item.width = item.col*self.button_width-btn_margin*2
+				item.height = self.button_height-btn_margin*2
+				item.pos_x = left_col*self.button_width + btn_margin
+				item.pos_y = (row-1)*self.button_height+btn_margin
+
+				local keyBtn = ParaUI.CreateUIObject("button",item.name, "_lt", item.pos_x, item.pos_y, item.width, item.height);
 				keyBtn.background = "Texture/Aries/Quest/keyboard_btn.png:10 10 10 16";
 				keyBtn.enabled = false;
 				keyBtn.text = self:GetItemDisplayText(item);
@@ -480,12 +517,12 @@ end
 
 function VirtualKeyboard:ShowButtons(button)
 	if(button) then
-		-- self:ClearAllKeyDown()
+		self:ClearAllKeyDown()
 		local count = 0
 		for text in button:gmatch("([%w_]+)") do
 			local item = self:GetButtonByName(text)
 			if(item) then
-				self:SetKeyState(item, true, true)
+				self:ShowMacroCircle(item, true)
 				count = count + 1;
 			end
 		end
@@ -514,4 +551,28 @@ function VirtualKeyboard:GetButtonByName(name)
 		name = "DIK_LMENU"
 	end
 	return self:GetButtonByKeyname(name)
+end
+
+function VirtualKeyboard:ShowMacroCircle(item, is_show)
+	if item.circle_object == nil then
+		if not is_show then
+			return
+		end
+
+		local off_size = 20
+		local width = item.height + off_size
+		local height = item.height + off_size
+		local circle = ParaUI.CreateUIObject("button",item.name .. "_circle", "_lt", item.pos_x + item.width/2 - width/2, item.pos_y - off_size/2, width, height - 5);
+		_guihelper.SetUIColor(circle, self.colors[1].normal);
+		circle.enabled = false;
+		
+		circle.background = "Texture/Aries/Common/ThemeTeen/circle_32bits.png"
+		item.circle_object = circle
+		local _parent = self:GetUIControl()
+		_parent:AddChild(circle)
+	end
+	
+	local circle = item.circle_object
+	circle.visible = is_show
+
 end
