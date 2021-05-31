@@ -802,6 +802,8 @@ function Entity:ToggleFly(bFly)
 		player:ToCharacter():SetSpeedScale(self:GetCurrentSpeedScale());
 		--tricky: this prevent switching back to walking immediately
 		player:SetField("VerticalSpeed", self:GetSpeedScale());
+		-- this fixed camera direction in mobile device. 
+		player:SetField("FlyUsingCameraDir", true);
 
 		-- BroadcastHelper.PushLabel({id="fly_tip", label = "进入飞行模式：按住鼠标右键控制方向, W键前进", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 

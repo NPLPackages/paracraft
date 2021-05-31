@@ -371,6 +371,19 @@ function QuestAction.DailyWorldTask()
         end
     end, 2500)
 end
+
+function QuestAction.Print(...)
+    if System.User.username == 'changjl' then
+        local arg={...}
+        local str = ""
+        for index, v in ipairs(arg) do
+            str = str .. ", " .. tostring(v)
+        end
+        str = str .. "   time:" .. os.time()
+        commonlib.echo(str)
+    end
+end
+
 -- 结束某个任务
 function QuestAction.FinishDailyTask(task_id)
     local clientData = QuestAction.GetClientData()
@@ -388,6 +401,10 @@ end
 function QuestAction.GetClientData()
 	local clientData = KeepWorkItemManager.GetClientData(QuestAction.task_gsid) or {};
     local is_new_day, time_stamp = QuestAction.CheckIsNewDay(clientData)
+    QuestAction.Print("aaaaaaaaaaaaaaaaaaaaaaaaaa", is_new_day, time_stamp, QuestAction.task_gsid)
+    if System.User.username == 'changjl' then
+        echo(clientData, true)
+    end
     if is_new_day then
         local course_world_id = clientData.course_world_id
         QuestAction.DailyTaskData.course_teacher_id = clientData.course_teacher_id
@@ -411,12 +428,13 @@ function QuestAction.CheckIsNewDay(clientData)
     local time_stamp = clientData.time_stamp or 0;
 	-- 获取今日凌晨的时间戳 1603949593
     local cur_time_stamp = QuestAction.GetServerTime() or 0
+    QuestAction.Print("bbbbbbbbbbbbbbbbbbbb",cur_time_stamp)
     if cur_time_stamp == nil or cur_time_stamp == 0 then
         cur_time_stamp = os.time()
     end
     
 	local day_time_stamp = commonlib.timehelp.GetWeeHoursTimeStamp(cur_time_stamp)
-
+    QuestAction.Print("ccccccccccccccc",day_time_stamp, time_stamp)
 	-- 天数改变 清除数据
 	if day_time_stamp > time_stamp then
 		return true, day_time_stamp
@@ -749,132 +767,4 @@ function QuestAction.GetAskTimes()
 	local clientData = QuestAction.GetClientData()
     local ask_times = clientData.ask_times or 0
     return ask_times
-end
-
-function QuestAction.GenerateActivationCodes(count, private_key)
-    count = count or 5
-    private_key = QuestAction.GetCurrentSearchKey("yang1")
-
-
-    local key_list = ""
-    for i = 1, count do
-        local key = QuestAction.EncodeKeys(private_key, 1001, mathlib.bit.band(math.random(10, 9999), 0xff))
-        key_list = key_list .. key .. "\n"
-        -- print("ccccccccc", key)
-        QuestAction.DecodeKeys(key)
-    end
-
-    -- local filename = os.time()
-    local date = os.date("%Y-%m-%d")
-    local filename = os.date("%H%M%S") .. ".txt"
-    print("cccc", filename)
-    local folder_path = string.format("%s/%s", ParaIO.GetWritablePath().."temp/Key", date)
-    local file_path = string.format("%s/%s", folder_path, filename)
-	ParaIO.CreateDirectory(file_path)
-	local file = ParaIO.open(file_path, "w");
-
-	if(file) then
-		file:write(key_list, #key_list);
-		file:close();
-	end
-    -- ccccccccc	C:\yang\work_pro\paracraft_dev\npl_packages\Agents\Mod\Agents\
-    local path = string.gsub(folder_path, "/", "\\")
-    ParaGlobal.ShellExecute("open", "explorer.exe", path, "", 1)
-end
-
-function QuestAction.EncodeKeys(nKey1, nKey2, nKey3)
-    nKey2 = mathlib.bit.band(0xffffff, nKey2)
-    nKey3 = mathlib.bit.band(0xff, nKey3)
-    -- print("cccccccccccc", mathlib.bit.band(0xffffff, 100), mathlib.bit.band(math.random(1, 1000), 0xff))
-    local part1 = QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey1, nKey3)
-    local part2 = mathlib.bit.lshift(QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey2, nKey3), 8)
-    part2 = part2 + nKey3
-    local num_a = mathlib.bit.rshift(part1, 16)
-    local num_b = mathlib.bit.band(part1, 0xffff)
-    local num_c = mathlib.bit.rshift(part2, 16)
-    local num_d = mathlib.bit.band(part2, 0xffff)
-
-    return string.format("%sx-%sx-%sx-%sx", num_a, num_b, num_c, num_d)
-end
-
-function QuestAction.DecodeKeys(sActivationCode)
-    local parts = commonlib.split(sActivationCode,"x-");
-
-	local nKey3 = mathlib.bit.band(0xff, parts[4])
-	local nKey1 = mathlib.bit.lshift(parts[1], 16)+parts[2];
-	nKey1 = QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey1, nKey3);
-	local nKey2 = mathlib.bit.lshift(parts[3], 8)+mathlib.bit.rshift(parts[4], 8);
-	nKey2 = mathlib.bit.band(QuestAction.SYMETRIC_ENCODE_32_BY_8(nKey2, nKey3), 0x00ffffff);
-end
-
-function QuestAction.SYMETRIC_ENCODE_32_BY_8(a, k)
-    
-    local encode_a = mathlib.bit.band(mathlib.bit.bxor(a, (mathlib.bit.lshift(k, 24))), 0xff000000)
-    local encode_b = mathlib.bit.band(mathlib.bit.bxor(a, (mathlib.bit.lshift(k, 16))), 0x00ff0000)
-    local encode_c = mathlib.bit.band(mathlib.bit.bxor(a, (mathlib.bit.lshift(k, 8))), 0x0000ff00)
-    local encode_d = mathlib.bit.band(mathlib.bit.bxor(a, k), 0x000000ff)
-
-
-    -- local encode_b = mathlib.bit.band((a^(mathlib.bit.lshift(k, 16))), 0x00ff0000)
-    -- local encode_c = mathlib.bit.band((a^(mathlib.bit.lshift(k, 8)))), 0x0000ff00)
-    -- local encode_d = mathlib.bit.band((a^(mathlib.bit.lshift(k)))), 0x000000ff)
-    return  encode_a + encode_b + encode_c + encode_d
-end
-
-function QuestAction.CharToBase64(byte)
-    local n = 0
-    if byte >= string.byte('0') and byte <= string.byte('9') then
-        n=byte - string.byte('0')
-    elseif byte>= string.byte('a') and byte <= string.byte('z') then
-        n=10+byte - string.byte('a')
-    elseif byte >= string.byte('A') and byte <= string.byte('Z') then
-        n=36+byte - string.byte('A')
-    elseif byte == string.byte('.') then
-        n=63;
-    end
-
-    return n
-end
-
-function QuestAction.Base64ToChar(num)
-    local char = ""
-    if num < 10 then
-        char = string.char(string.byte('0') + num)
-    elseif num < 36 then
-        char = string.char(string.byte('a') + num)
-    elseif num < 62 then
-        char = string.char(string.byte('A') + num)
-    else
-        char = '.'
-    end
-
-    return char
-end
-
-function QuestAction.isValidActivationCode()
-    -- body
-end
-
-function QuestAction.GetCurrentSearchKey(serach_key)
-    local key_num = 0
-    for index = 1, #serach_key do
-        key_num = mathlib.bit.lshift(key_num, 6) + QuestAction.CharToBase64(string.byte(serach_key, index))
-    end
-    
-    return key_num
-end
-
-function QuestAction.DecodeSearchKey(key_num)
-    local str = ""
-    while (key_num > 0) do
-        local rshift = mathlib.bit.rshift(key_num, 6)
-        local byte = key_num - rshift
-        -- print("bbbb", key_num , rshift)
-        local char = QuestAction.Base64ToChar(byte)
-
-        str = char .. str
-        key_num = rshift
-    end
-
-    print("dddddddddddd", str)
 end

@@ -186,6 +186,11 @@ function getEmailTitle(str)
     return Email.GetStrWithLength(str,22)
 end
 
+function CanShowRedTip(type)
+    local count = Email.GetUnReadMsgWithType(type)
+    return count > 0
+end
+
 ]]></script>
 <kp:window name="iframe" width="1040" height="600" icon="Texture/Aries/Creator/keepwork/Email/biaoti_youjian_32bits.png"  help_type ="email"  onclose="ClosePage">
     <div style="color:#ffffff;width:1040px;height:600px" class="kp_window_container">
@@ -197,12 +202,18 @@ end
                             <div style="color:#ffffff;width: 106px;height: 34px;float: left;">
                                 <input type="button" value='' zorder=-1 name = '<%=Eval("index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' alwaysmouseover="true" style="position: relative; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/Email/btn_qiehuan2_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
                                 <%=Eval("word_div") %>
+                                <pe:if condition='<%=CanShowRedTip(Eval("msg_type"))%>'>
+                                    <kp:redtip style="position:relative;margin-left:98px;margin-top:-26px;" value="true" ></kp:redtip>
+                                </pe:if>
                             </div>
                         </pe:if> 
                         <pe:if condition='<%=not IsSelect(Eval("index")) %>'>
                             <div style="color:#ffffff;width: 106px;height: 34px;float: left;">
                                 <input type="button" value='' zorder=-1 name = '<%=Eval("index") %>' onclick="ClickItem" param1='<%=Eval("index") %>' alwaysmouseover="true" style="position: relative; margin-top:0px;width:106px;height:34px;background:url(Texture/Aries/Creator/keepwork/Email/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
                                 <%=Eval("word_div") %>
+                                <pe:if condition='<%=CanShowRedTip(Eval("msg_type"))%>'>
+                                    <kp:redtip style="position:relative;margin-left:98px;margin-top:-26px;" value="true" ></kp:redtip>
+                                </pe:if>
                             </div>
                         </pe:if> 
                  </Columns>                

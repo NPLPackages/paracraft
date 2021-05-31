@@ -27,6 +27,7 @@ local isFavorited= false;
 local favoriteCount = 0;
 local isCodeOn = true;
 local asset = "character/CC/02human/paperman/boy01.x";
+local skin = nil;
 local timer;
 
 function ParaWorldUserInfo.OnInit()
@@ -132,8 +133,10 @@ function ParaWorldUserInfo.Refresh(userId)
 				keepwork.user.getinfo({router_params = {id = id}}, function(err, msg, data)
 					if (data and data.extra and data.extra.ParacraftPlayerEntityInfo and data.extra.ParacraftPlayerEntityInfo.asset) then
 						asset = data.extra.ParacraftPlayerEntityInfo.asset;
+						skin = data.extra.ParacraftPlayerEntityInfo.skin;
 					end
 					page:CallMethod("UserPlayer", "SetAssetFile", asset);
+					page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
 				end);
 			end);
 		end);
@@ -176,6 +179,7 @@ function ParaWorldUserInfo.OnClickStar()
 			starCount = starCount + 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
 
 			GameLogic.QuestAction.SetDailyTaskValue("40012_1", nil, 1)
 		end
@@ -190,6 +194,7 @@ function ParaWorldUserInfo.OnClickFavorite()
 			favoriteCount = favoriteCount + 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
 		end
 	end);
 	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.home.favorited");
@@ -202,6 +207,7 @@ function ParaWorldUserInfo.OnClickUnFavorite()
 			favoriteCount = favoriteCount - 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
 		end
 	end);
 end

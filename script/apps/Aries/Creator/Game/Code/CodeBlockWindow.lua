@@ -968,9 +968,9 @@ function CodeBlockWindow.OnClickEditMode(name,bForceRefresh)
 	end
 	if(CodeBlockWindow.IsBlocklyEditMode()) then
 		if(name == "codeMode") then
+			CodeBlockWindow.CloseNplBlocklyEditorPage();
 			entity:SetBlocklyEditMode(false);
 			CodeBlockWindow.UpdateCodeEditorStatus();
-			CodeBlockWindow.CloseNplBlocklyEditorPage();
 		end
 	else
 		if(name == "blockMode") then

@@ -66,11 +66,11 @@ function ClientUpdater:CopyAssetsToWritablePath()
 
 	local fileList = {
 		'version.txt',
-		'assets_manifest.txt',
-		'npl_packages/ParacraftBuildinMod.zip',
-		'main.pkg',
-		'main_mobile_res.pkg',
-		'main150727.pkg',
+		-- 'assets_manifest.txt',
+		-- 'npl_packages/ParacraftBuildinMod.zip',
+		-- 'main.pkg',
+		-- 'main_mobile_res.pkg',
+		-- 'main150727.pkg',
 	}
 
 	for key, item in ipairs(fileList) do
@@ -101,9 +101,17 @@ function ClientUpdater:Check(callbackFunc)
 
 		if(bSucceed) then
 			if(self.autoUpdater:isNeedUpdate())then
-				callbackFunc(true, self.autoUpdater:getLatestVersion());
+				callbackFunc(
+					true,
+					self.autoUpdater:getLatestVersion(),
+					self.autoUpdater._comparedVersion
+				);
 			else
-				callbackFunc(false, self.autoUpdater:getLatestVersion());
+				callbackFunc(
+					false,
+					self.autoUpdater:getLatestVersion(),
+					self.autoUpdater._comparedVersion
+				);
 			end
 		else
 			LOG.std(nil, "info", "ClientUpdater", "version error");
@@ -120,7 +128,7 @@ function ClientUpdater:Download(callback)
 	end)
 end
 function ClientUpdater:OnClickUpdate()
-	ParaGlobal.ShellExecute("open", L"http://paracraft.keepwork.com/download?lang=zh", "", "", 1);
+	ParaGlobal.ShellExecute("open", L"https://www.paracraft.cn/download", "", "", 1);
 end
 
 function ClientUpdater:GetCurrentVersion()

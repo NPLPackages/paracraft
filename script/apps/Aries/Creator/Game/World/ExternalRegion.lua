@@ -112,6 +112,12 @@ function ExternalRegion:Save()
 	-- TODO: we need to find a way to save bmax files to dest directory during Block template saving
 end
 
+function ExternalRegion:HasBlocks()
+	if(ParaIO.DoesAssetFileExist(self.regionRawFilename, true)) then
+		return true
+	end
+end
+
 -- better backup the world before this
 -- @param worldpath: if nil, it will be current working directory
 function ExternalRegion:SaveAs(worldpath, regionX, regionY)

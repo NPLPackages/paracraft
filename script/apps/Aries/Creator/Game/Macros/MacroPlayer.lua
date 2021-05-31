@@ -174,12 +174,12 @@ function MacroPlayer.ShowPage()
 	end
 
 	if System.options.isDevMode then
-		local pro_mcml_node = page:GetNode("root")
-		local pro_ui_object = ParaUI.GetUIObject(pro_mcml_node.uiobject_id)
+		-- local pro_mcml_node = page:GetNode("root")
+		-- local pro_ui_object = ParaUI.GetUIObject(pro_mcml_node.uiobject_id)
 		
-		pro_ui_object:SetScript("onmousedown", function() MacroPlayer.OnMouseDown({type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
-		pro_ui_object:SetScript("onmouseup", function() MacroPlayer.OnMouseUp({type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
-		pro_ui_object:SetScript("onmousemove", function() MacroPlayer.OnMouseMove({type="WM_POINTERUPDATE", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+		-- pro_ui_object:SetScript("onmousedown", function() MacroPlayer.OnMouseDown({type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+		-- pro_ui_object:SetScript("onmouseup", function() MacroPlayer.OnMouseUp({type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
+		-- pro_ui_object:SetScript("onmousemove", function() MacroPlayer.OnMouseMove({type="WM_POINTERUPDATE", x=mouse_x, y=mouse_y, id=-1, time=0}) end);
 	end
 
 end

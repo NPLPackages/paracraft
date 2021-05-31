@@ -471,7 +471,13 @@ function Macros:AddMacro(text, ...)
 				-- tricky: swap WindowInputMethod and WindowKeyPressTrigger, so that trigger is always before input method
 				if(mTrigger.name == "WindowKeyPressTrigger") then
 					local lastMacro = self.macros[#self.macros - 1]
-					if(lastMacro and lastMacro.name == "WindowInputMethod") then
+					local lastLastMacro = self.macros[#self.macros - 2];
+					if(lastLastMacro and lastMacro.name == "Idle" and lastLastMacro.name == "WindowInputMethod") then
+						local nCount = #self.macros;
+						self.macros[nCount - 2], self.macros[nCount-1] = lastMacro, lastLastMacro;
+						lastMacro = lastLastMacro;
+					end
+					if((lastMacro and lastMacro.name == "WindowInputMethod")) then
 						local nCount = #self.macros;
 						self.macros[nCount - 1], self.macros[nCount] = mTrigger, lastMacro;
 					end

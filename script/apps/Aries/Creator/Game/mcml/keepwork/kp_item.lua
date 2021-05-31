@@ -9,6 +9,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_item.lua");
 local kp_item = commonlib.gettable("MyCompany.Aries.Game.mcml.kp_item");
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 
 local kp_item = commonlib.gettable("MyCompany.Aries.Game.mcml.kp_item");
 function kp_item.render_callback(mcmlNode, rootName, bindingContext, _parent, left, top, right, bottom, myLayout, css)
@@ -32,9 +34,18 @@ function kp_item.render_callback(mcmlNode, rootName, bindingContext, _parent, le
     if(itemTemplate and itemTemplate.icon)then
         background = itemTemplate.icon;
     end
+
+	if background == "1" then
+		local item = CustomCharItems:GetItemById(tostring(gsid))
+		if item then
+			background = item.icon
+		end
+    end
+
     if(not background or background == "" or background == "0")then
         background = string.format("Texture/Aries/Creator/keepwork/items/item_%d_32bits.png",gsid);
     end
+
 	_this.background = background;
 
 	

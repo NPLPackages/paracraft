@@ -75,6 +75,8 @@ function Entity:init()
 		obj:SetField("Physics Radius", 0.3);
 		obj:SetField("PhysicsHeight", 0.5);
 		obj:SetDensity(0);
+		-- this fixed camera direction in mobile device. 
+		obj:SetField("FlyUsingCameraDir", true);
 	end
 	return self;
 end

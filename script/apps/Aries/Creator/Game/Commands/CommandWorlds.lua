@@ -574,11 +574,13 @@ Commands["copyregion"] = {
 			if(fromX < 64 and fromY < 64 and toX < 64 and toY < 64) then
 				local function CopyRegion_()
 					local region = ExternalRegion:new():Init(nil, fromX, fromY)
-					region:SaveAs(toWorldName, toX, toY)
+					if(region:HasBlocks()) then
+						region:SaveAs(toWorldName, toX, toY)
 
-					if(not toWorldName) then
-						local region = ExternalRegion:new():Init(nil, toX, toY)
-						region:Load()
+						if(not toWorldName) then
+							local region = ExternalRegion:new():Init(nil, toX, toY)
+							region:Load()
+						end
 					end
 				end
 				if(options.s or options.silent) then
@@ -593,6 +595,64 @@ Commands["copyregion"] = {
 	end,
 };
 
+Commands["moveregion"] = {
+	name="moveregion", 
+	quick_ref="/moveregion [-silent|s] fromX fromY toX toY [toWorldName]", 
+	desc=[[copy everything from one region to another region
+/moveregion 37 37 37 38
+-- silently copy region(37,37) to region(37,38) of another world
+/moveregion -s 37 37 37 38 lixizhi_main
+/moveregion -s 37 37 37 38 c:/temp/absolut_world_path/
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		if(GameLogic.IsReadOnly()) then
+			LOG.std(nil, "warn", "moveregion", "access denied in read only world");
+			return
+		end
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/World/ExternalRegion.lua");
+		local ExternalRegion = commonlib.gettable("MyCompany.Aries.Game.World.ExternalRegion");
+
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
+		local fromX, fromY, toX, toY, toWorldName
+		fromX, cmd_text = CmdParser.ParseInt(cmd_text);
+		fromY, cmd_text = CmdParser.ParseInt(cmd_text);
+		toX, cmd_text = CmdParser.ParseInt(cmd_text);
+		toY, cmd_text = CmdParser.ParseInt(cmd_text);
+		toWorldName, cmd_text = CmdParser.ParseFilename(cmd_text);
+		if(toWorldName) then
+			if(not toWorldName:match("[/\\]")) then
+				toWorldName = GameLogic.GetWorldDirectory():gsub("[^/]+/?$", commonlib.Encoding.Utf8ToDefault(toWorldName))
+			end
+			-- TODO: check if the world exists and we own the world, for copy right reasons
+		end
+		if(fromX and fromY and toX and toY) then
+			if(fromX < 64 and fromY < 64 and toX < 64 and toY < 64) then
+				local function MoveRegion_()
+					local region = ExternalRegion:new():Init(nil, fromX, fromY)
+					if(region:HasBlocks()) then
+						region:SaveAs(toWorldName, toX, toY)
+
+						if(not toWorldName) then
+							local region = ExternalRegion:new():Init(nil, toX, toY)
+							region:Load()
+						end
+						region:ClearRegion()
+					end
+				end
+				if(options.s or options.silent) then
+					MoveRegion_()
+				else
+					_guihelper.MessageBox(L"[警告] 操作不可逆, 建议先备份世界后再进行。是否任然继续？", function()
+						MoveRegion_()
+					end)
+				end
+			end
+		end
+	end,
+};
 
 Commands["loadregionex"] = {
 	name="loadregionex", 

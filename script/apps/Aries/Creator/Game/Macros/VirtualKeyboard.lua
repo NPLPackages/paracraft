@@ -164,6 +164,10 @@ function VirtualKeyboard:Show(bShow, is_key_up_hide)
 	end
 	self.bIsVisible = bShow;
 	_parent.visible = bShow;
+
+	if not bShow then
+		self:StopCtrlDrawAnim()
+	end
 end
 
 function VirtualKeyboard:isVisible()
@@ -518,14 +522,25 @@ end
 function VirtualKeyboard:ShowButtons(button)
 	if(button) then
 		self:ClearAllKeyDown()
+		self:StopCtrlDrawAnim()
 		local count = 0
+		local has_ctrl_key = false
 		for text in button:gmatch("([%w_]+)") do
 			local item = self:GetButtonByName(text)
 			if(item) then
 				self:ShowMacroCircle(item, true)
 				count = count + 1;
+
+				if item.name == "CTRL" then
+					has_ctrl_key = true
+				end
 			end
 		end
+
+		if has_ctrl_key and count == 2 then
+			self:ShowCtrlDrawAnim()
+		end
+
 		return count;
 	end
 end
@@ -575,4 +590,94 @@ function VirtualKeyboard:ShowMacroCircle(item, is_show)
 	local circle = item.circle_object
 	circle.visible = is_show
 
+end
+
+function VirtualKeyboard:StopCtrlDrawAnim()
+	if self.circle_tween_x and self.circle_tween_y then
+		self.circle_tween_x:Stop()
+		self.circle_tween_y:Stop()
+
+		self.circle_tween_x = nil
+		self.circle_tween_y = nil
+
+		if self.anim_circle_object then
+			self.anim_circle_object.visible = false
+		end
+	end
+
+end
+
+function VirtualKeyboard:ShowCtrlDrawAnim()
+	if self.circle_tween_x then
+		return
+	end
+
+	local start_pos = {}
+	local end_pos = {}
+
+	local item_width
+	for row = 1, #self.keylayout do
+		for _, item in ipairs(self.keylayout[row]) do
+			if item.circle_object and item.circle_object.visible then
+				if item.name == "CTRL" then
+					start_pos.x = item.pos_x
+					start_pos.y = item.pos_y
+				else
+					end_pos.x = item.pos_x
+					end_pos.y = item.pos_y
+				end
+
+				if item_width == nil then
+					item_width = item.width
+				end
+			end
+		end
+	end
+
+	if start_pos.x == nil or start_pos.y == nil then
+		return
+	end
+
+	if nil == self.anim_circle_object then
+		
+		local off_size = 10
+		local width = item_width - 10
+		local height = item_width - 10
+
+		local circle = ParaUI.CreateUIObject("button","macro_anim_circle", "_lt", start_pos.x, start_pos.x, width, height);
+		_guihelper.SetUIColor(circle, self.colors[1].normal);
+		circle.enabled = false;
+		
+		circle.background = "Texture/Aries/Common/ThemeTeen/circle_32bits.png"
+		self.anim_circle_object = circle
+		local _parent = self:GetUIControl()
+		_parent:AddChild(circle)
+	end
+
+	self.anim_circle_object.visible = true
+
+    self.circle_tween_x=CommonCtrl.Tween:new{
+			obj=self.anim_circle_object,
+			prop="x",
+			begin=start_pos.x,
+			change=end_pos.x - start_pos.x,
+			duration=1.5}
+
+	self.circle_tween_x.func=CommonCtrl.TweenEquations.easeNone;
+	self.circle_tween_x:Start();
+
+    self.circle_tween_y=CommonCtrl.Tween:new{
+		obj=self.anim_circle_object,
+		prop="y",
+		begin=start_pos.y,
+		change=end_pos.y - start_pos.y,
+		duration=1.5,
+		MotionFinish = function()
+			self.circle_tween_x:Start()
+			self.circle_tween_y:Start()
+		end
+	}
+
+	self.circle_tween_y.func=CommonCtrl.TweenEquations.easeNone;
+	self.circle_tween_y:Start();
 end

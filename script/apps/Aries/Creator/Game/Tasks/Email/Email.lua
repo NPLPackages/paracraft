@@ -26,6 +26,7 @@ Email.MsgType = {
 	organization = 1,
 	system = 2,
 	interaction = 3,
+	email = 4,
 }
 -- 与服务器的类型对应
 Email.InteractionType = {
@@ -61,6 +62,7 @@ Email.select_button_index = 1
 local FollowList = {}
 local ProjectList = {}
 local MsgStateList = {}
+local UnReadMsgData = {}
 function Email.OnInit()
 	page = document:GetPageCtrl();
 	page.OnClose = Email.CloseView
@@ -111,7 +113,8 @@ function Email.ShowView()
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	
 	Email.isOpen = true
-	Email.RequestAllMsg()
+	--Email.RequestAllMsg()
+	Email.GetUnReadMsg()
 	EmailManager.Init()
 end
 
@@ -179,12 +182,47 @@ function Email.RequestAllMsg()
 	end)  
 end
 
+function Email.GetUnReadMsg()
+	keepwork.msgcenter.unReadCount({
+    },function(err, msg, data)
+        if err == 200 then
+			local msgdata = data.data
+            UnReadMsgData.orgMsgCount = msgdata.orgMsgCount
+			UnReadMsgData.sysMsgCount = msgdata.sysMsgCount
+			UnReadMsgData.interactionMsgCount = msgdata.interactionMsgCount
+        end
+    end)
+end
+
+function Email.UpdateUnReadMsg(type)
+	if type == Email.MsgType.interaction then
+		UnReadMsgData.interactionMsgCount = 0
+	elseif type == Email.MsgType.organization then
+		UnReadMsgData.orgMsgCount = 0
+	elseif type == Email.MsgType.system then
+		UnReadMsgData.sysMsgCount = 0
+	end
+end
+
+function Email.GetUnReadMsgWithType(type)
+	if type == Email.MsgType.interaction then
+		return UnReadMsgData.interactionMsgCount or 0
+	elseif type == Email.MsgType.organization then
+		return UnReadMsgData.orgMsgCount or 0
+	elseif type == Email.MsgType.system then
+		return UnReadMsgData.sysMsgCount or 0
+	elseif type == Email.MsgType.email then
+		return 0
+	end
+end
+
 function Email.RequestMsgByType(type)
 	keepwork.msgcenter.byType({
 		msgType = type,
 		-- orgId = 0,
 	},function(err, msg, data)
 		Email.server_data = data.data
+		Email.UpdateUnReadMsg(type)
 		Email.HandleData(Email.server_data, function()
 			Email.FlushView()
 			Email.ChangeMsgState()
