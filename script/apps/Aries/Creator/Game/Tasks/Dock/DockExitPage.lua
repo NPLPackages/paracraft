@@ -51,6 +51,7 @@ function DockExitPage.OnClick(id)
         end
         -- GameLogic.RunCommand("/menu file.exit");
     end
+    DockExitPage.OnClose()
 end
 
 function DockExitPage.OnClose()

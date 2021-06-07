@@ -34,6 +34,8 @@ rpc:new():init(
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
+NPL.load("(gl)script/ide/System/Encoding/crc32.lua");
+local Encoding = commonlib.gettable("System.Encoding");
 local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
@@ -46,7 +48,7 @@ MakeApp.mode = {
 	UI = 1,
 }
 
-MakeApp.curAndroidVersion = '2.0.4';
+MakeApp.curAndroidVersion = '2.0.6';
 MakeApp.androidBuildRoot = 'temp/build_android_resource/';
 
 function MakeApp:ctor()
@@ -224,7 +226,7 @@ function MakeApp:AndroidUpdateManifest(callback)
 						local pLine = string.match(line, '(.+package%=)%"');
 
 						if (pLine) then
-							content = content .. pLine .. '"com.tatfook.paracraft.user"\n' ;
+							content = content .. pLine .. '"com.tatfook.paracraft.world.c' .. Encoding.crc32(currentEnterWorld.foldername) .. '"\n' ;
 						else
 							content = content .. line .. '\n';
 						end
@@ -281,7 +283,33 @@ function MakeApp:AndroidUnzipApk(callback)
 		self.androidBuildRoot .. 'paracraft_android_ver' .. self.curAndroidVersion .. '/',
 		self.androidBuildRoot .. 'paracraft_ver' .. self.curAndroidVersion .. '.zip',
 		function()
+			-- Delete META-INF
 			ParaIO.DeleteFile(self.androidBuildRoot .. 'paracraft_android_ver' .. self.curAndroidVersion .. '/META-INF/');
+
+			-- Add bat tools
+			local testAssetsWin32BatPath = self.androidBuildRoot .. 'paracraft_android_ver' .. self.curAndroidVersion .. '/assets/test_assets_win32.bat';
+			local removeUserDataBatPath = self.androidBuildRoot .. 'paracraft_android_ver' .. self.curAndroidVersion .. '/assets/remove_user_data.bat';
+
+			local testAssetsWin32BatFile = ParaIO.open(testAssetsWin32BatPath, "w");
+
+			if (testAssetsWin32BatFile:IsValid()) then
+				local content = '@echo off\n' ..
+							    'start %~dp0\\..\\..\\..\\..\\ParaEngineClient.exe single="false" httpdebug="true" debug="main" mc="true" IsTouchDevice="true"';
+
+				testAssetsWin32BatFile:write(content, #content);
+				testAssetsWin32BatFile:close();
+			end
+
+			local removeUserDataBatFile = ParaIO.open(removeUserDataBatPath, "w");
+
+			if (removeUserDataBatFile:IsValid()) then
+				local content = '@echo off\n' ..
+								'rd /s /q _emptyworld "temp\tempdatabase" "Screen Shots"\n' ..
+								'del log.txt Database\\creator_profile.db Database\\localserver.db Database\\localserver.ver Database\\userdata.db';
+
+				removeUserDataBatFile:write(content, #content);
+				removeUserDataBatFile:close();
+			end
 
 			GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close');
 
@@ -292,7 +320,7 @@ function MakeApp:AndroidUnzipApk(callback)
 	)
 end
 
-function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, callback)
+function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, loginEnable, callback)
 	GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在拷贝世界，请稍候...', 120000, nil, 350);
 	local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
 
@@ -303,6 +331,46 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, callback)
 	
 			if not fileList or type(fileList) ~= 'table' or #fileList == 0 then
 				return;
+			end
+
+			for key, item in ipairs(fileList) do
+				if item.filename == "icon.png" then
+					local worldIcon = item.file_path;
+
+					ParaIO.CreateDirectory(self.androidBuildRoot .. 'backup/');
+
+					local drawableHdpiV4IconPath = self.androidBuildRoot ..
+												   'paracraft_android_ver' .. self.curAndroidVersion ..
+												   '/res/drawable-hdpi-v4/ic_launcher.png';
+					local drawableXhdpiV4IconPath = self.androidBuildRoot ..
+												   'paracraft_android_ver' .. self.curAndroidVersion ..
+												   '/res/drawable-xhdpi-v4/ic_launcher.png';
+					local drawableXxhdpiV4IconPath = self.androidBuildRoot ..
+												   'paracraft_android_ver' .. self.curAndroidVersion ..
+												   '/res/drawable-xxhdpi-v4/ic_launcher.png';
+
+					local drawableHdpiV4BackupIconPath = self.androidBuildRoot .. 'backup/drawable_hdpi_v4_icon.png';
+					local drawableXhdpiV4BackupIconPath = self.androidBuildRoot .. 'backup/drawable_xhdpi_v4_icon.png';
+					local drawableXxhdpiV4BackupIconPath = self.androidBuildRoot .. 'backup/drawable_xxhdpi_v4_icon.png';
+
+					if (not ParaIO.DoesFileExist(drawableHdpiV4BackupIconPath)) then
+						ParaIO.CopyFile(drawableHdpiV4IconPath, drawableHdpiV4BackupIconPath, true);
+					end
+
+					if (not ParaIO.DoesFileExist(drawableXhdpiV4BackupIconPath)) then
+						ParaIO.CopyFile(drawableXhdpiV4IconPath, drawableXhdpiV4BackupIconPath, true);
+					end
+
+					if (not ParaIO.DoesFileExist(drawableXxhdpiV4BackupIconPath)) then
+						ParaIO.CopyFile(drawableXxhdpiV4IconPath, drawableXxhdpiV4BackupIconPath, true);
+					end
+
+					ParaIO.CopyFile(worldIcon, drawableHdpiV4IconPath, true);
+					ParaIO.CopyFile(worldIcon, drawableXhdpiV4IconPath, true);
+					ParaIO.CopyFile(worldIcon, drawableXxhdpiV4IconPath, true);
+
+					break;
+				end
 			end
 	
 			local apkWorldPath = self.androidBuildRoot .. 'paracraft_android_ver' .. self.curAndroidVersion .. '/assets/worlds/DesignHouse/' ..
@@ -347,6 +415,10 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, callback)
 							content = content .. ' noclientupdate="true"';
 						end
 
+						if (loginEnable) then
+							content = content .. ' login_enable="true"';
+						end
+
 						writeFile:write(content, #content);
 						writeFile:close();
 					end
@@ -364,6 +436,46 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, callback)
 	
 			if not fileList or type(fileList) ~= 'table' or #fileList == 0 then
 				return;
+			end
+
+			for key, item in ipairs(fileList) do
+				if item.filename == "icon.png" then
+					local worldIcon = item.file_path;
+
+					ParaIO.CreateDirectory(self.androidBuildRoot .. 'backup/');
+
+					local drawableHdpiV4IconPath = self.androidBuildRoot ..
+												   'paracraft_android_ver' .. self.curAndroidVersion ..
+												   '/res/drawable-hdpi-v4/ic_launcher.png';
+					local drawableXhdpiV4IconPath = self.androidBuildRoot ..
+												   'paracraft_android_ver' .. self.curAndroidVersion ..
+												   '/res/drawable-xhdpi-v4/ic_launcher.png';
+					local drawableXxhdpiV4IconPath = self.androidBuildRoot ..
+												   'paracraft_android_ver' .. self.curAndroidVersion ..
+												   '/res/drawable-xxhdpi-v4/ic_launcher.png';
+
+					local drawableHdpiV4BackupIconPath = self.androidBuildRoot .. 'backup/drawable_hdpi_v4_icon.png';
+					local drawableXhdpiV4BackupIconPath = self.androidBuildRoot .. 'backup/drawable_xhdpi_v4_icon.png';
+					local drawableXxhdpiV4BackupIconPath = self.androidBuildRoot .. 'backup/drawable_xxhdpi_v4_icon.png';
+
+					if (not ParaIO.DoesFileExist(drawableHdpiV4BackupIconPath)) then
+						ParaIO.CopyFile(drawableHdpiV4IconPath, drawableHdpiV4BackupIconPath, true);
+					end
+
+					if (not ParaIO.DoesFileExist(drawableXhdpiV4BackupIconPath)) then
+						ParaIO.CopyFile(drawableXhdpiV4IconPath, drawableXhdpiV4BackupIconPath, true);
+					end
+
+					if (not ParaIO.DoesFileExist(drawableXxhdpiV4BackupIconPath)) then
+						ParaIO.CopyFile(drawableXxhdpiV4IconPath, drawableXxhdpiV4BackupIconPath, true);
+					end
+
+					ParaIO.CopyFile(worldIcon, drawableHdpiV4IconPath, true);
+					ParaIO.CopyFile(worldIcon, drawableXhdpiV4IconPath, true);
+					ParaIO.CopyFile(worldIcon, drawableXxhdpiV4IconPath, true);
+
+					break;
+				end
 			end
 	
 			local apkWorldPath = self.androidBuildRoot .. 'paracraft_android_ver' .. self.curAndroidVersion .. '/assets/worlds/DesignHouse/' ..
@@ -395,6 +507,10 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, callback)
 
 				if (not beAutoUpdate) then
 					content = content .. ' noclientupdate="true"';
+				end
+
+				if (loginEnable) then
+					content = content .. ' login_enable="true"';
 				end
 
 				writeFile:write(content, #content);
@@ -519,7 +635,7 @@ function MakeApp:AndroidZip()
 	if ParaIO.DoesFileExist(self.androidBuildRoot .. 'paracraft_android_ver' .. self.curAndroidVersion .. '/') then
 		self:AndroidDownloadJre(function()
 			self:AndroidUpdateManifest(function()
-				self:AndroidCopyWorld(false, false, function()	
+				self:AndroidCopyWorld(false, false, false, function()	
 					self:AndroidGenerateApk(function()
 						self:AndroidSignApk()
 					end)
@@ -531,7 +647,7 @@ function MakeApp:AndroidZip()
 			self:AndroidUnzipApk(function()
 				self:AndroidDownloadJre(function()
 					self:AndroidUpdateManifest(function()
-						self:AndroidCopyWorld(false, false, function()	
+						self:AndroidCopyWorld(false, false, false, function()	
 							self:AndroidGenerateApk(function()
 								self:AndroidSignApk()
 							end)

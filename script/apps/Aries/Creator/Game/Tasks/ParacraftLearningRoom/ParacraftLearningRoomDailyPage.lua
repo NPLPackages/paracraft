@@ -24,7 +24,7 @@ local ParacraftLearningRoomDailyPage = NPL.export()
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 164;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 178;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -193,8 +193,18 @@ hide隐藏角色
 自定义物品AgentItem（下）
 playSound播放音乐(上）
 playSound播放音乐(下）
+playText朗读文字
+在电影方块中朗读字幕
 playBone骨骼动画
-自定义动画anim
+自定义动画anim（上）
+自定义动画anim（下）
+Clone命令上升的气球
+运动的可换装方块
+教学模式与地基方块
+限制可创作的方块数
+看不见的可点击区域
+激活代码方块编辑器(上)
+激活代码方块编辑器(下)
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 

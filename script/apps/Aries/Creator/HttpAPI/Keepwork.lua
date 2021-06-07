@@ -38,8 +38,8 @@ function Keepwork:GetAllAssets()
 
     for _, tpl in ipairs(KeepWorkItemManager.globalstore) do
         -- echo(tpl, true)
-        if (tpl.bagId == bagId) then
-            table.insert(assets, {
+        if (tpl.bagId == bagId and tpl.modelUrl) then
+			table.insert(assets, {
                 id = tpl.id,
                 gsId = tpl.gsId,
                 modelUrl = tpl.modelUrl,

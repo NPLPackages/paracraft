@@ -12,6 +12,10 @@ local EntityCode = commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlock.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActorItemStack.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/BoxTrigger.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
+local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
+local BoxTrigger = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld.BoxTrigger")
 local CodeActorItemStack = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActorItemStack");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
@@ -953,3 +957,55 @@ function Entity:OpenAtLine(line, pos)
 	CodeBlockWindow.RestoreCursorPosition(true);
 	CodeBlockWindow.SetFocusToTextControl()
 end
+
+-- set a box(quad) area and automatically load and unload nearby code blocks when player enters the trigger area. 
+-- please note, if the code block is already powered, we will not unload it when player leaves the trigger area. 
+-- currently the box height is ignored
+-- @param strArea: can be a string like "~ ~ ~ (10 10 10)" or absolution box like "20000 0 20000 (10 10 10)"
+-- The area can be very large or small.  
+function Entity:SetTriggerBoxByString(strArea)
+	if(self.boxTrigger) then
+		self.boxTrigger:Destroy()
+		self.boxTrigger = nil;
+	end
+	
+	if(strArea and strArea~="") then
+		local x, y, z, dx, dy, dz;
+		x, y, z, strArea = CmdParser.ParsePos(strArea, self);
+		if(x) then
+			dx, dy, dz, strArea = CmdParser.ParsePosInBrackets(strArea);
+			if(dx) then
+				local trigger = BoxTrigger:new():Init(x, z, x + dx, z + dz)
+				trigger:Attach();
+				trigger:Connect("enterTrigger", self, self.OnEntityEnterTrigger)
+				trigger:Connect("leaveTrigger", self, self.OnEntityLeaveTrigger)
+				self.triggerBoxString = strArea;
+				self.boxTrigger = trigger;
+				return
+			end
+		end
+	end
+	self.triggerBoxString = nil;
+end
+
+function Entity:GetTriggerBox()
+	return self.boxTrigger;
+end
+
+function Entity:OnEntityEnterTrigger(entityPlayer)
+	-- start all code block if code block is not started yet
+	if(not self:IsCodeLoaded()) then
+		self:Restart();
+	end
+end
+
+function Entity:OnEntityLeaveTrigger(entityPlayer)
+	-- stop all code block if code block is not currently powered
+	if(self:IsCodeLoaded() and not self:IsPowered()) then
+		local codeBlock = self:GetCodeBlock()
+		if(codeBlock) then
+			codeBlock:StopAll();
+		end
+	end
+end
+

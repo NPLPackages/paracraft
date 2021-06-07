@@ -200,6 +200,10 @@ local ignoreBtnList = {
 	["MacroRecorder.AddSubTitle"] = true,
 	["_click_to_continue_delay_"] = true,
 	["_g_GlobalDragCanvas"] = true,
+	["TouchMiniKeyboard"] = true,
+	["TouchMiniRightKeyboard"] = true,
+	["TouchVirtualKeyboardIcon"] = true,
+	["TouchVirtualKeyboard"] = true,
 }
 
 local function IsRecordableUIObject(obj, name)
@@ -588,6 +592,12 @@ function Macros:LoadMacrosFromText(text)
 		line = line:gsub("^%s+", "")
 		local m = Macro:new():Init(line, lineNumber);
 		if(m:IsValid()) then
+			local preMacro = macros[#macros];
+			if (m.name == "text" and preMacro and preMacro.name == "text") then
+				lineNumber = lineNumber + 1;
+				local idle = Macro:new():Init("Idle(10)", lineNumber);
+				macros[#macros+1] = idle;
+			end
 			macros[#macros+1] = m;
 		end
 	end
@@ -637,11 +647,24 @@ function Macros:PrepareInitialBuildState()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
     local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
     ChatEdit.LostFocus()
+
+	local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon")
+	if TouchVirtualKeyboardIcon and TouchVirtualKeyboardIcon.GetSingleton then
+		TouchVirtualKeyboardIcon = TouchVirtualKeyboardIcon.GetSingleton()
+		if TouchVirtualKeyboardIcon then
+			local keyboard = TouchVirtualKeyboardIcon:GetKeyBoard()
+			if keyboard and keyboard:isVisible() then
+				TouchVirtualKeyboardIcon:ShowKeyboard(false)
+			end
+		end
+	end
+
 end
 
 -- @param text: text lines of macros. if nil, it will play from clipboard
-function Macros:Play(text, speed)	
+function Macros:Play(text, speed, maxPrepareTime)	
 	text = text or ParaMisc.GetTextFromClipboard() or "";
+	self.maxPrepareTime = maxPrepareTime or 3;
 	local macros = self:LoadMacrosFromText(text)
 	self:PlayMacros(macros, 1, speed);
 	self:InitPrePlaytextData()
@@ -731,39 +754,56 @@ function Macros:PlayMacros(macros, fromLine, speed)
 		end
 	end
 	self.macros = macros;
-	
-	while(true) do
-		local m = macros[fromLine];
-		if(m) then
-			self.isPlaying = true;
-			self.curLine = fromLine
-			local isAsync = nil;
-			MacroPlayer.Focus();
-			GameLogic.GetFilters():apply_filters("Macro_PlayMacro", fromLine, macros);
-			m:Run(function()
-				if(isAsync) then
-					if(self.isPlaying) then
-						self:PlayMacros(macros, fromLine+1)
+
+	function play()
+		while(true) do
+			local m = macros[fromLine];
+			if(m) then
+				self.isPlaying = true;
+				self.curLine = fromLine
+				local isAsync = nil;
+				MacroPlayer.Focus();
+				GameLogic.GetFilters():apply_filters("Macro_PlayMacro", fromLine, macros);
+				m:Run(function()
+					if(isAsync) then
+						if(self.isPlaying) then
+							self:PlayMacros(macros, fromLine+1)
+						end
+					else
+						isAsync = false;
 					end
-				else
-					isAsync = false;
+				end)
+
+				if m.name == "text" then
+					self:PreparePlayText()
 				end
-			end)
 
-			if m.name == "text" then
-				self:PreparePlayText()
-			end
-
-			if(isAsync == false) then
-				fromLine = fromLine + 1;
+				if(isAsync == false) then
+					fromLine = fromLine + 1;
+				else
+					isAsync = true;
+					break;
+				end
 			else
-				isAsync = true;
+				self:Stop()
 				break;
 			end
-		else
-			self:Stop()
-			break;
 		end
+	end
+
+	if (fromLine == 1) then
+		self.firstTextPrepared = false;
+		local second = 0;
+		self.checkText = self.checkText or commonlib.Timer:new({callbackFunc = function(timer)
+			second = second + 1;
+			if (second >= self.maxPrepareTime or self.firstTextPrepared) then
+				self.checkText:Change();
+				play();
+			end
+		end});
+		self.checkText:Change(1000, 1000);
+	else
+		play();
 	end
 end
 
@@ -935,8 +975,13 @@ function Macros:PreparePlayText(prepare_nums)
 			if item.name == "text" and item.params then
 				local params = type(item.params) == "table" and item.params or commonlib.split(item.params,",")
 				local text = params[1] or ""
+				if (string.find(text, "\"", 1) == 1 and string.find(text, "\"", string.len(text)) == string.len(text)) then
+					text = string.sub(text, 2, string.len(text) - 1);
+				end
 				if text ~= "" then
-					SoundManager:PrepareText(text,  params[4])
+					SoundManager:PrepareText(text,  params[4], function(file_path)
+						self.firstTextPrepared = true;
+					end)
 					pre_count = pre_count + 1
 				end
 			end

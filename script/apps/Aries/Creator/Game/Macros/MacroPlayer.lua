@@ -19,10 +19,13 @@ local Screen = commonlib.gettable("System.Windows.Screen");
 local KeyEvent = commonlib.gettable("System.Windows.KeyEvent");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 local MacroPlayer = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer"));
 local page;
 local TouchMiniKeyboard, TouchVirtualKeyboardIcon = nil, nil;
 local TouchMiniRightKeyboard
+
+MacroPlayer.TextData = {{}}
 
 function MacroPlayer.OnInit()
 	page = document:GetPageCtrl();
@@ -211,6 +214,12 @@ function MacroPlayer.OnPlayMacro(fromLine, macros)
 		TouchMiniKeyboard:UpdateIconVisible()
 	end
 
+	if System.os.IsTouchMode() then
+		NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatEdit.lua");
+		local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
+		ChatEdit.SetUseIME(false)
+	end
+
 	return fromLine;
 end
 
@@ -252,7 +261,7 @@ end
 MacroPlayer.TipStartTime = 0;
 MacroPlayer.ShowTipTime = 5000;
 if System.os.IsTouchMode() then
-	MacroPlayer.ShowTipTime = 2000
+	MacroPlayer.ShowTipTime = 500
 end
 function MacroPlayer.ResetTipTime(nDeltaMilliSeconds)
 	MacroPlayer.TipStartTime = commonlib.TimerManager.GetCurrentTime() + (nDeltaMilliSeconds or 0)
@@ -295,9 +304,15 @@ function MacroPlayer.ShowMoreTips()
 		local count = TouchMiniKeyboard and TouchMiniKeyboard:ShowMacroTip(MacroPlayer.expectedKeyButton) or 0
 		if count <= 0 then
 			local mouseX, mouseY = GameLogic.Macros.GetNextKeyPressWithMouseMove()
-		
+			
+
 			if(mouseX and mouseY) then
 				-- key press at given scene location. 
+				if System.os.IsTouchMode() then
+					commonlib.TimerManager.SetTimeout(function()  
+						MacroPlayer.AutoCompleteTrigger()
+					end, 1000)
+				end
 			else
 				local count = MacroPlayer.ShowKeyboard(true, MacroPlayer.expectedKeyButton);
 				if(count and count > 1) then
@@ -534,6 +549,11 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
 			cursor.visible = bShow;
 			if(bShow) then
 				MacroPlayer.SetTopLevel();
+				
+				if System.os.IsTouchMode() then
+					cursor.width = 32
+					cursor.height = 32
+				end
 				
 				if(x and y) then
 					cursor.x = x - 16;
@@ -957,6 +977,10 @@ function MacroPlayer.ShowDrag(bShow, startX, startY, endX, endY, button)
 			if(bShow) then
 				local curPoint = page:FindControl("cursorClick");
 				curPoint.candrag = true;
+				if System.os.IsTouchMode() then
+					curPoint.width = 55
+					curPoint.height = 55
+				end
 
 				local startPoint = page:FindControl("startPoint")
 				local width = 24;
@@ -1006,7 +1030,11 @@ function MacroPlayer.OnDragMove()
 			local startX, startY = curPoint:GetAbsPosition();
 			local endX, endY = endPoint:GetAbsPosition();
 			local diffDistance = math.sqrt((endX - startX)^2 + (endY - startY)^2)
-			MacroPlayer.isReachedDragTarget = (diffDistance < 16);
+			local targetDistance = 16
+			if System.os.IsTouchMode() then
+				targetDistance = targetDistance * 2
+			end
+			MacroPlayer.isReachedDragTarget = (diffDistance < targetDistance);
 		end
 	end
 
@@ -1069,6 +1097,16 @@ function MacroPlayer.ShowTip(text)
 	end	
 end
 
+function MacroPlayer.SetTextValue(text)
+	MacroPlayer.text = text
+	local gvw_name = "text_grid";
+	local node = page:GetNode(gvw_name);
+	if node then
+		pe_gridview.DataBind(node, gvw_name, false);
+	end
+	
+end
+
 -- @param text: text.  if nil, we will hide it. 
 -- @param duration: the max duration
 -- @param position: nil default to "bottom", can also be "center", "top"
@@ -1077,10 +1115,12 @@ function MacroPlayer.ShowText(text, duration, position)
 		local textWnd = page:FindControl("textWnd");
 		if(text and text~="") then
 			textWnd.visible = true;
-			page:SetValue("text", text)
+			MacroPlayer.SetTextValue(text)
+			-- page:Refresh(0.01)
+
 		else
 			textWnd.visible = false;
-			page:SetValue("text", "")
+			MacroPlayer.SetTextValue("")
 		end
 		if(duration) then
 			duration = tonumber(duration);
@@ -1101,14 +1141,14 @@ function MacroPlayer.SetShowTextPosition(textWnd, position)
 	position = position or "bottom"
 	if(position == "bottom") then
 		if TouchMiniKeyboard and TouchMiniKeyboard:isVisible() then
-			textWnd:Reposition("_mb", 0, 30, 0, 60);
+			textWnd:Reposition("_mb", 0, -30, 0, 120);
 		else
-			textWnd:Reposition("_mb", 0, 80, 0, 60);
+			textWnd:Reposition("_mb", 0, 20, 0, 120);
 		end
 	elseif(position == "center") then
-		textWnd:Reposition("_mb", 0, 400, 0, 60);
+		textWnd:Reposition("_mb", 0, 340, 0, 120);
 	elseif(position == "top") then
-		textWnd:Reposition("_mt", 0, 120, 0, 60);
+		textWnd:Reposition("_mt", 0, 120, 0, 120);
 	end
 end
 

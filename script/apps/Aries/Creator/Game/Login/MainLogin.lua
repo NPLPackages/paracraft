@@ -459,8 +459,10 @@ function MainLogin:CheckCommandLine()
 		local curWorldpath = System.options.cmdline_world;
 		UrlProtocolHandler:ParseCommand(msg.msg);
 		if(System.options.cmdline_world) then
-			-- TODO: shall we ask the user to confirm before automatically download and login. 
-			self:CheckLoadWorldFromCmdLine(true);
+			-- TODO: shall we ask the user to confirm before automatically download and login.
+			if (login_enable ~= "true") then
+				self:CheckLoadWorldFromCmdLine(true);
+			end
 		end
 		return true;
 	end, self);
@@ -554,7 +556,9 @@ function MainLogin:ShowLoginModePage()
 		self:CheckShowTouchVirtualKeyboard();
 	end);
 
-	if(System.options.cmdline_world and System.options.cmdline_world~="") then
+	local login_enable = ParaEngine.GetAppCommandLineByParam("login_enable","")
+
+	if(login_enable ~= "true" and System.options.cmdline_world and System.options.cmdline_world~="") then
 		System.options.loginmode = "local";
 		self:next_step({IsLoginModeSelected = true});
 		return;
@@ -686,7 +690,9 @@ function MainLogin:PreloadTextures()
 end
 
 function MainLogin:LoadMainWorld()
-	if(self:CheckLoadWorldFromCmdLine() or System.options.servermode) then
+	local login_enable = ParaEngine.GetAppCommandLineByParam("login_enable","");
+
+	if(login_enable ~= "true" and (self:CheckLoadWorldFromCmdLine() or System.options.servermode)) then
 		return;
 	end
 	if (not System.options.isCodepku) then

@@ -239,17 +239,25 @@ function DockAssetsPreloader.FillAssets(loader)
         loader:AddAssets(v);
     end
 end
+function DockAssetsPreloader.IsIsolatedApp()
+	if(System.options and System.options.cmdline_world and System.options.cmdline_world~="") then
+		return true
+	end
+	return false;
+end
 function DockAssetsPreloader.GetDownloadList()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
 	local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
     local list = {};
 	table.insert(list, {filename = CustomCharItems.defaultModelFile, filesize = 1});
-    for k,v in ipairs(assets) do
-        table.insert(list,{
-            filename = v,
-            filesize = 1,
-        });
-    end
+	if(not DockAssetsPreloader.IsIsolatedApp())then
+		for k,v in ipairs(assets) do
+			table.insert(list,{
+				filename = v,
+				filesize = 1,
+			});
+		end
+	end
     return list;
 end
 

@@ -232,13 +232,13 @@ function TouchMiniKeyboard:SetPosition(left, top, width)
 
 	
 	self.button_width = self.default_button_width * ratio;
-	self.width = self.button_width  *4
+	self.width = self.button_width  *3
 	
 	self.button_height = self.default_button_height * ratio;
-	self.height = self.button_height * 5;
+	self.height = self.button_height * 3;
 
 	self.left = left or self.button_width * 0.4;
-	self.top = top or math.floor(Screen:GetHeight() - self.height);
+	self.top = top or math.floor(Screen:GetHeight() - self.height - self.button_height);
 
 	-- 50% padding between keys
 	self.key_margin = math.floor(math.min(self.finger_size, self.button_width*0.1) * 0.5);
@@ -610,7 +610,7 @@ function TouchMiniKeyboard:CreateWindow()
 			if (item.name) then
 				-- get global screen position
 				item.left = left_col*self.button_width;
-				item.top = row*self.button_height;
+				item.top = (row - 1)*self.button_height;
 				item.right = item.left + (item.col or 1)*self.button_width;
 				item.bottom = item.top + self.button_height;
 
@@ -776,6 +776,18 @@ function TouchMiniKeyboard:ShowMacroTip(buttons)
 	local buttons_list = {};
 	local has_ctrl_key = false
 	local has_y_s_z = false
+	local shiled_list = {
+		DIK_E = 1,
+		DIK_W = 1,
+		DIK_A = 1,
+		DIK_S = 1,
+		DIK_D = 1,
+	}
+
+	if shiled_list[buttons] then
+		return 0
+	end
+
 	for text in buttons:gmatch("([%w_]+)") do
 		text = Macros.ConvertKeyNameToButtonText(text)
 		if text == "CTRL" then
@@ -825,6 +837,10 @@ function TouchMiniKeyboard:ShowMacroTip(buttons)
 
 	if has_ctrl_key and need_count == 2 and mouse_count == 0 and has_y_s_z then
 		self:ShowCtrlDrawAnim()
+	end
+
+	if buttons == "shift+right" then
+		self:ShowShiftDrawAnim()
 	end
 
 	if key_count > 0 or mouse_count > 0 then
@@ -978,12 +994,36 @@ function TouchMiniKeyboard:StopCtrlDrawAnim()
 		end
 	end
 
+	if self.circle_tween_timer then
+		self.circle_tween_timer:Change()
+		self.circle_tween_timer = nil
+	end
+
+	if self.circle_alpha_timer then
+		self.circle_alpha_timer:Change()
+		self.circle_alpha_timer = nil
+	end
 end
 
 function TouchMiniKeyboard:ShowCtrlDrawAnim()
 	if self.circle_tween_x then
 		return
 	end
+
+	if self.circle_tween_timer then
+		self.circle_tween_timer:Change()
+		self.circle_tween_timer = nil
+	end
+
+	if self.circle_tween_timer == nil then
+		self.circle_tween_timer = commonlib.Timer:new({callbackFunc = function(timer)
+			GameLogic.AddBBS("Macro", L"请根据提示滑动到目标点", 5000, "255 0 0");
+			local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+			Macros.voice("请根据提示滑动到目标点")
+		end})
+		self.circle_tween_timer:Change(3000);
+	end
+
 	
 	self:ChangeCtrlPressState(true)
 
@@ -1056,3 +1096,118 @@ function TouchMiniKeyboard:ShowCtrlDrawAnim()
 	self.circle_tween_y.func=CommonCtrl.TweenEquations.easeNone;
 	self.circle_tween_y:Start();
 end
+
+function TouchMiniKeyboard:ShowShiftDrawAnim()
+	if self.circle_tween_x then
+		return
+	end
+
+	if self.circle_tween_timer then
+		self.circle_tween_timer:Change()
+		self.circle_tween_timer = nil
+	end
+
+	if self.circle_tween_timer == nil then
+		self.circle_tween_timer = commonlib.Timer:new({callbackFunc = function(timer)
+			local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+			Macros.voice("请根据提示滑动到目标点,并按住目标点不放")
+			GameLogic.AddBBS("Macro", L"请根据提示滑动到目标点,并按住目标点不放", 5000, "255 0 0");
+		end})
+		self.circle_tween_timer:Change(3000);
+	end
+	
+
+	local start_pos = {}
+	local end_pos = {}
+
+	local end_object = nil
+	local item_width
+	for row = 1, #self.keylayout do
+		for _, item in ipairs(self.keylayout[row]) do
+			if item.circle_object and item.circle_object.visible then
+				if item.name == "Shift" then
+					start_pos.x = item.pos_x
+					start_pos.y = item.pos_y
+				else
+					end_pos.x = item.pos_x
+					end_pos.y = item.pos_y
+
+					end_object = item.circle_object
+				end
+
+				if item_width == nil then
+					item_width = item.width
+				end
+			end
+		end
+	end
+
+	if start_pos.x == nil or start_pos.y == nil then
+		return
+	end
+
+	if nil == self.anim_circle_object then
+		
+		local off_size = 10
+		local width = item_width - 10
+		local height = item_width - 10
+
+		local circle = ParaUI.CreateUIObject("button","anim_circle", "_lt", start_pos.x, start_pos.x, width, height);
+		_guihelper.SetUIColor(circle, self.colors[1].normal);
+		circle.enabled = false;
+		
+		circle.background = "Texture/Aries/Common/ThemeTeen/circle_32bits.png"
+		self.anim_circle_object = circle
+		local _parent = self:GetUIControl()
+		_parent:AddChild(circle)
+	end
+
+	self.anim_circle_object.visible = true
+
+    self.circle_tween_x=CommonCtrl.Tween:new{
+			obj=self.anim_circle_object,
+			prop="x",
+			begin=start_pos.x,
+			change=end_pos.x - start_pos.x,
+			duration=1.5}
+
+	self.circle_tween_x.func=CommonCtrl.TweenEquations.easeNone;
+	self.circle_tween_x:Start();
+
+    self.circle_tween_y=CommonCtrl.Tween:new{
+		obj=self.anim_circle_object,
+		prop="y",
+		begin=start_pos.y,
+		change=end_pos.y - start_pos.y,
+		duration=1.5,
+		MotionFinish = function()
+			self.circle_tween_x:Start()
+			self.circle_tween_y:Start()
+		end
+	}
+
+	self.circle_tween_y.func=CommonCtrl.TweenEquations.easeNone;
+	self.circle_tween_y:Start();
+
+	if self.circle_alpha_timer then
+		self.circle_alpha_timer:Change()
+		self.circle_alpha_timer = nil
+	end
+	if end_object then
+		local alpha = 255
+		local change_alpha = 15
+		self.circle_alpha_timer = commonlib.Timer:new({callbackFunc = function(timer)
+			if alpha >= 250 then
+				change_alpha = -15
+			elseif alpha <= 20 then
+				change_alpha = 15
+			end
+			
+			alpha = alpha + change_alpha
+			-- print("ioooooooooo", change_alpha, alpha)
+			_guihelper.SetColorMask(end_object, format("255 255 255 %d",alpha))
+		end})
+		self.circle_alpha_timer:Change(0, 33);
+	end
+end
+

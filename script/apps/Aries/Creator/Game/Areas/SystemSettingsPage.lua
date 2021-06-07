@@ -111,15 +111,34 @@ function SystemSettingsPage.OnInit()
 	}
 
 	SystemSettingsPage.render_dist_list = {
-	[L"低"] = {dist = 60, next = L"中"},
-	[L"中"] = {dist = 120,next = L"高"},
-	[L"高"] = {dist = 180,next = L"低"},
-}
+		[L"低"] = {dist = 60, next = L"中"},
+		[L"中"] = {dist = 120,next = L"高"},
+		[L"高"] = {dist = 180,next = L"低"},		
+	}
+
+	SystemSettingsPage.shader_ds = {
+		{value="1", text=L"关闭"},
+		{value="2", text=L"开启"},
+		{value="3", text=L"HDR"},
+		{value="4", text=L"Dof/HDR"},
+	}
 
 	page = document:GetPageCtrl();
 	page.OnClose = SystemSettingsPage.OnClose;
 	SystemSettingsPage.setting_ds = {};
 	SystemSettingsPage.InitPageParams();
+
+	--
+	local nRenderMethod = ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1);
+	for i, item in ipairs(SystemSettingsPage.shader_ds) do
+		if(i == nRenderMethod) then
+			item.selected = true;
+		else
+			item.selected = nil;
+		end
+	end
+	
+	page:SetValue("comboShader",  tostring(math.min(math.max(1, nRenderMethod), 4)) );
 end
 
 local function GetRenderDistText(dist)
@@ -164,9 +183,10 @@ local function UpdateCheckBox(name, bChecked)
 	local useDefaultStyle = GameLogic.GetFilters():apply_filters('SystemSettingsPage.CheckBoxBackground', page, name, bChecked);
 	if(page) then
 		bChecked = bChecked == true or bChecked == "true";
-		page:SetValue(name, GetCheckBoxText(bChecked))
+		--page:SetValue(name, GetCheckBoxText(bChecked))
+		print("UpdateCheckBox==========",name,bChecked)
 		if (useDefaultStyle or useDefaultStyle == nil) then
-			page:CallMethod(name, "SetUIBackground", bChecked and "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 197 40 18:8 8 8 8" or "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4");
+			page:CallMethod(name, "SetUIBackground", bChecked and "Texture/Aries/Creator/keepwork/setting/qiehuan1_108X29_32bits.png;0 0 108 29" or "Texture/Aries/Creator/keepwork/setting/qiehuan2_108X29_32bits.png;0 0 108 29");
 		end
 	end
 end
@@ -211,10 +231,10 @@ function SystemSettingsPage.InitPageParams()
 
 	-- 音量大小
 	--local sound_volume = ParaAudio.GetVolume();
-	local sound_volume = Game.PlayerController:LoadLocalData(key,1,true);
-	local sound_volume_text = GetSoundVolumeText(sound_volume);
-	page:SetNodeValue("btn_SoundVolume", sound_volume_text);
-	ds["sound_volume"] = sound_volume_text;
+	local sound_volume = Game.PlayerController:LoadLocalData("Paracraft_System_Sound_Volume",1,true);
+	--local sound_volume_text = GetSoundVolumeText(sound_volume);
+	--page:SetNodeValue("btn_SoundVolume", sound_volume_text);
+	ds["sound_volume"] = sound_volume;
 
 
 	-- 真实光影
@@ -415,10 +435,10 @@ function SystemSettingsPage.CheckMinimumSystemRequirement(bShowUI, callbackFunc)
 				isTopLevel = true,
 				directPosition = true,
 					align = "_ct",
-					x = -550/2,
-					y = -380/2,
-					width = 550,
-					height = 380,
+					x = -360/2,
+					y = -530/2,
+					width = 360,
+					height = 530,
 			}
 			System.App.Commands.Call("File.MCMLWindowFrame", params);
 			params._page.OnClose = function()
@@ -788,18 +808,16 @@ function SystemSettingsPage.AdjustGraphicsSettingsByEffectLevel(effect_level)
 end
 
 function SystemSettingsPage.OnClickEnableSound()
-	--local openMusic = SystemSettingsPage.setting_ds["open_sound"];
 	local cur_state = SystemSettingsPage.setting_ds["open_sound"];
 	local next_state = not cur_state;
 	if(page)then
 		if(next_state) then
-			page:SetValue("btn_EnableSound", L"开启")
 			local sound_volume = Game.PlayerController:LoadLocalData(key,1,true);
 			ParaAudio.SetVolume(sound_volume);
 		else
-			page:SetValue("btn_EnableSound", L"关闭");
 			ParaAudio.SetVolume(0);
 		end
+		UpdateCheckBox("btn_EnableSound", next_state)
 	end
 	SystemSettingsPage.setting_ds["open_sound"] = next_state;
 	local MapArea = commonlib.gettable("MyCompany.Aries.Desktop.MapArea");
@@ -927,6 +945,17 @@ function SystemSettingsPage.OnClickChangeSoundVolume()
 	SystemSettingsPage.setting_ds["sound_volume"] = new_text;
 	local key = "Paracraft_System_Sound_Volume";
 	GameLogic.GetPlayerController():SaveLocalData(key,next_volume,true);
+end
+
+function SystemSettingsPage.OnChangeSoundVolume(value)
+	value = tonumber(value);
+	local sound_state = SystemSettingsPage.setting_ds["open_sound"];
+	if(value and sound_state) then
+		local volume = value-- math.floor(value)
+		ParaAudio.SetVolume(volume);
+		local key = "Paracraft_System_Sound_Volume";
+		GameLogic.GetPlayerController():SaveLocalData(key,volume,true);
+	end
 end
 
 function SystemSettingsPage.OnClickEnableBackgroundMusic(bChecked)
@@ -1227,10 +1256,10 @@ function SystemSettingsPage.ShowPage()
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 			align = "_ct",
-			x = -350/2,
-			y = -430/2,
-			width = 350,
-			height = 430,
+			x = -360/2,
+			y = -530/2,
+			width = 360,
+			height = 530,
 	};
 	--CreatorDesktop.params.bShow = bShow;
 	System.App.Commands.Call("File.MCMLWindowFrame", params);

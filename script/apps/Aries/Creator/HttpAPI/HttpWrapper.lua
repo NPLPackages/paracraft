@@ -52,7 +52,7 @@ function HttpWrapper.GetToken()
     local token = commonlib.getfield("System.User.keepworktoken")
     return token;
 end
-local default_cache_policy = System.localserver.CachePolicy:new("access plus 1 hour");
+local default_cache_policy = System.localserver.CachePolicy:new("access plus 12 hour");
 
 function HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option)
     cache_policy = inputParams.cache_policy or default_cache_policy;

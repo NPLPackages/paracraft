@@ -104,7 +104,7 @@ function Item:OnClickInHand(itemStack, entityPlayer)
 	if(GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
 		local selected_blocks = Game.SelectionManager:GetSelectedBlocks();
 		if(selected_blocks) then
-			if(self.id>0 and self.id < 1000) then
+			if(self.id>0 and self.id < 2000) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
 				local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blocks = commonlib.clone(selected_blocks), to_id = self.id, to_data=nil})
 				task:Run();

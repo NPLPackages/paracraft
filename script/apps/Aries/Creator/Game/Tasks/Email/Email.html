@@ -188,6 +188,9 @@ end
 
 function CanShowRedTip(type)
     local count = Email.GetUnReadMsgWithType(type)
+    if type == Email.MsgType.email then
+        return EmailManager.IsHaveNew()
+    end
     return count > 0
 end
 

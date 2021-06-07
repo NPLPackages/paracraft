@@ -51,7 +51,7 @@ function Macros.Idle(timeMs, bForceWait)
 				return Macros.Idle(DefaultTriggerInterval, true);
 			end
 
-			if (nextMacro.name == "CameraLookat" or nextMacro.name == "Idle") then
+			if (nextMacro.name == "CameraLookat" or nextMacro.name == "Idle" or nextMacro.name == "text") then
 				local previousMacro = Macros:PeekNextMacro(-1)
 				if(previousMacro and previousMacro.name == "text") then
 					local params = type(previousMacro.params) == "table" and previousMacro.params or commonlib.split(item.params,",")

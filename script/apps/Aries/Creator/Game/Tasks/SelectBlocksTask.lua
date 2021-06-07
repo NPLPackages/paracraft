@@ -1403,8 +1403,9 @@ function SelectBlocks.ReplaceBlocks(from_block_id, to_block_id)
 			for x = min[1], max[1] do
 				for y = min[2], max[2] do
 					for z = min[3], max[3] do
-						if( ParaTerrain.GetBlockTemplateByIdx(x,y,z) == from_block_id) then
-							BlockEngine:SetBlock(x,y,z, to_block_id);
+						local id, data = BlockEngine:GetBlockIdAndData(x, y, z);
+						if(id == from_block_id) then
+							BlockEngine:SetBlock(x,y,z, to_block_id, data, 3);
 						end
 					end
 				end

@@ -186,6 +186,12 @@ end
 -- @param callback: function(bChecked) end, bChecked is true if successfully downloaded
 -- return true if we are downloading
 function NplBrowserLoaderPage.Check(callback)
+    local IsTouchDevice = ParaEngine.GetAppCommandLineByParam('IsTouchDevice', nil)
+
+    if (IsTouchDevice == "true") then
+        return;
+    end
+
 	if(not NplBrowserLoaderPage.isCheckOnce) then
 		NplBrowserLoaderPage.isCheckOnce = true;
 	end

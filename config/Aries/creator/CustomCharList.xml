@@ -90,6 +90,10 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+		<!--20210527新增-->
+		<item id="83164" gsid="82004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83164_alloy_silver_helmet_32bits.png" name="合金头盔（白银）"/>
+		<item id="83165" gsid="82005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83165_alloy_green_helmet_32bits.png" name="合金头盔（翡绿）"/>
+		<item id="83166" gsid="82006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83166_alloy_red_helmet_32bits.png" name="合金头盔（炽焰）"/>
   		<!--20210408新加-->
 		<item id="83163" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83163_killer_hat_32bits.png" name="黑色面罩"/>
   		<!--20210318新加-->
@@ -430,6 +434,10 @@
 	</category>
 
 	<category name="shirt" text="衣服">
+		<!--20210527新增-->
+		<item id="84056" gsid="83001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84056_alloy_silver_armor_32bits.png" name="合金装甲（白银）"/>
+		<item id="84057" gsid="83002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84057_alloy_green_armor_32bits.png" name="合金装甲（翡绿）"/>
+		<item id="84058" gsid="83003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84058_alloy_red_armor_32bits.png" name="合金装甲（炽焰）"/>
 		<!--20210422新加衣服-->
 		<item id="84054" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84054_soldier_blue_32bits.png" name="蓝色盔甲"/>
 		<item id="84055" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84055_soldier_red_32bits.png" name="红色盔甲"/>
@@ -494,6 +502,10 @@
 	</category>
 
 	<category name="pants" text="裤子">
+		<!--20210527新增-->
+		<item id="85075" gsid="84002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85075_alloy_silver_guards_32bits.png" name="合金守护（白银）"/>
+		<item id="85076" gsid="84003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85076_alloy_green_guards_32bits.png" name="合金守护（翡绿）"/>
+		<item id="85077" gsid="84004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85077_alloy_red_guards_32bits.png" name="合金守护（炽焰）"/>
 		<!--20210408新加-->
 		<item id="85073" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85073_killer_pants_icon.png" name="夜行裤"/>
 		<item id="85074" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85074_killer_pants_icon.png" name="夜行裤"/>
@@ -621,6 +633,11 @@
 	</category>
 
 	<category name="right_hand_equipment" text="手持">
+		<!--20210527新增-->
+		<item id="87188" gsid="86000" icon="Texture/Aries/Creator/keepwork/Avatar/icons/87188_alloy_silver_shield_32bits.png" name="合金盾牌（白银）"/>
+		<item id="87189" gsid="86001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/87189_alloy_green_shield_32bits.png" name="合金盾牌（翡绿）"/>
+		<item id="87190" gsid="86002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/87190_alloy_red_shield_32bits.png" name="合金盾牌（炽焰）"/>
+		<!--初始化装备-->
 		<item id="87001" icon="Texture/Aries/Item/1022_LargeLollipop.png" name="棒棒糖"/>
 		<item id="87002" icon="Texture/Aries/Item/1147_Detector.png" name="放大镜"/>
 		<item id="87003" icon="Texture/Aries/Item/1156_YuanXiaoTorch.png" name="火炬"/>

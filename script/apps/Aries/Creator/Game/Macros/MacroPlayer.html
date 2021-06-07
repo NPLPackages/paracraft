@@ -22,6 +22,19 @@ local objParams = {
 function GetModelParams()
     return objParams;
 end
+
+function GetText()
+    return MacroPlayer.text or ""
+end
+
+function DataSource(index)
+    if index == nil then
+        return #MacroPlayer.TextData
+    else
+        return MacroPlayer.TextData[index]
+    end
+end
+
 ]]></script>
 <style type="text/mcss">
 {
@@ -78,10 +91,21 @@ end
         <div style="float:left;width:80px;height:20px;margin-left:-15px;margin-top:-40px;"><pe:canvas3d miniscenegraphname="DownloadWorld128" DefaultRotY="-0.9" DefaultCameraObjectDist="4" IsInteractive="false" RenderTargetSize="128" style="width:80px;height:80px;" value='<%=GetModelParams()%>' /></div>
         <pe:label name="tipText" style="font-size:14;text-align:center;color:#f5c4bd;height:36px;"></pe:label>
     </pe:container>
-    <pe:container ClickThrough="true" name="textWnd" alignment="_mb" zorder="-1" style="margin-top:80px;width:0px;height:60px;position:relative;background:url();" width="100%">
-        <div style="background-color:#00000080" width="100%" height="100%">
-            <input type="button" ClickThrough="true" name="text" enabled="false" value="some 停止示教宏播放 here" width="100%" height="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;"/>
+    <pe:container ClickThrough="true" name="textWnd" alignment="_mb" zorder="-1" style="margin-top:80px;width:0px;height:120px;position:relative;background:url();" width="100%">
+        <div name="text" style="height: 120px" width="100%">
+            <pe:gridview name = "text_grid" style="height:120px;margin-top: 0px;margin-left: 0px; background-color: #000000;" width="100%" VerticalScrollBarStep="100" AllowPaging="false" CellPadding="0" ItemsPerLine="1" DefaultNodeHeight = "10" 
+            DataSource='<%=DataSource%>'>
+            <Columns>
+                <div style="background-color:#00000080;min-height: 60px; base-font-size:20px;font-size:20px;text-align: center;text-valign: center; color:#ffffff;" width="100%">
+                    <div style="margin-top: 15px;"><%=GetText()%></div>
+                    <div style="height: 10px;"></div>
+                </div>
+            </Columns>                
+            </pe:gridview>
         </div>
+
+            <!-- <pe:label name="text" value="some 停止示教宏播放 here" width="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;height:120px;"></pe:label> -->
+            <!-- <input type="button" ClickThrough="true" name="text" enabled="false" value="some 停止示教宏播放 here" width="100%" height="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;"/> -->
     </pe:container>
 </pe:container>
 

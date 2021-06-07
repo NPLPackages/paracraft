@@ -456,3 +456,13 @@ function CustomCharItems:CheckAvatarExist(skin)
 	end
 	return false;
 end
+
+function CustomCharItems:GetItemByGsid(gsid)
+	for k, v in pairs(category_items) do
+		for k2, item in pairs(v) do
+			if (item.gsid == gsid) then
+				return item;
+			end
+		end
+	end
+end

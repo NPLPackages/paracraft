@@ -2915,3 +2915,53 @@ function Entity:IsShaderCaster()
 		return true;
 	end
 end
+
+-- this function is called by the physics world engine, when the entity is inside the trigger objects
+-- @param triggerObjects: nil or array of trigger objects that this entity is inside in this frame
+function Entity:SetInsideTriggers(triggerObjects)
+	if(self.lastTriggerObjects and triggerObjects) then
+		for _, trigger in ipairs(self.lastTriggerObjects) do
+			if(trigger:IsEnabled()) then
+				local hasTrigger;
+				for _, trigger2 in ipairs(triggerObjects) do
+					if(trigger2 == trigger) then
+						hasTrigger = true
+						break;
+					end
+				end
+				if(not hasTrigger) then
+					trigger:leaveTrigger(self)
+				end
+			end
+		end
+		for _, trigger in ipairs(triggerObjects) do
+			if(trigger:IsEnabled()) then
+				local hasTrigger;
+				for _, trigger2 in ipairs(self.lastTriggerObjects) do
+					if(trigger2 == trigger) then
+						hasTrigger = true
+						break;
+					end
+				end
+				if(not hasTrigger) then
+					trigger:enterTrigger(self)
+				end
+			end
+		end
+		self.lastTriggerObjects = triggerObjects;
+	elseif(self.lastTriggerObjects) then
+		for _, trigger in ipairs(self.lastTriggerObjects) do
+			if(trigger:IsEnabled()) then
+				trigger:leaveTrigger(self)
+			end
+		end
+		self.lastTriggerObjects = triggerObjects;
+	elseif(triggerObjects) then
+		for _, trigger in ipairs(triggerObjects) do
+			if(trigger:IsEnabled()) then
+				trigger:enterTrigger(self)
+			end
+		end
+		self.lastTriggerObjects = triggerObjects;
+	end
+end

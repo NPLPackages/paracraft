@@ -163,12 +163,14 @@ function ParaWorldLoginAdapter.ShowExitWorld(restart)
             if(res and res == _guihelper.DialogResult.Yes)then
                 ParaWorldLoginAdapter.MainWorldId = nil;
                 ParaWorldLoginAdapter.ParaWorldId = nil;
-                Desktop.is_exiting = true;			
-    
-                GameLogic.GetFilters():apply_filters('logout', nil, function()
-                    GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true);
-                end);
-    
+                Desktop.is_exiting = true;
+
+                if (System.os.GetPlatform() ~= "android") then
+                    GameLogic.GetFilters():apply_filters('logout', nil, function()
+                        GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true);
+                    end);
+                end
+
                 Desktop.ForceExit(restart);
             end
         end, _guihelper.MessageBoxButtons.YesNo);        

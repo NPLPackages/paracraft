@@ -13,6 +13,24 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 
 local kp_item = commonlib.gettable("MyCompany.Aries.Game.mcml.kp_item");
+local icon_config = {
+	[82004] = "Texture/Aries/Creator/keepwork/Avatar/icons/83164_alloy_silver_helmet_32bits.png",
+	[82005] = "Texture/Aries/Creator/keepwork/Avatar/icons/83165_alloy_green_helmet_32bits.png",
+	[82006] = "Texture/Aries/Creator/keepwork/Avatar/icons/83166_alloy_red_helmet_32bits.png",
+	
+	[83001] = "Texture/Aries/Creator/keepwork/Avatar/icons/84056_alloy_silver_armor_32bits.png",
+	[83002] = "Texture/Aries/Creator/keepwork/Avatar/icons/84057_alloy_green_armor_32bits.png",
+	[83003] = "Texture/Aries/Creator/keepwork/Avatar/icons/84058_alloy_red_armor_32bits.png",
+
+	[84002] = "Texture/Aries/Creator/keepwork/Avatar/icons/85075_alloy_silver_guards_32bits.png",
+	[84003] = "Texture/Aries/Creator/keepwork/Avatar/icons/85076_alloy_green_guards_32bits.png",
+	[84004] = "Texture/Aries/Creator/keepwork/Avatar/icons/85077_alloy_red_guards_32bits.png",
+
+	[86000] = "Texture/Aries/Creator/keepwork/Avatar/icons/87188_alloy_silver_shield_32bits.png",
+	[86001] = "Texture/Aries/Creator/keepwork/Avatar/icons/87189_alloy_green_shield_32bits.png",
+	[86002] = "Texture/Aries/Creator/keepwork/Avatar/icons/87190_alloy_red_shield_32bits.png",
+}
+
 function kp_item.render_callback(mcmlNode, rootName, bindingContext, _parent, left, top, right, bottom, myLayout, css)
 	local _this = ParaUI.CreateUIObject("button", "b", "_lt", left, top, right-left, bottom-top);
 	_guihelper.SetUIColor(_this, "#ffffffff");
@@ -36,10 +54,15 @@ function kp_item.render_callback(mcmlNode, rootName, bindingContext, _parent, le
     end
 
 	if background == "1" then
-		local item = CustomCharItems:GetItemById(tostring(gsid))
-		if item then
-			background = item.icon
+		if icon_config[gsid] then
+			background = icon_config[gsid]
+		else
+			local item = CustomCharItems:GetItemByGsid(tostring(gsid))
+			if item then
+				background = item.icon
+			end
 		end
+
     end
 
     if(not background or background == "" or background == "0")then

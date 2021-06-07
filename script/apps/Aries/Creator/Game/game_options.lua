@@ -848,7 +848,9 @@ function options:SetMaxViewDist(value, bSaveToDisk)
 	if(value == nil) then
 		local maxViewDist
 		if(System.os.IsMobilePlatform()) then
-			maxViewDist = 64
+			-- shall we make it small in mobile platform ?
+			-- maxViewDist = 64
+			maxViewDist = GameLogic.GetPlayerController():LoadLocalData(key,self:GetMaxViewDist(),true);
 		else
 			maxViewDist = GameLogic.GetPlayerController():LoadLocalData(key,self:GetMaxViewDist(),true);
 		end

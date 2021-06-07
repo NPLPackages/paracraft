@@ -42,6 +42,7 @@ function ChatEdit.ShowPage(bForceRefreshPage, alignment, left, top, width, heigh
 			url="script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.html", 
 			click_through=true});
 	end
+	ChatEdit.page.OnCreate = ChatEdit.OnCreate
 
 	if(bForceRefreshPage) then
 		ParaUI.Destroy("ChatEditPage");
@@ -267,6 +268,7 @@ function ChatEdit.SetComboSelect(select)
 end
 
 function ChatEdit.LostFocus()
+	ChatEdit.is_focus_in = false
 	local _editbox = ChatEdit.GetInputControl();
 	if(_editbox) then
 		_editbox:LostFocus();
@@ -288,6 +290,34 @@ function ChatEdit.SendTextSilent(words, channel)
 	if(ChatChannel.SendMessage( channel or ChatEdit.selected_channel, nil, nil, words )) then
 		return true;
 	end
+end
+
+function ChatEdit.OnCreate()
+	if ChatEdit.enable_ime ~= nil then
+		local value = ChatEdit.enable_ime and "En" or "中文"
+		local name = ChatWindow.IsGGSMode() and "ggs_imebt" or "imebt"
+		ChatEdit.page:SetValue(name, value)
+
+		if ChatEdit.temp_text and ChatEdit.temp_text ~= "" then
+			ChatEdit.SetText(ChatEdit.temp_text)
+			ChatEdit.temp_text = nil
+		end
+	end
+end
+
+function ChatEdit.OnChangeIme(name)
+	ChatEdit.enable_ime = not ChatEdit.enable_ime
+	ChatEdit.temp_text = ChatEdit.GetText()
+	ChatEdit.page:Refresh(0.01)
+end
+
+function ChatEdit.SetUseIME(is_use_ime)
+	if ChatEdit.page then
+		ChatEdit.enable_ime = is_use_ime
+		ChatEdit.temp_text = ChatEdit.GetText()
+		ChatEdit.page:Refresh(0.01)
+	end
+
 end
 
 function ChatEdit.OnClickSend(name)
@@ -396,6 +426,9 @@ end
 function ChatEdit.FadeOut(animSeconds)
 	if(not ChatEdit.is_fade_out) then
 		ChatEdit.is_fade_out = true;
+		if ChatEdit.is_focus_in then
+			ChatEdit.LostFocus()
+		end
 		if(not ChatEdit.redirect_UI_name) then
 			local _parent = ParaUI.GetUIObject("ChatEditPage");
 			UIAnimManager.ChangeAlpha("Aries.ChatEditPage", _parent, if_else(System.options.version == "teen", 0, 0), 256/(animSeconds or 4))
@@ -440,6 +473,7 @@ function ChatEdit.SetFocus()
 	end
 	ChatEdit.FadeIn(0.2);
 	ChatWindow.FadeIn(0.2);
+	ChatEdit.is_focus_in = true
 	--ChatWindow.RefreshTreeView();
 end
 
@@ -576,4 +610,20 @@ function ChatEdit.handleEscKey()
 			ChatEdit.LostFocus()
 		end
 	end
+end
+
+function ChatEdit.IsShowIMEBt()
+	if System.os.IsTouchMode() then
+		if ChatWindow.IsGGSMode() then
+			local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+			local generatorName = WorldCommon.GetWorldTag("world_generator");
+			if(generatorName == "paraworld")then
+				return true				
+			end
+		else
+			return true
+		end
+	end
+
+	return false
 end

@@ -264,6 +264,8 @@ function GameLogic.InitCommon()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/Macros.lua");
 	local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+
+	PhysicsWorld:StaticInit()
 end
 
 -- for checking desktop state after activate desktop
@@ -335,6 +337,8 @@ function GameLogic.Init(worldObj)
 
 	MovieManager:Init();
 	
+	PhysicsWorld:Init()
+
 	GameLogic.OnBeforeBlockWorldLoaded();
 
 	local sun_light = math.min(1, 1.1-math.abs(ParaScene.GetTimeOfDaySTD()));
@@ -739,6 +743,15 @@ function GameLogic.ToggleFly()
 			else
 				GameLogic.picking_dist = options.picking_dist_walkmode;
 				CameraController.ToggleFly(false);
+			end
+
+			if System.os.IsTouchMode() then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniRightKeyboard.lua");
+				local TouchMiniRightKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniRightKeyboard");
+				if TouchMiniRightKeyboard then
+					TouchMiniRightKeyboard = TouchMiniRightKeyboard.GetSingleton();
+					TouchMiniRightKeyboard:ChangeFlyBtImg()
+				end
 			end
 		end
 	end

@@ -538,7 +538,9 @@ function VirtualKeyboard:ShowButtons(button)
 		end
 
 		if has_ctrl_key and count == 2 then
-			self:ShowCtrlDrawAnim()
+			if System.os.IsTouchMode() then
+				self:ShowCtrlDrawAnim()
+			end
 		end
 
 		return count;

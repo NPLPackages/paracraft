@@ -314,7 +314,7 @@ function QuestAction.SetDailyTaskValue(task_id, value, change_value)
         data.state = QuestAction.TaskState.can_complete
     end
     
-    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, clientData)
+    QuestAction.SetClientData(clientData)
     QuestPage.RefreshData()
 end
 
@@ -394,17 +394,18 @@ function QuestAction.FinishDailyTask(task_id)
 
     if data.state == QuestAction.TaskState.can_complete then
         data.state = QuestAction.TaskState.has_complete
-        KeepWorkItemManager.SetClientData(QuestAction.task_gsid, clientData)
+        QuestAction.SetClientData(clientData)
     end
 end
 
 function QuestAction.GetClientData()
-	local clientData = KeepWorkItemManager.GetClientData(QuestAction.task_gsid) or {};
-    local is_new_day, time_stamp = QuestAction.CheckIsNewDay(clientData)
-    QuestAction.Print("aaaaaaaaaaaaaaaaaaaaaaaaaa", is_new_day, time_stamp, QuestAction.task_gsid)
-    if System.User.username == 'changjl' then
-        echo(clientData, true)
+    if QuestAction.clientData == nil then
+        QuestAction.clientData = KeepWorkItemManager.GetClientData(QuestAction.task_gsid) or {};
     end
+
+	local clientData = QuestAction.clientData
+    local is_new_day, time_stamp = QuestAction.CheckIsNewDay(clientData)
+
     if is_new_day then
         local course_world_id = clientData.course_world_id
         QuestAction.DailyTaskData.course_teacher_id = clientData.course_teacher_id
@@ -416,8 +417,19 @@ function QuestAction.GetClientData()
         clientData.exp = 0
         clientData.play_course_times = 0
         clientData.course_world_id = course_world_id
+
+        QuestAction.clientData = clientData
     end
 	return clientData
+end
+
+function QuestAction.SetClientData(clientData, cb)
+    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, clientData, function()
+        QuestAction.clientData = clientData
+        if cb then
+            cb()
+        end
+    end)
 end
 
 -- 检测是否新一天的数据
@@ -428,13 +440,11 @@ function QuestAction.CheckIsNewDay(clientData)
     local time_stamp = clientData.time_stamp or 0;
 	-- 获取今日凌晨的时间戳 1603949593
     local cur_time_stamp = QuestAction.GetServerTime() or 0
-    QuestAction.Print("bbbbbbbbbbbbbbbbbbbb",cur_time_stamp)
     if cur_time_stamp == nil or cur_time_stamp == 0 then
         cur_time_stamp = os.time()
     end
     
 	local day_time_stamp = commonlib.timehelp.GetWeeHoursTimeStamp(cur_time_stamp)
-    QuestAction.Print("ccccccccccccccc",day_time_stamp, time_stamp)
 	-- 天数改变 清除数据
 	if day_time_stamp > time_stamp then
 		return true, day_time_stamp
@@ -509,7 +519,7 @@ function QuestAction.AddExp(exp, cb)
         end
     end
 
-    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, clientData, cb)
+    QuestAction.SetClientData(clientData, cb)
 end
 
 function QuestAction.GetGiftStateList()
@@ -526,7 +536,7 @@ function QuestAction.SetGiftState(gift_id, state)
 
     gift_state_list[gift_id] = state
 
-    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, clientData)
+    QuestAction.SetClientData(clientData)
 end
 ----------------------------------------日常任务处理/end-------------------------------------------------
 -- 是否补课界面
@@ -760,7 +770,7 @@ function QuestAction.AddAskTimes()
     local ask_times = clientData.ask_times or 0
     clientData.ask_times = ask_times + 1
     
-    KeepWorkItemManager.SetClientData(QuestAction.task_gsid, clientData)
+    QuestAction.SetClientData(clientData)
 end
 
 function QuestAction.GetAskTimes()

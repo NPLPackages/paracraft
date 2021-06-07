@@ -15,6 +15,8 @@ NPL.load("(gl)script/ide/STL.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/DynamicObject.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 NPL.load("(gl)script/ide/math/AABBPool.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/QuadTree.lua");
+local QuadTree = commonlib.gettable("MyCompany.Aries.Game.Common.QuadTree")
 local AABBPool = commonlib.gettable("mathlib.AABBPool");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -28,13 +30,28 @@ local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
 local active_dynamic_obj = commonlib.List:new();
 -- bounding boxes
 PhysicsWorld.collidingBoundingBoxes = commonlib.vector:new();
+-- quadtree for all static triggers
+PhysicsWorld.triggerQuadTree = nil;
 
 function PhysicsWorld:StaticInit()
-	
+end
+
+-- before world is loaded
+function PhysicsWorld:Init()
+	PhysicsWorld.triggerQuadTree = QuadTree:new():Init({minWidth = 32, minHeight = 32, left = 0, top = 0, right = 64*512, bottom = 64*512, splitThreshold = 20});
 end
 
 function PhysicsWorld.Clear()
 	active_dynamic_obj:clear();
+end
+
+function PhysicsWorld:AddStaticTrigger(triggerObject)
+	local left, top, right, bottom = triggerObject:GetQuadSize();
+	PhysicsWorld.triggerQuadTree:AddObject(triggerObject, left, top, right, bottom);
+end
+
+function PhysicsWorld:RemoveStaticTrigger(triggerObject)
+	PhysicsWorld.triggerQuadTree:RemoveObject(triggerObject)
 end
 
 -- whether the given block is blocked. 
@@ -66,6 +83,7 @@ function PhysicsWorld.FrameMove(deltaTime)
 			obj_cont = active_dynamic_obj:remove(obj_cont);
 		end
 	end
+	PhysicsWorld.UpdateTriggers()
 end
 
 function PhysicsWorld.AddDynamicObject(obj)
@@ -135,4 +153,19 @@ function PhysicsWorld:GetCollidingBoundingBoxes(aabb, entity, filterEntityFunc, 
 		end
 	end
     return self.collidingBoundingBoxes;
+end
+
+function PhysicsWorld.UpdateTriggers()
+	local triggerQuadTree = PhysicsWorld.triggerQuadTree
+	local count = triggerQuadTree:GetObjectCount()
+	if(count == 0) then
+		return
+	end
+
+	local player = EntityManager.GetPlayer();
+	if(player) then
+		local x, y, z = player:GetBlockPos()
+		local triggers = triggerQuadTree:GetObjectsByPoint(x, z)
+		player:SetInsideTriggers(triggers);
+	end
 end

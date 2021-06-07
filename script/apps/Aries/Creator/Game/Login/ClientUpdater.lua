@@ -66,11 +66,11 @@ function ClientUpdater:CopyAssetsToWritablePath()
 
 	local fileList = {
 		'version.txt',
-		-- 'assets_manifest.txt',
-		-- 'npl_packages/ParacraftBuildinMod.zip',
-		-- 'main.pkg',
-		-- 'main_mobile_res.pkg',
-		-- 'main150727.pkg',
+		'assets_manifest.txt',
+		'npl_packages/ParacraftBuildinMod.zip',
+		'main.pkg',
+		'main_mobile_res.pkg',
+		'main150727.pkg',
 	}
 
 	for key, item in ipairs(fileList) do
