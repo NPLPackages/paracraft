@@ -154,53 +154,53 @@ function OnReturnLastWorld()
     WorldStacks:ReturnLastWorld();
 end
 ]]></script>
-<div style="height:64px;width:300px;">
+<div style="height:64px;width:370px;">
     <pe:if condition='<%=WorldStacks:GetReturnWorld() ~= nil%>'>
-        <input type="button" value='<%=WorldStacks:GetReturnWorld():GetDisplayName()%>' class="mc_big_button" style="color:#572712;font-size:16px;width:300px;height:52px;" onclick="OnReturnLastWorld" />    
+        <input type="button" value='<%=WorldStacks:GetReturnWorld():GetDisplayName()%>' class="mc_big_button" style="color:#572712;font-size:16px;width:370px;height:52px;" onclick="OnReturnLastWorld" />    
     </pe:if>
 </div>
-<aries:window mode="thin" style="width:300px;" title='<%=L"系统设置"%>' onclose="ClosePage">
+<aries:window mode="thin" style="width:370px;" title='<%=L"系统设置"%>' onclose="ClosePage">
 <div style="padding-bottom:10px;">
     
-    <div style="margin-top:5px;">
-        <input type="button" tooltip='<%=L"点击备份并查看历史版本"%>' value='<%=format(L"版本:%d", GameLogic.options:GetRevision())%>' style="margin-left:25px;font-size:11px;height:20px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickRevision"/>
-        <input type="button" value='<%=L"历史"%>' tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' style="margin-left:3px;font-size:11px;height:20px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickViewHistory" />
-        <div style="float:left;margin-left: 5px; color: #ffffff;"  tooltip='<%=L"点击打开所在目录"%>' onclick="OnOpenWorldDir">
+    <div style="margin-top:10px;">
+        <input type="button" tooltip='<%=L"点击备份并查看历史版本"%>' value='<%=format(L"版本:%d", GameLogic.options:GetRevision())%>' style="margin-left:31px;font-size:14px;height:26px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickRevision"/>
+        <input type="button" value='<%=L"历史"%>' tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickViewHistory" />
+        <div style="float:left;margin-left: 6px; color: #ffffff;"  tooltip='<%=L"点击打开所在目录"%>' onclick="OnOpenWorldDir">
             <%=format("%s", GetCurWorldName() or "") %>
-            <input type="button" value='...' style="margin-left:3px;font-size:11px;height:20px;color:#ffffff;" class="mc_button_blue"/>
+            <input type="button" value='...' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_button_blue"/>
         </div>
     </div>
-    <div style="margin-left:25px;">
-        <div style="margin-top:10px;">
-            <input type="button" value='<%=L"分享世界"%>' name="shareWorld" style="width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-            <input type="button" value='<%=GameLogic.IsReadOnly() and L"另存为..." or L"保存世界"%>' tooltip="Ctrl+S" name="saveWorld" style="margin-left:33px;width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+    <div style="margin-left:31px;">
+        <div style="margin-top:13px;">
+            <input type="button" value='<%=L"分享世界"%>' name="shareWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=GameLogic.IsReadOnly() and L"另存为..." or L"保存世界"%>' tooltip="Ctrl+S" name="saveWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
-        <div style="margin-top:5px;">
-            <input type="button" value='<%=L"新建世界"%>' name="createNewWorld" style="width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-            <input type="button" value='<%=L"加载世界"%>' tooltip="Ctrl+O" name= "loadWorld" style="margin-left:33px;width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+        <div style="margin-top:8px;">
+            <input type="button" value='<%=L"新建世界"%>' name="createNewWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=L"加载世界"%>' tooltip="Ctrl+O" name= "loadWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
         <pe:if condition='<%=not System.options.mc %>'>
-        <div style="margin-top:5px;">
-            <input type="button" value='<%=L"邀请好友"%>' name="friends" style="width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+        <div style="margin-top:8px;">
+            <input type="button" value='<%=L"邀请好友"%>' name="friends" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
         </pe:if>
-        <div style="margin-top:5px;">
-            <input type="button" value='<%=L"更换材质"%>' name="changeTexture" style="width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-            <input type="button" value='<%=L"系统设置"%>' name= "systemSetting" style="margin-left:33px;width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+        <div style="margin-top:8px;">
+            <input type="button" value='<%=L"更换材质"%>' name="changeTexture" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=L"系统设置"%>' name= "systemSetting" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
-        <div style="margin-top:5px;">
+        <div style="margin-top:8px;">
             <pe:if condition='<%=System.options.mc %>'>
-                <input type="button" value='<%=GetServerButtonValue() %>' name= "openServerPage" style="width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                <input type="button" value='<%=GetServerButtonValue() %>' name= "openServerPage" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
             </pe:if>
             <pe:if condition='<%=not System.options.mc %>'>
-                <input type="button" value='<%=L"继续创作"%>' name= "continueGame" style="width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                <input type="button" value='<%=L"继续创作"%>' name= "continueGame" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
             </pe:if>
-            <input type="button" value='<%=L"退出世界"%>' name= "exitWorld" style="margin-left:33px;width:100px;height:24px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=L"退出世界"%>' name= "exitWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
     </div>
-    <div style="margin-left:25px;margin-top:5px;">
+    <div style="margin-left:41px;margin-top:8px;">
         <!--<a tooltip='<%=L"打开官网"%>' href='<%=L"http://www.paracraft.cn/"%>' style="color:#CFCFCF;font-size:13px;" onclick='goto_url("http://www.paracraft.cn")'>www.paracraft.cn</a>-->
-        <div style="float:left;align:right;margin-right:5px;width:100px;color:#CFCFCF;font-size:13px;">
+        <div style="float:left;align:right;margin-right:-16px;width:130px;color:#CFCFCF;font-size:17px;">
             <%=GetVersion() %>
         </div>
     </div>

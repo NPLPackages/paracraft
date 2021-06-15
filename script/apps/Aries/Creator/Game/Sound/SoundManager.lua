@@ -437,3 +437,17 @@ function SoundManager:GetPlayTextDiskFolder()
     
 	return DiskFolder
 end
+
+function SoundManager:IsPlayTextSoundPlaying()
+	if self.playingSounds == nil then
+		return false
+	end
+
+	for k, v in pairs(self.playingSounds) do
+		if string.find(k, "playtext") and AudioEngine.IsPlaying(k) then
+			return true
+		end
+	end
+
+	return false
+end

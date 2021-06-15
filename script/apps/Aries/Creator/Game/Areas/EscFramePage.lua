@@ -38,7 +38,7 @@ EscFramePage.category_ds = {
 function EscFramePage.OnInit()
 	EscFramePage.OneTimeInit();
 	page = document:GetPageCtrl();
-
+	
 	EscFramePage.OnChangeCategory(nil, false);
 end
 
@@ -109,9 +109,9 @@ function EscFramePage.ShowPage(bShow)
 					app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 					directPosition = true,
 						align = "_ct",
-						x = -300/2,
-						y = -300/2,
-						width = 300,
+						x = -390/2,
+						y = -350/2,
+						width = 390,
 						height = 350,
 				};
 			System.App.Commands.Call("File.MCMLWindowFrame", params);

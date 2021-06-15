@@ -430,6 +430,7 @@ function ChatChannel.GetChat(ChannelIndexAssemble)
 	return result;
 end
 
+
 function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inputType)
     inputType = inputType or ChatChannel.InputTypes.FromEditBox;
     NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
@@ -444,7 +445,8 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inpu
 		end
 		
 	end
-    if(generatorName == "paraworld" and KpChatChannel.IsBlockedChannel(ChannelIndex))then
+    --if(generatorName == "paraworld" and KpChatChannel.IsBlockedChannel(ChannelIndex))then
+    if(KpChatChannel.IsInWorld() and KpChatChannel.IsBlockedChannel(ChannelIndex))then
         if(inputType ~= ChatChannel.InputTypes.FromQuickWord)then
 			_guihelper.MessageBox(L"这个频道只能发快捷语言！");
             return

@@ -173,6 +173,8 @@ function ParaWorldUserInfo.GetFavoritesCount()
 end
 
 function ParaWorldUserInfo.OnClickStar()
+	GameLogic.GetFilters():apply_filters("service.session.add_rice", "thumbsup")
+
 	keepwork.world.star({router_params = {id = worldParams.projectId}}, function(err, msg, data)
 		if (err == 200) then
 			isStared = true;

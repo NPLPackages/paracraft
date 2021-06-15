@@ -142,6 +142,8 @@ registerKeyPressedEvent("any", function(msg)
         return true
     end
 end)
+-- unregister the given key press event
+registerKeyPressedEvent("any", nil);
 ]]},
 {desc = L"鼠标按钮", canRun = true, code = [[
 registerKeyPressedEvent("mouse_buttons",function(event)
@@ -254,6 +256,9 @@ registerTickEvent(1, function(msg)
     i = i + 1
     say(i)
 end)
+wait(10)
+-- unregister
+registerTickEvent(1, nil)
 ]]},
 },
 },

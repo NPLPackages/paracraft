@@ -473,7 +473,12 @@ model id
     <item id="83162" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83162_blue_cat_hat.anim.x"></attachment></item>
     <!--20210408新加-->
     <item id="83163" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83163_killer_hat.anim.x"></attachment></item>
-
+    <!--20210527新增-->
+    <item id="83164" model="actor;"><geoset category="0" id="0"></geoset><geoset category="3" id="0"></geoset><texture id="6" filename="Texture/blocks/CustomGeoset/hand/83164_alloy_black_hand.png"></texture><attachment id="11" filename="character/CC/ObjectComponents/Head/83164_alloy_silver_helmet.anim.x"></attachment></item>
+    <item id="83165" model="actor;"><geoset category="0" id="0"></geoset><geoset category="3" id="0"></geoset><texture id="6" filename="Texture/blocks/CustomGeoset/hand/83164_alloy_black_hand.png"></texture><attachment id="11" filename="character/CC/ObjectComponents/Head/83165_alloy_green_helmet.anim.x"></attachment></item>
+    <item id="83166" model="actor;"><geoset category="0" id="0"></geoset><geoset category="3" id="0"></geoset><texture id="6" filename="Texture/blocks/CustomGeoset/hand/83164_alloy_black_hand.png"></texture><attachment id="11" filename="character/CC/ObjectComponents/Head/83166_alloy_red_helmet.anim.x"></attachment></item>
+    <!--20210610新增-->
+    <item id="83167" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83167_space_suit_hat.anim.x"></attachment></item>
     
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>
@@ -537,6 +542,12 @@ model id
     <!--20210422新加-->
     <item id="84054" model="actor;"><geoset category="8" id="8"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84054_soldier_blue.png"></texture></item>
     <item id="84055" model="actor;"><geoset category="8" id="8"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84055_soldier_red.png"></texture></item>
+    <!--20210527新增-->
+    <item id="84056" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84056_alloy_silver_armor.png"></texture></item>
+    <item id="84057" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84057_alloy_green_armor.png"></texture></item>
+    <item id="84058" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84058_alloy_red_armor.png"></texture></item>
+    <!--20210610新增-->
+    <item id="84059" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84059_space_suit_armor.png"></texture></item>
 
     
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
@@ -617,7 +628,12 @@ model id
     <!--20210408新加-->
     <item id="85073" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85073_killer_pants_03_04.png"></texture></item>
     <item id="85074" model="actor;"><geoset category="9" id="4"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85073_killer_pants_03_04.png"></texture></item>
-
+    <!--20210527新增-->
+    <item id="85075" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85075_alloy_silver_guards.png"></texture></item>
+    <item id="85076" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85076_alloy_green_guards.png"></texture></item>
+    <item id="85077" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85077_alloy_red_guards.png"></texture></item>
+    <!--20210610新增-->
+    <item id="85078" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85078_space_suit_pants.png"></texture></item>
     
     <!--      86000 86999  背部  attachment id="15"    -->
     <!--第一批数据-->
@@ -662,7 +678,9 @@ model id
     <item id="86039" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/2392_DeadRabbit.anim.x"></attachment></item>
     <!--20210324添加3月活动物品-->
     <item id="86040" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86040_shubao.anim.x"></attachment></item>
-    
+    <!--20210610添加6月活动物品-->
+    <item id="86041" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86041_space_suit_bag.anim.x"></attachment></item>
+
     <!--      87000 97999  手持  attachment id="1"    -->
     <item id="87001" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x"></attachment></item>
     <item id="87002" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/1147_Detector.x"></attachment></item>
@@ -851,6 +869,10 @@ model id
     <item id="87185" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/Lollipop.x"></attachment></item>
     <item id="87186" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/red.x"></attachment></item>
     <item id="87187" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/yellow.x"></attachment></item>
+    <!--20210527新增-->
+<item id="87188" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87188_alloy_silver_shield.anim.x"></attachment></item>
+<item id="87189" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87189_alloy_green_shield.anim.x"></attachment></item>
+<item id="87190" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87190_alloy_red_shield.anim.x"></attachment></item>
 
 
     <!--    88000 88999  嘴巴                        4嘴巴          -->

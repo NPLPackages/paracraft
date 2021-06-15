@@ -849,10 +849,15 @@ local mouseKeys = {
 }
 
 
--- @param keyname: if nil or "any", it means any key, such as "a-z", "space", "return", "escape", "mouse_wheel", "mouse_buttons"
--- @param callbackFunc: if keyname is "any", this function will block key if it returns true. 
+-- @param keyname: if "any", it means any key, such as "a-z", "space", "return", "escape", "mouse_wheel", "mouse_buttons"
+-- @param callbackFunc: if keyname is "any", this function will block key if it returns true.  If nil, it will UnRegister the given event. 
 -- case insensitive
 function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
+	if(not callbackFunc) then
+		-- if keyname is nil, it will unregister all key press event
+		self:UnRegisterEvent("onKeyPressed", nil, keyname);
+		return
+	end
 	local event = self:CreateEvent("onKeyPressed");
 	if(not event) then
 		return
@@ -860,6 +865,7 @@ function CodeBlock:RegisterKeyPressedEvent(keyname, callbackFunc)
 	event:SetIsFireForAllActors(true);
 	event:SetStopLastEvent(false);
 	event:SetFunction(callbackFunc);
+	event.tag = keyname;
 	keyname = GameLogic.GetCodeGlobal():GetKeyNameFromString(keyname) or keyname;
 	
 	local function onEvent_(_, msg)
@@ -892,8 +898,13 @@ end
 
 -- if last tick event is not finished, the tick is ignored. 
 -- @param ticks: default to 1 tick
+-- @param callbackFunc: call back function. if nil, it will unregister
 function CodeBlock:RegisterTickEvent(ticks, callbackFunc)
 	ticks = tonumber(ticks or 1);
+	if(not callbackFunc) then
+		self:UnRegisterEvent("onTick", nil, ticks);
+		return
+	end
 	local event = self:CreateEvent("onTick");
 	if(not event) then
 		return
@@ -901,6 +912,7 @@ function CodeBlock:RegisterTickEvent(ticks, callbackFunc)
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
 	event:SetStopLastEvent(false);
+	event.tag = ticks;
 	local tick = 1;
 	local function onEvent_(_, msg)
 		tick = tick + 1;
@@ -964,14 +976,20 @@ function CodeBlock:RegisterAgentEvent(text, callbackFunc)
 	return event;
 end
 
-
+-- @param callbackFunc: if nil, it will unregister the call back function. 
 function CodeBlock:RegisterTextEvent(text, callbackFunc)
+	if(not callbackFunc) then
+		self:UnRegisterEvent("onText"..text, nil, text);
+		return
+	end
+
 	local event = self:CreateEvent("onText"..text);
 	if(not event) then
 		return
 	end
 	event:SetIsFireForAllActors(true);
 	event:SetFunction(callbackFunc);
+	event.tag = text;
 	local function onEvent_(_, msg)
 		if(msg and msg.dest) then
 			for i, actor in ipairs(self:GetActors()) do
@@ -995,24 +1013,65 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	return event;
 end
 
+-- @param eventname: if nil, we will remove all.
+-- @param callbackFunc: if nil, we will remove all event of eventname
+-- @param eventTag: if callbackFunc is nil, we will destroy events with the given tag. self.tag==tag. 
+function CodeBlock:UnRegisterEvent(eventname, callbackFunc, eventTag)
+	if(eventname) then
+		local events = self.events[eventname];
+	
+		if(callbackFunc) then
+			for i, event in ipairs(events) do
+				if (event.callbackFunc == callbackFunc) then
+					if(event.UnRegisterTextEvent) then
+						event.UnRegisterTextEvent();
+					end
+					event:Destroy();
+					table.remove(events, i);
+					break;
+				end
+			end
+			if #events == 0 then
+				self.events[eventname] = nil;
+			end
+		else
+			if(eventTag) then
+				while(true) do
+					local found;
+					for i, event in ipairs(events) do
+						if (event.tag == eventTag) then
+							if(event.UnRegisterTextEvent) then
+								event.UnRegisterTextEvent();
+							end
+							event:Destroy();
+							table.remove(events, i);
+							found = true
+							break;
+						end
+					end
+					if(not found) then
+						break
+					end
+				end
+				if #events == 0 then
+					self.events[eventname] = nil;
+				end
+			else
+				 -- remove all event of eventname
+				for i, event in ipairs(events) do
+					event:Destroy();
+				end
+				self.events[eventname] = nil;
+			end
+		end
+	else
+		self:RemoveAllEvents()
+	end
+end
+
 function CodeBlock:UnRegisterTextEvent(text, callbackFunc)
 	local eventname = "onText"..text;
-	local events = self.events[eventname];
-	
-	for i, event in ipairs(events) do
-		if event.callbackFunc == callbackFunc then
-			if(event.UnRegisterTextEvent) then
-				event.UnRegisterTextEvent();
-			end
-			event:Destroy();
-			table.remove(events, i);
-			break;
-		end
-	end
-	
-	if #events == 0 then
-		self.events[eventname] = nil;
-	end
+	self:UnRegisterEvent(eventname, callbackFunc)
 end
 
 -- @param onFinishedCallback: can be nil

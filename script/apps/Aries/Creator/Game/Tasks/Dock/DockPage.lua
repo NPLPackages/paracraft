@@ -50,7 +50,7 @@ DockPage.top_line_1 = {
 }
 DockPage.top_line_2 = {
     { label = L"", },
-    { label = L"", },
+    { label = L"端午活动", id = "dragonboatfestival", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_duanwu_32bits.png#0 0 100 80" },
     { label = L"呼朋唤友", id = "invitefriend", enabled2 = true, bg="Texture/Aries/Creator/keepwork/InviteFriend/btn3_jieban_32bits.png#0 0 100 80", }, 
     { label = L"作业", id = "homework", enabled2 = false, bg="Texture/Aries/Creator/keepwork/dock/btn3_zuoye_32bits.png#0 0 100 80", },
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_riji_32bits.png#0 0 100 80", },
@@ -295,9 +295,13 @@ function DockPage.OnClickTop(id)
         InviteFriend.ShowView()
         table.insert(DockPage.showPages,{id,InviteFriend.GetPageCtrl()})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.invitefriend");
-    elseif (id == 'rank') then        
+    elseif (id == 'rank') then    
         RankPage.Show();
-        table.insert(DockPage.showPages,{id,RankPage.GetPageCtrl()})    end
+        table.insert(DockPage.showPages,{id,RankPage.GetPageCtrl()})
+    elseif (id == 'dragonboatfestival') then
+        local ActDragonBoatFestival = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActDragonBoatFestival/ActDragonBoatFestival.lua");
+        ActDragonBoatFestival:Init();
+    end
 end
 function DockPage.OnClick(id)
     if(DockPage.CloseLastShowPage(id))then
@@ -380,6 +384,15 @@ function DockPage.OnClick(id)
         end
         KeepWorkMallPage.Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.mall");
+        return
+    elseif(id == "school_center")then
+        local SchoolCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/SchoolCenter.lua")
+        SchoolCenter.OpenPage(function(last_page_ctrl)
+            DockPage.last_page_ctrl = last_page_ctrl;
+            DockPage.last_page_ctrl_id = id;
+            table.insert(DockPage.showPages,{id,last_page_ctrl})
+        end)
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.school_center");
         return
     elseif id == "vip_make_up" then
         -- if System.User.isVip then

@@ -105,6 +105,7 @@ function ChatWindow.InitSystem()
 			ParentWnd = {alignment = "_lb", left = 2, top = -335, width = 700, height = 330},
 		}
 	end
+
 	ChatWindow.BeShowAll = false;
 	ChatWindow.IsInited = true;
 	ChatWindow.minimized = false; -- start minimized. 
@@ -339,6 +340,12 @@ end
 -- show the chat log page. 
 -- e.g. ChatWindow.ShowChatLogPage(true, "_lb", 0, -420, 450, 300)
 function ChatWindow.ShowChatLogPage(bForceRefreshPage, alignment, left, top, width, height)
+	if System.os.IsTouchMode() then
+		ChatWindow.DefaultUIPos.EditWnd = {alignment = "_lb", left = 2, top = -40, width = 700, height = 50}
+		ChatWindow.DefaultUIPos.EditWnd_ggs_valid = {alignment = "_lb", left = 2, top = -40, width = 400, height = 50}
+		ChatWindow.DefaultUIPos.LogWnd = {alignment = "_lb", left = 2, top = -290, width = 400, height = 250}
+	end
+
 	if(bForceRefreshPage or not ChatWindow.page) then
 		ChatWindow.page = Map3DSystem.mcml.PageCtrl:new({
 			url="script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.html", 
@@ -349,7 +356,6 @@ function ChatWindow.ShowChatLogPage(bForceRefreshPage, alignment, left, top, wid
 		ParaUI.Destroy("ChatLogPage");
 	end
 	local _parent = ParaUI.GetUIObject("ChatLogPage");
-
 	if(not _parent or not _parent:IsValid()) then
 		_parent = ParaUI.CreateUIObject("container", "ChatLogPage", alignment or ChatWindow.DefaultUIPos.LogWnd.alignment, left or ChatWindow.DefaultUIPos.LogWnd.left, top or ChatWindow.DefaultUIPos.LogWnd.top, width or ChatWindow.DefaultUIPos.LogWnd.width, height or ChatWindow.DefaultUIPos.LogWnd.height);
 		_parent.background = "";

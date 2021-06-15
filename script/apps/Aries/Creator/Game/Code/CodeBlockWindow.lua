@@ -1308,7 +1308,7 @@ end
 
 function CodeBlockWindow.IsSupportNplBlockly()
 	local entity = CodeBlockWindow.GetCodeEntity();
-	return entity and entity.class_name == "EntityCode" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
+	return entity and type(entity.IsBlocklyEditMode) == "function" and type(entity.IsUseNplBlockly) == "function" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
 end
 
 function CodeBlockWindow.UpdateNplBlocklyCode()
@@ -1340,8 +1340,9 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 
 	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
 	local width, height = self:CalculateMargins();
+	local language = entity:IsUseCustomBlock() and "UserCustomBlock" or entity:GetLanguageConfigFile();
 	NplBlocklyEditorPage = Page.Show({
-		BlocklyType = entity:IsUseCustomBlock() and "" or "npl",
+		Language = (language == "npl" or language == "") and "SystemNplBlock" or "npl",
 		xmltext = entity:GetNPLBlocklyXMLCode() or "",
 		ToolBoxXmlText = entity:GetNplBlocklyToolboxXmlText(),
 		OnChange = function()

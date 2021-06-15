@@ -26,8 +26,8 @@ function QuestWork.OnInit()
     page.OnClose = QuestWork.CloseView
 end
 
-function QuestWork.Show()
-    QuestWork.TypeIndex = 1
+function QuestWork.Show(TypeIndex)
+    QuestWork.TypeIndex = TypeIndex or 1
     QuestWork.GetWorkList(QuestWork.ShowView)
 end
 

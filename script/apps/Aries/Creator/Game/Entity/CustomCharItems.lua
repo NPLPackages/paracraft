@@ -39,7 +39,10 @@ function CustomCharItems:Init()
 				if (name == "geoset") then
 					local slotId = attr.category or 0;
 					local itemId = attr.id or 0;
-					item.data.geoset = tonumber(slotId) * 100 + tonumber(itemId);
+					if (item.data.geoset == nil) then
+						item.data.geoset = {};
+					end
+					item.data.geoset[#(item.data.geoset) + 1] = tonumber(slotId) * 100 + tonumber(itemId);
 				elseif (name == "texture") then
 					item.data.texture = string.format("%s:%s", attr.id or "0", attr.filename or "");
 				elseif (name == "attachment") then
@@ -141,7 +144,7 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 				local debug = ParaEngine.GetAppCommandLineByParam("debug", false);
 				if (item.debug ~= "true" or (debug == "true" and item.debug == "true" and not avatar)) then
 					local data = self:GetItemById(item.id, modelType);
-					if (data and (checkGeoset[1] == 0 or checkGeoset[1] == data.geoset or checkGeoset[2] == data.geoset)) then
+					if (data and (checkGeoset[1] == 0 or checkGeoset[1] == data.geoset[1] or checkGeoset[2] == data.geoset[1])) then
 						data.id = item.id;
 						data.icon = item.icon;
 						data.name = item.name;
@@ -176,11 +179,12 @@ CustomCharItems.defaultSkinTable = {
 				"Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png",
 				"Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png",
 				"Texture/blocks/Paperman/mouth/mouth_01.png",
-				"Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png"},
+				"Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png",
+				"Texture/blocks/CustomGeoset/main/Avatar_tsj.png"},
 	attachments = {}
 }
 
-CustomCharItems.defaultSkinString = "1#201#301#401#501#801#901#@1:Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png;2:Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png;3:Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png;4:Texture/blocks/Paperman/mouth/mouth_01.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png";
+CustomCharItems.defaultSkinString = "1#201#301#401#501#801#901#@1:Texture/blocks/CustomGeoset/hair/Avatar_boy_hair_01.png;2:Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png;3:Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png;4:Texture/blocks/Paperman/mouth/mouth_01.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png;6:Texture/blocks/CustomGeoset/main/Avatar_tsj.png";
 
 function CustomCharItems:SkinTableToString(skin)
 	local customGeosets = "";
@@ -243,7 +247,7 @@ function CustomCharItems:SkinStringToItemIds(skin)
 			end
 			if (id > 300 and id < 400) then
 				for _, item in ipairs(items) do
-					if (item.data.geoset == id) then
+					if (item.data.geoset[1] == id or item.data.geoset[2] == id) then
 						idString = item.data.id..";";
 						break;
 					end
@@ -255,7 +259,7 @@ function CustomCharItems:SkinStringToItemIds(skin)
 		function checkItem(item, geosets)
 			for geoset in string.gfind(geosets, "([^#]+)") do
 				local id = tonumber(geoset);
-				if (item.data.geoset == id or item.data.geoset == nil) then
+				if (item.data.geoset == nil or item.data.geoset[1] == id or item.data.geoset[2] == id or item.data.geoset[1] == nil) then
 					return true;
 				end
 			end
@@ -364,7 +368,9 @@ function CustomCharItems:AddItemToSkinTable(skinTable, item)
 		return;
 	end
 	if (item.geoset) then
-		skinTable.geosets[math.floor(item.geoset/100) + 1] = item.geoset % 100;
+		for _, gs in ipairs(item.geoset) do
+			skinTable.geosets[math.floor(gs/100) + 1] = gs % 100;
+		end
 	end
 	if (item.texture) then
 		local id, filename = string.match(item.texture, "(%d+):(.*)");
@@ -396,25 +402,27 @@ function CustomCharItems:RemoveItemInSkin(skin, itemId)
 		local item = CustomCharItems:GetItemById(itemId);
 		if (item) then
 			if (item.geoset) then
-				local str = tostring(item.geoset);
-				if (item.geoset < 100) then
-					currentSkin = string.gsub(currentSkin, str.."#", "1#");
-				elseif (item.geoset < 200) then
-				elseif (item.geoset < 300) then
-					currentSkin = string.gsub(currentSkin, str, "201");
-				elseif (item.geoset < 400) then
-					currentSkin = string.gsub(currentSkin, str, "301");
-				elseif (item.geoset < 500) then
-					currentSkin = string.gsub(currentSkin, str, "401");
-				elseif (item.geoset < 600) then
-					currentSkin = string.gsub(currentSkin, str, "501");
-				elseif (item.geoset < 700) then
-				elseif (item.geoset < 800) then
-				elseif (item.geoset < 900) then
-					currentSkin = string.gsub(currentSkin, str, "801");
-				elseif (item.geoset < 1000) then
-					currentSkin = string.gsub(currentSkin, str, "901");
-				else
+				for _, gs in ipairs(item.geoset) do
+					local str = tostring(gs);
+					if (gs < 100) then
+						currentSkin = string.gsub(currentSkin, str.."#", "1#");
+					elseif (gs < 200) then
+					elseif (gs < 300) then
+						currentSkin = string.gsub(currentSkin, str, "201");
+					elseif (gs < 400) then
+						currentSkin = string.gsub(currentSkin, str, "301");
+					elseif (gs < 500) then
+						currentSkin = string.gsub(currentSkin, str, "401");
+					elseif (gs < 600) then
+						currentSkin = string.gsub(currentSkin, str, "501");
+					elseif (gs < 700) then
+					elseif (gs < 800) then
+					elseif (gs < 900) then
+						currentSkin = string.gsub(currentSkin, str, "801");
+					elseif (gs < 1000) then
+						currentSkin = string.gsub(currentSkin, str, "901");
+					else
+					end
 				end
 			end
 			if (item.texture) then
@@ -427,6 +435,7 @@ function CustomCharItems:RemoveItemInSkin(skin, itemId)
 				id = tonumber(id);
 				if (id == 11) then
 					currentSkin = string.gsub(currentSkin, "0#", "1#");
+					currentSkin = string.gsub(currentSkin, "300#", "301#");
 				end
 				currentSkin = string.gsub(currentSkin, item.attachment..";", "");
 			end

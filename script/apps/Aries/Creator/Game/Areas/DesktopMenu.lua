@@ -81,6 +81,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 			{
 				{text = L"探索...",name = "window.explore", onclick=nil},
 				--{text = L"角色换装...",name = "window.changeskin", onclick=nil},
+				{text = L"校园中心...",name = "window.schoolcenter",onclick=nil},
 				{text = L"材质包管理...",name = "window.texturepack",onclick=nil},
 				{text = L"资源...",name = "window.mall",onclick=nil},
 				{text = L"背包...",name = "window.userbag",onclick=nil},

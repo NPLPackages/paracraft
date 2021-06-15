@@ -732,6 +732,10 @@ function CodeIntelliSense:OnUserKeyPress(textCtrl, event)
 		CodeIntelliSense.ProcessAutoComplete(textCtrl);
 		event:accept();
 	end
+
+	if keyname == "DIK_RETURN" then
+		GameLogic.GetFilters():apply_filters("SchoolCenter.AddEvent", "create.world.code");
+	end
 end
 
 function CodeIntelliSense.CursorOnBracket(textCtrl)

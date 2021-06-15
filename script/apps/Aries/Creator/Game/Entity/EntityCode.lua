@@ -36,7 +36,6 @@ Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "Set
 Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
 Entity:Property({"hasDiskFileMirror", false, "HasDiskFileMirror", "SetHasDiskFileMirror"})
 Entity:Property({"isOpenSource", false, "IsOpenSource", "SetOpenSource"})
-Entity:Property("NplBlocklyToolboxXmlText");
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
 Entity:Signal("remotelyUpdated")
@@ -113,118 +112,16 @@ function Entity:OnNeighborChanged(x,y,z, from_block_id)
 		self:ScheduleRefresh(x,y,z);
 	end
 end
-
-
-function Entity:SetBlocklyXMLCode(blockly_xmlcode)
-	if (self:IsUseNplBlockly()) then
-		self:SetNPLBlocklyXMLCode(blockly_xmlcode or "");
-	else
-		self.blockly_xmlcode = blockly_xmlcode;
-	end
-end
-
-function Entity:GetBlocklyXMLCode()
-	return self.blockly_xmlcode;
-end
-
-
-function Entity:SetBlocklyNPLCode(blockly_nplcode)
-	if (self:IsUseNplBlockly()) then
-		self:SetNPLBlocklyNPLCode(blockly_nplcode or "");
-	else
-		self.blockly_nplcode = blockly_nplcode;
-		self:SetCommand(blockly_nplcode);
-	end
-end
-
-function Entity:GetBlocklyNPLCode()
-	return self.blockly_nplcode;
-end
-
-function Entity:SetNPLBlocklyXMLCode(blockly_xmlcode)
-	self.npl_blockly_xmlcode = blockly_xmlcode;
-end
-
-function Entity:GetNPLBlocklyXMLCode()
-	return self.npl_blockly_xmlcode or "";
-end
-
-function Entity:SetNPLBlocklyNPLCode(blockly_nplcode)
-	self.npl_blockly_nplcode = blockly_nplcode;
-	self:SetCommand(blockly_nplcode);
-end
-
-function Entity:GetNPLBlocklyNPLCode()
-	return self.npl_blockly_nplcode or "";
-end
-
-function Entity:SetNPLCode(nplcode)
-	self.nplcode = nplcode;
-	self:SetCommand(nplcode);
-end
-
-function Entity:GetNPLCode()
-	return self.nplcode or self:GetCommand();
-end
-
-function Entity:IsCodeEmpty()
-	local cmd = self:GetCommand()
-	if(not cmd or cmd == "") then
-		return true;
-	end
-end
-
-function Entity:TextToXmlInnerNode(text)
-	if(text and commonlib.Encoding.HasXMLEscapeChar(text)) then
-		return {name="![CDATA[", [1] = text};
-	else
-		return text;
-	end
-end
 	
-function Entity:IsBlocklyEditMode()
-	return self.isBlocklyEditMode;
-end
-
-function Entity:SetBlocklyEditMode(bEnabled)
-	if(self.isBlocklyEditMode~=bEnabled) then
-		self.isBlocklyEditMode = bEnabled;
-		if(bEnabled)  then
-			self:SetCommand(self.isUseNplBlockly and self:GetNPLBlocklyNPLCode() or self:GetBlocklyNPLCode());
-		else
-			self:SetCommand(self:GetNPLCode());
-		end
-		self:editModeChanged();
-	end
-end
-
-function Entity:IsUseNplBlockly()
-	return self.isUseNplBlockly;
-end
-
-function Entity:SetUseNplBlockly(bEnabled)
-	self.isUseNplBlockly = bEnabled;
-end
-
-function Entity:SetUseCustomBlock(bEnabled)
-	self.isUseCustomBlock = bEnabled;
-end
-
-function Entity:IsUseCustomBlock()
-	return self.isUseCustomBlock;
-end
-
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	node.attr.allowGameModeEdit = self:IsAllowGameModeEdit();
 	node.attr.isPowered = self.isPowered;
 	node.attr.isBlocklyEditMode = self:IsBlocklyEditMode();
-	if(self:IsUseNplBlockly()) then
-		node.attr.isUseNplBlockly = true;
+	if(self.triggerBoxString and self.triggerBoxString~="") then
+		node.attr.triggerBoxString = self.triggerBoxString;
 	end
-	if(self:IsUseCustomBlock()) then
-		node.attr.isUseCustomBlock = true;
-	end
+	
 	if(self:IsAllowClientExecution()) then
 		node.attr.allowClientExecution = true;
 	end
@@ -245,25 +142,8 @@ function Entity:SaveToXMLNode(node, bSort)
 		node.attr.codeLanguageType = self:GetCodeLanguageType();
 	end
 
-	if((self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") or self:GetNPLBlocklyXMLCode()~="") then
-		local blocklyNode = {name="blockly", };
-		node[#node+1] = blocklyNode;
-		blocklyNode[#blocklyNode+1] = {name="xmlcode", self:TextToXmlInnerNode(self:GetBlocklyXMLCode())}
-		blocklyNode[#blocklyNode+1] = {name="nplcode", self:TextToXmlInnerNode(self:GetBlocklyNPLCode()) }
-		blocklyNode[#blocklyNode+1] = {name="npl_xmlcode", self:TextToXmlInnerNode(self:GetNPLBlocklyXMLCode())}
-		blocklyNode[#blocklyNode+1] = {name="npl_nplcode", self:TextToXmlInnerNode(self:GetNPLBlocklyNPLCode()) }
-		blocklyNode[#blocklyNode+1] = {name="npl_toolbox_xml_text", self:TextToXmlInnerNode(self:GetNplBlocklyToolboxXmlText()) }
-		if(self:GetNPLCode()~=self:GetBlocklyNPLCode()) then
-			blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
-		end
-	end
-	if(self.includedFiles) then
-		local includedFilesNode = {name="includedFiles", };
-		node[#node+1] = includedFilesNode;
-		for i, name in ipairs(self.includedFiles) do
-			includedFilesNode[i] = {name="filename", name}
-		end
-	end
+	self:SaveBlocklyToXMLNode(node);
+
 	return node;
 end
 
@@ -274,11 +154,9 @@ function Entity:LoadFromXMLNode(node)
 	self.isAllowFastMode = (node.attr.allowFastMode == "true" or node.attr.allowFastMode == true);
 	self.hasDiskFileMirror = (node.attr.hasDiskFileMirror == "true" or node.attr.hasDiskFileMirror == true);
 	self.isOpenSource = (node.attr.isOpenSource == "true" or node.attr.isOpenSource == true);
-	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	self.languageConfigFile = node.attr.languageConfigFile;
 	self.codeLanguageType = node.attr.codeLanguageType;
-	self.isUseNplBlockly = (node.attr.isUseNplBlockly == "true" or node.attr.isUseNplBlockly == true); 
-    self.isUseCustomBlock = (node.attr.isUseCustomBlock == "true" or node.attr.isUseCustomBlock == true);
+	self.triggerBoxString = node.attr.triggerBoxString;
 	
 	local isPowered = (node.attr.isPowered == "true" or node.attr.isPowered == true);
 	if(isPowered) then
@@ -289,49 +167,10 @@ function Entity:LoadFromXMLNode(node)
 			self:ScheduleRefresh();
 		end
 	end
-	for i=1, #node do
-		if(node[i].name == "blockly") then
-			for j=1, #(node[i]) do
-				local sub_node = node[i][j];
-				local code = sub_node[1]
-				if(code) then
-					if(type(code) == "table" and type(code[1]) == "string") then
-						-- just in case cmd.name == "![CDATA["
-						code = code[1];
-					end
-				end
-				if(type(code) == "string") then
-					if(sub_node.name == "xmlcode") then
-						self:SetBlocklyXMLCode(code);
-					elseif(sub_node.name == "nplcode") then
-						self:SetBlocklyNPLCode(code);
-					elseif(sub_node.name == "npl_xmlcode") then
-						self:SetNPLBlocklyXMLCode(code);
-					elseif(sub_node.name == "npl_nplcode") then
-						self:SetNPLBlocklyNPLCode(code);
-					elseif(sub_node.name == "code") then
-						self:SetNPLCode(code);
-					elseif(sub_node.name == "npl_toolbox_xml_text") then
-						self:SetNplBlocklyToolboxXmlText(code);
-					end
-				end
-			end
-		elseif(node[i].name == "includedFiles") then
-			self.includedFiles = {};
-			for j=1, #(node[i]) do
-				local sub_node = node[i][j];
-				local filename = sub_node[1]
-				self.includedFiles[j] = filename;
-			end
-		end
-	end
-	if(not self.isBlocklyEditMode and not self.nplcode) then
-		self.nplcode = self:GetCommand();
-	end
-	if(self.isBlocklyEditMode) then
-		self:SetCommand(self.isUseNplBlockly and self:GetNPLBlocklyNPLCode() or self:GetBlocklyNPLCode());
-	else
-		self:SetCommand(self:GetNPLCode());
+	self:LoadBlocklyFromXMLNode(node);
+
+	if(self.triggerBoxString) then
+		self:SetTriggerBoxByString(self.triggerBoxString)
 	end
 end
 
@@ -970,22 +809,29 @@ function Entity:SetTriggerBoxByString(strArea)
 	end
 	
 	if(strArea and strArea~="") then
+		local triggerBoxString = strArea
 		local x, y, z, dx, dy, dz;
 		x, y, z, strArea = CmdParser.ParsePos(strArea, self);
 		if(x) then
 			dx, dy, dz, strArea = CmdParser.ParsePosInBrackets(strArea);
 			if(dx) then
 				local trigger = BoxTrigger:new():Init(x, z, x + dx, z + dz)
+				local bx, by, bz = self:GetBlockPos();
+				trigger:SetBlockPos(bx, by, bz)
 				trigger:Attach();
 				trigger:Connect("enterTrigger", self, self.OnEntityEnterTrigger)
 				trigger:Connect("leaveTrigger", self, self.OnEntityLeaveTrigger)
-				self.triggerBoxString = strArea;
+				self.triggerBoxString = triggerBoxString;
 				self.boxTrigger = trigger;
 				return
 			end
 		end
 	end
 	self.triggerBoxString = nil;
+end
+
+function Entity:GetTriggerBoxString()
+	return self.triggerBoxString
 end
 
 function Entity:GetTriggerBox()

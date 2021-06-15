@@ -444,6 +444,13 @@ function options:OnLoadWorld()
 		end, 3000)
 	end
 
+	local kpParentWorldId = WorldCommon.GetWorldTag("parentProjectId")
+	if kpParentWorldId and tonumber(kpParentWorldId) > 0 then
+		commonlib.TimerManager.SetTimeout(function()  
+			GameLogic.RunCommand(string.format("/loadworld -s -force  -inplace %d | /sendevent globalGotoCreate",kpParentWorldId))
+		end, 500)
+	end
+
 	GameLogic.RunCommand('/shader 1')
 end
 

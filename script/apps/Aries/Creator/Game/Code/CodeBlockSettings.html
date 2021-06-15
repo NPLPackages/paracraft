@@ -35,6 +35,11 @@ end
         </div>
     </div>-->
     <div style="margin-bottom:10px;">
+        <%=L"自动开关范围: "%>
+        <input type="text" uiname="CodeBlockSettings.txtTriggerBox" EmptyText="~ ~ ~ (dx dy dz)" name="txtTriggerBox" style="height:23px" onchange="CodeBlockSettings.OnChangeBoxTriggerString"/>
+        <div style="color:#808080;font-size:12px"><%=L"当主角进入该区域时自动启动代码方块, 离开时关闭"%></div>
+    </div>
+    <div style="margin-bottom:10px;">
         <input type="checkbox" uiname="CodeBlockSettings.allowClientExecution" name="allowClientExecution" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeAllowClientExecution"/>
         <div uiname="CodeBlockSettings.allowClientExecutionFor"  for="allowClientExecution" style="float:left;margin-left:5px;" >
             <%=L"允许客户端执行代码"%>

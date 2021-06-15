@@ -46,7 +46,8 @@ function FriendsPage.OnInit()
 	TypeToCb[TopBtListType.Followers] = FriendsPage.GetFollowersLlist
 end
 
-function FriendsPage.Show()
+function FriendsPage.Show(index)
+	FriendsPage.index = index or 1
 	KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
         if(err ~= 200)then
             return
@@ -73,7 +74,7 @@ function FriendsPage.Show()
 				style = CommonCtrl.WindowFrame.ContainerStyle,
 				allowDrag = true,
 				enable_esc_key = true,
-				zorder = -1,
+				zorder = 0,
 				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 				directPosition = true,
 					align = "_ctl",
@@ -83,7 +84,7 @@ function FriendsPage.Show()
 					height = 583,
 			};
 			System.App.Commands.Call("File.MCMLWindowFrame", params);
-			FriendsPage.OnChange(1);
+			FriendsPage.OnChange(FriendsPage.index);
 	
 			IsOpen = true
 

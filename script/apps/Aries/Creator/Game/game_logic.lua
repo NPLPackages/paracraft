@@ -258,6 +258,9 @@ function GameLogic.InitCommon()
 		--ClassManager.StaticInit();
 	end
 
+	local SchoolCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/SchoolCenter.lua")
+	SchoolCenter.OnInt()
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMain.lua");
 	local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
 	ParaWorldMain:Init()

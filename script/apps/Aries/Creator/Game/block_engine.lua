@@ -711,15 +711,19 @@ function BlockEngine:SetBlock(x,y,z,block_id, block_data, flag, entity_data)
 				if(not block.cubeMode and block.customModel) then
 					block:UpdateModel(x,y,z, block_data)
 				end
+
 				if(flag ~= 0) then
 					block:OnBlockAdded(x,y,z, block_data, entity_data);
 				end
 			end
+
+			GameLogic.GetFilters():apply_filters("SchoolCenter.AddEvent", "create.world.block");
 		end
 
 		if(flag and flag >= 3) then
 			BlockEngine:NotifyNeighborBlocksChange(x, y, z, block_id);
 		end
+		
 		return true;
 	end
 end

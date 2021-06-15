@@ -46,6 +46,7 @@ function CodeBlockSettings.OnInit()
 	page = document:GetPageCtrl();
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
+		page:SetValue("txtTriggerBox", entity:GetTriggerBoxString() or "");
 		page:SetValue("allowClientExecution", entity:IsAllowClientExecution() == true);
 		page:SetValue("allowFastMode", entity:IsAllowFastMode() == true);
 		page:SetValue("isOpenSource", type(entity.IsOpenSource) == "function" and entity:IsOpenSource() == true);
@@ -150,4 +151,16 @@ function CodeBlockSettings.ClickCustomBlockBtn()
 		height = 1000,
 		url = "%ui%/Blockly/Pages/BlocklyFactory.html",
 	});
+end
+
+function CodeBlockSettings.OnChangeBoxTriggerString()
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(page and entity) then 
+		local triggerString = page:GetValue("txtTriggerBox")
+		entity:SetTriggerBoxByString(triggerString)
+		local codeBlock = entity:GetCodeBlock()
+		if(codeBlock) then
+			codeBlock:stateChanged();
+		end
+	end
 end

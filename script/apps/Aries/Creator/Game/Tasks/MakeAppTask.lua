@@ -84,7 +84,7 @@ function MakeApp:RunImp(mode, ...)
 				x = -250,
 				y = -225,
 				width = 500,
-				height = 450,
+				height = 460,
 				cancelShowAnimation = true,
 				bToggleShowHide = true,
 			}

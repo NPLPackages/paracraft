@@ -154,6 +154,9 @@ Commands["menu"] = {
 			task:Run();
 		elseif(name == "window.explore") then
 			GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
+		elseif(name == "window.schoolcenter") then
+			local SchoolCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/SchoolCenter.lua")
+			SchoolCenter.OpenPage()
 		elseif(name == "window.changeskin") then
 			--[[
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SkinPage.lua");

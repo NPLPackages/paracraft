@@ -108,6 +108,10 @@ HttpWrapper.Create("keepwork.user.honors", "%MAIN%/core/v0/users/honors","GET",t
 -- http://yapi.kp-para.cn/project/32/interface/api/3817
 HttpWrapper.Create("keepwork.user.set_class", "%MAIN%/core/v0/users/classes","PUT",true);
 
+-- 用户是否老师
+-- http://yapi.kp-para.cn/project/32/interface/api/4207
+HttpWrapper.Create("keepwork.user.roles_in_campus", "%MAIN%/core/v0/campusCenter/rolesInCampus","GET",true);
+
 -- 获取socketio地址
 -- http://yapi.kp-para.cn/project/165/interface/api/3992
 HttpWrapper.Create("keepwork.app.availableHost", "%MAIN%/push-manage/v0/app/availableHost","GET",true);

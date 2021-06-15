@@ -195,9 +195,16 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 	end
 
 	if (textures) then
+		local replace_hand = false;
 		for id, filename in textures:gmatch("(%d+):([^;]+)") do
 			id = tonumber(id)
+			if (id == 6) then
+				replace_hand = true;
+			end
 			player:SetReplaceableTexture(id, ParaAsset.LoadTexture("", filename, 1));
+		end
+		if (not replace_hand) then
+			player:SetReplaceableTexture(6, ParaAsset.LoadTexture("", CustomCharItems.defaultSkinTable.textures[6], 1));
 		end
 	end
 

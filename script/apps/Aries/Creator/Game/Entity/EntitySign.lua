@@ -44,6 +44,7 @@ Entity.text_color = "0 0 0";
 Entity.text_offset = {x=0,y=0.42,z=0.37};
 
 function Entity:ctor()
+	self:SetUseNplBlockly(true);
 end
 
 function Entity:OnBlockAdded(x,y,z, data)
@@ -227,125 +228,15 @@ function Entity:GetCodeLanguageType()
     return self.codeLanguageType;
 end
 
-
-function Entity:SetBlocklyXMLCode(blockly_xmlcode)
-	self.blockly_xmlcode = blockly_xmlcode;
-end
-
-function Entity:GetBlocklyXMLCode()
-	return self.blockly_xmlcode;
-end
-
-
-function Entity:SetBlocklyNPLCode(blockly_nplcode)
-	self.blockly_nplcode = blockly_nplcode;
-	self:SetCommand(blockly_nplcode);
-end
-
-function Entity:GetBlocklyNPLCode()
-	return self.blockly_nplcode;
-end
-
-function Entity:SetNPLCode(nplcode)
-	self.nplcode = nplcode;
-	self:SetCommand(nplcode);
-end
-
-function Entity:GetNPLCode()
-	return self.nplcode or self:GetCommand();
-end
-
-function Entity:IsCodeEmpty()
-	local cmd = self:GetCommand()
-	if(not cmd or cmd == "") then
-		return true;
-	end
-end
-
-function Entity:TextToXmlInnerNode(text)
-	if(text and commonlib.Encoding.HasXMLEscapeChar(text)) then
-		return {name="![CDATA[", [1] = text};
-	else
-		return text;
-	end
-end
-	
-function Entity:IsBlocklyEditMode()
-	return self.isBlocklyEditMode;
-end
-
-function Entity:SetBlocklyEditMode(bEnabled)
-	if(self.isBlocklyEditMode~=bEnabled) then
-		self.isBlocklyEditMode = bEnabled;
-		if(bEnabled)  then
-			self:SetCommand(self:GetBlocklyNPLCode());
-		else
-			self:SetCommand(self:GetNPLCode());
-		end
-		self:editModeChanged();
-	end
-end
-
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
-	if(self:IsBlocklyEditMode()) then
-		node.attr.isBlocklyEditMode = true;
-	end
-
-	if(self:GetBlocklyXMLCode() and self:GetBlocklyXMLCode()~="") then
-		local blocklyNode = {name="blockly", };
-		node[#node+1] = blocklyNode;
-		blocklyNode[#blocklyNode+1] = {name="xmlcode", self:TextToXmlInnerNode(self:GetBlocklyXMLCode())}
-		blocklyNode[#blocklyNode+1] = {name="nplcode", self:TextToXmlInnerNode(self:GetBlocklyNPLCode()) }
-		if(self:GetNPLCode()~=self:GetBlocklyNPLCode()) then
-			blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
-		end
-	end
+	self:SaveBlocklyToXMLNode(node);
 	return node;
 end
 
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
-	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
-
-	for i=1, #node do
-		if(node[i].name == "blockly") then
-			for j=1, #(node[i]) do
-				local sub_node = node[i][j];
-				local code = sub_node[1]
-				if(code) then
-					if(type(code) == "table" and type(code[1]) == "string") then
-						-- just in case cmd.name == "![CDATA["
-						code = code[1];
-					end
-				end
-				if(type(code) == "string") then
-					if(sub_node.name == "xmlcode") then
-						self:SetBlocklyXMLCode(code);
-					elseif(sub_node.name == "nplcode") then
-						self:SetBlocklyNPLCode(code);
-					elseif(sub_node.name == "code") then
-						self:SetNPLCode(code);
-					end
-				end
-			end
-		elseif(node[i].name == "includedFiles") then
-			self.includedFiles = {};
-			for j=1, #(node[i]) do
-				local sub_node = node[i][j];
-				local filename = sub_node[1]
-				self.includedFiles[j] = filename;
-			end
-		end
-	end
-	if(not self.isBlocklyEditMode and not self.nplcode) then
-		self.nplcode = self:GetCommand();
-	end
-	if(self.isBlocklyEditMode) then
-		self:SetCommand(self:GetBlocklyNPLCode());
-	else
-		self:SetCommand(self:GetNPLCode());
-	end
+	self:LoadBlocklyFromXMLNode(node);
 end
 
 function Entity:GetCodeBlock(bCreateIfNotExist)

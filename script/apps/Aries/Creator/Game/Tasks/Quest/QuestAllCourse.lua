@@ -530,6 +530,7 @@ function QuestAllCourse.GotoClass(index, is_pre)
     -- 刷新课程列表控件
     QuestAllCourse.FreshGridView("course_list")
 
+    GameLogic.GetFilters():apply_filters("service.session.add_rice", "study")
     QuestAllCourse.RunCommand(index, is_pre)
 end
 
@@ -985,6 +986,8 @@ function QuestAllCourse.ClickWork(index, is_pre)
                     end
                 end
             end
+
+            GameLogic.GetFilters():apply_filters("service.session.add_rice", "work")
 
             local type = work_data.type -- 0：更新世界类型，1：更新家园，2：作业世界
             local client_data = QuestAction.GetClientData()

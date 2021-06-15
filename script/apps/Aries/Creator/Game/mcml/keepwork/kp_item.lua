@@ -54,13 +54,13 @@ function kp_item.render_callback(mcmlNode, rootName, bindingContext, _parent, le
     end
 
 	if background == "1" then
-		if icon_config[gsid] then
+		local item = CustomCharItems:GetItemByGsid(tostring(gsid))
+		print("iiiiiiiiiiiiiiiiiiiiiiiiiii", item)
+		if item then
+			background = item.icon
+		elseif icon_config[gsid] then
+			LOG.std(nil, "debug", "kp_item", "%s item can not find", gsid);
 			background = icon_config[gsid]
-		else
-			local item = CustomCharItems:GetItemByGsid(tostring(gsid))
-			if item then
-				background = item.icon
-			end
 		end
 
     end

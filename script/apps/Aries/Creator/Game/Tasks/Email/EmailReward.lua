@@ -6,6 +6,9 @@
     local EmailReward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/EmailReward.lua" ) 
     EmailReward.ShowView()
 ]]
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local EmailReward = NPL.export()
 local page = nil
 EmailReward.rewards = {}
@@ -18,6 +21,8 @@ end
 
 function EmailReward.ShowView(rewards)
     EmailReward.rewards = rewards or test
+    print("zzzzzzzzzzzzzzz===============")
+    echo(EmailReward.rewards,true)
     local view_width = 440
     local view_height = 310
     local params = {
@@ -49,8 +54,15 @@ end
 
 function EmailReward.GetRewardIcon(index)
     if EmailReward.rewards and EmailReward.rewards[index] then
-        local gsId = EmailReward.rewards[index].gsId   
-        return string.format("Texture/Aries/Creator/keepwork/items/item_%d_32bits.png;32 0 65 64",gsId)    
+        local gsId = EmailReward.rewards[index].gsId
+        local icon = string.format("Texture/Aries/Creator/keepwork/items/item_%d_32bits.png;32 0 65 64",gsId)  
+        if gsId > 80000 then
+            local item = CustomCharItems:GetItemByGsid(tostring(gsId))
+			if item then
+				icon = item.icon
+			end
+        end
+        return icon   
     end 
     return ""   
 end
@@ -75,6 +87,16 @@ function EmailReward.GetRewardNum(index)
     return 0
 end
 
+function EmailReward.GetRewardTips(index)
+    if EmailReward.rewards and EmailReward.rewards[index] then
+        local gsId = EmailReward.rewards[index].gsId
+        local itemTemplate = KeepWorkItemManager.GetItemTemplate(gsId);
+        if itemTemplate then
+            return itemTemplate.name
+        end
+    end  
+end
+
 function EmailReward.InitRewardUI()
     local parent_root = page:GetParentUIObject() 
 
@@ -91,8 +113,12 @@ function EmailReward.InitRewardUI()
         parent_root:AddChild(rewardBg)
 
         local icon = ParaUI.CreateUIObject("container", "icon"..i, "_lt", 6, 0, 48, 48);
+        local tooltip = EmailReward.GetRewardTips(i)
         icon.background = EmailReward.GetRewardIcon(i)
-        icon.visible = true  
+        icon.visible = true
+        if tooltip then
+            icon.tooltip=tooltip
+        end  
         rewardBg:AddChild(icon)
 
 

@@ -176,41 +176,40 @@ end
 --点击公告图片，此处需要添加埋点事件
 function Notice.OnImageBgClick(data)
     --(data,true)
-    local name = data.name    
-    if string.find(name, "邀请好友") and string.find(name, "邀请好友") > 0 then
+    
+    local name = data.name 
+    
+     
+    if string.find(name, "夏令营") and string.find(name, "夏令营") > 0 then
+        Notice.CloseView()
+        local SummerCampIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampIntro.lua") 
+        SummerCampIntro.ShowView()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'summercamp' });
+        return
+    end  
+    
+    if string.find(name, "端午") and string.find(name, "端午") > 0 then
+        Notice.CloseView()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board2', fromName = 'actdragon' });
+        local ActDragonBoatFestival = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActDragonBoatFestival/ActDragonBoatFestival.lua");
+        ActDragonBoatFestival:Init();
+        return
+    end
+    if string.find(name, "结伴学习") and string.find(name, "结伴学习") > 0 then
         Notice.CloseView()
         local InviteFriend = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFriend/InviteFriend.lua")
         InviteFriend.ShowView()
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'invite_friend' });
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'invite_friend' });
         return
-    end   
-    -- if string.find(name, "探索界面") and string.find(name, "探索界面") > 0 then
-    --     Notice.CloseView()
-    --     GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
-    --     GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'explore' });
-    --     return
-    -- end
-    if string.find(name, "排行榜") and string.find(name, "排行榜") > 0 then
-        Notice.CloseView()
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board2', fromName = 'rank' });
-        local RankPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua")
-        RankPage.Show();
-        return
-    end
-    if string.find(name, "新皮肤") and string.find(name, "新皮肤") > 0 then
-        Notice.CloseView()
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'character' });
-        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-        last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
-        return
-    end
+    end  
+
     if string.find(name, "资源库") and string.find(name, "资源库") > 0 then
         Notice.CloseView()
         local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
         KeepWorkMallPage.Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board4', fromName = 'sf_res' });
         return
-    end
+    end   
     
     if string.find(name, "人工智能") and string.find(name, "人工智能") > 0 then
         Notice.CloseView()
@@ -218,6 +217,27 @@ function Notice.OnImageBgClick(data)
         GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board5', fromName = 'AI_class' });
         return
     end
+
+    -- if string.find(name, "探索界面") and string.find(name, "探索界面") > 0 then
+    --     Notice.CloseView()
+    --     GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
+    --     GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'explore' });
+    --     return
+    -- end
+    -- if string.find(name, "排行榜") and string.find(name, "排行榜") > 0 then
+    --     Notice.CloseView()
+    --     GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board2', fromName = 'rank' });
+    --     local RankPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua")
+    --     RankPage.Show();
+    --     return
+    -- end
+    -- if string.find(name, "新皮肤") and string.find(name, "新皮肤") > 0 then
+    --     Notice.CloseView()
+    --     GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board3', fromName = 'character' });
+    --     local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+    --     last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
+    --     return
+    -- end
 
     -- if string.find(name, "五一活动") and string.find(name, "五一活动") > 0 then
     --     Notice.CloseView()

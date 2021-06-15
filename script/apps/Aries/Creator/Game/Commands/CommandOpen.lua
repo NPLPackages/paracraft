@@ -128,11 +128,13 @@ Examples:
 				end
 
 			elseif(protocol) then
-				if(options.p) then
+                if (options.e) then
+					ParaGlobal.ShellExecute("openExternalBrowser", url, "", "", 1);
+				elseif (options.p) then
 					_guihelper.MessageBox(L"你确定要打开:"..url, function()
 						ParaGlobal.ShellExecute("open", url, "", "", 1);
 					end)
-				elseif(not options.width and not options.height) then
+				elseif (not options.width and not options.height) then
 					ParaGlobal.ShellExecute("open", url, "", "", 1);
 				else
 					-- only when width or height is specified, we will use NPL cef browser

@@ -150,13 +150,46 @@
             </div>
         </pe:if> 
     </pe:container>
-    <pe:container ClickThrough="true" alignment="_ctr" style="position:relative;height:90px; background:;">
-        <div style="float:right;margin-right:0px;">
-            <!--资源-->
-            <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->
-            <input type="button" name='mall' onclick="OnClick" style="width:182px;height:68px;background:url(Texture/Aries/Creator/keepwork/dock/btn_ziyuan_32bits.png#0 0 182 68)"/>
-        </div>                
-    </pe:container>
+    <pe:if condition="<%=not System.os.IsTouchMode()%>">
+        <pe:container ClickThrough="true" alignment="_ctr" style="margin-top: -45px;position:relative;height:90px; background:;">
+            <div style="float:right;margin-right:0px;">
+                <!--资源-->
+                <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->
+                <input type="button" name='mall' onclick="OnClick" style="width:198px;height:82px;background:url(Texture/Aries/Creator/keepwork/dock/btn_ziyuan_32bits.png#0 0 198 82)"/>
+                
+            </div>                
+        </pe:container>
+    
+        <pe:container ClickThrough="true" alignment="_ctr" style="margin-top: 25px; height:90px; background:;">
+            <div style="float:right;margin-right:0px;">
+                <!--资源-->
+                <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->
+                <input type="button" name='school_center' onclick="OnClick" style="width:198px;height:82px;background:url(Texture/Aries/Creator/keepwork/dock/btn_xiaoyuan_32bits.png#0 0 198 82)"/>
+                
+            </div>                
+        </pe:container>
+    </pe:if> 
+
+    <pe:if condition="<%=System.os.IsTouchMode()%>">
+        <pe:container ClickThrough="true" alignment="_ctr" style="margin-top: -40px;position:relative;height:90px; background:;">
+            <div style="float:right;margin-right:0px;">
+                <!--资源-->
+                <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->
+                <input type="button" name='mall' onclick="OnClick" style="width:158px;height:65px;background:url(Texture/Aries/Creator/keepwork/dock/btn_ziyuan_32bits.png#0 0 198 82)"/>
+                
+            </div>                
+        </pe:container>
+    
+        <pe:container ClickThrough="true" alignment="_ctr" style="margin-top: 10px; height:90px; background:;">
+            <div style="float:right;margin-right:0px;">
+                <!--资源-->
+                <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->
+                <input type="button" name='school_center' onclick="OnClick" style="width:158px;height:65px;background:url(Texture/Aries/Creator/keepwork/dock/btn_xiaoyuan_32bits.png#0 0 198 82)"/>
+                
+            </div>                
+        </pe:container>
+    </pe:if> 
+    
     <pe:container zorder= "-1" ClickThrough="true" height="100" alignment="_mb" style="position:relative; background:url(Texture/Aries/Creator/keepwork/dock/jianbian-xia_32bits.png#0 0 32 99:8 25 8 25);"></pe:container>
     <pe:container ClickThrough="true" zorder="-1"  alignment="_mt" style="position:relative;margin-top:0px;margin-right:205px;height:270px;background:url(Texture/Aries/Creator/keepwork/dock/jianbian-shang_32bits.png#0 0 32 128:8 32 8 32);"></pe:container>
 </pe:mcml> 

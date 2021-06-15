@@ -47,7 +47,9 @@ function Macros.voice(text)
 		-- play macro voice and macro sound on two channels
 		GameLogic.RunCommand("sound", format("macroplayerVoice %s", filename))
 	else
-		SoundManager:PlayText(text,  nil, 3)
+		if not SoundManager:IsPlayTextSoundPlaying() then
+			SoundManager:PlayText(text,  nil, 3)
+		end
 	end
 end
 

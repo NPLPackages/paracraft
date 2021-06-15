@@ -90,6 +90,8 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+		<!--20210610新增-->
+		<item id="83167" gsid="82007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83167_space_suit_hat_32bits.png" name="宇航帽"/>
 		<!--20210527新增-->
 		<item id="83164" gsid="82004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83164_alloy_silver_helmet_32bits.png" name="合金头盔（白银）"/>
 		<item id="83165" gsid="82005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83165_alloy_green_helmet_32bits.png" name="合金头盔（翡绿）"/>
@@ -434,6 +436,8 @@
 	</category>
 
 	<category name="shirt" text="衣服">
+		<!--20210610新增-->
+		<item id="84059" gsid="83004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84059_space_suit_armor_32bits.png" name="宇航服"/>
 		<!--20210527新增-->
 		<item id="84056" gsid="83001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84056_alloy_silver_armor_32bits.png" name="合金装甲（白银）"/>
 		<item id="84057" gsid="83002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84057_alloy_green_armor_32bits.png" name="合金装甲（翡绿）"/>
@@ -502,6 +506,8 @@
 	</category>
 
 	<category name="pants" text="裤子">
+	    <!--20210610新增-->
+		<item id="85078" gsid="84005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85078_space_suit_pants_32bits.png" name="宇航裤"/>
 		<!--20210527新增-->
 		<item id="85075" gsid="84002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85075_alloy_silver_guards_32bits.png" name="合金守护（白银）"/>
 		<item id="85076" gsid="84003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85076_alloy_green_guards_32bits.png" name="合金守护（翡绿）"/>
@@ -587,6 +593,9 @@
 	</category>
 	
 	<category name="back" text="背部">
+	    <!--20210610新加-->
+		<item id="86041" gsid="85001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86041_space_suit_bag_32bits.png" name="氧气瓶"/>
+
 		<item id="86040" gsid="85000" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86040_shubao_32bits.png" name="小伙伴书包"/>
 		<item id="86008" icon="Texture/Aries/Item/1656_ShopSchoolUniformBoyBack.png" name="黑色书包"/>
 		<item id="86009" icon="Texture/Aries/Item/1657_ShopSchoolUniformGalBack.png" name="白色书包"/>

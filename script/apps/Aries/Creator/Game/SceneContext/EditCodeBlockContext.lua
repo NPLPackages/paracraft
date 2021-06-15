@@ -209,6 +209,18 @@ function EditCodeBlockContext:updateManipulators(delaySeconds)
 
 	self:DeleteManipulators();
 	self:RemoveActor();
+
+	local codeEntity = self:GetCodeEntity()
+
+	if(codeEntity and codeEntity.boxTrigger) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/Manipulators/QuadManipContainer.lua");
+		local QuadManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.QuadManipContainer");
+		local manipCont = QuadManipContainer:new();
+		manipCont:init();
+		self:AddManipulator(manipCont);
+		manipCont:connectToDependNode(codeEntity.boxTrigger);
+	end
+
 	if(self:IsCodeRunning()) then
 		return;
 	end

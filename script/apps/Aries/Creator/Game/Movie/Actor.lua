@@ -541,6 +541,7 @@ function Actor:AddKeyFrame()
 	self:FrameMoveRecording(0);
 	self:SetControllable(self:IsAllowUserControl() == true);
 	self.is_adding_key = nil;
+	GameLogic.GetFilters():apply_filters("SchoolCenter.AddEvent", "create.world.animation");
 end
 
 -- virtual function: display a UI to let the user to edit this keyframe's data. 
@@ -558,6 +559,7 @@ function Actor:AddKeyFrameByName(name, time, data)
 		self:AutoAddKey(name, time, data);
 		self.is_adding_key = nil;
 		self:EndModify();
+		GameLogic.GetFilters():apply_filters("SchoolCenter.AddEvent", "create.world.animation");
 	end
 end
 
