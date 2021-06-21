@@ -268,7 +268,9 @@ function CustomCharItems:SkinStringToItemIds(skin)
 		for tex in textures:gmatch("([^;]+)") do
 			for _, item in ipairs(items) do
 				if (item.data.texture == tex and checkItem(item, geosets) and item.data.id) then
-					idString = idString..item.data.id..";";
+					if (string.find(idString, item.data.id) == nil and string.find(tex, "6:") == nil) then
+						idString = idString..item.data.id..";";
+					end
 					break;
 				end
 			end
@@ -282,7 +284,9 @@ function CustomCharItems:SkinStringToItemIds(skin)
 					local id, filename = string.match(item.data.attachment, "(%d+):(.*)");
 					id = tonumber(id);
 					if (not use_hair or id ~= 11) then
-						idString = idString..item.data.id..";";
+						if (string.find(idString, item.data.id) == nil) then
+							idString = idString..item.data.id..";";
+						end
 					end
 				end
 			end
@@ -368,6 +372,7 @@ function CustomCharItems:AddItemToSkinTable(skinTable, item)
 		return;
 	end
 	if (item.geoset) then
+		skinTable.geosets[4] = 1;
 		for _, gs in ipairs(item.geoset) do
 			skinTable.geosets[math.floor(gs/100) + 1] = gs % 100;
 		end

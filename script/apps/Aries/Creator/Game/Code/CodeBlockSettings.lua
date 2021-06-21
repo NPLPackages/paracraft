@@ -46,7 +46,9 @@ function CodeBlockSettings.OnInit()
 	page = document:GetPageCtrl();
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
-		page:SetValue("txtTriggerBox", entity:GetTriggerBoxString() or "");
+		if(entity.GetTriggerBoxString) then
+			page:SetValue("txtTriggerBox", entity:GetTriggerBoxString() or "");
+		end
 		page:SetValue("allowClientExecution", entity:IsAllowClientExecution() == true);
 		page:SetValue("allowFastMode", entity:IsAllowFastMode() == true);
 		page:SetValue("isOpenSource", type(entity.IsOpenSource) == "function" and entity:IsOpenSource() == true);
@@ -155,7 +157,7 @@ end
 
 function CodeBlockSettings.OnChangeBoxTriggerString()
 	local entity = CodeBlockWindow.GetCodeEntity()
-	if(page and entity) then 
+	if(page and entity and entity.SetTriggerBoxByString) then 
 		local triggerString = page:GetValue("txtTriggerBox")
 		entity:SetTriggerBoxByString(triggerString)
 		local codeBlock = entity:GetCodeBlock()

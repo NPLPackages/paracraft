@@ -46,8 +46,8 @@ function Macros.Idle(timeMs, bForceWait)
 
 			-- also merge CameraLookat and Trigger. 
 			if(nextMacro:IsTrigger() or 
-				(nextMacro.name == "CameraMove") or (nextMacro.name == "PlayerMove") or 
-				(nextNextMacro and nextNextMacro:IsTrigger() and nextMacro.name == "CameraLookat")) then
+				(nextMacro.name == "CameraMove") or (nextMacro.name == "PlayerMove") or (nextMacro.name == "SceneMouseMove") or
+				(nextNextMacro and (nextNextMacro:IsTrigger() or (nextNextMacro.name == "SceneMouseMove")) and nextMacro.name == "CameraLookat")) then
 				return Macros.Idle(DefaultTriggerInterval, true);
 			end
 

@@ -35,6 +35,7 @@ Email.InteractionType = {
 	like = 3, 				--点赞
 	collect = 4, 			--收藏
 	jion = 5, 				--加入项目
+	wechat_like = 6, 		--微信点赞
 }
 
 Email.ButtonData = {
@@ -54,6 +55,7 @@ local interaction_type_desc = {
 	[Email.InteractionType.like] = "觉得你的《%s》很赞", 	
 	[Email.InteractionType.collect] = "收藏了你的《%s》", 
 	[Email.InteractionType.jion] = "申请加入项目《%s》", 	
+	[Email.InteractionType.wechat_like] = "觉得你的《%s》很赞", 
 }
 
 
@@ -252,8 +254,15 @@ function Email.HandleData(data, updata_cb)
 			local interaction_type = v.type
 
 			msg_data.msg_content1 = msg.schoolName and string.format("%s的", msg.schoolName) or ""
+
 			local name = msg.nickname or msg.username
 			msg_data.color_name = name or ""	
+			if interaction_type == Email.InteractionType.wechat_like then
+				msg_data.color_name = msg.parentNickname or ""
+				if msg_data.color_name == "" then
+					msg_data.color_name = "来自微信的朋友"
+				end
+			end
 			msg_data.interaction_type = interaction_type
 
 			msg_data.msg_content2 = interaction_type_desc[interaction_type] or ""	

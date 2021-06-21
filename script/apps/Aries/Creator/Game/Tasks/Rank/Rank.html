@@ -139,6 +139,10 @@ function IsUseDefaul(portrait)
 
     return true
 end
+
+function ShowRankHelp()
+    Rank.ShowRankHelp()
+end
 ]]></script>
 <kp:window name="iframe" width="958" height="585" icon="Texture/Aries/Creator/keepwork/rank/biaoti_232X62_32bits.png" help_type="rank" icon_width="232" icon_height = "62" onclose="ClosePage">
     <div style="color:#ffffff;" class="kp_window_container">
@@ -353,19 +357,19 @@ end
                         <div tooltip='<%=GetMyData("tool_score")%>' style="position:relative;width: 70px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 522px;"><%=GetRecudedNumberDesc(GetMyData("score"))%></div>
         
                         <pe:if condition='<%=GetMyData("icon_type") == "rise" %>'>
-                            <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 684px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon2_8X18_32bits.png#0 0 8 18);"></div>
+                            <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 624px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon2_8X18_32bits.png#0 0 8 18);"></div>
                         </pe:if>
         
                         <pe:if condition='<%=GetMyData("icon_type") == "low" %>'>
-                            <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 684px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon1_8X18_32bits.png#0 0 8 18);"></div>
+                            <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 624px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon1_8X18_32bits.png#0 0 8 18);"></div>
                         </pe:if>
         
                         <pe:if condition='<%=GetMyData("icon_type") == "none" %>'>
-                            <div zorder="1" style="position:relative;margin-top: 26px;margin-left: 685px;width:7px;height:2px;background:url(Texture/Aries/Creator/keepwork/rank/icon3_7X2_32bits.png#0 0 7 2);"></div>
+                            <div zorder="1" style="position:relative;margin-top: 26px;margin-left: 625px;width:7px;height:2px;background:url(Texture/Aries/Creator/keepwork/rank/icon3_7X2_32bits.png#0 0 7 2);"></div>
                         </pe:if>
         
                         <pe:if condition='<%=GetMyData("icon_type") == "new" %>'>
-                            <div zorder="1" style="position:relative;margin-top: 22px;margin-left: 668px;width:37px;height:11px;background:url(Texture/Aries/Creator/keepwork/rank/icon4_37X11_32bits.png#0 0 37 11);"></div>
+                            <div zorder="1" style="position:relative;margin-top: 22px;margin-left: 608px;width:37px;height:11px;background:url(Texture/Aries/Creator/keepwork/rank/icon4_37X11_32bits.png#0 0 37 11);"></div>
                         </pe:if>
                     </pe:if>
                     <pe:if condition='<%=not IsPersonalRank()%>'>
@@ -373,22 +377,23 @@ end
                         <div tooltip='<%=GetMyData("tool_score")%>' style="position:relative;width: 70px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 522px;"><%=GetRecudedNumberDesc(GetMyData("score"))%></div>
         
                         <pe:if condition='<%=GetMyData("icon_type") == "rise" %>'>
-                            <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 684px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon2_8X18_32bits.png#0 0 8 18);"></div>
+                            <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 624px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon2_8X18_32bits.png#0 0 8 18);"></div>
                         </pe:if>
         
                         <pe:if condition='<%=GetMyData("icon_type") == "low" %>'>
-                            <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 684px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon1_8X18_32bits.png#0 0 8 18);"></div>
+                            <div zorder="1" style="position:relative;margin-top: 20px;margin-left: 624px;width:8px;height:18px;background:url(Texture/Aries/Creator/keepwork/rank/icon1_8X18_32bits.png#0 0 8 18);"></div>
                         </pe:if>
         
                         <pe:if condition='<%=GetMyData("icon_type") == "none" %>'>
-                            <div zorder="1" style="position:relative;margin-top: 26px;margin-left: 685px;width:7px;height:2px;background:url(Texture/Aries/Creator/keepwork/rank/icon3_7X2_32bits.png#0 0 7 2);"></div>
+                            <div zorder="1" style="position:relative;margin-top: 26px;margin-left: 625px;width:7px;height:2px;background:url(Texture/Aries/Creator/keepwork/rank/icon3_7X2_32bits.png#0 0 7 2);"></div>
                         </pe:if>
         
                         <pe:if condition='<%=GetMyData("icon_type") == "new" %>'>
-                            <div zorder="1" style="position:relative;margin-top: 22px;margin-left: 668px;width:37px;height:11px;background:url(Texture/Aries/Creator/keepwork/rank/icon4_37X11_32bits.png#0 0 37 11);"></div>
+                            <div zorder="1" style="position:relative;margin-top: 22px;margin-left: 608px;width:37px;height:11px;background:url(Texture/Aries/Creator/keepwork/rank/icon4_37X11_32bits.png#0 0 37 11);"></div>
                         </pe:if>
                     </pe:if>
 
+                    <input type="button" onclick="ShowRankHelp" style="float:left;margin-left:662px;margin-top: 14px; width:116px;height:29px;background:url(Texture/Aries/Creator/keepwork/rank/btn_166X29_32bits.png#0 0 116 29)" />
                     <!-- <pe:if condition='<%=IsPersonalRank() %>'>
                         <input type="button" onclick="ChangeMenuType" value='' name='<%=XPath("this|index") %>' style="position:relative;margin-left:0px;width:50px;height:40px;background:url(Texture/Aries/Creator/keepwork/rank/btnchazhao_50X40_32bits.png#0 0 50 40)" />
                     </pe:if> -->

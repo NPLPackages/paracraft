@@ -438,3 +438,9 @@ end
 function Rank.ShowReward()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/RankReward.lua").Show(Rank.cur_select_item_data.exid);
 end
+
+function Rank.ShowRankHelp()
+    local data = Rank.cur_select_item_data
+    local code = data.code or "orgComprehensive"
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/RankHelp.lua").Show(code);
+end

@@ -249,7 +249,7 @@ function env_imp:ask(text, buttons, cb)
 
 	height = 200;
 	if(buttons) then
-		height = math.max(height, 120 + (#buttons)*30);
+		height = math.max(height, 120 + (#buttons)*36);
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
@@ -294,7 +294,7 @@ function env_imp:ask(text, buttons, cb)
 				GameLogic:event(event);
 			end
 		
-			EnterTextDialog.ShowPage(text, onDialogClose, nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height, isTopLevel=false, url="script/apps/Aries/Creator/Game/GUI/EnterTextDialogForCodeBlock.html"});
+			EnterTextDialog.ShowPage(text, onDialogClose, nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=480, height=height, isTopLevel=false, url="script/apps/Aries/Creator/Game/GUI/EnterTextDialogForCodeBlock.html"});
 		else
 			EnterTextDialog.OnClose();
 			cb();
@@ -305,7 +305,7 @@ function env_imp:ask(text, buttons, cb)
 			EnterTextDialog.ShowPage(text, self.co:MakeCallbackFuncAsync(function(result)
 				GameLogic.GetCodeGlobal():SetGlobal("answer", result);
 				env_imp.resume(self);
-			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=400, height=height, isTopLevel=false, url="script/apps/Aries/Creator/Game/GUI/EnterTextDialogForCodeBlock.html"})
+			end, true), nil, type_, buttons, {align="_ctb", x=-offsetX, y=0, width=480, height=height, isTopLevel=false, url="script/apps/Aries/Creator/Game/GUI/EnterTextDialogForCodeBlock.html"})
 			env_imp.yield(self)
 		else
 			self.co:SetTimeout(0.02, function()

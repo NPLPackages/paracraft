@@ -1858,3 +1858,62 @@ function GameLogic.IsInABTest(percent)
 	end
 	return false;
 end
+
+-- check lesson is vip
+function GameLogic.CheckVIPItem(isVip,freeTime,freeVipSchoolTime)
+	local server_time = QuestAction.GetServerTime()
+	local year = tonumber(os.date("%Y", server_time))	
+	local month = tonumber(os.date("%m", server_time))
+	local day = tonumber(os.date("%d", server_time))
+	local function formatTime(strTime)
+		local nTime = tonumber(strTime)
+		local year1 = math.floor(nTime/10000) 
+		local month1 = math.floor((nTime - year1*10000)/100)
+		local day1 = nTime - year1*10000 - month1*100
+		return {year1,month1,day1}
+	end
+
+	local function checkIsInTime(strTime)
+		local times={}
+		for temp in string.gfind(strTime, "([^;]+)") do
+			times[#times + 1] = formatTime(temp)
+		end
+		if #times == 0 then
+			times[#times + 1] = formatTime(strTime)
+		end
+		local nTimeNum = #times
+		local strTip = "时间："
+		for i=1,nTimeNum do
+			local temp=string.format("%d年%d月%d日,",times[i][1],times[i][2],times[i][3])
+			if times[i][1] > year or (times[i][1] == year and times[i][2] >month) or (times[i][1] == year and times[i][2] == month and times[i][3] > day) then
+				strTip = strTip..temp
+			end			
+		end
+		for i=1,nTimeNum do
+			local nCurTime = times[i]
+			if(nCurTime[1] == year and nCurTime[2]==month and nCurTime[3]==day)then
+				return true,strTip
+			end
+		end
+		return false,strTip
+	end
+	if isVip then
+		if System.User.IsVip then
+			return true,""
+		end
+		local isInTime,strTip = nil,nil		
+		if freeTime then
+			isInTime,strTip=checkIsInTime(freeTime)	
+		end
+		if freeVipSchoolTime and System.User.isVipSchool then
+			isInTime,strTip=checkIsInTime(freeVipSchoolTime)	
+		end
+		if type(isInTime) == "boolean" then
+			return isInTime,strTip
+		else
+			return false,""
+		end		
+	else
+		return true,""
+	end
+end

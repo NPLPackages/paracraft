@@ -55,7 +55,6 @@ function kp_item.render_callback(mcmlNode, rootName, bindingContext, _parent, le
 
 	if background == "1" then
 		local item = CustomCharItems:GetItemByGsid(tostring(gsid))
-		print("iiiiiiiiiiiiiiiiiiiiiiiiiii", item)
 		if item then
 			background = item.icon
 		elseif icon_config[gsid] then

@@ -215,3 +215,19 @@ function MiniWorldUserInfo.OnClickUserInfo()
 	local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
 	page.ShowUserInfoPage({userId = currentId});
 end
+
+function MiniWorldUserInfo.TemporaryHide()
+	if page and page:IsVisible() then
+		local parent = page:GetParentUIObject()
+		parent.visible = false
+		MiniWorldUserInfo.is_temporary_hide = true
+	end
+end
+
+function MiniWorldUserInfo.ShowTemporaryHide()
+	if page and MiniWorldUserInfo.is_temporary_hide then
+		local parent = page:GetParentUIObject()
+		parent.visible = true
+		MiniWorldUserInfo.is_temporary_hide = false
+	end
+end

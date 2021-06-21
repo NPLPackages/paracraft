@@ -50,7 +50,7 @@ DockPage.top_line_1 = {
 }
 DockPage.top_line_2 = {
     { label = L"", },
-    { label = L"端午活动", id = "dragonboatfestival", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_duanwu_32bits.png#0 0 100 80" },
+    { label = L"", },
     { label = L"呼朋唤友", id = "invitefriend", enabled2 = true, bg="Texture/Aries/Creator/keepwork/InviteFriend/btn3_jieban_32bits.png#0 0 100 80", }, 
     { label = L"作业", id = "homework", enabled2 = false, bg="Texture/Aries/Creator/keepwork/dock/btn3_zuoye_32bits.png#0 0 100 80", },
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_riji_32bits.png#0 0 100 80", },

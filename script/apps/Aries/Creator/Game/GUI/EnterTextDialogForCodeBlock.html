@@ -13,36 +13,52 @@ EnterTextDialog.OnInit()
 function OnClose()
     Page:CloseWindow();
 end
+
+function GetButtonStyle(index)
+print("ccccc", index)
+    local style = "margin-left: 10px; margin-bottom:8px;width:432px;color:%s;font-size:18px;height:30px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)"
+    local source = EnterTextDialog.GetButtonsDS()
+    if source == nil then
+        return style
+    end
+
+    local data = source[index] or {}
+    print("dddddd", data.color)
+    local color = data.color or "#ffffff"
+    style = string.format(style, color)
+    
+    return style
+end
 ]]></script>
-<div style="width:400px;" class="mc_panel">
-<div style="margin:10px;">
-    <div style="color:#ffffff;margin-bottom:5px;">
+<div style="width:480px;" class="mc_panel">
+<div style="margin:12px;">
+    <div style="color:#ffffff;margin-bottom:7px;">
         <%=EnterTextDialog.GetText()%>
     </div>
     <div>
         <pe:if condition='<%=EnterTextDialog.IsSingleLine()%>'>
-            <input type="text" EmptyText='<%=L"点这里输入"%>' uiname="EnterTextDialog.text" name="text" style="height:24px;"/>
+            <input type="text" EmptyText='<%=L"点这里输入"%>' uiname="EnterTextDialog.text" name="text" style="height:28px;"/>
         </pe:if>
         <pe:if condition='<%=EnterTextDialog.IsMultiLine()%>'>
-            <div class="mc_paper_panel" style="padding:5px;margin-bottom:5px;margin-right:5px;">
+            <div class="mc_paper_panel" style="padding:6px;margin-bottom:6px;margin-right:6px;">
                 <textarea rows="4" UseSystemControl="true" uiname="EnterTextDialog.text_multi" name="text_multi" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" />
             </div>
         </pe:if>
         <pe:if condition='<%=EnterTextDialog.IsSelectText()%>'>
-            <select name="text_select" uiname="EnterTextDialog.text_select" AllowUserEdit="true" style="width:220px;height:24px;" DataSource='<%=EnterTextDialog.options%>'>
+            <select name="text_select" uiname="EnterTextDialog.text_select" AllowUserEdit="true" style="width:264px;height:28px;" DataSource='<%=EnterTextDialog.options%>'>
             </select>
         </pe:if>
         <pe:if condition='<%=EnterTextDialog.IsButtons()%>'>
             <pe:repeat DataSource="<%=EnterTextDialog.GetButtonsDS()%>">
                 <pe:repeatitem>
-                    <input type="button" uiname='<%="EnterTextDialog.button_"..Eval("index")%>' style="margin-bottom:5px;width:360px;color:#ffffff;font-size:14px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" name='<%=Eval("index")%>' value='<%=Eval("text")%>' onclick="EnterTextDialog.OnClickButton"/>
+                    <input type="button" uiname='<%="EnterTextDialog.button_"..Eval("index")%>' style='<%=GetButtonStyle(Eval("index"))%>' name='<%=Eval("index")%>' value='<%=Eval("text")%>' onclick="EnterTextDialog.OnClickButton"/>
                 </pe:repeatitem>
             </pe:repeat>
         </pe:if>
     </div>
     <pe:if condition='<%=not EnterTextDialog.IsButtons()%>'>
         <div>
-            <input type="button" uiname="EnterTextDialog.OK" name="OK" DefaultButton="true" align="right" style="margin-right:0px;margin-top:5px;width:70px;" class="mc_light_grey_button_with_fillet" onclick="EnterTextDialog.OnOK" value='<%=L"确定"%>' />
+            <input type="button" uiname="EnterTextDialog.OK" name="OK" DefaultButton="true" align="right" style="margin-right:0px;margin-top:6px;width:84px;" class="mc_light_grey_button_with_fillet" onclick="EnterTextDialog.OnOK" value='<%=L"确定"%>' />
         </div>
     </pe:if>
 </div>

@@ -976,7 +976,7 @@ function CodeBlockWindow.OnClickEditMode(name,bForceRefresh)
 		if(name == "blockMode") then
 			CodeBlockWindow.UpdateCodeToEntity();
 			if(GameLogic.Macros:IsRecording() or GameLogic.Macros:IsPlaying()) then
-				entity.isUseNplBlockly = true;
+				entity:SetUseNplBlockly(true);
 			end
 			entity:SetBlocklyEditMode(true);
 			CodeBlockWindow.UpdateCodeEditorStatus();

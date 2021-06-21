@@ -18,14 +18,12 @@ GameLogic.Macros:AddMacro("SceneDrag", GameLogic.Macros.GetButtonTextFromClickEv
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
-NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
 NPL.load("(gl)script/ide/System/Windows/MouseEvent.lua");
 NPL.load("(gl)script/ide/System/Scene/Cameras/Cameras.lua");
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Cameras = commonlib.gettable("System.Scene.Cameras");
 local MouseEvent = commonlib.gettable("System.Windows.MouseEvent");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
-local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
@@ -111,6 +109,22 @@ end
 
 --@param mouse_button: "left", "right", default to "left", such as "ctrl+left"
 --@param angleX, angleY
+function Macros.SceneMouseMove(angleX, angleY)
+	Macros.PrepareLastCameraView()
+	-- mouse_x, mouse_y are global variables
+	mouse_x, mouse_y = Macros.MouseAngleToScreenPos(angleX, angleY)
+	ParaUI.SetMousePosition(mouse_x, mouse_y);
+
+	local event = MouseEvent:init("mouseMoveEvent");
+	local ctx = GameLogic.GetSceneContext()
+	ctx:handleMouseEvent(event);
+
+	return Macros.Idle(1);
+end
+
+
+--@param mouse_button: "left", "right", default to "left", such as "ctrl+left"
+--@param angleX, angleY
 function Macros.SceneClick(button, angleX, angleY)
 	Macros.PrepareLastCameraView()
 	-- mouse_x, mouse_y, mouse_button are global variables
@@ -153,7 +167,7 @@ function Macros.SceneDrag(button, startAngleX, startAngleY, endAngleX, endAngleY
 		SetMouseEventFromButtonText(event, button)
 		local ctx = GameLogic.GetSceneContext()
 		ctx:handleMouseEvent(event);
-
+		
 		local startX, startY = mouse_x, mouse_y;
 		local endX, endY, endMouseButton = Macros.MouseAngleToScreenPos(endAngleX, endAngleY)
 
@@ -184,7 +198,6 @@ function Macros.SceneDrag(button, startAngleX, startAngleY, endAngleX, endAngleY
 				SetKeyboardFromButtonText(emulatedKeys, button)
 				local ctx = GameLogic.GetSceneContext()
 				ctx:handleMouseEvent(event);
-
 				timer:Change(200);
 			else
 				-- clear all keyboard emulations

@@ -45,7 +45,12 @@ end
 -- @param text: the text to play
 -- @param voiceNarrator: the narrator of the voice
 function env_imp:playText(text, duration, voiceNarrator)
-	SoundManager:PlayText(text, voiceNarrator);	
+	if text == nil or text == "" then
+		SoundManager:StopPlayText()
+	else
+		SoundManager:PlayText(text, voiceNarrator);	
+	end
+	
 	if duration then
 		env_imp.wait(self, duration);
 	end

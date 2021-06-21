@@ -405,6 +405,8 @@ local cameraViewMacros = {
 	["SceneClick"] = true,
 	["SceneDrag"] = true,
 	["ButtonClick"] = true,
+	["SceneMouseMove"] = true,
+	["NextKeyPressWithMouseMove"] = true,
 }
 
 function Macros:ClearIdleTime()

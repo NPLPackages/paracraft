@@ -172,7 +172,7 @@ function ClickName(name, mcmlNode)
     local server_data = data.server_data or {}
     local msg = server_data.msg or {}
     local username = msg.username
-    if username then
+    if username and data.interaction_type ~= Email.InteractionType.wechat_like then
         local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
         user_page.ShowUserInfoPage({username=username});
     end

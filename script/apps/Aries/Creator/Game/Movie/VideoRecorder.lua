@@ -236,6 +236,7 @@ function VideoRecorder.ShowRecordingArea(bShow)
 	NPL.load("(gl)script/kids/3DMapSystemApp/Assets/AsyncLoaderProgressBar.lua");
 	local AsyncLoaderProgressBar = commonlib.gettable("Map3DSystem.App.Assets.AsyncLoaderProgressBar");
 	if(VideoRecorder.HasFFmpegPlugin()) then
+		local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
 		local _parent = ParaUI.GetUIObject("RecordSafeArea");
 		if(not bShow) then
 			if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then
@@ -252,6 +253,8 @@ function VideoRecorder.ShowRecordingArea(bShow)
 				ParaEngine.SetWindowText(VideoRecorder.last_text);
 				VideoRecorder.last_text = nil;
 			end
+
+			MiniWorldUserInfo.ShowTemporaryHide()
 			return;
 		else
 			if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then
@@ -326,6 +329,7 @@ function VideoRecorder.ShowRecordingArea(bShow)
 				border_cont:ApplyAnim();
 			end
 
+			MiniWorldUserInfo.TemporaryHide()
 		end
 	end
 end

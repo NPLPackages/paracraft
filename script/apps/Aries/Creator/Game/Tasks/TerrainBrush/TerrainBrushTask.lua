@@ -131,7 +131,7 @@ function TerrainBrushTask:BeginOperation()
 	self.begin_side = self.last_side;
 	self.timer = self.timer or commonlib.Timer:new({callbackFunc = function(timer)
 		if(self:GetToolTask()) then
-			if(self:UpdateCenterPosition()) then
+			if(self:HasValidCenterPosition()) then
 				self:StepOperation();
 			end
 		end
@@ -314,6 +314,10 @@ function TerrainBrushTask:mousePressEvent(event)
 				self:StepOperation(x,y,z);
 			end
 		end
+		if(GameLogic.Macros:IsRecording()) then
+			local angleX, angleY = GameLogic.Macros.GetSceneClickParams();
+			GameLogic.Macros:AddMacro("SceneMouseMove", angleX, angleY);
+		end
 		event:accept();
 	else
 		self:GetSceneContext():mousePressEvent(event);
@@ -324,13 +328,20 @@ end
 function TerrainBrushTask:UpdateCenterPosition()
 	local result = Game.SelectionManager:MousePickBlock(true, false, false);
 	if(result.blockX) then
+		self.hasValidCenterPosition = true
 		local x,y,z = result.blockX,result.blockY,result.blockZ;
 		local rx, ry, yz = BlockEngine:real_top(x,y,z);
 		self.position:set(rx, ry, yz);
 		self.item:SetPosition(self.position);
 		self.last_side = result.side;
 		return true;
+	else
+		self.hasValidCenterPosition = false;
 	end
+end
+
+function TerrainBrushTask:HasValidCenterPosition()
+	return self.hasValidCenterPosition;
 end
 
 function TerrainBrushTask:mouseReleaseEvent(event)
@@ -367,10 +378,18 @@ function TerrainBrushTask:keyPressEvent(event)
 	if(dik_key == "DIK_ADD" or dik_key == "DIK_EQUALS") then
 		-- increase radius
 		self.item:SetPenRadius(self.item:GetPenRadius()*1.1);
+		if(GameLogic.Macros:IsRecording()) then
+			local angleX, angleY = GameLogic.Macros.GetSceneClickParams();
+			GameLogic.Macros:AddMacro("SceneMouseMove", angleX, angleY);
+		end
 		event:accept();
 	elseif(dik_key == "DIK_SUBTRACT" or dik_key == "DIK_MINUS") then
 		-- decrease radius
 		self.item:SetPenRadius(self.item:GetPenRadius()*0.9);
+		if(GameLogic.Macros:IsRecording()) then
+			local angleX, angleY = GameLogic.Macros.GetSceneClickParams();
+			GameLogic.Macros:AddMacro("SceneMouseMove", angleX, angleY);
+		end
 		event:accept();
 	elseif(dik_key == "DIK_Z")then
 		UndoManager.Undo();

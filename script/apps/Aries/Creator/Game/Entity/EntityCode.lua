@@ -14,6 +14,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActorItemStack.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Physics/BoxTrigger.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockCodeBase.lua");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local BoxTrigger = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld.BoxTrigger")
 local CodeActorItemStack = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActorItemStack");
@@ -29,7 +30,7 @@ local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
-local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCode"));
+local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockCodeBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCode"));
 
 Entity:Property({"languageConfigFile", "", "GetLanguageConfigFile", "SetLanguageConfigFile"})
 Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
@@ -59,6 +60,11 @@ function Entity:ctor()
 	self.inventory:SetOnChangedCallback(function(inventory, slot_index)
 		self:OnInventoryChanged(slot_index);
 	end);
+
+	-- TODO: eventually, all win32 will also use NPL blockly, instead of google blockly. 
+	if(System.os.GetPlatform() ~= "win32") then
+		self:SetUseNplBlockly(true);
+	end
 end
 
 -- this should be called when inventory itemstack or its values are changed

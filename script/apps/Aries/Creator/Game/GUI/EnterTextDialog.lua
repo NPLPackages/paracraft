@@ -147,7 +147,16 @@ function EnterTextDialog.GetButtonsDS()
 	local ds = {};
 	if(EnterTextDialog.options) then
 		for _, text in ipairs(EnterTextDialog.options) do
-			ds[#ds+1] = {text = text};
+			if type(text) == "table" then
+				local data = {text = text.text or ""}
+				if text.color then
+					data.color = text.color
+				end
+				ds[#ds+1] = data
+			else
+				ds[#ds+1] = {text = text};
+			end
+			
 		end
 	end
 	return ds;

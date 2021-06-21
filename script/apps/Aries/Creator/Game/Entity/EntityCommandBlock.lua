@@ -11,10 +11,11 @@ local EntityCommandBlock = commonlib.gettable("MyCompany.Aries.Game.EntityManage
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Neuron/NeuronManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockCodeBase.lua");
+local EntityBlockCodeBase = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockCodeBase")
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local NeuronManager = commonlib.gettable("MyCompany.Aries.Game.Neuron.NeuronManager");
@@ -29,7 +30,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
-local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock"));
+local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockCodeBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock"));
 Entity:Property({"languageConfigFile", "commands", "GetLanguageConfigFile", "SetLanguageConfigFile"})
 Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
 Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
