@@ -479,7 +479,20 @@ model id
     <item id="83166" model="actor;"><geoset category="0" id="0"></geoset><geoset category="3" id="0"></geoset><texture id="6" filename="Texture/blocks/CustomGeoset/hand/83164_alloy_black_hand.png"></texture><attachment id="11" filename="character/CC/ObjectComponents/Head/83166_alloy_red_helmet.anim.x"></attachment></item>
     <!--20210610新增-->
     <item id="83167" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83167_space_suit_hat.anim.x"></attachment></item>
-    
+     <!--20210624新增-->
+    <item id="83168" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83168_sodier_hat1.anim.x"></attachment></item>
+    <item id="83169" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83169_sodier_hat2.anim.x"></attachment></item>
+    <item id="83170" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83170_sodier_hat3.anim.x"></attachment></item>
+    <item id="83171" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83171_sodier_hat4.anim.x"></attachment></item>
+    <item id="83172" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83172_red_sodier_hat1.anim.x"></attachment></item>
+    <item id="83173" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83173_red_sodier_hat2.anim.x"></attachment></item>
+    <item id="83174" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83174_red_sodier_hat3.anim.x"></attachment></item>
+    <item id="83175" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83175_red_sodier_hat4.anim.x"></attachment></item>
+    <item id="83176" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83176_red_sodier_hat5.anim.x"></attachment></item>
+    <item id="83177" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83177_red_sodier_hat6.anim.x"></attachment></item>
+
+
+
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>
     <item id="84002" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_01.png"></texture></item>
@@ -548,8 +561,9 @@ model id
     <item id="84058" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84058_alloy_red_armor.png"></texture></item>
     <!--20210610新增-->
     <item id="84059" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84059_space_suit_armor.png"></texture></item>
-
-    
+    <!--20210610新增-->
+    <item id="84060" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84060_red_sodier_armor.png"></texture></item>
+    <item id="84061" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84061_sodier_armor.png"></texture></item>
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
     <item id="85002" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_.png"></texture></item>
@@ -634,7 +648,9 @@ model id
     <item id="85077" model="actor;"><geoset category="9" id="3"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85077_alloy_red_guards.png"></texture></item>
     <!--20210610新增-->
     <item id="85078" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85078_space_suit_pants.png"></texture></item>
-    
+    <!--20210624新增-->
+    <item id="85079" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85079_red_sodier_pants.png"></texture></item>
+    <item id="85080" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85080_sodier_pants.png"></texture></item>
     <!--      86000 86999  背部  attachment id="15"    -->
     <!--第一批数据-->
     <item id="86001" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/1425_FireExchangeBack03.anim.x"></attachment></item>
@@ -680,6 +696,8 @@ model id
     <item id="86040" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86040_shubao.anim.x"></attachment></item>
     <!--20210610添加6月活动物品-->
     <item id="86041" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86041_space_suit_bag.anim.x"></attachment></item>
+    <!--20210624添加夏令营-->
+    <item id="86042" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86042_red_scarf.anim.x"></attachment></item>
 
     <!--      87000 97999  手持  attachment id="1"    -->
     <item id="87001" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x"></attachment></item>

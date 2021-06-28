@@ -48,7 +48,7 @@ MakeApp.mode = {
 	UI = 1,
 }
 
-MakeApp.curAndroidVersion = '2.0.6';
+MakeApp.curAndroidVersion = '2.0.9';
 MakeApp.androidBuildRoot = 'temp/build_android_resource/';
 
 function MakeApp:ctor()

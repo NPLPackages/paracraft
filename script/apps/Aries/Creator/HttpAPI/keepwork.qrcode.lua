@@ -18,3 +18,7 @@ HttpWrapper.Create("keepwork.qrcode.generateQR", "%MAIN%/core/v0/keepworks/gener
     生成的二维码图片是base64格式的图片数据，我们首先使用base64解码图片数据，
     然后将字符流写入到一个png文件当中，最后使用这个png文件渲染二维码图片
 ]]
+
+-- 兑换Vip
+-- http://yapi.kp-para.cn/project/130/interface/api/3077
+HttpWrapper.Create("keepwork.paracraftVipCode.activate", "%MAIN%/accounting/paracraftVipCode/activate", "POST", true)

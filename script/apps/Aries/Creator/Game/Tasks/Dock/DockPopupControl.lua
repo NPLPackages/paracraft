@@ -55,9 +55,14 @@ end
 
 function DockPopupControl.ShowNotice()
     DockPopupControl.popup_num = DockPopupControl.popup_num + 1
-    if Notice.CheckCanShow() then
-        Notice.Show(0)
-    end    
+    if (System.options.isDevMode and (System.User.isVipSchool or System.User.isVip)) then
+        local SummerCampNotice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNotice.lua") 
+        SummerCampNotice.ShowView()
+    else
+        if Notice.CheckCanShow() then
+            Notice.Show(0)
+        end  
+    end  
 end
 
 function DockPopupControl.ShowRealNameCertificate()

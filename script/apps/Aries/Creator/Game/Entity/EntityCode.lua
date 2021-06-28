@@ -62,7 +62,7 @@ function Entity:ctor()
 	end);
 
 	-- TODO: eventually, all win32 will also use NPL blockly, instead of google blockly. 
-	if(System.os.GetPlatform() ~= "win32") then
+	if(System.os.GetPlatform() ~= "win32" or System.os.Is64BitsSystem()) then
 		self:SetUseNplBlockly(true);
 	end
 end

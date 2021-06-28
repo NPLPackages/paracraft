@@ -7,7 +7,7 @@ Support undo/redo
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
-local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX, blockY, blockZ, from_id, [from_data,] to_id, to_data=nil, max_radius = 20})
+local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX, blockY, blockZ, from_id, [from_data,] to_id, to_data=nil, max_radius = 20, preserveRotation = true})
 -- if max_radius=0, it just replace the one clicked
 local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blocks={}, to_id=number})
 task:Run();
@@ -21,10 +21,15 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local ReplaceBlock = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.ReplaceBlock"));
+local rshift = mathlib.bit.rshift;
+local lshift = mathlib.bit.lshift;
+local band = mathlib.bit.band;
+local bor = mathlib.bit.bor;
 
 ReplaceBlock.max_radius = 0;
 ReplaceBlock.to_data = 0;
 ReplaceBlock.from_data = 0;
+ReplaceBlock.preserveRotation = false;
 
 function ReplaceBlock:ctor()
 	self.step = 1;
@@ -110,14 +115,32 @@ function ReplaceBlock:ReplaceBlock(x, y, z)
 				self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
 			end
 		end
-	elseif( from_id == self.from_id and from_data == self.from_data) then
-		local idx = BlockEngine:GetSparseIndex(x,y,z);
-		if(not self.replaced_map[idx]) then
-			self.replaced_map[idx] = true;
-			self.new_blocks[#(self.new_blocks)+1] = {x,y,z};
-			BlockEngine:SetBlock(x,y,z, self.to_id, self.to_data or 0, 3);
-			if(GameLogic.GameMode:CanAddToHistory()) then
-				self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
+	elseif( from_id == self.from_id) then
+		local fromBlock = block_types.get(from_id);
+		if( (fromBlock and fromBlock.color_data and from_data == self.from_data) or 
+			(fromBlock and fromBlock.color8_data and band(from_data, 0xff00)==band(self.from_data, 0xff00)) or 
+			(fromBlock and not fromBlock.color8_data and not fromBlock.color_data)) then
+			local idx = BlockEngine:GetSparseIndex(x,y,z);
+			if(not self.replaced_map[idx]) then
+				self.replaced_map[idx] = true;
+				self.new_blocks[#(self.new_blocks)+1] = {x,y,z};
+
+				local to_data = self.to_data or 0;
+				if(self.preserveRotation) then
+					local toBlock = block_types.get(self.to_id);
+					if(toBlock and fromBlock and ((toBlock == fromBlock) or (toBlock.modelName and toBlock.modelName == fromBlock.modelName))) then
+						-- they are of the same block model type. 
+						if(toBlock.color8_data) then
+							to_data = band(from_data, 0x00ff) + band(to_data, 0xff00);
+						elseif(fromBlock.color8_data) then
+							to_data = band(from_data, 0x00ff);
+						end
+					end
+				end
+				BlockEngine:SetBlock(x,y,z, self.to_id, to_data or 0, 3);
+				if(GameLogic.GameMode:CanAddToHistory()) then
+					self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
+				end
 			end
 		end
 	end

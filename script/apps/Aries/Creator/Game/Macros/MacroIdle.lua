@@ -68,6 +68,8 @@ function Macros.Idle(timeMs, bForceWait)
 						end
 						return Macros.Idle(1000, true);
 					end
+				elseif (previousMacro:IsTrigger() or previousMacro.name == "Idle") then
+					return Macros.Idle(DefaultTriggerInterval, true);
 				end
 			end
 		end

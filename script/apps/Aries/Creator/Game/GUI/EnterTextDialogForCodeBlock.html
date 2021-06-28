@@ -15,17 +15,17 @@ function OnClose()
 end
 
 function GetButtonStyle(index)
-print("ccccc", index)
-    local style = "margin-left: 10px; margin-bottom:8px;width:432px;color:%s;font-size:18px;height:30px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)"
+    local style = "position: relative;width:432px;height:30px;color:%s;font-size:%s;base-font-size:%s;text-align:%s;background:"
     local source = EnterTextDialog.GetButtonsDS()
     if source == nil then
         return style
     end
 
     local data = source[index] or {}
-    print("dddddd", data.color)
     local color = data.color or "#ffffff"
-    style = string.format(style, color)
+    local font_size = data.size or "20px"
+    local text_align = data.align or "center"
+    style = string.format(style, color, font_size, font_size, text_align)
     
     return style
 end
@@ -51,7 +51,11 @@ end
         <pe:if condition='<%=EnterTextDialog.IsButtons()%>'>
             <pe:repeat DataSource="<%=EnterTextDialog.GetButtonsDS()%>">
                 <pe:repeatitem>
-                    <input type="button" uiname='<%="EnterTextDialog.button_"..Eval("index")%>' style='<%=GetButtonStyle(Eval("index"))%>' name='<%=Eval("index")%>' value='<%=Eval("text")%>' onclick="EnterTextDialog.OnClickButton"/>
+                    <pe:container ClickThrough="true" style="margin-left: 10px; margin-bottom:8px;width:432px;height:30px;background: url();">
+                        <div style='<%=GetButtonStyle(Eval("index"))%>'><%=Eval("text")%></div>
+                        <input type="button" zorder="-1" uiname='<%="EnterTextDialog.button_"..Eval("index")%>' style='width:432px;height:30px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)' name='<%=Eval("index")%>' value='' onclick="EnterTextDialog.OnClickButton"/>
+                    </pe:container>
+
                 </pe:repeatitem>
             </pe:repeat>
         </pe:if>

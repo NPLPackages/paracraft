@@ -32,6 +32,11 @@ function VipToolNew.GetPageCtrl()
 end 
 
 function VipToolNew.Show(from)
+    local platform = System.os.GetPlatform()
+    if platform == 'ios' or platform == 'mac' then
+        _guihelper.MessageBox(L'会员相关功能只能在windows平台使用');
+        return;
+    end
     VipToolNew.from = from or "main_icon"
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
 		VipToolNew.ShowPage()
@@ -92,6 +97,9 @@ function VipToolNew.ShowPage()
 end
 
 function VipToolNew.OnCreate()
+    if System.os.IsTouchMode() then
+        return 
+    end
     local parent  = page:GetParentUIObject()
     local qrcode_width = 140
     local qrcode_height = 140
@@ -114,6 +122,25 @@ function VipToolNew.OnCreate()
     end);
 
     parent:AddChild(qrcode);
+end
+
+
+
+function VipToolNew.OnClickbuy()
+    local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
+	local userid = Mod.WorldShare.Store:Get('user/userId')
+    local url;
+	if(userid) then
+		url = string.format("%s/p/qr/purchase?userId=%s&from=%s",KeepworkService:GetKeepworkUrl(), userid, VipToolNew.from);
+	else
+		url = string.format("%s/p/qr/buyFor?from=%s",KeepworkService:GetKeepworkUrl(), VipToolNew.from);
+	end
+    
+    if System.os.IsTouchMode() then
+        GameLogic.RunCommand(string.format("/open -e %s",url))
+    else
+        ParaGlobal.ShellExecute("open",url, "","", 1);
+    end
 end
 
 function VipToolNew.InitData()

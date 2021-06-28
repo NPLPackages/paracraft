@@ -253,7 +253,7 @@ e.g.
     <model id_data="25" assetfile="[filename]_Slope.fbx" facing="0" texture_index="2" ></model>
     <model id_data="26" assetfile="[filename]_Slope.fbx" facing="4.71" texture_index="2" ></model>
   </block>
-  <block name="Fence" texture="" class="BlockFence" customBlockModel="true" itemModel="model/blockworld/Fence/Fence_Middle.x" shape="Fence" obstruction="true" customModel="true" handleNeighborChange="true">
+  <block name="Fence" texture="" class="BlockFence" modelName="fence" customBlockModel="true" itemModel="model/blockworld/Fence/Fence_Middle.x" shape="Fence" obstruction="true" customModel="true" handleNeighborChange="true">
     <!--  single: i   -->
     <model id_data="1" assetfile="[filename]_Single.x" facing="0" condition="{[2]='~obstruction',[4]='~obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
     <!--  half: -   -->
@@ -332,7 +332,7 @@ e.g.
     <model id_data="11" assetfile="[filename]_Cross.x" facing="0" condition="{[2]='1',[4]='1',[6]='1',[8]='1'}"></model>
   </block>
   
-  <block name="Wall" texture="" handleNeighborChange="true" customBlockModel="true" itemModel="model/blockworld/StoneWall/StoneWall_Middle.x"obstruction="true" customModel="true">
+  <block name="Wall" texture="" handleNeighborChange="true" modelName="wall" customBlockModel="true" itemModel="model/blockworld/StoneWall/StoneWall_Middle.x" obstruction="true" customModel="true">
     <!--  single: i   -->
     <model id_data="1" assetfile="[filename]_Single.x" facing="0" condition="{[2]='~obstruction',[4]='~obstruction',[6]='~obstruction',[8]='~obstruction'}"></model>
     <!--  half: -   -->

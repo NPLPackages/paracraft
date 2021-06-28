@@ -233,12 +233,14 @@ e.g.
 Commands["replacefile"] = {
 	name="replacefile", 
 	quick_ref="/replacefile src dest", 
-	desc=[[replace model files from src to dest. this will include 
+	desc=[[replace model or texture files from src to dest. this will include 
 Please note, if no blocks are selected by the user, 
 all movie block and model block with matching filenames will be replaced.
+all image blocks with matching textures will also be replaced.
 if user has selected some blocks, then replacement only take place in these selected blocks.
 e.g.
 /replacefile blocktemplates/from.bmax    blocktemplates/to.bmax
+/replacefile from.jpg    to.png
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		

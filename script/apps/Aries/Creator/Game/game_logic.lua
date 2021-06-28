@@ -1860,7 +1860,14 @@ function GameLogic.IsInABTest(percent)
 end
 
 -- check lesson is vip
-function GameLogic.CheckVIPItem(isVip,freeTime,freeVipSchoolTime)
+--[[
+	-- @return type 
+		0.未到开放时间
+		1.
+
+]]
+function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isSchoolTimeOnly)	
+	local response = {isInTime = false,strTip = "",type = 0,}
 	local server_time = QuestAction.GetServerTime()
 	local year = tonumber(os.date("%Y", server_time))	
 	local month = tonumber(os.date("%m", server_time))
@@ -1868,8 +1875,8 @@ function GameLogic.CheckVIPItem(isVip,freeTime,freeVipSchoolTime)
 	local function formatTime(strTime)
 		local nTime = tonumber(strTime)
 		local year1 = math.floor(nTime/10000) 
-		local month1 = math.floor((nTime - year1*10000)/100)
-		local day1 = nTime - year1*10000 - month1*100
+		local month1 = math.floor((nTime - year1*10000)/100)   
+		local day1 = nTime - year1*10000 - month1*100 
 		return {year1,month1,day1}
 	end
 
@@ -1882,7 +1889,7 @@ function GameLogic.CheckVIPItem(isVip,freeTime,freeVipSchoolTime)
 			times[#times + 1] = formatTime(strTime)
 		end
 		local nTimeNum = #times
-		local strTip = "时间："
+		local strTip = ""
 		for i=1,nTimeNum do
 			local temp=string.format("%d年%d月%d日,",times[i][1],times[i][2],times[i][3])
 			if times[i][1] > year or (times[i][1] == year and times[i][2] >month) or (times[i][1] == year and times[i][2] == month and times[i][3] > day) then
@@ -1897,23 +1904,81 @@ function GameLogic.CheckVIPItem(isVip,freeTime,freeVipSchoolTime)
 		end
 		return false,strTip
 	end
-	if isVip then
-		if System.User.IsVip then
-			return true,""
-		end
-		local isInTime,strTip = nil,nil		
-		if freeTime then
-			isInTime,strTip=checkIsInTime(freeTime)	
-		end
-		if freeVipSchoolTime and System.User.isVipSchool then
-			isInTime,strTip=checkIsInTime(freeVipSchoolTime)	
-		end
-		if type(isInTime) == "boolean" then
-			return isInTime,strTip
-		else
-			return false,""
-		end		
-	else
-		return true,""
+
+	if not GameLogic.IsReadOnly() then
+		response.isInTime = true
+		response.strTip=""
+		response.type = 7 --可以进入，课程开发人员
+		return response
 	end
+
+	if type(isSchoolTimeOnly) == "boolean" and isSchoolTimeOnly == true then
+		local week_day = os.date("*t",server_time).wday-1 == 0 and 7 or os.date("*t",server_time).wday-1
+        if week_day ~= 6 and week_day ~= 7 then
+            local limit_time_stamp = today_weehours + 9 * 60 * 60 + 30 * 60
+            local limit_time_end_stamp = today_weehours + 18 * 60 * 60 + 30 * 60
+            if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
+                response.isInTime = false
+				response.strTip=""
+				response.type = 8 --是否学校专用
+				return response
+            end
+        end		
+	end
+
+	local tOpenTime = formatTime(openTime)
+	local openTimeStamp = os.time({year = tOpenTime[1], month = tOpenTime[2], day = tOpenTime[3], hour=0, minute=0, second=0})
+	if server_time < openTimeStamp then
+		response.isInTime = false
+		response.strTip=""
+		response.type = 0 
+		return response --不可以进入，还没有到开放时间
+	end
+
+	if not isVip then
+		response.isInTime = true
+		response.strTip=""
+		response.type = 1 --免费课程
+		return response
+	end
+	local time = nil
+	if GameLogic.IsVip() then
+		time = freeTime or freeVipSchoolTime
+	elseif System.User.isVipSchool then
+		time = freeVipSchoolTime
+	else
+		time = freeTime
+	end
+	if not time then
+		GameLogic.AddBBS(nil,"没有配置课程免费时间")
+	end
+	local isInTime,strTip=checkIsInTime(time)	
+	if  isInTime then
+		response.isInTime = true
+		response.strTip=""
+		response.type = 2 --可以进入，正好在免费时间内
+		return response
+	end
+	response.isInTime = false
+	response.strTip= strTip
+	if GameLogic.IsVip() then
+		if strTip == "" then --Vip错过免费时间
+			response.type = 3
+		else				 
+			response.type = 4 --Vip还没到免费时间
+		end
+		return response
+	end
+
+	if strTip == "" then
+		response.type = 5 --非Vip错过免费时间
+	else
+		response.type = 6 --非Vip还没到免费时间
+	end
+	return response
 end
+
+
+
+
+

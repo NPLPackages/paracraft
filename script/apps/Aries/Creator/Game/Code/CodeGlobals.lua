@@ -190,6 +190,10 @@ function CodeGlobals:ctor()
         NplOce = NplOce,
 		Game = MyCompany.Aries.Game,
 	};
+	
+	-- 直接加载不动态加载 动态加载不使用代码不自动提示
+	local GI = NPL.load("Mod/GeneralGameServerMod/GI/GI.lua");
+	self.shared_API.GI = GI:GetCodeBlockAPI();
 
 	self:Reset();
 
@@ -202,7 +206,6 @@ function CodeGlobals:Reset()
 	local curGlobals = {};
 	self.curGlobals = curGlobals;
 	self.cur_co = nil;
-
 	-- look in global table first, and then in shared API. 
 	local meta_table = {__index = function(tab, name)
 		if(name == "__LINE__") then

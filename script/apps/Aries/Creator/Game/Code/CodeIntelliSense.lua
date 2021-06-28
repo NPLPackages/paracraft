@@ -165,8 +165,9 @@ function CodeIntelliSense.GetSharedAPIGlobals()
 			getBlockEntity = globals.getBlockEntity,
 			print = dummyFunc,
 			printStack = dummyFunc,
-			actor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
-			codeblock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
+			actor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor"),
+			codeblock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock"),
+			GI = globals.GI,
 		}
 		CodeIntelliSense.shared_API = shared_API
 		return shared_API;

@@ -105,6 +105,11 @@ function QuestPage.Show(show_exid_t)
 end
 
 function QuestPage.RefreshData()
+	local SummerCampTaskPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampTaskPage.lua") 
+	if SummerCampTaskPage and SummerCampTaskPage.RefreshData then
+		SummerCampTaskPage.RefreshData()
+	end
+
 	if page == nil or not page:IsVisible() then
 		return
 	end
@@ -282,8 +287,11 @@ function QuestPage.CloseView()
 end
 
 function QuestPage.EnterWorld(world_id)
-	page:CloseWindow()
-	QuestPage.CloseView()
+	if page and page:IsVisible() then
+		page:CloseWindow()
+		QuestPage.CloseView()
+	end
+
 	local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 	CommandManager:RunCommand(string.format('/loadworld -force -s %s', world_id))
 
@@ -291,7 +299,10 @@ function QuestPage.EnterWorld(world_id)
 end
 
 function QuestPage.GrowthDiary()
-	page:CloseWindow();
+	if page and page:IsVisible() then
+		page:CloseWindow();
+	end
+	
 	ParacraftLearningRoomDailyPage.DoCheckin();
 end
 
@@ -648,8 +659,10 @@ function QuestPage.Goto(task_id)
 					break
 				elseif v.template.click and v.template.click ~= "" then
 					if string.find(v.template.click, "loadworld ") then
-						page:CloseWindow()
-						QuestPage.CloseView()
+						if page and page:IsVisible() then
+							page:CloseWindow()
+							QuestPage.CloseView()
+						end
 					end
 					NPL.DoString(v.template.click)
 				end

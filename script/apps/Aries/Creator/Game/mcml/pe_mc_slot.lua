@@ -385,8 +385,8 @@ function pe_mc_slot.OnClickSlot(ui_obj, mcmlNode)
 	if(can_edit) then
 		if(mouse_button=="left") then
 			local onclick = mcmlNode:GetAttributeWithCode("onclick");
-			local shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
-			local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+			local shift_pressed = System.Windows.Keyboard:IsShiftKeyPressed();
+			local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
 
 			if(ctrl_pressed and GameLogic.GameMode:IsUseCreatorBag()) then
 				-- ctrl+left click to clone the given slot item only in editor mode. 

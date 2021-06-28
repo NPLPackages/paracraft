@@ -52,13 +52,30 @@ function ExternalRegion:GetWorldSearchPath()
 	return self.worldSearchPath;
 end
 
-function ExternalRegion:GetRegionAttr()
+-- @param callbackFunc: this function is called when region is loaded and not locked. if nil, we will not create region if it does not exist
+function ExternalRegion:GetRegionAttr(callbackFunc)
 	local attrRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", self.regionX, self.regionY))
 	if(attrRegion:IsValid()) then
 		
-	else
-		-- TODO: create region first
+	elseif(callbackFunc) then
+		-- create region first
+		ParaBlockWorld.LoadRegion(GameLogic.GetBlockWorld(), self.regionX * 512, 0, self.regionY * 512);
+		attrRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", self.regionX, self.regionY))
 	end
+	if(callbackFunc and attrRegion:IsValid()) then
+		if(attrRegion:GetField("IsLocked", false)) then
+			local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+				if(not attrRegion:IsValid() or not attrRegion:GetField("IsLocked", false)) then
+					timer:Change()
+					callbackFunc(attrRegion)
+				end
+			end})
+			mytimer:Change(50, 100)
+		else
+			callbackFunc(attrRegion)
+		end
+	end
+
 	return attrRegion;
 end
 
@@ -99,10 +116,11 @@ function ExternalRegion:PrepareSearchPath()
 end
 
 function ExternalRegion:Load()
-	self:ClearRegion()
-	local attrRegion = self:GetRegionAttr()
-	self:PrepareSearchPath()
-	attrRegion:SetField("LoadFromFile", self.regionRawFilename);
+	local attrRegion = self:GetRegionAttr(function(attrRegion)
+		self:ClearRegion()
+		self:PrepareSearchPath()
+		attrRegion:SetField("LoadFromFile", self.regionRawFilename);
+	end)
 end
 
 function ExternalRegion:Save()

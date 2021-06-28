@@ -288,7 +288,7 @@ function ItemColorBlock:mouseReleaseEvent(event)
 					local data = self:ColorToData(self:GetPenColor());
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
 					local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX = x,blockY = y, blockZ = z, 
-						to_id = self.id, to_data=data, max_radius = if_else(event.shift_pressed, 30, 0)})
+						to_id = self.id, to_data=data, max_radius = if_else(event.shift_pressed, 30, 0), preserveRotation=true})
 					task:Run();
 					event:accept();
 				elseif(event.shift_pressed) then

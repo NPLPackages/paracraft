@@ -832,3 +832,22 @@ function Entity:FindFile(text, bExactMatch)
 	end
 end
 
+-- return the number of entities replaced
+function Entity:ReplaceFile(from, to)
+	local filename = self:GetText();
+	if( filename == from) then
+		local cmd = to;
+		if(self.cmd) then
+			local inlineCmd = self.cmd:match("^$%(.*%)")
+			if(inlineCmd and inlineCmd~="") then
+				cmd = inlineCmd.. (cmd or "")	
+			end
+		end
+		self:BeginEdit();
+		self:SetCommand(cmd);
+		self:Refresh(true);
+		self:EndEdit();
+		return 1
+	end
+	return 0
+end

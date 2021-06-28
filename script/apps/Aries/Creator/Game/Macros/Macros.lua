@@ -589,18 +589,61 @@ function Macros:LoadMacrosFromText(text)
 	Macros:Init();
 	local macros = {};
 	local lineNumber = 0;
+
+	local last_text_duration = 0;
+	local last_total_idle = 0;
+	local add_idle = false;
+
 	for line in text:gmatch("([^\r\n]*)\r?\n?") do
 		lineNumber = lineNumber + 1;
 		line = line:gsub("^%s+", "")
+
+		if (add_idle) then
+			local name, params = line:match("(%w[%w%.]*)%((.*)%)");
+			if (name == "text" and params) then
+				local t = last_text_duration - last_total_idle;
+				if (t > 0) then
+					local m = Macro:new():Init(string.format("Idle(%d)", t + 200), lineNumber);
+					if (m:IsValid()) then
+						macros[#macros+1] = m;
+						lineNumber = lineNumber + 1;
+					end
+				end
+			elseif (name == "Idle" and params) then
+				params = NPL.LoadTableFromString("{"..params.."}");
+				local t = unpack(params);
+				last_total_idle = last_total_idle + t;
+			end
+		end
+
 		local m = Macro:new():Init(line, lineNumber);
 		if(m:IsValid()) then
-			local preMacro = macros[#macros];
-			if (m.name == "text" and preMacro and preMacro.name == "text") then
-				lineNumber = lineNumber + 1;
-				local idle = Macro:new():Init("Idle(10)", lineNumber);
-				macros[#macros+1] = idle;
-			end
 			macros[#macros+1] = m;
+			if (m.name == "text" and m.params) then
+				if (not add_idle) then
+					add_idle = true;
+				end
+				last_total_idle = 0;
+
+				local params = type(m.params) == "table" and m.params or commonlib.split(m.params,",")
+				local text = params[1] or ""
+				if (string.find(text, "\"", 1) == 1 and string.find(text, "\"", string.len(text)) == string.len(text)) then
+					text = string.sub(text, 2, string.len(text) - 1);
+				end
+				local voiceNarrator = params[4] or 10012;
+				voiceNarrator = tonumber(voiceNarrator);
+				if (text ~= "" and voiceNarrator ~= nil) then
+					last_text_duration = (math.floor(commonlib.utf8.len(text) / 5) + 1.5) * 1000;
+					local sound_name = "playtext" .. voiceNarrator;
+					local md5_value = SoundManager:GetPlayTextMd5(text, voiceNarrator)
+					local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
+					if (file_path) then
+						SoundManager:PlaySound(sound_name, file_path);
+						last_text_duration = SoundManager:GetSoundDuration(sound_name, file_path) * 1000;
+						SoundManager:StopSound(sound_name);
+					end				
+				end
+			end
 		end
 	end
 	return macros;

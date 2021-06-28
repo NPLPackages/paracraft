@@ -165,8 +165,16 @@ function BaseContext:OnMouseDownTimer(timer)
 	end
 end
 
+function BaseContext:handleHookedEvent(event)
+	local __GI__ = GameLogic.GetCodeGlobal().__GI__;
+	if (not __GI__) then return end
+	__GI__:HandleMouseKeyBoardEvent(event);
+end
+
 -- return true if handled
 function BaseContext:handleHookedMouseEvent(event)
+	self:handleHookedEvent(event);
+
 	if(ModManager:handleMouseEvent(event)) then
 		return true;
 	end
@@ -613,6 +621,8 @@ end
 
 -- virtual: return true if handled
 function BaseContext:handleHookedKeyEvent(event)
+	self:handleHookedEvent(event);
+
 	if(ModManager:handleKeyEvent(event)) then
 		return true;
 	end
@@ -790,7 +800,7 @@ function BaseContext:OnCreateBlock(result, event)
 				if(block_id or result.block_id == block_types.names.water) then
 					-- if ctrl key is pressed, we will replace block at the cursor with the current block in right hand. 
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_id = block_id or 0, to_data = block_data, max_radius = 30})
+					local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_id = block_id or 0, to_data = block_data, max_radius = 30, preserveRotation=true})
 					task:Run();
 				end
 			elseif(shift_pressed) then
@@ -801,7 +811,7 @@ function BaseContext:OnCreateBlock(result, event)
 				if(block_id) then
 					-- if alt key is pressed, we will replace block at the cursor with the current block in right hand. 
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_id = block_id, max_radius = 0, side = result.side})
+					local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_id = block_id, max_radius = 0, side = result.side, preserveRotation=true})
 					task:Run();
 				end
 			else

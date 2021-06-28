@@ -90,6 +90,17 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+	    <!-- 20210624夏令营道具-->
+        <!--<item id="83177" gsid="82017" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83177_red_sodier_hat6_32bits.png" name="女文艺红军帽子02"/>
+        <item id="83176" gsid="82016" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83176_red_sodier_hat5_32bits.png" name="女文艺红军帽子01"/>
+        <item id="83175" gsid="82015" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83175_red_sodier_hat4_32bits.png" name="女红军帽子02"/>
+        <item id="83174" gsid="82014" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83174_red_sodier_hat3_32bits.png" name="女红军帽子01"/>
+		<item id="83173" gsid="82013" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83173_red_sodier_hat2_32bits.png" name="红军政委帽子"/>-->
+		<item id="83172" gsid="82012" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83172_red_sodier_hat1_32bits.png" name="红军战士帽子"/>
+		<!--<item id="83171" gsid="82011" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83171_sodier_hat4_32bits.png" name="长官帽子"/>
+        <item id="83170" gsid="82010" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83170_sodier_hat3_32bits.png" name="士兵帽"/>
+		<item id="83169" gsid="82009" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83168_sodier_hat2_32bits.png" name="戴眼镜士兵帽"/>
+		<item id="83168" gsid="82008" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83169_sodier_hat1_32bits.png" name="戴眼镜的长官帽子"/>-->
 		<!--20210610新增-->
 		<item id="83167" gsid="82007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83167_space_suit_hat_32bits.png" name="宇航帽"/>
 		<!--20210527新增-->
@@ -104,6 +115,7 @@
 		<item id="83160" gsid="82001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83160_brown_cat_hat_32bits.png" name="棕色猫猫头"/>
 		<item id="83161" gsid="82002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83161_yellow_cat_hat_32bits.png" name="黄色猫猫头"/>
 		<item id="83162" gsid="82003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83162_blue_cat_hat_32bits.png" name="蓝色猫猫头"/>
+		
 		
 		<!--起始数据-->
 		<item id="83127" icon="Texture/Aries/Item/2331_ChristmasTire_Prince.png" name="麋鹿角"/>
@@ -436,6 +448,9 @@
 	</category>
 
 	<category name="shirt" text="衣服">
+	    <!--20210624新增-->
+		<!--<item id="84061" gsid="83006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84061_sodier_armor_32bits.png" name="军服"/>-->
+		<item id="84060" gsid="83005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84060_red_sodier_armor_32bits.png" name="长征服"/>
 		<!--20210610新增-->
 		<item id="84059" gsid="83004" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84059_space_suit_armor_32bits.png" name="宇航服"/>
 		<!--20210527新增-->
@@ -506,6 +521,10 @@
 	</category>
 
 	<category name="pants" text="裤子">
+        <!--20210624新增-->
+		<!--<item id="85080" gsid="84007" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85080_sodier_pants_32bits.png" name="军裤"/>-->
+        <item id="85079" gsid="84006" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85079_red_sodier_pants_32bits.png" name="长征裤"/>
+
 	    <!--20210610新增-->
 		<item id="85078" gsid="84005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85078_space_suit_pants_32bits.png" name="宇航裤"/>
 		<!--20210527新增-->
@@ -593,6 +612,8 @@
 	</category>
 	
 	<category name="back" text="背部">
+	    <!--20210610新加-->
+		<item id="86042" gsid="85002" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86042_red_scarf_32bits.png" name="红领巾"/>
 	    <!--20210610新加-->
 		<item id="86041" gsid="85001" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86041_space_suit_bag_32bits.png" name="氧气瓶"/>
 

@@ -38,6 +38,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/TeacherBlocklyDef/TeacherBlockly.lua");
 	elseif(filename == "microbit") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Microbit/Microbit.lua");
+	elseif(filename == "npl_camera") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraBlockly.lua");
 	else
 		filename = Files.GetWorldFilePath(filename)
 		if(filename) then
@@ -60,6 +62,7 @@ function LanguageConfigurations:IsBuildinFilename(filename)
 	or filename=="npl_blockpen" 
 	or filename=="npl_teacher"
 	or filename=="microbit"
+	or filename=="npl_camera"
 end
 
 -- enable caching

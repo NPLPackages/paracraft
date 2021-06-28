@@ -47,14 +47,18 @@ ParaWorldLoginAdapter.ids = {
 }
 
 ParaWorldLoginAdapter.campIds = {
-    ONLINE = 41570,
-    RELEASE = 1471,
+    ONLINE = 70351,
+    RELEASE = 20669,
 }
 
 ParaWorldLoginAdapter.SchoolWorldId = 20576;
 
 function ParaWorldLoginAdapter.GetDefaultWorldID()
     local httpwrapper_version = HttpWrapper.GetDevVersion();
+    if (System.options.isDevMode and (System.User.isVipSchool or System.User.isVip)) then
+        return ParaWorldLoginAdapter.campIds[httpwrapper_version]
+    end
+    
     local ids = ParaWorldLoginAdapter.ids[httpwrapper_version];
     if(ids)then
         local len = #ids;

@@ -778,3 +778,184 @@ function QuestAction.GetAskTimes()
     local ask_times = clientData.ask_times or 0
     return ask_times
 end
+
+local world2in1_gsid = 90007
+function QuestAction.GetSummerTaskProgress(gsid)
+    local client_data = KeepWorkItemManager.GetClientData(world2in1_gsid)
+    if client_data == nil then
+        return 0
+    end
+    
+    local summer_progress_data = client_data.summer_progress_data
+
+    local task_data = summer_progress_data[gsid] or summer_progress_data[tostring(gsid)]
+    if task_data then
+        return task_data.value or 0
+    end
+
+    return 0
+end
+
+function QuestAction.SetSummerTaskProgress(gsid, change_value)
+    local is_task_finish = QuestAction.CheckSummerTaskFinish(gsid)
+    if is_task_finish then
+        return
+    end
+
+    local task_data = QuestAction.GetSummerCampTaskData(gsid)
+    if task_data == nil then
+        return
+    end
+
+    local client_data = KeepWorkItemManager.GetClientData(world2in1_gsid)
+    if client_data == nil then
+        client_data = {}
+    end
+    
+    if client_data.summer_progress_data == nil then
+        client_data.summer_progress_data = {}
+    end
+
+    if client_data.summer_progress_data[gsid] == nil then
+        client_data.summer_progress_data[gsid] = {value = 0}
+    end
+
+    local value = client_data.summer_progress_data[gsid].value or 0
+    if value >= task_data.max_pro then
+        -- QuestAction.SummerTaskDoFinish(gsid)
+        return
+    end
+
+    if change_value then
+        value = change_value
+    else
+        value = value + 1
+    end
+    if value >= task_data.max_pro then
+        value = task_data.max_pro
+        QuestAction.SummerTaskDoFinish(gsid, function()
+            client_data.summer_progress_data[gsid].value = value
+
+            if client_data.summer_progress_data.certificate_num == nil then
+                client_data.summer_progress_data.certificate_num = 0
+            end
+
+            client_data.summer_progress_data.certificate_num = client_data.summer_progress_data.certificate_num + 1
+            KeepWorkItemManager.SetClientData(world2in1_gsid, client_data, function()
+                GameLogic.GetFilters():apply_filters("summer_task_change", gsid);
+            end)
+        end)
+    else
+        client_data.summer_progress_data[gsid].value = value
+        KeepWorkItemManager.SetClientData(world2in1_gsid, client_data, function()
+            GameLogic.GetFilters():apply_filters("summer_task_change", gsid);
+        end)
+    end
+    
+    if client_data.summer_progress_data[gsid] then
+        return client_data.summer_progress_data[gsid].value or 0
+    end
+
+    return 0
+end
+
+function QuestAction.CheckSummerTaskFinish(gsid)
+    local bOwn = KeepWorkItemManager.HasGSItem(gsid)
+    if bOwn then
+        return true
+    end
+
+    return false
+end
+
+function QuestAction.SummerTaskDoFinish(gsid, success_cb)
+    local is_task_finish = QuestAction.CheckSummerTaskFinish(gsid)
+    if is_task_finish then
+        return
+    end
+
+    local task_data = QuestAction.GetSummerCampTaskData(gsid) 
+    KeepWorkItemManager.DoExtendedCost(task_data.exid, function()
+        if success_cb then
+            success_cb()
+        end
+    end) 
+end
+
+function QuestAction.GetSummerCampTaskData(gsid)
+    if QuestAction.SummerCampTaskData == nil then
+        QuestAction.SummerCampTaskData = {
+            [70009] = {name = "闪闪红星", exid = 31066, gsid = 70009, max_pro = 1, desc = "完成共筑红旗渠活动"},
+            [70010] = {name = "不忘初心", exid = 31067, gsid = 70010, max_pro = 20, desc = "完成梦回党的摇篮活动"},
+            [70011] = {name = "红色先锋", exid = 31068, gsid = 70011, max_pro = 10, desc = "完成重走长征路活动"},
+            [70012] = {name = "时代接班人", exid = 31069, gsid = 70012, max_pro = 15, desc = "完成3D动画编程课程学习"},
+        }
+    end
+
+    if gsid and QuestAction.SummerCampTaskData[gsid] then
+        return QuestAction.SummerCampTaskData[gsid]
+    end
+
+    return QuestAction.SummerCampTaskData
+end
+
+function QuestAction.OpenSummerVipView()
+    local SummerCampVipView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampVipView.lua") 
+    SummerCampVipView.ShowView()
+end
+
+function QuestAction.GetSummerRewardHasGet(index)
+    local client_data = KeepWorkItemManager.GetClientData(world2in1_gsid)
+    if client_data == nil then
+        client_data = {}
+    end
+    
+    if client_data.summer_progress_data == nil then
+        return false
+    end
+
+    if client_data.summer_progress_data.reward_state == nil then
+        return false
+    end
+
+    return client_data.summer_progress_data.reward_state[index]
+end
+
+function QuestAction.SetSummerRewardGet(index, cb)
+    local client_data = KeepWorkItemManager.GetClientData(world2in1_gsid)
+    if client_data == nil then
+        client_data = {}
+    end
+    
+    if client_data.summer_progress_data == nil then
+        client_data.summer_progress_data = {}
+    end
+
+    if client_data.summer_progress_data.reward_state == nil then
+        client_data.summer_progress_data.reward_state = {}
+    end
+
+    if client_data.summer_progress_data.reward_state[index] then
+        return
+    end
+
+    client_data.summer_progress_data.reward_state[index] = true
+    KeepWorkItemManager.SetClientData(world2in1_gsid, client_data, function()
+        if cb then
+            cb()
+        end
+    end)
+end
+
+function QuestAction.GetCertificateNum()
+    local client_data = KeepWorkItemManager.GetClientData(world2in1_gsid)
+    if client_data == nil then
+        return 0
+    end
+    
+    if client_data.summer_progress_data == nil then
+        return 0
+    end
+
+    return client_data.summer_progress_data.certificate_num or 0
+end

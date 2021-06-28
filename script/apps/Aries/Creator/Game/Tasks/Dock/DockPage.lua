@@ -50,7 +50,7 @@ DockPage.top_line_1 = {
 }
 DockPage.top_line_2 = {
     { label = L"", },
-    { label = L"", },
+    { label = L"夏令营主ui", id = "summer_camp_main", enabled2 = false, bg="Texture/Aries/Creator/keepwork/SummerCamp/btn3_summer_camp_32bits.png#0 0 100 80", }, 
     { label = L"呼朋唤友", id = "invitefriend", enabled2 = true, bg="Texture/Aries/Creator/keepwork/InviteFriend/btn3_jieban_32bits.png#0 0 100 80", }, 
     { label = L"作业", id = "homework", enabled2 = false, bg="Texture/Aries/Creator/keepwork/dock/btn3_zuoye_32bits.png#0 0 100 80", },
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_riji_32bits.png#0 0 100 80", },
@@ -95,9 +95,11 @@ function DockPage.Show(bCommand)
     DockPage.CheckIsTaskCompelete()
 
     DockPage.ShowCampIcon()
+    
     -- ActWeek.GetServerTime(function()
     --     DockPage.RefreshPage(0.01)
     -- end)
+    DockPage.ShowSummerCampIcon()
     GameLogic.QuestAction.RequestAiHomeWork(DockPage.FreshHomeWorkIcon)
 end
 
@@ -207,7 +209,7 @@ function DockPage.CloseLastShowPage(id)
                 GameLogic.GetFilters():apply_filters("cellar.explorer.close")
             elseif v[1] == "study" then
                 page = QuestAllCourse.GetPageCtrl()
-            elseif v[1] == "notice" then
+            elseif v[1] == "notice" then                
                 page = Notice.GetPageCtrl()
             elseif v[1] == "invitefriend"then
                 page = InviteFriend.GetPageCtrl()
@@ -258,10 +260,13 @@ function DockPage.OnClickTop(id)
         Email.Show();
         table.insert(DockPage.showPages,{id,Email.GetPageCtrl()})
     elseif(id == "notice")then
-        if Notice then
+        if (System.options.isDevMode and (System.User.isVipSchool or System.User.isVip)) then
+            local SummerCampNotice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNotice.lua") 
+            SummerCampNotice.ShowView()
+        else
             Notice.Show(1); 
             table.insert(DockPage.showPages,{id,Notice.GetPageCtrl()})
-        end
+        end  
     elseif (id == 'present') then
         if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
             GameLogic.GetFilters():apply_filters(
@@ -295,6 +300,13 @@ function DockPage.OnClickTop(id)
         InviteFriend.ShowView()
         table.insert(DockPage.showPages,{id,InviteFriend.GetPageCtrl()})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.invitefriend");
+
+    elseif (id == 'summer_camp_main') then
+        local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua") 
+        SummerCampMainPage.ShowView()
+        table.insert(DockPage.showPages,{id,SummerCampMainPage.GetPageCtrl()})
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.summer_camp_main");
+        
     elseif (id == 'rank') then    
         RankPage.Show();
         table.insert(DockPage.showPages,{id,RankPage.GetPageCtrl()})
@@ -723,6 +735,49 @@ function DockPage.ShowCampIcon()
     if tonumber(world_id) == camp_id then
         local DockCampIcon = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockCampIcon.lua");
         DockCampIcon.Show();
+    end
+end
+
+function DockPage.ShowSummerCampIcon()
+    if not System.options.isDevMode then
+        return
+    end
+    if DockPage.page == nil or not DockPage.page:IsVisible() then
+        return
+    end
+
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local world_id = WorldCommon.GetWorldTag("kpProjectId");
+    local camp_id_list = {
+        ONLINE = 70351,
+        RELEASE = 20669,
+    }
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+    local httpwrapper_version = HttpWrapper.GetDevVersion();
+    local camp_id = camp_id_list[httpwrapper_version]
+
+    if tonumber(world_id) == camp_id then
+        local has_icon = false
+        for key, v in pairs(DockPage.top_line_2) do
+            if v.id == "summer_camp_main" then
+                has_icon = true
+                v.enabled2 = true
+            end
+        end
+
+        if not has_icon then
+            table.insert(DockPage.top_line_2, 1, { label = L"夏令营主ui", id = "summer_camp_main", enabled2 = true, bg="Texture/Aries/Creator/keepwork/SummerCamp/btn3_summer_camp_32bits.png#0 0 100 80", })
+        end
+        
+        DockPage.RefreshPage()
+    else
+        for key, v in pairs(DockPage.top_line_2) do
+            if v.id == "summer_camp_main" then
+                v.enabled2 = false
+            end
+        end
+
+        DockPage.RefreshPage()
     end
 end
 

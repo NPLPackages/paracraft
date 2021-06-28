@@ -369,8 +369,8 @@ function Rank.IsRoleModel(item_data)
 	return false
 end
 
-function Rank.GetLimitLabel(text)
-    local maxCharCount = 13;
+function Rank.GetLimitLabel(text, maxCharCount)
+    maxCharCount = maxCharCount or 13;
     local len = ParaMisc.GetUnicodeCharNum(text);
     if(len >= maxCharCount)then
 	    text = ParaMisc.UniSubString(text, 1, maxCharCount-2) or "";
