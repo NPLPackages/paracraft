@@ -59,13 +59,19 @@ function VideoSharing.InstallPlugin(callbackFunc)
 	end);
 end
 
-function VideoSharing.ToggleRecording(time)
+function VideoSharing.ToggleRecording(time, callback)
 	if (ParaMovie.IsRecording()) then
 		VideoSharing.EndCapture(false);
 		ParaIO.DeleteFile(VideoSharing.GetOutputFile());
 	end
 	VideoSharingSettings.total_time = time;
-	VideoSharing.BeginCapture();
+	VideoSharing.BeginCapture(callback);
+end
+
+function VideoSharing.StopRecording()
+	if (ParaMovie.IsRecording()) then
+		VideoSharing.EndCapture(false);
+	end
 end
 
 function VideoSharing.GetOutputFile()
@@ -130,7 +136,7 @@ function VideoSharing.BeginCapture(callbackFunc)
 		end)
 	end
 	if(VideoSharing.HasFFmpegPlugin()) then
-		if (VideoSharingSettings.total_time == 10 or VideoSharingSettings.total_time == 30) then
+		if (VideoSharingSettings.total_time) then
 			VideoSharingSettings.OnClose();
 			startCapture();
 		else
@@ -368,7 +374,9 @@ function VideoSharing.ShowRecordingArea(bShow)
 					VideoSharing.EndCapture(true);
 				end
 			end})
-			VideoSharing.title_timer:Change(1000,500);
+			if (VideoSharingSettings.total_time == 10 or VideoSharingSettings.total_time == 30) then
+				VideoSharing.title_timer:Change(1000,500);
+			end
 
 			_parent:GetChild("logo").visible = VideoSharingSettings.IsShowLogo();
 

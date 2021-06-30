@@ -429,6 +429,12 @@ function CodeBlockWindow.IsVisible()
 end
 
 function CodeBlockWindow.Close()
+	local codeBlock = CodeBlockWindow.GetCodeBlock();
+	if(codeBlock and codeBlock:GetEntity() and codeBlock:GetEntity():GetLanguageConfigFile() == "npl_camera") then
+		local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+		camera.close();
+	end
+
 	GameLogic.GetCodeGlobal():Disconnect("logAdded", CodeBlockWindow, CodeBlockWindow.AddConsoleText);
 	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.CloseEditorWindow();
@@ -554,11 +560,15 @@ function CodeBlockWindow.OnClickStop()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	if(codeBlock) then
 		codeBlock:StopAll();
+		if(codeBlock:GetEntity() and codeBlock:GetEntity():GetLanguageConfigFile() == "npl_camera") then
+			local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+			camera.showWithEditor(codeBlock:GetEntity());
+		end
 	end
 end
 
 
-function CodeBlockWindow.OnClickCompileAndRun()
+function CodeBlockWindow.OnClickCompileAndRun(onFinishedCallback)
 	ParaUI.GetUIObject("root"):Focus();
 	
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
@@ -577,7 +587,7 @@ function CodeBlockWindow.OnClickCompileAndRun()
 			-- GameLogic.GetFilters():apply_filters("user_event_stat", "code", "execute", nil, nil);
 			CodeBlockWindow.UpdateCodeToEntity();
 			CodeBlockWindow.UpdateNplBlocklyCode();
-			codeEntity:Restart();
+			codeEntity:Restart(onFinishedCallback);
 		end
 	end
 end

@@ -191,10 +191,6 @@ function CodeGlobals:ctor()
 		Game = MyCompany.Aries.Game,
 	};
 	
-	-- 直接加载不动态加载 动态加载不使用代码不自动提示
-	local GI = NPL.load("Mod/GeneralGameServerMod/GI/GI.lua");
-	self.shared_API.GI = GI:GetCodeBlockAPI();
-
 	self:Reset();
 
 	GameLogic:Connect("beforeWorldSaved", self, self.OnWorldSave, "UniqueConnection");
@@ -219,6 +215,8 @@ function CodeGlobals:Reset()
 			return self.cur_co and self.cur_co:GetActor();
 		elseif(name == "document") then
 			return document;
+		elseif(name == "GI") then
+			return self:GetSandboxAPI();
 		end
 		local value = curGlobals[name];
 		if(value==nil) then
@@ -246,6 +244,11 @@ function CodeGlobals:Reset()
 	LobbyServerViaTunnel.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 end
 
+function CodeGlobals:GetSandboxAPI()
+	if (self.__GI__) then return self.__GI__:GetCodeBlockAPI() end 
+	self.__GI__ = NPL.load("Mod/GeneralGameServerMod/GI/GI.lua");
+	return self.__GI__:GetCodeBlockAPI();
+end
 
 function CodeGlobals:log(obj, ...)
 	local text;

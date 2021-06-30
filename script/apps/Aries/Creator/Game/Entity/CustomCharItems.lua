@@ -15,6 +15,7 @@ local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 
 CustomCharItems.defaultModelFile = "character/CC/02human/CustomGeoset/actor.x";
+CustomCharItems.ReplaceableAvatars = {};
 
 local models = {};
 local items = {};
@@ -26,6 +27,27 @@ function CustomCharItems:Init()
 		return;
 	end
 	self.is_inited = true;
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Blue_Army_boss.x"] = "80001;84061;81018;88014;85080;83171";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Red_Army_boss.x"] = "80001;82011;84060;81018;88014;85079";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Blue_Army_xiaobing.x"] = "80001;84061;81018;88014;85080;83170";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Red_Army_xiaobing.x"] = "80001;84060;81018;88014;85079;83172";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Red_Army_nv1.x"] = "80001;84060;81018;88014;85079;83175";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Red_Army_nv2.x"] = "80001;84060;81018;88014;85079;83174";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/tufei_movie.x"] = "80001;82065;84048;81018;88014;85070";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Red_Army_master.x"] = "80001;84060;81018;88014;85079;83173";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunzhang.x"] = "80001;83158;84050;81018;88014;85067";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunming.x"] = "80001;82001;84046;81018;88014;85040";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84032;81018;88014;85027";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;82001;84003;81018;88014;85017";
+	CustomCharItems.ReplaceableAvatars["character/CC/codewar/sunbinjunshixingtai_movie.x"] = "80001;83150;84049;81018;88014;85067";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school20.x"] = "80001;82001;84017;81018;88014;85019";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school16.x"] = "80001;82011;84010;81018;88014;85005";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school1.x"] = "80001;82028;84003;81018;88014;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school28.x"] = "80001;82148;84033;81058;88014;85049";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school34.x"] = "80001;82104;84012;81018;88014;85009";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school22.x"] = "80001;82126;84029;81018;88014;85050";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school43.x"] = "80001;82148;84012;81018;88014;85009";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school35.x"] = "80001;82004;84012;81018;88014;85009";
 
 	local root = ParaXML.LuaXML_ParseFile("config/Aries/creator/CustomCharItems.xml");
 	if (root) then
@@ -469,6 +491,10 @@ function CustomCharItems:CheckAvatarExist(skin)
 		end
 	end
 	return false;
+end
+
+function CustomCharItems:GetSkinByAsset(assetPath)
+	return CustomCharItems.ReplaceableAvatars[assetPath];
 end
 
 function CustomCharItems:GetItemByGsid(gsid)

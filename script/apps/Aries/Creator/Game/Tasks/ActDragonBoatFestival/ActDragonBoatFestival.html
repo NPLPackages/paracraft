@@ -1,0 +1,287 @@
+<html>
+<body>
+    <pe:mcml>
+        <script type="text/npl" refresh="false">
+            <![CDATA[
+                local ActDragonBoatFestival = NPL.load("./ActDragonBoatFestival.lua");
+                local EmailReward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/EmailReward.lua");
+                local page = document:GetPageCtrl();
+
+                local cur_page = 1;
+                local select_item_button_1_active = "Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#492 1208 68 49";
+                local select_item_button_2_active = "Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#581 1208 68 49";
+                local select_item_button_3_active = "Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#671 1208 68 49";
+
+                function close()
+                    if (cur_page == 1) then
+                        page:CloseWindow();
+                    elseif (cur_page == 2) then
+                        local main_page = page:FindControl("main");
+                        local intro_page = page:FindControl("intro");
+
+                        main_page.visible = true;
+                        intro_page.visible = false;
+
+                        cur_page = 1;
+                    end
+                end
+
+                function get_line_length()
+                    local rice = get_rice();
+                    local bar_node = page:FindControl("bar");
+
+                    if (width ~= 0) then
+                        bar_node.visible = true;
+                    end
+
+                    local width = 580 * (rice / 150000);
+
+                    return 'width: ' .. width .. 'px';
+                end
+
+                commonlib.TimerManager.SetTimeout(function()
+                    local rice = get_rice();
+
+                    local star2_node = page:FindControl("star2");
+                    local star3_node = page:FindControl("star3");
+                    local star4_node = page:FindControl("star4");
+
+                    if (rice >= 50000) then
+                        star2_node.visible = true;
+                        page:SetUIBackground("select_item_button_1", select_item_button_1_active)
+                    end
+
+                    if (rice >= 100000) then
+                        star3_node.visible = true;
+                        page:SetUIBackground("select_item_button_1", select_item_button_1_active)
+                        page:SetUIBackground("select_item_button_2", select_item_button_2_active)
+                    end
+
+                    if (rice >= 150000) then
+                        star4_node.visible = true;
+                        page:SetUIBackground("select_item_button_1", select_item_button_1_active)
+                        page:SetUIBackground("select_item_button_2", select_item_button_2_active)
+                        page:SetUIBackground("select_item_button_3", select_item_button_3_active)
+                    end
+                end, 0)
+
+                function set_page()
+                    local main_page = page:FindControl("main");
+                    local intro_page = page:FindControl("intro");
+
+                    main_page.visible = false;
+                    intro_page.visible = true;
+                    
+                    cur_page = 2;
+                end
+
+                function select_item_1()
+                    select_item(1);
+                end
+
+                function select_item_2()
+                    select_item(2);
+                end
+
+                function select_item_3()
+                    select_item(3);
+                end
+
+                function select_item(index)
+                    ActDragonBoatFestival:GetGifts(index, function(data, err)
+                        if (err == 400) then
+                            if (data and data.message) then
+                                _guihelper.MessageBox(data.message)
+                            end
+                            return;
+                        end
+
+                        if (err ~= 200) then
+                            return;
+                        end
+
+                        if (not data or
+                            type(data) ~= 'table' or
+                            not data.gainList or
+                            type(data.gainList) ~= 'table') then
+                            return;
+                        end
+
+                        if (index == 1) then
+                            page:SetUIBackground("select_item_button_1", select_item_button_1_active)
+                        end
+
+                        if (index == 2) then
+                            page:SetUIBackground("select_item_button_2", select_item_button_2_active)
+                        end
+
+                        if (index == 3) then
+                            page:SetUIBackground("select_item_button_3", select_item_button_3_active)
+                        end
+
+                        local list = {}
+
+                        for key, item in ipairs(data.gainList) do
+                            list[#list + 1] = {
+                                gsId = item.goodsInfo.gsId,
+                                amount = item.amount
+                            }
+                        end
+
+                        EmailReward.ShowView(list);
+                    end);
+                end
+
+                function get_rice()
+                    if (ActDragonBoatFestival.data and ActDragonBoatFestival.data.totalRice) then
+                        if ActDragonBoatFestival.data.totalRice > 150000 then
+                            return 150000;
+                        end
+
+                        return ActDragonBoatFestival.data.totalRice;
+                    else
+                        return 0;
+                    end
+                end
+
+                function get_rice_plus()
+                    local rice = get_rice()
+
+                    if (rice >= 150000) then
+                        return rice .. "+";
+                    else
+                        return rice;
+                    end
+                end
+            ]]>
+        </script>
+        <style type="text/mcss"></style>
+        <div>
+            <input type="button"
+                   align="right"
+                   onclick="close()"
+                   zorder="1"
+                   style="position: relative;
+                          width: 22px;
+                          height: 22px;
+                          margin-top: 50px;
+                          margin-right: 110px;
+                          background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#105 1225 22 22);" />
+            <pe:container name="main" style="position: relative;
+                                             background:;
+                                             width: 912px;
+                                             height: 546px;">
+                <div style="position: relative;
+                            width: 912px;
+                            height: 546px;
+                            background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#0 0 912 546);">
+                </div>
+                <div zorder="1"
+                     style="position: relative;
+                            margin-top: 148px;
+                            margin-left: 166px;">
+                    <pe:container name="bar" visible="false" style="background:;position: relative;">
+                        <div zorder="1"
+                             style="<%= get_line_length() .. ';position: relative;height: 8px;background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#361 1232 24 9:6 0 6 0);' %>"></div>
+                    </pe:container>
+                    <pe:container name="star1" visible="true" style="background:;position: relative;">
+                        <div zorder="2"
+                            style="width: 26px;
+                                    height: 26px;
+                                    margin-left: -10px;
+                                    margin-top: -8px;
+                                    background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#414 1225 26 26)"></div>
+                    </pe:container>
+                    <pe:container name="star2" visible="false" style="background:;position: relative;">
+                        <div zorder="2"
+                            style="width: 26px;
+                                    height: 26px;
+                                    margin-left: 180px;
+                                    margin-top: -8px;
+                                    background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#414 1225 26 26)"></div>
+                    </pe:container>
+                    <pe:container name="star3" visible="false" style="background:;position: relative;">
+                        <div zorder="2"
+                            style="width: 26px;
+                                    height: 26px;
+                                    margin-left: 372px;
+                                    margin-top: -8px;
+                                    background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#414 1225 26 26)"></div>
+                    </pe:container>
+                    <pe:container name="star4" visible="false" style="background:;position: relative;">
+                        <div zorder="2"
+                            style="width: 26px;
+                                    height: 26px;
+                                    margin-left: 562px;
+                                    margin-top: -8px;
+                                    background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#414 1225 26 26)"></div>
+                    </pe:container>
+                    <div style="position: relative;
+                                margin-left: 160px;
+                                margin-top: -55px;
+                                width: 68px;
+                                height: 49px;">
+                        <input type="button"
+                               name="select_item_button_1"
+                               onclick="select_item_1()"
+                               style="width: 68px;
+                                      height: 49px;
+                                      background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#782 1209 68 49);" />       
+                    </div>
+                    <div style="position: relative;
+                                margin-left: 350px;
+                                margin-top: -55px;
+                                width: 68px;
+                                height: 49px;">
+                        <input type="button"
+                               name="select_item_button_2"
+                               onclick="select_item_2()"
+                               style="width: 68px;
+                                      height: 49px;
+                                      background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#871 1209 68 49);" />
+                    </div>
+                    <div style="position: relative;
+                                margin-left: 540px;
+                                margin-top: -55px;
+                                width: 70px;
+                                height: 55px;">
+                        <input type="button"
+                               name="select_item_button_3"
+                               onclick="select_item_3()"
+                               style="width: 68px;
+                                    height: 49px;
+                                    background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#961 1209 68 49);" />
+                    </div>
+                </div>
+                <div zorder="1"
+                     onclick="set_page()"
+                     style="position: relative;
+                            width: 126px;
+                            height: 24px;
+                            margin-top: 355px;
+                            margin-left: 370px;
+                            background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#161 1226 126 24)"></div>
+                <div zorder="1"
+                     style="position: relative;
+                            width: 160px;
+                            height: 30px;
+                            margin-left: 374px;
+                            margin-top: 478px;
+                            color: #FFFFFF;
+                            text-align: center;
+                            font-weight: bolder;
+                            font-size: 13px;
+                            base-font-size: 13px;">
+                    <%= L"获得总糯米：" .. get_rice_plus() %>
+                </div>
+            </pe:container>
+            <pe:container name="intro" visible="false" style="position: relative;background:;">
+                <div style="position: relative;
+                            width: 912px;
+                            height: 546px;
+                            background: url(Texture/Aries/Creator/paracraft/dragon_boat_festival_32bits.png#0 593 912 546);">
+            </pe:container>
+        </div>
+    </pe:mcml>
+</body>
+</html>

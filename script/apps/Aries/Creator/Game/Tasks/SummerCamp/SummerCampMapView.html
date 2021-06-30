@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+local SummerCampMapView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMapView.lua");
+SummerCampMapView.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+function GotoWorld()
+    ClosePage()
+    SummerCampMapView.GotoSummerWorld()
+end
+
+function IconData()
+    return SummerCampMapView.IconData
+end
+
+function ToPos(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampMapView.ToPos(tonumber(index))
+end
+
+local map_pos_list = {
+    {pos={326, 100}},
+    {pos={507, 107}},
+    {pos={485, -12}},
+    {pos={68, 255}},
+    {pos={382, 25}},
+    {pos={296, 40}},
+    {pos={232, 141}},
+    {pos={20, 88}},
+    {pos={505, 47}},
+    {pos={261, 63}},
+    {pos={119, 118}},
+    {pos={462, 270}},
+}
+function GetIconPosStyle(index)
+    local pos = map_pos_list[index].pos
+    local pos_x = pos[1]
+    local pos_y = pos[2]
+    return string.format("position: relative;margin-left: %s;margin-top: %s;background:", pos_x, pos_y)
+end
+
+
+function GetIndex(index)
+    return tostring(index)
+end
+
+]]></script>
+<div style=" width: 912x; height: 515px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/map_bg_912x515_bits.png#0 0 912 515);">
+    <input type="button" style="position: relative; margin-left: 880px; margin-top: 5px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    <div style="float: left;width: 224px;margin-left: 40px; margin-top: 75px;">
+        <pe:repeat DataSource="<%=IconData()%>">
+            <pe:repeatitem>
+                <input type="button" onclick="ToPos" width="166" height="21" param1 = '<%=Eval("index") %>' style='<%=string.format("margin-left: 0px; margin-top: 10px; background:url(%s)", Eval("bg_img"))%>'/>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+    
+    <pe:container zorder="10" uiname="summer_decode_wxcode_root" width="633" height="338" style="float: left;margin-left: 0px;margin-top: 97px;background: ;">
+        <img zorder="0" uiname='map_head_icon' src='Texture/Aries/Creator/keepwork/SummerCamp/wodeweizhi_34X41_32bits.png#0 0 34 41' style="position: relative; margin-left: 0px;margin-top: 0px;" width="34" height="41"/>
+        <pe:repeat DataSource="<%=IconData()%>">
+            <pe:repeatitem>
+                <input type="button" onclick="ToPos" width="40" height="40" value='' param1 = '<%=Eval("index") %>' tooltip='<%=Eval("name") %>' style='<%=GetIconPosStyle(Eval("index"))%>'/>
+            </pe:repeatitem>
+        </pe:repeat>
+    </pe:container>
+</div>
+</pe:mcml>
+</body>
+</html>

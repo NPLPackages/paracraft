@@ -1,0 +1,33 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskVip.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Act51AskVip.lua"><![CDATA[
+local Act51AskVip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskVip.lua");
+Act51AskVip.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    Act51AskVip.CloseView()
+end
+
+function BuyVip()
+    local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+    VipToolNew.Show("51_activity")
+end
+
+]]></script>
+<div style="width: 858px;height: 612px;background: url(Texture/Aries/Creator/keepwork/Act51Ask/datu_1024X1024_32bits.png#0 0 858 612);">
+    <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 30px; margin-left:815px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/AiCourse/guanbi_32bits.png#0 0 22 22);"/>
+    <input type="button" zorder="10" value="" onclick="BuyVip" style="position: relative; margin-top: 455px; margin-left:380px;width:221px;height:52px;background: url(Texture/Aries/Creator/keepwork/Act51Ask/btn1_221X52_32bits.png#0 0 221 52);"/>
+    <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 455px; margin-left:620px;width:151px;height:52px;background: url(Texture/Aries/Creator/keepwork/Act51Ask/btn2_151X52_32bits.png#0 0 151 52);"/>
+</div>
+    
+</pe:mcml>
+</body>
+</html>
+

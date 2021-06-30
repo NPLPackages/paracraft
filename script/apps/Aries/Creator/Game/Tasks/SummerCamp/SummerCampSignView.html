@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+local SummerCampSignView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampSignView.lua");
+SummerCampSignView.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+    SummerCampSignView.CloseView()
+end
+
+function OnMouseOverWordChange(word, line, from, to)
+    SummerCampSignView.OnMouseOverWordChange(word, line, from, to)
+end
+
+function OnTextChange(name, mcmlNode)
+    SummerCampSignView.OnTextChange(name, mcmlNode)
+end
+
+function OnClickTeacher()
+    SummerCampSignView.OnClickTeacher()
+end
+
+function OnClickCommit()
+    SummerCampSignView.OnClickCommit()
+end
+
+function CanClose()
+    return SummerCampSignView.CanClose()
+end
+]]></script>
+<div style=" width: 402x; height: 445px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/sign_bg_402x445_32bits.png#0 0 402 445);">
+    <pe:if condition='<%=CanClose()%>'>
+        <input type="button" style="position: relative; margin-left: 368px; margin-top: 5px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_close_22X19_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    </pe:if>
+    
+    <div style="margin-left: 32px;margin-top: 80px; width: 334px; height: 277px;">
+        <!-- <input type="text" uiname="summer_sign_code" name="sign_text" rows="20" width="334" language="npl" height="100%" value='' 
+        ReadOnly="false" OnMouseOverWordChange="OnMouseOverWordChange" OnRightClick="CodeBlockWindow.OnRightClick"
+        UseSystemControl="true" enable_ime="true" EmptyText='<%=L"点击这里输入..."%>' onchange="OnTextChange" CaretColor="#000000" style="textcolor:#000000;line-height:17;font-family:Consolas" fontsize="13"/> -->
+        
+        <!-- <textarea uiname="summer_sign_code" SingleLineEdit="true" WordWrap="true" name="sign_text" EmptyText='<%=L"点击这里输入..."%>' onchange="OnTextChange" rows="20"/> -->
+        <textarea uiname="summer_sign_code" name="sign_text" EmptyText='<%=L"点击这里输入..."%>' onchange="OnTextChange" rows="20"/>
+    </div>
+
+    <input type="button" onclick="OnClickTeacher" width="183" height="68" style="margin-left: 10px;margin-top: 10px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/sign_bt_183x68_32bits.png#0 0 183 68) ;"/>
+    <input type="button" onclick="OnClickCommit" width="107" height="37" style="float: left; margin-left: 100px;margin-top: 30px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/sign_bt1_107x37_32bits.png#0 0 107 37);"/>
+</div>
+</pe:mcml>
+</body>
+</html>

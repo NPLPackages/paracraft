@@ -1,0 +1,40 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskAlert.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Act51AskAlert.lua"><![CDATA[
+local Act51AskAlert = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskAlert.lua");
+Act51AskAlert.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    Act51AskAlert.CloseView()
+end
+
+function GetDesc()
+    return Act51AskAlert.desc
+end
+
+function OnSure()
+    Act51AskAlert.OnSure()
+end
+
+]]></script>
+<div style="width: 474px;height: 330px;background: url(Texture/Aries/Creator/keepwork/Act51Ask/dK_474X330_32bits.png#0 0 474 330);">
+    <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 15px; margin-left:432px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/AiCourse/guanbi_32bits.png#0 0 22 22);"/>
+    <div style="margin-left: 73px;margin-top: -21; width: 333px;height: 75px;background: url(Texture/Aries/Creator/keepwork/Act51Ask/dK2_333X75_32bits.png#0 0 333 75)"></div>z
+    <div style="width: 474px;height: 82px;text-align: center;margin-top: 60px;font-size: 18px;base-font-size:18px;font-weight:bold; color: #ffffff;">
+        <%=GetDesc()%>
+    </div>
+    <input type="button" name = "2" value="确定" onclick="ClosePage" style="width: 114px;height: 44px; margin-left: 180px;margin-top: 50px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);"/>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

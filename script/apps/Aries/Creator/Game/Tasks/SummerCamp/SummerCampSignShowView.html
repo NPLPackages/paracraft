@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+local SummerCampSignShowView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampSignShowView.lua");
+SummerCampSignShowView.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+    SummerCampSignShowView.CloseView()
+end
+
+function OnMouseOverWordChange(word, line, from, to)
+    SummerCampSignShowView.OnMouseOverWordChange(word, line, from, to)
+end
+
+function OnTextChange(name, mcmlNode)
+    SummerCampSignShowView.OnTextChange(name, mcmlNode)
+end
+
+function OnClickTeacher()
+    SummerCampSignShowView.OnClickTeacher()
+end
+
+function OpenSignView()
+    SummerCampSignShowView.OpenSignView()
+end
+
+function GetDesc()
+    return SummerCampSignShowView.GetDesc()
+end
+]]></script>
+<div style=" width: 572x; height: 445px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/sign_bg2_572x445_32bits.png#0 0 572 445);">
+    <input type="button" style="position: relative; margin-left: 540px; margin-top: 5px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_close_22X19_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+
+    <div style="margin-left: 30px;margin-top: 290px; width: 501px;height: 108px;background-size: 20px;font-size: 20px;color: #ffffff;"><%=GetDesc()%></div>
+    <input type="button" onclick="OpenSignView" width="107" height="37" style="float: left; margin-left: 80px;margin-top: 0px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/sign_bt2_107x37_32bits.png#0 0 107 37);"/>
+    <input type="button" onclick="ClosePage" width="107" height="37" style="float: left; margin-left: 190px;margin-top: 0px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/sign_bt3_107x37_32bits.png#0 0 107 37);"/>
+</div>
+</pe:mcml>
+</body>
+</html>

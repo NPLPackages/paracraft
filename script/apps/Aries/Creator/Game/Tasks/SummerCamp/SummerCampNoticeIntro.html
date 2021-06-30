@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local SummerCampNoticeIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNoticeIntro.lua");
+    SummerCampNoticeIntro.OnInit()
+    function ClosePage()
+        SummerCampNoticeIntro.OnClosePage()
+    end
+
+    function GetBackStyle()
+        local str = string.format([[width: 822px; height: 560px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_content%d_822X560_32bits.png#0 0 822 560);]],SummerCampNoticeIntro.n_curIndex)
+        return str
+    end
+
+    function OnClickGo()
+        SummerCampNoticeIntro.OnClickGo()
+    end
+]]></script>
+<div style="<%=GetBackStyle()%>">
+    <div style="width: 822x; height: 20px;">
+        <input type="button" style="margin-left: 790px; margin-top: 8px; width:22px;height:19px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_close_22X19_32bits.png#0 0 22 19);" onclick="ClosePage()"/>
+    </div>
+    <div>
+        <input type="button" style="margin-left: 16px; margin-top: 450px; width:147px;height:47px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_back_147X47_32bits.png#0 0 147 47);" onclick="ClosePage()"/>
+        <input type="button" style="margin-left: 658px; margin-top: -47px; width:147px;height:47px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_go_147X47_32bits.png#0 0 147 47);" onclick="OnClickGo()"/>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

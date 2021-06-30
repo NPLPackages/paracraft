@@ -615,7 +615,9 @@ function GameLogic.LoadGame()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 	Files:ClearFindFileCache();
-	Files:UnloadAllWorldAssets();
+	-- Files:UnloadAllWorldAssets();
+	Files:UnloadAllUnusedAssets();
+
 	GameLogic.IsRegionLoadedFired = nil;
 	GameLogic.tickCount = 0;
 
@@ -1914,6 +1916,7 @@ function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isScho
 
 	if type(isSchoolTimeOnly) == "boolean" and isSchoolTimeOnly == true then
 		local week_day = os.date("*t",server_time).wday-1 == 0 and 7 or os.date("*t",server_time).wday-1
+		local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
         if week_day ~= 6 and week_day ~= 7 then
             local limit_time_stamp = today_weehours + 9 * 60 * 60 + 30 * 60
             local limit_time_end_stamp = today_weehours + 18 * 60 * 60 + 30 * 60

@@ -1,0 +1,106 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/World2In1/WorldCreatePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="WorldCreatePage.lua"><![CDATA[
+local WorldCreatePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/WorldCreatePage.lua");
+WorldCreatePage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    WorldCreatePage.CloseView()
+end
+
+function WorldListData(index)
+    if(index == nil) then
+        return #WorldCreatePage.WorldListData;
+    else
+        return WorldCreatePage.WorldListData[index];
+    end
+end
+
+function OnClickCreate()
+    WorldCreatePage.OnClickCreate()
+end
+
+function OnClickSelect(index)
+    index = tonumber(index)
+    WorldCreatePage.OnClickSelect(index)
+end
+
+function OnClickDelete(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    index = tonumber(index)
+    WorldCreatePage.OnClickDelete(index)
+end
+
+function GetDesc1()
+    return WorldCreatePage.GetDesc1()
+end
+
+function IsShowNeedVipDesc()
+    return not GameLogic.IsVip()
+end
+
+]]></script>
+<kp:window name="iframe" width="754" height="573" icon=""   onclose="ClosePage">
+<div style="position: relative;margin-top: 3px; base-font-size:22px;font-size: 22px;font-weight: bold;text-align: center;height: 41px;color: #ffffff;">我的地块</div>
+<div style="color:#ffffff;width:754;height:630px" class="kp_window_container">
+    <div style="margin-left: 15px;margin-top:15px; width: 728px; height: 506px;background: url(Texture/Aries/Creator/keepwork/World2In1/BJK2_32bits.png#0 0 32 32:8 8 8 8);">
+        <div style="margin-left: 10px; margin-top: 20px; base-font-size:16;font-size: 16;height: 20px;color: #000000;"><%=GetDesc1()%></div>
+        <div style="margin-left: 15px;margin-top:15px; width: 684px; height: 28px;color: #ffffff;font-weight: bold;text-align: center;font-size: 16px; 
+                    background: url(Texture/Aries/Creator/keepwork/World2In1/BJK3_32bits.png#0 0 32 28:8 8 8 8);">
+            <div style="margin-top: 3px; width: 225px;float: left;">名称</div>
+            <div style="margin-top: 3px; width: 265px;float: left;">更新时间</div>
+            <div style="margin-top: 3px; float: left;">操作</div>
+        </div>
+        <div type ="box" style="width:680px;height:400px;margin-left: 8px;margin-top: 10px">
+            <pe:gridview style="margin:0px;width:680px;height:400px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="true" pagesize="6" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                DataSource='<%=WorldListData%>'>
+                <PagerSettings Position="Bottom" height="36" style="position:relative;width:725px;margin-top:2px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
+                <PagerTemplate>
+                    <form>
+                        <input type="button" name="pre" zorder="2" style="width:18px;height:22px;margin-left:318px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan2_18X22_32bits.png#0 0 18 22);"/>
+                        <div style="float:left;margin-top:0px;text-singleline:true">
+                            <label name="page" style="base-font-size:22px;font-size: 22px;color:#000000;text-align:center;width:45px;height:30px;margin:4px"/>
+                        </div>
+                        <input type="button" name="next" zorder=2 style="width:18px;height:22px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan1_18X22_32bits.png#0 0 18 22)"/>
+                    </form>
+                </PagerTemplate>
+                <Columns>
+                    <div style="width: 684px;height: 50px;text-align: center;base-font-size:20px; font-size: 20px;color: #000000;">
+                        <div tooltip='<%=Eval("name")%>' style="margin-top: 10px; width: 225px;float: left;"><%=Eval("limit_name") %></div>
+                        <div style="margin-top: 10px; width: 265px;float: left;"><%=Eval("time_desc") %></div>
+                        <div style="margin-top: 3px; float: left;"> 
+                            <pe:if condition='<%=Eval("index") == 1%>'>
+                                <input type="button" name='<%=Eval("index") %>' style="margin-left: 43px; width: 50px;height: 40px;background: url(Texture/Aries/Creator/keepwork/World2In1/btn1_50X40_32bits.png#0 0 50 40);" onclick="OnClickSelect"/>
+                            </pe:if>
+
+                            <pe:if condition='<%=Eval("index") > 1%>'>
+                                <input type="button" name='<%=Eval("index") %>' style="margin-left: 43px; width: 50px;height: 40px;background: url(Texture/Aries/Creator/keepwork/World2In1/btn3_50X40_32bits.png#0 0 50 40);" onclick="OnClickSelect"/>
+                            </pe:if>
+                            
+                            <input type="button" param1='<%=Eval("index") %>' name="delect_bt" style="margin-left: 7px; width: 50px;height: 40px;background: url(Texture/Aries/Creator/keepwork/World2In1/btn2_50X40_32bits.png#0 0 50 40);" onclick="OnClickDelete"/>
+                        </div>
+                    </div>
+                        
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+        <input type="button" width="142" height="48" value="创建新地块" onclick="OnClickCreate" style="font-size: 16px; margin-left: 557px;margin-top: -45px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan1_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
+    </div>
+
+</div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

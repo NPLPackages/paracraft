@@ -41,6 +41,8 @@ Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
 Entity:Signal("remotelyUpdated")
 Entity:Signal("inventoryChanged", function(slotIndex) end)
+Entity:Signal("beforeRunThisBlock")
+Entity:Signal("afterRunThisBlock")
 
 -- class name
 Entity.class_name = "EntityCode";
@@ -150,6 +152,17 @@ function Entity:SaveToXMLNode(node, bSort)
 
 	self:SaveBlocklyToXMLNode(node);
 
+	if(self:GetLanguageConfigFile() == "npl_camera") then
+		local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+		local cameraNode = {name="camera", };
+		node[#node+1] = cameraNode;
+		local cameras = camera.getCameras();
+		for i, data in ipairs(cameras) do
+			local x, y, z = data:GetPosition();
+			cameraNode[i] = {name="camera"..i, attr={x=x, y=y, z=z}};
+		end
+	end
+
 	return node;
 end
 
@@ -177,6 +190,17 @@ function Entity:LoadFromXMLNode(node)
 
 	if(self.triggerBoxString) then
 		self:SetTriggerBoxByString(self.triggerBoxString)
+	end
+
+	if(self:GetLanguageConfigFile() == "npl_camera") then
+		local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+		for i = 1, #node do
+			if (node[i].name == "camera") then
+				for j = 1, #(node[i]) do
+					camera.setCamera(j, node[i][j].attr);
+				end
+			end
+		end
 	end
 end
 
@@ -388,6 +412,10 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			self:OpenEditor("entity", entity);
 		elseif(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 			self:OpenEditor("entity", entity);
+			if (self:GetLanguageConfigFile() == "npl_camera") then
+				local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+				camera.showWithEditor(self);
+			end
 		end
 	end
 	return true;
@@ -491,16 +519,16 @@ end
 
 -- virtual function:
 function Entity:OnBeforeRunThisBlock()
-	
+	self:beforeRunThisBlock();	
 end
 
 -- virtual function:
 function Entity:OnAfterRunThisBlock()
-	
+	self:afterRunThisBlock();	
 end
 
 -- run regardless of whether it is powered. 
-function Entity:Restart()
+function Entity:Restart(onFinishedCallback)
 	if(self.delayLoad) then
 		self.delayLoad = nil;
 	end
@@ -514,6 +542,9 @@ function Entity:Restart()
 				codeEntity:OnBeforeRunThisBlock()
 				codeBlock:Run(function()
 					codeEntity:OnAfterRunThisBlock();
+					if (onFinishedCallback) then
+						onFinishedCallback();
+					end
 				end);
 			end
 		end
@@ -821,7 +852,7 @@ function Entity:SetTriggerBoxByString(strArea)
 		if(x) then
 			dx, dy, dz, strArea = CmdParser.ParsePosInBrackets(strArea);
 			if(dx) then
-				local trigger = BoxTrigger:new():Init(x, z, x + dx, z + dz)
+				local trigger = BoxTrigger:new():Init(x, z, x + dx, z + dz, y, y + dy)
 				local bx, by, bz = self:GetBlockPos();
 				trigger:SetBlockPos(bx, by, bz)
 				trigger:Attach();

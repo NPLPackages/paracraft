@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="SummerCampNotice.lua" ><![CDATA[
+    local SummerCampNotice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNotice.lua");
+    SummerCampNotice.OnInit()
+    function ClosePage()
+        SummerCampNotice.OnClosePage()
+    end
+
+    function GetDS()
+        return SummerCampNotice.tblNoticeDt
+    end
+
+    function GetAds()
+        return SummerCampNotice.tbAdsDt
+    end
+
+    function GetImageStyle(name)
+        local index = tonumber(name)
+        local data = SummerCampNotice.tblNoticeDt[index]
+        if data then
+            local str =string.format("position: relative;margin-left: 6px;width: 232px; height: 225px; background: url(%s%s);",SummerCampNotice.strImgPath,data.icon)
+            return str
+        end
+        return "position: relative;margin-left: 6px;width: 232px; height: 225px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_notice2_232X225_32bits.png#0 0 232 225);"
+    end
+
+
+
+    function OnClickBottom(name, mcmlNode)
+        local index = mcmlNode:GetAttribute("param1")
+        SummerCampNotice.OnClosePage()
+        local SummerCampNoticeIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNoticeIntro.lua") 
+        SummerCampNoticeIntro.ShowView(index)
+    end
+
+    function GetToolTip(name)
+        if not name then
+            return 
+        end
+        local index = tonumber(name)
+        return SummerCampNotice.GetToolTip(index)
+    end
+
+    function GetCurAdsBgStyle()
+        return SummerCampNotice.GetCurAdsBgStyle()
+    end
+
+    function OnClickPreAds()
+        SummerCampNotice.OnClickPreAds()
+    end
+    
+    function OnClickNextAds()
+        SummerCampNotice.OnClickNextAds()
+    end
+
+    function OnClickDot(name)
+        SummerCampNotice.OnClickDot(name)
+    end
+
+    function IsCurSelect(name)
+        if name then
+            local index = tonumber(name)
+            local isSelect = (index == SummerCampNotice.m_nSelectAdIndex)
+            return isSelect
+        end
+        return false
+    end
+
+    function GetImgName(name)
+        if name then
+            local index = tonumber(name)
+            return "bottom"..index
+        end
+    end
+
+    function OnMouseEnter(name, mcmlNode)
+        local index = mcmlNode:GetAttribute("param1")
+        SummerCampNotice.OnMouseEnter(index)
+    end
+    function OnMouseLeave(name, mcmlNode)
+        local index = mcmlNode:GetAttribute("param1")
+        SummerCampNotice.OnMouseLeave(index)    
+    end
+
+    function GetSelBgStyle(index)
+        local strBg = string.format("Texture/Aries/Creator/keepwork/SummerCamp/img_item%d_200X80_32bits.png#0 0 232 225",index)
+        return strBg
+    end
+
+    function GetSelImgName(name)
+        if name then
+            local index = tonumber(name)
+            return "bottomsel"..index
+        end
+    end
+
+    function OnClickAds(name)
+        SummerCampNotice.OnClickAds(name)
+    end
+]]></script>
+<div style=" width: 962px; height: 560px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_noticebg_980X560_32bits.png#0 0 962 560);">
+    <div style="width: 980x; height: 20px;">
+        <input type="button" style="margin-left: 930px; margin-top: 10px; width:22px;height:19px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_close_22X19_32bits.png#0 0 22 19);" onclick="ClosePage()"/>
+    </div>
+    <div style="width: 962px; height: 260px;">
+        <div>
+            <div onclick="OnClickPreAds" style="margin-left: 10px;margin-top: 120px; width: 26px; height: 26px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_left_26X26_32bits.png#0 0 26 26);"></div>
+            <%=GetCurAdsBgStyle()%>
+            <div onclick="OnClickNextAds" style="margin-left: 544px; margin-top: -135px; width: 26px; height: 26px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_right_26X26_32bits.png#0 0 26 26);"></div>
+        </div>
+        <div style="margin-left: 260px; margin-top: 4px;">
+            <pe:repeat DataSource="<%=GetAds()%>">
+                <pe:repeatitem style="float: left;width: 14px;height: 14px;" >
+                    <pe:if condition='<%=IsCurSelect(Eval("index"))%>'>
+                        <input type="button"  onclick="OnClickDot" name='<%=Eval("index")%>' style='margin-left: 5px; width: 13px; height: 14px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/dian1_select_14X14_32bits.png#0 0 14 14);' />
+                    </pe:if>
+                    <pe:if condition='<%=not IsCurSelect(Eval("index"))%>'>
+                        <input type="button"  onclick="OnClickDot" name='<%=Eval("index")%>' style='margin-left: 5px; width: 13px; height: 14px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/dian1_normal_14X14_32bits.png#0 0 14 14);' />
+                    </pe:if>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>        
+    </div>
+
+    <div style="width: 962px; height: 260px;margin-top: 40px; margin-left: 4px;">        
+        <pe:repeat DataSource="<%=GetDS()%>">
+            <pe:repeatitem style="float: left;width: 232px;height: 225px;" >
+                <div style="float: left;width: 232px;height: 225px; margin-left: 4px;">
+                    <div style='<%=GetImageStyle(Eval("index"))%>'></div>
+                    <input zorder="3" type="button"  onclick="OnClickBottom" param1='<%=Eval("index")%>' width="232" height="225" style='background:;' onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave" />
+                    <div zorder="2" style="margin-left: 4px; margin-top: -36px; width:232px; height: 37px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/btn_232X37_32bits.png#0 0 232 37);"></div>
+                    <img zorder="1" uiname='<%=GetSelImgName(Eval("index"))%>' src='<%=GetSelBgStyle(Eval("index"))%>' style='margin-left: 6px; width: 232px; height: 225px; margin-top: -225px;' />
+                </div>                
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

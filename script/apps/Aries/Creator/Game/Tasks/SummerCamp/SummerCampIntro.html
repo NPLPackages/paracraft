@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local SummerCampIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampIntro.lua");
+    SummerCampIntro.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+    function GotoWorld()
+        ClosePage()
+        SummerCampIntro.GotoSummerWorld()
+    end
+]]></script>
+<div style=" width: 920x; height: 686px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_summer_920X686_32bits.png#0 0 920 686);">
+    <div style="width: 920px; height: 60px;">
+        <input type="button" style="margin-left: 850px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    </div>
+
+    <input type="button" style="margin-left: 360px; margin-top: 560px; width: 208px; height: 42px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/btn_enter208X42_32bits.png#0 0 208 42);" onclick="GotoWorld"/>
+</div>
+</pe:mcml>
+</body>
+</html>

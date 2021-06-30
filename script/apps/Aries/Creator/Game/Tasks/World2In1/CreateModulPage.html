@@ -1,0 +1,143 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/World2In1/CreateModulPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CreateModulPage.lua"><![CDATA[
+local CreateModulPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/CreateModulPage.lua");
+CreateModulPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    CreateModulPage.CloseView()
+end
+
+function GetBgImg(index)
+    if CreateModulPage.select_type_index == index then
+        return "Texture/Aries/Creator/keepwork/rank/btn_qiehuan2_32X32_32bits.png#0 0 32 32:8 8 8 8"
+    else
+        return "Texture/Aries/Creator/keepwork/rank/btn_qiehuan1_32X32_32bits.png#0 0 32 32:8 8 8 8"
+    end
+end
+
+function GetTypeBtData()
+    return CreateModulPage.TypeData
+end
+
+function OnClickCreate()
+    CreateModulPage.OnClickCreate()
+end
+
+function OnClickSelect(index)
+    index = tonumber(index)
+    CreateModulPage.OnClickSelect(index)
+end
+
+function GetDesc1()
+    return CreateModulPage.GetDesc1()
+end
+
+function SelectType(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    CreateModulPage.SelectType(tonumber(index))
+end
+
+function IsSelectModule(index)
+    return CreateModulPage.select_module_index == index
+end
+
+function SelectModule(index)
+    CreateModulPage.SelectModule(tonumber(index))
+end
+
+function WorldDataList(index)
+    if(index == nil) then    
+        return #CreateModulPage.WorldDataList;
+    else
+        return CreateModulPage.WorldDataList[index];
+    end
+end
+]]></script>
+<kp:window name="iframe" width="854" height="573" icon=""   onclose="ClosePage">
+<div style="position: relative;margin-top: 3px; base-font-size:22px;font-size: 22px;font-weight: bold;text-align: center;height: 41px;color: #ffffff;">选择模板</div>
+<div style="color:#ffffff;width:854;height:630px" class="kp_window_container">
+    <div style="margin-left: 0px; margin-top: 15px; base-font-size:17;font-size: 17;height: 20px;color: #000000;text-align: center;"><%=GetDesc1()%></div>
+    <div style="float:left;width: 150px;margin-top: 5px;">
+        <pe:repeat DataSource="<%=GetTypeBtData()%>">
+            <pe:repeatitem>
+                <div onclick='SelectType' param1='<%=Eval("index")%>'  style="margin-left: 22px;margin-top: 8px; float: left; width: 108px;height: 36px; background:;">
+                    <img zorder="0" src='<%=GetBgImg(Eval("index"))%>' style="position: relative;" width="108" height="36"/>
+                    <img zorder="0" src='<%=Eval("background")%>' style="position: relative;margin-left: 0px;margin-top: 0px;" width="108" height="36"/>
+                </div>
+
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+    <div style="float:left;margin-left: 0px;margin-top: 70px; width: 79px;height: 446px;background: url(Texture/Aries/Creator/keepwork/World2In1/BJKb_79X446_32bits.png#0 0 79 446)"></div>
+    <div style="float:left;height:482px;margin-top:10px;margin-left: -60px;">
+        <div style="width: 650px; height:410px;margin-top:10px;margin-left: 0px; ">
+            <pe:gridview name="module_list" style="margin-left:0px;" CellPadding="0" AllowPaging="true" pagesize="6" ItemsPerLine="3" DefaultNodeHeight="50"
+                        DataSource='<%=WorldDataList%>'>
+                <PagerSettings Position="Bottom" height="36" style="position:relative;width:650px;margin-top:2px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
+                <PagerTemplate>
+                    <form>
+                        <input type="button" name="pre" zorder="2" style="width:18px;height:22px;margin-left:260px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan2_18X22_32bits.png#0 0 18 22);"/>
+                        <div style="float:left;margin-top:-10px;text-singleline:true">
+                            <label name="page" style="base-font-size:22px;font-size: 22px;color:#000000;text-align:center;width:45px;height:30px;margin:4px"/>
+                        </div>
+                        <input type="button" name="next" zorder=2 style="width:18px;height:22px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan1_18X22_32bits.png#0 0 18 22)"/>
+                    </form>
+                </PagerTemplate>
+                <Columns>
+                    <div style="width: 200px; height: 178px;">
+                        <input zorder="2" type="button" onclick="SelectModule" name='<%=Eval("index")%>' style="position: relative; width: 200px;height: 178px;background: ;"/>
+
+                        <pe:if condition='<%=IsSelectModule(Eval("index"))%>'>
+                            <div zorder="-1" style="position: relative; width: 200px;height: 178px; background:url(Texture/Aries/Creator/keepwork/World2In1/BJK4_1_200X178_32bits.png#0 0 200 178)"></div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsSelectModule(Eval("index"))%>'>
+                            <div zorder="-1" style="position: relative; width: 200px;height: 178px; background:url(Texture/Aries/Creator/keepwork/World2In1/BJK4_200X178_32bits.png#0 0 200 178)"></div>
+                        </pe:if>
+
+                        <pe:if condition='<%=Eval("is_vip_use")%>'>
+                            <div zorder="1" style="position: relative;margin-left: -11px;margin-top: -13px; width: 48px;height: 53px; background:url(Texture/Aries/Creator/keepwork/World2In1/VIP_48X53_32bits.png#0 0 48 53)"></div>
+                        </pe:if>
+                        
+                        <pe:if condition='<%=Eval("is_recommend")%>'>
+                            <div zorder="1" style="position: relative;margin-left: 0px;margin-top: -8px; width: 32px;height: 35px; background:url(Texture/Aries/Creator/keepwork/World2In1/tuijian_32X35_32bits.png#0 0 32 35)"></div>
+                        </pe:if>
+
+                        <pe:if condition='<%=Eval("is_show_vip_lock")%>'>
+                            <pe:container zorder="1" ClickThrough="true" style="position: relative;margin-left: 2px; width: 196px;height: 175px; background:url(Texture/Aries/Creator/keepwork/World2In1/BJK5_32X32_32bits.png#0 0 32 32:8 8 8 8)">
+                                <div zorder="2" style="margin-left: 0px;margin-top: 60px; text-align: center;base-font-size:20px; font-size: 20px;font-weight: bold;color: #ffffff;">大赛专用</div>
+                            </pe:container>
+                        </pe:if>
+
+
+                        <img zorder="0" style="margin-top: 20px;margin-left: 6px;" src='<%=Eval("img_bg")%>' width="188" height="88"/>
+
+                        <div style="margin-left: 0px;margin-top: 15px; text-align: center;base-font-size:18px; font-size: 18px;color: #000000;font-weight: bold;"><%=Eval("name")%></div>
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </div>
+
+        <div style="margin-left: 0px;margin-top: 5px;">
+            <div style="float: left;margin-left: 30px;margin-top: 6px; width: 488px;height: 36px;background: url(Texture/Aries/Creator/keepwork/World2In1/BJK2_32bits.png#0 0 32 32:8 8 8 8)">
+                <input type="text" onchange="" width="488" height="26" value="<%=''%>" autofocus="false" name="project_text" EmptyText='<%=L"请输入你创建项目的名称"%>' style="font-size: 14px;margin-top: 5px; background:;" />
+            </div>
+            <input type="button" width="142" height="48" value="创建" onclick="OnClickCreate" style="float: left; font-size: 16px; margin-left: 10px;margin-top: 0px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan1_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
+        </div>
+
+    </div>
+</div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

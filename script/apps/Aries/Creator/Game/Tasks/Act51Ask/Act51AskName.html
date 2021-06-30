@@ -1,0 +1,59 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskName.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Act51AskName.lua"><![CDATA[
+local Act51AskName = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskName.lua");
+Act51AskName.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    Act51AskName.CloseView()
+end
+
+function DataSource(index)
+    if index == nil then
+        return #Act51AskName.Data
+    else
+        return Act51AskName.Data[index]
+    end
+end
+
+function OpenDress()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskDress.lua").Show()
+end
+
+]]></script>
+<kp:window name="iframe" width="960" height="635" icon=""   onclose="ClosePage">
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div style="margin-top: -54px;margin-left: -2px; width: 960px;height: 656;background: url(Texture/Aries/Creator/keepwork/Act51Ask/reward_bg_32bits.png#0 0 960 656);">
+            <div style="color:#ffffff;position: relative;" class="kp_window_container">
+                <input type="button" onclick="OpenDress" style="width: 98px;height: 35px; margin-left: 638px;margin-top: 149px; position: relative;background: url(Texture/Aries/Creator/keepwork/Act51Ask/button3_128X46_bits.png#0 0 98 35);"/>
+
+                <div style="width: 646px;height: 382px;position: relative; margin-top: 193px; margin-left: 270px;background-color: #ffffff;">
+                    <div style="width: 646px; height: 382px;">
+                        <pe:gridview name = "" RememberScrollPos="true" style="height:523px;margin-top: 0px;margin-left: -2px;" VerticalScrollBarStep="100" AllowPaging="false" CellPadding="2" ItemsPerLine="1" DefaultNodeHeight = "10" 
+                            DataSource='<%=DataSource%>'>
+                            <Columns>
+                                <div style="width: 632px;height: 1489px;background: url(Texture/Aries/Creator/keepwork/Act51Ask/reward_632X1489_32bit.png#0 0 632 1489);">
+                                    
+                                </div>
+                            </Columns>                
+                        </pe:gridview>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

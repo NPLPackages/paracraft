@@ -1,0 +1,608 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Rank/ProjectView.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ProjectView.lua"><![CDATA[
+local ProjectView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/ProjectView.lua");
+local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua")
+ProjectView.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    ProjectView.CloseView()
+end
+
+function GetData(key)
+    if key == "point" then
+        return 998
+    end
+    if key == "index" then
+        return 1
+    end
+
+    return ProjectView.ProjectData[key]
+end
+
+function is_vip()
+    return GetData('isVipWorld')
+end
+
+function get_item_padding_style()
+    return 'padding-left: 20px;'
+end
+
+function get_work_item_style()
+    --return 'work_item_vip_selected'
+    --return 'work_item_selected'
+    return 'work_item'
+end
+
+function has_rated()
+    if GetData('point') then
+        return true
+    else
+        return false
+    end
+end
+
+function get_art_number()
+    local point = GetData('point')
+
+    if not point or
+        type(point) ~= "number"  then
+        return ""
+    end
+
+    local number = point
+    local n = math.floor(1)
+    local fmt = '%.' .. n .. 'f'
+    local nRet = tonumber(string.format(fmt, number))
+
+    number = tostring(nRet)
+
+    local returnString = ""
+
+    for item in string.gmatch(number, ".") do
+        if item == "1" then
+            returnString = returnString .. "<img style='width: 11px;height: 18px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;108 287 11 18' />"
+        end
+
+        if item == "2" then
+            returnString = returnString .. "<img style='width: 14px;height: 18px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;122 287 14 18' />"
+        end
+
+        if item == "3" then
+            returnString = returnString .. "<img style='width: 11px;height: 20px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;139 286 11 20' />"
+        end
+
+        if item == "4" then
+            returnString = returnString .. "<img style='width: 14px;height: 18px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;152 287 15 18' />"
+        end
+        
+        if item == "5" then
+            returnString = returnString .. "<img style='width: 14px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;170 287 15 19' />"
+        end
+
+        if item == "6" then
+            returnString = returnString .. "<img style='width: 14px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;188 287 14 19' />"
+        end
+
+        if item == "7" then
+            returnString = returnString .. "<img style='width: 14px;height: 18px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;204 287 14 18' />"
+        end
+            
+        if item == "8" then
+            returnString = returnString .. "<img style='width: 15px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;221 287 15 19' />"
+        end
+            
+        if item == "9" then
+            returnString = returnString .. "<img style='width: 13px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;257 287 13 19' />"
+        end
+
+        if item == "0" then
+            returnString = returnString .. "<img style='width: 15px;height: 19px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;238 287 15 19' />"
+        end
+            
+        if item == "." then
+            returnString = returnString .. "<img style='width: 6px;height: 7px;margin-top: 11px;margin-right: 2px;' src='Texture/Aries/Creator/keepwork/worldshare_32bits.png;273 293 6 7' />"
+        end
+    end
+
+    return returnString
+end
+
+function has_username()
+    local username = GetData('username')
+
+    if username then
+        return true
+    else
+        return false
+    end
+end
+
+function get_user_icon()
+    local user = GetData('user')
+
+    if not user or type(user) ~= "table" then
+        return ""
+    end
+
+    local user_info = {}
+    local count = 0
+
+    if user.tLevel and user.tLevel >= 1 then
+        user_info.tLevel = 1
+        count = count + 1
+    end
+        
+    if user.student and user.student == 1 then
+        user_info.student = 1
+        count = count + 1
+    end
+
+    if user.vip and user.vip == 1 then
+        user_info.vip = 1
+        count = count + 1
+    end
+
+    return KpUserTag.GetMcml(user_info)
+end
+
+function get_username()
+    local user = GetData('user')
+
+    if not user or type(user) ~= "table" then
+        return GetData('username') or "<%= '暂无' %>"
+    end
+
+    if user.username then
+        return user.username
+    else
+        return GetData('username') or "<%= '暂无' %>"
+    end
+end
+
+function get_project_views()
+    local total_view = GetData('total_view')
+
+    if total_view and type(total_view) == "number" then
+        return total_view
+    else
+        return 0
+    end
+end
+
+function get_project_thumbs()
+    local total_like = GetData('total_like')
+
+    if total_like and type(total_like) == "number" then
+        return total_like
+    else
+        return 0
+    end 
+end
+
+function is_star(type)
+    return true
+end
+
+function is_favorite(type)
+    return true
+end
+
+function has_school()
+    if GetData('user') and GetData('user').school and GetData('user').school.name then
+        return true
+    else
+        return false
+    end
+end
+
+function get_project_favorites()
+    return GetData('total_mark')
+end
+
+function get_numbers_width()
+    local views_width = _guihelper.GetTextWidth(tostring(Mod.WorldShare.Utils.ShortNumber(get_project_views())))
+    local thumbs_width = _guihelper.GetTextWidth(tostring(Mod.WorldShare.Utils.ShortNumber(get_project_thumbs())))
+    local favorite_width = _guihelper.GetTextWidth(tostring(Mod.WorldShare.Utils.ShortNumber(get_project_favorites())))
+
+    local total = views_width + thumbs_width + favorite_width
+
+    return 'width: ' .. (total + 75) .. 'px;'
+end
+
+function is_selected()
+    return false
+end
+]]></script>
+
+<style type='text/mcss' src='Mod/ExplorerApp/components/Theme/Mcss/MainPageMcss.mcss'>
+    {
+        close = {
+            ['margin-top'] = 8,
+            ['margin-right'] = 10,
+            float = 'left',
+            width = 65,
+            height = 28,
+            background = 'Texture/Aries/Creator/keepwork/explorer_32bits.png#61 131 16 16:3 3 3 3',
+            color = '#ffffff'
+        },
+        area = {
+            color = 'white'
+        },
+        strip = {
+            height = 40,
+            width = 1100,
+        },
+        title = {
+            position = 'relative',
+            ['margin-left'] = 12,
+            ['margin-top'] = 12
+        },
+        area_content = {
+            width = 1150,
+        },
+        menubar = {
+            float = "left",
+            width = 170,
+            height = 565,
+            ['margin-left'] = 25,
+            ['margin-top'] = 10,
+        },
+        menubar_button = {
+            width = 140,
+            height = 40,
+            background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#336 125 32 32:10 10 10 10",
+            ['margin-left'] = 4,
+            ['margin-bottom'] = 6,
+        },
+        menubar_button_selected = {
+            width = 140,
+            height = 40,
+            background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#299 125 32 32:10 10 10 10",
+            ['margin-left'] = 4,
+            ['margin-bottom'] = 6,
+        },
+        list = {
+            float = 'left',
+            width = 955,
+        },
+        downloaded_game = {
+            float = 'left',
+            width = 170,
+            height = 30,
+            ['margin-top'] = 22,
+            ['padding-left'] = 5,
+        },
+        list_search_bar = {
+            float = 'left',
+            ['margin-left'] = 10,
+            ['margin-top'] = 4,
+            textcolor = "#ffffff",
+            width = 316,
+            height = 30,
+            padding = 0,
+            background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#205 162 32 16:5 5 5 5",
+        },
+        list_search_textfield = {
+            width = 266,
+            height = 30,
+            background = '',
+        },
+        list_search_button = {
+            position = 'relative',
+            align = 'right',
+            color = "#000000",
+            background = "Texture/Aries/Creator/keepwork/explorer_32bits.png#225 127 36 28:6 5 7 6",
+            height = 30,
+            width = 57,
+            ['text-align'] = 'center',
+            ['padding-top'] = 3,
+            ['margin-top'] = -32
+        },
+        list_search_button_click = {
+            postion = 'relative',
+            height = 30,
+            width = 57,
+            ['margin-top'] = -25,
+            background = ''
+        },
+        list_content = {
+            ['margin-top'] = 5,
+            ['padding-left'] = 0,
+            ['padding-right'] = 10,
+            ['padding-bottom'] = 10,
+        },
+        work_item = {
+            height = 210,
+            width = 285,
+            ['margin-right'] = 10,
+            ['margin-bottom'] = 10,
+            ['padding-left'] = 9,
+            ['padding-top'] = 9,
+            background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;435 212 30 30:11 11 11 11",
+        },
+        work_item_selected = {
+            height = 210,
+            width = 285,
+            ['margin-right'] = 10,
+            ['margin-bottom'] = 10,
+            ['padding-left'] = 9,
+            ['padding-top'] = 9,
+            background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;471 212 30 30:11 11 11 11",
+        },
+        work_item_vip_selected = {
+            height = 210,
+            width = 285,
+            ['margin-right'] = 10,
+            ['margin-bottom'] = 10,
+            ['padding-left'] = 9,
+            ['padding-top'] = 9,
+            background = "Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png;7 173 64 64:20 20 20 20",
+        },
+        work_item_info = {
+            height = 60,
+            width = 290,
+            ['margin-left'] = 5,
+            ['margin-top'] = 5
+        },
+        radius = {
+            position = 'relative',
+            height = 180,
+            width = 250,
+            background = "Texture/Aries/Creator/keepwork/explorer_32bits.png;37 28 16 15:4 4 4 4",
+        },
+        download = {
+            float = 'left'
+            width = 30,
+            height = 18,
+            background = "",
+        },
+        download_icon = {
+            width = 11,
+            height = 11,
+            ['margin-left'] = 8,
+            ['margin-top'] = 3,
+            background = 'Texture/Aries/Creator/keepwork/explorer_32bits.png;83 3 15 12',
+        },
+        favorite = {
+            float = 'left',
+            background = "",
+            width = 30,
+            height = 18
+        },
+        click = {
+            position = 'relative',
+            height = 270,
+            width = 290,
+            background = ''
+        },
+        enter_button = {
+            float = 'left',
+            width = 46,
+            height = 46,
+            ["margin-right"] = 6,
+            background = "Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#445 282 46 46"
+        },
+        share_world_name = {
+            ["text-singleline"] = "true",
+            width = 220,
+            float = "left",
+            ["base-font-size"] = 16,
+            ["font-size"] = 16,
+            ["margin-top"] = 2,
+            ["text-align"] = "left",
+            color = "#000000",
+        },
+        vip_icon = {
+            position = 'relative',
+            width = 47,
+            height = 52,
+            ['margin-left'] = -28,
+            ['margin-top'] = -20,
+            background = 'Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#87 172 47 52'
+        }
+    }
+</style>
+
+<kp:window name="iframe" width="996" height="613" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_ziyuan_32bits.png"   onclose="ClosePage">
+<div style='margin-top: 50px'>
+    <div class="<%= get_work_item_style() %>">
+        <input type="button" class="click" name='<%=GetData("index")%>' onclick="select_project" />
+        <pe:if condition='<%= is_vip() %>' >
+            <pe:container zorder='4' style="background:;">
+                <div class='vip_icon'></div>
+            </pe:container>
+        </pe:if>
+        <pe:if condition="<%= has_rated() %>">
+            <pe:container zorder='3' style="position: relative;background: ;">
+                <pe:if condition='<%= is_vip() %>'>
+                    <div style="width: 90x;height: 36px;
+                            margin-top: -7px;
+                            margin-left: -7px;
+                            padding-top: 4px;
+                            padding-left: 30px;
+                            background: url(Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#651 231 90 36)">
+                        <%= get_art_number()%>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%= not is_vip() %>'>
+                    <div style="width: 70px;height: 36px;
+                            margin-top: -7px;
+                            margin-left: -7px;
+                            padding-top: 4px;
+                            padding-left: 6px;
+                            background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#356 136 70 36)">
+                        <%= get_art_number()%>
+                    </div>
+                </pe:if>
+            </pe:container>
+        </pe:if>
+        <div style="width: 265px;height: 130px;background-color: #afafaf;">
+            <div style="width: 265px;height: 130px;background-color: #afafaf;">
+                <pe:if condition='<%= not is_selected() %>'>
+                    <input type='button'
+                           name='<%=GetData("index")%>'
+                           onmouseenter='on_mouse_enter'
+                           style='position: relative;
+                                  width: 265px;
+                                  height: 130px;
+                                  background:;' />
+                    <pe:container name='<%= "double_click_mask_" .. GetData("index") %>'
+                                  visible='false'
+                                  zorder='1'
+                                  style='position: relative;background:;'>
+                        <div style="height: 130px;
+                                    width: 265px;
+                                    background: url(Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#705 32 66 64:10 10 10 10)">
+                            <img style='width: 85px;
+                                        height: 17px;
+                                        margin-top: 55px;
+                                        margin-left: 95px;'
+                                 src="Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#784 35 85 17" />
+                        </div>
+                        <input type='button'
+                               name='<%=GetData("index")%>'
+                               onmouseleave='on_mouse_leave'
+                               ondoubleclick='enter'
+                               style='position: relative;
+                                      width: 265px;
+                                      height: 130px;
+                                      margin-top: -130px;
+                                      background:;' />
+                    </pe:container>
+                </pe:if>
+                <pe:if condition='<%= is_selected() %>'>
+                    <div style='position: relative;
+                                width: 28px;
+                                height: 26px;
+                                margin-left: 230px;
+                                margin-top: 5px;
+                                background: url(Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#347 289 28 26);'>
+                        <pe:container visible='true' name='<%= "share_button_gray_" .. GetData("index") %>' style='position: relative;background:;'>
+                            <img src='Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#385 294 14 14'
+                                 style='width: 14px;
+                                        height: 14px;
+                                        margin-top: 4px;
+                                        margin-left: 6px;' />
+                        </pe:container>
+                        <pe:container visible='false' name='<%= "share_button_blue_" .. GetData("index") %>' style='position: relative;background:;'>
+                            <img src='Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#415 294 14 14'
+                                 style='width: 14px;
+                                        height: 14px;
+                                        margin-top: 4px;
+                                        margin-left: 6px;' />
+                        </pe:container>
+                        <input type='button'
+                               name='<%= GetData("index") %>'
+                               onmouseenter='on_mouse_enter_share_button'
+                               onmouseleave='on_mouse_leave_share_button'
+                               onclick='share'
+                               style='width: 28px;height: 26px;background: url();' />
+                    </div>
+                </pe:if>
+
+            <div style="position: relative;width: 265px;height: 130px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#394 211 32 32:9 9 9 9)"></div>
+            <div style="<%= 'width: 265px;height: 130px;background: url(' .. (GetData('cover') and GetData('cover') or '') .. ')' %>">
+                <pe:if condition="<%= has_username() %>">
+                    <div style="width: 265px;height: 30px;margin-top: 100px;font-size: 12px;padding-top: 5px;padding-left: 4px;color: #ffffff;background-color: #000000a3">
+                        <%= get_user_icon() %>
+                        <div style="float:left;margin-left: 4px;">
+                            <%= get_username() %>
+                        </div>
+                        <div align="right"
+                             style='<%= "font-size: 12px;base-font-size: 12px;color: #FFFFFF;margin-top: 0px;height: 20px;float: left;" .. get_numbers_width() %>'>
+                            <div style="float:left">
+                                <img src="Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#652 167 18 13" style="width: 18px;height: 13px;margin-top: 2px;" />
+                                <div style="float:left;margin-left: 2px;max-width: 45px;">
+                                    <%= Mod.WorldShare.Utils.ShortNumber(get_project_views()) %>
+                                </div>
+                            </div>
+                            <div style="float:left;margin-left: 8px;">
+                                <div style='float: left;width: 16px;height: 16px;'>
+                                    <pe:container visible='<%= is_star(1) %>' name='<%= "star_item_" .. GetData("index") %>' style="position: relative;background:;">
+                                        <div>
+                                            <img src="Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#704 166 16 15" style="width: 16px;height: 16px;margin-top: 1px;" />
+                                        </div>
+                                        <input type='button' name='<%= GetData("index") %>' onclick='star()' style='background:;width: 16px;height: 17px;margin-top: -16px;' />
+                                    </pe:container>
+                                    <pe:container visible='<%= is_star(2) %>' name='<%= "stared_item_" .. GetData("index") %>' style="position: relative;background:;">
+                                        <div>
+                                            <img src="Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#703 196 17 16" style="width: 16px;height: 16px;margin-top: 1px;" />
+                                        </div>
+                                        <input type='button' name='<%= GetData("index") %>' onclick='unstar()' style='background:;width: 16px;height: 17px;margin-top: -16px;' />
+                                    </pe:container>
+                                </div>
+                                <div style="float:left;margin-left: 2px;max-width: 45px;">
+                                    <%= Mod.WorldShare.Utils.ShortNumber(get_project_thumbs()) %>
+                                </div>
+                            </div>
+                            <div style="float:left;margin-left: 8px;">
+                                <div style='float: left;width: 16px;height: 16px;'>
+                                    <pe:container visible='<%= is_favorite(1) %>' name='<%= "favorite_item_" .. GetData("index") %>' style="position: relative;background:;">
+                                        <div>
+                                            <img src="Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#747 166 16 15" style="width: 16px;height: 16px;margin-top: 1px;" />
+                                        </div>
+                                        <input type='button' name='<%= GetData("index") %>' onclick='favorite()' style='background:;width: 16px;height: 17px;margin-top: -16px;' />
+                                    </pe:container>
+                                    <pe:container visible='<%= is_favorite(2) %>' name='<%= "favorited_item_" .. GetData("index") %>' style="position: relative;background:;">
+                                        <div>
+                                            <img src="Texture/Aries/Creator/paracraft/paracraft_explorer_32bits.png#745 196 17 16" style="width: 16px;height: 16px;margin-top: 1px;" />
+                                        </div>
+                                        <input type='button' name='<%= GetData("index") %>' onclick='unfavorite()' style='background:;width: 16px;height: 17px;margin-top: -16px;' />
+                                    </pe:container>
+                                </div>
+                                <div style="float:left;margin-left: 2px;max-width: 45px;">
+                                    <%= Mod.WorldShare.Utils.ShortNumber(get_project_favorites()) %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </pe:if>
+            </div>
+        </div>
+        <div class="work_item_info">
+            <div>
+                <div class="share_world_name">
+                    <%= Mod.WorldShare.Utils.WordsLimit(GetData("name")) %>
+                    <span style="color: #9e9e9e;">
+                        #<%= GetData('id') or '' %>
+                    </span>
+                </div>
+            </div>
+            <div style="position: relative;
+                        margin-top: 10px;
+                        float:left;
+                        font-size: 12px;">
+                <pe:if condition='<%= has_school() %>'>
+                    <div>
+                        <img style="width: 19px;height: 16px;margin-right: 5px;" src="Texture/Aries/Creator/keepwork/worldshare_32bits.png#311 311 19 16" />
+                        <%= Mod.WorldShare.Utils.WordsLimit(GetData('user').school.name) %>
+                    </div>
+                </pe:if>
+            </div>
+            <div align="right" style="margin-right: 14px;width: 58px;height: 46px;margin-top: -20x;">
+                <input type="button"
+                       class="enter_button"
+                       onclick="enter"
+                       tooltip='<%= L"进入" %>'
+                       name='<%= GetData("index") %>' />
+            </div>
+        </div>
+        <!-- <pe:if condition="<%= is_load_more_items(GetData('index')) %>">
+            <pe:custom oncreate="<%= lazy_load %>"></pe:custom>
+        </pe:if> -->
+    </div>
+</div>
+</kp:window>
+    
+</pe:mcml>
+</body>
+</html>
+

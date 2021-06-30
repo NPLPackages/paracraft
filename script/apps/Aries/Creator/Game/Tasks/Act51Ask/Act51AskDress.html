@@ -1,0 +1,30 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskDress.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Act51AskDress.lua"><![CDATA[
+local Act51AskDress = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskDress.lua");
+Act51AskDress.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    Act51AskDress.CloseView()
+end
+
+]]></script>
+<kp:window name="iframe" width="953" height="448" icon=""   onclose="ClosePage">
+    <div style="position: relative; margin-top: 2px;margin-left: 2px; width: 179px;height: 41;background: url(Texture/Aries/Creator/keepwork/Act51Ask/biaoti_179X41_32bits.png#0 0 179 41);"></div>
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div style="margin-top: 0px;margin-left: -2px; width: 952px;height: 408;background: url(Texture/Aries/Creator/keepwork/Act51Ask/adrs_953X408_32bits.png#0 0 953 408);"></div>
+    </div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

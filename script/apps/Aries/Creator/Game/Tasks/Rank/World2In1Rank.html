@@ -1,0 +1,163 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Rank/World2In1Rank.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="World2In1Rank.lua"><![CDATA[
+local World2In1Rank = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/World2In1Rank.lua");
+World2In1Rank.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    World2In1Rank.CloseView()
+end
+
+function OnClickApply()
+    World2In1Rank.OnClickApply()
+end
+
+function GetTypeBtData()
+    return World2In1Rank.TypeBtData
+end
+
+function GetBgImg(index)
+    if World2In1Rank.select_type_index == index then
+        return "Texture/Aries/Creator/keepwork/rank/qiehuan1_32X36_32bits.png#0 0 32 36:8 8 8 8"
+    else
+        return "Texture/Aries/Creator/keepwork/rank/qiehuan2_32X36_32bits.png#0 0 32 36:8 8 8 8"
+    end
+end
+
+function GetWorldImg(index)
+    return World2In1Rank.TypeBtData[index].background
+end
+
+function SelectType(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    World2In1Rank.SelectType(tonumber(index))
+end
+
+function ToWorld(index)
+    World2In1Rank.ToWorld(index)
+end 
+
+function GetRecudedNumberDesc(num)
+    return World2In1Rank.GetRecudedNumberDesc(num)
+end
+
+function GetRankData(index)
+    if(index == nil) then
+        return #World2In1Rank.RankData;
+    else
+        return World2In1Rank.RankData[index];
+    end
+end
+
+function GetMyData(name)
+    return World2In1Rank.MyRankData[name]
+end
+
+function GetTitleName()
+    return World2In1Rank.world_name .. "作品排行榜"
+end
+
+function ShowRankHelp()
+    World2In1Rank.ShowRankHelp()
+end
+]]></script>
+<kp:window name="iframe" width="812" height="613" icon="" icon_width="232" icon_height = "62" onclose="ClosePage">
+    <div style="position: relative;margin-top: 5px; text-align: center;width: 812; base-font-size:22px; font-size: 22px;color: #ffffff;font-weight: bold;"><%=GetTitleName()%></div>
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div style="margin-top: 4px; height: 112px;background;">
+            <div style="float: left;margin-left: 8px;margin-top: -40; width: 676px;height:153px; background: url(Texture/Aries/Creator/keepwork/rank/tu_676X153_32bits.png#0 0 676 153);"></div>
+            <div style="float: left; margin-left: 8px;margin-top: 3px; width: 104px;height: 112px; background: url()">
+                <div style="position: relative; margin-left: 23px;margin-top: 21px; width: 57px;height: 67px; background: url(Texture/Aries/Creator/keepwork/rank/zi4_57X67_32bits.png#0 0 57 67)"></div>
+                <input type="button" zorder="-1" onclick="OnClickApply" style="position: relative;width: 104px;height: 112px; background: url(Texture/Aries/Creator/keepwork/rank/btnlv_32X112_32bits.png#0 0 32 112:8 8 8 8)"/>
+            </div>
+        </div>
+
+        <pe:repeat DataSource="<%=GetTypeBtData()%>">
+            <pe:repeatitem>
+                <div onclick='SelectType' param1='<%=Eval("index")%>'  style="margin-left: 12px;margin-top: 8px; float: left; width: 248px;height: 36px; background:;">
+                    <img zorder="0" src='<%=GetBgImg(Eval("index"))%>' style="position: relative;" width="248" height="36"/>
+                    <img zorder="0" src='<%=GetWorldImg(Eval("index"))%>' style="position: relative;margin-left: 93px;margin-top: 10px;" width="62" height="15"/>
+                </div>
+
+            </pe:repeatitem>
+        </pe:repeat>
+        
+
+        <div type ="box" style="width:815px;height:318px;margin-left: 0px;margin-top: 0px;float: left;">
+            <pe:gridview style="width:815px;height:318px;float:left" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                DataSource='<%=GetRankData%>'>
+                <Columns>
+                        <!-- <div name="item_root" style="color:#ffffff;width: 570px;height: 90px;float: left;">
+                        </div>                -->
+                        <div style="margin-left: 0px;margin-top: 0px;width: 780px;height: 56px;background:">
+                            <pe:if condition='<%=Eval("is_my_rank")%>'>
+                                <div zorder="-2" style="position:relative;margin-left: 0px;margin-top: 0px;width: 780px;height: 54px;background: url(Texture/Aries/Creator/keepwork/rank/tiao3_32X32_32bits.png#0 0 32 32:13 13 13 13);"></div>
+                            </pe:if>
+                            <pe:if condition='<%=not Eval("is_my_rank")%>'>
+                                <div zorder="-2" style="position:relative;margin-left: 0px;margin-top: 0px;width: 780px;height: 54px;background: url(Texture/Aries/Creator/keepwork/rank/tiao2_32X32_32bits.png#0 0 32 32:13 13 13 13);"></div>
+                            </pe:if>
+                            
+                            <div style="position:relative;margin-left: 0px;margin-top: 0px;width: 780px;height: 54px;">
+                                <div style="width: 53px;height: 54px;float: left;">
+                                    <div style="position: relative; width: 60px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 29px;"><%=Eval("index")%></div>
+                                    <pe:if condition='<%=Eval("index") == 1 %>'>
+                                        <div zorder="1" style="position: relative; margin-top: 9px;margin-left: 40px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/rank/1_42X37_32bits.png#0 0 42 37);"></div>
+                                    </pe:if>
+                                    <pe:if condition='<%=Eval("index") == 2 %>'>
+                                        <div zorder="1" style="position: relative; margin-top: 9px;margin-left: 40px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/rank/2_42X37_32bits.png#0 0 42 37);"></div>
+                                    </pe:if>
+                                    <pe:if condition='<%=Eval("index") == 3 %>'>
+                                        <div zorder="1" style="position: relative; margin-top: 9px;margin-left: 40px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/rank/3_42X37_32bits.png#0 0 42 37);"></div>
+                                    </pe:if>
+                                </div>
+
+                                <div style="margin-left:40px;margin-top:9px;float: left;width: 38px;height: 38px;">
+                                </div>
+                                <div style="margin-left: 0px;margin-top: 0px;width: 640px;height: 54px;float: left;">
+                                    <div onclick="ClickHead" param1='<%= Eval("rank") %>' tooltip='<%=Eval("tool_name")%>' style="float: left;width: 130px;height: 24px; text-align: center; color: #0d329b;base-font-size:20px;font-size: 20px;margin-top: 12px;margin-left: 0px;"><%=Eval("username")%></div>
+                                    <div tooltip='<%=Eval("tool_projectname")%>' style="float: left;width: 240px;height: 24px; text-align: center; color: #0d329b;base-font-size:20px;font-size: 20px;margin-top: 12px;margin-left: 20px;"><%=Eval("projectname")%></div>
+
+                                    <div style="float: left;width: 70px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 35px;"><%=GetRecudedNumberDesc(Eval("score"))%></div>
+
+                                    <input type="button" onclick="ToWorld" value='' name='<%=Eval("index") %>' style="margin-left:63px;margin-top: 8px; width:50px;height:40px;background:url(Texture/Aries/Creator/keepwork/rank/btnchazhao_50X40_32bits.png#0 0 50 40)" />
+                                </div>
+                            </div> 
+                        </div>         
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+
+        <div style="margin-left: 6px;margin-top: 5px;width: 780px;height: 78px;background: url(Texture/Aries/Creator/keepwork/rank/tiao1_32X32_32bits.png#0 0 32 32:13 13 13 13);">
+            <div zorder="1" style="position:relative;margin-top: 5px;margin-left: 5px;width:116px;height:26px;background:url(Texture/Aries/Creator/keepwork/rank/biaoqian_116X26_32bits.png#0 0 116 26);"></div>
+            <div style="position:relative;margin-left: 0px;margin-top: 15px;width: 780px;height: 54px;">
+                <div style="width: 53px;height: 54px;float: left;">
+                    <div style="position: relative; width: 60px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 29px;"><%=GetMyData("rank")%></div>
+                </div>
+
+                <div style="margin-left:40px;margin-top:9px;float: left;width: 38px;height: 38px;">
+                </div>
+                <div style="margin-left: 0px;margin-top: 0px;width: 640px;height: 54px;float: left;">
+                    <div onclick="ClickHead" param1='<%= GetMyData("index") %>' tooltip='<%=GetMyData("tool_name")%>' style="float: left;width: 130px;height: 24px; text-align: center; color: #0d329b;base-font-size:20px;font-size: 20px;margin-top: 12px;margin-left: 0px;"><%=GetMyData("username")%></div>
+                    <div tooltip='<%=GetMyData("tool_projectname")%>' style="float: left;width: 240px;height: 24px; text-align: center; color: #0d329b;base-font-size:20px;font-size: 20px;margin-top: 12px;margin-left: 20px;"><%=GetMyData("projectname")%></div>
+
+                    <div style="float: left;width: 70px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 35px;"><%=GetRecudedNumberDesc(GetMyData("score"))%></div>
+
+                    <input type="button" onclick="ShowRankHelp" style="float:left;margin-left:25px;margin-top: 14px; width:116px;height:29px;background:url(Texture/Aries/Creator/keepwork/rank/btn_166X29_32bits.png#0 0 116 29)" />
+                </div>
+            </div> 
+        </div>   
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+local SummerCampSignAnim = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampSignAnim.lua");
+SummerCampSignAnim.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+    SummerCampSignAnim.CloseView()
+end
+
+function OnMouseOverWordChange(word, line, from, to)
+    SummerCampSignAnim.OnMouseOverWordChange(word, line, from, to)
+end
+
+function OnTextChange(name, mcmlNode)
+    SummerCampSignAnim.OnTextChange(name, mcmlNode)
+end
+
+function OnClickTeacher()
+    SummerCampSignAnim.OnClickTeacher()
+end
+
+function OpenSignView()
+    SummerCampSignAnim.OpenSignView()
+end
+
+function GetDesc()
+    return SummerCampSignAnim.GetDesc()
+end
+]]></script>
+<pe:container style="background: ;" name = "root" alignment="_fi" ClickThrough="true">
+    <pe:container uiname="summer_sign_ani_text1" style="margin-left: 0px;margin-top: 0px; float: left;width: 120;height: 120;background: url();"></pe:container>
+</pe:mcml>
+</body>
+</html>

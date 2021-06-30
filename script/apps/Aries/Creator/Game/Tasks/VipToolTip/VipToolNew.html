@@ -45,16 +45,30 @@ function GetBgStyle()
     end
 end
 
+function OnClickHelp()
+    GameLogic.AddBBS(nil,"敬请期待")
+end
+
 ]]></script>
 
 <kp:window class="default" mode="lite" width="746" height="530"  icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_vip_32bits.png" onclose="ClosePage">
     <div type ="box" style="<%=GetBgStyle()%>">
         <pe:if condition="<%=GetIsMobileMode()%>">
             <div style="position: relative; width: 184px;height: 30px;margin-top: 75px; margin-left: 530px">
-                <input type="button" style="width: 180px;height: 64px;background: url(Texture/Aries/Creator/keepwork/vip/btn_buy_180X64_32bits.png#0 0 180 64);"  onclick="OnClickBuy()" />
-                <input type="button" style="margin-top: 40px; width: 180px;height: 64px;background: url(Texture/Aries/Creator/keepwork/vip/btn_input_180X64_32bits.png#0 0 180 64);"  onclick="ShowVipCodePage()" />
+                <div style="margin-top: -66px;">方法一：微信扫码购买或续费</div>
+                <input type="button" value="点击加入会员" onclick="OnClickBuy" style="color: #111616;font-size: 16px; base-font-size: 16px; margin-top: 130px;  width: 200px; height: 40px; background: url(Texture/Aries/Creator/keepwork/macro/btn_1_32X32_32bits.png#0 0 32 32:14 14 14 14);" />
+                <div style="margin-top: 8px;">
+                    <div style="color: #ffffff;">方法二：</div>
+                    <input type="button" onclick="ShowVipCodePage" style=" margin-left: 50px; margin-top: -24px;  width: 96px; height: 29px; background: url(Texture/Aries/Creator/keepwork/vip/btn_96x29_32bits.png#0 0 96 29);" />
+                </div>
+                <input type="button" value="如何获得激活码？" onclick="OnClickHelp" style="color: #ffffff;font-size: 14px; base-font-size: 14px;margin-left: 20px;  margin-top: 2px;  width: 96px; height: 29px; background: url();" />
             </div>
-        </pe:if>        
+        </pe:if>  
+        
+        <pe:if condition="<%=not GetIsMobileMode()%>">
+            <input type="button" onclick="ShowVipCodePage" style=" margin-left: 574px; margin-top: 273px;  width: 96px; height: 29px; background: url(Texture/Aries/Creator/keepwork/vip/btn_96x29_32bits.png#0 0 96 29);" />
+        </pe:if>  
+
     </div>
 </kp:window>
 

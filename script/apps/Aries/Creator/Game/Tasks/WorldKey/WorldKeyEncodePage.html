@@ -1,0 +1,97 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyEncodePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="WorldKeyEncodePage.lua"><![CDATA[
+local WorldKeyEncodePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyEncodePage.lua");
+WorldKeyEncodePage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    WorldKeyEncodePage.CloseView()
+end
+
+function OnSearch()
+end
+
+function EncodeKey()
+    WorldKeyEncodePage.EncodeKey()
+end
+
+function SelectFilePath()
+    WorldKeyEncodePage.SelectFilePath()
+end
+
+function OpenFilePath()
+    WorldKeyEncodePage.OpenFilePath()
+end
+
+function WriteOut()
+    WorldKeyEncodePage.WriteOut()
+end
+
+function OnEncodeNumChange()
+    WorldKeyEncodePage.OnEncodeNumChange()
+end
+]]></script>
+<kp:window name="iframe" width="510" height="384" icon=""   onclose="ClosePage">
+    <div style="position: relative; margin-top: 8px;margin-left: 18px; width: 121px;height: 25px;background: url(Texture/Aries/Creator/keepwork/WorldKey/zi1_121X25_32bits.png#0 0 121 25);"></div>
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div name="link" style="margin-top: 16px;">
+            <div style="float: left;width: 85px;height: 32px;">
+                <div style="width: 55px;height: 14px;margin-left: 15px;margin-top: 10px; background: url(Texture/Aries/Creator/keepwork/WorldKey/zi3_55X14_32bits.png#0 0 55 14);"></div>
+            </div>
+            <div style="float: left; margin-left:0px;margin-top:0px;width:408px;height:32px;background:url(Texture/Aries/Creator/keepwork/WorldKey/shuzishuru_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                <input type="text" EmptyText='<%=L"请输入激活码淘宝购买链接"%>' class="mc_text" name="buy_link_text" style="font-size: 12px; margin-top:4px;margin-left:5px;height:24px;background:;" />
+            </div>
+        </div>
+
+        <div name="title" style="margin-top: 16px;">
+            <div style="float: left;width: 85px;height: 32px;">
+                <div style="width: 27px;height: 14px;margin-left: 15px;margin-top: 10px; background: url(Texture/Aries/Creator/keepwork/WorldKey/zi6_27X14_32bits.png#0 0 27 14);"></div>
+            </div>
+            <div style="float: left; margin-left:0px;margin-top:0px;width:408px;height:32px;background:url(Texture/Aries/Creator/keepwork/WorldKey/shuzishuru_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                <input type="text" EmptyText='请输入标题' class="mc_text" name="title_text" style="textcolor:#101010;font-size: 12px; margin-top:4px;margin-left:5px;height:24px;background:;" />
+            </div>
+        </div>
+
+        <div name="encode_nums" style="margin-top: 16px;">
+            <div style="float: left;width: 85px;height: 32px;">
+                <div style="width: 55px;height: 14px;margin-left: 15px;margin-top: 10px; background: url(Texture/Aries/Creator/keepwork/WorldKey/zi4_55X14_32bits.png#0 0 55 14);"></div>
+            </div>
+            <div style="float: left; margin-left:0px;margin-top:0px;width:408px;height:32px;background:url(Texture/Aries/Creator/keepwork/WorldKey/shuzishuru_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                <input type="text" EmptyText='请输入生成数量' uiname = "ui_encode_nums_text" onchange="OnEncodeNumChange" class="mc_text" name="encode_nums_text" style="textcolor:#101010;font-size: 12px; margin-top:4px;margin-left:5px;height:24px;background:;" />
+            </div>
+        </div>
+        
+        <div name="encode_file_path" style="margin-top: 16px;">
+            <div style="float: left;width: 285px;height: 32px;">
+                <div style="float: left; width: 97px;height: 14px;margin-left: 15px;margin-top: 10px; background: url(Texture/Aries/Creator/keepwork/WorldKey/zi2_97X14_32bits.png#0 0 97 14);"></div>
+                <input type="button" onclick="OpenFilePath" tooltip="打开文件夹" style="float: left;color: #000000;margin-left: 8px; margin-top: 0px;font-size: 14pt;width: 38px;height: 30px; background:url(Texture/Aries/Creator/keepwork/WorldKey/btn_xiala_38X36_32bits.png#0 0 38 36)" />
+            </div>
+            <div style="margin-left:12px;margin-top:0px;width:478px;height:32px;background:url(Texture/Aries/Creator/keepwork/WorldKey/shuzishuru_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                <input type="text" EmptyText='请输入生成文件名' class="mc_text" name="txt_file_name" style="textcolor:#101010;font-size: 12px; margin-top:4px;margin-left:5px;height:24px;background:;" />
+            </div>
+            <div style="margin-left:12px;margin-top:10px;width:480px;height:32px;background:url(Texture/Aries/Creator/keepwork/WorldKey/shuzishuru_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                <input type="text" EmptyText='请输入生成文件的存放路径' class="mc_text" name="txt_file_path" style="float: left;textcolor:#101010;font-size: 12px; margin-top:4px;margin-left:5px;height:24px;background:;" />
+                <input type="button" onclick="SelectFilePath" style="float: left;color: #000000;margin-left: -38px; margin-top: -1px;font-size: 14pt;width: 38px;height: 36px; background:url(Texture/Aries/Creator/keepwork/WorldKey/btn_xiala_38X36_32bits.png#0 0 38 36)" />
+            </div>
+        </div>
+
+        <div name="encode_file_path" style="margin-top: 20px;">
+            <input type="button" style="float: left; margin-left: 42; margin-top:0px;min-width:113px;height:44px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="EncodeKey" value='<%=L"生成"%>' />
+            <input type="button" style="float: left; margin-left: 40; margin-top:0px;min-width:113px;height:44px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="WriteOut" value='<%=L"注销"%>' />
+            <input type="button" style="margin-left: 40; margin-top:0px;min-width:113px;height:44px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="ClosePage" value='<%=L"取消"%>' />
+        </div>
+    </div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

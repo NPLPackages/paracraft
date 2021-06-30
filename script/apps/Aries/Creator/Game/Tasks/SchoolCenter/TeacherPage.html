@@ -1,0 +1,132 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/SchoolCenter/TeacherPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="TeacherPage.lua"><![CDATA[
+local TeacherPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/TeacherPage.lua");
+TeacherPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    TeacherPage.CloseView()
+end
+
+function ClickBt(name)
+    TeacherPage.ClickBt(name)
+end
+
+function IsShowReimd()
+    return TeacherPage.IsShowReimd()
+end
+
+function IsShowRealName()
+    return TeacherPage.IsShowRealName()
+end
+
+function IsShowSchoolInfo()
+    return TeacherPage.IsShowSchoolInfo()
+end
+
+function IsShowClassInfo()
+    return TeacherPage.IsShowClassInfo()
+end
+
+
+]]></script>
+<style type="text/mcss">
+    {
+        school_button = {
+            background = "Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8",
+            ["font-size"] = 18,
+            ["font-weight"] = "bold",
+            width = 144,
+            height = 49,
+            float = "left",
+        },
+    }
+</style>
+
+<kp:window name="iframe" width="1062" height="614" icon=""   onclose="ClosePage">
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div style="margin-left: 15px;margin-top: 15px; width:1016px; height: 544px; background: url(Texture/Aries/Creator/keepwork/SchoolCenter/kuang2_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+            <div style="float: left; margin-left: 35px;margin-top: 0px; width:493px; height: 544px; background:;">
+                <div style="margin-left: 0px;margin-top: 18px; width:110px; height: 22px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/5_110X22_32bits.png#0 0 110 22);"></div>
+                <div style="margin-top: 15px;">
+                    <div style="float: left; margin-left: 0px;margin-top: 0px; width:143px; height: 170px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/kuang1_32X32_32bits.png#0 0 32 32:12 12 12 12);">
+                        <div style="float: left; margin-left: 26px;margin-top: 12px; width:89px; height: 18px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/zi1_89X18_32bits.png#0 0 89 18);"></div>
+                        <!-- <pe:container style="margin-left: 10px;margin-top: 7px;width: 123;height: 123;"></pe:container> -->
+                        <div style="margin-left: 10px;margin-top: 7px;width: 123;height: 123; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/home_page_32bits.jpg#0 0 128 128);"></div>
+                    </div>
+                    <!-- <div style="float: left; margin-left: 18px;margin-top: 0px; width:143px; height: 170px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/kuang1_32X32_32bits.png#0 0 32 32:12 12 12 12);">
+                        <div style="float: left; margin-left: 26px;margin-top: 12px; width:89px; height: 18px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/zi2_89X18_32bits.png#0 0 89 18);"></div>
+                        <pe:container uiname="decode_wxcode_root2" style="margin-left: 10px;margin-top: 7px;width: 123;height: 123;"></pe:container>
+                    </div> -->
+                </div>
+
+                <div style="margin-left: 0px;margin-top: 18px; width:110px; height: 22px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/7_110X22_32bits.png#0 0 110 22);"></div>
+                <div style="margin-top: 10px;">
+                    <input name="teaching_management_plaform" type="button" style="margin-left: 0px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"教学管理平台"%>' />
+                    <input name="online_plans" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"在线教案"%>' />
+                    <input name="reset_password" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"同学密码重置"%>' />
+                </div>
+
+                <div style="margin-left: 0px;margin-top: 18px; width:110px; height: 22px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/6_110X22_32bits.png#0 0 110 22);"></div>
+                <div style="margin-top: 10px;">
+                    <input name="teach_statistics" type="button" style="margin-left: 0px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"教学统计"%>' />
+                    <input name="lesson_progress" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"课程进度"%>' />
+                    <input name="work_progress" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"练习进度"%>' />
+                </div>
+
+                <div style="margin-left: 0px;margin-top: 18px; width:110px; height: 22px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/3_110X22_32bits.png#0 0 110 22);"></div>
+                <div style="margin-top: 10px;">
+                    <input name="3d_school" type="button" style="margin-left: 0px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"3D校园"%>' />
+                    <input name="school_page" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"学校首页"%>' />
+                    <input name="3d_school_management" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"3D校园管理"%>' />
+                </div>
+            </div>
+            <div style="float: left; margin-left: 0px;margin-top: 26px; width:2px; height: 487px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/fengexian_2X8_32bits.png#0 0 2 8);"></div>
+            <div style="float: left; margin-left: 25px;margin-top: 0px; width:460px; height: 544px; background:;">
+                <div style="margin-left: 0px;margin-top: 18px; width:110px; height: 22px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/2_110X22_32bits.png#0 0 110 22);"></div>
+                <div style="margin-top: 10px;">
+                    <input name="class_management" type="button" style="margin-left: 0px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"班级管理"%>' />
+                    <input name="students_work" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"同学作品"%>' />
+                </div>
+
+                <div style="margin-left: 0px;margin-top: 18px; width:110px; height: 22px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/1_110X22_32bits.png#0 0 110 22);"></div>
+                <div style="margin-top: 10px;">
+                    <input name="my_work" type="button" style="margin-left: 0px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"我的练习"%>' />
+                    <input name="history_work" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"历史成绩"%>' />
+                    <input name="my_project" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"我的作品"%>' />
+                    <input name="personal_data_statistics" type="button" style="margin-left: 0px; margin-top:18px;" class="school_button" onclick="ClickBt" value='<%=L"个人数据统计"%>' />
+                </div>
+                <pe:if condition='<%= IsShowReimd() %>'>
+                    <div style="margin-left: 0px;margin-top: 18px; width:110px; height: 22px; background:url(Texture/Aries/Creator/keepwork/SchoolCenter/4_110X22_32bits.png#0 0 110 22);"></div>
+                    <div style="margin-top: 10px;margin-left: -12px">
+                        <pe:if condition='<%= IsShowRealName() %>'>
+                            <input name="comple_rel_name" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"完善实名认证"%>' />
+                        </pe:if>
+                        <pe:if condition='<%= IsShowSchoolInfo() %>'>
+                            <input name="comple_school_info" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"完善学校信息"%>' />
+                        </pe:if>
+                        <pe:if condition='<%= IsShowClassInfo() %>'>
+                            <input name="comple_class_info" type="button" style="margin-left: 12px; margin-top:0px;" class="school_button" onclick="ClickBt" value='<%=L"完善班级信息"%>' />
+                        </pe:if>
+                    </div>
+                </pe:if>
+
+            </div>
+        </div>
+    </div>
+
+
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

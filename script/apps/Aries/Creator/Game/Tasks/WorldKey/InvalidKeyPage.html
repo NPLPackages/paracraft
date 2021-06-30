@@ -1,0 +1,44 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/WorldKey/InvalidKeyPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="InvalidKeyPage.lua"><![CDATA[
+local InvalidKeyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/InvalidKeyPage.lua");
+InvalidKeyPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    InvalidKeyPage.CloseView()
+end
+
+function Paste()
+    InvalidKeyPage.Paste()
+end
+
+function WriteOff()
+    InvalidKeyPage.WriteOff()
+end
+
+]]></script>
+<kp:window name="iframe" mode="lite" width="400" height="180" title='<%= L"注销激活码"%>' onclose="ClosePage">
+    <div style="color:#ffffff;padding-left:2px;padding-top:48px;padding-right:2px;padding-bottom:2px;">
+    <pe:container style="margin-left:15px;height:23px;color: #be0e0e;background: ;">*注销激活码后，该激活码将无法用于激活世界</pe:container>
+    <div style="margin-top:5px;width:560;">
+        <div style="float: left; margin-left:15px;margin-top:5px;width:360px;height:32px;background:url(Texture/Aries/Creator/keepwork/WorldKey/shuzishuru_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+            <input type="text" onchange="OnTextChange" EmptyText='<%=L"请输入激活码"%>' class="mc_text" name="key_text" style="font-size: 12px; margin-top:4px;margin-left:5px;height:24px;background:;" />
+            <input type="button" value="粘贴" onclick="Paste" style="float: left;color: #000000;margin-left: -58px; margin-top: -1px;font-size: 14pt;width: 58px;height: 36px; background:url(Texture/Aries/Creator/keepwork/WorldKey/btn_zhantie_32X32_32bits.png#0 0 32 32:8 8 8 8)" />
+        </div>
+
+        <input type="button" style="float: left; margin-left: 134; margin-top:14px;min-width:113px;height:44px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="WriteOff" value='<%=L"注销"%>' />
+    </div>
+</div>
+    
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -23,6 +23,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovable.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
@@ -113,6 +115,12 @@ end
 function Entity:SetMainAssetPath(name)
 	if(self:GetMainAssetPath() ~= name) then
 		self.mainAssetPath = name;
+		local skin = CustomCharItems:GetSkinByAsset(name);
+		if (skin) then
+			self.mainAssetPath = CustomCharItems.defaultModelFile;
+			self.skin = skin;
+		end
+
 		self:RefreshClientModel(true);
 		self:GetDataWatcher():SetField(self.dataMainAsset, self:GetMainAssetPath());
 		return true;

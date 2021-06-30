@@ -44,6 +44,7 @@ default name is "default"
 /loadtemplate -a 3 test
 /loadtemplate -r test
 /loadtemplate -nohistory test
+/loadtemplate ~/test   in writable global temp directory
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		
@@ -97,12 +98,19 @@ default name is "default"
 			if (filename == "") then
 				templatename = "default";
 			end
-
+			if(filename:match("^~")) then
+				filename = ParaIO.GetWritablePath().."temp"..filename:sub(2, -1)
+			end
 			if(not filename:match("%.xml$") and not filename:match("%.bmax$")) then
 				filename = filename .. ".blocks.xml";
 			end
 
-			local fullpath = Files.GetWorldFilePath(filename) or (not filename:match("[/\\]") and Files.GetWorldFilePath("blocktemplates/"..filename));
+			local fullpath;
+			if(commonlib.Files.IsAbsolutePath(filename)) then
+				fullpath = filename;
+			else
+				fullpath = Files.GetWorldFilePath(filename) or (not filename:match("[/\\]") and Files.GetWorldFilePath("blocktemplates/"..filename));
+			end
 			
 			if(not fullpath and ParaIO.DoesFileExist(filename, true)) then
 				fullpath = filename;
@@ -146,6 +154,7 @@ Commands["savetemplate"] = {
 /savetemplate -hollow test
 /savetemplate -auto_pivot test
 /savetemplate -relative_motion test
+/savetemplate ~/test   in writable global temp directory
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
@@ -155,9 +164,17 @@ Commands["savetemplate"] = {
 		if(not templatename or templatename == "") then
 			templatename = "default";
 		end
+		if(templatename:match("^~")) then
+			templatename = ParaIO.GetWritablePath().."temp"..templatename:sub(2, -1)
+		end
 
 		templatename = templatename:gsub("^blocktemplates/", ""):gsub("%.blocks%.xml$", "");
-		local filename = format("%sblocktemplates/%s.blocks.xml", GameLogic.current_worlddir, templatename);
+		local filename;
+		if(commonlib.Files.IsAbsolutePath(templatename)) then
+			filename = format("%s.blocks.xml", templatename);
+		else
+			filename = format("%sblocktemplates/%s.blocks.xml", GameLogic.current_worlddir, templatename);
+		end
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");

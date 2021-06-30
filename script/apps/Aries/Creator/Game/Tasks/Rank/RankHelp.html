@@ -1,0 +1,82 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/Rank/RankHelp.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="RankHelp.lua"><![CDATA[
+local RankHelp = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/RankHelp.lua");
+RankHelp.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    RankHelp.CloseView()
+end
+
+function HelpDataSource(index)
+    if(index == nil) then    
+        return #RankHelp.DataSource;
+    else
+        return RankHelp.DataSource[index];
+    end
+end
+
+function GetCourseData()
+    return RankHelp.CourseData
+end
+
+function ToCourse(index)
+    RankHelp.ToCourse(index)
+end
+
+function IsShowImg()
+    return #RankHelp.CourseData > 0
+end
+
+]]></script>
+<kp:window name="iframe" width="632" height="352" onclose="ClosePage">
+<div style="margin-top: 7px;margin-left: 10px; position: relative;width:50px;height:25px;background: url(Texture/Aries/Creator/keepwork/Help/bangzhu_50X25_32bits.png#0 0 50 25);"></div>
+<div style="position: relative;color:#ffffff;margin-left: -2px;" class="kp_window_container">
+    <div style="width:610px;height:247px;margin-top:5px;margin-left: 25px;">
+        <pe:gridview name="course_list" style="margin-left:5px;" CellPadding="0" ItemsPerLine="1" DefaultNodeHeight="50"
+                    DataSource='<%=HelpDataSource%>'>
+            <Columns>
+                <!-- <div style="width: 612px;line-height:25px;font-size: 16px;font-weight:bold;"> -->
+                <div style="width: 590px;line-height:25px;font-size: 16px;base-font-size: 16px;">
+                    <%=Eval("help_desc")%>
+                </div>
+            </Columns>
+        </pe:gridview>
+    </div>
+    <div style="width:632px;height:60px;background: url(Texture/Aries/Creator/keepwork/Help/tu_64X60_32bits.png#0 0 64 60:20 20 20 20);">
+        <pe:if condition='<%= IsShowImg() %>'>
+            <div style="position: relative;width:70px;height:17px;margin-left: 17px;margin-top: 21px; background: url(Texture/Aries/Creator/keepwork/Help/zi1_70X17_32bits.png#0 0 70 17);color: #000000;"></div>
+        </pe:if>
+        
+        <div style="position: relative; margin-left: 100px; width:576px;height: 60px;">
+            <pe:repeat DataSource = "<%=GetCourseData()%>">
+                <pe:repeatitem>
+                    <div style="float: left; width: 142px;height: 42px;margin-left: 5;margin-top: 10px;">
+                        <input type="button" onclick="ToCourse" name='<%=Eval("index") %>' style="position: relative;width: 142px;height: 42px;background: url(Texture/Aries/Creator/keepwork/Help/btn2_32X42_32bits.png#0 0 32 42:14 12 14 12);"/>
+                        <div style="position: relative;font-size: 18px;base-font-size:18px;color: #ffffff;width: 142px;height: 42px;text-align: center;margin-top: 7px;">
+                            <%=Eval("name") %>
+                        </div>
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+
+    </div>
+
+</div>
+
+
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

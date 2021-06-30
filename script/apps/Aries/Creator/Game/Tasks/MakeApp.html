@@ -1,0 +1,395 @@
+<html>
+<body>
+    <pe:mcml>
+        <script type="text/npl" refresh="true">
+            <![CDATA[
+                NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
+                local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+
+                local page = document:GetPageCtrl()
+
+                function close()
+                    page:CloseWindow()
+                end
+
+                function get_world_name()
+                    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
+
+                    if (currentEnterWorld and currentEnterWorld.text) then
+                        return currentEnterWorld.text
+                    else
+                        return ''
+                    end
+                end
+
+                function android()
+                    GameLogic.IsVip("MakeApk", true, function(result) 
+                        if(result) then  
+                            android_exec();
+                        end
+                    end)
+                end
+
+                function android_exec()
+                    local step1Controller = page:FindControl('step1');
+                    local step2Controller = page:FindControl('step2');
+
+                    step1Controller.visible = false;
+                    step2Controller.visible = true;
+
+                    -- check pacakge step
+                    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
+
+                    if (ParaIO.DoesFileExist(MakeApp.androidBuildRoot .. 'paracraft_android_ver' .. MakeApp.curAndroidVersion .. '/')) then
+                        local p_step1_content_controller = page:FindControl('p_step1_content');
+                        local p_step2_button_controller = page:FindControl('p_step2_button');
+
+                        p_step1_content_controller.visible = true;
+                        p_step2_button_controller.visible = true;
+
+                        local world_path = MakeApp.androidBuildRoot .. 'paracraft_android_ver' .. MakeApp.curAndroidVersion .. '/assets/worlds/DesignHouse/' .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. '/';
+                        local world_zip = MakeApp.androidBuildRoot .. 'paracraft_android_ver' .. MakeApp.curAndroidVersion .. '/assets/worlds/DesignHouse/' .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. '.zip';
+                        local is_world_path_exist = false;
+                        local is_world_zip_exist = false;
+
+                        if (ParaIO.DoesFileExist(world_path)) then
+                            is_world_path_exist = true;
+                        end
+
+                        if (ParaIO.DoesFileExist(world_zip)) then
+                            is_world_zip_exist = true;
+                        end
+
+                        if (is_world_path_exist or is_world_zip_exist) then
+                            local p_step2_content_controller = page:FindControl('p_step2_content');
+                            local p_step3_button_controller = page:FindControl('p_step3_button');
+
+                            p_step2_content_controller.visible = true;
+                            p_step3_button_controller.visible = true;
+
+                            page:SetUIBackground('app_icon', get_app_icon());
+
+                            if (is_world_zip_exist) then
+                                page:SetValue('copy_read_only_world', true);
+                            end
+
+                            if (ParaIO.DoesFileExist(MakeApp.androidBuildRoot .. 'paracraft_ver' .. MakeApp.curAndroidVersion .. '_pack.apk')) then
+                                local p_step3_content_controller = page:FindControl('p_step3_content');
+
+                                p_step3_content_controller.visible = true;
+                            end
+                        end
+
+                    end
+                end
+
+                function windows()
+                    local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+                    local task = MyCompany.Aries.Game.Tasks.MakeApp:new();
+
+                    task:MakeWindows()
+                end
+
+                function get_notice()
+                    return L'你可以在这一步编辑文件，在本地下载离线资源到temp/cache，改APP的图标等'
+                end
+
+                function p_step1(callback)
+                    MakeApp:AndroidDownloadApk(function()
+                        MakeApp:AndroidUnzipApk(function()
+                            MakeApp:AndroidDownloadJre(function()
+                                local p_step1_content_controller = page:FindControl('p_step1_content');
+                                local p_step2_button_controller = page:FindControl('p_step2_button');
+
+                                p_step1_content_controller.visible = true;
+                                p_step2_button_controller.visible = true;
+
+                                if (callback and type(callback) == 'function') then
+                                    callback();
+                                end
+                            end)
+                        end)
+                    end)
+                end
+
+                function p_step2(callback)
+                    local p_step2_content_controller = page:FindControl('p_step2_content');
+                    local p_step3_button_controller = page:FindControl('p_step3_button');
+                    local copy_read_only_world = page:GetValue('copy_read_only_world');
+                    local be_auto_update = page:GetValue('be_auto_update');
+                    local login_enable = page:GetValue('login_enable');
+
+                    MakeApp:AndroidUpdateManifest(function()
+                        MakeApp:AndroidCopyWorld(
+                            copy_read_only_world,
+                            be_auto_update,
+                            login_enable,
+                            function()
+                                p_step2_content_controller.visible = true;
+                                p_step3_button_controller.visible = true;
+
+                                page:SetUIBackground('app_icon', get_app_icon());
+
+                                if (callback and type(callback) == 'function') then
+                                    callback();
+                                end
+                            end
+                        )
+                    end)
+                end
+
+                function p_step3()
+                    MakeApp:AndroidGenerateApk(function()
+                        MakeApp:AndroidSignApk(function()
+                            local p_step3_content_controller = page:FindControl('p_step3_content');
+                            p_step3_content_controller.visible = true;
+                        end)
+                    end)
+                end
+
+                function one_click()
+                    p_step1(function()
+                        p_step2(function()
+                            p_step3()
+                        end)
+                    end)
+                end
+
+                function open_paracraft_android_folder()
+                    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
+                    local world_path = MakeApp.androidBuildRoot .. 'paracraft_android_ver' .. MakeApp.curAndroidVersion .. '/assets/worlds/DesignHouse/' .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. '/';
+                    local world_zip = MakeApp.androidBuildRoot .. 'paracraft_android_ver' .. MakeApp.curAndroidVersion .. '/assets/worlds/DesignHouse/' .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. '.zip';
+
+                    if (ParaIO.DoesFileExist(world_path)) then
+                        System.App.Commands.Call("File.WinExplorer", world_path);
+                    else
+                        if (ParaIO.DoesFileExist(world_zip)) then
+                            System.App.Commands.Call("File.WinExplorer", MakeApp.androidBuildRoot .. 'paracraft_android_ver' .. MakeApp.curAndroidVersion .. '/assets/worlds/DesignHouse/');
+                        end
+                    end
+                end
+
+                function open_temp_folder()
+                    System.App.Commands.Call("File.WinExplorer", MakeApp.androidBuildRoot);
+                end
+
+                function get_build_folder()
+                    return MakeApp.androidBuildRoot .. 'paracraft_android_ver' .. MakeApp.curAndroidVersion .. '/';
+                end
+
+                function get_apk_name()
+                    return 'paracraft_ver' .. MakeApp.curAndroidVersion .. '_pack.apk';
+                end
+
+                function need_updated()
+                    if (not MakeApp.localAndroidVersion or
+                        MakeApp.curAndroidVersion == MakeApp.localAndroidVersion) then
+                        return false;
+                    else
+                        return true;
+                    end
+                end
+
+                function get_update_notice()
+                    return format(L'(有更新ver%s)', MakeApp.curAndroidVersion);
+                end
+
+                function get_app_icon()
+                    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
+                    local world_path = MakeApp.androidBuildRoot .. 'paracraft_android_ver' .. MakeApp.curAndroidVersion .. '/assets/worlds/DesignHouse/' .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. '/';
+                    local icon_path = world_path .. 'icon.png';
+
+                    if (ParaIO.DoesFileExist(icon_path)) then
+                        return icon_path;
+                    else
+                        return  "Texture/alphadot.png";
+                    end
+                end
+             ]]>
+        </script>
+        <style type="text/mcss"></style>
+        <pe:container name='step1' visible='true' style='position: relative;background:;'>
+            <kp:window width="500" height="350"  title='<%=L"请选择" %>' onclose="close()">
+                <div style="height: 40px;"></div>
+                <div style='padding: 15px;'>
+                    <div style='font-size: 18px;
+                                base-font-size: 18px;
+                                margin-bottom: 20px;'>
+                        <div><%= format(L"准备发布世界《%s》", get_world_name()) %></div>
+                        <div><%= L"请选择你要发布的平台" %></div>
+                    </div>
+                    <div style='text-align: center;font-size: 18px;base-font-size: 18px;'>
+                        <div style="float: left;width: 235px;">
+                            <div style='width: 112px;height:128px;margin-bottom: 8px;' align="center">
+                                <input type='button'
+                                       onclick='android()'
+                                       style='width: 112px;
+                                              height: 128px;
+                                              background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#13 9 112 128)' />
+                            </div>
+                            <div style='margin-bottom: 4px;'>Android</div>
+                            <div style="color: #515151"><%= L"APK文件" %></div>
+                        </div>
+                        <div style="float: left;width: 235px;">
+                            <div style='width: 105px;height:128px;;margin-bottom: 8px;' align="center">
+                                <input type='button'
+                                       onclick='windows()'
+                                       style='width: 105px;
+                                              height: 106px;
+                                              margin-top: 11px;
+                                              background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 23 105 106)' />
+                            </div>
+                            <div style='margin-bottom: 4px;'>Windows</div>
+                            <div style="color: #515151"><%= L"EXE文件" %></div>
+                        </div>
+                    </div>
+                </div>
+            </kp:window>
+        </pe:container>
+        <pe:container name='step2' visible='false' style='position: relative;background:;' >
+            <kp:window width="500" height="470"  title='<%=L"生成独立应用程序" %>' onclose="close()">
+                <div style='height: 40px;'></div>
+                <div style='padding: 20px;padding-top: 8px;'>
+                    <div style='padding-left: 30px;
+                                font-size: 18px;base-font-size: 18px;
+                                margin-bottom: 5px;'>
+                        <%= L'准备安卓开发环境' %>
+                        <pe:if condition='<%= need_updated() %>'>
+                            <span style='color: #FF0000;'><%= get_update_notice() %></span>
+                        </pe:if>
+                    </div>
+                    <div style='padding-left: 30px;
+                                margin-bottom: 5px;'>
+                        <input type="button"
+                               tooltip="点击执行：下载安装安卓开发环境"
+                               onclick='p_step1()'
+                               style='width: 55px;
+                                      height: 60.5px;
+                                      background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 132 110 121)' />
+                    </div>
+                    <pe:container name='p_step1_content' visible='false' style='background:;'>
+                        <div style='margin-bottom: 5px;'>
+                            <div style='float: left;'>
+                                <img style='width: 44.1px;
+                                            height: 36.4px;'
+                                     src='Texture/Aries/Creator/paracraft/make_app_32bits.png#10 148 63 52' />
+                            </div>
+                            <div style='float: left;
+                                        font-size: 18px;
+                                        base-font-size: 18px;
+                                        line-height: 36px;'>
+                                <%= format(L"《%s》", get_world_name()) %>
+                            </div>
+                        </div>
+                    </pe:container>
+                    <pe:container name='p_step2_button' visible='false' style='background:;'>
+                        <div style='padding-left: 30px;
+                                    margin-bottom: 5px;'>
+                            <div style='float: left;'>
+                                <input type="button"
+                                       tooltip="点击执行：复制世界文件到打包目录中"
+                                       onclick='p_step2()'
+                                       style='width: 55px;
+                                          height: 60.5px;
+                                          background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 132 110 121)' />
+                            </div>
+                            <div style='float: left;
+                                        margin-top: 5px;
+                                        margin-left: 5px;
+                                        font-size: 16px;
+                                        base-font-size: 16px;'>
+                                <div>
+                                    <input name='copy_read_only_world' type='checkbox' style='margin-top: 3px;' checked='false' />
+                                    <%= L'只读世界' %>
+                                </div>
+                                <div>
+                                    <input name='be_auto_update' type='checkbox' style='margin-top: 3px;' checked='false' />
+                                    <%= L'自动更新' %>
+                                </div>
+                                <div>
+                                    <input name='login_enable' type='checkbox' style='margin-top: 3px;' checked='false' />
+                                    <%= L'登录模式' %>
+                                </div>
+                            </div>
+                        </div>
+                    </pe:container>
+                    <pe:container name='p_step2_content' visible='false' style='background:;'>
+                        <div style='margin-bottom: 5px;'>
+                            <div style='float: left;' tooltip='<%= get_notice() %>'>
+                                <img style='width: 44.1px;
+                                            height: 36.4px;'
+                                     src='Texture/Aries/Creator/paracraft/make_app_32bits.png#10 148 63 52' />
+                            </div>
+                            <div style='float: left;
+                                        font-size: 14px;
+                                        base-font-size: 14px;
+                                        line-height: 36px;
+                                        margin-left: 6px;'
+                                 tooltip='<%= get_notice() %>'>
+                                <%= get_build_folder() %>
+                            </div>
+                            <div style='float: left;'>
+                                <input type='button'
+                                       class='mc_button_blue'
+                                       onclick='open_paracraft_android_folder()'
+                                       style='color: #FFFFFF;
+                                              margin-top: 10px;
+                                              margin-left: 6px;'
+                                       value='...'
+                                       tooltip='<%= get_notice() %>'/>
+                            </div>
+                        </div>
+                    </pe:container>
+                    <pe:container name='p_step3_button' visible='false' style='background:;'>
+                        <div style='padding-left: 30px;
+                                    margin-bottom: 5px;'>
+                            <input type="button"
+                                   tooltip="点击执行：签名生成APK"
+                                   onclick='p_step3()'
+                                   style='width: 55px;
+                                          height: 60.5px;
+                                          background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 132 110 121)' />
+                            <div style="float:left;margin-left:5px;">
+                                <input type="button" name="app_icon" tooltip="自动读取世界目录下的icon.png作为应用图标" style="width: 64px;height: 64px;" />
+                            </div>
+                        </div>
+                    </pe:container>
+                    <pe:container name='p_step3_content' visible='false' style='background:;'>
+                        <div style='margin-bottom: 5px;'>
+                            <div style="float: left;">
+                                <img style='width: 44.1px;
+                                            height: 36.4px;'
+                                     src='Texture/Aries/Creator/paracraft/make_app_32bits.png#10 148 63 52' />
+                            </div>
+                            <div style='float: left;
+                                        font-size: 18px;
+                                        base-font-size: 18px;
+                                        line-height: 36px;
+                                        margin-left: 6px;'>
+                                <%= get_apk_name() %>
+                            </div>
+                            <div style='float: left;'>
+                                <input type='button'
+                                       class='mc_button_blue'
+                                       onclick='open_temp_folder()'
+                                       style='color: #FFFFFF;
+                                              margin-top: 10px;
+                                              margin-left: 6px;'
+                                       value='...' />
+                            </div>
+                        </div>
+                    </pe:container>
+                    <div style='width: 100px;' align='right'>
+                        <input type='button'
+                               style='width: 100px;
+                                      height: 30px;'
+                               class='mc_button_blue'
+                               onclick='one_click()'
+                               value='<%= L"一键打包" %>' />
+                    </div>
+                </div>
+            </kp:window>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

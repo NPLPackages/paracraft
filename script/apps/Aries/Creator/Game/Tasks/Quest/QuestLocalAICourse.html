@@ -1,0 +1,263 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Quest/QuestLocalAICourse.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="QuestLocalAICourse.lua"><![CDATA[
+local QuestLocalAICourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestLocalAICourse.lua");
+QuestLocalAICourse.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    QuestLocalAICourse.CloseView()
+end
+
+function TeacherListData(index)
+    if(index == nil) then    
+        return #QuestLocalAICourse.TeacherListData;
+    else
+        return QuestLocalAICourse.TeacherListData[index];
+    end
+end
+
+function LevelListData(index)
+    if(index == nil) then    
+        return #QuestLocalAICourse.LevelListData;
+    else
+        return QuestLocalAICourse.LevelListData[index];
+    end
+end
+
+function CourseListData(index)
+    if(index == nil) then    
+        return #QuestLocalAICourse.CourseListData;
+    else
+        return QuestLocalAICourse.CourseListData[index];
+    end
+end
+
+function SelectTeacher(index)
+    QuestLocalAICourse.SelectTeacher(index)
+end
+
+function IsSelectTeacher(index)
+    return QuestLocalAICourse.IsSelectTeacher(index)
+end
+
+function SelectLevel(index)
+    QuestLocalAICourse.SelectLevel(index)
+end
+
+function IsSelectLevel(index)
+    return QuestLocalAICourse.IsSelectLevel(index)
+end
+
+function SelectCourse(index)
+    QuestLocalAICourse.SelectCourse(index)
+end
+
+function GotoClass(index)
+    QuestLocalAICourse.GotoClass(index)
+end
+
+function GotoPreClass(index)
+    QuestLocalAICourse.GotoClass(index, true)
+end
+
+function IsSelectCourse(index)
+    return QuestLocalAICourse.IsSelectCourse(index)
+end
+
+function RunCommand(index)
+    QuestLocalAICourse.RunCommand(index)
+end
+
+function GetWorldIconUrl(index)
+    return QuestLocalAICourse.GetWorldIconUrl(index)
+end
+
+function HasWork(index)
+    return QuestLocalAICourse.HasWork(index)
+end
+
+function ClickWork(index)
+    QuestLocalAICourse.ClickWork(index)
+end
+
+function ClickPreWork(index)
+    QuestLocalAICourse.ClickWork(index, true)
+end
+
+function GetTooltip(s)
+    if(s and s~= "")then
+        s = string.format("script/apps/Aries/Creator/Game/Tasks/Quest/QuestAiCourseToolTip.html?s=%s",s);
+        return s;
+    end
+end
+
+function IsShowCourseCheckTag(index)
+    return QuestLocalAICourse.IsShowCourseCheckTag(index)    
+end
+
+function GetCourseCheckDesc(index)
+    return QuestLocalAICourse.GetCourseCheckDesc(index)
+end
+
+function IsWorldType(index)
+    local data = QuestLocalAICourse.CourseListData[index]
+    if data == nil then
+        return false
+    end
+    local select_teacher_data = QuestLocalAICourse.TeacherListData[QuestLocalAICourse.SelectTeacherIndex]
+
+    return select_teacher_data.course_type == "world"
+end
+
+]]></script>
+<div style="width: 926px;height: 562px; background: url(Texture/Aries/Creator/keepwork/AiCourse/bjk_926X562_32bits.png#0 0 926 562);">
+    <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 18px; margin-left:892px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/AiCourse/guanbi_32bits.png#0 0 22 22);"/>
+    <div name="left_containt" style="float:left;width:182px;height:562px;margin-top:0px;background:">
+        <div style="float:left;width:180px;height:480px;margin-top:58px;margin-left: 20px; background:">
+            <pe:gridview name="teacher_list" style="margin-left:0px;" CellPadding="0" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="50"
+                        DataSource='<%=TeacherListData%>'>
+                <Columns>
+                    <div style="width: 165px; height: 80px;">
+                        <input zorder="1" type="button" onclick="SelectTeacher" name='<%=Eval("index")%>' style="position: relative; width: 165px;height: 80px;background: ;"/>
+                        <pe:if condition='<%=IsSelectTeacher(Eval("index"))%>'>
+                            <div style="position: relative; width: 163px;height: 70px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_1_163X70_32bits.png#0 0 163 70)"></div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsSelectTeacher(Eval("index"))%>'>
+                            <div style="position: relative; width: 146px;height: 70px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_2_146X70_32bits.png#0 0 146 70)"></div>
+                        </pe:if>
+
+                        <img style="margin-left: 12px;margin-top: 4px; float: left;" src='<%=Eval("icon")%>' width="55" height="55"/>
+                        <div style="float: left;margin-top: 10px;margin-left: 8px;">
+                            <div style="base-font-size:14px;font-size: 14px;color: #ffffff;"><%=Eval("name")%></div>
+                            <div style="base-font-size:12px;font-size: 12px;margin-top: 6px; "><%=Eval("desc")%></div>
+                        </div>
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </div>
+    </div>
+
+    <div name="right_containt" style="float:left;width:720px;height:610px;margin-top:0px;">
+        <div style="width:720px;height:45px;margin-top:10px;;">
+            <pe:gridview name="level_list" style="margin-left:5px;" CellPadding="0" AllowPaging="false" ItemsPerLine="10" DefaultNodeHeight="45"
+                        DataSource='<%=LevelListData%>'>
+                <Columns>
+                    <div style="width: 142px; height: 42px;">
+                        <input type="button" zorder="1" onclick="SelectLevel" name='<%=Eval("index")%>' style="position: relative; width: 142px;height: 42px;background: ;"/>
+                        <pe:if condition='<%=IsSelectLevel(Eval("index"))%>'>
+                            <div style="position: relative; width: 138px;height: 42px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_qiehuan1_138X42_32bits.png#0 0 138 42)">
+                                <div style="width: 138px;text-align: center;margin-top:12px;">
+                                    <div style="base-font-size:16px;font-size: 16px;color: #171717;font-weight: bold;"><%=Eval("name")%></div>
+                                </div>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsSelectLevel(Eval("index"))%>'>
+                            <div style="position: relative; width: 138px;height: 42px; background:url(Texture/Aries/Creator/keepwork/AiCourse/btn_qiehuan2_138X42_32bits.png#0 0 138 42)">
+                                <div style="width: 138px;text-align: center;margin-top:12px;">
+                                    <div style="base-font-size:16px;font-size: 16px;color: #e4e4e4;"><%=Eval("name")%></div>
+                                </div>
+                            </div>
+                        </pe:if>
+                        
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </div>
+        <div style="width:725px;height:480px;margin-top:0px;">
+            <pe:gridview name="course_list" style="margin-left:5px;" CellPadding="0" AllowPaging="true" pagesize="8" ItemsPerLine="2 " DefaultNodeHeight="50"
+                        DataSource='<%=CourseListData%>'>
+                <PagerSettings Position="Bottom" height="36" style="position:relative;width:725px;margin-top:2px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
+                <PagerTemplate>
+                    <form>
+                        <input type="button" name="pre" zorder="2" style="width:18px;height:22px;margin-left:318px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan2_18X22_32bits.png#0 0 18 22);"/>
+                        <div style="float:left;margin-top:0px;text-singleline:true">
+                            <label name="page" style="base-font-size:22px;font-size: 22px;color:#ffffff;text-align:center;width:45px;height:30px;margin:4px"/>
+                        </div>
+                        <input type="button" name="next" zorder=2 style="width:18px;height:22px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan1_18X22_32bits.png#0 0 18 22)"/>
+                    </form>
+                </PagerTemplate>
+                <Columns>
+                    <div style="width: 360px; height: 110px;">
+                        <pe:if condition='<%=Eval("IsLock")%>'>
+                            <!-- <input zorder="2" type="button" onclick="" name='<%=Eval("index")%>'  style="position: relative; width: 360px;height: 110px;background: ;"/> -->
+                            <img zorder="4" class="invalid_mask" style="position:relative;margin-left:0px;margin-top:0px;width:360px;height:110px;" bindtooltip='<%=GetTooltip(Eval("lock_desc"))%>'/>
+
+                            <div zorder="2" style="position: relative; margin-left: 5px; margin-top: 5px; width: 349px;height: 99px; background:url(Texture/Aries/Creator/keepwork/AiCourse/heidi_32X32_32bits.png#0 0 32 32:4 4 4 4)">
+                                <div zorder="3" style="margin-top: 5px;margin-left: 290px; width: 46px;height: 46px; background:url(Texture/Aries/Creator/keepwork/AiCourse/suo_46X46_32bits.png#0 0 46 46)"> </div>
+                            </div>
+                        </pe:if>
+
+                        <img zorder="1" class="invalid_mask" onclick="SelectCourse" name='<%=Eval("index")%>' style="position:relative;margin-left:0px;margin-top:0px;width:360px;height:110px;" bindtooltip='<%=GetTooltip(Eval("description"))%>'/>
+                        <!-- <input zorder="1" type="button" onclick="SelectCourse" name='<%=Eval("index")%>' style="position: relative; width: 360px;height: 110px;background: ;"/> -->
+
+                        <pe:if condition='<%=IsSelectCourse(Eval("index"))%>'>
+                            <div style="position: relative; width: 358px;height: 108px; background:url(Texture/Aries/Creator/keepwork/AiCourse/k2_358X108_32bits.png#0 0 358 108)"></div>
+                        </pe:if>
+                        <pe:if condition='<%=not IsSelectCourse(Eval("index"))%>'>
+                            <div style="position: relative; width: 358px;height: 108px; background:url(Texture/Aries/Creator/keepwork/AiCourse/k1_358X108_32bits.png#0 0 358 108)"></div>
+                        </pe:if>
+
+                        <!-- <pe:if condition='<%=Eval("isVip") == 1 %>'>
+                            <div zorder="5" style="position: relative; width: 48px;height: 53px; margin-top: -5px;margin-left: -8px; background:url(Texture/Aries/Creator/keepwork/AiCourse/VIP_48X53_32bits.png#0 0 48 53)"></div>
+                        </pe:if> -->
+
+                        <!-- <pe:if condition='<%=IsShowCourseCheckTag(Eval("index"))%>'>
+                            <div zorder="1" style="position: relative; font-size: 12px; margin-left: 12px; width:128px;height:26px;margin-top:72px; background-color: #414141; color: #ffffff;">   
+                                <pe:container zorder="1" width="128" height="26" style="background:" onclick="">
+                                    <div style="text-align: center;color: #ffffff;margin-top: 4px;font-size: 13px;">
+                                        <%=GetCourseCheckDesc(Eval("index"))%>
+                                    </div>
+                                </pe:container>
+                            </div>
+                        </pe:if> -->
+
+                        <!-- <div style="<%= 'width: 256px;height: 128px;background: url(' .. (Eval('imageUrl') and Eval('imageUrl') or '') .. ')' %>"></div> -->
+                        <!-- <div style="width: 262px;height: 174px;background: url(http://qiniu-dev.keepwork.com/2-259c3c28-751c-4fa0-afa6-b41c7cac3e1b.jpg?e=4765940093&token=LYZsjH0681n9sWZqCM4E2KmU6DsJOE7CAM4O3eJq:StoKBEd96QeX9_ar8PRPRBCe0MY=);"></div> -->
+                        <!-- <img zorder="10" src='http://api.keepwork.com/ts-storage/siteFiles/15270/raw#商城商品1.png' width="256" height="128"/> -->
+                        <pe:if condition='<%=IsWorldType(Eval("index"))%>'>
+                            <img zorder="0" style="margin-top: 17px;margin-left: 12px;float: left;" src='<%=GetWorldIconUrl(Eval("index"))%>' width="128" height="72"/>
+                        </pe:if>
+                        <pe:if condition='<%=not IsWorldType(Eval("index"))%>'>
+                            <img zorder="0" style="margin-top: 11px;margin-left: 12px;float: left;" src='<%=GetWorldIconUrl(Eval("index"))%>' width="128" height="86"/>
+                        </pe:if>
+                        
+                        <div style="width: 134px; height: 110px; float: left;">
+                            <div style="width: 134px; float: left;base-font-size:16px;font-size: 16px;margin-top: 12px;margin-left: 12px;position: relative;"><%=Eval("name")%></div>
+                            <div style="width: 134px; float: left;base-font-size:14px;font-size: 14px;margin-top: 58px;margin-left: 12px;color: #ff7529;position: relative;">
+                                <!-- <%=Eval("level_start_div")%> -->
+                            </div>
+                            
+                            <!-- <div style="width: 134px; float: left;base-font-size:12px;font-size: 12px;margin-top: 83px;margin-left: 12px;color: #999999;position: relative;"><%=Eval("time_desc")%></div> -->
+                        </div>
+                        <div style="width: 70px; height: 110px; float: left;">
+                            <!-- <div style="margin-left: 5px; width:64px;height:30px;margin-top:28px;">
+                                <input zorder="0" name='<%=Eval("index")%>' value="去上课" onclick="GotoClass" type="button" style="font-size: 14px;position: relative; width:64px;height:30px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn1_64X30_32bits.png#0 0 64 30)"/>
+                                <div ClickThrough="true" style="position: relative;margin-top: 4px;margin-left: 16px;">去上课</div>
+                            </div> -->
+                            <input zorder="1" name='<%=Eval("index")%>' tooltip="进入课程" value="" onclick="GotoClass" type="button" style="font-size: 12px; margin-left: 20px; width:46px;height:46px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn2_46X46_32bits.png#0 0 46 46)"/>
+                            <!-- <pe:if condition='<%=HasWork(Eval("index"))%>'>
+                                <input zorder="1" name='<%=Eval("index")%>' tooltip="进入练习"  value="" onclick="ClickWork" type="button" style="font-size: 12px; margin-left: 20px; width:46px;height:46px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/AiCourse/btn1_46X46_32bits.png#0 0 46 46)"/>
+                            </pe:if> -->
+                            
+                        </div>
+                        
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </div>
+
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

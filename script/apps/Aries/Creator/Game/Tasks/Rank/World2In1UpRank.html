@@ -1,0 +1,55 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Rank/World2In1UpRank.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="World2In1UpRank.lua"><![CDATA[
+local World2In1UpRank = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/World2In1UpRank.lua");
+World2In1UpRank.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    World2In1UpRank.CloseView()
+end
+
+function GoNow()
+    World2In1UpRank.GoNow()
+end
+
+function ToCreate()
+    World2In1UpRank.ToCreate()
+end
+]]></script>
+<kp:window name="iframe" width="632" height="443" onclose="ClosePage">
+    <div style="color:#000000;" class="kp_window_container">
+        <div style="margin-left: 15px;margin-top:15px; width: 596px; height: 363px;background: url(Texture/Aries/Creator/keepwork/rank/BJK2_32bits.png#0 0 32 32:8 8 8 8);">
+            <div style="width: 505px;height: 306pxs; margin-left: 45px;margin-top: 25px;">
+                <div style="font-weight: bold;base-font-size:28px; font-size: 28px;">如何提升排名？</div>
+                <div style="margin-left: 0px;margin-top: 15px; font-weight: bold;base-font-size:18px; font-size: 18px;">本榜单统计数据为作品的点赞数量，每次点赞都可获得1分。</div>
+                <div style="margin-left: 0px;margin-top: 0px; font-weight: bold;base-font-size:18px; font-size: 18px;">可以通过以下方式来提升你的作品点赞数量：</div>
+                <div style="width: 489px;height: 117px;">
+                    <div style="width: 393px;float: left;">
+                        <div style="margin-left: 0px;margin-top: 5px;base-font-size:16px; font-size: 16px;">1.分享短视频到朋友圈，请父母，同学，好友点赞</div>
+                        <div style="margin-left: 0px;margin-top: 5px;base-font-size:16px; font-size: 16px;">2.每天创造世界，可以领取点赞奖励</div>
+                        <div style="margin-left: 0px;margin-top: 5px;base-font-size:14px; font-size: 14px;">每次打开排行榜都会刷新至当前最新排名</div>
+                    </div>
+                    <div style="float: left;">
+                        <input type="button" onclick="GoNow" style="float:left;margin-left:0px;margin-top: 0px; width:86px;height:29px;background:url(Texture/Aries/Creator/keepwork/rank/btn2_86X29_32bits.png#0 0 86 29)" />
+                        <input type="button" onclick="ToCreate" style="float:left;margin-left:0px;margin-top: 7px; width:86px;height:29px;background:url(Texture/Aries/Creator/keepwork/rank/btn3_86X29_32bits.png#0 0 86 29)" />
+                    </div>
+                </div>
+    
+                <input type="button" style="float: left; margin-left: 385px; margin-top:46px;width: 111px; height:44px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="ClosePage" value='<%=L"确定"%>' />
+            </div>
+        </div>
+    </div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

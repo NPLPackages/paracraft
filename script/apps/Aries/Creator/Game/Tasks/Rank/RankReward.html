@@ -1,0 +1,95 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Rank/RankReward.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="RankReward.lua"><![CDATA[
+local RankReward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/RankReward.lua");
+RankReward.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    RankReward.CloseView()
+end
+
+function Button_DS_Items(index)
+    if(index == nil) then
+        return #RankReward.RewardData;
+    else
+        return RankReward.RewardData[index];
+    end
+end
+
+function IsRoleModel(item_data)
+    return RankReward.IsRoleModel(item_data)
+end
+
+function GetItemDesc(data)
+    if data.goods and data.goods.name then
+        return data.goods.name
+    end
+    return ""
+end
+
+function GetGiftItemGId(item_data)
+    local gsid = item_data.gsId or 998
+    return gsid
+end
+]]></script>
+<kp:window name="iframe" width="679" height="434" onclose="ClosePage">
+<div style="margin-top: 10px;margin-left: 10px; position: relative;width: 97px;height: 25px;background: url(Texture/Aries/Creator/keepwork/rank/zi13_97X25_32bits.png#0 0 97 25);"></div>
+<div style="color:#ffffff;width:679;height:395x" class="kp_window_container">
+    <div type ="box" style="width:662px;height:380px;margin-left: 4px;margin-top: 10px;float: left;">
+        <pe:gridview style="margin:0px;width:662px;height:380px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+            DataSource='<%=Button_DS_Items%>'>
+            <Columns>
+                    <div name="item_root" style="color:#ffffff;width: 642px;height: 54px;background: url(Texture/Aries/Creator/keepwork/rank/tiao2_32X32_32bits.png#0 0 32 32:13 13 13 13);">
+                        <div style="width: 146px;height: 54px;float: left;">
+                            <div style="margin-left: 20px; margin-top: 16px; width: 100px;height: 24px;background:url(Texture/Aries/Creator/keepwork/rank/shuzidi_32X24_32bits.png#0 0 32 24:13 8 13 8);">
+                                <div style="text-align: center;width: 100px;margin-top: 2px;"><%=Eval("name")%></div>
+                            </div>
+                        </div>
+
+                        <div style="width: 490px;height:54px;float: left;">
+                            <div type ="box" style="float:left;width:410px;height:60px;margin-left: 5px;margin-top: 3px;background:;">
+                                <pe:gridview style="width:410px;height:60px;float:left" RememberScrollPos="true" name="" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "35" 
+                                    DataSource='<%=Eval("goods_data")%>'>
+                                    <Columns>
+                                            <div style="width: 50px;height: 38px;">
+                                                <div style="margin-left: 0px;margin-top: 0px;width: 38px;height: 38px;background: url(Texture/Aries/Creator/keepwork/rank/wupingk_38X38_32bits.png#0 0 38 38);">
+                                                    <div zorder="1" tooltip='<%=GetItemDesc(XPath("this"))%>' style="width: 38px; height: 38px; position: relative;"></div>
+                                                    <pe:if condition = '<%=IsRoleModel(XPath("this|goods"))%>'>
+                                                        <kp:item gsid='<%=GetGiftItemGId(XPath("this|goods")) %>' isclickable='false' style="margin-top: 4px;margin-left: 6px; position: relative; width:28px;height:28px;"/>
+                                                    </pe:if>
+                                                    <pe:if condition = '<%=not IsRoleModel(XPath("this|goods")) %>'>
+                                                        <kp:item gsid='<%=GetGiftItemGId(XPath("this|goods")) %>' isclickable='false' style="margin-top: 8px;margin-left: -3px; position: relative; width:46px;height:23px;"/>
+                                                    </pe:if>
+                                                    <div style="width: 30px;text-align: center; margin-top: 21px;margin-left: 12px;text-align: center;color: #ffffffff;font-weight: bold;text-shadow:true;shadow-quality:8;font-size: 12px;base-font-size:12px"><%=Eval("amount") %></div>  
+                                                </div>    
+                                            </div>
+                
+                                    </Columns>
+                                    <EmptyDataTemplate>
+                                    </EmptyDataTemplate>
+                                </pe:gridview>
+                            </div>  
+                        </div>  
+                </div>                   
+                    
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+</div>
+
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

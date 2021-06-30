@@ -170,18 +170,22 @@ function Files:UnloadAllUnusedAssets()
 	local textureManager = assetManager:GetChild("TextureManager")
 	for i=1, textureManager:GetChildCount(0) do
 		local attr = textureManager:GetChildAt(i)
+		
+		-- TODO: remove this line
+		LOG.std(nil, "debug", "Files", "texture file: %s, Inited: %s, Ref:%d", attr:GetField("name", ""), tostring(attr:GetField("IsInitialized", false)), attr:GetField("RefCount", 1));
+
+
 		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
 			local filename = attr:GetField("name", "");
 			if(filename ~= "") then
 				local ext = filename:match("%.(%w+)$");
 				-- also release http textures
 				if(not ext and filename:match("^https?://")) then
-					local localFilename = attr:GetField("LocalFileName", "")	
-					ext = localFilename:match("^temp/webcache/.*%.(%w+)$");
+					ext = "http";
 				end
 				if(ext) then
 					ext = string.lower(ext)
-					if(ext == "jpg" or ext == "png" or ext == "dds") then
+					if(ext == "jpg" or ext == "png" or ext == "dds" or ext == "http") then
 						ParaAsset.LoadTexture("", filename, 1):UnloadAsset();
 						LOG.std(nil, "info", "Files", "unload unused asset file: %s", filename);
 					end
@@ -231,18 +235,18 @@ function Files:UnloadAllWorldAssets()
 	local textureManager = assetManager:GetChild("TextureManager")
 	for i=1, textureManager:GetChildCount(0) do
 		local attr = textureManager:GetChildAt(i)
+		
 		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
 			local filename = attr:GetField("name", "");
 			if(filename ~= "") then
 				local ext = filename:match("worlds/DesignHouse/.*%.(%w+)$") or filename:match("temp/.*%.(%w+)$");
 				-- also release http textures
 				if(not ext and filename:match("^https?://")) then
-					local localFilename = attr:GetField("LocalFileName", "")	
-					ext = localFilename:match("^temp/webcache/.*%.(%w+)$");
+					ext = "http";
 				end
 				if(ext) then
 					ext = string.lower(ext)
-					if(ext == "jpg" or ext == "png") then
+					if(ext == "jpg" or ext == "png"  or ext == "dds" or ext == "http") then
 						ParaAsset.LoadTexture("", filename, 1):UnloadAsset();
 						LOG.std(nil, "info", "Files", "unload world asset file: %s", filename);
 					end

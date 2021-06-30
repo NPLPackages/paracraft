@@ -1,0 +1,25 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraViewport.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="CameraViewport.lua">
+            <![CDATA[
+            CameraViewport = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraViewport.lua");
+            CameraViewport.OnInit();
+            ]]>
+        </script>
+        <pe:container ClickThrough="true" alignment="_fi" width="100%" height="100%" style="position:relative;background:url()">
+            <div style="margin-top:200px;">
+                <input type="button" name="OK" hotkey="DIK_RETURN" style="margin-left:80px;min-width:84px;height:30px;" class="kp_yellow_button" onclick="CameraViewport.OnOK" value='<%=string.format(L"确定%d号机位", CameraViewport.GetIndex())%>' />
+                <input type="button" name="Cancel" style="margin-left:60px;min-width:84px;height:30px;" class="kp_gray_button" onclick="CameraViewport.OnClose" value='<%=L"取消"%>' />
+            </div>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>
+

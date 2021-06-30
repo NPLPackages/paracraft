@@ -1,0 +1,64 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="WorldKeyDecodePage.lua"><![CDATA[
+local WorldKeyDecodePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyDecodePage.lua");
+WorldKeyDecodePage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    WorldKeyDecodePage.CloseView()
+end
+
+function Paste()
+    WorldKeyDecodePage.Paste()
+end
+
+function GetTitle()
+    return WorldKeyDecodePage.title_text
+end
+
+function GetDesc()
+    return WorldKeyDecodePage.desc
+end
+
+function DecodeWorld()
+    WorldKeyDecodePage.DecodeWorld()
+end
+
+function ToBuy()
+    WorldKeyDecodePage.ToBuy()
+end
+
+function OnTextChange()
+    WorldKeyDecodePage.OnTextChange()
+end
+]]></script>
+<kp:window name="iframe" width="510" height="345" icon=""   onclose="ClosePage">
+    <div style="position: relative; margin-top: 8px;margin-left: 18px; width: 97px;height: 26;background: url(Texture/Aries/Creator/keepwork/WorldKey/zi_97X26_32bitsi.png#0 0 97 26);"></div>
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div style="position: relative; margin-top: -34px;margin-left: 0px; width: 506px;height: 338px;background: url(Texture/Aries/Creator/keepwork/WorldKey/bjk_506X338_32bits.png#0 0 506 338);">
+
+            <pe:container uiname="decode_wxcode_root" style="margin-left: 358px;margin-top: 123px; float: left;width: 110;height: 110;"></pe:container>
+            <div style="width: 510px; height: 60px;margin-top: 38px;">
+                <div style="float: left; margin-left:15px;margin-top:5px;width:360px;height:32px;background:url(Texture/Aries/Creator/keepwork/WorldKey/shuzishuru_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                    <input type="text" onchange="OnTextChange" EmptyText='<%=L"请输入激活码"%>' class="mc_text" name="key_text" style="font-size: 12px; margin-top:4px;margin-left:5px;height:24px;background:;" />
+                    <!-- <input type="button" value="粘贴" onclick="Paste" style="float: left;color: #000000;margin-left: -58px; margin-top: -1px;font-size: 14pt;width: 58px;height: 36px; background:url(Texture/Aries/Creator/keepwork/WorldKey/btn_zhantie_32X32_32bits.png#0 0 32 32:8 8 8 8)" /> -->
+                </div>
+                <input type="button" style="float: left; margin-left: 8; margin-top:0px;min-width:114px;height:44px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="DecodeWorld" value='<%=L"激活世界"%>' />
+            </div>
+        </div>
+
+    </div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

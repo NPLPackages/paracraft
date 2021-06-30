@@ -47,7 +47,8 @@ end
 
 function PhysicsWorld:AddStaticTrigger(triggerObject)
 	local left, top, right, bottom = triggerObject:GetQuadSize();
-	PhysicsWorld.triggerQuadTree:AddObject(triggerObject, left, top, right, bottom);
+	local fromHeight, toHeight = triggerObject:GetHeightMinMax();
+	PhysicsWorld.triggerQuadTree:AddObject(triggerObject, left, top, right, bottom, fromHeight, toHeight);
 end
 
 function PhysicsWorld:RemoveStaticTrigger(triggerObject)
@@ -165,7 +166,7 @@ function PhysicsWorld.UpdateTriggers()
 	local player = EntityManager.GetPlayer();
 	if(player) then
 		local x, y, z = player:GetBlockPos()
-		local triggers = triggerQuadTree:GetObjectsByPoint(x, z)
+		local triggers = triggerQuadTree:GetObjectsBy3DPoint(x, y, z)
 		player:SetInsideTriggers(triggers);
 	end
 end

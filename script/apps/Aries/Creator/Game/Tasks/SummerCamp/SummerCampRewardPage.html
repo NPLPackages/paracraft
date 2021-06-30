@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+local SummerCampRewardPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampRewardPage.lua");
+SummerCampRewardPage.OnInit()
+function GetItemData()
+    return SummerCampRewardPage.ItemData
+end
+
+function GetRewardData()
+    return SummerCampRewardPage.RewardData
+end
+
+function OnclickGetReward()
+    SummerCampRewardPage.OnclickGetReward()
+end
+
+function OnMouseEnter(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampRewardPage.OnMouseEnter(index)
+end
+function OnMouseLeave(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampRewardPage.OnMouseLeave(index)    
+end
+    
+]]></script>
+<div style=" width: 1035px; height: 623px;">
+    <div style="height: 465px;">
+        <pe:repeat DataSource="<%=GetItemData()%>">
+            <pe:repeatitem>
+                <div style="float: left; margin-left: 15px;margin-top: 0px; float: left; width: 237px;height: 451px;;">                    
+                    <img zorder="0" src='<%=Eval("item_bg")%>' style="position: relative; margin-left: 0px;margin-top: 10px;" width="237" height="451"/>
+                    <img zorder="0" src='<%=Eval("state_icon")%>' style="margin-left: 60px;margin-top: 226px;" width="125" height="60"/>
+                </div>
+    
+            </pe:repeatitem>
+        </pe:repeat>        
+    </div>
+    <div style="">
+        <div style="float: left; width: 174px;height: 153px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/img_3_174x153_32bits.png#0 0 174 153);"></div>
+        <div style="width: 860px;float: left;margin-left: 0px;">
+            <div style="position: relative;margin-left: -20px; margin-top: 78px; width: 845px;height: 24px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/prog_3_845x24_32bits.png#0 0 845 24);">
+
+            </div>
+            <pe:repeat DataSource="<%=GetRewardData()%>">
+                <pe:repeatitem>
+                    <div style="float: left; margin-left: 10px;margin-top: 0px; float: left; width: 200px;height: 153px;">    
+                        <div style="position: relative;width: 128px;height: 128px; margin-left: 0px;margin-top: 5px;">
+                            <input zorder="1" type="button" style="position: relative;background:;" onclick="OnclickGetReward" param1='<%=Eval("index")%>' width="128" height="128" onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave"/>                
+                            <img zorder="0" src='<%=Eval("icon")%>' style="position: relative;margin-left: 0px;margin-top: 0px;" width="128" height="128"/>
+                        </div>
+
+                        <img zorder="0" uiname='<%=Eval("reward_icon_uiname")%>' src='<%=Eval("reward_icon")%>' style="position: relative; margin-left: 80px;margin-top: -45px;" width="112" height="78"/>
+                    </div>
+        
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

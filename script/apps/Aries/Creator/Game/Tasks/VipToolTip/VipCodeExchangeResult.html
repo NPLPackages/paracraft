@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local VipCodeExchangeResult = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchangeResult.lua");
+    VipCodeExchangeResult.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+    function OnClick()
+        local code = Page:GetValue("vipcode")
+        VipCodeExchangeResult.Exchange(code)
+    end
+
+    function GetDesc()
+        return VipCodeExchangeResult.desc
+    end
+]]></script>
+<div style="width: 400px;height: 200px; background: url(Texture/Aries/Creator/keepwork/ActRedhat/tipbj_32bits.png#0 0 32 32:16 16 8 8);">
+    <!-- <input type="button" style="margin-left: 368; margin-top: 6px; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/ActRedhat/tipX_19X20_32bits.png#0 0 20 20);" onclick="ClosePage()"/> -->
+    <div style="margin-top: 20px;">            
+        <div style="position:relative; text-align: center; font-size: 20px; base-font-size: 20x; color: #ffffff;">
+            <%=GetDesc()%>
+        </div>
+        <input type="button" class="" value="确定" style=" font-size: 16px ;base-font-size: 16px ; font-weight: bold;margin-left:150px;margin-top: 90px; width:100px;height:40px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16)" onclick="ClosePage()"/>
+    </div>        
+</div>
+</pe:mcml>
+</body>
+</html>

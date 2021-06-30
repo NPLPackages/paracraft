@@ -796,7 +796,7 @@ function QuestAction.GetSummerTaskProgress(gsid)
     return 0
 end
 
-function QuestAction.SetSummerTaskProgress(gsid, change_value)
+function QuestAction.SetSummerTaskProgress(gsid, change_value, finish_cb)
     local is_task_finish = QuestAction.CheckSummerTaskFinish(gsid)
     if is_task_finish then
         return
@@ -822,7 +822,7 @@ function QuestAction.SetSummerTaskProgress(gsid, change_value)
 
     local value = client_data.summer_progress_data[gsid].value or 0
     if value >= task_data.max_pro then
-        -- QuestAction.SummerTaskDoFinish(gsid)
+        QuestAction.SummerTaskDoFinish(gsid)
         return
     end
 
@@ -844,6 +844,10 @@ function QuestAction.SetSummerTaskProgress(gsid, change_value)
             KeepWorkItemManager.SetClientData(world2in1_gsid, client_data, function()
                 GameLogic.GetFilters():apply_filters("summer_task_change", gsid);
             end)
+
+            if finish_cb then
+                finish_cb()
+            end
         end)
     else
         client_data.summer_progress_data[gsid].value = value
@@ -958,4 +962,26 @@ function QuestAction.GetCertificateNum()
     end
 
     return client_data.summer_progress_data.certificate_num or 0
+end
+-- GameLogic.QuestAction.ChangeFirstPerson(true)
+function QuestAction.ChangeFirstPerson(is_change)
+    if is_change then
+        GameLogic.RunCommand("/fps 1");
+        ParaUI.Destroy("FPS_Cursor");
+        -- commonlib.TimerManager.SetTimeout(function()  
+        --     local _this = ParaUI.GetUIObject("FPS_Cursor");
+        --     --print("ccccccccccccccc", _this:IsValid())
+        --     if _this:IsValid() then
+        --         _this.visible = false;
+        --     end
+        -- end, 1000);
+    else
+        GameLogic.RunCommand("/fps 0");
+    end
+end
+
+function QuestAction.CreateBlock(x,y,z,block_id,side)
+    local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+    local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x,blockY = y, blockZ = z, block_id = block_id, side = side, entityPlayer = EntityManager.GetPlayer()})
+    task:Run();
 end

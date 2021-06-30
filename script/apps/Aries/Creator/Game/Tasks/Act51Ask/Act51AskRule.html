@@ -1,0 +1,29 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskRule.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Act51AskRule.lua"><![CDATA[
+local Act51AskRule = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskRule.lua");
+Act51AskRule.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    Act51AskRule.CloseView()
+end
+
+]]></script>
+<kp:window name="iframe" width="960" height="635" icon=""   onclose="ClosePage">
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div style="margin-top: -40px;margin-left: -2px; width: 960px;height: 642;background: url(Texture/Aries/Creator/keepwork/Act51Ask/help_bg_32bits.png#0 0 960 642);"></div>
+    </div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

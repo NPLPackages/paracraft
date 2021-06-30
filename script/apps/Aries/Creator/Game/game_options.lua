@@ -349,7 +349,9 @@ function options:OnLoadWorld()
 			EntityManager.GetPlayer():SetMainAssetPath(mainAssetFilename)
 		end
 		local mainSkins = self:GetMainPlayerSkins();
-		EntityManager.GetPlayer():SetSkin(mainSkins);
+		if(mainSkins) then
+			EntityManager.GetPlayer():SetSkin(mainSkins);
+		end
 		
 		player:SetScale(1);
 		self.jump_up_speed = 5*1.3;

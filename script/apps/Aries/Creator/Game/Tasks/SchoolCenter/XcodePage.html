@@ -1,0 +1,49 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/SchoolCenter/XcodePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="XcodePage.lua"><![CDATA[
+local XcodePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/XcodePage.lua");
+XcodePage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    XcodePage.CloseView()
+end
+
+function GetXcodeImg()
+    return XcodePage.GetXcodeImg()
+end
+]]></script>
+<style type="text/mcss">
+    {
+        xcode_class = {
+            background = "Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8",
+            ["margin-top"] = 13,
+            ["margin-left"] = 130,
+            width = 128,
+            height = 128,
+        },
+    }
+</style>
+
+<kp:window name="iframe" mode="lite" width="392" height="300" title="二维码"   onclose="ClosePage">
+    <div style="color:#ffffff;" class="kp_window_container">
+        <div style="margin-top: 10px; text-align: center; width: 392px;base-font-size:22px; font-size: 22px; font-weight: bold;color: #000000;">请扫描二维码，进行操作</div>
+        <div class="xcode_class" style='<%=GetXcodeImg()%>'></div>
+
+        <input type="button" style="margin-left: 137; margin-top:17px;min-width:114px;height:44px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="ClosePage" value='<%=L"关闭"%>' />
+    </div>
+
+
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+local SummerCampTaskPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampTaskPage.lua");
+SummerCampTaskPage.OnInit()
+
+function GetTaskData(index)
+    if(index == nil) then
+        return #SummerCampTaskPage.TaskData;
+    else
+        return SummerCampTaskPage.TaskData[index];
+    end
+end
+
+function GetProgressBarValue(index)
+    return SummerCampTaskPage.GetProgressBarValue(index)
+end
+
+function GetReward(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampTaskPage.GetReward(index)
+end
+
+function Goto(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampTaskPage.Goto(index)
+end
+
+]]></script>
+<div style=" width: 1035px; height: 623px;">
+    <div type ="box" style="width:1030px;height:620px;margin-left: 4px;margin-top: 5px;float: left;">
+        <pe:gridview style="margin:0px;width:1030px;height:620px;float:left" RememberScrollPos="true" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+            DataSource='<%=GetTaskData%>'>
+            <Columns>
+                    <div name="item_root" style="color:#000000;width: 994px;height: 117px;float: left;">
+                       <div style="position:relative;margin-left:0px;margin-top:0px;">
+                           <img zorder="-1" src='<%=Eval("bg_img") %>'width="994" height="112"/>
+                       </div>
+                       <pe:if condition='<%=Eval("is_summer_task")%>'>
+                           <div style="position:relative;margin-top: 0px;margin-left: 0px; width: 69px;height: 62px; background: Texture/Aries/Creator/keepwork/SummerCamp/icon_main_60x56_32bits.png#0 0 60 56;"></div>
+                       </pe:if>
+                    
+                       <div style="width: 420px; height:112px; float: left;">
+                            <pe:if condition='<%=Eval("is_summer_task")%>'>
+                                <div style="width: 323px;base-font-size:32px; font-size:32px; margin-left: 0px; margin-top: 14px;float: left;font-weight: bold;text-align: center;"><%=Eval("name") %></div>
+                                <div style="width: 323px;base-font-size:24px; font-size:24px; margin-left: 0px; margin-top: 2px;text-align: center;"><%=Eval("task_desc") %></div>
+                            </pe:if>
+                            <pe:if condition='<%=not Eval("is_summer_task")%>'>
+                                <div style="width: 390px;base-font-size:22px; font-size:22px; margin-left: 30px; margin-top: 20px;float: left;font-weight: bold;"><%=Eval("name") %></div>
+                                <div style="width: 390px;base-font-size:20px; font-size:20px; margin-left: 30px; margin-top: 2px;color:#666666;"><%=Eval("task_desc") %></div>
+                            </pe:if>
+                       </div>
+
+                       <div style="width: 399px;height:112px;float: left">
+                            <pe:if condition='<%=Eval("is_show_progress")%>'>
+                                <div style="width: 399px;height: 47px; margin-left:0px;margin-top:34px;position: relative;background: Texture/Aries/Creator/keepwork/SummerCamp/prog_2_399x47_32bits.png#0 0 399 47;">
+                                    <pe:progressbar name="expbar" Minimum = "0" Maximum = '<%=Eval("max_pro")%>' Value = '<%=Eval("value")%>' Step = "1"
+                                    style="width:399px;height:47px;" miniblockwidth="15"
+                                    blockimage="Texture/Aries/Creator/keepwork/SummerCamp/prog_1_399x47_32bits.png;0 0 399 47"
+                                    background=""
+                                    />
+                                </div>
+    
+                                <div style="width: 399px;height:112px;base-font-size:22px; font-size:22px; margin-left: 0px; margin-top: 43px;color:#000000;text-align: center;"><%=Eval("task_pro_desc")%></div>
+                            </pe:if>                            
+
+                        </div>
+
+                       <div name="button_list" style="width: 165px; height:112px; float: left;">
+                           <pe:if condition = '<%=Eval("task_state") == 0%>'>
+                            <div style="margin-left: 23px; margin-top: 28px; width: 127px;height: 60px;background:Texture/Aries/Creator/keepwork/SummerCamp/bt_weida_125x60_32bits.png#0 0 125 60;"></div>
+                           </pe:if>
+
+                           <pe:if condition = '<%=Eval("task_state") == 1%>'>
+                            <input type="button" onclick="GetReward" param1 = '<%=Eval("index") %>' style="margin-left: 23px; margin-top: 28px;width: 127px;height: 59px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/bt_get_127x59_32bits.png#0 0 127 59)" />
+                           </pe:if>
+
+                           <pe:if condition = '<%=Eval("task_state") == 2%>'>
+                                <div style="margin-top: 18px;margin-left: 50px; width: 77px;height: 77px;background:Texture/Aries/Creator/keepwork/SummerCamp/icon_finish_77x77_32bits.png#0 0 77 77;"></div>
+                           </pe:if>
+
+                           <pe:if condition = '<%=Eval("task_state") == 3%>'>
+                            <input type="button" onclick="Goto" param1 = '<%=Eval("index") %>' style="margin-left: 23px; margin-top: 28px;width: 127px;height: 59px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/bt_go_127x59_32bits.png#0 0 127 59)" />
+                           </pe:if>
+
+                           
+                       </div>
+                    </div>
+
+                    
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

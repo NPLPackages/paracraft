@@ -34,7 +34,7 @@ end
 function VipToolNew.Show(from)
     local platform = System.os.GetPlatform()
     if platform == 'ios' or platform == 'mac' then
-        _guihelper.MessageBox(L'会员相关功能只能在windows平台使用');
+        _guihelper.MessageBox(L'苹果系统暂时不支持开通会员。请下载Windows版本体验会员功能或关注“帕拉卡”微信小程序了解更多。');
         return;
     end
     VipToolNew.from = from or "main_icon"
@@ -97,15 +97,20 @@ function VipToolNew.ShowPage()
 end
 
 function VipToolNew.OnCreate()
-    if System.os.IsTouchMode() then
-        return 
-    end
+    -- if System.os.IsTouchMode() then
+    --     return 
+    -- end
     local parent  = page:GetParentUIObject()
     local qrcode_width = 140
     local qrcode_height = 140
     local block_size = qrcode_width / #VipToolNew.qrcode
 
-    local qrcode = ParaUI.CreateUIObject("container", "qrcode_vip_tool", "_lt", 558, 147, qrcode_width, qrcode_height);
+    local startY = 147
+    if System.os.IsTouchMode() then
+        startY = 86
+    end
+
+    local qrcode = ParaUI.CreateUIObject("container", "qrcode_vip_tool", "_lt", 558, startY, qrcode_width, qrcode_height);
     qrcode:SetField("OwnerDraw", true); -- enable owner draw paint event
     qrcode:SetField("SelfPaint", true);
     qrcode:SetScript("ondraw", function(test)
@@ -127,6 +132,9 @@ end
 
 
 function VipToolNew.OnClickbuy()
+    if page then
+        page:CloseWindow()
+    end
     local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua")
 	local userid = Mod.WorldShare.Store:Get('user/userId')
     local url;
@@ -137,7 +145,8 @@ function VipToolNew.OnClickbuy()
 	end
     
     if System.os.IsTouchMode() then
-        GameLogic.RunCommand(string.format("/open -e %s",url))
+        local weixinUrl = "weixin://dl/business/?t=ZbXsre0lSAf"
+        GameLogic.RunCommand(string.format("/open -e %s",weixinUrl))
     else
         ParaGlobal.ShellExecute("open",url, "","", 1);
     end

@@ -226,7 +226,7 @@ function MakeApp:AndroidUpdateManifest(callback)
 						local pLine = string.match(line, '(.+package%=)%"');
 
 						if (pLine) then
-							content = content .. pLine .. '"com.tatfook.paracraft.world.c' .. Encoding.crc32(currentEnterWorld.foldername) .. '"\n' ;
+							content = content .. pLine .. '"com.paraengine.paracraft.world.c' .. Encoding.crc32(currentEnterWorld.foldername) .. '"\n' ;
 						else
 							content = content .. line .. '\n';
 						end

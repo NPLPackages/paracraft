@@ -167,7 +167,7 @@ function CodeIntelliSense.GetSharedAPIGlobals()
 			printStack = dummyFunc,
 			actor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor"),
 			codeblock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock"),
-			GI = globals.GI,
+			GI = GameLogic.GetCodeGlobal():GetSandboxAPI(),
 		}
 		CodeIntelliSense.shared_API = shared_API
 		return shared_API;
@@ -615,16 +615,18 @@ function CodeIntelliSense.ShowContextMenuForWord(word, line, from, to)
 			node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
 		end
 			
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"裁剪" .. "           Ctrl+ X", Name = "Cut", Type = "Menuitem", onclick = nil, }))
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"复制" .. "           Ctrl+ C", Name = "Copy", Type = "Menuitem", onclick = nil, }))
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"粘贴" .. "           Ctrl+ V", Name = "Paste", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"裁剪" .. "           Ctrl + X", Name = "Cut", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"复制" .. "           Ctrl + C", Name = "Copy", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"粘贴" .. "           Ctrl + V", Name = "Paste", Type = "Menuitem", onclick = nil, }))
 		node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"全选" .. "           Ctrl+ A", Name = "SelectAll", Type = "Menuitem", onclick = nil, }))
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"撤销" .. "           Ctrl+ Z", Name = "Undo", Type = "Menuitem", onclick = nil, }))
-		node:AddChild(CommonCtrl.TreeNode:new({Text = L"重做" .. "           Ctrl+ Y", Name = "Redo", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"全选" .. "           Ctrl + A", Name = "SelectAll", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"撤销" .. "           Ctrl + Z", Name = "Undo", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"重做" .. "           Ctrl + Y", Name = "Redo", Type = "Menuitem", onclick = nil, }))
 		node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
-
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"编辑..." .. "", Name = "EditCode", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"添加断点..." .. "", Name = "AddBreakPointHere", Type = "Menuitem", onclick = nil, }))
 		if(word) then
+			node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
 			node:AddChild(CommonCtrl.TreeNode:new({Text = format(L"朗读: %s", word), tag = word, Name = "PronounceIt", Type = "Menuitem", onclick = nil, }))
 			if(word:match("^%w+$")) then
 				node:AddChild(CommonCtrl.TreeNode:new({Text = format(L"翻译: %s ...", word), tag = word, Name = "Dictionary", Type = "Menuitem", onclick = nil, }))
@@ -687,6 +689,50 @@ function CodeIntelliSense.OnClickContextMenuItem(node)
 		GameLogic.RunCommand("/voice ".. node.tag);
 	elseif(name == "Dictionary") then
 		GameLogic.RunCommand("open", format("https://fanyi.baidu.com/#en/zh/"..node.tag));
+	elseif(name == "EditCode") then
+		local codeblock = CodeBlockWindow.GetCodeBlock()
+		if(codeblock) then
+			GameLogic.RunCommand("open", "npl://editcode?src="..codeblock:GetFilename());
+		end
+	elseif(name == "AddBreakPointHere") then
+		CodeIntelliSense:AddBreakPointHere()
+	end
+end
+
+-- static function: set breakpoint in NPL debugger
+function CodeIntelliSense:AddBreakPoint(filename, linenumber)
+	local function AddBreakPoint(baseUrl)
+		baseUrl = baseUrl or "http://127.0.0.1:8099/";
+		System.os.GetUrl({url = baseUrl.."ajax/debugger", form = {
+				action="addbreakpoint",
+				filename = filename,
+				line = tostring(linenumber),
+			}}, 
+			function(err, msg, data)		
+				GameLogic.RunCommand("open", "npl://debugger");
+			end);
+	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
+	local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
+	local isReturned;
+	local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)
+		if(bStarted and isReturned) then
+			AddBreakPoint(site_url)
+		end
+	end)
+	isReturned = true;
+	if(bStarted) then
+		AddBreakPoint(site_url)
+	end
+end
+
+function CodeIntelliSense:AddBreakPointHere()
+	local codeblock = CodeBlockWindow.GetCodeBlock()
+	local ctrl = CodeBlockWindow.GetTextControl()
+	if(codeblock and ctrl) then
+		local linenumber = ctrl:CursorPos().line
+		local filename = codeblock:GetFilename()
+		self:AddBreakPoint(filename, linenumber)
 	end
 end
 

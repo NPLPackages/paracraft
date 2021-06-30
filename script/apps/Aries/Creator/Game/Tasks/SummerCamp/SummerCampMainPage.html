@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua");
+SummerCampMainPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+function GotoWorld()
+    ClosePage()
+    SummerCampMainPage.CloseView()
+end
+
+function OnSelectType(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampMainPage.OnSelectType(tonumber(index))
+end
+
+function GetSelectTypeIndex()
+    return SummerCampMainPage.select_type_index
+end
+
+function GetTypeBtData()
+    return SummerCampMainPage.TypeBtData
+end
+
+function GetWorldImg(index)
+    return SummerCampMainPage.TypeBtData[index].background
+end
+
+function GetTypeBgImg(index)
+    return SummerCampMainPage.GetTypeBgImg(index)
+end
+
+function ClickMap()
+    SummerCampMainPage.ClickMap()
+end
+    
+]]></script>
+<div style=" width: 1107px; height: 715px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/bg_1107x715_32bits.png#0 0 1107 715);">
+    <input type="button" zorder="1" value="" onclick="ClosePage" style="position: relative; margin-top: 18px; margin-left:1050px;width:43px;height:48px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/close_43x48_32bits.png#0 0 43 48);"/>
+    <input type="button" zorder="1" value="" onclick="ClickMap" style="position: relative; margin-top: 18px; margin-left:40px;width:73px;height:73px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/ditu_73x73_32bits.png#0 0 73 73);"/>
+    <div style="height: 90px;"></div>
+    <div style="float: left;width: 61px;height: 537px;margin-left: 0px;margin-top: 15px;">
+        <img zorder="0" src='<%=GetTypeBgImg()%>' style="position: relative;" width="61" height="537"/>
+        <pe:repeat DataSource="<%=GetTypeBtData()%>">
+            <pe:repeatitem>
+                <div onclick='OnSelectType' param1='<%=Eval("index")%>'  style="margin-left: 0px;margin-top: 0px; float: left; width: 61px;height: 179px;;">                    
+                    <!-- <img zorder="0" src='<%=GetWorldImg(Eval("index"))%>' style="position: relative;margin-left: 93px;margin-top: 10px;" width="62" height="15"/> -->
+                </div>
+
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+
+    <pe:container uiname="child_view_node" style="margin-left: 10px; float: left; width: 1035px;height: 623px; background: ;" zorder="1">
+    </pe:container>
+</div>
+</pe:mcml>
+</body>
+</html>

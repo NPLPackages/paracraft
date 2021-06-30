@@ -1,0 +1,62 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/World2In1/NotItemPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="NotItemPage.lua"><![CDATA[
+local NotItemPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/NotItemPage.lua");
+NotItemPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    NotItemPage.CloseView()
+end
+
+function WorldListData(index)
+    if(index == nil) then
+        return #NotItemPage.WorldListData;
+    else
+        return NotItemPage.WorldListData[index];
+    end
+end
+
+function OnClickCreate()
+    NotItemPage.OnClickCreate()
+end
+
+function OnClickSelect(index)
+    index = tonumber(index)
+    NotItemPage.OnClickSelect(index)
+end
+
+function OnClickDelete()
+    NotItemPage.OnClickDelete()
+end
+
+function GetDesc1()
+    return NotItemPage.GetDesc1()
+end
+]]></script>
+<kp:window name="iframe" width="644" height="413" icon=""   onclose="ClosePage">
+<div style="position: relative;margin-top: 3px; base-font-size:22px;font-size: 22px;font-weight: bold;text-align: center;height: 41px;color: #ffffff;">我的地块</div>
+<div class="kp_window_container">
+    <div style="margin-left: 0px; margin-top: 20px; base-font-size:16;font-size: 16;height: 20px;color: #000000; text-align: center;"><%=GetDesc1()%></div>
+    <div style="margin-left: 20px;margin-top: 45px; width: 618px;height: 178px;">
+        <div style="margin-left: 275px;margin-top:0px; width: 50px; height: 50px;background: url(Texture/Aries/Creator/keepwork/World2In1/BJK6_50X50_32bits.png#0 0 50 50);"></div>
+        <div style="margin-left: 0px;margin-top: 10px; text-align: center;color: #000000;base-font-size:24px;font-size: 24px;font-weight: bold;">
+            暂未创建迷你地块， 快点击下方按钮去创建新地块吧！
+        </div>
+    </div>
+
+    <input type="button" width="142" height="48" value="创建" onclick="OnClickCreate" style="font-size: 16px; margin-left: 480px;margin-top: 45px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan1_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
+</div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+
