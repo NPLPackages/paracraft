@@ -155,6 +155,10 @@ function QuestProvider:OnInit()
         Act51AskAlert.CheckGetVipItem()
     end);
 
+    GameLogic.GetFilters():add_filter("OnWorldLoaded", function()
+        GameLogic.QuestAction.OnWorldLoaded()
+    end);
+
     QuestProvider:GetInstance():OnInit__();
 
 end

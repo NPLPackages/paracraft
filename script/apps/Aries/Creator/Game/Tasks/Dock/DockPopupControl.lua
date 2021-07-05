@@ -12,6 +12,8 @@ local KeepWorkItemManager = NPL.load('(gl)script/apps/Aries/Creator/HttpAPI/Keep
 local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua")
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local DockPopupControl = NPL.export()--commonlib.gettable("MyCompany.Aries.Game.Tasks.Dock.DockPopupControl");
 
 DockPopupControl.popup_index = 1
@@ -26,6 +28,10 @@ function DockPopupControl.StartPopup(bCommand)
     if DockPopupControl.isShow then
         return 
     end
+    if DockPopupControl.IsInSummerCampWorld() then
+        return 
+    end
+
     DockPopupControl.isShow = true
     DockPopupControl.popup_num = 0
     DockPopupControl.popup_index =1
@@ -38,6 +44,12 @@ function DockPopupControl.GotoNextPopup()
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
         return
     end
+	
+--	local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+--	if(MovieManager:HasActiveCameraPlaying()) then
+--		return
+--	end
+
     DockPopupControl.popup_index = DockPopupControl.popup_index + 1
     if DockPopupControl.popup_index == 2 then
         DockPopupControl.ShowHomeWorkTip()
@@ -53,15 +65,36 @@ function DockPopupControl.StopPopup()
     DockPopupControl.popup_index =1
 end
 
+function DockPopupControl.IsInSummerCampWorld()
+    local id_list = {
+        ONLINE = 70351,
+        RELEASE = 20669,
+    }
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+    local httpwrapper_version = HttpWrapper.GetDevVersion();
+    local world_id = id_list[httpwrapper_version]
+	local project_id = WorldCommon.GetWorldTag("kpProjectId");
+	if project_id == world_id then
+		return true
+	end
+
+	return false
+end
+
 function DockPopupControl.ShowNotice()
     DockPopupControl.popup_num = DockPopupControl.popup_num + 1
-    if (System.options.isDevMode and (System.User.isVipSchool or System.User.isVip)) then
-        local SummerCampNotice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNotice.lua") 
-        SummerCampNotice.ShowView()
-    else
-        if Notice.CheckCanShow() then
-            Notice.Show(0)
-        end  
+    -- if ((System.User.isVipSchool or System.User.isVip)) then
+    --     if not DockPopupControl.IsInSummerCampWorld() then
+    --         local SummerCampNotice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNotice.lua") 
+    --         SummerCampNotice.ShowView()
+    --     end        
+    -- else
+    --     if Notice.CheckCanShow() then
+    --         Notice.Show(0)
+    --     end  
+    -- end  
+    if Notice.CheckCanShow() then
+        Notice.Show(0)
     end  
 end
 
@@ -87,7 +120,7 @@ function DockPopupControl.ShowRealNameCertificate()
 end
 
 function DockPopupControl.ShowHomeWorkTip()    
-    local HomeWorkTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/HomeWork/HomeWorkTip.lua") 
+	local HomeWorkTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/HomeWork/HomeWorkTip.lua") 
     HomeWorkTip.Show()
 end
 

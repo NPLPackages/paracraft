@@ -15,6 +15,8 @@ end)
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ActorAnimationsDialog.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -37,7 +39,7 @@ function ActorAnimationsDialog.GetModelAnimDs()
 	return ActorAnimationsDialog.anims_ds;
 end
 
-function ActorAnimationsDialog.ShowPage(modelName, options, OnClose, text)
+function ActorAnimationsDialog.ShowPage(modelName, skin, options, OnClose, text)
 	ActorAnimationsDialog.result = nil;
 	ActorAnimationsDialog.text = text;
 
@@ -69,7 +71,9 @@ function ActorAnimationsDialog.ShowPage(modelName, options, OnClose, text)
 		end
 	end
 
-	ActorAnimationsDialog.UpdateModel(modelName, options);
+	echo(modelName);
+	echo(skin);
+	ActorAnimationsDialog.UpdateModel(modelName, skin, options);
 end
 
 function ActorAnimationsDialog.GetText()
@@ -83,7 +87,7 @@ function ActorAnimationsDialog.OnOK()
 end
 
 -- @param modelName: filename of the model, if nil, it is ActorAnimationsDialog.modelFilename
-function ActorAnimationsDialog.UpdateModel(modelName, options)
+function ActorAnimationsDialog.UpdateModel(modelName, skin, options)
 	local filepath = PlayerAssetFile:GetValidAssetByString(modelName);
 	if(filepath) then
 		local ctl = page:FindControl("AssetPreview");
@@ -92,11 +96,12 @@ function ActorAnimationsDialog.UpdateModel(modelName, options)
 			if(PlayerAssetFile:IsCustomModel(filepath)) then
 				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
 			elseif(PlayerAssetFile:HasCustomGeosets(filepath)) then
-				CustomGeosets = PlayerAssetFile:GetDefaultCustomGeosets();
+				CustomGeosets = skin;
 			elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 				-- TODO:  hard code worker skin here
 				ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
 			end
+
 			ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures, CCSInfoStr=CCSInfoStr, CustomGeosets = CustomGeosets});
 
 			ActorAnimationsDialog.RefreshAnims(filepath, options);

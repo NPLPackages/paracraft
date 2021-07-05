@@ -616,7 +616,7 @@ function GameLogic.LoadGame()
 	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 	Files:ClearFindFileCache();
 	-- Files:UnloadAllWorldAssets();
-	Files:UnloadAllUnusedAssets();
+	Files:SafeUnloadAllAssets();
 
 	GameLogic.IsRegionLoadedFired = nil;
 	GameLogic.tickCount = 0;
@@ -1868,6 +1868,7 @@ end
 		1.
 
 ]]
+
 function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isSchoolTimeOnly)	
 	local response = {isInTime = false,strTip = "",type = 0,}
 	local server_time = QuestAction.GetServerTime()
@@ -1893,9 +1894,13 @@ function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isScho
 		local nTimeNum = #times
 		local strTip = ""
 		for i=1,nTimeNum do
-			local temp=string.format("%d年%d月%d日,",times[i][1],times[i][2],times[i][3])
+			local temp=string.format("%d年%d月%d日",times[i][1],times[i][2],times[i][3])
 			if times[i][1] > year or (times[i][1] == year and times[i][2] >month) or (times[i][1] == year and times[i][2] == month and times[i][3] > day) then
-				strTip = strTip..temp
+				if strTip ~= "" then
+					strTip = strTip..","..temp
+				else
+					strTip = strTip..temp
+				end				
 			end			
 		end
 		for i=1,nTimeNum do
@@ -1918,8 +1923,10 @@ function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isScho
 		local week_day = os.date("*t",server_time).wday-1 == 0 and 7 or os.date("*t",server_time).wday-1
 		local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
         if week_day ~= 6 and week_day ~= 7 then
-            local limit_time_stamp = today_weehours + 9 * 60 * 60 + 30 * 60
-            local limit_time_end_stamp = today_weehours + 18 * 60 * 60 + 30 * 60
+            local limit_time_stamp = today_weehours + 9 * 60 * 60 + 0 * 60
+            --local limit_time_end_stamp = today_weehours + 18 * 60 * 60 + 0 * 60
+			-- 临时延长到20点， 记得开学后改成18点
+			local limit_time_end_stamp = today_weehours + 20 * 60 * 60 + 0 * 60
             if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
                 response.isInTime = false
 				response.strTip=""
@@ -1954,6 +1961,10 @@ function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isScho
 	end
 	if not time then
 		GameLogic.AddBBS(nil,"没有配置课程免费时间")
+		response.isInTime = false
+		response.strTip=""
+		response.type = 9 --没有配置免费时间，任何时间都不可以上课
+		return response
 	end
 	local isInTime,strTip=checkIsInTime(time)	
 	if  isInTime then
@@ -1981,6 +1992,12 @@ function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isScho
 	return response
 end
 
+
+--判断是否本地版本
+function GameLogic.IsLocalVersion()
+	local localVersion = ParaEngine.GetAppCommandLineByParam("localVersion", nil)    
+    return localVersion == 'SCHOOL'
+end
 
 
 

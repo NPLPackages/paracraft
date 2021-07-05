@@ -25,7 +25,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|terrain|
+	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|terrain|
 mod|physics|vision|quickselectbar|tips|map|dock|miniuserinfo|camera] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
@@ -33,7 +33,6 @@ Other show filters:
 /show movie.controller
 /show desktop.builder.movie
 /show vision   : AI memory vision
-/show touch   show touch device
 /show overlaybuffer    show overlay picking buffer on left top corner
 /show quickselectbar
 ]], 

@@ -65,7 +65,10 @@ function ChatWindow.ResetPosition(ggs_valid)
     ChatWindow.ggs_mode = ggs_valid;
 
     if(ggs_valid)then
-        ChatWindow.ShowAllPage(true)
+	-- 手机版默认不打开
+		if not System.os.IsTouchMode() then
+			ChatWindow.ShowAllPage(true)
+		end
     end
 
     if(ggs_valid)then
@@ -83,6 +86,8 @@ function ChatWindow.ResetPosition(ggs_valid)
 
     NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
     local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
+
+
 
 	local edit_container = ParaUI.GetUIObject("ChatEditPage");
      if(edit_container and edit_container:IsValid())then

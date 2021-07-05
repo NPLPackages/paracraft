@@ -685,7 +685,7 @@ function Entity:GetPortaitObjectParams(bForceRefresh)
 end
 
 -- this is helper function that derived class can use to create an inner mesh or character object. 
-function Entity:CreateInnerObject(filename, isCharacter, offsetY, scaling)
+function Entity:CreateInnerObject(filename, isCharacter, offsetY, scaling, skin)
 	local x, y, z = self:GetPosition();
 
 	local obj = ObjEditor.CreateObjectByParams({
@@ -699,6 +699,7 @@ function Entity:CreateInnerObject(filename, isCharacter, offsetY, scaling)
 		facing = self.facing,
 		IsPersistent = false,
 		EnablePhysics = false,
+		CustomGeosets = skin,
 	});
 	if(obj) then
 		-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 

@@ -9,6 +9,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPlayerMPClient.lua");
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPlayer.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -51,6 +53,12 @@ function Entity:init(world, netHandler, entityId)
 	local x, y, z = world:GetSpawnPoint();
 	self:SetLocationAndAngles(x, y, z, 0, 0);
 
+	local skin = CustomCharItems:GetSkinByAsset(self:GetMainAssetPath());
+	if (skin) then
+		self.mainAssetPath = CustomCharItems.defaultModelFile;
+		self.skin = skin;
+		self:GetDataWatcher():SetField(self.dataMainAsset, self:GetMainAssetPath());
+	end
 	self:CreateInnerObject();
 	self:RefreshClientModel();
 
@@ -67,7 +75,7 @@ function Entity:doesEntityTriggerPressurePlate()
 end
 
 function Entity:CreateInnerObject(...)
-	local obj = Entity._super.CreateInnerObject(self, self:GetMainAssetPath(), true, 0, 1);
+	local obj = Entity._super.CreateInnerObject(self, self:GetMainAssetPath(), true, 0, 1, self:GetSkin());
 
 	if(self:IsShowHeadOnDisplay() and System.ShowHeadOnDisplay) then
 		System.ShowHeadOnDisplay(true, obj, self:GetDisplayName(), GameLogic.options.PlayerHeadOnTextColor);	

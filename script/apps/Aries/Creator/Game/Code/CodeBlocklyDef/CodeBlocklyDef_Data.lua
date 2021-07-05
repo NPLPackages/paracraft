@@ -357,6 +357,7 @@ end
 				{ L"物理半径", "physicsRadius" },
 				{ L"物理高度", "physicsHeight" },
 				{ L"是否有物理", "isBlocker" },
+				{ L"开启LOD", "isLodEnabled" },
 				{ L"组Id", "groupId" },
 				{ L"感知半径", "sentientRadius" },
 				{ "x", "x" },

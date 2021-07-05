@@ -64,6 +64,10 @@ function Entity:ctor()
 end
 
 function Entity:Destroy()
+	if(self.headon_filename and self.headon_filename ~= "") then
+		local obj = self:GetInnerObject();
+		Image3DDisplay.ShowHeadonDisplay(false, obj, self.headon_filename, self.headon_width, self.headon_height);
+	end
 	self:DestroyInnerObject();
 	Entity._super.Destroy(self);
 end
@@ -700,7 +704,10 @@ function Entity:UpdateImageModel(filename, isSingle)
 
 			if(isSingle) then
 				self.text_offset.y = 0.45;
-				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 90, 90, nil, self.text_offset, -1.57);
+				self.headon_filename = filename or ""
+				self.headon_width = 90
+				self.headon_height = 90
+				Image3DDisplay.ShowHeadonDisplay(true, obj, self.headon_filename, self.headon_width, self.headon_height, nil, self.text_offset, -1.57);
 			else
 				local imageScale = imageRadius*2;
 				local data = self.block_data or 0;
@@ -710,9 +717,11 @@ function Entity:UpdateImageModel(filename, isSingle)
 						gridWidth, gridHeight = gridHeight, gridWidth;
 					end
 				end
-
 				local text_offset = {x = (self.text_offset.x + gridWidth*0.5-0.5)  / imageScale, y = (0.5+imageRadius) / imageScale, z = self.text_offset.z / imageScale}
-				Image3DDisplay.ShowHeadonDisplay(true, obj, filename or "", 100/imageScale * gridWidth, 100/imageScale*gridHeight, nil, text_offset, -1.57);
+				self.headon_filename = filename
+				self.headon_width = 100/imageScale * gridWidth
+				self.headon_height = 100/imageScale*gridHeight
+				Image3DDisplay.ShowHeadonDisplay(true, obj, self.headon_filename, self.headon_width, self.headon_height, nil, text_offset, -1.57);
 			end
 		end
 	end

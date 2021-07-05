@@ -18,6 +18,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerHeadController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
@@ -366,8 +368,14 @@ end
 -- if the string is of format "id:filename;id:filename;...", it can be used to set multiple replaceable textures at custom index. 
 function Entity:SetSkin(skin)
 	if(self.skin ~= skin) then
-		self.skin = skin;
 		if(skin) then
+			local customSkin = skin;
+			if (self:HasCustomGeosets()) then
+				if(skin:match("^(%d+):[^;+]")) then
+					customSkin = CustomCharItems:ReplaceSkinTexture(self.skin, skin);
+				end
+			end
+			self.skin = customSkin;
 			if (not self.isCustomModel and not self.hasCustomGeosets) then
 				if (skin:match("^%d+;") and EntityManager.GetPlayer() == self) then
 					self.skin = nil;
@@ -377,7 +385,10 @@ function Entity:SetSkin(skin)
 			end
 			self:RefreshClientModel();
 		else
-			self:RefreshSkin();
+			if (not self:HasCustomGeosets()) then
+				self.skin = skin;
+				self:RefreshSkin();
+			end
 		end
 	end
 end
@@ -390,10 +401,17 @@ function Entity:RefreshClientModel(bForceRefresh, playerObj)
 		-- refresh skin and base model, preserving all custom bone info
 		local assetPath = self:GetMainAssetPath()
 		if(playerObj:GetField("assetfile", "") ~= assetPath) then
+			local skin = CustomCharItems:GetSkinByAsset(assetPath);
+			if (skin) then
+				self.mainAssetPath = CustomCharItems.defaultModelFile;
+				self.skin = skin;
+				assetPath = self.mainAssetPath;
+				self:GetDataWatcher():SetField(self.dataMainAsset, assetPath);
+			end
 			playerObj:SetField("assetfile", assetPath);
-			self.isCustomModel = PlayerAssetFile:IsCustomModel(assetPath);
-			self.hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(assetPath);
 		end
+		self.isCustomModel = PlayerAssetFile:IsCustomModel(assetPath);
+		self.hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(assetPath);
 		self:RefreshSkin(playerObj);
 		self:RefreshRightHand(playerObj);
 	end

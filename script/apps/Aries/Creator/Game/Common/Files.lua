@@ -33,6 +33,35 @@ local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 -- additional world search path
 Files.worldSearchPath = nil;
+-- how many assets to unload during each step. 
+Files.garbageCollectStep = 20;
+
+-- add default always-in-memory files here, keep this to minimum, these file will survive UnloadAllUnusedAssets when a new world is loaded. 
+local alwaysInMemoryFiles = {
+-- system 
+["Texture/whitedot.png"] = true,
+["Texture/dxutcontrols.dds"] = true,
+["Texture/kidui/main/cursor.tga"] = true,
+["Texture/Aries/Common/AssetLoader_32bits.png"] = true,
+["Texture/Aries/Creator/keepwork/worldshare_32bits.png"] = true,   -- world share main UI
+["Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png"] = true,   -- paracraft main UI
+["Texture/Aries/Creator/Theme/scroll_track_32bits.png"] = true,
+["Texture/3DMapSystem/common/ThemeLightBlue/container_bg.png"] = true,
+["Texture/3DMapSystem/common/ThemeLightBlue/slider_button_16.png"] = true,
+["Texture/Aries/Common/ThemeKid/editbox_32bits.png"] = true,
+
+-- Loading screen
+["Texture/Aries/Login/Login/teen/loading_green_32bits.png"] = true,
+["Texture/Aries/Login/Login/teen/loading_gray_32bits.png"] = true,
+["Texture/Aries/Login/Login/teen/progressbar_green_tile.png"] = true,
+["Texture/Aries/Creator/Mobile/blocks_Background.png"] = true,  
+
+["character/CC/02human/actor/actor.x"] = true,
+["character/CC/02human/CustomGeoset/actor.x"] = true,
+["character/CC/05effect/Birthplace/Birthplace.x"] = true,
+
+[""] = true,
+}
 
 -- currently only one addtional world search path can be added. 
 function Files.AddWorldSearchPath(worldPath)
@@ -146,15 +175,34 @@ function Files:ClearFindFileCache()
 	Files.ClearWorldSearchPaths()
 end
 
-function Files:UnloadAllUnusedAssets()
-	local assetManager = ParaEngine.GetAttributeObject():GetChild("AssetManager");
+-- this is usually used when user entered or left a complex closed room full of assets.
+-- one may expect 2 or 3 seconds stall on graphics
+function Files:SafeUnloadAllAssets()
+	Files:UnloadAllUnusedAssets(10000)
+end
 
-	local paraXManager = assetManager:GetChild("ParaXManager")
+local s_managers = {};
+-- @param name: "ParaXManager" or "TextureManager"
+function Files:GetAssetManager(name)
+	if(s_managers[name]) then
+		return s_managers[name];
+	else
+		local assetManager = ParaEngine.GetAttributeObject():GetChild("AssetManager");
+		s_managers[name] = assetManager:GetChild(name)
+		return s_managers[name];
+	end
+end
+
+-- @param MaxRefCount: release all assets whose reference count it smaller than or equal to this value. default to 1. 
+function Files:UnloadAllUnusedAssets(MaxRefCount)
+	MaxRefCount = MaxRefCount or 1;
+
+	local paraXManager = self:GetAssetManager("ParaXManager")
 	for i=1, paraXManager:GetChildCount(0) do
 		local attr = paraXManager:GetChildAt(i)
-		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
+		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= MaxRefCount) then
 			local filename = attr:GetField("name", "");
-			if(filename ~= "") then
+			if(filename ~= "" and not self:IsFileAlwaysInMemory(filename)) then
 				local ext = filename:match("%.(%w+)$");
 				if(ext) then
 					ext = string.lower(ext)
@@ -167,17 +215,16 @@ function Files:UnloadAllUnusedAssets()
 		end
 	end
 
-	local textureManager = assetManager:GetChild("TextureManager")
+	local textureManager = self:GetAssetManager("TextureManager")
 	for i=1, textureManager:GetChildCount(0) do
 		local attr = textureManager:GetChildAt(i)
 		
-		-- TODO: remove this line
-		LOG.std(nil, "debug", "Files", "texture file: %s, Inited: %s, Ref:%d", attr:GetField("name", ""), tostring(attr:GetField("IsInitialized", false)), attr:GetField("RefCount", 1));
+		-- remove following line, for debugging texture reference count
+		-- LOG.std(nil, "debug", "Files", "texture file: %s, Inited: %s, Ref:%d", attr:GetField("name", ""), tostring(attr:GetField("IsInitialized", false)), attr:GetField("RefCount", 1));
 
-
-		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
+		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= MaxRefCount) then
 			local filename = attr:GetField("name", "");
-			if(filename ~= "") then
+			if(filename ~= "" and not self:IsFileAlwaysInMemory(filename)) then
 				local ext = filename:match("%.(%w+)$");
 				-- also release http textures
 				if(not ext and filename:match("^https?://")) then
@@ -195,6 +242,40 @@ function Files:UnloadAllUnusedAssets()
 	end
 end
 
+function Files:AddAlwaysInMemoryFile(filename)
+	alwaysInMemoryFiles[filename] = true;
+end
+
+function Files:IsFileAlwaysInMemory(filename)
+	return alwaysInMemoryFiles[filename or ""];
+end
+
+-- for debugging only
+function Files:PrintAllAssets()
+	local managers = {"TextureManager", "ParaXManager"}
+	local initedList = {};
+	local uninitedList = {};
+	for _, managerName in ipairs(managers) do
+		local manager = self:GetAssetManager(managerName)
+		for i=1, manager:GetChildCount(0) do
+			local attr = manager:GetChildAt(i)
+			local item = {managerName, attr:GetField("name", ""), attr:GetField("IsInitialized", false), attr:GetField("RefCount", 1)}
+			if(item[3]) then
+				initedList[#initedList + 1] = item
+			else
+				uninitedList[#uninitedList + 1] = item
+			end
+		end
+	end
+	LOG.std(nil, "info", "Files", "%d files are initied", #initedList);
+	for _, item in ipairs(initedList) do
+		LOG.std(nil, "info", "Files", "%s file: %s, Inited, Ref:%d", item[1], item[2], item[4]);
+	end
+	LOG.std(nil, "info", "Files", "%d files are UnInited", #uninitedList);
+	for _, item in ipairs(uninitedList) do
+		LOG.std(nil, "info", "Files", "%s file: %s, UnInited, Ref:%d", item[1], item[2], item[4]);
+	end
+end
 
 function Files:IsAssetFileLoaded(filename)
 	if(self.loadedAssetFiles[filename]) then
@@ -209,15 +290,22 @@ function Files:IsAssetFileLoaded(filename)
 	end
 end
 
+-- this is usually used when user entered or left a complex closed room full of assets.
+-- one may expect 1 or 2 seconds stall on graphics
+function Files:SafeUnloadAllWorldAssets()
+	Files:UnloadAllWorldAssets(10000)
+end
+
 -- this function is called before a new world is loaded. It will try to unload assets used in previous world.
 -- unload all assets in all world directory, where IsInitialized is true and RefCount is 1. 
-function Files:UnloadAllWorldAssets()
-	local assetManager = ParaEngine.GetAttributeObject():GetChild("AssetManager");
+-- @param MaxRefCount: release all assets whose reference count it smaller than or equal to this value. default to 1. 
+function Files:UnloadAllWorldAssets(MaxRefCount)
+	MaxRefCount = MaxRefCount or 1;
 
-	local paraXManager = assetManager:GetChild("ParaXManager")
+	local paraXManager = self:GetAssetManager("ParaXManager")
 	for i=1, paraXManager:GetChildCount(0) do
 		local attr = paraXManager:GetChildAt(i)
-		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
+		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= MaxRefCount) then
 			local filename = attr:GetField("name", "");
 			if(filename ~= "") then
 				local ext = filename:match("worlds/DesignHouse/.*%.(%w+)$") or filename:match("temp/.*%.(%w+)$");
@@ -232,11 +320,11 @@ function Files:UnloadAllWorldAssets()
 		end
 	end
 
-	local textureManager = assetManager:GetChild("TextureManager")
+	local textureManager = self:GetAssetManager("TextureManager")
 	for i=1, textureManager:GetChildCount(0) do
 		local attr = textureManager:GetChildAt(i)
 		
-		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
+		if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= MaxRefCount) then
 			local filename = attr:GetField("name", "");
 			if(filename ~= "") then
 				local ext = filename:match("worlds/DesignHouse/.*%.(%w+)$") or filename:match("temp/.*%.(%w+)$");
@@ -252,6 +340,92 @@ function Files:UnloadAllWorldAssets()
 					end
 				end	
 			end
+		end
+	end
+end
+
+-- how many assets to unload during each step. 
+-- @param nStep: default to 20.
+function Files:SetGarbageColectStep(nStep)
+	Files.garbageCollectStep = nStep or 20;
+end
+
+function Files:GetGarbageColectStep()
+	return Files.garbageCollectStep;
+end
+
+local nXfileGCIndex = 0;
+local nTexfileGCIndex = 0;
+
+-- call this function regularly to release unreferenced assets 
+-- @param bModel: if not false, we will garbage collect model files
+-- @param bTexture: if not false, we will garbage collect texture files
+-- @see also:  SetGarbageColectStep()
+function Files:GarbageCollect(bModel, bTexture)
+	local nStep = self:GetGarbageColectStep()
+
+	if(bModel~=false) then
+		local count = 0;
+
+		local paraXManager = self:GetAssetManager("ParaXManager")
+		local nTotalCount = paraXManager:GetChildCount(0)
+		for i=1, math.min(nStep*10, nTotalCount) do
+			nXfileGCIndex = nXfileGCIndex + 1;
+			local attr = paraXManager:GetChildAt(((i+nXfileGCIndex)%nTotalCount)+1)
+			if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
+				local filename = attr:GetField("name", "");
+				if(filename ~= "" and not self:IsFileAlwaysInMemory(filename)) then
+					local ext = filename:match("%.(%w+)$");
+					if(ext) then
+						ext = string.lower(ext)
+						if(ext == "bmax" or ext == "x" or ext == "fbx") then
+							ParaAsset.LoadParaX("", filename):UnloadAsset();
+							count = count + 1;
+							LOG.std(nil, "debug", "Files", "GarbageCollect unused asset file: %s", filename);
+							if(count >= nStep) then
+								break;
+							end
+						end
+					end	
+				end
+			end
+		end
+		if(count > 0) then
+			LOG.std(nil, "debug", "Files", "GarbageCollect %d/%d x files in this step", count, nTotalCount);
+		end
+	end
+
+	if(bTexture~=false) then
+		local count = 0;
+		local textureManager = self:GetAssetManager("TextureManager")
+		local nTotalCount = textureManager:GetChildCount(0)
+		for i=1, math.min(nStep*10, nTotalCount) do
+			nXfileGCIndex = nXfileGCIndex + 1;
+			local attr = textureManager:GetChildAt(((i+nXfileGCIndex)%nTotalCount)+1)
+			if(attr:GetField("IsInitialized", false) and attr:GetField("RefCount", 1) <= 1) then
+				local filename = attr:GetField("name", "");
+				if(filename ~= "" and not self:IsFileAlwaysInMemory(filename)) then
+					local ext = filename:match("%.(%w+)$");
+					-- also release http textures
+					if(not ext and filename:match("^https?://")) then
+						ext = "http";
+					end
+					if(ext) then
+						ext = string.lower(ext)
+						if(ext == "jpg" or ext == "png" or ext == "dds" or ext == "http") then
+							ParaAsset.LoadTexture("", filename, 1):UnloadAsset();
+							count = count + 1;
+							LOG.std(nil, "debug", "Files", "GarbageCollect unused asset file: %s", filename);
+							if(count >= nStep) then
+								break;
+							end
+						end
+					end	
+				end
+			end
+		end
+		if(count > 0) then
+			LOG.std(nil, "debug", "Files", "GarbageCollect %d/%d texture files in this step", count, nTotalCount);
 		end
 	end
 end

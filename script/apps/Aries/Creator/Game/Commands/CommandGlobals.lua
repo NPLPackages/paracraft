@@ -554,7 +554,7 @@ Commands["memlimit"] = {
 			local isSilentMode = options["s"];
 			if(options["v"]) then
 				attr:SetField("MaxVisibleVertexBufferBytes", max_mem_bytes);
-				if(attr:GetField("VertexBufferSizeLimit", 0) < max_mem_bytes) then
+				if(true or attr:GetField("VertexBufferSizeLimit", 0) < max_mem_bytes) then
 					attr:SetField("VertexBufferSizeLimit", max_mem_bytes);
 					if(not isSilentMode) then
 						GameLogic.AddBBS(nil, format(L"memory and visible chunk limit changed: %d mb", max_mem));
@@ -732,4 +732,51 @@ e.g.
 	end,
 };
 
+
+
+Commands["clearmemory"] = {
+	name="clearmemory", 
+	quick_ref="/clearmemory [-world] [-noref] [-print] [-step] [-model|texture]", 
+	desc=[[clear all memory objects like textures and models in asset manager.
+@param -world: only clear assets in the world
+@param -noref: only clear assets when it is no longer used (no references)
+@param -print: print all assets in memory to log.txt file
+@param -step: release 20 unused assets, one can call this regularly like every 5 seconds.
+@param -model|texture: default to both textures and models. but we can limit to just models. 
+e.g.
+/clearmemory
+/clearmemory -noref -world
+/clearmemory -print
+/clearmemory -step
+/clearmemory -step -model
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+		local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+		local options = {};
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
+		if(options.step) then
+			if(options.model or options.texture) then
+				Files:GarbageCollect(options.model~=nil, options.texture~=nil)
+			else
+				Files:GarbageCollect();
+			end
+		elseif(options.print) then
+			Files:PrintAllAssets();
+		elseif(options.world) then
+			if(options.noref) then
+				Files:UnloadAllWorldAssets()
+			else
+				Files:SafeUnloadAllWorldAssets()
+			end
+		else
+			if(options.noref) then
+				Files:UnloadAllUnusedAssets()
+			else
+				Files:SafeUnloadAllAssets()
+			end
+		end
+	end,
+};
 

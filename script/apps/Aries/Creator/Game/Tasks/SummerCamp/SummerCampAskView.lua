@@ -106,7 +106,7 @@ function SummerCampAskView.OnClickAnswer(index)
         if SummerCampAskView.right_num >= #problems then
             page:CloseWindow()
             GameLogic.AddBBS("summer_ask", L"恭喜你完成所有答题");
-            QuestAction.SetSummerTaskProgress(gsid, 20, function()
+            QuestAction.SetSummerTaskProgress(gsid, nil, function()
                 GameLogic.GetCodeGlobal():BroadcastTextEvent("openRemainOriginalUI",{name="certiRemainOriginal"})
             end)
         end

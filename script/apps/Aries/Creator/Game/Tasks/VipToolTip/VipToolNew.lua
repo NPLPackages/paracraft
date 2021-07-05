@@ -72,7 +72,7 @@ function VipToolNew.ShowPage()
     VipToolNew.InitData()
 
     local view_width = 746
-	local view_height = 530
+	local view_height = 570
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.html",
         name = "VipToolNew.ShowPage", 
@@ -105,9 +105,9 @@ function VipToolNew.OnCreate()
     local qrcode_height = 140
     local block_size = qrcode_width / #VipToolNew.qrcode
 
-    local startY = 147
+    local startY = 187
     if System.os.IsTouchMode() then
-        startY = 86
+        startY = 126
     end
 
     local qrcode = ParaUI.CreateUIObject("container", "qrcode_vip_tool", "_lt", 558, startY, qrcode_width, qrcode_height);
@@ -173,4 +173,20 @@ end
 function VipToolNew.GetDesc2()
     local nickname = KeepWorkItemManager.GetProfile().nickname or ""
     return string.format('<div style="color: #ffff00;float: left;">%s</div>已学习了<div style="color: #ffff00;float: left;">%s</div>天动画编程，拥有<div style="color: #ffff00;float: left;">%s</div>部作品', nickname, VipToolNew.learn_day, VipToolNew.project_num)
+end
+
+function VipToolNew.GetVipDesc()
+    local profile = KeepWorkItemManager.GetProfile()
+    local state = profile.vip == 1 and "已开通" or "未开通"
+    local date_desc = ""
+    if profile.vip == 1 and profile.vipDeadline == nil then
+        date_desc = "永久"
+    elseif profile.vip ~= 1 then
+        date_desc = "未开通"
+    else
+        local time_stamp = commonlib.timehelp.GetTimeStampByDateTime(profile.vipDeadline)
+        date_desc = os.date("%Y.%m.%d", time_stamp)
+    end
+
+    return string.format("会员状态：%s &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;有效日期：%s", state, date_desc)
 end

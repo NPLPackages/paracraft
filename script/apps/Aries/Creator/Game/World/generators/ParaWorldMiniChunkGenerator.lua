@@ -51,7 +51,6 @@ function ParaWorldMiniChunkGenerator:OnExit()
 	end
 end
 
-
 function ParaWorldMiniChunkGenerator:GetPivot()
 	return 19136, 12, 19136
 end

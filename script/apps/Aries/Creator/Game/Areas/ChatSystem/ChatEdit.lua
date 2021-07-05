@@ -75,8 +75,11 @@ function ChatEdit.ShowPage(bForceRefreshPage, alignment, left, top, width, heigh
 		_parent.visible = true;
 	end
 
-	ChatEdit.EnableTimer(true);
-	ChatEdit.is_shown = true;
+	ChatEdit.IsTouchMode = System.os.IsTouchMode()
+	if not ChatEdit.IsTouchMode then
+		ChatEdit.EnableTimer(true);
+		ChatEdit.is_shown = true;
+	end
 end
 
 function ChatEdit.Init()
@@ -341,6 +344,14 @@ function ChatEdit.OnClickSend(name)
 		ChatEdit.LostFocus();
 		if(System.options.IsMobilePlatform) then
 			MyCompany.Aries.Creator.Game.Desktop.ShowMobileDesktop(true);
+		end
+		
+		if ChatEdit.IsTouchMode then
+			ChatWindow.FadeOut(0.2);
+			if(ChatEdit.CanAutoHide()) then
+				ChatEdit.FadeOut(0.2);
+				CommandHelpPage.ClosePage();
+			end
 		end
 		return;
 	end

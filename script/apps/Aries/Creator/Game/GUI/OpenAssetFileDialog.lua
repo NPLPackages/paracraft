@@ -15,6 +15,8 @@ end, default_text, title, filters)
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -380,6 +382,13 @@ function OpenAssetFileDialog.UpdateModel(modelName)
 				-- TODO:  hard code worker skin here
 				ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
 			end
+
+			local skin = CustomCharItems:GetSkinByAsset(filepath);
+			if (skin) then
+				filepath = CustomCharItems.defaultModelFile;
+				CustomGeosets = skin;
+			end
+
 			ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures, CCSInfoStr=CCSInfoStr, CustomGeosets = CustomGeosets});
 
 			OpenAssetFileDialog.RefreshAnims(filepath);

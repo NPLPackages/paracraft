@@ -8,6 +8,7 @@ SummerCampSignAnim.ShowView()
 ]]
 NPL.load("(gl)script/ide/Transitions/Tween.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local httpwrapper_version = HttpWrapper.GetDevVersion();
 local SummerCampSignAnim = NPL.export()
 
@@ -21,7 +22,8 @@ function SummerCampSignAnim.OnInit()
     page.OnClose = SummerCampSignAnim.CloseView
 end
 
-function SummerCampSignAnim.ShowView()
+function SummerCampSignAnim.ShowView(movice_name)
+    SummerCampSignAnim.movice_name = movice_name
     keepwork.sign_wall.get_greetings({}, function(err, message, data)
         -- print("vzzzzzzzzzzzzzzzzzzzzzzzzzzzz", err)
         -- echo(data, true)
@@ -81,11 +83,12 @@ function SummerCampSignAnim.OnCreate()
     data.text_object = _this
     SummerCampSignAnim.AnimData[#SummerCampSignAnim.AnimData + 1] = data
 
-    SummerCampSignAnim.PlayAnim(1)
     commonlib.TimerManager.SetTimeout(function()  
-        SummerCampSignAnim.PlayAnim(2)
-    end, 1500);
-    
+        SummerCampSignAnim.PlayAnim(1)
+        commonlib.TimerManager.SetTimeout(function()  
+            SummerCampSignAnim.PlayAnim(2)
+        end, 1500);
+    end, 500);
 end
 
 function SummerCampSignAnim.CloseView()
@@ -116,6 +119,16 @@ function SummerCampSignAnim.GetRandomX(flag)
 end
 
 function SummerCampSignAnim.PlayAnim(index)
+    local channel = MovieManager.movieChannels[SummerCampSignAnim.movice_name]
+    if channel == nil then
+        SummerCampSignAnim.Close()
+        return
+    end
+
+    if not channel:IsPlaying() then
+        SummerCampSignAnim.Close()
+        return
+    end
     -- if SummerCampSignAnim.timer == nil then
     --     local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
     --         SummerCampSignAnim.UpdateAnim()
@@ -125,6 +138,9 @@ function SummerCampSignAnim.PlayAnim(index)
     
     --     SummerCampSignAnim.timer = mytimer
     -- end
+    if page == nil then
+        return
+    end
 
     local AnimData = SummerCampSignAnim.AnimData[index]
     local att = ParaEngine.GetAttributeObject();
@@ -227,8 +243,12 @@ function SummerCampSignAnim.GetRandomText()
 
     local data = list[math.random(1, #list)]
     local text = data.content
-
-    local name_desc = "——" .. data.user.username
+    local name_desc = "——"
+    if data.user.school then
+        local school = data.user.school
+        name_desc = name_desc .. school.name .. " "
+    end
+    name_desc = name_desc .. data.user.username
     text = data.content .. "\r\n" .. name_desc
     return text
 end

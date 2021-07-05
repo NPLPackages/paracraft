@@ -321,6 +321,11 @@ function options:OnLoadWorld()
 	GameLogic.RunCommand("language");
 	-- increased chunk limit
 	GameLogic.RunCommand("/memlimit -v -s 500");
+--	if(System.os.Is64BitsSystem()) then
+--		GameLogic.RunCommand("/memlimit -v -s 500");
+--	else
+--		GameLogic.RunCommand("/memlimit -v -s 200");
+--	end
 	GameLogic.AddBBS("options", nil);
 
 	local player = ParaScene.GetPlayer();

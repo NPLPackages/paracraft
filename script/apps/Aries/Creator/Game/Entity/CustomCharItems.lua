@@ -35,19 +35,82 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Red_Army_nv2.x"] = "80001;84060;81018;88014;85079;83174";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/tufei_movie.x"] = "80001;82065;84048;81018;88014;85070";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/Red_Army_master.x"] = "80001;84060;81018;88014;85079;83173";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunzhang.x"] = "80001;83158;84050;81018;88014;85067";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunming.x"] = "80001;82001;84046;81018;88014;85040";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84032;81018;88014;85027";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;82001;84003;81018;88014;85017";
-	CustomCharItems.ReplaceableAvatars["character/CC/codewar/sunbinjunshixingtai_movie.x"] = "80001;83150;84049;81018;88014;85067";
-	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school20.x"] = "80001;82001;84017;81018;88014;85019";
-	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school16.x"] = "80001;82011;84010;81018;88014;85005";
+	
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school0.x"] = "80001;82011;84003;81018;88002;85011";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school1.x"] = "80001;82028;84003;81018;88014;85011";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school28.x"] = "80001;82148;84033;81058;88014;85049";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school34.x"] = "80001;82104;84012;81018;88014;85009";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school22.x"] = "80001;82126;84029;81018;88014;85050";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school43.x"] = "80001;82148;84012;81018;88014;85009";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school35.x"] = "80001;82004;84012;81018;88014;85009";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school10.x"] = "80001;82028;84052;81018;88002;85017";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school11.x"] = "80001;82029;84052;81018;88014;85002";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school14.x"] = "80001;82028;84010;81018;88014;85005";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school15.x"] = "80001;82011;84010;81018;88014;85005";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school17.x"] = "80001;82011;84017;81018;88014;85019";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school18.x"] = "80001;82029;84017;81018;88014;85019";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school2.x"] = "80001;82029;84003;81018;88014;85002";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school5.x"] = "80001;82029;84015;81018;88014;85017";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school6.x"] = "80001;82028;84013;81018;88014;85010";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school7.x"] = "80001;82047;84013;81018;88014;85010";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school16.x"] = "80001;82011;84010;81018;88014;85005";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school20.x"] = "80001;82001;84017;81018;88014;85019";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school21.x"] = "80001;82126;84016;81049;88020;85018";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school23.x"] = "80001;82148;84032;81049;88020;85027";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school24.x"] = "80001;82170;84032;81049;88020;85027";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school25.x"] = "80001;82104;84032;81049;88020;85027";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school26.x"] = "80001;82010;84032;81049;88020;85027";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school27.x"] = "80001;82126;84013;81049;88020;85010";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school29.x"] = "80001;82170;84013;81049;88020;85010";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school30.x"] = "80001;82104;84013;81049;88020;85010";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school31.x"] = "80001;82010;84013;81049;88020;85010";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school32.x"] = "80001;82126;84012;81049;88020;85009";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school33.x"] = "80001;82170;84012;81049;88020;85009";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school36.x"] = "80001;82170;84003;81049;88020;85018";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school37.x"] = "80001;82148;84003;81049;88020;85018";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school38.x"] = "80001;82170;84003;81049;88020;85018";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school39.x"] = "80001;82104;84003;81049;88020;85018";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school9.x"] =  "80001;82047;84013;81018;88002;85010";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school4.x"] =  "80001;82047;84003;81018;88002;85002";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school11.x"] = "80001;82047;84010;81018;88002;85005";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school12.x"] = "80001;82029;84010;81018;88002;85005";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school1.x"] =  "80001;82011;84003;81018;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school34.x"] = "80001;82104;84012;81049;88002;85009";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school35.x"] = "80001;82004;84012;81049;88002;85009";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school39.x"] = "80001;82104;84032;81049;88002;85028";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school40.x"] = "80001;82004;84032;81049;88002;85028";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school3.x"] = "80001;82029;84003;81018;88002;85002";
+	
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_archaeologist.x"] = "80001;82064;84015;81018;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_host.x"] = "80001;82126;84038;81049;88002;85028";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_host.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_staff_bank.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/paperman/principal.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/paperman/bay01.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/paperman/Female_teacher.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/paperman/bay07.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/blockman/cunzhang.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/paperman/boy01.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/blockman/cunming.x"] = "80001;82011;84014;81005;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunzhang.x"] = "80001;83158;84050;81018;88014;85067";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunming.x"] = "80001;82001;84046;81018;88014;85040";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84032;81018;88014;85027";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;82001;84003;81018;88014;85017";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy01.x"] = "80001;82001;84020;81018;88002;85058";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy02.x"] = "80001;82029;84015;81018;88002;85017";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy03.x"] = "80001;82065;84001;81018;88002;85011";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy04.x"] = "80001;82028;84010;81018;88002;85005"; -- 黑鬼，没有黑脸皮肤，默认为学生装
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy05.x"] = "80001;82047;84017;81018;88002;85019";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy06.x"] = "80001;82001;84027;81018;88002;85024";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy07.x"] = "80001;82001;84016;81018;88002;85017";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl01.x"] = "80001;82004;84028;81018;88002;85029";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl02.x"] = "80001;82085;84013;81018;88002;85010";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl03.x"] = "80001;82126;84032;81018;88002;85049";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl04.x"] = "80001;82109;84039;81018;88002;85029";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl05.x"] = "80001;82170;84012;81018;88002;85009"; --这套因为前段时间才一次给到手，没来得及上架，默认为学生装
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/zaizai.x"] = "80001;82001;84022;81018;88020;85004";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/nuannuan.x"] = "80001;82010;84022;81049;88004;85004";
+	CustomCharItems.ReplaceableAvatars["character/CC/codewar/sunbinjunshixingtai_movie.x"] = "80001;83150;84049;81018;88014;85067";
 
 	local root = ParaXML.LuaXML_ParseFile("config/Aries/creator/CustomCharItems.xml");
 	if (root) then
@@ -495,6 +558,22 @@ end
 
 function CustomCharItems:GetSkinByAsset(assetPath)
 	return CustomCharItems.ReplaceableAvatars[assetPath];
+end
+
+function CustomCharItems:ReplaceSkinTexture(skin, texture)
+	local currentSkin = skin;
+	if (not skin or skin == "") then
+		currentSkin = CustomCharItems.defaultSkinString;
+	elseif (not skin:match("^%d+#")) then
+		currentSkin = CustomCharItems:ItemIdsToSkinString(skin);
+	end
+	local skinTable = CustomCharItems:SkinStringToTable(currentSkin);
+	for id, filename in texture:gmatch("(%d+):([^;]+)") do
+		skinTable.textures[tonumber(id)] = filename;
+	end
+	currentSkin = CustomCharItems:SkinTableToString(skinTable);
+
+	return currentSkin;
 end
 
 function CustomCharItems:GetItemByGsid(gsid)

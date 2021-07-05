@@ -78,7 +78,85 @@ function SummerCampTaskPage.InitData()
         SummerCampTaskPage.TaskData[#SummerCampTaskPage.TaskData + 1] = data
     end
 
+	SummerCampTaskPage.HandleSummerSpecialTaskData()
+	SummerCampTaskPage.HandleSummerDailyTaskData()
     SummerCampTaskPage.HandleQuestTaskData()
+end
+
+local kangyi_task_data = {
+	{taskId="40025_60028_1"},
+	{taskId="40026_60029_1"},
+	{taskId="40026_60029_2"},
+	{taskId="40026_60029_3"},
+	{taskId="40026_60029_4"},
+	{taskId="40026_60029_5"},
+	{taskId="40026_60029_6"},
+	{taskId="40026_60029_7"},
+	{taskId="40026_60029_8"},
+	{taskId="40026_60029_9"},
+	{taskId="40026_60029_10"},
+	{taskId="40026_60029_11"},
+	{taskId="40026_60029_12"},
+	{taskId="40026_60029_13"},
+	{taskId="40026_60029_14"},
+	{taskId="40026_60029_15"},
+	{taskId="40026_60029_16"},
+	{taskId="40027_60030_1"},
+}
+
+-- 处理夏令营一些特殊任务 比如抗疫
+function SummerCampTaskPage.HandleSummerSpecialTaskData()
+	local exid = 40025
+	local data = {}
+	local name = "抗疫小能手"
+	local desc = "完成抗疫小能手任务"
+	data.name = name
+	data.task_id = exid
+	data.task_desc = desc
+	data.max_pro = 0
+	data.value = 0
+	data.max_pro = #kangyi_task_data
+	for i, v in ipairs(kangyi_task_data) do
+		local child_value = GameLogic.QuestAction.GetValue(v.taskId) or 0
+		if child_value > 0 then
+			data.value = data.value + 1
+		end
+	end
+	
+	data.task_state = data.value >= data.max_pro and QuestPage.TaskState.has_complete or QuestPage.TaskState.can_go
+	data.is_show_progress = true
+	data.task_pro_desc = data.value .. "/" .. data.max_pro
+	
+	data.is_summer_task = true
+	data.bg_img = SummerCampTaskPage.GetItemBgImg(data)
+	-- data.questItemContainer = v.questItemContainer
+
+	SummerCampTaskPage.TaskData[#SummerCampTaskPage.TaskData + 1] = data
+end
+
+-- 处理夏令营日常任务
+function SummerCampTaskPage.HandleSummerDailyTaskData()
+	local data_list = QuestAction.GetTodaySummerDailyTaskData()
+    for i, v in ipairs(data_list) do
+        local task_data = v
+		local max_pro = 1
+        local data = {}
+        data.name = "【每日专属】" .. task_data.name
+        data.task_desc = task_data.desc or ""
+
+        data.value = QuestAction.GetSummerDailyTaskProgress(i)
+        data.task_pro_desc = data.value .. "/" .. max_pro
+        data.task_state = data.value >= max_pro and QuestPage.TaskState.has_complete or QuestPage.TaskState.can_go
+        data.task_id = i
+		data.world_id = v.world_id
+		data.course_id = v.course_id
+        data.max_pro = max_pro
+        data.is_summer_daily_task = true
+        data.bg_img = SummerCampTaskPage.GetItemBgImg(data)
+        data.is_show_progress = true
+
+        SummerCampTaskPage.TaskData[#SummerCampTaskPage.TaskData + 1] = data
+    end
 end
 
 -- 加入原本的任务
@@ -205,7 +283,7 @@ function SummerCampTaskPage.GetItemBgImg(data)
         return "Texture/Aries/Creator/keepwork/SummerCamp/item_bg_3_994x112_32bits.png#0 0 994 112"
     end
 
-    return "Texture/Aries/Creator/keepwork/SummerCamp/item_bg_1_994x112_32bits.png#0 0 994 112"
+    return "Texture/Aries/Creator/keepwork/SummerCamp/item_bg_2_994x112_32bits.png#0 0 994 112"
 end
 
 function SummerCampTaskPage.GetTaskProDescByQuest(data, task_type)
@@ -319,19 +397,73 @@ function SummerCampTaskPage.Goto(index)
 --     [70011] = {name = "红色先锋", exid = 31068, gsid = 70011, max_pro = 10},
 --     [70012] = {name = "时代接班人", exid = 31069, gsid = 70012, max_pro = 15},
 -- }
-	if task_data.task_id == 70009 then
-        local SummerCampSignShowView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampSignShowView.lua") 
-        SummerCampSignShowView.ShowView()
-	elseif task_data.task_id == 70010 then
-        GameLogic.GetCodeGlobal():BroadcastTextEvent("openRemainOriginalUI", {name = "mainPage"}, function()
-           
-        end);
-	elseif task_data.task_id == 70011 then
-		-- GameLogic.AddBBS(nil,"敬请期待~")
-		GameLogic.GetCodeGlobal():BroadcastTextEvent("openLongMarchUI", {name = "mainPage"});
-	elseif task_data.task_id == 70012 then
-		GameLogic.AddBBS(nil,"敬请期待~")
+	if task_data.is_summer_task then
+		local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua") 
+		SummerCampMainPage.CloseView()
+		if task_data.task_id == 70009 then
+			local SummerCampSignShowView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampSignShowView.lua") 
+			SummerCampSignShowView.ShowView()
+
+		elseif task_data.task_id == 70010 then
+			GameLogic.GetCodeGlobal():BroadcastTextEvent("openRemainOriginalUI", {name = "mainPage"}, function()
+			end);
+		elseif task_data.task_id == 70011 then
+			GameLogic.GetCodeGlobal():BroadcastTextEvent("openLongMarchUI", {name = "mainPage"});
+		elseif task_data.task_id == 70012 then
+			GameLogic.RunCommand(string.format("/goto %s %s %s", 18876,12,19189))
+		elseif task_data.name == "抗疫小能手" then
+			GameLogic.GetCodeGlobal():BroadcastTextEvent("openUI", {name = "taskMain"}, function()
+			end);
+		end
 	end
+
+	if task_data.is_summer_daily_task then
+		if task_data.course_id then
+			local id_str = tostring(task_data.course_id)
+
+			keepwork.quest_course.search({
+				ids=id_str,
+			}, function(err, msg, data)
+				-- print("xxxxxx", err)
+				-- echo(data, true)
+				if err == 200 then
+					data = data[1]
+					local course_id = data.id
+					keepwork.quest_complete_course.get({
+						aiCourseId = course_id,
+					}, function(err2, msg2, data2)
+						-- print("bbbbb", err2)
+						-- echo(data2, true)
+						if err2 == 200 then
+							local work_data = data.aiHomework or {}
+								
+							local client_data = QuestAction.GetClientData()
+				
+							client_data.course_id = course_id
+							client_data.home_work_id = work_data.id or -1
+							client_data.is_home_work = false
+							
+							client_data.course_step = 0
+							if data2.userAiCourse and data2.userAiCourse.progress then
+								client_data.course_step = data2.userAiCourse.progress.stepNum or 0
+							end
+							KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
+				
+							local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua") 
+							SummerCampMainPage.CloseView()
+							GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.enter_course_world', course_id, false, data.projectReleaseId)
+						end
+					end)
+				end
+			end)
+		else
+			local world_id = task_data.world_id
+			local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua") 
+			SummerCampMainPage.CloseView()
+			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
+			CommandManager:RunCommand(string.format('/loadworld -force -s %s', world_id))
+		end
+    end
 end
 
 function SummerCampTaskPage.QuestTaskGoto(task_id)

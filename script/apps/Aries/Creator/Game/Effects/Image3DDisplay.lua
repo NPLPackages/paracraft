@@ -55,6 +55,9 @@ function Image3DDisplay.ShowHeadonDisplay(bShow, obj, filename, width, height, c
 		index = index or 0;
 		if(bShow == false or filename == nil or filename == "") then
 			o:ShowHeadOnDisplay(false,index);
+			if(filename) then
+				Image3DDisplay.RemoveTemplateByImageAndSize(filename, width, height, obj.id);
+			end
 			return;
 		else
 			o:ShowHeadOnDisplay(true,index);
@@ -62,7 +65,7 @@ function Image3DDisplay.ShowHeadonDisplay(bShow, obj, filename, width, height, c
 
 		local style = headon_style;
 		-- calculate the text width
-		o:SetHeadOnUITemplateName(Image3DDisplay.GetTemplateByImageAndSize(filename, width, height),index);
+		o:SetHeadOnUITemplateName(Image3DDisplay.GetTemplateByImageAndSize(filename, width, height, obj.id),index);
 
 		if(offset) then
 			o:SetHeadOnOffset(offset.x or 0, offset.y or 0, offset.z or 0, index);
@@ -75,14 +78,26 @@ end
 
 local keynames = {};
 local count = 1;
-local function ComputeKeyName(filename, width, height)
+local function CreateGetKey(filename, width, height, objId)
 	local keyname = format("%s%d%d", filename, width, height);
-	if(keynames[keyname]) then
-		return keynames[keyname];
+	local key = keynames[keyname]
+	if(key) then
+		if(not objId) then
+			key.objects = true;
+		elseif(type(key.objects) == "table") then
+			if(not key.objects[objId]) then
+				key.objects[objId] = true
+			end
+		else
+			key.objects = {[key.objects] = true}
+			key.objects[objId] = true
+		end
+		return key;
 	else
 		count = count + 1;
-		keynames[keyname] = "_i3d_"..tostring(count);
-		return keynames[keyname];
+		key = {name = "_i3d_"..tostring(count), objects = objId or true};
+		keynames[keyname] = key
+		return key;
 	end
 end
 
@@ -97,12 +112,58 @@ function Image3DDisplay.Reset()
 	Image3DDisplay.InitHeadOnTemplates(true);
 end
 
-function Image3DDisplay.GetTemplateByImageAndSize(filename, width, height)
-	local _parent = ParaUI.GetUIObject("headon_templates_cont");
-	if(_parent:IsValid() and filename) then
+function Image3DDisplay.RemoveTemplateByImageAndSize(filename, width, height, objId)
+	local keyname = format("%s%d%d", filename, width, height);
+	local key = keynames[keyname]
+	if(key and key.objects ~= true and objId) then
+		local objects = key.objects;
+		if(objects == objId) then
+			Image3DDisplay.RemoveKeyByName(key.name)	
+		elseif(type(objects) == "table") then
+			objects[objId] = nil
+			if(not next(objects)) then
+				Image3DDisplay.RemoveKeyByName(key.name)	
+			end
+		end
+	end
+end
+
+function Image3DDisplay.RemoveKeyByName(keyname)
+	local _parent = Image3DDisplay.GetParentUIObj()
+	if(_parent) then
+		local _this = _parent:GetChild(keyname);
+		if(_this:IsValid()) then
+			ParaUI.Destroy(_this.id);
+		end
+	end
+	keynames[keyname] = nil;
+end
+
+
+local _parent_obj;
+
+-- return nil if not exist
+function Image3DDisplay.GetParentUIObj()
+	if(_parent_obj and _parent_obj:IsValid()) then
+		return _parent_obj;
+	else
+		_parent_obj = ParaUI.GetUIObject("headon_templates_cont");
+		if(_parent_obj:IsValid()) then
+			return _parent_obj;
+		end
+	end
+end
+
+
+-- Create get template by filename and size
+-- @param objId: optional object id, to enable removing the template when object is deleted to release reference count of texture resources. 
+function Image3DDisplay.GetTemplateByImageAndSize(filename, width, height, objId)
+	local _parent = Image3DDisplay.GetParentUIObj();
+	if(_parent and filename) then
 		width = width or self.width;
 		height = height or self.height;
-		local keyname = ComputeKeyName(filename, width, height);
+		local key = CreateGetKey(filename, width, height, objId);
+		local keyname = key.name;
 		local _this = _parent:GetChild(keyname);
 		if(not _this:IsValid()) then
 			filename = filename:gsub("#", ";");

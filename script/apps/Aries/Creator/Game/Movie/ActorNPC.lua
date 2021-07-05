@@ -496,6 +496,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				assetfile = entity:GetMainAssetPath();
 			end
 		end
+		local skin = self:GetValue("skin", curTime);
 		if(assetfile) then
 			assetfile = PlayerAssetFile:GetFilenameByName(assetfile)
 			NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
@@ -531,7 +532,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ActorAnimationsDialog.lua");
 		local ActorAnimationsDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.ActorAnimationsDialog");
-		ActorAnimationsDialog.ShowPage(assetfile, options, function(result)
+		ActorAnimationsDialog.ShowPage(assetfile, skin, options, function(result)
 			if(result and result ~= "") then
 				result = EntityAnimation.CreateGetAnimId(result);	
 				if( type(result) == "number") then

@@ -55,7 +55,7 @@ ParaWorldLoginAdapter.SchoolWorldId = 20576;
 
 function ParaWorldLoginAdapter.GetDefaultWorldID()
     local httpwrapper_version = HttpWrapper.GetDevVersion();
-    if (System.options.isDevMode and (System.User.isVipSchool or System.User.isVip)) then
+    if (System.User.isVipSchool or System.User.isVip) then
         return ParaWorldLoginAdapter.campIds[httpwrapper_version]
     end
     

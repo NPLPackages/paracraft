@@ -1334,9 +1334,7 @@ function SystemSettingsPage.OnClickAutoMovieFPS()
 end
 
 function SystemSettingsPage.OnClearMemory()
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
-	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-	Files:UnloadAllUnusedAssets();
+	GameLogic.RunCommand("/clearmemory")
 end
 
 function SystemSettingsPage.OnOpenBackupFolder()

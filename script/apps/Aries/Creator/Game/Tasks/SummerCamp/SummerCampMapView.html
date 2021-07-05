@@ -48,25 +48,39 @@ function GetIndex(index)
     return tostring(index)
 end
 
+function OnMouseEnter(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampMapView.OnMouseEnter(index)
+end
+function OnMouseLeave(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampMapView.OnMouseLeave(index)    
+end
+
 ]]></script>
 <div style=" width: 912x; height: 515px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/map_bg_912x515_bits.png#0 0 912 515);">
     <input type="button" style="position: relative; margin-left: 880px; margin-top: 5px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
     <div style="float: left;width: 224px;margin-left: 40px; margin-top: 75px;">
         <pe:repeat DataSource="<%=IconData()%>">
             <pe:repeatitem>
-                <input type="button" onclick="ToPos" width="166" height="21" param1 = '<%=Eval("index") %>' style='<%=string.format("margin-left: 0px; margin-top: 10px; background:url(%s)", Eval("bg_img"))%>'/>
+                <input type="button" onclick="ToPos" width="166" height="21" param1 = '<%=Eval("index") %>' onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave" style='<%=string.format("margin-left: 0px; margin-top: 10px; background:url(%s)", Eval("bg_img"))%>'/>
             </pe:repeatitem>
         </pe:repeat>
     </div>
     
-    <pe:container zorder="10" uiname="summer_decode_wxcode_root" width="633" height="338" style="float: left;margin-left: 0px;margin-top: 97px;background: ;">
+    <pe:container zorder="10" uiname="map_root" width="633" height="338" style="float: left;margin-left: 0px;margin-top: 97px;background: ;">
         <img zorder="0" uiname='map_head_icon' src='Texture/Aries/Creator/keepwork/SummerCamp/wodeweizhi_34X41_32bits.png#0 0 34 41' style="position: relative; margin-left: 0px;margin-top: 0px;" width="34" height="41"/>
         <pe:repeat DataSource="<%=IconData()%>">
             <pe:repeatitem>
-                <input type="button" onclick="ToPos" width="40" height="40" value='' param1 = '<%=Eval("index") %>' tooltip='<%=Eval("name") %>' style='<%=GetIconPosStyle(Eval("index"))%>'/>
+                <input type="button" onclick="ToPos" width="40" height="40" value='' param1 = '<%=Eval("index") %>' tooltip='<%=Eval("name") %>' onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave" style='<%=GetIconPosStyle(Eval("index"))%>'/>
             </pe:repeatitem>
         </pe:repeat>
     </pe:container>
+
+    
+    <div style="margin-left: 335x;margin-top: 0px;width: 496px; height: 57px; background: url(Texture/Aries/Creator/keepwork/SummerCamp/map_infobg_496x57_32bits.png#0 0 496 57)">
+        <pe:label name="map_info_lable" autosize="true" style="width: 465px; margin-left: 20px;margin-top: 8px;" value=""/>
+    </div>
 </div>
 </pe:mcml>
 </body>

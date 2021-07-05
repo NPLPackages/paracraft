@@ -17,9 +17,10 @@ local ViewList = {
 }
 
 SummerCampMainPage.TypeBtData = {
-    {view_file = "SummerCampCoursePage.lua", select_img="Texture/Aries/Creator/keepwork/SummerCamp/bar_1_61x537_32bits.png#0 0 61 537"},       
-    {view_file = "SummerCampTaskPage.lua", select_img="Texture/Aries/Creator/keepwork/SummerCamp/bar_2_61x537_32bits.png#0 0 61 537"},    
-    {view_file = "SummerCampRewardPage.lua", select_img="Texture/Aries/Creator/keepwork/SummerCamp/bar_3_61x537_32bits.png#0 0 61 537"},    
+    {view_file = "SummerCampMainNotice.lua", select_img="Texture/Aries/Creator/keepwork/SummerCamp/bar_1_61x547_32bits.png#0 0 61 547"},  
+    {view_file = "SummerCampCoursePage.lua", select_img="Texture/Aries/Creator/keepwork/SummerCamp/bar_2_61x547_32bits.png#0 0 61 547"},       
+    {view_file = "SummerCampTaskPage.lua", select_img="Texture/Aries/Creator/keepwork/SummerCamp/bar_3_61x547_32bits.png#0 0 61 547"},    
+    {view_file = "SummerCampRewardPage.lua", select_img="Texture/Aries/Creator/keepwork/SummerCamp/bar_4_61x547_32bits.png#0 0 61 547"},   
 }
 
 function SummerCampMainPage.OnInit()
@@ -42,8 +43,8 @@ function SummerCampMainPage.OnCreate()
     select_type_data.page = SummerCampCoursePage.ShowView(node)
 end
 
-function SummerCampMainPage.ShowView()
-    SummerCampMainPage.select_type_index = 1
+function SummerCampMainPage.ShowView(index)
+    SummerCampMainPage.select_type_index = index or 1
 
     local view_width = 1107
     local view_height = 715

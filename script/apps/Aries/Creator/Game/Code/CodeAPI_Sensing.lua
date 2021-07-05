@@ -247,9 +247,9 @@ function env_imp:ask(text, buttons, cb)
 	local viewport = ViewportManager:GetSceneViewport();
 	local offsetX = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]*0.5);
 
-	height = 200;
+	height = 220;
 	if(buttons) then
-		height = math.max(height, 120 + (#buttons)*36);
+		height = math.max(height, 140 + (#buttons)*36);
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");

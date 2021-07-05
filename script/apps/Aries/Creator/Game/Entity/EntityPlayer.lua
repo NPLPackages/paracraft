@@ -23,8 +23,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovable.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
-local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
@@ -115,12 +113,6 @@ end
 function Entity:SetMainAssetPath(name)
 	if(self:GetMainAssetPath() ~= name) then
 		self.mainAssetPath = name;
-		local skin = CustomCharItems:GetSkinByAsset(name);
-		if (skin) then
-			self.mainAssetPath = CustomCharItems.defaultModelFile;
-			self.skin = skin;
-		end
-
 		self:RefreshClientModel(true);
 		self:GetDataWatcher():SetField(self.dataMainAsset, self:GetMainAssetPath());
 		return true;
@@ -658,12 +650,17 @@ function Entity:AutoFindPosition(bUseSpawnPoint)
 	else
 		-- if no spawn point is found, snap to ground. 
 		local bx, by, bz = self:GetBlockPos();
-		-- find the first non-water solid block. 
-		-- find the first non-air block and use it as spawn
-		local dist = ParaTerrain.FindFirstBlock(bx, by, bz, 5, 255, 255);
-		if(dist<0) then
-			by = 255;
-			dist = ParaTerrain.FindFirstBlock(bx, by, bz, 5, 255, 255);	
+		local dist
+		if(bx == 0 and by == 0 and bz == 0) then
+			dist = -1;
+		else
+			-- find the first non-water solid block. 
+			-- find the first non-air block and use it as spawn
+			dist = ParaTerrain.FindFirstBlock(bx, by, bz, 5, 255, 255);
+			if(dist<0) then
+				by = 255;
+				dist = ParaTerrain.FindFirstBlock(bx, by, bz, 5, 255, 255);	
+			end
 		end
 		if(dist>0) then
 			by = by - dist; 
@@ -675,8 +672,16 @@ function Entity:AutoFindPosition(bUseSpawnPoint)
 			local bx, by, bz = self:GetBlockPos();
 			LOG.std(nil, "info", "AutoFindVerticalPosition", "player is spawned at highest solid block: %d %d %d", bx, by, bz);
 		else
-			-- in offline mode, apply_filters PlayerHasLoginPosition to {20000, -120, 20000}
-			GameLogic.options:SetLoginPosition(20000, -120, 20000);
+			local block_generator = GameLogic.GetBlockGenerator();
+			local x, y, z = 20000, -120, 20000;
+			if(block_generator and block_generator.GetDefaultLoginPos) then
+				x, y, z = block_generator:GetDefaultLoginPos();
+			end
+			if(bx == 0 and bz == 0) then
+				-- just in case there is no last saved position. 
+				self:SetPosition(x,y,z);
+			end
+			GameLogic.options:SetLoginPosition(x, y, z);
 		end	
 	end
 end

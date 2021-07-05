@@ -797,6 +797,18 @@ function Actor:SetIsBlocker(bBlocker)
 	end
 end
 
+function Actor:IsLODEnabled()
+	return self:GetEntity() and self:GetEntity():IsLODEnabled();
+end
+
+function Actor:EnableLOD(bEnabled)
+	local entity = self:GetEntity();
+	if(entity) then	
+		entity:EnableLOD(bEnabled == true);
+	end
+end
+
+
 function Actor:SetBillboarded(att)
 	local entity = self:GetEntity();
 	if entity then
@@ -1008,6 +1020,7 @@ local internalValues = {
 	["physicsHeight"] = {setter = Actor.SetPhysicsHeight, getter = Actor.GetPhysicsHeight, isVariable = false}, 
 	["sentientRadius"] = {setter = Actor.SetSentientRadius, getter = Actor.GetSentientRadius, isVariable = false}, 
 	["isBlocker"] = {setter = Actor.SetIsBlocker, getter = Actor.GetIsBlocker, isVariable = false}, 
+	["isLodEnabled"] = {setter = Actor.EnableLOD, getter = Actor.IsLODEnabled, isVariable = false}, 
 	["groupId"] = {setter = Actor.SetGroupId, getter = Actor.GetGroupId, isVariable = false}, 
 	["facing"] = {setter = Actor.SetFacingDegree, getter = Actor.GetFacingDegree, isVariable = false}, 
 	-- tricky: pitch and roll are reversed

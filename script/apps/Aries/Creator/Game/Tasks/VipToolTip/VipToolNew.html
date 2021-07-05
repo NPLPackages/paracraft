@@ -49,9 +49,17 @@ function OnClickHelp()
     GameLogic.AddBBS(nil,"敬请期待")
 end
 
+function GetVipDesc()
+    return VipToolNew.GetVipDesc()
+end
+
 ]]></script>
 
-<kp:window class="default" mode="lite" width="746" height="530"  icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_vip_32bits.png" onclose="ClosePage">
+<kp:window class="default" mode="lite" width="746" height="570"  icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_vip_32bits.png" onclose="ClosePage">
+    <div style="height: 40px;color: #000000;">
+        <div style="margin-left: 50px;margin-top: 50px;font-weight: bold;font-size: 16px;"><%=GetVipDesc()%></div>
+        
+    </div>
     <div type ="box" style="<%=GetBgStyle()%>">
         <pe:if condition="<%=GetIsMobileMode()%>">
             <div style="position: relative; width: 184px;height: 30px;margin-top: 75px; margin-left: 530px">

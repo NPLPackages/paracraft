@@ -298,6 +298,9 @@ model id
     <item id="82172" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
     <item id="82173" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
     <item id="82174" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
+    <!--20210701夏令营活动头饰-->
+    <item id="82175" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/82175_feedman_hat.anim.x"></attachment></item>
+    <item id="82176" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/82176_feedwoman_hat.anim.x"></attachment></item>
 
 
 
@@ -561,9 +564,24 @@ model id
     <item id="84058" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84058_alloy_red_armor.png"></texture></item>
     <!--20210610新增-->
     <item id="84059" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84059_space_suit_armor.png"></texture></item>
-    <!--20210610新增-->
+    <!--20210623新增-->
     <item id="84060" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84060_red_sodier_armor.png"></texture></item>
     <item id="84061" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84061_sodier_armor.png"></texture></item>
+    <!--20210701新增-->
+    <item id="84062" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84062_Avatar_boy_body_52.png"></texture></item>
+    <item id="84063" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84063_Avatar_boy_body_53.png"></texture></item>
+    <item id="84064" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84064_Avatar_boy_body_54.png"></texture></item>
+    <item id="84065" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84065_Avatar_boy_body_55.png"></texture></item>
+    <item id="84066" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84066_Avatar_girl_body_56.png"></texture></item>
+    <item id="84067" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84067_Avatar_girl_body_57.png"></texture></item>
+    <item id="84068" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84068_Avatar_girl_body_58.png"></texture></item>
+    <item id="84069" model="actor;"><geoset category="8" id="2"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84069_Avatar_boy_body_59.png"></texture></item>
+    <item id="84070" model="actor;"><geoset category="8" id="2"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84070_Avatar_boy_body_60.png"></texture></item>
+    <item id="84071" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84071_Avatar_girl_body_61.png"></texture></item>
+    <item id="84072" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84072_Avatar_girl_body_62.png"></texture></item>
+    <item id="84073" model="actor;"><geoset category="8" id="5"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84073_Avatar_girl_body_63.png"></texture></item>
+
+
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
     <item id="85002" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_.png"></texture></item>
@@ -651,6 +669,16 @@ model id
     <!--20210624新增-->
     <item id="85079" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85079_red_sodier_pants.png"></texture></item>
     <item id="85080" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85080_sodier_pants.png"></texture></item>
+    
+    <!--20210701新增-->
+    <item id="85081" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85081_Avatar_boy_leg_71.png"></texture></item>
+    <item id="85082" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85082_Avatar_boy_leg_72.png"></texture></item>
+    <item id="85083" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85083_Avatar_boy_leg_73.png"></texture></item>
+    <item id="85084" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85084_Avatar_girl_leg_74.png"></texture></item>
+    <item id="85085" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85085_Avatar_girl_leg_75.png"></texture></item>
+    <item id="85086" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85086_Avatar_girl_leg_76.png"></texture></item>
+
+
     <!--      86000 86999  背部  attachment id="15"    -->
     <!--第一批数据-->
     <item id="86001" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/1425_FireExchangeBack03.anim.x"></attachment></item>
@@ -891,7 +919,8 @@ model id
 <item id="87188" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87188_alloy_silver_shield.anim.x"></attachment></item>
 <item id="87189" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87189_alloy_green_shield.anim.x"></attachment></item>
 <item id="87190" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87190_alloy_red_shield.anim.x"></attachment></item>
-
+      <!--20210701新增-->
+<item id="87191" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87191_keyboard.anim.x"></attachment></item>
 
     <!--    88000 88999  嘴巴                        4嘴巴          -->
     <item id="88001" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_08_01.png"></texture></item>

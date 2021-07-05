@@ -33,3 +33,11 @@ HttpWrapper.Create("keepwork.sign_wall.get_my_greeting", "%MAIN%/core/v0/summerC
 --http://yapi.kp-para.cn/project/32/interface/api/4267
 -- 获取祝福语列表
 HttpWrapper.Create("keepwork.sign_wall.get_greetings", "%MAIN%/core/v0/summerCamp/greetings", "GET", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/4242
+--上报小节进度
+HttpWrapper.Create("keepwork.lesson2in1.set_useraction", "%MAIN%/core/v0/ai/userAiSection", "PUT", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/4247
+--获取小节进度
+HttpWrapper.Create("keepwork.lesson2in1.get_useraction", "%MAIN%/core/v0/ai/userAiSection", "GET", true)

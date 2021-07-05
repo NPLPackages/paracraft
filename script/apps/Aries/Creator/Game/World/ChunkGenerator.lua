@@ -517,6 +517,9 @@ function ChunkGenerator:PostGenerateChunk(chunk, x, z)
 	end
 end
 
+function ChunkGenerator:GetDefaultLoginPos()
+	return 20000, -120, 20000;
+end
 
 -- return gen_id of the most recent request
 local function VerifyOutOfWorldRequest()

@@ -13,8 +13,9 @@ function GetRewardData()
     return SummerCampRewardPage.RewardData
 end
 
-function OnclickGetReward()
-    SummerCampRewardPage.OnclickGetReward()
+function OnClickGetReward(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    SummerCampRewardPage.OnClickGetReward(index)
 end
 
 function OnMouseEnter(name, mcmlNode)
@@ -49,7 +50,7 @@ end
                 <pe:repeatitem>
                     <div style="float: left; margin-left: 10px;margin-top: 0px; float: left; width: 200px;height: 153px;">    
                         <div style="position: relative;width: 128px;height: 128px; margin-left: 0px;margin-top: 5px;">
-                            <input zorder="1" type="button" style="position: relative;background:;" onclick="OnclickGetReward" param1='<%=Eval("index")%>' width="128" height="128" onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave"/>                
+                            <input zorder="1" type="button" style="position: relative;background:;" onclick="OnClickGetReward" param1='<%=Eval("index")%>' width="128" height="128" onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave"/>                
                             <img zorder="0" src='<%=Eval("icon")%>' style="position: relative;margin-left: 0px;margin-top: 0px;" width="128" height="128"/>
                         </div>
 

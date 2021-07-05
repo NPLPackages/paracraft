@@ -40,6 +40,8 @@ if(GameLogic.QuestAction and GameLogic.QuestAction.SetValue)then
 end
 -------------------------------------------------------
 ]]
+
+
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
@@ -52,6 +54,7 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
 -- read world_id from template.goto_world
 local QuestCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestCoursePage.lua");
+local Quest2in1Lesson = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/Quest2in1Lesson.lua");
 -- template.goto_world = ["ONLINE","RELEASE","LOCAL"]
 
 QuestAction.VersionToKey = {
@@ -83,6 +86,63 @@ QuestAction.TaskState = {
 	can_complete = 1,		--可完成
     has_complete = 2,		--已完成
     can_go = 3,				-- 前往
+}
+
+QuestAction.SummerCampDailyTask = {
+    {
+        {name="探索世界：FindYou", world_id = 242},
+        {name="学习课程：拜访帕帕的家", world_id = 42457, course_id = 1},
+    },
+
+    {
+        {name="探索世界：当下的力量", world_id = 1070},
+        {name="学习课程：拜访拉拉的家", world_id = 42701, course_id = 2},
+    },
+
+    {
+        {name="探索世界：伟大的发明家", world_id = 470},
+        {name="学习课程：拜访卡卡的家", world_id = 42670, course_id = 3},
+    },
+
+    {
+        {name="探索世界：火星探险", world_id = 1082},
+        {name="学习课程：快速移动的方法", world_id = 44620, course_id = 11},
+    },
+
+    {
+        {name="探索世界：圆的故事", world_id = 94},
+        {name="学习课程：跳转：在场景中穿梭", world_id = 44747, course_id = 16},
+    },
+
+    {
+        {name="探索世界：在山的那边", world_id = 96},
+        {name="学习课程：如何选择一组方块", world_id = 44708, course_id = 12},
+    },
+
+    {
+        {name="探索世界：晓出净慈寺送林子方", world_id = 7945},
+        {name="学习课程：跳转：在场景中穿梭", world_id = 49658, course_id = 37},
+    },
+
+    {
+        {name="探索世界：象形之美", world_id = 2769},
+        {name="学习课程：选择方块的命令/take", world_id = 44859, course_id = 19},
+    },
+
+    {
+        {name="探索世界：永生的雪人", world_id = 158},
+        {name="学习课程：通知提醒命令/tip", world_id = 44628, course_id = 10},
+    },
+
+    {
+        {name="探索世界：父亲", world_id = 1073},
+        {name="学习课程：控制阴影的命令/shader", world_id = 44627, course_id = 6},
+    },
+
+    {
+        {name="探索世界：有了想法你怎么做", world_id = 455},
+        {name="学习课程： 旋转木马", world_id = 49764, course_id = 92},
+    },
 }
 
 QuestAction.winter_camp_jion_gsid = 90004
@@ -781,12 +841,23 @@ end
 
 local world2in1_gsid = 90007
 function QuestAction.GetSummerTaskProgress(gsid)
+    if gsid == 70010 then
+        local task_data = QuestAction.GetSummerCampTaskData(gsid)
+        local is_task_finish = QuestAction.CheckSummerTaskFinish(gsid)
+        if is_task_finish then
+            return task_data.max_pro
+        end
+
+        local value = QuestAction.GetSummerTaskBuWangProgress()
+        return value
+    end
+
     local client_data = KeepWorkItemManager.GetClientData(world2in1_gsid)
     if client_data == nil then
         return 0
     end
     
-    local summer_progress_data = client_data.summer_progress_data
+    local summer_progress_data = client_data.summer_progress_data or {}
 
     local task_data = summer_progress_data[gsid] or summer_progress_data[tostring(gsid)]
     if task_data then
@@ -794,6 +865,43 @@ function QuestAction.GetSummerTaskProgress(gsid)
     end
 
     return 0
+end
+
+function QuestAction.SetSummerTaskBuWangProgress()
+end
+
+local buwang_task_data = {
+    {gsid=65013,exid=31070,name="秋收起义"},
+    {gsid=65014,exid=31071,name="武装起义"},
+    {gsid=65015,exid=31072,name="护宝"},
+    {gsid=65016,exid=31073,name="东纵展馆"},
+    {gsid=65017,exid=31074,name="洛川会议"},
+    {gsid=65018,exid=31075,name="山地游击战"},
+    {gsid=65019,exid=31076,name="古田会议"},
+    {gsid=65020,exid=31077,name="批阅"},
+    {gsid=65021,exid=31078,name="毛泽东故居"},
+    {gsid=65022,exid=31079,name="革命根据地"},
+    {gsid=65023,exid=31080,name="红八军军部"},
+    {gsid=65024,exid=31081,name="种树"},
+    {gsid=65025,exid=31082,name="红井"},
+    {gsid=65026,exid=31083,name="挖井人"},
+    {gsid=65027,exid=31084,name="朱德旧居"},
+    {gsid=65028,exid=31085,name="朱德生平"},
+    {gsid=65029,exid=31086,name="瓦窑堡会议"},
+    {gsid=65030,exid=31087,name="统一战线"},
+    {gsid=65031,exid=31088,name="中共七大"},
+    {gsid=65032,exid=31089,name="从容就义"},
+}
+function QuestAction.GetSummerTaskBuWangProgress()
+    local value = 0
+    for index, v in ipairs(buwang_task_data) do
+        local bOwn = KeepWorkItemManager.HasGSItem(v.gsid)
+        if bOwn then
+            value = value + 1
+        end
+    end
+
+    return value
 end
 
 function QuestAction.SetSummerTaskProgress(gsid, change_value, finish_cb)
@@ -820,7 +928,12 @@ function QuestAction.SetSummerTaskProgress(gsid, change_value, finish_cb)
         client_data.summer_progress_data[gsid] = {value = 0}
     end
 
+    
+
     local value = client_data.summer_progress_data[gsid].value or 0
+    if gsid == 70010 then
+        value = QuestAction.GetSummerTaskBuWangProgress()
+    end
     if value >= task_data.max_pro then
         QuestAction.SummerTaskDoFinish(gsid)
         return
@@ -844,6 +957,10 @@ function QuestAction.SetSummerTaskProgress(gsid, change_value, finish_cb)
             KeepWorkItemManager.SetClientData(world2in1_gsid, client_data, function()
                 GameLogic.GetFilters():apply_filters("summer_task_change", gsid);
             end)
+
+            if task_data.name == "红色先锋" then
+                GameLogic.GetCodeGlobal():BroadcastTextEvent("openLongMarchUI",{name = "certiRedPioneer"})
+            end
 
             if finish_cb then
                 finish_cb()
@@ -890,7 +1007,7 @@ function QuestAction.GetSummerCampTaskData(gsid)
     if QuestAction.SummerCampTaskData == nil then
         QuestAction.SummerCampTaskData = {
             [70009] = {name = "闪闪红星", exid = 31066, gsid = 70009, max_pro = 1, desc = "完成共筑红旗渠活动"},
-            [70010] = {name = "不忘初心", exid = 31067, gsid = 70010, max_pro = 20, desc = "完成梦回党的摇篮活动"},
+            [70010] = {name = "不忘初心", exid = 31067, gsid = 70010, max_pro = 21, desc = "完成梦回党的摇篮活动"},
             [70011] = {name = "红色先锋", exid = 31068, gsid = 70011, max_pro = 10, desc = "完成重走长征路活动"},
             [70012] = {name = "时代接班人", exid = 31069, gsid = 70012, max_pro = 15, desc = "完成3D动画编程课程学习"},
         }
@@ -984,4 +1101,132 @@ function QuestAction.CreateBlock(x,y,z,block_id,side)
     local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
     local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x,blockY = y, blockZ = z, block_id = block_id, side = side, entityPlayer = EntityManager.GetPlayer()})
     task:Run();
+end
+
+function QuestAction.OnWorldLoaded()
+    local world_id = WorldCommon.GetWorldTag("kpProjectId")
+    local name = WorldCommon.GetWorldTag("name")
+    local today_daily_data = QuestAction.GetTodaySummerDailyTaskData()
+    for i, v in ipairs(today_daily_data) do
+        if v.world_id == world_id or string.find(v.name, name) then
+            QuestAction.SetSummerDailyTaskProgress(i)
+            break
+        end
+    end
+end
+
+-- 夏令营每日任务每天只有两个 所以task_id只有1 和 2
+function QuestAction.SetSummerDailyTaskProgress(task_id, change_value)
+    local client_data = QuestAction.GetSummerTaskClientData()
+    if client_data == nil then
+        client_data = {}
+    end
+    
+    if client_data.summer_dailytask_data == nil then
+        client_data.summer_dailytask_data = {}
+    end
+
+    if client_data.summer_dailytask_data[task_id] == nil then
+        client_data.summer_dailytask_data[task_id] = {value = 0}
+    end
+
+    local value = client_data.summer_dailytask_data[task_id].value or 0
+    local max_pro = 1
+    if value >= max_pro then
+        if client_data.summer_dailytask_data.today_weehours == nil then
+            local server_time_stamp = QuestAction.GetServerTime() or 0
+            local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time_stamp)
+            client_data.summer_dailytask_data.today_weehours = today_weehours
+            KeepWorkItemManager.SetClientData(world2in1_gsid, client_data, function()
+        
+            end)
+        end
+        return
+    end
+
+    if change_value then
+        value = change_value
+    else
+        value = value + 1
+    end
+
+    if value >= max_pro then
+        value = max_pro
+    end
+
+    client_data.summer_dailytask_data[task_id].value = value
+    local server_time_stamp = QuestAction.GetServerTime() or 0
+    local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time_stamp)
+    client_data.summer_dailytask_weehours = today_weehours
+
+    -- print("xxaaaaaaaaaaa保存每日任务数据")
+    -- echo(client_data, true)
+    KeepWorkItemManager.SetClientData(world2in1_gsid, client_data, function()
+        
+    end)
+end
+
+function QuestAction.GetSummerDailyTaskProgress(task_id)
+    local client_data = QuestAction.GetSummerTaskClientData()
+    if client_data == nil then
+        return 0
+    end
+    
+    local summer_dailytask_data = client_data.summer_dailytask_data
+    if summer_dailytask_data == nil then
+        return 0
+    end
+
+    local task_data = summer_dailytask_data[task_id] or summer_dailytask_data[tostring(task_id)]
+    if task_data then
+        return task_data.value or 0
+    end
+
+    return 0
+end
+
+function QuestAction.GetSummerTaskClientData()
+    local client_data = KeepWorkItemManager.GetClientData(world2in1_gsid)
+    if client_data == nil then
+        return
+    end
+
+    local last_day_weehours = client_data.summer_dailytask_weehours or 0
+    local server_time_stamp = QuestAction.GetServerTime() or 0
+    local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time_stamp)
+    if today_weehours > last_day_weehours then
+        client_data.summer_dailytask_data = {}
+    end
+    return client_data
+end
+
+function QuestAction.GetTodaySummerDailyTaskData()
+    local day_index = QuestAction.GetSummerDay()
+    local data = QuestAction.SummerCampDailyTask[day_index]
+
+    return data or {}
+end
+
+-- 获取今天是夏令营第几天 7.1号是第一天
+local SummerStartDate = {year = 2021, month = 7, day = 1, hour=0, min=0, sec=0}
+function QuestAction.GetSummerDay()
+    local begain_time_stamp = os.time(SummerStartDate)
+    local now_time_stamp = QuestAction.GetServerTime()
+    local on_day_second = 24 * 60 * 60
+    local past_second = now_time_stamp - begain_time_stamp
+    if past_second < 0 then
+        return 0
+    end
+
+    local day_index = math.modf(past_second/on_day_second) + 1
+
+    return day_index
+end
+
+function QuestAction.Get2In1LessonProgress(course_id,callback)
+    return Quest2in1Lesson.GetLessonProgress(course_id,callback)
+end
+
+function QuestAction.UpdateLessonProgress(course_id,lessonId,progress,status,callback)
+    Quest2in1Lesson.UpdateLessonProgress(course_id,lessonId,progress,status)
 end

@@ -9,6 +9,7 @@
 local SummerCampNotice = NPL.export()
 SummerCampNotice.strImgPath = "Texture/Aries/Creator/keepwork/SummerCamp/"
 local strPath = ';NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNotice.lua")'
+local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua") 
 local parent_root
 SummerCampNotice.tblNoticeDt = {
     {   icon="img_notice2_232X225_32bits.png#0 0 232 225",
@@ -60,6 +61,11 @@ function SummerCampNotice.OnInit()
 end
 
 function SummerCampNotice.ShowView()
+    if SummerCampMainPage then
+        SummerCampMainPage.ShowView()
+        return
+    end
+    
     local view_width = 980
     local view_height = 560
     local params = {
@@ -110,10 +116,10 @@ function SummerCampNotice.OnClickPreAds()
     if not isCanClickPre then
         return
     end
-    commonlib.TimerManager.SetTimeout(function() 
-        isCanClickPre = true
-    end, 500);
-    isCanClickPre = false
+    -- commonlib.TimerManager.SetTimeout(function() 
+    --     isCanClickPre = true
+    -- end, 500);
+    -- isCanClickPre = false
     local num = #SummerCampNotice.tbAdsDt
     SummerCampNotice.m_nSelectAdIndex = SummerCampNotice.m_nSelectAdIndex - 1
     if SummerCampNotice.m_nSelectAdIndex < 1 then
@@ -126,10 +132,10 @@ function SummerCampNotice.OnClickNextAds()
     if not isCanClickNext then
         return
     end
-    commonlib.TimerManager.SetTimeout(function() 
-        isCanClickNext = true
-    end, 500);
-    isCanClickNext = false
+    -- commonlib.TimerManager.SetTimeout(function() 
+    --     isCanClickNext = true
+    -- end, 500);
+    -- isCanClickNext = false
     local num = #SummerCampNotice.tbAdsDt
     SummerCampNotice.m_nSelectAdIndex = SummerCampNotice.m_nSelectAdIndex + 1
     if SummerCampNotice.m_nSelectAdIndex > num then
@@ -159,11 +165,14 @@ function SummerCampNotice.GetSummerWorldId()
 end
 
 function SummerCampNotice.OnClickAds(name)
+    
     if name == "zhengcheng" then --征程
+        SummerCampNotice.OnClosePage()
         GameLogic.QuestAction.OpenSummerVipView()
         return 
     end
-    if name == "lesson" then  --名师公开课 
+    if name == "lesson" then  --名师公开课
+        GameLogic.RunCommand("/open https://keepwork.com/official/tips/xu.ni-wx/dinghuistudio")
         return
     end
 
@@ -179,6 +188,7 @@ function SummerCampNotice.OnClickAds(name)
     end
 
     if name == "hero" then --盖世英雄
+        SummerCampNotice.OnClosePage()
         GameLogic.RunCommand("/goto 18907,12,19188")
         return
     end
@@ -195,7 +205,7 @@ end
 
 function SummerCampNotice.RefreshPage()
     if page then
-        page:Refresh()
+        page:Refresh(0)
     end    
 end
 

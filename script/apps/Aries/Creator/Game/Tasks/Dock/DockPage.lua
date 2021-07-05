@@ -260,13 +260,15 @@ function DockPage.OnClickTop(id)
         Email.Show();
         table.insert(DockPage.showPages,{id,Email.GetPageCtrl()})
     elseif(id == "notice")then
-        if (System.options.isDevMode and (System.User.isVipSchool or System.User.isVip)) then
-            local SummerCampNotice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNotice.lua") 
-            SummerCampNotice.ShowView()
-        else
-            Notice.Show(1); 
-            table.insert(DockPage.showPages,{id,Notice.GetPageCtrl()})
-        end  
+        -- if (System.User.isVipSchool or System.User.isVip) then
+        --     local SummerCampNotice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNotice.lua") 
+        --     SummerCampNotice.ShowView()
+        -- else
+        --     Notice.Show(1); 
+        --     table.insert(DockPage.showPages,{id,Notice.GetPageCtrl()})
+        -- end  
+        Notice.Show(1); 
+        table.insert(DockPage.showPages,{id,Notice.GetPageCtrl()})
     elseif (id == 'present') then
         if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
             GameLogic.GetFilters():apply_filters(
@@ -739,9 +741,9 @@ function DockPage.ShowCampIcon()
 end
 
 function DockPage.ShowSummerCampIcon()
-    if not System.options.isDevMode then
-        return
-    end
+    -- if not System.options.isDevMode then
+    --     return
+    -- end
     if DockPage.page == nil or not DockPage.page:IsVisible() then
         return
     end

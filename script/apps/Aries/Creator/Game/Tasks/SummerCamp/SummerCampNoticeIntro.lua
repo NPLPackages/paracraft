@@ -60,7 +60,7 @@ function SummerCampNoticeIntro.OnClickGo()
         GameLogic.GetCodeGlobal():BroadcastTextEvent("openLongMarchUI", {name = "mainPage"});
     elseif SummerCampNoticeIntro.n_curIndex == 3 then
         --[[当用户点击【立即前往】的按钮时，如果用户不在夏令营的世界中，则首先拉起世界。将用户扔进2in1学习的世界（杜提供）。]]
-        GameLogic.AddBBS(nil,"敬请期待~")
+        GameLogic.RunCommand(string.format("/goto %d %d %d", 18876,13,19189)); --18876,12,19189
     elseif SummerCampNoticeIntro.n_curIndex == 4 then
         --[[当用户点击【立即前往】的按钮时，如果用户不在夏令营的世界中，则首先拉起世界。如果用户已经完成了开营仪式，则打开【祝福编辑面板】。（面板见《闪闪红星》策划案）]]
         local SummerCampSignShowView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampSignShowView.lua") 

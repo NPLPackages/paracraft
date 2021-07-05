@@ -8,6 +8,7 @@ SummerCampRewardPage.ShowView()
 ]]
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local httpwrapper_version = HttpWrapper.GetDevVersion();
 local SummerCampRewardPage = NPL.export()
 
@@ -20,7 +21,7 @@ SummerCampRewardPage.ItemData = {
     {gsid = 70009, item_bg="Texture/Aries/Creator/keepwork/SummerCamp/item_4_237x451_32bits.png#0 0 237 451"},
 }
 
-SummerCampRewardPage.RewardData = { {},{},{},{} }
+SummerCampRewardPage.RewardData = { {exid=60055},{exid=60056},{exid=60057},{exid=60058} }
 
 function SummerCampRewardPage.OnInit()
     page = document:GetPageCtrl();
@@ -95,4 +96,28 @@ end
 function SummerCampRewardPage.OnMouseLeave(index)
     local ui_object = ParaUI.GetUIObject("summer_reward_icon_" .. index);
     ui_object.visible = false
+end
+
+function SummerCampRewardPage.OnClickGetReward(index)
+    local has_get = QuestAction.GetSummerRewardHasGet(index)
+    if has_get then
+        GameLogic.AddBBS("summer_reward", L"您已领取", 5000, "255 0 0");
+        return
+    end
+
+
+    local certificate_num = QuestAction.GetCertificateNum()
+    if certificate_num < index then
+        GameLogic.AddBBS("summer_reward", L"尚未达成", 5000, "255 0 0");
+        return
+    end
+    
+    local reward_data = SummerCampRewardPage.RewardData[index]
+    KeepWorkItemManager.DoExtendedCost(reward_data.exid, function()
+        QuestAction.SetSummerRewardGet(index, function()
+            GameLogic.AddBBS("summer_reward", L"领取成功", 5000, "0 255 0");
+            SummerCampRewardPage.InitData()
+            page:Refresh(0)
+        end)
+    end) 
 end
