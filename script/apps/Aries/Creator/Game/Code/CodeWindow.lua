@@ -151,53 +151,6 @@ function CodeWindow:FilterImage(filename)
 	return filename;
 end
 
--- the parent container must be larger than or equal to this screen size
--- otherwise we will scale the screen.
-function CodeWindow:SetMinimumScreenSize(minScreenWidth,minScreenHeight)
-	self.minScreenWidth = minScreenWidth;
-	self.minScreenHeight = minScreenHeight;
-	
-	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
-	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
-	local viewport = ViewportManager:GetSceneViewport();
-	viewport:Connect("sizeChanged", self, "OnViewportSizeChange", "UniqueConnection")
-
-	self:OnViewportSizeChange();
-end
-
-function CodeWindow:OnViewportSizeChange()
-	if(self.minScreenWidth and self.minScreenHeight) then
-		local nativeWnd = self:GetNativeWindow();
-		if(nativeWnd) then
-			local parent = nativeWnd.parent
-			if(not parent:IsValid()) then
-				parent = ParaUI.GetUIObject("root");
-			end
-			local x, y, width, height = parent:GetAbsPosition();
-			local scalingWidth, scalingHeight = 1, 1;
-			if(width < self.minScreenWidth) then
-				scalingWidth = width / self.minScreenWidth;
-			end
-			if(height < self.minScreenHeight) then
-				scalingHeight = height / self.minScreenHeight;
-			end
-			local scaling = math.min(scalingWidth, scalingHeight);
-			self:SetUIScaling(scaling, scaling);
-
-			if(self.showParams) then
-				local params = self.showParams;
-				local left, top, width, height, alignment = params.left, params.top, params.width, params.height, params.alignment or "_lt";
-				self:SetAlignment(alignment);
-				nativeWnd:Reposition(alignment, math.floor(left * scaling+0.5), math.floor(top * scaling + 0.5), math.floor(width * scaling + 0.5), math.floor(height * scaling+0.5));
-
-				local x, y, width, height = nativeWnd:GetAbsPosition();
-				width, height = math.floor(width/scaling + 0.5), math.floor(height/scaling + 0.5)
-				self:setGeometry(self.screen_x, self.screen_y, width, height);
-			end
-		end
-	end
-end
-
 -- virtual
 function CodeWindow:CloseWindow(bDestroy)
 	CodeWindow._super.CloseWindow(self, bDestroy);

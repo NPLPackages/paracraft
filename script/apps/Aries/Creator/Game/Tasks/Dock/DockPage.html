@@ -9,7 +9,20 @@
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
     local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
     local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
-
+    function ds_left_top_line_1(index)
+        if(index == nil) then
+            return #DockPage.left_top_line_1;
+        else
+            return DockPage.left_top_line_1[index];
+        end
+    end
+    function ds_left_top_line_2(index)
+        if(index == nil) then
+            return #DockPage.left_top_line_2;
+        else
+            return DockPage.left_top_line_2[index];
+        end
+    end
     function ds_top_line_1(index)
         if(index == nil) then
             return #DockPage.top_line_1;
@@ -30,6 +43,15 @@
         else
             return DockPage.top_line_3[index];
         end
+    end
+    function OnClickLeftTop(id)
+        DockPage.OnClickLeftTop(id)
+    end
+    function RenderButton_LeftTop_1(index)
+        return DockPage.RenderButton_LeftTop_1(index);
+    end
+    function RenderButton_LeftTop_2(index)
+        return DockPage.RenderButton_LeftTop_2(index);
     end
     function OnClickTop(id)
         DockPage.OnClickTop(id)
@@ -68,7 +90,38 @@
         return DockPage.CanShowCampVip();
     end
 ]]></script>
-    <pe:container ClickThrough="true" alignment="_rt" style="position:relative;margin-top:10px;margin-right:205px;height:270px;background:;">
+    <!--左上角UI-->
+    <pe:container ClickThrough="true" name="left_top_container" alignment="_lt" style="position:relative;margin-left:10px;margin-top:10px;height:270px;background:;">
+        <div style="width:820px;height:90px;">
+            <pe:gridview name="gridview_1" style="position:relative;width:820px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="8" DefaultNodeHeight="75" pagesize="8"
+                         DataSource='<%=ds_left_top_line_1%>'>
+                <Columns>
+                    <div style="width:100px;height:80px;">
+                        <pe:if condition='<%= (Eval("enabled") == true) %>'>
+                            <%= RenderButton_LeftTop_1(Eval("index"))%>
+                        </pe:if>
+                    </div>
+                </Columns>
+                <PagerSettings Position="Top" height="0" PreviousPageText="" NextPageText="" />
+            </pe:gridview>
+
+        </div>
+        <div style="margin-top:-10px;width:600px;height:90px;">
+            <pe:gridview name="gridview_2" style="width:600px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight="75" pagesize="6"
+                         DataSource='<%=ds_left_top_line_2%>'>
+                <Columns>
+                    <div style="width:100px;height:80px;">
+                        <pe:if condition='<%= (Eval("enabled2") == true) %>'>
+                            <%= RenderButton_LeftTop_2(Eval("index"))%>
+                        </pe:if>
+                    </div>
+                </Columns>
+                <PagerSettings Position="Top" height="0" PreviousPageText="" NextPageText="" />
+            </pe:gridview>
+        </div>
+    </pe:container>
+    <!--右上角UI-->
+    <pe:container ClickThrough="true" name="right_top_container"  alignment="_rt" style="position:relative;margin-top:10px;margin-right:205px;height:270px;background:;">
         <div style="width:600px;height:90px;">
             <pe:gridview name="gridview_1" style="position:relative;width:600px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight = "75" pagesize="6"
                 DataSource='<%=ds_top_line_1%>'>
@@ -97,7 +150,7 @@
             </pe:gridview>
         </div>        
     </pe:container>    
-    <pe:container ClickThrough="true" alignment="_ctb" style="position:relative;height:130px; background:;">
+    <pe:container ClickThrough="true" name="center_bottom_container" alignment="_ctb" style="position:relative;height:130px; background:;" >
         <div style="margin-top:0px;">
             <div style="float:left;margin-left:-20px;">
                 <!--创造-->
@@ -113,7 +166,7 @@
             </div>                       
         </div>        
     </pe:container>
-    <pe:container ClickThrough="true" alignment="_rb" style="position:relative;height:90px; background:;">
+    <pe:container ClickThrough="true" name="right_bottom_container" alignment="_rb" style="position:relative;height:90px; background:;">
         <div style="float:right;margin-right:-7px;">
             <!--人物-->
             <input type="button" name='character' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_renwu_32bits.png#0 0 85 80)"/>
@@ -130,7 +183,7 @@
         <pe:if condition="<%=not CanShowVip()%>">
             <div  style="float:right;margin-right:7px;">
                 <!--好友-->
-                <input type="button" name='friends' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_haoyou_32bits.png#0 0 85 80)"/>
+                <input type="button" name='friends_1' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_haoyou_32bits.png#0 0 85 80)"/>
                 <pe:if condition="<%=CanShowFriendRedTip()%>">
                     <kp:redtip style="position:relative;margin-left:72px;margin-top:-76px;" value="true" ></kp:redtip>
                 </pe:if>                
@@ -139,7 +192,7 @@
         <pe:if condition="<%=CanShowVip()%>">
             <div  style="float:right;margin-right:-7px;">
                 <!--好友-->
-                <input type="button" name='friends' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_haoyou_32bits.png#0 0 85 80)"/>
+                <input type="button" name='friends_2' onclick="OnClick" style="width:85px;height:80px;background:url(Texture/Aries/Creator/keepwork/dock/btn2_haoyou_32bits.png#0 0 85 80)"/>
                 <pe:if condition="<%=CanShowFriendRedTip()%>">
                     <kp:redtip style="position:relative;margin-left:72px;margin-top:-76px;" value="true" ></kp:redtip>
                 </pe:if>                
@@ -151,7 +204,7 @@
         </pe:if> 
     </pe:container>
     <pe:if condition="<%=not System.os.IsTouchMode()%>">
-        <pe:container ClickThrough="true" alignment="_ctr" style="margin-top: -45px;position:relative;height:90px; background:;">
+        <pe:container ClickThrough="true" name="btn_ziyuan_container" alignment="_ctr" style="margin-top: -45px;position:relative;height:90px; background:;">
             <div style="float:right;margin-right:0px;">
                 <!--资源-->
                 <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->
@@ -160,7 +213,7 @@
             </div>                
         </pe:container>
     
-        <pe:container ClickThrough="true" alignment="_ctr" style="margin-top: 25px; height:90px; background:;">
+        <pe:container ClickThrough="true" name="btn_xiaoyuan_container" alignment="_ctr" style="margin-top: 25px; height:90px; background:;">
             <div style="float:right;margin-right:0px;">
                 <!--资源-->
                 <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->
@@ -171,7 +224,7 @@
     </pe:if> 
 
     <pe:if condition="<%=System.os.IsTouchMode()%>">
-        <pe:container ClickThrough="true" alignment="_ctr" style="margin-top: -40px;position:relative;height:90px; background:;">
+        <pe:container ClickThrough="true" name="btn_ziyuan_container" alignment="_ctr" style="margin-top: -40px;position:relative;height:90px; background:;">
             <div style="float:right;margin-right:0px;">
                 <!--资源-->
                 <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->
@@ -180,7 +233,7 @@
             </div>                
         </pe:container>
     
-        <pe:container ClickThrough="true" alignment="_ctr" style="margin-top: 10px; height:90px; background:;">
+        <pe:container ClickThrough="true" name="btn_xiaoyuan_container" alignment="_ctr" style="margin-top: 10px; height:90px; background:;">
             <div style="float:right;margin-right:0px;">
                 <!--资源-->
                 <!-- <img ClickThrough="true" style="position: relative;margin-left: 5;margin-top: -7;" uiname="animator" zorder="1" class="animated_btn_overlay" width="180" height="68"/> -->

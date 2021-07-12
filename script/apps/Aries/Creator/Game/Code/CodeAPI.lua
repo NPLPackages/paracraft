@@ -239,7 +239,7 @@ end
 function env_imp:checkyield(count)
 	self.check_count = self.check_count + (count or 1);
 	if(self.check_count > 100) then
-		if(self.codeblock:IsAutoWait()) then
+		if(self.codeblock:IsAutoWait() and (self.co and coroutine.running() == self.co.co)) then
 			env_imp.wait(self, env_imp.GetDefaultTick(self));
 		else
 			self.check_count = 0;

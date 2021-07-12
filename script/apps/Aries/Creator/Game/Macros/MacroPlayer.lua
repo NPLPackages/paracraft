@@ -26,12 +26,17 @@ local TouchMiniKeyboard, TouchVirtualKeyboardIcon = nil, nil;
 local TouchMiniRightKeyboard
 
 MacroPlayer.TextData = {{}}
+MacroPlayer.touch_scale = 1
 
 function MacroPlayer.OnInit()
 	page = document:GetPageCtrl();
 	GameLogic.GetFilters():add_filter("Macro_EndPlay", MacroPlayer.OnEndPlay);
 	GameLogic.GetFilters():add_filter("Macro_PlayMacro", MacroPlayer.OnPlayMacro);
 	MacroPlayer.isShowDebugWnd = false;
+
+	if System.os.IsTouchMode() then
+		MacroPlayer.touch_scale = 1.8
+	end
 end
 
 function MacroPlayer.OnInitEnd()
@@ -345,12 +350,15 @@ function MacroPlayer.AnimCursorBtn(bRestart)
 			local cursorBtn = page:FindControl("cursorBtn")
 			cursorBtn.visible = false
 		elseif(cursor and cursor.visible) then
+			local cursorBtn = page:FindControl("cursorBtn")
 			local x, y, width, height = cursor:GetAbsPosition();
+			local scale = MacroPlayer.touch_scale
+			cursorBtn.x = 12 * scale
+			cursorBtn.y = 15 * scale
+
 			x = x + 12;
 			y = y + 15;
-			local cursorBtn = page:FindControl("cursorBtn")
 			
-
 			local mouseX, mouseY = ParaUI.GetMousePosition();
 			
 			local totalTicks = 30;
@@ -550,27 +558,34 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
 			if(bShow) then
 				MacroPlayer.SetTopLevel();
 				
-				if System.os.IsTouchMode() then
-					cursor.width = 32
-					cursor.height = 32
-				end
-				
+				local scale = MacroPlayer.touch_scale
+				local default_size = 32
+
+				cursor.width = default_size * scale
+				cursor.height = default_size * scale
+				local img_cursor = page:FindControl("img_mousecursor");
+				img_cursor.x = cursor.width/2 - img_cursor.width/2
+				img_cursor.y = cursor.height/2 - img_cursor.height/2
+
 				if(x and y) then
-					cursor.x = x - 16;
-					cursor.y = y - 16;
+					cursor.x = x - cursor.width/2;
+					cursor.y = y - cursor.height/2;
 				end
 				button = button or "";
 				if(not Macros.IsShowButtonTip()) then
 					button = ""
 				end
-				local left = 16 + 32;
+				local offset = (cursor.width - default_size)/2 + 32
+				local left = default_size/2 + offset;
 				
+
 				local shiftKey = page:FindControl("shiftKey")
 				if(button:match("shift")) then
 					shiftKey.visible = true;
 					shiftKey.translationx = left;
 					shiftKey:ApplyAnim();
 					left = left + shiftKey.width + 5;
+					shiftKey.y = offset
 				else
 					shiftKey.visible = false;
 				end
@@ -580,6 +595,7 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
 					ctrlKey.translationx = left;
 					ctrlKey:ApplyAnim();
 					left = left + ctrlKey.width + 5;
+					ctrlKey.y = offset
 				else
 					ctrlKey.visible = false;
 				end
@@ -589,12 +605,14 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
 					altKey.translationx = left;
 					altKey:ApplyAnim();
 					left = left + altKey.width + 5;
+					altKey.y = offset
 				else
 					altKey.visible = false;
 				end
 
 
 				local mouseBtn = page:FindControl("mouseBtn")
+				mouseBtn.y = offset
 				if(button:match("left")) then
 					mouseBtn.visible = true;
 					mouseBtn.background = "Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png";
@@ -613,7 +631,9 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
 				else
 					mouseBtn.visible = false;
 				end
-
+				-- mouseBtn.x = 0
+				-- mouseBtn.y = 0
+				-- mouseBtn.translationx = 0
 				local cursorBtn = page:FindControl("cursorBtn")
 				if(cursorBtn) then
 					cursorBtn.visible = Macros.IsShowButtonTip()
@@ -977,10 +997,6 @@ function MacroPlayer.ShowDrag(bShow, startX, startY, endX, endY, button)
 			if(bShow) then
 				local curPoint = page:FindControl("cursorClick");
 				curPoint.candrag = true;
-				if System.os.IsTouchMode() then
-					curPoint.width = 55
-					curPoint.height = 55
-				end
 
 				local startPoint = page:FindControl("startPoint")
 				local width = 24;
@@ -1030,10 +1046,7 @@ function MacroPlayer.OnDragMove()
 			local startX, startY = curPoint:GetAbsPosition();
 			local endX, endY = endPoint:GetAbsPosition();
 			local diffDistance = math.sqrt((endX - startX)^2 + (endY - startY)^2)
-			local targetDistance = 16
-			if System.os.IsTouchMode() then
-				targetDistance = targetDistance * 2
-			end
+			local targetDistance = 16 * MacroPlayer.touch_scale
 			MacroPlayer.isReachedDragTarget = (diffDistance < targetDistance);
 		end
 	end

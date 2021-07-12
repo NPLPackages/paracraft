@@ -245,6 +245,13 @@ function DefaultTheme:Load()
 
 	local pe_css = commonlib.gettable("Map3DSystem.mcml_controls.pe_css");
 	pe_css.default = {
+		--red summer camp 2021------------------------------------------------------------------------
+		["red_summer_camp_bg"] = {background = "Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png;380 247 128 257 : 1 123 126 123", },
+		["red_summer_camp_open_vip_btn"] = {background = "Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png;298 110 80 75", width = 80, height = 75, },
+		["red_summer_camp_back_bg"] = {background = "Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png;0 0 378 55", width = 378, height = 55, },
+		["red_summer_camp_back_arrow"] = {background = "Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png;0 65 45 38", width = 45, height = 38, },      
+
+		--------------------------------------------------------------------------
 		["kp_green_button"] = {background = "Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png;0 0 38 64:16 16 16 16", ["text-offset-y"] = -4, ["font-size"] = 14, height = 64},
 		["kp_yellow_button"] = {background = "Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png;0 0 38 64:16 16 16 16", ["text-offset-y"] = -4, ["font-size"] = 14, height = 64},
 		["kp_gray_button"] = {background = "Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png;0 0 38 64:16 16 16 16", ["text-offset-y"] = -4, ["font-size"] = 14, height = 64},

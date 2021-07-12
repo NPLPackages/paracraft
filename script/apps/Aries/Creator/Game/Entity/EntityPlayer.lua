@@ -953,3 +953,18 @@ function Entity:SetCanRandomMove(bEnable)
  -- empty implementation just to be compatible with EntityNPC as used in ActorNPC
 end
 
+-- this is the c++ mount method. 
+-- please note one needs to set focus to the targetEntity to take control of it. 
+function Entity:MountOn(targetEntity, mountID)
+	local player = self:GetInnerObject();
+	if(player and targetEntity) then
+		local target = targetEntity:GetInnerObject();
+		if(target) then
+			player:ToCharacter():MountOn(target, mountID or -1);
+			target:SetField("IsControlledExternally", false);
+			target:SetField("EnableAnim", true);
+			-- make it normal movement style
+			target:SetField("MovementStyle", 0)
+		end
+	end
+end

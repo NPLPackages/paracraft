@@ -9,24 +9,45 @@ SummerCampCoursePage.OnInit()
 function GoTo()
     SummerCampCoursePage.GoTo()
 end
+
+function GetCourseData(name)
+    return SummerCampCoursePage.GetCourseData(name)
+end
+
+function IsShowBuke()
+    return SummerCampCoursePage.IsShowBuke()
+end
 ]]></script>
 <div style=" width: 1035px; height: 623px;">
     <div style="float: left;width: 283px;text-align: center;color: #d1d3ce;">
         <div style="margin-left: 5px;margin-top: -4px; width: 251px;height: 516px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/img_2_251x516_32bits.png#0 0 251 516)">
-            <div style="margin-left: 0px;margin-top: 80px; font-weight: bold;base-font-size:18px; font-size: 18px;">暂无课程</div>
-            <div style="margin-left: 0px;margin-top: 156px; font-weight: bold;base-font-size:18px; font-size: 18px;">暂无课程</div>
-            <div style="margin-left: 0px;margin-top: 156px; font-weight: bold;base-font-size:18px; font-size: 18px;">暂无课程</div>
+            <pe:if condition='<%=GetCourseData("name") == ""%>'>
+                <div style="margin-left: 0px;margin-top: 80px; font-weight: bold;base-font-size:18px; font-size: 18px;">暂无课程</div>
+                <div style="margin-left: 0px;margin-top: 156px; font-weight: bold;base-font-size:18px; font-size: 18px;">暂无课程</div>
+                <div style="margin-left: 0px;margin-top: 156px; font-weight: bold;base-font-size:18px; font-size: 18px;">暂无课程</div>
+            </pe:if>
+            <pe:if condition='<%=GetCourseData("name") ~= ""%>'>
+                <div style="position: relative;margin-left: 0px;margin-top: 80px; font-weight: bold;base-font-size:18px; font-size: 18px;"><%=GetCourseData("name")%></div>
+                <div tooltip='<%=GetCourseData("point_desc")%>' style="position: relative;margin-left: 22px;margin-top: 226px;width: 220px; font-weight: bold;base-font-size:16px; font-size: 16px;text-align: left;"><%=GetCourseData("limit_point_desc")%></div>
+                <div tooltip='<%=GetCourseData("world_desc")%>' style="position: relative; margin-left: 22px;margin-top: 405px;width: 220px; font-weight: bold;base-font-size:16px; font-size: 16px;text-align: left;"><%=GetCourseData("limit_world_desc")%></div>
+            </pe:if>
         </div>
 
         <input type="button" onclick="GoTo" style="float: left; margin-left: 0px; margin-top:26px;width: 282px; height:59px;font-size:20px;base-font-size:20px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/bt_shangke_282_59_32bits.png#0 0 282 59);" />
     </div>
 
     <div style="float: left;">
-        <div style="margin-left: -8px;margin-top: 15px; width: 739px;height: 494px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/img_5_739x494_32bits.png#0 0 739 494)"></div>
-        <div style="margin-left: 0px; margin-top: 5px;">
-            <div style="float: left; margin-left: 136px;margin-top: 40px; width: 402px;height: 28px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/img_1_402x28_32bits.png#0 0 402 28)"></div>
-            <input type="button" onclick="GoTo" style="float: left; margin-left: 5px; margin-top:23px;width: 162px; height:59px;font-size:20px;base-font-size:20px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/bt_buke_162x59_32bits.png#0 0 162 59);" />
+        <div style="margin-left: -8px;margin-top: 15px; width: 739px;height: 494px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/img_5_739x494_32bits.png#0 0 739 494)">
+            <pe:if condition='<%=IsShowBuke()%>'>
+                <div style="margin-left: 150px;margin-top: 415px; width: 496px;height: 26px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/course_world1_496x26_32bits.png#0 0 496 26)"></div>
+            </pe:if>
         </div>
+        <pe:if condition='<%=IsShowBuke()%>'>
+            <div style="margin-left: 0px; margin-top: 5px;">
+                <div style="float: left; margin-left: 136px;margin-top: 40px; width: 402px;height: 28px; background:url(Texture/Aries/Creator/keepwork/SummerCamp/img_1_402x28_32bits.png#0 0 402 28)"></div>
+                <input type="button" onclick="GoTo" style="float: left; margin-left: 5px; margin-top:23px;width: 162px; height:59px;font-size:20px;base-font-size:20px;background: url(Texture/Aries/Creator/keepwork/SummerCamp/bt_buke_162x59_32bits.png#0 0 162 59);" />
+            </div>
+        </pe:if>
     </div>
 </div>
 </pe:mcml>

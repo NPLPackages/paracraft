@@ -1633,13 +1633,18 @@ function GameLogic.ToggleDesktop(name)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
 		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 		local projectId = GameLogic.options:GetProjectId();
-		if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
-			ParaWorldLoginAdapter.ShowExitWorld(true);
-		else
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
-			local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
-			EscFramePage.ShowPage();
-		end
+
+		-- if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
+		-- 	ParaWorldLoginAdapter.ShowExitWorld(true);
+		-- else
+		-- 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
+		-- 	local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+		-- 	EscFramePage.ShowPage();
+		-- end
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
+		local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+		EscFramePage.ShowPage();
 	elseif(name == "builder") then
 		if(GameMode:IsUseCreatorBag()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");
@@ -1960,7 +1965,7 @@ function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isScho
 		time = freeTime
 	end
 	if not time then
-		GameLogic.AddBBS(nil,"没有配置课程免费时间")
+		--GameLogic.AddBBS(nil,"没有配置课程免费时间")
 		response.isInTime = false
 		response.strTip=""
 		response.type = 9 --没有配置免费时间，任何时间都不可以上课
@@ -1999,6 +2004,53 @@ function GameLogic.IsLocalVersion()
     return localVersion == 'SCHOOL'
 end
 
+-- get and set Camera code block
+GameLogic.Cameras = {};
+GameLogic.positions = {};
+GameLogic.rotations = {};
+GameLogic.eyeDist = 3;
+GameLogic.currentId = 0;
+GameLogic.totalTimes = 5;
+GameLogic.currentTime = 0;
+
+function GameLogic.Camera_getAllCameras()
+	return GameLogic.Cameras;
+end
+
+function GameLogic.Camera_addCamera(camera)
+	GameLogic.Cameras[#GameLogic.Cameras+1] = camera;
+end
+
+function GameLogic.Camera_getCurrentCamera()
+	return GameLogic.Cameras[GameLogic.currentId];
+end
+
+function GameLogic.Camera_getCurrentCameraId()
+	return GameLogic.currentId;
+end
+
+function GameLogic.Camera_setCurrentCameraId(id)
+	GameLogic.currentId = id;
+end
+
+function GameLogic.Camera_getTotalTimes()
+	return GameLogic.totalTimes;
+end
+
+function GameLogic.Camera_setTotalTimes(t)
+	GameLogic.totalTimes = t;
+end
+
+function GameLogic.Camera_getCurrentTime()
+	return GameLogic.currentTime;
+end
+
+function GameLogic.Camera_setCurrentTime(t)
+	GameLogic.currentTime = t;
+end
 
 
+function GameLogic.Camera_getDefaultCameraCount()
+	return 4;
+end
 

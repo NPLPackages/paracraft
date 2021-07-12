@@ -39,7 +39,7 @@ Commands["share"] = {
 	desc="toggle sharing, [10] to record 10 seconds video, [30] to record 30 seconds" , 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local time, cmd_text = CmdParser.ParseInt(cmd_text);
-		if (time == 10 or time == 30) then
+		if (time == 10 or time == 30 or time == nil) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharing.lua");
 			local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing");
 			VideoSharing.ToggleRecording(time);

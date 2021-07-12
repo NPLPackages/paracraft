@@ -19,12 +19,20 @@ end
 ]]
 local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
 
+-- @return nil if not found, otherwise it is a string containing the protocol
+function UrlProtocolHandler:GetParacraftProtocol(cmdline)
+	cmdline = cmdline or ParaEngine.GetAppCommandLine();
+	-- the c++ ConvertToCanonicalForm may replace : with space for standard command line
+	local urlProtocol = string.match(cmdline or "", "paracraft%W?//(.*)$");
+	return urlProtocol;
+end
+
 --@param cmdline: if nil we will read from current cmd line
 function UrlProtocolHandler:ParseCommand(cmdline)
 	local cmdline = cmdline or ParaEngine.GetAppCommandLine();
 
 	-- the c++ ConvertToCanonicalForm may replace : with space for standard command line
-	local urlProtocol = string.match(cmdline or "", "paracraft%W?//(.*)$");
+	local urlProtocol = self:GetParacraftProtocol(cmdline);
 
 	if urlProtocol then
 		NPL.load("(gl)script/ide/Encoding.lua");

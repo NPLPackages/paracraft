@@ -74,7 +74,10 @@ function DockPopupControl.IsInSummerCampWorld()
     local httpwrapper_version = HttpWrapper.GetDevVersion();
     local world_id = id_list[httpwrapper_version]
 	local project_id = WorldCommon.GetWorldTag("kpProjectId");
-	if project_id == world_id then
+	if project_id == world_id 
+        or project_id == 72966 
+        or project_id == 73104
+        or project_id == 72945 then
 		return true
 	end
 
@@ -101,27 +104,16 @@ end
 function DockPopupControl.ShowRealNameCertificate()
     if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
         DockPopupControl.popup_num = DockPopupControl.popup_num + 1
-        GameLogic.GetFilters():apply_filters(
-            'show_certificate',
-            function(result)
-                if (result) then
-                    local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
-                    DockPage.RefreshPage(0.01)
-                    GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
-                    DockPopupControl.GotoNextPopup()
-                else
-                    DockPopupControl.GotoNextPopup()
-                end
-            end
-        );
+        DockPopupControl.GotoNextPopup()
     else
         DockPopupControl.GotoNextPopup()
     end
 end
 
 function DockPopupControl.ShowHomeWorkTip()    
-	local HomeWorkTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/HomeWork/HomeWorkTip.lua") 
-    HomeWorkTip.Show()
+	-- local HomeWorkTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/HomeWork/HomeWorkTip.lua") 
+    -- HomeWorkTip.Show()
+    DockPopupControl.GotoNextPopup()
 end
 
 function DockPopupControl.GetBeginnerWorldId()
@@ -155,19 +147,7 @@ function DockPopupControl.ShowGuide()
 
     if not KeepWorkItemManager.HasGSItem(60001) then
         DockPopupControl.popup_num = DockPopupControl.popup_num + 1
-        _guihelper.MessageBox(
-            L"是否进入新手教学？",
-            function(res)
-                if res and res == _guihelper.DialogResult.OK then
-                    CommandManager:RunCommand('/loadworld -s -force ' .. DockPopupControl.GetBeginnerWorldId())
-                end
-
-                if res and res == _guihelper.DialogResult.Cancel then
-                    DockPopupControl.GotoNextPopup()
-                end
-            end,
-            _guihelper.MessageBoxButtons.OKCancel_CustomLabel
-        )
+        DockPopupControl.GotoNextPopup()
 
         return
     end

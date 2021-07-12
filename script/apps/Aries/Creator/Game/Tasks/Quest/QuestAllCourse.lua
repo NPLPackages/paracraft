@@ -6,6 +6,7 @@ Desc:
 Use Lib:
 -------------------------------------------------------
 local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")
+QuestAllCourse.Show()
 QuestAllCourse.permissions_check = true
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
@@ -101,7 +102,7 @@ function QuestAllCourse.Show(target_course_id)
         allowDrag = true,
         enable_esc_key = true,
         zorder = 0,
-        app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+        -- app_key = "", 
         directPosition = true,
         
         align = "_ct",
@@ -554,7 +555,7 @@ function QuestAllCourse.RunCommand(index, is_pre)
     -- local command = string.format("/loadworld -s -force %s", data.projectId)
     local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
     local function enter_world()
-        local server_time = GameLogic.QuestAction.GetServerTime()
+        local server_time = QuestAction.GetServerTime()
 
         if not QuestAllCourse.permissions_check then
             if data.beginAt and data.endAt then
@@ -600,7 +601,7 @@ function QuestAllCourse.RunCommand(index, is_pre)
     
                 KeepWorkItemManager.SetClientData(QuestAction.task_gsid, client_data)
     
-                GameLogic.QuestAction.SetDailyTaskValue("40044_60047_1",1)
+                QuestAction.SetDailyTaskValue("40044_60047_1",1)
                 -- print("ssssssssssss")
                 -- echo(data, true)
 
@@ -958,7 +959,7 @@ function QuestAllCourse.ClickWork(index, is_pre)
                                         DockPage.RefreshPage(0.01)
                                     end
                                     
-                                    GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
+                                    QuestAction.AchieveTask("40006_1", 1, true)
                                     QuestAllCourse.ClickWork(index, is_pre)
                                 end
                             end
@@ -967,7 +968,7 @@ function QuestAllCourse.ClickWork(index, is_pre)
                     return
                 end
 
-                local server_time = GameLogic.QuestAction.GetServerTime()
+                local server_time = QuestAction.GetServerTime()
                 local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
     
                 -- 入校课程的话 需要每天四点半之后才能做

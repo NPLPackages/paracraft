@@ -8,6 +8,9 @@ Use Lib:
 local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 DockPage.Show();
 DockPage.Hide();
+
+local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+DockPage.SetUIVisible_RightTop(false)
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
@@ -39,7 +42,27 @@ DockPage.hide_vip_world_ids = {
     ONLINE = { 18626 },
     RELEASE = { 1236 },
 };
+DockPage.hide_ui_world_ids = {
+    ONLINE = { 70351 },
+    RELEASE = { 20669 },
+};
 DockPage.is_show = true;
+
+DockPage.left_top_line_1 = {
+    { label = L"夏令营主ui", id = "summer_camp_main", enabled = true, bg="Texture/Aries/Creator/keepwork/SummerCamp/btn3_summer_camp_32bits.png#0 0 100 80", },  
+    { label = L"地图", id = "summer_camp_map", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/map_32bits.png#0 0 100 80", }, 
+    { label = L"课程", id = "summer_camp_kecheng", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/kecheng_32bits.png#0 0 100 80", },    
+    { label = L"成就", id = "summer_camp_chengjiu", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/chengjiu_32bits.png#0 0 100 80", }, 
+
+	{ label = L"云游", id = "summer_camp_yunyou", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/yunyou_32bits.png#0 0 100 80", }, 
+    { label = L"长征路", id = "summer_camp_changzheng", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/changzheng_32bits.png#0 0 100 80", },
+    { label = L"抗疫", id = "summer_camp_kangyi", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/kangyi_32bits.png#0 0 100 80", },
+    { label = L"任务", id = "summer_camp_renwu", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/renwu_32bits.png#0 0 100 80", },
+}
+DockPage.left_top_line_2 = {
+    
+}
+
 DockPage.top_line_1 = {
     { label = L"", },
     { label = L"荣誉榜", id = "rank", enabled = true, bg="Texture/Aries/Creator/keepwork/rank/btn3_rongyu_32bits.png#0 0 100 80", },  
@@ -59,9 +82,19 @@ DockPage.top_line_2 = {
 
 DockPage.show_friend_red_tip = false
 
+function DockPage.IsLessonWorld()
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+	local project_id = WorldCommon.GetWorldTag("kpProjectId");
+	if project_id == 72966 or project_id == 73104 then
+		return true
+	end
+    return false
+end
+
 function DockPage.Show(bCommand)
     local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-    if(not KeepWorkItemManager.GetToken())then
+    if(not KeepWorkItemManager.GetToken() or DockPage.IsLessonWorld())then
         return
     end
     DockPage.InitTopIconData()
@@ -76,7 +109,6 @@ function DockPage.Show(bCommand)
     end
     DockPage._root.visible = true;
     DockPage.is_show = true;
-    
     KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
         if(err ~= 200)then
             return
@@ -97,20 +129,19 @@ function DockPage.Show(bCommand)
     DockPage.ShowCampIcon()
     
     -- ActWeek.GetServerTime(function()
-    --     DockPage.RefreshPage(0.01)
+    --     DockPage.RefreshPage()
     -- end)
     DockPage.ShowSummerCampIcon()
+
     GameLogic.QuestAction.RequestAiHomeWork(DockPage.FreshHomeWorkIcon)
 end
 
-function DockPage.RefreshPage(time)
-    local time = time or 0.01
+function DockPage.RefreshPage()
     if DockPage.page then
         DockPage.InitTopIconData()
-        DockPage.page:Refresh(time)
-        commonlib.TimerManager.SetTimeout(function()  
-            DockPage.InitButton()
-        end, 500);
+        DockPage.page:Refresh(0)
+        DockPage.InitButton()
+		DockPage.CheckRedSummerCampUIVisible();
     end    
 end
 
@@ -157,10 +188,11 @@ function DockPage.InitTopIconData()
 end
 
 function DockPage.InitButton()
-    local buttons = {"character","work","explore","home","friends","school","vip","study"} -- ,"mall"
+    local buttons = {"character","work","explore","home","friends_1","friends_2", "school","vip","study"} -- ,"mall"
     for k,v in pairs(buttons) do
         local button = DockPage.page:GetNode(v);   
         local uiobject = ParaUI.GetUIObject(button.uiobject_id)
+
         if button and button.uiobject_id and uiobject then
             local width = uiobject.width
             local height = uiobject.height
@@ -252,7 +284,7 @@ function DockPage.OnClickTop(id)
         table.insert(DockPage.showPages,{id,QuestPage.GetPageCtrl()})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.user_tip");
         DockPage.isShowTaskIconEffect = false
-        DockPage.RefreshPage(0.01)
+        DockPage.RefreshPage()
     elseif(id == "msg_center")then
         -- local MsgCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MsgCenter/MsgCenter.lua");
         -- MsgCenter.Show();
@@ -276,7 +308,7 @@ function DockPage.OnClickTop(id)
                 function(result)
                     if (result) then
                         -- GameLogic.AddBBS(nil, L'领取成功', 5000, '0 255 0');
-                        DockPage.RefreshPage(0.01)
+                        DockPage.RefreshPage()
                         GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
                     end
                 end
@@ -351,7 +383,7 @@ function DockPage.OnClick(id)
         GameLogic.GetFilters():apply_filters('check_and_updated_before_enter_my_home', function()
             GameLogic.RunCommand("/loadworld home");
         end)
-    elseif(id == "friends")then
+    elseif(id == "friends_1" or id == "friends_2")then
         local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
         FriendsPage.show_callback = function()
             last_page_ctrl = FriendsPage.GetPageCtrl();
@@ -383,9 +415,16 @@ function DockPage.OnClick(id)
     elseif(id == "vip")then
         -- ParacraftLearningRoomDailyPage.OnVIP("dock");
         -- local VipToolTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolTip.lua")
-        -- VipToolTip:Init(true)        
-        VipToolNew.Show()
-        last_page_ctrl = VipToolNew.GetPageCtrl()        
+        -- VipToolTip:Init(true)  
+		
+		      
+--        VipToolNew.Show()
+--        last_page_ctrl = VipToolNew.GetPageCtrl()        
+
+		local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+		VipPage.ShowPage();
+        last_page_ctrl = VipPage.GetPageCtrl()        
+
         table.insert(DockPage.showPages,{id,last_page_ctrl})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.vip");
     elseif(id == "mall")then
@@ -429,6 +468,55 @@ function DockPage.FindUIControl(name)
         return
     end
     return   DockPage.page:FindUIControl(name);
+end
+
+function DockPage.OnClickLeftTop(id)
+    local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua") 
+	local SummerCampNoticeIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNoticeIntro.lua") 
+	local SummerCampTaskPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampTaskPage.lua") 
+	NPL.load("(gl)script/ide/timer.lua");
+
+	if (id == 'summer_camp_main') then
+        SummerCampMainPage.ShowView(1)
+	elseif (id == 'summer_camp_map') then
+		SummerCampMainPage.ClickMap()
+	elseif (id == 'summer_camp_kecheng') then
+        SummerCampMainPage.ShowView(2)
+	elseif (id == 'summer_camp_chengjiu') then
+        SummerCampMainPage.ShowView(4)
+	elseif (id == 'summer_camp_yunyou') then
+		SummerCampNoticeIntro.ShowView(1)
+	elseif (id == 'summer_camp_changzheng') then
+		SummerCampNoticeIntro.ShowView(2)
+	elseif (id == 'summer_camp_kangyi') then
+		GameLogic.GetCodeGlobal():BroadcastTextEvent("openUI", {name = "taskMain"}, function() end)
+	elseif (id == 'summer_camp_renwu') then
+        SummerCampMainPage.ShowView(3)
+	end
+	table.insert(DockPage.showPages,{id,SummerCampMainPage.GetPageCtrl()})
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.summer_camp_main");
+end
+function DockPage.RenderButton_LeftTop_1(index)
+    local node = DockPage.left_top_line_1[index];
+	local tip_str = "";
+    local id = node.id;
+    local bg = node.bg
+	 local s = string.format([[
+        <input type="button" name='%s' onclick="OnClickLeftTop" style="width:100px;height:80px;background:url(%s)"/>
+        %s
+    ]],node.id,bg,tip_str);
+    return s;
+end
+function DockPage.RenderButton_LeftTop_2(index)
+    local node = DockPage.left_top_line_2[index];
+	local tip_str = "";
+    local id = node.id;
+    local bg = node.bg
+	 local s = string.format([[
+        <input type="button" name='%s' onclick="OnClickLeftTop" style="width:100px;height:80px;background:url(%s)"/>
+        %s
+    ]],node.id,bg,tip_str);
+    return s;
 end
 
 function DockPage.RenderButton_1(index)
@@ -652,7 +740,7 @@ end
 function DockPage.ChangeFriendRedTipState(state)
     if state ~= DockPage.show_friend_red_tip then
         DockPage.show_friend_red_tip = state
-        DockPage.RefreshPage(0.01)
+        DockPage.RefreshPage()
     end
 end
 
@@ -675,7 +763,7 @@ function DockPage.HandMsgCenterMsgData()
             end
             DockPage.SetMsgCenterUnReadNum(all_count)
             if DockPage.is_show and DockPage.page then
-                DockPage.RefreshPage(0.01)
+                DockPage.RefreshPage()
             end 
         end
     end)
@@ -711,12 +799,14 @@ function DockPage.CheckIsTaskCompelete()
        if profile and profile.region and profile.region.hasChildren == 0 then
             GameLogic.QuestAction.SetValue("40004_1",1);
        end
-       DockPage.RefreshPage(0.01)
+       DockPage.RefreshPage()
 
        GameLogic.QuestAction.SetDailyTaskValue("40008_1",1)
 
        local Act51AskAlert = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskAlert.lua")
        Act51AskAlert.CheckGetVipItem()
+
+       GameLogic.QuestAction.CheckSummerGameTask()
     end, 1000)
 end
 
@@ -894,4 +984,60 @@ function DockPage.FreshHomeWorkIcon()
 
         DockPage.RefreshPage()
     end
+end
+function DockPage.SetMcmlNodeVisible(name, v)
+	local uiobj = DockPage.GetContainerObj(name);
+	if(uiobj and uiobj:IsValid()) then
+		uiobj.visible = v;
+	end
+end
+function DockPage.GetContainerObj(name)
+	if(DockPage.page)then
+		local mcmlNode = DockPage.page:GetNode(name);
+		if(mcmlNode and mcmlNode.uiobject_id)then
+			local uiobj = ParaUI.GetUIObject(mcmlNode.uiobject_id);
+			return uiobj;
+		end
+	end
+end
+function DockPage.SetUIVisible_LeftTop(v)
+	DockPage.SetMcmlNodeVisible("left_top_container", v)
+end
+function DockPage.SetUIVisible_CenterBottom(v)
+	DockPage.SetMcmlNodeVisible("center_bottom_container", v)
+end
+function DockPage.SetUIVisible_RightBottom(v)
+	DockPage.SetMcmlNodeVisible("right_bottom_container", v)
+end
+function DockPage.SetUIVisible_RightTop(v)
+	DockPage.SetMcmlNodeVisible("right_top_container", v)
+	DockPage.SetMcmlNodeVisible("btn_ziyuan_container", v)
+	DockPage.SetMcmlNodeVisible("btn_xiaoyuan_container", v)
+end
+function DockPage.SetUIVisible_Map(v)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
+	local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
+	if(v)then
+		ParaWorldMinimapWnd:Show();
+	else
+		ParaWorldMinimapWnd:Close();
+	end
+end
+function DockPage.CheckRedSummerCampUIVisible()
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+	local list = DockPage.hide_ui_world_ids[HttpWrapper.GetDevVersion()];
+	local visible = true;
+    if(list)then
+		local projectId = GameLogic.options:GetProjectId();
+        projectId = tonumber(projectId);
+        for k,id in ipairs(list) do
+            if(id == projectId)then
+                visible = false;
+            end
+        end
+    end
+	DockPage.SetUIVisible_RightTop(visible)
+	DockPage.SetUIVisible_LeftTop(not visible)
 end

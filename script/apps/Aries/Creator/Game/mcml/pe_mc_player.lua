@@ -73,7 +73,9 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 	mcmlNode.control = ctl;
 	ctl:Show(true);
 
-	local obj_params = ObjEditor.GetObjectParams(ParaScene.GetPlayer());
+	local entityPlayer = EntityManager.GetPlayer();
+	local playerObj = entityPlayer and entityPlayer:GetInnerObject() or ParaScene.GetPlayer();
+	local obj_params = ObjEditor.GetObjectParams(playerObj);
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/PlayerController.lua");
 	
@@ -89,7 +91,7 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 	pe_mc_player.AutoSetObjectSkin(obj_params)
 
 	if(obj_params.ReplaceableTextures[2]) then
-		local player = EntityManager.GetFocus();
+		local player = entityPlayer;
 		if(player and player.GetSkin) then
 			obj_params.ReplaceableTextures[2] = player:GetSkin() or obj_params.ReplaceableTextures[2];
 		end

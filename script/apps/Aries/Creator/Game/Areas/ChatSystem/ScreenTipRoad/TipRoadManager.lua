@@ -34,14 +34,17 @@ TipRoadManager.gap = 5;
 
 TipRoadManager.name = "TipRoadManager_Instance";
 function TipRoadManager:CreateRoads()
-	local root = ParaUI.GetUIObject("root");
-    root:SetScript("onsize", function()
-        self:OnResize();
-	end)
-    if(self.created)then
+	if(self.created)then
         return
     end
-    self.created = true;
+	self.created = true;
+	LOG.std(nil, "info", "TipRoadManager", "inited");
+
+	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+	local Screen = commonlib.gettable("System.Windows.Screen");
+	Screen:Connect("sizeChanged", self, self.OnResize, "UniqueConnection")
+
+	local root = ParaUI.GetUIObject("root");
     local width = root.width;
     local height = TipRoadManager.height * TipRoadManager.cnt;
     self.width = width;

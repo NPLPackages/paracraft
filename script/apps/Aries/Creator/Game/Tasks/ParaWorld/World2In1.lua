@@ -12,6 +12,7 @@ World2In1.ShowPage();
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldMiniChunkGenerator.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
+local CreateRewardManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/CreateRewardManager.lua") 
 local World2In1UserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1UserInfo.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local ParaWorldMiniChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldMiniChunkGenerator");
@@ -32,6 +33,7 @@ local currentWorlds = {};
 local worldIndex = 1;
 local parentWorldId = 59045;
 local currentType = "course";
+local last_region_type = "course"
 local currentGridX = 0;
 local currentGridY = 0;
 local lock_timer;
@@ -39,9 +41,10 @@ local load_timer;
 local courcePosition = {18542,43,19197}
 
 local hidePage = false;
-
+local page_root = nil
 function World2In1.OnInit()
 	page = document:GetPageCtrl();
+	page_root = page:GetParentUIObject()
 end
 
 function World2In1.ShowPage(offset, reload)
@@ -67,15 +70,17 @@ function World2In1.ShowPage(offset, reload)
 
 	GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", World2In1.MoveLeft, World2In1, "World2In1");
 	GameLogic:Connect("WorldUnloaded", World2In1, World2In1.OnWorldUnload, "UniqueConnection");
-
+	--echo({hidePage,reload})
 	if (not hidePage and not reload) then
 		allMiniWorlds = {{}, {}, {}};
 		World2In1.OnEnterCourseRegion();
+		
 	end
 	hidePage = false;
-	commonlib.TimerManager.SetTimeout(function()  
-		World2In1.OnMouseChangeEx()
-	end, 500);
+	World2In1.OnMouseChangeEx()
+	-- commonlib.TimerManager.SetTimeout(function()  
+	-- 	World2In1.OnMouseChangeEx()
+	-- end, 500);
 end
 
 function World2In1.OnMouseChangeEx()
@@ -152,7 +157,6 @@ end
 
 function World2In1:MoveLeft(event)
 	if (hidePage) then return end
-
 	if (page) then
 		page:CloseWindow();
 	end
@@ -166,9 +170,20 @@ end
 function World2In1.OnWorldUnload()
 	World2In1.EndLoadTimer();
 	World2In1.EndLockTimer();
+	World2In1.HideCreateReward()
 	World2In1UserInfo.ShowPage(nil);
-	allMiniWorlds = nil;
-	currentWorlds = nil;
+	allMiniWorlds = {{}, {}, {}};
+	currentWorlds = {};
+	worldIndex = 1;
+	parentWorldId = 59045;
+	World2In1.SetCurrentType("course")
+	currentGridX = 0;
+	currentGridY = 0;
+	lock_timer = nil
+	load_timer = nil
+	courcePosition = {18542,43,19197}
+	hidePage = false;
+	page_root = nil
 end
 
 function World2In1.OnClose()
@@ -195,12 +210,43 @@ function World2In1.BroadcastTypeChanged()
 	if(currentType == "creator")then
 		GameLogic.RunCommand("/ggs user hidden ");	
 	else
-		GameLogic.RunCommand("/ggs user visible");	
+		GameLogic.RunCommand("/ggs user visible");
+		World2In1.HideCreateReward()	
 	end
+
+	World2In1.UnLoadcurrentWorldList()
 	GameLogic.GetCodeGlobal():BroadcastTextEvent("changeRegionType")
 end
 
+function World2In1.SaveCreateTips(callback)
+	if currentType == "creator" then
+		_guihelper.MessageBox(
+            L"是否需要保存你已经创造的作品?",
+            function(res)
+                if res and res == _guihelper.DialogResult.OK then
+                    World2In1.OnSaveWorld()
+					if(callback)then
+						callback()
+					end
+                end
+                if res and res == _guihelper.DialogResult.Cancel then
+                    if(callback)then
+						callback()
+					end
+                end
+            end,
+            _guihelper.MessageBoxButtons.OKCancel_CustomLabel
+        )
+	else
+		if(callback)then
+			callback()
+		end
+	end
+	
+end
+
 function World2In1.SetParentWorldId(parentId)
+	CreateRewardManager.InitCreateManager()
 	parentWorldId = parentId;
 end
 
@@ -261,49 +307,87 @@ function World2In1.updateWorldIndex(typeIndex, gridX, gridY)
 end
 
 function World2In1.OnEnterGradeRegion()
-	World2In1.SetGameMode();
-	currentType = "grade";
-	World2In1.BroadcastTypeChanged()
-	local x, y,  z = World2In1.GetRegionCenterPos(1);
-	GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y, z + 64));	
-	World2In1.StartLoadTimer();
-	World2In1.LoadAllWorlds(currentType, function()
-		worldIndex = World2In1.defaul_world_index or 1;
-		World2In1.defaul_world_index = nil
-		World2In1.LoadMiniWorld(currentType, 0, 0);
-	end);
+	World2In1.SaveCreateTips(function()
+		World2In1.ShowCreateReward()
+		World2In1.SetGameMode();
+		World2In1.SetCurrentType("grade")
+		World2In1.BroadcastTypeChanged()
+		local x, y,  z = World2In1.GetRegionCenterPos(1);
+		GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y, z + 64));	
+		World2In1.StartLoadTimer();
+		World2In1.LoadAllWorlds(currentType, function()
+			World2In1.LoadMiniWorld(currentType, 0, 0);
+		end);		
+	end)
+	
 end
 
 function World2In1.OnEnterSchoolRegion()
+	World2In1.SaveCreateTips(function()
+		World2In1.ShowCreateReward()
+		World2In1.SetGameMode();
+		World2In1.SetCurrentType("school")
+		World2In1.BroadcastTypeChanged()
+		local x, y,  z = World2In1.GetRegionCenterPos(2);
+		GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y, z + 64));	
+		World2In1.StartLoadTimer();
+		World2In1.LoadAllWorlds(currentType, function()
+			World2In1.LoadMiniWorld(currentType, 0, 0);
+		end);	
+	end)	
+end
+
+function World2In1.OnEnterRegionByProjectName(type, project_name)
 	World2In1.SetGameMode();
-	currentType = "school";
+	World2In1.SetCurrentType(type)
 	World2In1.BroadcastTypeChanged()
-	local x, y,  z = World2In1.GetRegionCenterPos(2);
-	GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y, z + 64));	
 	World2In1.StartLoadTimer();
-	World2In1.LoadAllWorlds(currentType, function()
-		worldIndex = World2In1.defaul_world_index or 1;
-		World2In1.defaul_world_index = nil
-		World2In1.LoadMiniWorld(currentType, 0, 0);
+
+	worldIndex = 1
+	World2In1.LoadAllWorlds(currentType, function(worlds_data)
+		for i, v in ipairs(worlds_data) do
+			if v.name == project_name then
+				worldIndex = i
+				break
+			end
+		end
+		-- worldIndex = worldIndex - 1;
+		local pox_index = worldIndex - 1
+		if type == "all" then
+			local x, y,  z = World2In1.GetRegionCenterPos(3);
+			z = z + pox_index * 128;
+			GameLogic.RunCommand(string.format("/goto %d %d %d", x+64, y, z+64));
+			-- worldIndex = worldIndex + 1;
+			World2In1.LoadMiniWorld(currentType, 0, worldIndex - 1);
+		elseif type == "school" then 
+			local x, y,  z = World2In1.GetRegionCenterPos(2);
+			x = x + pox_index * 128;
+			GameLogic.RunCommand(string.format("/goto %d %d %d", x+64, y, z+64));
+			-- worldIndex = worldIndex + 1;
+			World2In1.LoadMiniWorld(currentType, worldIndex - 1, 0);
+		elseif type == "grade" then 
+			local x, y,  z = World2In1.GetRegionCenterPos(1);
+			z = z - pox_index * 128;
+			GameLogic.RunCommand(string.format("/goto %d %d %d", x+64, y, z+64));
+			-- worldIndex = worldIndex + 1;
+			World2In1.LoadMiniWorld(currentType, 0, 1 - worldIndex);
+		end
 	end);
 end
 
 function World2In1.OnEnterAllRegion()
-	World2In1.SetGameMode();
-	currentType = "all";
-	World2In1.BroadcastTypeChanged()
-	local x, y,  z = World2In1.GetRegionCenterPos(3);
-	GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y, z + 64));	
-	World2In1.StartLoadTimer();
-	World2In1.LoadAllWorlds(currentType, function()
-		worldIndex = World2In1.defaul_world_index or 1;
-		World2In1.defaul_world_index = nil
-		World2In1.LoadMiniWorld(currentType, 0, 0);
-	end);
-end
-
-function World2In1.SetDefaulWorldInex(index)
-	World2In1.defaul_world_index = index
+	World2In1.SaveCreateTips(function()
+		World2In1.SetGameMode();
+		World2In1.ShowCreateReward()
+		World2In1.SetCurrentType("all")
+		World2In1.BroadcastTypeChanged()
+		local x, y,  z = World2In1.GetRegionCenterPos(3);
+		GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y, z + 64));	
+		World2In1.StartLoadTimer();
+		World2In1.LoadAllWorlds(currentType, function()
+			World2In1.LoadMiniWorld(currentType, 0, 0);
+		end);	
+	end)	
 end
 
 function World2In1.StartLoadTimer()
@@ -329,25 +413,42 @@ function World2In1.EndLoadTimer()
 end
 
 function World2In1.OnEnterCourseRegion()
-	World2In1.EndLoadTimer();
-	World2In1UserInfo.ShowPage(nil);
-	World2In1.SetGameMode();
-	currentType = "course";
-	World2In1.BroadcastTypeChanged()
-	if courcePosition then
-		GameLogic.RunCommand(string.format("/goto %d %d %d", courcePosition[1],courcePosition[2],courcePosition[3]));
-	else
-		local x, y,  z = World2In1.GetRegionCenterPos(4);
-		GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y + 40,  z + 64));
-	end	
+	World2In1.SaveCreateTips(function()
+		World2In1.EndLoadTimer();
+		World2In1UserInfo.ShowPage(nil);
+		World2In1.SetGameMode();
+		World2In1.ShowCreateReward()
+		World2In1.SetCurrentType("course")
+		World2In1.BroadcastTypeChanged()
+		if courcePosition then
+			GameLogic.RunCommand(string.format("/goto %d %d %d", courcePosition[1],courcePosition[2],courcePosition[3]));
+		else
+			local x, y,  z = World2In1.GetRegionCenterPos(4);
+			GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y + 40,  z + 64));
+		end		
+	end)
+	
+end
+
+function World2In1.SetEnterCreateRegionCb(cb)
+	World2In1.enter_create_region_cb = cb
+end
+
+function World2In1.GetEnterCreateRegionCb()
+	return World2In1.enter_create_region_cb
 end
 
 function World2In1.GotoCreateRegion()
 	World2In1.EndLoadTimer();
 	World2In1UserInfo.ShowPage(nil);
 	GameLogic.RunCommand("/mode edit");
-	currentType = "creator";
+	World2In1.SetCurrentType("creator")
 	World2In1.BroadcastTypeChanged()
+	World2In1.ShowCreateReward(true)	
+	if World2In1.enter_create_region_cb then
+		World2In1.enter_create_region_cb()
+		World2In1.enter_create_region_cb = nil
+	end	
 
 	lock_timer = lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
 		local player = EntityManager.GetPlayer()
@@ -375,7 +476,19 @@ function World2In1.OnEnterCreatorRegion()
 	if (currentType == "creator") then
 		return;
 	end	
-	GameLogic.GetCodeGlobal():BroadcastTextEvent("gotoCreate");	
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/WorldCreatePage.lua").Show();
+	--GameLogic.GetCodeGlobal():BroadcastTextEvent("gotoCreate");	
+end
+
+function World2In1.ShowCreateReward(isCreateRegion)
+	if not page_root then
+		return 
+	end	
+	CreateRewardManager.ShowGiftBtn(page_root,isCreateRegion)
+end
+
+function World2In1.HideCreateReward()
+	CreateRewardManager.HideGiftBtn()
 end
 
 function World2In1.EndLockTimer()
@@ -418,7 +531,8 @@ function World2In1.ShowHelpPage()
 end
 
 function World2In1.ShowRankPage()
-	GameLogic.AddBBS(nil,"功能未上线~")
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/World2In1Rank.lua").Show();
+	--GameLogic.AddBBS(nil,"功能未上线~")
 end
 
 function World2In1.OnSaveWorld()
@@ -429,51 +543,84 @@ function World2In1.OnSaveWorld()
 		return 
 	end
 	if (creatorWorldName and creatorWorldName ~= "") then
-		GameLogic.GetCodeGlobal():BroadcastTextEvent("saveRegion", {}, function()
-			if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
-				GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.macro.task", { from = "macrosave",  name = "clicksave",});
-				local RealNameTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RealNameTip/RealNameTip.lua") 
-				RealNameTip.ShowView()
-				return 
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.macro.task", { from = "macrosave",  name = "clicksave",});
+		GameLogic.RunCommand(string.format("/saveregionex %s 37 37",creatorWorldName))   
+
+		if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.macro.task", { from = "macrosave",  name = "clicksave",});
+			local RealNameTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RealNameTip/RealNameTip.lua") 
+			RealNameTip.ShowView()
+			return 
+		end
+	
+		local blocks = ParaWorldMiniChunkGenerator:GetAllBlocks();
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+		local filename = ParaIO.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(creatorWorldName).."/miniworld.template.xml";
+		
+		local x, y, z = ParaWorldMiniChunkGenerator:GetPivot();
+		local params = {};
+		params.pivot = string.format("%d,%d,%d", x, y, z)
+		params.relative_motion = true;
+		
+		local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
+			params = params,
+			exportReferencedFiles = true,
+			blocks = blocks})
+		task:Run();
+	
+		GameLogic.GetFilters():apply_filters("cellar.sync.sync_main.sync_to_data_source_by_world_name", creatorWorldName, function(res)
+			if (res) then
 			end
-		
-			local blocks = ParaWorldMiniChunkGenerator:GetAllBlocks();
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
-			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-			local filename = ParaIO.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(creatorWorldName).."/miniworld.template.xml";
-			
-			local x, y, z = ParaWorldMiniChunkGenerator:GetPivot();
-			local params = {};
-			params.pivot = string.format("%d,%d,%d", x, y, z)
-			params.relative_motion = true;
-			
-			local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
-				params = params,
-				exportReferencedFiles = true,
-				blocks = blocks})
-			task:Run();
-		
-			GameLogic.GetFilters():apply_filters("cellar.sync.sync_main.sync_to_data_source_by_world_name", creatorWorldName, function(res)
-				if (res) then
-				end
-			end);
 		end);	
 	end
 end
 
-function World2In1.LoadMiniWorld(type, gridX, gridY)
-	local typeIndex = mapTypeIndex[type];
-	local currentWorldList = allMiniWorlds[typeIndex];
-	local key = string.format("%d_%d", gridX, gridY);
-	if (currentWorldList[key] and currentWorldList[key].loaded) then
-		if (currentWorldList[key].projectName and currentWorldList[key].projectName ~= "") then
-			GameLogic.AddBBS(nil, string.format(L"进入【%s】", currentWorldList[key].projectName), 3000, "0 255 0");
-			local params = currentWorldList[key]
-			World2In1UserInfo.ShowPage(params);
-		end
-		return;
+function World2In1.UnLoadcurrentWorldListByName(name)
+	if allMiniWorlds == nil then
+		return
 	end
 
+	for k, v in pairs(allMiniWorlds) do
+		for k2, v2 in pairs(v) do
+			if v2.projectName == name then
+				v[k2].need_clean = true
+			end
+		end
+
+	end
+end
+
+function World2In1.UnLoadcurrentWorldList(name)
+	if allMiniWorlds == nil then
+		return
+	end
+
+	for k, v in pairs(allMiniWorlds) do
+		for k2, v2 in pairs(v) do
+			v[k2].need_clean = true
+		end
+	end
+
+	-- local gen = GameLogic.GetBlockGenerator();
+	-- for k, v in pairs(allMiniWorlds) do
+	-- 	for k2, v2 in pairs(v) do
+	-- 		-- v[k2].need_clean = true
+	-- 		if v2.loaded then
+	-- 			if v2.gridX then
+	-- 				local x, y = localGridXYToGlobal(v2.gridX, v2.gridY, v2.typeIndex);
+	-- 				gen:ResetGridXY(x, y);
+	-- 				v2.loaded = false
+	-- 			end
+
+	-- 			v[k2] = {}
+	-- 		end
+	-- 	end
+	-- end
+
+end
+
+function World2In1.LoadMiniWorld(type, gridX, gridY)
 	function localGridXYToGlobal(gridX, gridY, typeIndex)
 		if (typeIndex == 1) then
 			gridX = gridX
@@ -486,6 +633,30 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 			gridY = gridY + 4;
 		end
 		return gridX, gridY;
+	end
+
+	local typeIndex = mapTypeIndex[type];
+	local currentWorldList = allMiniWorlds[typeIndex];
+	local key = string.format("%d_%d", gridX, gridY);
+	if (currentWorldList[key] and currentWorldList[key].loaded) then
+		if currentWorldList[key].need_clean then
+			local gen = GameLogic.GetBlockGenerator();
+			local x, y = localGridXYToGlobal(gridX, gridY, typeIndex);
+			gen:ResetGridXY(x, y);
+
+			-- currentWorldList[key].need_clean = false
+			-- currentWorldList[key].loaded = false
+			currentWorldList[key] = nil
+		else
+			if (currentWorldList[key].projectName and currentWorldList[key].projectName ~= "") then
+				GameLogic.AddBBS(nil, string.format(L"进入【%s】", currentWorldList[key].projectName), 3000, "0 255 0");
+				local params = currentWorldList[key]
+				World2In1UserInfo.ShowPage(params);
+			else
+				World2In1UserInfo.ShowPage(nil);
+			end
+			return;
+		end
 	end
 
 	function downloadFile(world, commitId)
@@ -511,6 +682,9 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 				currentWorldList[key].projectName = world.name;
 				currentWorldList[key].projectId = world.id;
 				currentWorldList[key].userId = world.userId;
+				currentWorldList[key].gridX = gridX;
+				currentWorldList[key].gridY = gridY;
+				currentWorldList[key].typeIndex = typeIndex;
 				GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", world.name), 3000, "0 255 0");				
 				local params = currentWorldList[key]
 				World2In1UserInfo.ShowPage(params);
@@ -539,6 +713,8 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 				currentWorldList[key].loaded = false;
 			end
 		end);
+	else
+		currentWorldList[key].loaded = false;
 	end
 	--[[
 	keepwork.world.by_parent_id({headers = {["x-per-page"] = 1, ["x-page"] = orldIndex}, type = type, parentId = parentWorldId}, function(err, msg, data)
@@ -559,6 +735,7 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 end
 
 function World2In1.LoadAllWorlds(type, callback)
+	worldIndex = 1
 	currentWorlds = {};
 	keepwork.world.by_parent_id({type = type, parentId = parentWorldId}, function(err, msg, data)
 		if (data and data.count and data.rows) then
@@ -567,12 +744,13 @@ function World2In1.LoadAllWorlds(type, callback)
 			end
 			if (page) then
 				page:Refresh(0);
-				commonlib.TimerManager.SetTimeout(function()  
-					World2In1.OnMouseChangeEx()
-				end, 500);
+				World2In1.OnMouseChangeEx()
+				-- commonlib.TimerManager.SetTimeout(function()  
+				-- 	World2In1.OnMouseChangeEx()
+				-- end, 500);
 			end
 			if (callback) then
-				callback();
+				callback(currentWorlds);
 			end
 		end
 	end);
@@ -583,9 +761,10 @@ function World2In1.GetTypeIndex()
 end
 
 function World2In1.ShowToolBox()
-	GameLogic.GetCodeGlobal():BroadcastTextEvent("showToolBox", {}, function()
+	GameLogic.AddBBS(nil,"暂无可用的工具")
+	-- GameLogic.GetCodeGlobal():BroadcastTextEvent("showToolBox", {}, function()
 		
-	end);
+	-- end);
 end
 
 function World2In1.IsInSummerCampWorld()
@@ -602,4 +781,9 @@ function World2In1.IsInSummerCampWorld()
 	end
 
 	return false
+end
+
+function World2In1.SetCurrentType(type)
+	last_region_type = currentType
+	currentType = type;
 end

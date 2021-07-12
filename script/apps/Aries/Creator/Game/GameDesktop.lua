@@ -255,8 +255,12 @@ function Desktop.DoAutoAdjustUIScaling(bForceUpdate)
 	if(System.options.IsTouchDevice or (not GameLogic.options.EnableAutoUIScaling and not bForceUpdate)) then
 		return;
 	end
+	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+	local Screen = commonlib.gettable("System.Windows.Screen");
 
-	if(not ParaEngine.GetAttributeObject():GetField("IgnoreWindowSizeChange",false)) then
+	if(System.options.mc) then
+		Screen:SetUIScale(1)
+	elseif(not ParaEngine.GetAttributeObject():GetField("IgnoreWindowSizeChange",false)) then
 		local screen_size = ParaUI.GetUIObject("root"):GetAttributeObject():GetField("BackBufferSize", {800, 600});
 		width, height = screen_size[1], screen_size[2];
 
@@ -269,12 +273,8 @@ function Desktop.DoAutoAdjustUIScaling(bForceUpdate)
 				scale[2] = scale[1];
 			else
 			end
-			ParaUI.GetUIObject("root"):GetAttributeObject():SetField("UIScale", scale);
+			Screen:SetUIScale(scale[1], scale[2])
 		end
-	end
-
-	if(System.options.mc) then
-		ParaUI.GetUIObject("root"):GetAttributeObject():SetField("UIScale", {1, 1});
 	end
 end
 
@@ -377,11 +377,11 @@ function Desktop.OnExit(bForceExit, bRestart)
 		else
 			Desktop.is_exiting = true;
 
-			local projectId = GameLogic.options:GetProjectId();
-			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
-				ParaWorldLoginAdapter.ShowExitWorld(true);
-				return true;
-			end
+			-- local projectId = GameLogic.options:GetProjectId();
+			-- if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
+			-- 	ParaWorldLoginAdapter.ShowExitWorld(true);
+			-- 	return true;
+			-- end
 
 			local dialog = {
 				text = L"确定要退出当前世界么？", 
@@ -426,11 +426,12 @@ function Desktop.OnExit(bForceExit, bRestart)
 			end
 		else
 			Desktop.is_exiting = true;
-			local projectId = GameLogic.options:GetProjectId();
-			if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
-				ParaWorldLoginAdapter.ShowExitWorld(true);
-				return true;
-			end
+
+			-- local projectId = GameLogic.options:GetProjectId();
+			-- if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
+			-- 	ParaWorldLoginAdapter.ShowExitWorld(true);
+			-- 	return true;
+			-- end
 
 			local dialog = {
 				text = string.format(L"%d秒内您没有保存过世界. <br/>退出前, 是否保存世界？", GameLogic.options:GetElapsedUnSavedTime()/1000), 
@@ -455,11 +456,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 							Desktop.ForceExit(bRestart);
 						end
 					elseif (res and res == _guihelper.DialogResult.Cancel) then
-						Desktop.is_exiting = true;
-
-						commonlib.TimerManager.SetTimeout(function()
-							Desktop.is_exiting = false;
-						end, 3000)
+						
 					end
 				end
 			};

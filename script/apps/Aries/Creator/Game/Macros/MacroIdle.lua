@@ -66,7 +66,7 @@ function Macros.Idle(timeMs, bForceWait)
 							local t = SoundManager:GetSoundDuration(sound_name, file_path);
 							return Macros.Idle(t * 1000 + DefaultTriggerInterval, true);
 						end
-						return Macros.Idle(1000, true);
+						return Macros.Idle((math.floor(commonlib.utf8.len(text) / 5) + 1.5) * 1000, true);
 					end
 				elseif (previousMacro:IsTrigger() or previousMacro.name == "Idle") then
 					return Macros.Idle(DefaultTriggerInterval, true);

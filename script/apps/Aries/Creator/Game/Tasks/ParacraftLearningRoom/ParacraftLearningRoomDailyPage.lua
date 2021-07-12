@@ -20,11 +20,11 @@ local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.Par
 local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
 
 local ParacraftLearningRoomDailyPage = NPL.export()
-
+ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 178;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 185;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -205,6 +205,37 @@ Clone命令上升的气球
 看不见的可点击区域
 激活代码方块编辑器(上)
 激活代码方块编辑器(下)
+相对位置播放动画
+用命令生成地形
+预加载地形上的代码
+接收键盘消息
+接收任意键盘消息
+处理并发的键盘消息
+接收鼠标消息
+取消接收消息
+并行执行
+自动启动代码方块
+用代码方块自动加载房间内景
+NPL图块
+NPL图块自动生成宏示教
+NPL自定义世界图块（上）
+NPL自定义世界图块（下）
+摄影机图块 (上)
+摄影机图块 (下)
+批量替换方块
+多人联网发消息
+多人联网共享数据
+多人联网排行榜
+新建世界模板展示
+手机版操作介绍（上）
+手机版操作介绍（下）
+给平板电脑加上键盘和鼠标
+2合1课程世界介绍（上）
+2合1课程世界介绍（下）
+3C教学法介绍
+发布手机App
+世界激活码 （上）
+世界激活码 （下）
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 
@@ -261,7 +292,39 @@ function ParacraftLearningRoomDailyPage.GetTitle(index)
     local s = string.format(L"第%d天:%s", index, ParacraftLearningRoomDailyPage.lessons_title[index] or "");
     return s;
 end
+function ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp()
+	ParacraftLearningRoomDailyPage.is_red_summercamp = true;
+
+	ParacraftLearningRoomDailyPage.FillDays()
+	local params = {
+			url = "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.html",
+			name = "ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp", 
+			isShowTitleBar = false,
+			DestroyOnClose = true,
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			allowDrag = false,
+			enable_esc_key = false,
+			cancelShowAnimation = true,
+			-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+			directPosition = true,
+				align = "_fi",
+				x = 0,
+				y = 0,
+				width = 0,
+				height = 0,
+			DesignResolutionWidth = 1280,
+			DesignResolutionHeight = 720,
+		};
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+    if(page)then
+        local index = ParacraftLearningRoomDailyPage.GetNextDay();
+        local row = math.floor((index-1) / 5) + 1;
+	    page:CallMethod("item_gridview", "ScrollToRow", row);
+    end
+end
 function ParacraftLearningRoomDailyPage.ShowPage()
+	ParacraftLearningRoomDailyPage.is_red_summercamp = false;
+	
 	ParacraftLearningRoomDailyPage.FillDays()
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.html",
@@ -301,9 +364,9 @@ function ParacraftLearningRoomDailyPage.DoCheckin(callback)
 			_guihelper.MessageBox(L"请先登录！");
 		return
 	end
-
+	ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 	local show_page = function()
-        ParacraftLearningRoomDailyPage.ShowPage();
+		ParacraftLearningRoomDailyPage.ShowPage();
 	end
 	if(not KeepWorkItemManager.IsLoaded())then
 		KeepWorkItemManager.GetFilter():add_filter("loaded_all", show_page);
@@ -343,7 +406,9 @@ end
 function ParacraftLearningRoomDailyPage.OnCheckinToday()
     local index = ParacraftLearningRoomDailyPage.GetNextDay();
 	LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnCheckinToday", index);
-	ParacraftLearningRoomDailyPage.ClosePage();
+	if(not ParacraftLearningRoomDailyPage.is_red_summercamp)then
+		ParacraftLearningRoomDailyPage.ClosePage();
+	end
 	ParacraftLearningRoomDailyPage.OnOpenWeb(index)
 end
 function ParacraftLearningRoomDailyPage.IsVip()
@@ -402,6 +467,15 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 		return
     end
 	index = tonumber(index)
+	
+	if(index <= 16)then
+		bCheckVip = false;
+	end
+	commonlib.echo("==========ParacraftLearningRoomDailyPage.OnOpenWeb");
+	commonlib.echo(index);
+	commonlib.echo(bCheckVip);
+	commonlib.echo(ParacraftLearningRoomDailyPage.IsVip());
+
 	if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip())then
 		if(ParacraftLearningRoomDailyPage.IsFuture(index))then
 			ParacraftLearningRoomDailyPage.OnVIP("DailyNote");
@@ -431,16 +505,20 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 			GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { ended = true, learningIndex = index });
             NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();
 			
-			
+			-- 如果不是今天的签到课，就直接返回
+			if(not ParacraftLearningRoomDailyPage.IsNextDay(index))then
+				return
+			end
 			local end_time = os.time()
 			if not ParacraftLearningRoomDailyPage.HasCheckedToday() and end_time - start_time >= 20 then
 				local exid = ParacraftLearningRoomDailyPage.exid;
 				KeepWorkItemManager.DoExtendedCost(exid, function()
-					ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
-					-- _guihelper.MessageBox(L"今日签到成功，自动获得4个知识豆。", function(res)
-						
-					-- end, _guihelper.MessageBoxButtons.OK);   
-					-- ParacraftLearningRoomDailyPage.ShowPage();
+
+					if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
+						ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp);
+					else
+						ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
+					end
 
 					local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
 					local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
@@ -451,7 +529,11 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 					_guihelper.MessageBox(L"签到失败！");
 				end)
 			else
-				ParacraftLearningRoomDailyPage.ShowPage();
+				if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
+					ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp();
+				else
+					ParacraftLearningRoomDailyPage.ShowPage();
+				end
 			end
 		end
 	end);

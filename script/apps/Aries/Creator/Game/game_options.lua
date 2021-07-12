@@ -17,6 +17,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
 local SentientGroupIDs = commonlib.gettable("MyCompany.Aries.Game.GameLogic.SentientGroupIDs");
+local Screen = commonlib.gettable("System.Windows.Screen");
 
 local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", {
 	jump_up_speed = 5,
@@ -146,10 +147,6 @@ function options:OneTimeInit()
 		return;
 	end
 	self.one_time_inited = true;
-
-	if(System.options.IsMobilePlatform) then
-		self:SetUIScaling(nil);
-	end
 
 	local key = "Paracraft_System_Sound_State";
 	local sound_state = GameLogic.GetPlayerController():LoadLocalData(key,true,true);
@@ -1058,12 +1055,12 @@ function options:SetUIScaling(value)
 			scaling = frame_height / self.min_ui_height;
 		end
 	end
-	ParaUI.GetUIObject("root"):SetField("UIScale", {scaling, scaling});
+	screen:SetUIScale(scaling, scaling)
 end
 
 function options:GetUIScaling()
-	local scaling = ParaUI.GetUIObject("root"):GetField("UIScale", {1, 1});
-	return scaling[1];
+	local scaling = Screen:GetUIScaling();
+	return scaling[1]
 end
 
 -- async asset loader

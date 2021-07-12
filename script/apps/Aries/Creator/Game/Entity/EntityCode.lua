@@ -156,10 +156,11 @@ function Entity:SaveToXMLNode(node, bSort)
 		local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
 		local cameraNode = {name="camera", };
 		node[#node+1] = cameraNode;
-		local cameras = camera.getCameras();
+		local cameras = GameLogic.Camera_getAllCameras();
 		for i, data in ipairs(cameras) do
 			local x, y, z = data:GetPosition();
-			cameraNode[i] = {name="camera"..i, attr={x=x, y=y, z=z}};
+			local yaw, pitch, roll = data:GetFacing(), data:GetPitch(), data:GetRoll();
+			cameraNode[i] = {name="camera"..i, attr={x=x, y=y, z=z, yaw=yaw, pitch=pitch, roll=roll}};
 		end
 	end
 

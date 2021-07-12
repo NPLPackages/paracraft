@@ -82,7 +82,7 @@ function VipToolNew.ShowPage()
         allowDrag = true,
         enable_esc_key = true,
         zorder = 0,
-        app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+        -- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
         directPosition = true,
             align = "_ct",
             x = -view_width/2,
@@ -186,6 +186,10 @@ function VipToolNew.GetVipDesc()
     else
         local time_stamp = commonlib.timehelp.GetTimeStampByDateTime(profile.vipDeadline)
         date_desc = os.date("%Y.%m.%d", time_stamp)
+    end
+
+    if profile.vip ~= 1 then
+        return string.format("会员状态：%s", state)
     end
 
     return string.format("会员状态：%s &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;有效日期：%s", state, date_desc)

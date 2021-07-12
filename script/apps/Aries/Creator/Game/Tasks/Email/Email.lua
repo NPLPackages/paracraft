@@ -36,6 +36,7 @@ Email.InteractionType = {
 	collect = 4, 			--收藏
 	jion = 5, 				--加入项目
 	wechat_like = 6, 		--微信点赞
+	world_star = 7,
 }
 
 Email.ButtonData = {
@@ -56,6 +57,7 @@ local interaction_type_desc = {
 	[Email.InteractionType.collect] = "收藏了你的《%s》", 
 	[Email.InteractionType.jion] = "申请加入项目《%s》", 	
 	[Email.InteractionType.wechat_like] = "觉得你的《%s》很赞", 
+	[Email.InteractionType.world_star] = "你的作品《%s》获得%d个赞的创作奖励。"
 }
 
 
@@ -273,8 +275,12 @@ function Email.HandleData(data, updata_cb)
 			if interaction_type == Email.InteractionType.fans then
 				search_id_list[#search_id_list + 1] = msg.userId
 			else
-				msg_data.msg_content2 = msg.projectName and string.format(interaction_type_desc[interaction_type], msg.projectName) or ""
-
+				if interaction_type == Email.InteractionType.world_star then
+					msg_data.msg_content2 = msg.projectName and string.format(interaction_type_desc[interaction_type], msg.projectName,msg.starCnt) or ""
+				else
+					local strFormat = interaction_type_desc[interaction_type] or "未定义类型"
+					msg_data.msg_content2 = msg.projectName and string.format(strFormat, msg.projectName) or ""
+				end
 				if interaction_type == Email.InteractionType.jion then
 					pro_id_list[#pro_id_list + 1] = msg.projectId
 				end

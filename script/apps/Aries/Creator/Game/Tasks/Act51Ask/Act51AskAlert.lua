@@ -8,6 +8,7 @@ Use Lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskAlert.lua").Show();
 --]]
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
 local Act51AskAlert = NPL.export();
 
 local page
@@ -86,7 +87,7 @@ end
 function Act51AskAlert.Check51ActState()
     local begain_time_stamp = os.time({year = 2021, month = 4, day = 30, hour=0, min=0, sec=0})
     local end_time_stamp = os.time({year = 2021, month = 5, day = 7, hour=23, min=59, sec=59})
-    local cur_time_stamp = GameLogic.QuestAction.GetServerTime()
+    local cur_time_stamp = QuestAction.GetServerTime()
     if cur_time_stamp > end_time_stamp then
         return "act_end"
     end

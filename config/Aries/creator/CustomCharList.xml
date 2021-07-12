@@ -90,6 +90,9 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+	    <!-- 2021705夏令营道具-->
+        <item id="83179" gsid="82021" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83179_feedwoman_hat_32bits.png" name="熊猫宝宝头（女）"/>
+        <item id="83178" gsid="82018" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83178_feedman_hat_32bits.png" name="熊猫宝宝头（男）"/>
 	    <!-- 20210624夏令营道具-->
         <item id="83177" gsid="82017" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83177_red_sodier_hat6_32bits.png" name="女文艺红军帽子02"avatarMode="false"/>
         <item id="83176" gsid="82016" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83176_red_sodier_hat5_32bits.png" name="女文艺红军帽子01"avatarMode="false"/>

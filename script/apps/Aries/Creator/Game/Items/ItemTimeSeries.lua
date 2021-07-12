@@ -30,6 +30,11 @@ function ItemTimeSeries:ctor()
 end
 
 
+-- not stackable
+function ItemTimeSeries:GetMaxCount()
+	return 64;
+end
+
 -- virtual: convert entity to item stack. 
 -- such as when alt key is pressed to pick a entity in edit mode. 
 function ItemTimeSeries:ConvertEntityToItem(entity)

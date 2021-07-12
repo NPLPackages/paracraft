@@ -9,8 +9,12 @@ local Keepwork = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
 ]]
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
+local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+
+
+HttpWrapper.Create("keepwork.school.region", "%MAIN%/core/v0/regions/:id", "GET", true);
 
 local Keepwork = NPL.export();
 
@@ -175,4 +179,16 @@ function Keepwork:IsPrefectUserInfo()
     self.isExitPrefectUserInfoItem = true;
     self.isPrefectUserInfo = true;
     return true;
+end
+
+function Keepwork:GetSchoolRegionId(callback)
+    keepwork.school.region({
+        router_params = {
+            id = (self:GetUserInfo().school or {}).regionId or 1,
+        }
+    }, function(err, msg, data)
+        if (type(callback) == "function") then
+            callback(data and data.info and data.info.state and data.info.state.id);
+        end
+    end)
 end

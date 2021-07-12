@@ -186,6 +186,7 @@ function EntityManager.Clear()
 	entity_id_maps = {};
 	regions = {};
 	cur_player = nil;
+	GameLogic.player = nil;
 	cur_focus = nil;
 	players = {};
 	senstient_list = {};
@@ -360,6 +361,7 @@ function EntityManager.SetMainPlayer(playerEntity)
 		end
 		local last_player = cur_player;
 		cur_player = playerEntity;
+		GameLogic.player = cur_player;
 		GameLogic.events:DispatchEvent({type = "OnPlayerReplaced" , });
 		return last_player;
 	else

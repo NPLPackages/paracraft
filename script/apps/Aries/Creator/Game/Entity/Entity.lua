@@ -2658,6 +2658,17 @@ function Entity:UpdateRiderPosition()
     end
 end
 
+-- this is the c++ mount method. 
+function Entity:MountOn(targetEntity, mountID)
+	local player = self:GetInnerObject();
+	if(player and targetEntity) then
+		local target = targetEntity:GetInnerObject();
+		if(target) then
+			player:ToCharacter():MountOn(target, mountID or -1);
+		end
+	end
+end
+
 -- mount current entity to the target entity. 
 -- @param targetEntity: nil to unmount
 function Entity:MountEntity(targetEntity)

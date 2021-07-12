@@ -16,6 +16,7 @@ local CodeActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
 local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
+local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
 local CameraBlockly = NPL.export();
 commonlib.setfield("MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly", CameraBlockly);
 
@@ -78,8 +79,8 @@ function CameraBlockly.GetCode(code)
 	if(not CameraBlockly.templateCode) then
 		CameraBlockly.templateCode = [[
 local CameraBlockly = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraBlockly.lua");
-local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
-local subtitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/subtitle.lua");
+local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Camera.lua");
+local subtitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Subtitle.lua");
 camera.init(codeblock);
 <code>
 ]]
@@ -92,7 +93,7 @@ end
 function CameraBlockly.GetCustomToolbarMCML()
 	CameraBlockly.toolBarMcmlText = CameraBlockly.toolBarMcmlText or string.format([[
 		<div style="float:left;margin-top:8px;margin-left:4px;">
-			<pe:sliderbar uiname="EnvFramePage.timeSlider" name="timeSlider" min="0" max="1" value='<%%=MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.GetCurrentTime()%%>' style="width:80px;height:22px;" onchange="MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.OnTimeChanged()"></pe:sliderbar>
+			<pe:sliderbar uiname="EnvFramePage.timeSlider" name="timeSlider" min="0" max='<%%=MyCompany.Aries.Game.GameLogic.Camera_getTotalTimes()%%>' value='<%%=MyCompany.Aries.Game.GameLogic.Camera_getCurrentTime()%%>' style="width:80px;height:22px;" onchange="MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.OnTimeChanged()"></pe:sliderbar>
 		</div>
 		<div style="float:left;margin-top:5px;margin-left:5px;">
 			<pe:gridview style="width:135px;height:26px;" name="cameras" CellPadding="0" VerticalScrollBarStep="26" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight="26" DataSource='<%%=MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.GetAllCameras()%%>'>
@@ -110,11 +111,13 @@ function CameraBlockly.GetCustomToolbarMCML()
 	return CameraBlockly.toolBarMcmlText;
 end
 
-function CameraBlockly.GetCurrentTime()
-	return 0
-end
-
 function CameraBlockly.OnTimeChanged(value)
+	if (value > 0) then
+		GameLogic.Camera_setCurrentTime(value);
+		CodeBlockWindow.OnClickCompileAndRun(function()
+			GameLogic.Camera_setCurrentTime(0);
+		end);
+	end
 end
 
 function CameraBlockly.GetAllCameras()
@@ -128,14 +131,12 @@ function CameraBlockly.GetAllCameras()
 end
 
 function CameraBlockly.OnClickCamera(index)
-	local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
 	if (CameraBlockly.cameras and CameraBlockly.cameras[index]) then
-		camera.showCamera(CameraBlockly.cameras[index].id);
+		camera.showCamera(CameraBlockly.cameras[index].id, CodeBlockWindow.GetCodeEntity());
 	end
 end
 
 function CameraBlockly.RunAndExportVideo()
-	local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
 	CodeBlockWindow.CloseEditorWindow();
 	VideoSharing.ToggleRecording(1, function()
 		CodeBlockWindow.OnClickCompileAndRun(function()

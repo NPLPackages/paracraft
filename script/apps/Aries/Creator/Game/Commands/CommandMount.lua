@@ -47,6 +47,9 @@ e.g.
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
 			if(option == "target") then
 				target, cmd_text = CmdParser.ParseString(cmd_text);
+				if(target) then
+					target = EntityManager.GetEntity(target);
+				end
 			elseif(option == "radius") then
 				radius, cmd_text = CmdParser.ParseNumber(cmd_text);
 			end

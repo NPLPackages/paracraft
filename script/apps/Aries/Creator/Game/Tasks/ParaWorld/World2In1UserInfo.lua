@@ -69,9 +69,9 @@ function World2In1UserInfo.ShowPage(world)
 end
 
 function World2In1UserInfo.Refresh(userId)
-	if (userId == currentId) then
-		return;
-	end
+	-- if (userId == currentId) then
+	-- 	return;
+	-- end
 
 	if (timer) then
 		timer:Change(nil, nil)
@@ -79,13 +79,14 @@ function World2In1UserInfo.Refresh(userId)
 	end
 
 	local times = 0
-	if worldParams == nil then
-		return
-	end
 	timer = commonlib.Timer:new(
 		{
 			callbackFunc = function()
 				if (times > 20) then
+					if worldParams == nil then
+						return
+					end
+					
 					GameLogic.GetFilters():apply_filters(
 						"user_behavior",
 						1,
@@ -148,7 +149,7 @@ function World2In1UserInfo.GetProjectName()
 			local text = commonlib.utf8.sub(worldParams.projectName, 1, 8);
 			return string.format(L"%s...的家园", text);
 		else
-			return commonlib.utf8.sub(worldParams.projectName, 1, 8);
+			return commonlib.utf8.sub(worldParams.projectName, 1, 14).."...";
 		end
 	else
 		return worldParams.projectName;
@@ -181,6 +182,8 @@ function World2In1UserInfo.OnClickStar()
 			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
 
 			GameLogic.QuestAction.SetDailyTaskValue("40012_1", nil, 1)
+		elseif (err == 500) then
+			GameLogic.AddBBS("world2in1", L"该世界已被其作者删除");
 		end
 	end);
 	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.home.thumbs_up");
@@ -194,6 +197,8 @@ function World2In1UserInfo.OnClickFavorite()
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
 			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+		elseif (err == 500) then
+			GameLogic.AddBBS("world2in1", L"该世界已被其作者删除");
 		end
 	end);
 	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.home.favorited");
@@ -207,6 +212,8 @@ function World2In1UserInfo.OnClickUnFavorite()
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
 			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+		elseif (err == 500) then
+			GameLogic.AddBBS("world2in1", L"该世界已被其作者删除");
 		end
 	end);
 end

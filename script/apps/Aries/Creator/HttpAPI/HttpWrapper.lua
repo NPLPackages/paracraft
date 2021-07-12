@@ -234,3 +234,69 @@ function HttpWrapper.ShowErrorTip(err)
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
     GameLogic.AddBBS("desktop", L"网络异常", 3000, "255 0 0"); 
 end
+
+-- get cache from localserver
+-- @param key: a global unique of string
+-- @param cache_policy: a cache policy string, default value is "access plus 12 hour"
+function HttpWrapper.GetCacheByKey(key, cache_policy)
+	if(not key)then
+		return
+	end
+	cache_policy = cache_policy or "access plus 12 hour";
+	if(type(cache_policy) == "string") then
+		cache_policy = System.localserver.CachePolicy:new(cache_policy);
+	end
+
+    local ls = System.localserver.CreateStore(nil, 3);
+	if(not ls) then
+		return 
+	end
+	local item = ls:GetItem(key)
+	if(item and item.entry and item.payload) then
+		if(not cache_policy:IsExpired(item.payload.creation_date)) then
+			-- make output msg
+			local output_msg = commonlib.LoadTableFromString(item.payload.data);
+			LOG.std("", "debug", "HttpWrapper", "load cache by key: %s", key);
+            return output_msg;
+		end
+	end
+end
+function HttpWrapper.DeleteCacheByKey(key)
+	if(not key)then
+		return
+	end
+	local ls = System.localserver.CreateStore(nil, 3);
+	if(not ls) then
+		return 
+	end
+	ls:Delete(key)
+end
+function HttpWrapper.SetCacheByKey(key, data)
+	if(not key)then
+		return
+	end
+	 local ls = System.localserver.CreateStore(nil, 3);
+	if(not ls) then
+		return 
+	end
+    -- make output msg
+	local output_msg = data;
+
+	local url = key;
+   -- make entry
+	local item = {
+		entry = System.localserver.WebCacheDB.EntryInfo:new({url = url,}),
+		payload = System.localserver.WebCacheDB.PayloadInfo:new({
+			status_code = System.localserver.HttpConstants.HTTP_OK,
+			data = (output_msg),
+		}),
+	}
+	-- save to database entry
+	local res = ls:PutItem(item) 
+    if(res) then 
+		LOG.std("", "info", "HttpWrapper", "saved to local server by key: %s ", url);
+        return true;
+	else	
+		LOG.std("", "warning", "HttpWrapper", LOG.tostring("warning: failed saving to local server %s \n", tostring(url))..LOG.tostring(output_msg));
+	end
+end

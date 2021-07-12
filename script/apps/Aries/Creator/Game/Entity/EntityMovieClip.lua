@@ -291,7 +291,7 @@ function Entity:CreateNPC()
 		self.inventory:SetSlotCount(self.inventory:GetSlotCount()+5);
 		self:GetInventoryView():UpdateFromInventory();
 	end
-	local bAdded, slot_index = self.inventory:AddItem(item);
+	local bAdded, slot_index = self.inventory:AddItem(item, nil, nil, true);
 	if(slot_index) then
 		return self.inventory:GetItem(slot_index);
 	end
@@ -299,7 +299,7 @@ end
 
 function Entity:CreateCamera()
 	local item = ItemStack:new():Init(block_types.names.TimeSeriesCamera, 1);
-	local bAdded, slot_index = self.inventory:AddItem(item);
+	local bAdded, slot_index = self.inventory:AddItem(item, nil, nil, true);
 	if(slot_index) then
 		return self.inventory:GetItem(slot_index);
 	end

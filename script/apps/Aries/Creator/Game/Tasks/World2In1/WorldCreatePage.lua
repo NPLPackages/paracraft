@@ -5,7 +5,8 @@ Date: 2021/6/18
 Desc:  
 Use Lib:
 -------------------------------------------------------
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/WorldCreatePage.lua").Show();
+local WorldCreatePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/WorldCreatePage.lua")
+WorldCreatePage.Show();
 --]]
 local WorldCreatePage = NPL.export();
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
@@ -20,16 +21,13 @@ function WorldCreatePage.OnInit()
     page.OnClose = WorldCreatePage.CloseView
 end
 
-function WorldCreatePage.CloseView()
-    WorldCreatePage.WorldListData = nil
-end
-
 function WorldCreatePage.Show()
     WorldCreatePage.FlushProjectList(WorldCreatePage.ShowView)
 end
 
 function WorldCreatePage.FlushProjectList(cb)
     local world_id = WorldCommon.GetWorldTag("kpProjectId");
+    world_id = world_id or 0
     keepwork.world2in1.project_list({
 		parentId=world_id,
         ["x-per-page"] = 200,
@@ -103,7 +101,16 @@ function WorldCreatePage.CloseView()
     WorldCreatePage.ClearData()
 end
 
+function WorldCreatePage.Close()
+    if page then
+        page:CloseWindow()
+        WorldCreatePage.CloseView()
+    end
+end
+
 function WorldCreatePage.ClearData()
+    WorldCreatePage.WorldListData = nil
+    World2In1.SetEnterCreateRegionCb(nil)
 end
 
 function WorldCreatePage.HandleData()
@@ -118,9 +125,12 @@ function WorldCreatePage.OnClickCreate()
 
     if page then
         page:CloseWindow()
+        WorldCreatePage.CloseView()
     end
     local world_id = WorldCommon.GetWorldTag("kpProjectId");
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/CreateModulPage.lua").Show(nil, world_id);
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/CreateModulPage.lua").Show(nil, world_id, function()
+        WorldCreatePage.Show();
+    end);
 end
 
 function WorldCreatePage.SetWorldListData(data)
@@ -143,6 +153,7 @@ function WorldCreatePage.OnClickSelect(index)
         }, function(err, msg, data)
             WorldCreatePage.InGetServerData = false
             if err == 200 then
+                local enter_create_region_cb = World2In1.GetEnterCreateRegionCb()
                 if page then
                     page:CloseWindow(0)
                     WorldCreatePage.CloseView()
@@ -152,6 +163,9 @@ function WorldCreatePage.OnClickSelect(index)
                 
                 local parentId = world_data.parentId
                 local cur_world_id = WorldCommon.GetWorldTag("kpProjectId");
+                if enter_create_region_cb then
+                    World2In1.SetEnterCreateRegionCb(enter_create_region_cb)
+                end
                 if parentId ~= cur_world_id then
                     local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
                     CommandManager:RunCommand(string.format('/loadworld -force -s %s', world_data.id))
@@ -195,25 +209,33 @@ function WorldCreatePage.OnClickDelete(index)
     end
 
     local world_data = WorldCreatePage.WorldListData[index]
-    local project_name = world_data.name or ""
+    if world_data == nil or world_data.name == nil then
+        return
+    end
 
+    local project_name = world_data.name or ""
+    project_name = commonlib.Encoding.Utf8ToDefault(project_name)
     local worldpath = WorldCreatePage.project_file_path .. project_name
-    _guihelper.MessageBox(string.format("是否要删除《%s》迷你地块", project_name), function()	
+    _guihelper.MessageBox(string.format("是否要删除《%s》迷你地块", world_data.name), function()	
         KeepworkServiceProject:RemoveProject(
             world_data.id,
             function(data, err)
                 if err == 200 then
                     if ParaIO.DoesFileExist(worldpath, true) then
                         commonlib.Files.DeleteFolder(worldpath)
-                        WorldCreatePage.FlushProjectList(function()
-                            WorldCreatePage.OnRefresh()
-                        end)
                     end
+
+                    WorldCreatePage.FlushProjectList(function()
+                        -- World2In1.UnLoadcurrentWorldListByName(project_name)
+                        WorldCreatePage.OnRefresh()
+                    end)
                 end
             end
         )
     end)
+end
 
-
-    
+function WorldCreatePage.JoinVip()
+    local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+    VipToolNew.Show("world_create_page")
 end

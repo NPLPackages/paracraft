@@ -73,6 +73,8 @@ function DefaultFilters.cmd_open_url(url)
 		else
 			return;
 		end
+	elseif(url == "self") then
+		url = "paracraft://cmd/loadworld "..GameLogic.GetWorldDirectory();
 	elseif(url == "store") then
 		--[[
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/OnlineStore/OnlineStore.lua");

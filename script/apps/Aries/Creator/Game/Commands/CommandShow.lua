@@ -26,7 +26,8 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["show"] = {
 	name="show", 
 	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|terrain|
-mod|physics|vision|quickselectbar|tips|map|dock|miniuserinfo|camera] [on|off]], 
+mod|physics|vision|quickselectbar|tips|map|camera|
+dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -37,6 +38,7 @@ Other show filters:
 /show quickselectbar
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
+		local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 		local name, bIsShow;
 		name, cmd_text = CmdParser.ParseString(cmd_text);
 		bIsShow, cmd_text = CmdParser.ParseBool(cmd_text);
@@ -120,8 +122,15 @@ Other show filters:
 			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 			ParaWorldMinimapWnd:Show();
 		elseif(name == "dock") then
-			local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 			DockPage.Show(true);
+		elseif(name == "dock_left_top") then
+			DockPage.SetUIVisible_LeftTop(true);
+		elseif(name == "dock_right_top") then
+			DockPage.SetUIVisible_RightTop(true);
+		elseif(name == "dock_center_bottom") then
+			DockPage.SetUIVisible_CenterBottom(true);
+		elseif(name == "dock_right_bottom") then
+			DockPage.SetUIVisible_RightBottom(true);
 		elseif (name == "miniuserinfo") then
 			local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
 			MiniWorldUserInfo.ShowInMiniWorld();
@@ -137,13 +146,16 @@ Other show filters:
 Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|mobile|terrain|
-vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo|camera]], 
+vision|ui|keyboard|quickselectbar|tips|map|info|camera|
+dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo
+]], 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
 /hide desktop
 /hide player
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
+		local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 		local name;
 		name, cmd_text = CmdParser.ParseString(cmd_text);
 		name = name or "";
@@ -198,8 +210,15 @@ vision|ui|keyboard|quickselectbar|tips|map|info|dock|miniuserinfo|camera]],
 			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 			ParaWorldMinimapWnd:Close();
 		elseif(name == "dock") then
-			local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 			DockPage.Hide();
+		elseif(name == "dock_left_top") then
+			DockPage.SetUIVisible_LeftTop(false);
+		elseif(name == "dock_right_top") then
+			DockPage.SetUIVisible_RightTop(false);
+		elseif(name == "dock_center_bottom") then
+			DockPage.SetUIVisible_CenterBottom(false);
+		elseif(name == "dock_right_bottom") then
+			DockPage.SetUIVisible_RightBottom(false);
 		elseif (name == "miniuserinfo") then
 			local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
 			MiniWorldUserInfo.ClosePage()

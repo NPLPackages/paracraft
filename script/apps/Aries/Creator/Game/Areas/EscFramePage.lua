@@ -113,6 +113,8 @@ function EscFramePage.ShowPage(bShow)
 						y = -350/2,
 						width = 390,
 						height = 350,
+					-- DesignResolutionWidth = 1280,
+					-- DesignResolutionHeight = 720,
 				};
 			System.App.Commands.Call("File.MCMLWindowFrame", params);
 			if(bShow ~= false) then

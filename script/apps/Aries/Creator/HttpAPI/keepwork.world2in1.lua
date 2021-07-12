@@ -41,3 +41,7 @@ HttpWrapper.Create("keepwork.lesson2in1.set_useraction", "%MAIN%/core/v0/ai/user
 --http://yapi.kp-para.cn/project/32/interface/api/4247
 --获取小节进度
 HttpWrapper.Create("keepwork.lesson2in1.get_useraction", "%MAIN%/core/v0/ai/userAiSection", "GET", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/4237
+--分配点赞
+HttpWrapper.Create("keepwork.projects.allocateStar", "%MAIN%/core/v0/projects/allocateStar", "POST", true)

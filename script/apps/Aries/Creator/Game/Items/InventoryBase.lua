@@ -167,8 +167,9 @@ end
 
 -- auto add item_stack to a free slot or merge with existing stack.
 -- @param from_slot_id: start from a given slot. if nil, it will search from beginning. 
+-- @param bAlwaysOnEmptySlot: if true, we will always insert to an empty slot
 -- @return bAllAdded, slot_index: true if placed, false if impossible or only part of the item_stack is placed. 
-function InventoryBase:AddItem(item_stack, from_slot_id, to_slot_id)
+function InventoryBase:AddItem(item_stack, from_slot_id, to_slot_id, bAlwaysOnEmptySlot)
 	local slots = self.slots;
 	
 	for i=(from_slot_id or 1), (to_slot_id or self.max_pick_item_count or self:GetSlotCount()) do
@@ -177,7 +178,7 @@ function InventoryBase:AddItem(item_stack, from_slot_id, to_slot_id)
 			slots[i] = item_stack:SplitStack(nil);
 			self:OnInventoryChanged(i);
 			return true, i;
-		elseif(item:IsSameItem(item_stack) and item:IsStackable() and item.count < self.stackItemCountLimit) then
+		elseif( (not bAlwaysOnEmptySlot and item:IsSameItem(item_stack) and item:IsStackable()) and item.count < self.stackItemCountLimit) then
 			if( (self.stackItemCountLimit - item.count) > item_stack.count) then
 				slots[i].count = slots[i].count + item_stack.count;	
 				item_stack.count = 0;

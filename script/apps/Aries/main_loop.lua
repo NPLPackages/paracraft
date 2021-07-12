@@ -592,10 +592,12 @@ local function Aries_Init()
 	System.options.ViewProfileCommand = "Profile.Aries.ShowFullProfile";
 	
 	-- in case back buffer is not big enough, we will use UI scaling. 
+	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+	local Screen = commonlib.gettable("System.Windows.Screen");
 	if(System.options.mc) then
-		ParaUI.SetMinimumScreenSize(1020,595,true);
+		Screen:SetMinimumScreenSize(1280,720,true);
 	else
-		ParaUI.SetMinimumScreenSize(1020,595,true);
+		Screen:SetMinimumScreenSize(1020,595,true);
 	end
 
 	local att = ParaEngine.GetAttributeObject();

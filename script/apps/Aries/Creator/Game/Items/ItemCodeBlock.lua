@@ -114,7 +114,7 @@ local tooltipMap = {
 	npl_cad = L"计算机辅助设计",
 	npl_python = L"Python",
 	npl_teacher = L"教师",
-	npl_teacher = L"摄影机",
+	npl_camera = L"摄影机",
 }
 function ItemCodeBlock:GetLangTooltipText(langName)
 	return tooltipMap[langName or ""] or langName;

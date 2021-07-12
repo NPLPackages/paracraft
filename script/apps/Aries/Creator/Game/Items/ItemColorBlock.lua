@@ -291,17 +291,7 @@ function ItemColorBlock:mouseReleaseEvent(event)
 						to_id = self.id, to_data=data, max_radius = if_else(event.shift_pressed, 30, 0), preserveRotation=true})
 					task:Run();
 					event:accept();
-				elseif(event.shift_pressed) then
-					-- fill line
-					self:PickPenColorAtMouse(result);
-					local data = self:ColorToData(self:GetPenColor());
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FillLineTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.FillLine:new({blockX = x,blockY = y, blockZ = z, side = result.side,
-						fill_id = self.id, fill_data = data})
-					task:Run();
-					event:accept();
 				else
-					
 				end
 			end
 		end

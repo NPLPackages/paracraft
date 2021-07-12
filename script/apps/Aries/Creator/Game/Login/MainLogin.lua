@@ -441,11 +441,13 @@ end
 function MainLogin:CheckCommandLine()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
 	local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
-	if(not System.options.cmdline_world or System.options.cmdline_world=="") then
+
+	local cmdline = ParaEngine.GetAppCommandLine()
+	if(not UrlProtocolHandler:GetParacraftProtocol(cmdline) and (not System.options.cmdline_world or System.options.cmdline_world=="")) then
 		-- only install url protocol when the world is empty
 		UrlProtocolHandler:CheckInstallUrlProtocol();
 	end
-	UrlProtocolHandler:ParseCommand(ParaEngine.GetAppCommandLine());
+	UrlProtocolHandler:ParseCommand(cmdline);
 	if(System.options.servermode) then
 		-- TODO: for server only world
 		if(not System.options.cmdline_world or System.options.cmdline_world=="") then
@@ -514,40 +516,7 @@ function MainLogin:AutoAdjustUIScalingForTouchDevice(callbackFunc)
 	if(System.options.IsTouchDevice) then
 		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 		local Screen = commonlib.gettable("System.Windows.Screen");
-
-		local function AutoAdjustUIScaling_()
-			local touch_ui_height = 720;
-			local frame_size = ParaEngine.GetAttributeObject():GetField("ScreenResolution", {1280,720});
-			local frame_height = frame_size[2];
-			if(frame_height == 0) then
-				frame_height = Screen:GetHeight();
-				LOG.std(nil, "error", "TouchDevice", "ScreenResolution not implemented");
-			end
-			LOG.std(nil, "info", "TouchDevice", {frame_size, ui_height = Screen:GetHeight()});
-			scaling = frame_height / touch_ui_height;
-			if(scaling ~= 1) then	
-				LOG.std(nil, "info", "TouchDevice", "set UIScale to %s for TouchDevice", scaling);
-				ParaUI.GetUIObject("root"):SetField("UIScale", {scaling, scaling});
-			end
-		end
-
-		NPL.load("(gl)script/ide/timer.lua");
-		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-			if(Screen:GetWidth() > 0) then
-				timer:Change();
-				
-				AutoAdjustUIScaling_();
-
-				if(callbackFunc) then
-					callbackFunc();
-				end
-
-				Screen:Connect("sizeChanged", function(width, height)
-					AutoAdjustUIScaling_();
-				end);
-			end
-		end})
-		mytimer:Change(0,300);
+		Screen:ChangeUIDesignResolution(1280, 720, callbackFunc)
 	end
 end
 

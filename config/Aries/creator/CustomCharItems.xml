@@ -298,9 +298,7 @@ model id
     <item id="82172" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
     <item id="82173" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
     <item id="82174" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/"></attachment></item>
-    <!--20210701夏令营活动头饰-->
-    <item id="82175" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/82175_feedman_hat.anim.x"></attachment></item>
-    <item id="82176" model="actor;"><attachment id="1" filename="character/CC/ObjectComponents/Head/82176_feedwoman_hat.anim.x"></attachment></item>
+    
 
 
 
@@ -493,8 +491,10 @@ model id
     <item id="83175" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83175_red_sodier_hat4.anim.x"></attachment></item>
     <item id="83176" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83176_red_sodier_hat5.anim.x"></attachment></item>
     <item id="83177" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83177_red_sodier_hat6.anim.x"></attachment></item>
-
-
+    <!--20210701夏令营活动头饰-->
+    <item id="83178" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83178_feedman_hat.anim.x"></attachment></item>
+    <item id="83179" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83179_feedwoman_hat.anim.x"></attachment></item>
+    
 
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>

@@ -46,10 +46,24 @@ function IsShowNeedVipDesc()
     return not GameLogic.IsVip()
 end
 
+function JoinVip()
+    WorldCreatePage.JoinVip()
+end
+
 ]]></script>
 <kp:window name="iframe" width="754" height="573" icon=""   onclose="ClosePage">
 <div style="position: relative;margin-top: 3px; base-font-size:22px;font-size: 22px;font-weight: bold;text-align: center;height: 41px;color: #ffffff;">我的地块</div>
 <div style="color:#ffffff;width:754;height:630px" class="kp_window_container">
+    <pe:if condition='<%=IsShowNeedVipDesc()%>'>
+        <pe:container name="canvas" style="margin-left: 55px;margin-top: 410px; width: 680px;height: 36px;position: relative;background: ;" zorder="2">
+            <div style="float: left;color:#000000">
+                你还不是会员，只能创建1个地块。立即加入会员，尽享创作吧！
+            </div>
+            <input type="button" width="86" height="29" value="" onclick="JoinVip" style="float: left; margin-left: 20px;margin-top: 0px;background:url(Texture/Aries/Creator/keepwork/World2In1/btn4_86X29_32bits.png#0 0 86 29)"/>
+        </pe:container>
+        <!-- <div zorder='10' style="margin-left: 55px;margin-top: 410px; width: 800px;height: 36px;position: relative;">
+        </div> -->
+    </pe:if>
     <div style="margin-left: 15px;margin-top:15px; width: 728px; height: 506px;background: url(Texture/Aries/Creator/keepwork/World2In1/BJK2_32bits.png#0 0 32 32:8 8 8 8);">
         <div style="margin-left: 10px; margin-top: 20px; base-font-size:16;font-size: 16;height: 20px;color: #000000;"><%=GetDesc1()%></div>
         <div style="margin-left: 15px;margin-top:15px; width: 684px; height: 28px;color: #ffffff;font-weight: bold;text-align: center;font-size: 16px; 
@@ -93,6 +107,7 @@ end
                 </EmptyDataTemplate>
             </pe:gridview>
         </div>
+
         <input type="button" width="142" height="48" value="创建新地块" onclick="OnClickCreate" style="font-size: 16px; margin-left: 557px;margin-top: -45px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan1_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
     </div>
 

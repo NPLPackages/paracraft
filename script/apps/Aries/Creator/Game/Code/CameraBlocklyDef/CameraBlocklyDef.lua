@@ -27,7 +27,7 @@ NPL.export({
 	},
 	category = "Camera", 
 	helpUrl = "", 
-	canRun = false,
+	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "camera.use",
@@ -35,7 +35,7 @@ NPL.export({
 	ToNPL = function(self)
 		return string.format('camera.use("%s")\n', self:getFieldValue('cameraId'));
 	end,
-	examples = {{desc = "使用指定的摄影机", canRun = false, code = [[
+	examples = {{desc = "使用指定的摄影机", canRun = true, code = [[
 ]]}},
 },
 
@@ -65,6 +65,7 @@ NPL.export({
 	category = "Motion", 
 	helpUrl = "", 
 	canRun = true,
+	hide_in_toolbox = true,
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "camera.setPosition",
@@ -171,7 +172,7 @@ NPL.export({
 
 {
 	type = "rotateYaw", 
-	message0 = L"摄影机左右旋转%1格 在%2秒内",
+	message0 = L"摄影机左右旋转%1度 在%2秒内",
 	arg0 = {
 		{
 			name = "degree",
@@ -202,7 +203,7 @@ NPL.export({
 
 {
 	type = "rotatePitch", 
-	message0 = L"摄影机上下旋转%1格 在%2秒内",
+	message0 = L"摄影机上下旋转%1度 在%2秒内",
 	arg0 = {
 		{
 			name = "degree",
@@ -233,7 +234,7 @@ NPL.export({
 
 {
 	type = "rotateRoll", 
-	message0 = L"摄影机摆动旋转%1格 在%2秒内",
+	message0 = L"摄影机摆动旋转%1度 在%2秒内",
 	arg0 = {
 		{
 			name = "degree",
@@ -264,7 +265,7 @@ NPL.export({
 
 {
 	type = "circle", 
-	message0 = L"摄影机环绕%1度，半径%2格，在%2秒内",
+	message0 = L"摄影机环绕%1度，在%2秒内，延长半径%3格",
 	arg0 = {
 		{
 			name = "degree",
@@ -273,16 +274,16 @@ NPL.export({
 			text = 60, 
 		},
 		{
-			name = "radius",
-			type = "input_value",
-			shadow = { type = "math_number", value = 20,},
-			text = 20, 
-		},
-		{
 			name = "duration",
 			type = "input_value",
 			shadow = { type = "math_number", value = 10,},
 			text = 10, 
+		},
+		{
+			name = "radius",
+			type = "input_value",
+			shadow = { type = "math_number", value = 0,},
+			text = 0, 
 		},
 	},
 	category = "Motion", 
@@ -293,7 +294,63 @@ NPL.export({
 	funcName = "camera.circle",
 	func_description = 'camera.circle(%d, %d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.circle(%s, %s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('radius'), self:getFieldAsString('duration'));
+		return string.format('camera.circle(%s, %s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'), self:getFieldAsString('radius'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "camera_play", 
+	message0 = L"播放动画%1到%2毫秒",
+	arg0 = {
+		{
+			name = "bengin_time",
+			type = "input_value",
+			shadow = { type = "math_number", value = 0,},
+			text = 0, 
+		},
+		{
+			name = "end_time",
+			type = "input_value",
+			shadow = { type = "math_number", value = 1000,},
+			text = 1000, 
+		},
+	},
+	category = "Motion", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "camera.play",
+	func_description = 'camera.play(%d, %d)',
+	ToNPL = function(self)
+		return string.format('camera.play(%s, %s)\n', self:getFieldAsString('bengin_time'), self:getFieldAsString('end_time'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "camera_wait", 
+	message0 = L"等待%1秒",
+	arg0 = {
+		{
+			name = "time",
+			type = "input_value",
+			shadow = { type = "math_number", value = 1,},
+			text = 1, 
+		},
+	},
+	category = "Control", 
+	helpUrl = "", 
+	canRun = true,
+	funcName = "camera.wait",
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'camera.wait(%s)',
+	ToNPL = function(self)
+		return string.format('camera.wait(%s)\n', self:getFieldAsString('time'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},

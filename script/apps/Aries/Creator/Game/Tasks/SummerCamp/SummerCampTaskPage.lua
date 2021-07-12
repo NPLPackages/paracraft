@@ -13,6 +13,123 @@ local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.Quest
 local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
 local SummerCampTaskPage = NPL.export()
 
+local SummerCampDailyTask = {
+	{
+        {name="探索世界：FindYou", world_id = 242},
+        {name="学习课程：拜访帕帕的家", world_id = 42457, course_id = 1},
+    },
+
+    {
+        {name="探索世界：当下的力量", world_id = 1070},
+        {name="学习课程：拜访拉拉的家", world_id = 42701, course_id = 2},
+    },
+
+    {
+        {name="探索世界：伟大的发明家", world_id = 470},
+        {name="学习课程：拜访卡卡的家", world_id = 42670, course_id = 3},
+    },
+
+    {
+        {name="探索世界：火星探险", world_id = 1082},
+        {name="学习课程：快速移动的方法", world_id = 44620, course_id = 11},
+    },
+
+    {
+        {name="探索世界：圆的故事", world_id = 94},
+        {name="学习课程：跳转：在场景中穿梭", world_id = 44747, course_id = 16},
+    },
+
+    {
+        {name="探索世界：在山的那边", world_id = 96},
+        {name="学习课程：如何选择一组方块", world_id = 44708, course_id = 12},
+    },
+
+    {
+        {name="探索世界：晓出净慈寺送林子方", world_id = 7945},
+        {name="学习课程：跳转：在场景中穿梭", world_id = 49658, course_id = 37},
+    },
+
+    {
+        {name="探索世界：象形之美", world_id = 2769},
+        {name="学习课程：选择方块的命令/take", world_id = 44859, course_id = 19},
+    },
+
+    {
+        {name="探索世界：永生的雪人", world_id = 158},
+        {name="学习课程：通知提醒命令/tip", world_id = 44628, course_id = 10},
+    },
+
+    {
+        {name="探索世界：父亲", world_id = 1073},
+        {name="学习课程：控制阴影的命令/shader", world_id = 44627, course_id = 6},
+    },
+
+    {
+        {name="探索世界：有了想法你怎么做", world_id = 455},
+        {name="学习课程： 旋转木马", world_id = 49764, course_id = 92},
+    },
+	-- 12号到18号
+	{
+        {name="探索世界：地球的颜色", world_id = 1066},
+        {name="学习课程：神秘空间1", world_id = 49661, course_id = 38},
+    },
+	{
+        {name="探索世界：森林之王", world_id = 569},
+        {name="学习课程：神秘空间2", world_id = 49665, course_id = 39},
+    },
+	{
+        {name="探索世界：宇宙快递", world_id = 506},
+        {name="学习课程：神秘空间3", world_id = 49678, course_id = 40},
+    },
+	{
+        {name="探索世界：美丽心灵", world_id = 164},
+        {name="学习课程：自动录制与视频输出", world_id = 49682, course_id = 41},
+    },
+	{
+        {name="探索世界：StoryOfMyLife", world_id = 211},
+        {name="学习课程：变装小魔术", world_id = 49686, course_id = 42},
+    },
+	{
+        {name="探索世界：吃货的一天", world_id = 459},
+        {name="学习课程：滚动吧！轮子", world_id = 49688, course_id = 44},
+    },
+	{
+        {name="探索世界：游乐园", world_id = 48674},
+        {name="学习课程：计时动画", world_id = 49687, course_id = 43},
+    },
+	-- 19号到25号
+	-- {
+    --     {name="探索世界：这就是我", world_id = 1164},
+    --     {name="学习课程：椅子", world_id = 49651, course_id = 92},
+    -- },
+	-- {
+    --     {name="探索世界：雨思", world_id = 175},
+    --     {name="学习课程：铅笔", world_id = 49653, course_id = 92},
+    -- },
+	-- {
+    --     {name="探索世界：苍玺城·梦的旅人", world_id = 1079},
+    --     {name="学习课程：拱形门", world_id = 49654, course_id = 92},
+    -- },
+	-- {
+    --     {name="探索世界：排队", world_id = 150},
+    --     {name="学习课程：铁链", world_id = 49657, course_id = 92},
+    -- },
+	-- {
+    --     {name="探索世界：威斯特利亚别墅", world_id = 169},
+    --     {name="学习课程：导出CAD模型", world_id = 49660, course_id = 92},
+    -- },
+	-- {
+    --     {name="探索世界：大徽宫", world_id = 156},
+    --     {name="学习课程：爱心", world_id = 49663, course_id = 92},
+    -- },
+	-- {
+    --     {name="探索世界：烟雨庄", world_id = 513},
+    --     {name="学习课程：西瓜", world_id = 49675, course_id = 92},
+    -- },
+
+	-- 19号到25号
+}
+
 local VersionToKey = {
 	ONLINE = 1,
 	RELEASE = 2,
@@ -538,4 +655,8 @@ function SummerCampTaskPage.GetQuestTaskReward(index)
 			quest_data.questItemContainer:DoFinish()
 		end
 	end
+end
+
+function SummerCampTaskPage.GetSummerCampDailyTask()
+	return SummerCampDailyTask
 end
