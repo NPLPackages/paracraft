@@ -480,9 +480,9 @@ function MainLogin:PreloadDailyCheckinAndTeachingWnd()
 			local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
 			local cef_preshow = ParaEngine.GetAppCommandLineByParam("cef_preshow", "true");
 			if(cef_preshow == "true")then
-				-- TODO: shall we move preloader to a later phase, no need to be on startup!
-				NplBrowserManager:PreShowWnd("DailyCheckBrowser")
-				NplBrowserManager:PreShowWnd("TeachingQuest_BrowserPage")
+				NplBrowserManager:PreLoadWindows({
+					{ name = "DailyCheckBrowser", url = nil, is_show_control = false, },
+				})
 			end
 		end
 	end

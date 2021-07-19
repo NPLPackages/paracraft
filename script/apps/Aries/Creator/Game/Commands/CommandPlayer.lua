@@ -484,3 +484,61 @@ Commands["/avatar"] = {
 		end
 	end,
 };
+
+Commands["animremap"] = {
+	name="animremap", 
+	quick_ref="/animremap filename id1:id2 id3:id4", 
+	desc=[[remap all animations in selected movie blocks from id1 to id2.
+if no movie blocks are selected, we will remap all movie blocks in the scene.
+@param filename: the asset model filename or short name to search for. If "*" it matches every filename
+@param id1:id2: change from id1 to id2
+e.g.
+/animremap actor.x  4:5 5:4
+/animremap *  4:5 5:4
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local options, filename;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		filename, cmd_text = CmdParser.ParseString(cmd_text)
+		if(filename == "*") then
+			filename = nil;
+		end
+		local animMap = {};
+		for fromId, toId in string.gmatch(cmd_text, "(%d+)[,:=](%d+)") do
+			animMap[tonumber(fromId)] = tonumber(toId);
+		end
+
+		if(cmd_text and next(animMap)) then
+			local entities;
+			NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
+			local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
+			local cur_selection = SelectionManager:GetSelectedBlocks()
+			if(cur_selection and next(cur_selection)) then
+				for _, block in ipairs(cur_selection) do
+					if(block[4] == block_types.names.MovieClip) then
+						local entity = EntityManager.GetBlockEntity(block[1], block[2], block[3])
+						if(entity) then
+							entities = entities or {};
+							entities[#entities + 1] = entity;
+						end
+					end
+				end
+			end
+			entities = entities or EntityManager.FindEntities({category="b",  type="EntityMovieClip"})
+			if(entities) then
+				local count, keyCount = 0, 0;
+				for _, entity in ipairs(entities) do
+					if(entity.RemapAnim) then
+						local bFound, occurance = entity:RemapAnim(animMap, filename)
+						if(bFound) then
+							count = count + 1
+							keyCount = keyCount + (occurance or 0);
+						end
+					end
+				end
+				GameLogic.AddBBS(nil, format("%d blocks are remapped with %d key occurances", count, keyCount))
+				LOG.std(nil, "info", "animremap", "%d blocks are remapped with %d key occurances", count, keyCount);
+			end
+		end
+	end,
+};

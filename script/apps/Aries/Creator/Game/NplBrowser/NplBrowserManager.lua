@@ -14,13 +14,11 @@ NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show("https://keepwork.com", 
 
 NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show("https://keepwork.com", "title", true, true, { scale_screen = "4:3:v", });
 
-NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Goto("https://keepwork.com/zhanglei/empty/index")
 NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty()
 -------------------------------------------------------
 ]]
 local NplBrowserFrame = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserFrame.lua");
 local NplBrowserManager = NPL.export();
-NplBrowserManager.empty_html = "https://keepwork.com/zhanglei/empty/index"
 NplBrowserManager.browser_pages = {};
 function NplBrowserManager:CreateOrGet(name)
     if(not name)then
@@ -38,30 +36,32 @@ function NplBrowserManager:CloseAll()
         v:Close();
     end
 end
-
--- preload a given window to a given url, so it is faster to show later. 
--- @param url: default to empty page. 
-function NplBrowserManager:PreShowWnd(wndName, url)
+-- pre loading cef3 window
+-- @param {table} list: window list
+-- @param {string} list.name
+-- @param {string} list.url
+-- @param {bool} list.is_show_control
+function NplBrowserManager:PreLoadWindows(list)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 	local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
-	if(NplBrowserLoaderPage.IsLoaded()) then
-		NplBrowserManager:CreateOrGet(wndName):PreShow(url or NplBrowserManager.empty_html, false);
-	else
-		self.preShowList = self.preShowList or {}
-		if(self.preShowList[wndName]==nil) then
-			self.preShowList[wndName] = url or NplBrowserManager.empty_html;
-		end
-		NplBrowserLoaderPage.CheckOnce()
-	end
-end
+	NPL.load("(gl)script/ide/timer.lua");
+	list = list or {};
 
-function NplBrowserManager:LoadAllPreShowWindows()
-	if(self.preShowList) then
-		for wnd, url in pairs(self.preShowList) do
-			if(url) then
-				NplBrowserManager:CreateOrGet(wnd):PreShow(url, false);
-				self.preShowList[wnd] = false;
-			end
+	local function loadingAll(list)
+		for k, v in ipairs(list) do
+			local name = v.name;
+			local url = v.url or "";
+			local is_show_control = v.is_show_control;
+			NplBrowserManager:CreateOrGet(name):PreShow(url, is_show_control);
 		end
+	end
+	if(NplBrowserLoaderPage.IsLoaded()) then
+		loadingAll(list);
+	else
+		NplBrowserLoaderPage.CheckOnce();
+		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+			loadingAll(list);
+		end})
+		mytimer:Change(5000, nil)
 	end
 end

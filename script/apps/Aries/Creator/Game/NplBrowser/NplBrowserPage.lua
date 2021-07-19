@@ -12,7 +12,6 @@ NplBrowserPage.Open("test","www.keepwork.com","title",nil,"_ct",100,100,400,600,
     commonlib.echo("============onclose");
 end);
 
-NplBrowserPage.Goto("test", "https://keepwork.com/zhanglei/empty/index")
 - NplBrowserPlugin
 https://github.com/tatfook/NplBrowser
 ------------------------------------------------------------

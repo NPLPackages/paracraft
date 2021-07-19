@@ -523,7 +523,8 @@ Sound related:
   <block id="10070" name="CodeActorInstance" text="代码演员实例" item_class="ItemCodeActorInstance" tooltip="代码演员实例" icon="Texture/blocks/items/ts_char_off.png"></block>
   <block id="10071" name="TimeSeriesLight" text="光源" searchkey="" item_class="ItemTimeSeriesLight" tooltip="光源" icon="Texture/blocks/items/blaze_powder.png"></block>
   <block id="10072" name="AgentItem" text="智能物品" searchkey="" item_class="ItemAgent" tooltip="智能物品" icon="Texture/blocks/items/agentitem.png"></block>
-  
+  <block id="10073" name="LinkBoy" text="LinkBoy" searchkey="linkboy" item_class="ItemLinkBoy" tooltip="LinkBoy" icon="Texture/blocks/items/linkboy.png"></block>
+
   <!--怪物和动物： id: 20000-20999-->
   <block id="20001" name="simple_mob" text="怪物" searchkey="怪物" tooltip="" item_class="ItemMob" icon="character/CC/03animals/treemonster/treemonster.x.png" gold_count="5" hp="100" respawn_time="300000">
     <model assetfile="character/CC/03animals/treemonster/treemonster.x" scaling="0.5" ></model>

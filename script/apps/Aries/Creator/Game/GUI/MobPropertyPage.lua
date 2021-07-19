@@ -186,7 +186,6 @@ end
 function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile, skin)
 	entity = entity or MobPropertyPage.GetEntity();
 	obj = obj or entity:GetInnerObject();
-	
 	if(obj and obj:IsCharacter()) then
 		assetfile = assetfile or page:GetValue("assetfile");
 		if(assetfile) then
@@ -194,27 +193,25 @@ function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile, skin)
 		end
 		local old_filename = assetfile;
 		assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(commonlib.Encoding.Utf8ToDefault(assetfile));
-		if(assetfile and assetfile~=entity:GetMainAssetPath()) then
-			if(entity.SetModelFile) then
-				entity:SetModelFile(commonlib.Encoding.Utf8ToDefault(old_filename));
-			else
-				entity:SetMainAssetPath(assetfile);
-			end
+		if(entity.SetModelFile) then
+			entity:SetModelFile(commonlib.Encoding.Utf8ToDefault(old_filename));
+		else
+			entity:SetMainAssetPath(assetfile);
+		end
 			
-			if (PlayerAssetFile:HasCustomGeosets(assetfile) and skin) then
-				entity:SetSkin(skin);
-			else
-				-- this ensure that at least one shirt is displayed if it contains geosets.
-				entity:SetCharacterSlot(CharGeosets["shirt"], 1);
-				-- this ensure that at least one default skin is selected
-				if((not entity.GetSkin or not entity:GetSkin()) and entity.ToggleNextSkin) then
-					entity:ToggleNextSkin();
-				end
+		if (PlayerAssetFile:HasCustomGeosets(assetfile) and skin) then
+			entity:SetSkin(skin);
+		else
+			-- this ensure that at least one shirt is displayed if it contains geosets.
+			entity:SetCharacterSlot(CharGeosets["shirt"], 1);
+			-- this ensure that at least one default skin is selected
+			if((not entity.GetSkin or not entity:GetSkin()) and entity.ToggleNextSkin) then
+				--entity:ToggleNextSkin();
 			end
-			if(entity:IsServerEntity() and entity:IsRemote()) then
-				if(entity.UpdateAndSendDataWatcher) then
-					entity:UpdateAndSendDataWatcher();
-				end
+		end
+		if(entity:IsServerEntity() and entity:IsRemote()) then
+			if(entity.UpdateAndSendDataWatcher) then
+				entity:UpdateAndSendDataWatcher();
 			end
 		end
 	end
@@ -263,16 +260,26 @@ function MobPropertyPage.OnOpenAssetFile()
 	if(page) then
 		lastFilename = page:GetValue("assetfile")
 	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+	local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 	local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+
+	local custom_geoset_model = "character/CC/02human/CustomGeoset/actor.x";
 	OpenAssetFileDialog.ShowPage("", function(filename)
 		if(filename and page) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 			local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 			local filepath = PlayerAssetFile:GetValidAssetByString(filename);
-			if(filepath or filename=="actor") then
+			if(string.lower(filepath) == string.lower(custom_geoset_model))then
 				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
-				MobPropertyPage.OnChangeAssetFile();
+
+				-- set default skin
+				local skin = CustomCharItems:ChangeSkinStringToItems(CustomCharItems.defaultSkinString)
+				MobPropertyPage.OnChangeAssetFile(skin);
+			else
+				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filepath));
+				MobPropertyPage.OnChangeAssetFile(filepath);
 			end
 		end
 	end, commonlib.Encoding.Utf8ToDefault(lastFilename), L"选择模型文件", "model");

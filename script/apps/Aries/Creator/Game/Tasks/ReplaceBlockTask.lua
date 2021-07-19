@@ -194,8 +194,9 @@ function ReplaceBlock:Undo()
 end
 
 -- @param blocks: if nil, it means entire blocks, or it will only replace in these blocks
+-- @param bRegularExpression: true to use regular expression. 
 -- @return the number of blocks replaced
-function ReplaceBlock:ReplaceFile(from, to, blocks)
+function ReplaceBlock:ReplaceFile(from, to, blocks, bRegularExpression)
 	if(from == to or not from or not to) then
 		return
 	end
@@ -214,32 +215,44 @@ function ReplaceBlock:ReplaceFile(from, to, blocks)
 			end
 		end
 	end
-	local count = self:ReplaceFileInEntities(from, to, entities);
+	local count = self:ReplaceFileInEntities(from, to, entities, bRegularExpression);
 	GameLogic.AddBBS(nil, format(L"%d个方块中的文件被替换", count))
 	return count;
 end
 
-function ReplaceBlock:ReplaceFileInEntities(from, to, entities)
+-- @param from, to: utf8 encoded string
+function ReplaceBlock:ReplaceFileInEntities(from, to, entities, bRegularExpression)
 	local movieBlockId = block_types.names.MovieClip;
 	local PhysicsModel = block_types.names.PhysicsModel;
 	local BlockModel = block_types.names.BlockModel;
 
 	local count = 0;
 	if(entities) then
-		for _, entity in ipairs(entities) do
-			local block_id = entity:GetBlockId()
-			if(block_id == movieBlockId) then
-				if(entity:ReplaceFile(from, to)>0) then
+		if(bRegularExpression) then
+			local fromDefaultEncoding = commonlib.Encoding.Utf8ToDefault(from)
+			local toDefaultEncoding = commonlib.Encoding.Utf8ToDefault(to)
+			for _, entity in ipairs(entities) do
+				local block_id = entity:GetBlockId()
+				if(entity:IsPersistent() and entity.ReplaceFileRegularExpression and entity:ReplaceFileRegularExpression(fromDefaultEncoding, toDefaultEncoding)>0) then
 					count = count + 1;
 				end
-			elseif(block_id == PhysicsModel or block_id == BlockModel) then
-				if(entity:GetModelFile() == from) then
-					entity:SetModelFile(to);
-					entity:Refresh()
+			end
+		else
+			for _, entity in ipairs(entities) do
+				local block_id = entity:GetBlockId()
+				if(block_id == movieBlockId) then
+					if(entity:ReplaceFile(from, to)>0) then
+						count = count + 1;
+					end
+				elseif(block_id == PhysicsModel or block_id == BlockModel) then
+					if(entity:GetModelFile() == from) then
+						entity:SetModelFile(to);
+						entity:Refresh()
+						count = count + 1;
+					end
+				elseif(entity:IsPersistent() and entity.ReplaceFile and entity:ReplaceFile(from, to)>0) then
 					count = count + 1;
 				end
-			elseif(entity:IsPersistent() and entity.ReplaceFile and entity:ReplaceFile(from, to)>0) then
-				count = count + 1;
 			end
 		end
 	end

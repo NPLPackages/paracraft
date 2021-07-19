@@ -111,6 +111,7 @@ function CodeBlockWindow.Show(bShow)
 		if (self.IsSupportNplBlockly()) then
 			self.OpenBlocklyEditor();
 		end
+		
 		GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = true, width = self.width});	
 	end
 end
@@ -340,6 +341,7 @@ function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate, bDelayRefresh)
 		if (CodeBlockWindow.IsSupportNplBlockly()) then 
 			CodeBlockWindow.OpenBlocklyEditor()
 		end
+		CodeBlockWindow.OnTryOpenMicrobit();
 
 		CodeBlockWindow.RestoreCursorPosition();
 		isEntityChanged = true;
@@ -1152,12 +1154,14 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 	if(blockpos) then
 		request_url = request_url..format("?blockpos=%s&codeLanguageType=%s&codeConfigType=%s", blockpos, codeLanguageType or "npl", codeConfigType or "");
 	end
+	local bForceShow;
 	if(codeConfigType == "microbit")then
 		local Microbit = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Microbit/Microbit.lua");
 		request_url = Microbit.GetWebEditorUrl();
+		bForceShow = true;
 	end
 	local function OpenInternalBrowser_()
-		if(not CodeBlockWindow.IsNPLBrowserVisible()) then
+		if(bForceShow or not CodeBlockWindow.IsNPLBrowserVisible()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
 			local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
 			local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)
@@ -1320,7 +1324,23 @@ function CodeBlockWindow.IsSupportNplBlockly()
 	local entity = CodeBlockWindow.GetCodeEntity();
 	return entity and type(entity.IsBlocklyEditMode) == "function" and type(entity.IsUseNplBlockly) == "function" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
 end
-
+		
+function CodeBlockWindow.OnTryOpenMicrobit()
+	if(CodeBlockWindow.IsMicrobitEntity() and CodeBlockWindow.IsVisible())then
+		local entity = CodeBlockWindow.GetCodeEntity();
+		entity:SetBlocklyEditMode(true);
+		CodeBlockWindow.OpenBlocklyEditor(true);	
+	end
+end
+function CodeBlockWindow.IsMicrobitEntity()
+	local entity = CodeBlockWindow.GetCodeEntity();
+	if(entity)then
+		local configFile = entity:GetLanguageConfigFile()
+		if(configFile == "microbit")then
+			return true;
+		end
+	end
+end
 function CodeBlockWindow.UpdateNplBlocklyCode()
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
 	if (not NplBlocklyEditorPage or not codeEntity) then return end

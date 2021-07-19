@@ -927,9 +927,10 @@ function QuestAction.SetSummerTaskProgress(gsid, change_value, finish_cb)
         value = QuestAction.GetSummerTaskGameProgress()
     else
         if change_value then
-            if change_value > value then
-                value = change_value
+            if change_value <= value then
+                return
             end
+            value = change_value
         else
             value = value + 1
         end

@@ -234,15 +234,23 @@ end
 OnInitValue()
 ]]></script>
 <div style="width: 396px;height: 274px; background: url(Texture/Aries/Creator/keepwork/Mall/tipbj_32bits.png#0 0 32 32:8 8 8 8);">
-    <div style="margin-left: 14px;margin-top: 10px;">
-        <div style="position:relative;color: #ffffff;">
-            <%=getGoodName()%>
-        </div>
-        <input type="button" class="mc_big_button" value="" style="margin-left:350px;width:19px;height:20px;background: url(Texture/Aries/Creator/keepwork/Mall/tipX_19X20_32bits.png#0 0 19 20)" onclick="OnCancel()"/>
+    <div style="margin-top: 10px;">
+        <pe:if condition='<%=canChooseNums() %>'>
+            <div style="margin-left: 14px;position:relative;color: #ffffff;">
+                <%=getGoodName()%>
+            </div>
+        </pe:if>
+
+        <pe:if condition='<%=not canChooseNums() %>'>
+            <div style="position:relative;color: #ffffff;text-align: center;">
+                <%=getGoodName()%>
+            </div>
+        </pe:if>
+        <input type="button" class="mc_big_button" value="" style="margin-left:364px;width:19px;height:20px;background: url(Texture/Aries/Creator/keepwork/Mall/tipX_19X20_32bits.png#0 0 19 20)" onclick="OnCancel()"/>
     </div>
 
-    <div style="width:411px;height:190px;">
-        <div style="width:411px;height:150px;">
+    <div style="width:396px;height:180px;">
+        <div style="width:396px;height:145px;">
             <pe:if condition='<%=canChooseNums() %>'>
                 <div style="float:right;margin-left:15px;margin-top:20px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
                    <div style="position:relative;width:114px">
@@ -262,7 +270,7 @@ OnInitValue()
                 </div>
             </pe:if>
             <pe:if condition='<%=not canChooseNums() %>'>
-                <div style="float:right;padding-top:20px;margin-left:130px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
+                <div style="float:right;padding-top:20px;margin-left:140px;width:114px;height:114px;margin:21px;background:url(Texture/Aries/Creator/keepwork/Mall/kuang2_114X144_32bits.png#0 0 114 114);">
                     <div style="position:relative;width:114px">
                          <div style="position:relative;margin-left:0px;margin-top:5px;">
                              <img zorder="0" src='<%=getIcon()%>'width="114" height="57"/>
@@ -272,13 +280,13 @@ OnInitValue()
             </pe:if>
         </div>
         <br/>
-        <div style="margin-left:48px;margin-top:0px;color:#f0f0f0;">
-            <label name="buydesc1" style="width:340px; height:60px;font-size:12pt;" value='<%=Eval("defaultDesc1")%>'/>
+        <div style="margin-left:0px;margin-top:0px;color:#f0f0f0;text-align: center;">
+            <label name="buydesc1" style="width:396px; height:60px;font-size:12pt;" value='<%=Eval("defaultDesc1")%>'/>
             <br/>
-            <label name="buydesc2" style="height:60px;font-size:12pt;" value='<%=Eval("defaultDesc2")%>'/>
+            <label name="buydesc2" style="width:396px;height:60px;font-size:12pt;" value='<%=Eval("defaultDesc2")%>'/>
         </div>
     </div>
-    <div style="width:466px;height:32px;margin-top:0px;margin-left:55px">
+    <div style="width:466px;height:32px;margin-top:0px;margin-left:59px">
         <pe:goalpointer listen="purchase_confirm" style="position:relative;margin-left:70px;width:90px;height:32px;"></pe:goalpointer>
         <input type="button" value="下次再说" style="float: left; margin-left:0px;width:100px;height:38px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnCancel()"/>
         <pe:if condition='<%=IsEnough() %>'>

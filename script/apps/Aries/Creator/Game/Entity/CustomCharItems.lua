@@ -8,6 +8,68 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 CustomCharItems:Init();
+
+
+
+function CustomCharItems:AddItemToSkin(skin, item) 
+调试信息：geosets index-1  = ccs index
+ geosets={ 2, [3]=1, [4]=1, [5]=1, [6]=1, [9]=1, [10]=1 },
+ 2#201#301#401#501#801#901
+-----------------------------------------------------------------
+==================AddItemToSkin"
+echo:"==================item"
+echo:return {
+  category="hair",
+  geoset={ 2 },
+  icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_02.png",
+  id="82006",
+  name="",
+  texture="1:Texture/blocks/CustomGeoset/hair/2_Avatar_girl_hair_02.png" 
+}
+echo:"==================currentSkin"
+echo:return "80001;82132;81004;88014;87003;"
+echo:"==================currentSkin 1"
+echo:return "9#201#301#401#501#801#901#@1:Texture/blocks/CustomGeoset/hair/710_girl_toufa06.png;2:Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png;3:Texture/blocks/Paperman/eye/eye_boy_02_01.png;4:Texture/blocks/Paperman/mouth/mouth_01.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png;6:Texture/blocks/CustomGeoset/main/Avatar_tsj.png;@2:character/v3/Item/ObjectComponents/WEAPON/1156_YuanXiaoTorch.x;"
+echo:"==================input skinTable"
+echo:return {
+  attachments={ [2]="character/v3/Item/ObjectComponents/WEAPON/1156_YuanXiaoTorch.x" },
+  geosets={ 9, [3]=1, [4]=1, [5]=1, [6]=1, [9]=1, [10]=1 },
+  textures={
+    "Texture/blocks/CustomGeoset/hair/710_girl_toufa06.png",
+    "Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png",
+    "Texture/blocks/Paperman/eye/eye_boy_02_01.png",
+    "Texture/blocks/Paperman/mouth/mouth_01.png",
+    "Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png",
+    "Texture/blocks/CustomGeoset/main/Avatar_tsj.png" 
+  } 
+}
+echo:"==================input skinTable 2"
+echo:return {
+  attachments={ [2]="character/v3/Item/ObjectComponents/WEAPON/1156_YuanXiaoTorch.x" },
+  geosets={ 2, [3]=1, [4]=1, [5]=1, [6]=1, [9]=1, [10]=1 },
+  textures={
+    "Texture/blocks/CustomGeoset/hair/2_Avatar_girl_hair_02.png",
+    "Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png",
+    "Texture/blocks/Paperman/eye/eye_boy_02_01.png",
+    "Texture/blocks/Paperman/mouth/mouth_01.png",
+    "Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png",
+    "Texture/blocks/CustomGeoset/main/Avatar_tsj.png" 
+  } 
+}
+echo:"==================currentSkin 2"
+echo:return "2#201#301#401#501#801#901#@1:Texture/blocks/CustomGeoset/hair/2_Avatar_girl_hair_02.png;2:Texture/blocks/CustomGeoset/body/Avatar_boy_body_default.png;3:Texture/blocks/Paperman/eye/eye_boy_02_01.png;4:Texture/blocks/Paperman/mouth/mouth_01.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_default.png;6:Texture/blocks/CustomGeoset/main/Avatar_tsj.png;@2:character/v3/Item/ObjectComponents/WEAPON/1156_YuanXiaoTorch.x;"
+echo:"==================currentSkin 3"
+echo:return "80001;82006;81004;88014;87003;"
+no such table: CreatureModelDBecho:"===================RefreshCustomGeosets input skin"
+echo:"80001;82001;84020;81018;88002;85058"
+echo:"===================RefreshCustomGeosets output skin"
+echo:"1#201#301#401#501#802#904#@1:Texture/blocks/CustomGeoset/hair/1_Avatar_boy_hair_00.png;2:Texture/blocks/CustomGeoset/body/shirt_02_Avatar_boy_body_01.png;3:Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png;4:Texture/blocks/Paperman/mouth/mouth_boy_fps10_a001.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_xiangyu00.png;6:Texture/blocks/CustomGeoset/main/Avatar_tsj.png;@"
+
+
+
+更新skin位置：
+PlayerAssetFile:RefreshCustomGeosets(player, skin)
+pe_mc_player.SetAssetFile(mcmlNode, pageInst, filename)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");

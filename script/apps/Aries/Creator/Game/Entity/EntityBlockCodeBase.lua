@@ -101,7 +101,7 @@ end
 
 function Entity:TextToXmlInnerNode(text)
 	if(text and commonlib.Encoding.HasXMLEscapeChar(text)) then
-		return {name="![CDATA[", [1] = text};
+		return {name="![CDATA[", [1] = string.gsub(text, "%]%]>", "%]%]%]%]><!%[CDATA%[>")};
 	else
 		return text or "";
 	end
@@ -118,13 +118,13 @@ function Entity:SaveBlocklyToXMLNode(node)
 		node.attr.isUseCustomBlock = true;
 	end
 	if(self:GetBlocklyXMLCode() ~= "" or self:GetNPLBlocklyXMLCode() ~= "") then
-		local blocklyNode = {name="blockly", };
+		local blocklyNode = {name="blockly"};
 		node[#node+1] = blocklyNode;
 		blocklyNode[#blocklyNode+1] = {name="code", self:TextToXmlInnerNode(self:GetNPLCode())}
-		blocklyNode[#blocklyNode+1] = {name="xmlcode", self:TextToXmlInnerNode(self:GetBlocklyXMLCode())}
-		blocklyNode[#blocklyNode+1] = {name="nplcode", self:TextToXmlInnerNode(self:GetBlocklyNPLCode())}
-		blocklyNode[#blocklyNode+1] = {name="npl_xmlcode", self:TextToXmlInnerNode(self:GetNPLBlocklyXMLCode())}
-		blocklyNode[#blocklyNode+1] = {name="npl_nplcode", self:TextToXmlInnerNode(self:GetNPLBlocklyNPLCode())}
+		blocklyNode[#blocklyNode+1] = {name="xmlcode", self:TextToXmlInnerNode(self.blockly_xmlcode)}
+		blocklyNode[#blocklyNode+1] = {name="nplcode", self:TextToXmlInnerNode(self.blockly_nplcode)}
+		blocklyNode[#blocklyNode+1] = {name="npl_xmlcode", self:TextToXmlInnerNode(self.npl_blockly_xmlcode)}
+		blocklyNode[#blocklyNode+1] = {name="npl_nplcode", self:TextToXmlInnerNode(self.npl_blockly_nplcode)}
 		blocklyNode[#blocklyNode+1] = {name="npl_toolbox_xml_text", self:TextToXmlInnerNode(self:GetNplBlocklyToolboxXmlText())}
 	end
 
@@ -135,33 +135,32 @@ function Entity:SaveBlocklyToXMLNode(node)
 			includedFilesNode[i] = {name="filename", name}
 		end
 	end
+
 end
 
 function Entity:LoadBlocklyFromXMLNode(node)
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	self.isUseNplBlockly = (node.attr.isUseNplBlockly == "true" or node.attr.isUseNplBlockly == true); 
     self.isUseCustomBlock = (node.attr.isUseCustomBlock == "true" or node.attr.isUseCustomBlock == true);
-	
+
 	for i=1, #node do
 		if(node[i].name == "blockly") then
 			for j=1, #(node[i]) do
 				local sub_node = node[i][j];
-				local code = sub_node[1]
-				if(code) then
-					if(type(code) == "table" and type(code[1]) == "string") then
-						-- just in case cmd.name == "![CDATA["
-						code = code[1];
-					end
+				local code = "";
+				for i = 1, #sub_node do
+					local sub_node_code = sub_node[i];
+					code = code .. (type(sub_node_code) == "table" and sub_node_code[1] or sub_node_code);
 				end
 				if(type(code) == "string") then
 					if(sub_node.name == "xmlcode") then
-						self:SetBlocklyXMLCode(code);
+						self.blockly_xmlcode = code;
 					elseif(sub_node.name == "nplcode") then
-						self:SetBlocklyNPLCode(code);
+						self.blockly_nplcode = code;
 					elseif(sub_node.name == "npl_xmlcode") then
-						self:SetNPLBlocklyXMLCode(code);
+						self.npl_blockly_xmlcode = code;  -- 兼容已存在的代码
 					elseif(sub_node.name == "npl_nplcode") then
-						-- self:SetNPLBlocklyNPLCode(code);
+						self.npl_blockly_nplcode = code;
 					elseif(sub_node.name == "code") then
 						self:SetNPLCode(code);
 					elseif(sub_node.name == "npl_toolbox_xml_text") then
@@ -178,6 +177,7 @@ function Entity:LoadBlocklyFromXMLNode(node)
 			end
 		end
 	end
+	
 	if(not self.isBlocklyEditMode and not self.nplcode) then
 		self.nplcode = self:GetCommand();
 	end

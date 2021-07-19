@@ -60,6 +60,16 @@ function WorldCreatePage.ShowView()
         return
     end
 
+	if not WorldCreatePage.BindFilter then
+		GameLogic.GetFilters():add_filter("became_vip", function()
+            if page then
+                WorldCreatePage.HandleData()
+                page:Refresh(0)
+            end
+        end);
+		WorldCreatePage.BindFilter = true
+	end
+
     if page and page:IsVisible() then
         return
     end
@@ -118,8 +128,11 @@ end
 
 function WorldCreatePage.OnClickCreate()
     if #WorldCreatePage.WorldListData > 0 and not GameLogic.IsVip() then
-        local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-        VipToolNew.Show("world2In1_create_mini")        
+        GameLogic.IsVip("world2In1_create_mini", true, function(result)
+            if result then
+                --Page:Refresh(0)
+            end
+        end);       
         return
     end
 
@@ -236,6 +249,9 @@ function WorldCreatePage.OnClickDelete(index)
 end
 
 function WorldCreatePage.JoinVip()
-    local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-    VipToolNew.Show("world_create_page")
+    GameLogic.IsVip("world2In1_create_mini", true, function(result)
+        if result then
+            --page:Refresh(0)
+        end
+    end);       
 end

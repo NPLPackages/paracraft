@@ -12,7 +12,6 @@ NplBrowserFrame:Show("https://keepwork.com", "title", true, true, { left = 100, 
 NplBrowserFrame:Show("https://keepwork.com", "title", false, false, { left = 100, top = 50, right = 100, bottom = 50, fixed = true, });
 NplBrowserFrame:Show("https://keepwork.com", "title", true, true, { left = 100, top = 50, right = 100, bottom = 50, fixed = true, candrag = true, });
 
-NplBrowserFrame:Goto("https://keepwork.com/zhanglei/empty/index")
 
 -------------------------------------------------------
 ]]
@@ -65,6 +64,7 @@ end
 function NplBrowserFrame:PreShow(url, is_show_control)
     local id = self.browser_name;
 	url = url or self.default_url;
+	LOG.std(nil, "info", "NplBrowserFrame", "PreShow [%s]:%s", id, url);
     if(not self.cef_is_preshow)then
         NplBrowserPlugin.Start({id = id, url = url, withControl = is_show_control, x = 10000, y = 10000, width = 1, height = 1, });
         self.cef_is_preshow = true
@@ -302,15 +302,6 @@ function NplBrowserFrame:Goto(url)
     end
 end
 function NplBrowserFrame:GotoEmpty()
-    local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
-    local local_file_path = string.format("%scef3/empty.html",ParaIO.GetCurDirectory(0));
-    local url;
---    if(ParaIO.DoesFileExist(local_file_path))then
---        url = string.format("file:///%s",local_file_path);
---    else
---        url = NplBrowserManager.empty_html;
---    end
-    --run self:Goto will crash exe if url include chinese character
     self:Goto("about:blank");
     commonlib.TimerManager.SetTimeout(function()  
 		ParaUI.GetUIObject("root"):Focus();

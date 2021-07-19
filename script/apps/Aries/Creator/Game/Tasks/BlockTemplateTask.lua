@@ -273,6 +273,19 @@ function BlockTemplate:RemoveTemplate()
 	local filename = self.filename;
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	if(xmlRoot) then
+		if(self.UseAbsolutePos) then
+			local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+			if(root_node and root_node[1]) then
+				if( self.UseAbsolutePos and root_node.attr and root_node.attr.pivot) then
+					local x, y, z = root_node.attr.pivot:match("^(%d+)%D+(%d+)%D+(%d+)");
+					if(x and y and z) then
+						self.blockX = tonumber(x);
+						self.blockY = tonumber(y);
+						self.blockZ = tonumber(z);
+					end
+				end
+			end
+		end
 		local node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate/pe:blocks");
 		if(node and node[1]) then
 			local blocks = NPL.LoadTableFromString(node[1]);

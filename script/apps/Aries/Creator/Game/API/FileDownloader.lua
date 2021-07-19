@@ -15,6 +15,8 @@ FileDownloader:new():Init("Texture1", {url="https://baidu.com/", headers={Author
 ]]
 local FileDownloader = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader"));
 
+FileDownloader.maxRetryCount = 2;
+
 function FileDownloader:ctor()
 end
 
@@ -26,7 +28,8 @@ end
 -- @param callbackFunc: if succeed, function(true, localFile) end, if not, function(false, errorMsg) end
 -- @param cachePolicy: default to "access plus 5 mins"
 -- @param bAutoDeleteCacheFile: if true we will remove cache file after downloaded.
-function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bAutoDeleteCacheFile)
+-- @param maxRetryCount: default to 2, we will try at least 2 times. 
+function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bAutoDeleteCacheFile, maxRetryCount)
 	if(type(url) == "table") then
 		self.url = url.url;
 		self.headers = url.headers;
@@ -47,6 +50,8 @@ function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bA
 	self.totalFileSize = -1;
 	self.currentFileSize = 0;
 	self.bAutoDeleteCacheFile = bAutoDeleteCacheFile;
+	self.retryCount = 0;
+	self.maxRetryCount = maxRetryCount;
 	self:Start(self.url, self.localFile, self.callbackFunc, cachePolicy, self.headers);
 
 	return self;
@@ -180,11 +185,20 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 				GameLogic.GetFilters():apply_filters("downloadFile_notify", 1, text);
 			elseif(msg.DownloadState == "terminated") then
 				text = L"下载终止了";
-				OnFail(L"下载终止了");
-				isRedText = true;
-				LOG.std(nil, "warn", "FileDownloader", "downloading terminated for %s", url);
-				LOG.std(nil, "warn", "FileDownloader", msg);
-				GameLogic.GetFilters():apply_filters("downloadFile_notify", 2, text);
+				self.retryCount =  self.retryCount + 1;
+				if(self.retryCount <= self.maxRetryCount) then
+					isRedText = true;
+					LOG.std(nil, "warn", "FileDownloader", "downloading terminated for %s, we will try %d times", commonlib.serialize_compact(url), self.retryCount);
+					LOG.std(nil, "warn", "FileDownloader", msg);
+					self.isFetching = false;
+					self:Start(src, dest, callbackFunc, cachePolicy, headers)
+				else
+					OnFail(L"下载终止了");
+					isRedText = true;
+					LOG.std(nil, "warn", "FileDownloader", "downloading terminated for %s", commonlib.serialize_compact(url));
+					LOG.std(nil, "warn", "FileDownloader", msg);
+					GameLogic.GetFilters():apply_filters("downloadFile_notify", 2, text);	
+				end
 			end
 			if(not self.isSilent and text and self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then
 				BroadcastHelper.PushLabel({id=label_id, label = format(L"文件%s: %s", self.text, text), max_duration=10000, color = isRedText and "255 0 0" or "0 255 0", scaling=1.1, bold=true, shadow=true,});

@@ -56,9 +56,12 @@ local alwaysInMemoryFiles = {
 ["Texture/Aries/Login/Login/teen/progressbar_green_tile.png"] = true,
 ["Texture/Aries/Creator/Mobile/blocks_Background.png"] = true,  
 
+-- camera and actors
 ["character/CC/02human/actor/actor.x"] = true,
 ["character/CC/02human/CustomGeoset/actor.x"] = true,
 ["character/CC/05effect/Birthplace/Birthplace.x"] = true,
+-- make sure the camera model is preloaded, otherwise the first movie block's camera height will be wrong
+["character/CC/02human/Camera/Camera.x"] = true, 
 
 [""] = true,
 }

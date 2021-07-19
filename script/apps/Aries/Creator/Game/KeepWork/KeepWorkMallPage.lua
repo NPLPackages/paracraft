@@ -392,18 +392,26 @@ function KeepWorkMallPage.HandleDataSources()
 				v.bag_nums = bag_nums
 				v.is_use_in_player = good_data.bagId == bagId
 				if bag_nums > 0 then
-					if GameLogic.IsReadOnly() or good_data.bagId == bagId then
+					if good_data.bagId == bagId then
 						v.buy_txt = "已拥有"
 						v.enabled = false
 						v.is_has = true
 						v.can_use = false
 						v.show_state = KeepWorkMallPage.show_state.has
 					else
-						v.buy_txt = "使用"
-						v.enabled = true
-						v.is_use = false
-						v.can_use = true
-						v.show_state = KeepWorkMallPage.show_state.can_use
+						if GameLogic.GameMode:IsEditor() then
+							v.buy_txt = "使用"
+							v.enabled = true
+							v.is_use = false
+							v.can_use = true
+							v.show_state = KeepWorkMallPage.show_state.can_use
+						else
+							v.buy_txt = "已拥有"
+							v.enabled = false
+							v.is_has = true
+							v.can_use = false
+							v.show_state = KeepWorkMallPage.show_state.has
+						end
 					end
 
 					--file ：blocktemplates/河马.bmax
@@ -475,7 +483,7 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 	end
 	
 	if item_data.isModelProduct and item_data.bag_nums and item_data.bag_nums > 0 then
-		if GameLogic.IsReadOnly() then
+		if not GameLogic.GameMode:IsEditor() then
 			return
 		end
 		local good_data = item_data.goods_data[1]

@@ -873,6 +873,8 @@
 	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2424_icecreram_brown_Left.x" displayname="棕色冰淇淋" name="2424_icecreram_brown_Left" school="false"/>
 	<asset filename="character/v3/Item/ObjectComponents/WEAPON/2429_Dream2_Flower_Left.anim.x" displayname="梦之花2" name="2429_Dream2_Flower_Left.anim" school="false"/>
 	<asset filename="character/v3/Item/ObjectComponents/WEAPON/1684_ShopFireWand04.anim.x" displayname="火魔杖04" name="1684_ShopFireWand04.anim" school="false"/>
+  <!--7月13日新增-->
+  <asset filename="character/v3/Item/ObjectComponents/WEAPON/2430_rifle.anim.x" displayname="步枪" name="2430_rifle.anim" school="false"/>
 </category>
 
 <category name="furnitures">

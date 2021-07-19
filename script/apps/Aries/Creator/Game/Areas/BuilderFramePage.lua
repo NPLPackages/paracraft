@@ -20,6 +20,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
+local pe_treeview = commonlib.gettable("Map3DSystem.mcml_controls.pe_treeview");
 
 local BuilderFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderFramePage");
 
@@ -67,6 +68,7 @@ BuilderFramePage.category_ds_touch = {
 BuilderFramePage.category_ds = BuilderFramePage.category_ds_new;
 BuilderFramePage.uiversion = 1;
 BuilderFramePage.isSearching = false;
+BuilderFramePage.EmptyText = L"搜索: 输入ID或名字";
 
 function BuilderFramePage.OnInit(uiversion)
 	BuilderFramePage.OneTimeInit(uiversion);
@@ -128,9 +130,10 @@ function BuilderFramePage.OnHelpBlock(block_id)
 	GameLogic.RunCommand("/wiki "..tostring(block_id));
 end
 
--- @param bRefreshPage: false to stop refreshing the page
+--- @param index number: category index
+--- @param bRefreshPage boolean: num false to stop refreshing the page
 function BuilderFramePage.OnChangeCategory(index, bRefreshPage)
-    BuilderFramePage.category_index = index or BuilderFramePage.category_index;
+	BuilderFramePage.category_index = index or BuilderFramePage.category_index;
 	local category = BuilderFramePage.GetCategoryButtons()[BuilderFramePage.category_index];
 	if(category) then
 		BuilderFramePage.Current_Item_DS = ItemClient.GetBlockDS(category.name);
@@ -138,18 +141,27 @@ function BuilderFramePage.OnChangeCategory(index, bRefreshPage)
 	end
 
 	BuilderFramePage.isSearching = false;
-    
-	if(bRefreshPage~=false and page) then
-		page:Refresh(0.01);
-	end
+	page:Refresh(0);
+
+	-- TODO 国际化-搜索: 输入模板名字
+	ParaUI.GetUIObject("block_search_text_obj"):SetField(
+		"EmptyText", 
+		if_else(BuilderFramePage.category_index ~= 8, L"搜索: 输入ID或名字", L"搜索: 输入模板名字"));
+
+	-- reset template list
+	BuilderFramePage.SearchTemplate(nil);
 end
 
 local first_search = true;
 local search_text_nil;
-
-function BuilderFramePage.SearchBlock(search_text)
+function BuilderFramePage.SearchBlockOrigin(search_text)
 	--local block_tag;
 	if(search_text) then
+		-- template search
+		if(BuilderFramePage.category_index == 8) then
+			BuilderFramePage.SearchTemplate(search_text);
+		end
+
 		local block_tag = string.gsub(search_text,"%s","");
 		local btnName = format("BuilderFramePage.category_%d", BuilderFramePage.category_index)
 		
@@ -173,7 +185,21 @@ function BuilderFramePage.SearchBlock(search_text)
 	local gvw_name = "new_builder_gvwItems";
 	local node = page:GetNode(gvw_name);
 	pe_gridview.DataBind(node, gvw_name, false);
+end
+-- 加下防抖, 输入延迟200ms后调用搜索函数
+BuilderFramePage.SearchBlock = commonlib.debounce(BuilderFramePage.SearchBlockOrigin, 200)
 
+--- @param search_text string
+--- @return nil
+function BuilderFramePage.SearchTemplate(search_text)
+	local name = "gvwBlockTemplates";
+	local node = page:GetNode(name);
+
+	pe_treeview.SetDataSource(
+		node, 
+		page.name, 
+		BlockTemplatePage.GetAllTemplatesDS(true, search_text));
+	pe_treeview.DataBind(node, page.name, true);
 end
 
 function BuilderFramePage.ShowMobilePage(bShow)

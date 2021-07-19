@@ -20,6 +20,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
+local CreateModulPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/CreateModulPage.lua")
 local World2In1 = NPL.export();
 
 local page;
@@ -31,6 +32,8 @@ local creatorWorldName = "chenjinxian_ceshi123_study";
 local allMiniWorlds = {{}, {}, {}};
 local currentWorlds = {};
 local worldIndex = 1;
+local serverDataIndex = 1;
+
 local parentWorldId = 59045;
 local currentType = "course";
 local last_region_type = "course"
@@ -42,6 +45,8 @@ local courcePosition = {18542,43,19197}
 
 local hidePage = false;
 local page_root = nil
+
+World2In1.ServerWorldData = {}
 function World2In1.OnInit()
 	page = document:GetPageCtrl();
 	page_root = page:GetParentUIObject()
@@ -174,7 +179,9 @@ function World2In1.OnWorldUnload()
 	World2In1UserInfo.ShowPage(nil);
 	allMiniWorlds = {{}, {}, {}};
 	currentWorlds = {};
+	World2In1.ServerWorldData = {}
 	worldIndex = 1;
+	serverDataIndex = 1
 	parentWorldId = 59045;
 	World2In1.SetCurrentType("course")
 	currentGridX = 0;
@@ -214,7 +221,7 @@ function World2In1.BroadcastTypeChanged()
 		World2In1.HideCreateReward()	
 	end
 
-	World2In1.UnLoadcurrentWorldList()
+	-- World2In1.UnLoadcurrentWorldList()
 	GameLogic.GetCodeGlobal():BroadcastTextEvent("changeRegionType")
 end
 
@@ -297,12 +304,54 @@ function World2In1.isValidGridXY(typeIndex, gridX, gridY)
 end
 
 function World2In1.updateWorldIndex(typeIndex, gridX, gridY)
+	local lastWorldIndex = worldIndex
 	if (typeIndex == 1) then
 		worldIndex = 1 - gridY;
 	elseif (typeIndex == 2) then
 		worldIndex = gridX + 1;
 	elseif (typeIndex == 3) then
 		worldIndex = gridY + 1;
+	end
+
+	local offset = worldIndex - lastWorldIndex
+	local move_dir = 1
+	move_dir = offset >= 0 and 1 or -1
+	
+	serverDataIndex = serverDataIndex + offset
+
+	
+	-- -- 判断下该地块是否加载
+	local gridX, gridY = 0, 0
+	if currentType == "all" then
+		gridX, gridY = 0, worldIndex - 1
+	elseif currentType == "school" then 
+		gridX, gridY = worldIndex - 1, 0
+	elseif currentType == "grade" then 
+		gridX, gridY = 0, 1 - worldIndex
+	end
+	
+	-- local typeIndex = mapTypeIndex[type];
+	local currentWorldList = allMiniWorlds[typeIndex];
+	local key = string.format("%d_%d", gridX, gridY);
+	if currentWorldList[key] == nil or not currentWorldList[key].loaded then
+		local world = currentWorlds[serverDataIndex]
+		if world and world.is_load then
+			local index = serverDataIndex
+			-- body
+			
+			while index > 1 and index < #currentWorlds do
+				index = index + move_dir
+				world = currentWorlds[index]
+				if world == nil then
+					break
+				end
+	
+				if not world.is_load then
+					serverDataIndex = index
+					break
+				end
+			end
+		end
 	end
 end
 
@@ -337,6 +386,42 @@ function World2In1.OnEnterSchoolRegion()
 	end)	
 end
 
+function World2In1.GetEmptyGridIndex(default_index, type)
+	-- 判断下该地块是否加载
+	local gridX, gridY = 0, 0
+	if type == "all" then
+		gridX, gridY = 0, default_index - 1
+	elseif type == "school" then 
+		gridX, gridY = default_index - 1, 0
+	elseif type == "grade" then 
+		gridX, gridY = 0, 1 - default_index
+	end
+	
+	local typeIndex = mapTypeIndex[type];
+	local currentWorldList = allMiniWorlds[typeIndex];
+	local key = string.format("%d_%d", gridX, gridY);
+	if currentWorldList[key] == nil or not currentWorldList[key].loaded then
+		return default_index
+	end
+
+	local index = default_index
+	while index < 85 do
+		index = index + 1
+		if type == "all" then
+			gridX, gridY = 0, index - 1
+		elseif type == "school" then 
+			gridX, gridY = index - 1, 0
+		elseif type == "grade" then 
+			gridX, gridY = 0, 1 - index
+		end
+
+		key = string.format("%d_%d", gridX, gridY);
+		if not currentWorldList[key] or not currentWorldList[key].loaded then
+			return index
+		end
+	end
+end
+
 function World2In1.OnEnterRegionByProjectName(type, project_name)
 	World2In1.SetGameMode();
 	World2In1.SetCurrentType(type)
@@ -344,14 +429,28 @@ function World2In1.OnEnterRegionByProjectName(type, project_name)
 	World2In1.StartLoadTimer();
 
 	worldIndex = 1
+	serverDataIndex = 1
+	local is_world_load = false
 	World2In1.LoadAllWorlds(currentType, function(worlds_data)
 		for i, v in ipairs(worlds_data) do
 			if v.name == project_name then
 				worldIndex = i
+				serverDataIndex = i
+				is_world_load = v.is_load
 				break
 			end
 		end
-		-- worldIndex = worldIndex - 1;
+
+		if worlds_data[serverDataIndex] and worlds_data[serverDataIndex].is_load then
+			worldIndex = worlds_data[serverDataIndex].worldIndex or 1
+		else
+			if serverDataIndex > 43 then
+				worldIndex = 43
+			end
+			
+			worldIndex = World2In1.GetEmptyGridIndex(worldIndex, type)
+		end
+
 		local pox_index = worldIndex - 1
 		if type == "all" then
 			local x, y,  z = World2In1.GetRegionCenterPos(3);
@@ -438,7 +537,7 @@ function World2In1.GetEnterCreateRegionCb()
 	return World2In1.enter_create_region_cb
 end
 
-function World2In1.GotoCreateRegion()
+function World2In1.GotoCreateRegion(pos)
 	World2In1.EndLoadTimer();
 	World2In1UserInfo.ShowPage(nil);
 	GameLogic.RunCommand("/mode edit");
@@ -449,6 +548,28 @@ function World2In1.GotoCreateRegion()
 		World2In1.enter_create_region_cb()
 		World2In1.enter_create_region_cb = nil
 	end	
+
+	local path = World2In1.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(creatorWorldName)
+	local tag_xml_data = World2In1.LoadWorldTageXml(path)      
+	if tag_xml_data and tag_xml_data.attr and tag_xml_data.attr.fromProjects then
+		local form_project_list = commonlib.split(tag_xml_data.attr.fromProjects,",") or {};
+		local form_project_id = form_project_list[#form_project_list]
+		
+		if form_project_id and tonumber(form_project_id) then
+			local module_data = CreateModulPage.GetOneProjectData(tonumber(form_project_id))
+			if module_data and module_data.pos then
+				local default_pos = module_data.pos
+				GameLogic.RunCommand(format("/goto %d %d %d", default_pos[1], default_pos[2], default_pos[3]))
+			elseif pos then
+				GameLogic.RunCommand(format("/goto %d %d %d", pos[1], pos[2], pos[3]))
+			end
+		elseif pos then
+			GameLogic.RunCommand(format("/goto %d %d %d", pos[1], pos[2], pos[3]))
+		end
+		-- body
+	elseif pos then
+		GameLogic.RunCommand(format("/goto %d %d %d", pos[1], pos[2], pos[3]))
+	end
 
 	lock_timer = lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
 		local player = EntityManager.GetPlayer()
@@ -507,6 +628,7 @@ function World2In1.GoToNextGradeMiniWorld()
 	z = z - worldIndex * 128;
 	GameLogic.RunCommand(string.format("/goto %d %d %d", x+64, y, z+64));
 	worldIndex = worldIndex + 1;
+	serverDataIndex = serverDataIndex + 1
 	World2In1.LoadMiniWorld(currentType, 0, 1 - worldIndex);
 end
 
@@ -515,6 +637,7 @@ function World2In1.GoToNextSchoolMiniWorld()
 	x = x + worldIndex * 128;
 	GameLogic.RunCommand(string.format("/goto %d %d %d", x+64, y, z+64));
 	worldIndex = worldIndex + 1;
+	serverDataIndex = serverDataIndex + 1
 	World2In1.LoadMiniWorld(currentType, worldIndex - 1, 0);
 end
 
@@ -523,6 +646,7 @@ function World2In1.GoToNextAllMiniWorld()
 	z = z + worldIndex * 128;
 	GameLogic.RunCommand(string.format("/goto %d %d %d", x+64, y, z+64));
 	worldIndex = worldIndex + 1;
+	serverDataIndex = serverDataIndex + 1
 	World2In1.LoadMiniWorld(currentType, 0, worldIndex - 1);
 end
 
@@ -556,7 +680,7 @@ function World2In1.OnSaveWorld()
 		local blocks = ParaWorldMiniChunkGenerator:GetAllBlocks();
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-		local filename = ParaIO.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(creatorWorldName).."/miniworld.template.xml";
+		local filename = World2In1.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(creatorWorldName).."/miniworld.template.xml";
 		
 		local x, y, z = ParaWorldMiniChunkGenerator:GetPivot();
 		local params = {};
@@ -601,22 +725,6 @@ function World2In1.UnLoadcurrentWorldList(name)
 			v[k2].need_clean = true
 		end
 	end
-
-	-- local gen = GameLogic.GetBlockGenerator();
-	-- for k, v in pairs(allMiniWorlds) do
-	-- 	for k2, v2 in pairs(v) do
-	-- 		-- v[k2].need_clean = true
-	-- 		if v2.loaded then
-	-- 			if v2.gridX then
-	-- 				local x, y = localGridXYToGlobal(v2.gridX, v2.gridY, v2.typeIndex);
-	-- 				gen:ResetGridXY(x, y);
-	-- 				v2.loaded = false
-	-- 			end
-
-	-- 			v[k2] = {}
-	-- 		end
-	-- 	end
-	-- end
 
 end
 
@@ -668,7 +776,7 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 				return;
 			end
 
-			local miniTemplateDir = ParaIO.GetWritablePath().."temp/miniworlds/";
+			local miniTemplateDir = World2In1.GetWritablePath().."temp/miniworlds/";
 			ParaIO.CreateDirectory(miniTemplateDir);
 			local template_file = miniTemplateDir..world.id..".xml";
 			local file = ParaIO.open(template_file, "w");
@@ -685,6 +793,9 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 				currentWorldList[key].gridX = gridX;
 				currentWorldList[key].gridY = gridY;
 				currentWorldList[key].typeIndex = typeIndex;
+
+				world.is_load = true
+				world.worldIndex = worldIndex
 				GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", world.name), 3000, "0 255 0");				
 				local params = currentWorldList[key]
 				World2In1UserInfo.ShowPage(params);
@@ -704,7 +815,7 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 	end
 
 	currentWorldList[key] = currentWorldList[key] or {loaded = true};
-	local world = currentWorlds[worldIndex];
+	local world = currentWorlds[serverDataIndex];
 	if (world) then
 		keepwork.world.detail({router_params = {id = world.id}}, function(err, msg, data)
 			if (data and data.world and data.world.commitId) then
@@ -736,24 +847,43 @@ end
 
 function World2In1.LoadAllWorlds(type, callback)
 	worldIndex = 1
-	currentWorlds = {};
-	keepwork.world.by_parent_id({type = type, parentId = parentWorldId}, function(err, msg, data)
-		if (data and data.count and data.rows) then
-			for i = 1, #data.rows do
-				currentWorlds[i] = data.rows[i];
-			end
-			if (page) then
-				page:Refresh(0);
-				World2In1.OnMouseChangeEx()
-				-- commonlib.TimerManager.SetTimeout(function()  
-				-- 	World2In1.OnMouseChangeEx()
-				-- end, 500);
-			end
-			if (callback) then
-				callback(currentWorlds);
-			end
+	serverDataIndex = 1
+	if World2In1.ServerWorldData[type] == nil then
+		World2In1.ServerWorldData[type] = {}
+	end
+	currentWorlds = World2In1.ServerWorldData[type]
+	if #currentWorlds > 0 then
+		if (page) then
+			page:Refresh(0);
+			World2In1.OnMouseChangeEx()
 		end
-	end);
+		if (callback) then
+			callback(currentWorlds);
+		end
+	else
+		keepwork.world.by_parent_id({
+			type = type, 
+			parentId = parentWorldId,
+			["x-per-page"] = 400,
+			["x-page"] = 1,
+		}, function(err, msg, data)
+			if (data and data.count and data.rows) then
+				for i = 1, #data.rows do
+					currentWorlds[i] = data.rows[i];
+				end
+				if (page) then
+					page:Refresh(0);
+					World2In1.OnMouseChangeEx()
+					-- commonlib.TimerManager.SetTimeout(function()  
+					-- 	World2In1.OnMouseChangeEx()
+					-- end, 500);
+				end
+				if (callback) then
+					callback(currentWorlds);
+				end
+			end
+		end);
+	end
 end
 
 function World2In1.GetTypeIndex()
@@ -786,4 +916,27 @@ end
 function World2In1.SetCurrentType(type)
 	last_region_type = currentType
 	currentType = type;
+end
+
+function World2In1.LoadWorldTageXml(world_path)
+	world_path = string.gsub(world_path, "[/\\]$", "");
+
+	local xmlRoot = ParaXML.LuaXML_ParseFile(world_path.."/tag.xml");
+	if(xmlRoot) then
+        -- local world_info = WorldInfo:new();
+        if(xmlRoot) then
+            local node;
+            for node in commonlib.XPath.eachNode(xmlRoot, "/pe:mcml/pe:world") do
+                return node;
+            end
+        end 
+	end
+end
+
+function World2In1.GetWritablePath()
+	if World2In1.write_table_path == nil then
+		World2In1.write_table_path = ParaIO.GetWritablePath()
+	end
+	
+	return World2In1.write_table_path
 end

@@ -46,7 +46,7 @@ function QuestMessageBox.ShowView()
 			allowDrag = true,
 			enable_esc_key = true,
 			zorder = 0,
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+			-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
 				align = "_ct",
 				x = -view_width/2,
@@ -75,7 +75,10 @@ end
 function QuestMessageBox.OpenVip()
 	page:CloseWindow()
 	QuestMessageBox.CloseView()
-    VipToolNew.Show("AI_lesson")
+	GameLogic.IsVip("AI_lesson", true, function(result)
+		if result then
+		end
+	end);  
 end
 
 function QuestMessageBox.GetDesc1()

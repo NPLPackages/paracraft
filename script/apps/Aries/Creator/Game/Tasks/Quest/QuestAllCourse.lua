@@ -79,6 +79,20 @@ function QuestAllCourse.Show(target_course_id)
         return
     end
 
+	-- if not QuestAllCourse.BindFilter then
+	-- 	GameLogic.GetFilters():add_filter("became_vip", function()
+    --         if page then
+    --             QuestAllCourse.RefreshCourseListData(function()
+    --                 -- 刷新课程列表控件
+    --                 QuestAllCourse.FreshGridView("course_list")
+    --                 local mcmlNode = page:GetNode("course_list");
+    --                 pe_gridview.GotoPage(mcmlNode, "course_list", 1);
+    --             end)
+    --         end
+    --     end);
+	-- 	QuestAllCourse.BindFilter = true
+	-- end
+
     local client_data = QuestAction.GetClientData()
 
     if target_course_id == nil then
@@ -648,8 +662,10 @@ function QuestAllCourse.RunCommand(index, is_pre)
             -- local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
             -- VipToolNew.Show("AI_lesson")
             local function sure_callback()
-                local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-                VipToolNew.Show("AI_lesson")
+                GameLogic.IsVip("AI_lesson", true, function(result)
+                    if result then
+                    end
+                end);  
             end
             local desc = "是否开通会员学习？"
             local desc2 = "该课程是vip专属课程，需要vip权限才能学习。"

@@ -65,25 +65,25 @@ end
         <!--close button  -->
         <input type="button" value="" onclick="ClosePage" style="margin-top: 28px; margin-left:1010px;width:32px;height:32px;background: url(Texture/Aries/Creator/keepwork/Noticev2/guanbi_32bits.png#0 0 32 32);"/>  
         <!-- content main-->
-        <div name="mainbg" style="margin-left: 32px; width: 1024px;height: 256px;">
-            <img style="width:1024px;height:256px" src='<%=getMainCover()%>' onclick="OnMainImageClick"/>
-            <div zorder = "1" style="margin-top: -256px; width: 1024px;height: 256px; background: url(Texture/Aries/Creator/keepwork/Noticev2/dabanner_64X64_32bits.png#0 0 64 64:15 15 18 18);"></div>
+        <div name="mainbg" style="margin-left: 31px; margin-top: 2px; width: 1024px;height: 256px;">
+            <img style="width:1016px;height:250px; margin-left: 4px;" src='<%=getMainCover()%>' onclick="OnMainImageClick"/>
+            <div zorder = "1" style="margin-top: -253px; width: 1024px;height: 256px; background: url(Texture/Aries/Creator/keepwork/Noticev2/dabanner_64X64_32bits.png#0 0 64 64:15 15 18 18);"></div>
         </div>
         <!-- content other -->
-        <div name="girdBg" style="margin-left: 33px;margin-top: 8px; width: 1024px; height: 300px;">
+        <div name="girdBg" style="margin-left: 33px;margin-top: 11px; width: 1024px; height: 300px;">
             <pe:gridview name="gridview_1"  AllowPaging="false" CellPadding="1" ItemsPerLine="16" DefaultNodeHeight = "128" style="width: 1024px;"
                 DataSource='<%=getNoticeDt%>'>
                 <Columns>
                     <div style="width: 254px;height: 254px;background: url(Texture/Aries/Creator/keepwork/Noticev2/xiaobanner_64X64_32bits.png#0 0 64 64:15 15 18 18);">
                         <a type="button" onclick="OnImageClick" param1='<%= XPath("this") %>'>
-                            <img zorder="-1"  style="width:250px;height:250px"  src='<%=Eval("cover")%>' />  
+                            <img zorder="-1"  style="width:248px;height:246px;margin-left: 2px; margin-top: 2px;"  src='<%=Eval("cover")%>' />  
                         </a>                                 
                     </div>
                 </Columns>
             </pe:gridview>
             <!-- next button -->
             <pe:if  condition='<%=isRendNext()%>'> 
-                <div  name = "nextbtn" style="width: 1024px; height: 70px; margin-top: -250px;">
+                <div  name = "nextbtn" style="width: 1024px; height: 70px; margin-top: -254px;">
                     <input  type="button" onclick="GoPrePage()" style="margin-left: 0px; width: 64px;height: 64px; background: url(Texture/Aries/Creator/keepwork/Noticev2/qiehuan1_64X64_32bits.png#0 0 64 64);"/>
                     <input  type="button" onclick="GoNextPage()" style="margin-left: 980px; margin-top: -64px; width: 64px;height: 64px; background: url(Texture/Aries/Creator/keepwork/Noticev2/qiehuan2_64X64_32bits.png#0 0 64 64);"/>
                 </div>               
@@ -91,7 +91,7 @@ end
         </div>
         <!-- content remind -->
         <div style="margin-top: -6px;">                
-            <div style="margin-left: 920px; margin-top: -20px;">
+            <div style="margin-left: 920px; margin-top: -26px;">
                 <input type="checkbox" name = "checkRemind" checked='<%=isShowToday%>' onclick="NoRemind" style="float: left; margin-top: 4px; width:14px;height:14px;" UncheckedBG="Texture/Aries/Creator/keepwork/Noticev2/dian1_normal_14X14_32bits.png#0 0 14 14" CheckedBG="Texture/Aries/Creator/keepwork/Noticev2/dian1_select_14X14_32bits.png#0 0 14 14"/>
                 <div onclick="NoRemind" style="float: left;margin-left: 5px;margin-top: 1px;width: 100px;height: 20px;  background: url(Texture/Aries/Creator/keepwork/Noticev2/zi_100X20_32bits.png#0 0 100 20);" ></div>
             </div>

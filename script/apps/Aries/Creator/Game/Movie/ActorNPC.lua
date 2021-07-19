@@ -490,13 +490,12 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		-- get {{value, text}} array of all animations in the asset file. 
 		local options = {};
 		local assetfile = self:GetValue("assetfile", curTime);
-		if(not assetfile) then
-			local entity = self:GetEntity()
-			if(entity) then
-				assetfile = entity:GetMainAssetPath();
-			end
-		end
 		local skin = self:GetValue("skin", curTime);
+		local entity = self:GetEntity()
+		if(entity) then
+			assetfile = entity:GetMainAssetPath();
+			skin = entity:GetSkin();
+		end
 		if(assetfile) then
 			assetfile = PlayerAssetFile:GetFilenameByName(assetfile)
 			NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
@@ -626,17 +625,23 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				end
 			end);
 		elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
+			if(not old_value or old_value == "") then
+				local entity = self:GetEntity()
+				if(entity) then
+					old_value = entity:GetSkin()
+				end
+			end
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
 			local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
 			CustomSkinPage.ShowPage(function(filename, skin)
-				if (filename and skin) then
+				if (filename and skin~=old_value) then
 					self:AddKeyFrameByName(keyname, nil, skin);
 					self:FrameMovePlaying(0);
 					if(callbackFunc) then
 						callbackFunc(true);
 					end
 				end
-			end);
+			end, old_value);
 		else
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
 			local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");

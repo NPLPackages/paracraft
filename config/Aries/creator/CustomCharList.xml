@@ -87,6 +87,30 @@
 		<item id="81076" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc2_32bits.png" name="眼睛76"/>
 		<item id="81077" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc3_32bits.png" name="眼睛77"/>
 		<item id="81078" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye1_32bits.png" name="眼睛78"/>
+
+		
+		<item id="81086" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_le_32bits.png" name="眼睛86"/>
+		<item id="81087" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_nu_32bits.png" name="眼睛87"/>
+		<item id="81088" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_xi_32bits.png" name="眼睛88"/>
+		<item id="81089" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_zhengchang_32bits.png" name="眼睛89"/>
+		<item id="81090" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_le_32bits.png" name="眼睛90"/>
+		<item id="81091" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_nu_32bits.png" name="眼睛91"/>
+		<item id="81092" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_xi_32bits.png" name="眼睛92"/>
+		<item id="81093" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_ai_32bits.png" name="眼睛93"/>
+		<item id="81094" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_le_32bits.png" name="眼睛94"/>
+		<item id="81095" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_nu_32bits.png" name="眼睛95"/>
+		<item id="81096" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_xi_32bits.png" name="眼睛96"/>
+		<item id="81097" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_zhengchang_32bits.png" name="眼睛97"/>
+		
+		<item id="81098" icon="Texture/Aries/Creator/keepwork/Avatar/icons/yunhuhu_32bits.png" name="眼睛98"/>
+		<item id="81079" icon="Texture/Aries/Creator/keepwork/Avatar/icons/e1_32bits.png" name="眼睛79"/>
+		<item id="81080" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mojing_32bits.png" name="眼睛80"/>
+		<item id="81081" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_001_32bits.png" name="眼睛81"/>
+		<item id="81082" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_01_32bits.png" name="眼睛82"/>
+		<item id="81083" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_02_32bits.png" name="眼睛83"/>
+		<item id="81084" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_fps14_emoji001_32bits.png" name="眼睛84"/>
+		<item id="81085" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_G_012_32bits.png" name="眼睛85"/>
+		
 	</category>
 	
 	<category name="hair" text="头饰">
@@ -870,6 +894,10 @@
 		<item id="88024" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_05_01_32bits.png" name="嘴巴24"/>
 		<item id="88025" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_06_01_32bits.png" name="嘴巴25"/>
 		<item id="88026" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_07_01_32bits.png" name="嘴巴26"/>
+      
+		<item id="88027" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_02_32bits.png" name="嘴巴27"/>
+		<item id="88028" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_03_32bits.png" name="嘴巴28"/>
+		
 	</category>
 
 

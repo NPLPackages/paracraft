@@ -261,7 +261,9 @@ end
 
 local cached_ds = {};
 -- get all template ds
-function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh)
+--- @param bForceRefresh boolean
+--- @param searchText string
+function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh, searchText)
 	if(not cached_ds[GameLogic.current_worlddir] or bForceRefresh) then
 		NPL.load("(gl)script/ide/Files.lua");
 	
@@ -295,17 +297,25 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh)
 		
 		for _, file in ipairs(result) do 
 			file.text = file.filename:match("([^/\\]+)%.blocks%.xml$")
+
 			if(not file.text) then
 				file.text = file.filename:match("([^/\\]+%.bmax)$")
 			end
+
 			if(file.text) then
 				file.text = commonlib.Encoding.url_decode(commonlib.Encoding.DefaultToUtf8(file.text));
 				file.filename = GameLogic.current_worlddir.."blocktemplates/"..file.filename;
-				folder_local[#folder_local+1] = {name="file", attr=file};
+
+				if(searchText == nil) then
+					folder_local[#folder_local+1] = { name="file", attr=file };
+				elseif(file.text:find(searchText)) then
+					folder_local[#folder_local+1] = { name="file", attr=file };
+				end
 			end
 		end
 		cached_ds[GameLogic.current_worlddir] = root;
 	end
+
 	return cached_ds[GameLogic.current_worlddir];
 end
 

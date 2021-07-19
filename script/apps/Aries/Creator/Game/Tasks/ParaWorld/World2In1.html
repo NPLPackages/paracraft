@@ -30,45 +30,45 @@
                 </div> -->
             </div>
 
-            <div name="mapBg" ClickThrough="true" onclick="OnClick" style="float:left;margin-left:136px;margin-top:-58px;width:212px;height:212px;background:url(Texture/Aries/Creator/keepwork/map/bj_212X212_32bits.png#0 0 212 212);">
+            <div name="mapBg" zorder = "-3" ClickThrough="true" onclick="OnClick" style="float:left;margin-left:136px;margin-top:-58px;width:212px;height:212px;background:url(Texture/Aries/Creator/keepwork/map/bj_212X212_32bits.png#0 0 212 212);">
                 <!-- 显示圆点 -->
                 <div type="button" style="margin-left:87px;margin-top:25px;width:40px;height:40px;background:url();">
-                    <div  zorder="1" style="margin-left:13px;margin-top:10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y1_16X16_32bits.png#0 0 16 16);">
+                    <div  zorder="-1" style="margin-left:13px;margin-top:10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y1_16X16_32bits.png#0 0 16 16);">
                     </div>
                 </div>
                 <div type="button" style="margin-left:22px;margin-top:22px;width:40px;height:40px;background:url();">
-                    <div  zorder="1" style="margin-left:11px;margin-top:10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y1_16X16_32bits.png#0 0 16 16);">
+                    <div  zorder="-1" style="margin-left:11px;margin-top:10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y1_16X16_32bits.png#0 0 16 16);">
                     </div>
                 </div>
                 <div type="button" style="margin-left:152px;margin-top:-40px;width:40px;height:40px;background:url();">
-                    <div  zorder="1" style="margin-left:14px;margin-top:10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y1_16X16_32bits.png#0 0 16 16);">
+                    <div  zorder="-1" style="margin-left:14px;margin-top:10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y1_16X16_32bits.png#0 0 16 16);">
                     </div>
                 </div>
                 <div type="button" style="margin-left:87px;margin-top:24px;width:40px;height:40px;background:url();">
-                    <div  zorder="1" style="margin-left:12px;margin-top:10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y3_16X16_32bits.png#0 0 16 16);">
+                    <div  zorder="-1" style="margin-left:12px;margin-top:10px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y3_16X16_32bits.png#0 0 16 16);">
                     </div>
                 </div>
                 <div type="button" style="margin-left:72px;margin-top:-118px;width:70px;height:70px;background:url();">
-                    <div  zorder="1" style="margin-left:28px;margin-top:20px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y2_16X16_32bits.png#0 0 16 16);">
+                    <div  zorder="-1" style="margin-left:28px;margin-top:20px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/map/y2_16X16_32bits.png#0 0 16 16);">
                     </div>
                 </div>          
             </div>
 
-            <div name="mapSelectBg" zorder="1" style="float:left;margin-left:136px;margin-top:-212px;width:212px;height:212px;background:url(Texture/Aries/Creator/keepwork/map/bj2_212X212_32bits.png#0 0 212 212);">
+            <div name="mapSelectBg" zorder = "-2" style="float:left;margin-left:136px;margin-top:-212px;width:212px;height:212px;background:url(Texture/Aries/Creator/keepwork/map/bj2_212X212_32bits.png#0 0 212 212);">
                 <!-- 显示字体和选中效果和点击效果 -->
-                <div name="school_title_bg"    onclick="World2In1.OnEnterSchoolRegion" style="margin-left:87px;margin-top:20px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
+                <div name="school_title_bg"  onclick="World2In1.OnEnterSchoolRegion" style="margin-left:87px;margin-top:20px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
                     <pe:label name="school_title"  value='<%=L"本校作品" %>' style="width: 40px;height: 40px;"/>
                 </div>
-                <div name="all_title_bg"       onclick="World2In1.OnEnterAllRegion" style="margin-left:22px;margin-top:22px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
+                <div name="all_title_bg"      onclick="World2In1.OnEnterAllRegion" style="margin-left:22px;margin-top:22px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
                     <pe:label name="all_title"     value='<%=L"全国作品" %>'style="width: 40px;height: 40px;"/>
                 </div>
-                <div name="grade_title_bg"     onclick="World2In1.OnEnterGradeRegion" style="margin-left:152px;margin-top:-40px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
+                <div name="grade_title_bg"    onclick="World2In1.OnEnterGradeRegion" style="margin-left:152px;margin-top:-40px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
                     <pe:label name="grade_title"   value='<%=L"同学作品" %>'style="width: 40px;height: 40px;"/>
                 </div>
-                <div name="cource_title_bg"    onclick="World2In1.OnEnterCourseRegion" style="margin-left:87px;margin-top:24px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
+                <div name="cource_title_bg"   onclick="World2In1.OnEnterCourseRegion" style="margin-left:87px;margin-top:24px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
                     <pe:label name="cource_title"  value='<%=L"教学区" %>'style="width: 40px;height: 40px;"/>
                 </div>
-                <div name="creator_title_bg"   onclick="World2In1.OnEnterCreatorRegion" style="margin-left:86px;margin-top:-98px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
+                <div name="creator_title_bg"  onclick="World2In1.OnEnterCreatorRegion" style="margin-left:86px;margin-top:-98px;width:40px;height:40px;text-align:center;color:#171717;font-size:14px;font-weight: bold;">
                     <pe:label name="creator_title" value='<%=L"创作区" %>'style="width: 40px;height: 40px;"/>
                 </div>
             </div>

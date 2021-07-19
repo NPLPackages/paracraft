@@ -798,3 +798,50 @@ function Entity:OpenAtLine(line, pos)
 	self:OpenEditor("entity", EntityManager.GetPlayer())
 	self.selectedActorIndex = nil
 end
+
+local function offset_time_variable(var, offset)
+	if(var and var.data) then
+		local data = var.data;
+		for i = 1, #(data) do
+			data[i] = data[i] + offset;
+		end
+	end
+end
+
+-- @param animMap: {fromId, toId} id to id map
+-- @param filename: if nil, we will match all filename
+-- @return bFound, count: count is the number key replaced
+function Entity:RemapAnim(animMap, filename)
+	local bFound, count;
+	for i=1, self.inventory:GetSlotCount() do
+		local itemStack = self.inventory:GetItem(i);
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) then
+			if(itemStack.id == block_types.names.TimeSeriesNPC) then
+				local timeSeries = itemStack.serverdata.timeseries;
+				if(timeSeries and timeSeries.assetfile and timeSeries.assetfile.data) then
+					local dataAssetFile = timeSeries.assetfile.data;
+					local fromTime, toTime = 0;
+					local bAssetMatched;
+					for i = 1, #(dataAssetFile) do
+						if(not filename or dataAssetFile[i] == filename) then
+							bAssetMatched = true
+							break;
+						end
+					end
+					if(bAssetMatched) then
+						bFound = true;
+						local animData = timeSeries.anim.data
+						for i = 1, #(animData) do
+							local newId = animMap[animData[i]]
+							if(newId) then
+								animData[i] = newId;
+								count = (count or 0) + 1;
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return bFound, count;
+end

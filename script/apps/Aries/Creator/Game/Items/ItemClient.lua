@@ -84,6 +84,7 @@ function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemInvisibleBlock.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemAgentSign.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemAgent.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemLinkBoy.lua");
 
 	GameLogic.GetFilters():apply_filters("register_item");
 end

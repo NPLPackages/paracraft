@@ -232,29 +232,32 @@ e.g.
 
 Commands["replacefile"] = {
 	name="replacefile", 
-	quick_ref="/replacefile src dest", 
+	quick_ref="/replacefile [-regexp] src dest", 
 	desc=[[replace model or texture files from src to dest. this will include 
 Please note, if no blocks are selected by the user, 
 all movie block and model block with matching filenames will be replaced.
 all image blocks with matching textures will also be replaced.
 if user has selected some blocks, then replacement only take place in these selected blocks.
+@param -regexp: regular expression
 e.g.
 /replacefile blocktemplates/from.bmax    blocktemplates/to.bmax
 /replacefile from.jpg    to.png
+/replacefile -regexp 中文/(.*).jpg    cn/%1.jpg
+/replacefile -regexp 中文 cn
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		
 		local from, to, radius
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
 		from, cmd_text = CmdParser.ParseString(cmd_text);
 		to, cmd_text = CmdParser.ParseString(cmd_text);
 		if(from and to) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
 			NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
 			local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
-			
-
 			local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({mode="all"});
-			task:ReplaceFile(from, to, SelectionManager:GetSelectedBlocks());
+			task:ReplaceFile(from, to, SelectionManager:GetSelectedBlocks(), options.regexp~=nil);
 		end
 	end,
 };

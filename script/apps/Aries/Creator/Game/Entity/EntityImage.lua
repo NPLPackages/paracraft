@@ -860,3 +860,23 @@ function Entity:ReplaceFile(from, to)
 	end
 	return 0
 end
+
+function Entity:ReplaceFileRegularExpression(from, to)
+	local filename = self:GetText();
+	if( filename:match(from)) then
+		to  = filename:gsub(from, to)
+		local cmd = to;
+		if(self.cmd) then
+			local inlineCmd = self.cmd:match("^$%(.*%)")
+			if(inlineCmd and inlineCmd~="") then
+				cmd = inlineCmd.. (cmd or "")	
+			end
+		end
+		self:BeginEdit();
+		self:SetCommand(cmd);
+		self:Refresh(true);
+		self:EndEdit();
+		return 1
+	end
+	return 0
+end

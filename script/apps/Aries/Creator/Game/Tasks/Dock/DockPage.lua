@@ -477,7 +477,7 @@ function DockPage.OnClickLeftTop(id)
 	NPL.load("(gl)script/ide/timer.lua");
 
 	if (id == 'summer_camp_main') then
-        SummerCampMainPage.ShowView(1)
+        SummerCampMainPage.ShowView()
 	elseif (id == 'summer_camp_map') then
 		SummerCampMainPage.ClickMap()
 	elseif (id == 'summer_camp_kecheng') then

@@ -51,9 +51,10 @@ function CustomSkinPage.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function CustomSkinPage.ShowPage(OnClose)
+-- @param skinIdString: optional skin string
+function CustomSkinPage.ShowPage(OnClose, skinIdString)
 	currentModelFile = CustomCharItems.defaultModelFile;
-	currentSkin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString);
+	currentSkin = skinIdString or CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString);
 	CustomSkinPage.category_index = 2;
 	CustomSkinPage.model_index = 1;
 	CustomSkinPage.Current_Item_DS = {};

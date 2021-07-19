@@ -98,36 +98,56 @@ local SummerCampDailyTask = {
         {name="学习课程：计时动画", world_id = 49687, course_id = 43},
     },
 	-- 19号到25号
-	-- {
-    --     {name="探索世界：这就是我", world_id = 1164},
-    --     {name="学习课程：椅子", world_id = 49651, course_id = 92},
-    -- },
-	-- {
-    --     {name="探索世界：雨思", world_id = 175},
-    --     {name="学习课程：铅笔", world_id = 49653, course_id = 92},
-    -- },
-	-- {
-    --     {name="探索世界：苍玺城·梦的旅人", world_id = 1079},
-    --     {name="学习课程：拱形门", world_id = 49654, course_id = 92},
-    -- },
-	-- {
-    --     {name="探索世界：排队", world_id = 150},
-    --     {name="学习课程：铁链", world_id = 49657, course_id = 92},
-    -- },
-	-- {
-    --     {name="探索世界：威斯特利亚别墅", world_id = 169},
-    --     {name="学习课程：导出CAD模型", world_id = 49660, course_id = 92},
-    -- },
-	-- {
-    --     {name="探索世界：大徽宫", world_id = 156},
-    --     {name="学习课程：爱心", world_id = 49663, course_id = 92},
-    -- },
-	-- {
-    --     {name="探索世界：烟雨庄", world_id = 513},
-    --     {name="学习课程：西瓜", world_id = 49675, course_id = 92},
-    -- },
+	{
+        {name="探索世界：这就是我", world_id = 1164},
+        {name="学习课程：椅子", world_id = 49651, course_id = 27},
+    },
+	{
+        {name="探索世界：雨思", world_id = 175},
+        {name="学习课程：铅笔", world_id = 49653, course_id = 28},
+    },
+	{
+        {name="探索世界：苍玺城·梦的旅人", world_id = 1079},
+        {name="学习课程：拱形门", world_id = 49654, course_id = 29},
+    },
+	{
+        {name="探索世界：排队", world_id = 150},
+        {name="学习课程：铁链", world_id = 49657, course_id = 30},
+    },
+	{
+        {name="探索世界：威斯特利亚别墅", world_id = 169},
+        {name="学习课程：导出CAD模型", world_id = 49660, course_id = 31},
+    },
+	{
+        {name="探索世界：大徽宫", world_id = 156},
+        {name="学习课程：爱心", world_id = 49663, course_id = 33},
+    },
+	{
+        {name="探索世界：烟雨庄", world_id = 513},
+        {name="学习课程：西瓜", world_id = 49675, course_id = 34},
+    },
 
-	-- 19号到25号
+	-- 26号到30号
+	{
+        {name="探索世界：寻龙密道", world_id = 9162},
+        {name="学习课程：全局变量", world_id = 44913, course_id = 8},
+    },
+	{
+        {name="探索世界：TypingGame", world_id = 867},
+        {name="学习课程：双重机关与事件", world_id = 44913, course_id = 17},
+    },
+	{
+        {name="探索世界：华山论剑", world_id = 213},
+        {name="学习课程：兵临城下（上）", world_id = 49703, course_id = 55},
+    },
+	{
+        {name="探索世界：拼单词", world_id = 4119},
+        {name="学习课程：兵临城下（中）", world_id = 49704, course_id = 56},
+    },
+	{
+        {name="探索世界：看图猜成语", world_id = 12728},
+        {name="学习课程：兵临城下（下）", world_id = 49706, course_id = 57},
+    },
 }
 
 local VersionToKey = {
@@ -551,7 +571,15 @@ function SummerCampTaskPage.Goto(index)
 					}, function(err2, msg2, data2)
 						-- print("bbbbb", err2)
 						-- echo(data2, true)
+						-- echo(data, true)
 						if err2 == 200 then
+							-- if data.isVip == 1 and not GameLogic.IsVip() then
+							-- 	GameLogic.IsVip("AI_lesson", true, function(result)
+							-- 		if result then
+							-- 		end
+							-- 	end);  
+							-- 	return
+							-- end
 							local work_data = data.aiHomework or {}
 								
 							local client_data = QuestAction.GetClientData()

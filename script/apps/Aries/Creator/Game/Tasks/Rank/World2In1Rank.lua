@@ -156,7 +156,7 @@ function World2In1Rank.GetRecudedNumberDesc(number)
 end
 
 function World2In1Rank.OnClickApply()
-    ParaGlobal.ShellExecute("open", "https://keepwork.com/cp/xichuanactivity", "", "", 1); 
+    ParaGlobal.ShellExecute("open", "https://keepwork.com/cp/stbactivity", "", "", 1); 
 end
 
 function World2In1Rank.ShowRankHelp()

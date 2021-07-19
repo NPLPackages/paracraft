@@ -13,7 +13,7 @@ self:AddManipulator(manipCont);
 manipCont:connectToDependNode(boxTrigger);
 ------------------------------------------------------------
 ]]
-NPL.load("(gl)script/ide/System/Scene/Manipulators/QuadManipContainer.lua");
+NPL.load("(gl)script/ide/System/Scene/Manipulators/ManipContainer.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local ShapesDrawer = commonlib.gettable("System.Scene.Overlays.ShapesDrawer");
 local QuadManipContainer = commonlib.inherit(commonlib.gettable("System.Scene.Manipulators.ManipContainer"), commonlib.gettable("MyCompany.Aries.Game.Manipulators.QuadManipContainer"));

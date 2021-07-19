@@ -182,6 +182,29 @@ function Entity:OnFocusIn()
 	if(not self:HasCollision()) then
 		ParaCamera.GetAttributeObject():SetField("EnableBlockCollision", false);	
 	end
+	self:CheckUpdateCameraGeometry();
+end
+
+-- the lookat height needs to be refreshed when asset is loaded
+function Entity:CheckUpdateCameraGeometry()
+	local obj = self:GetInnerObject();
+	if(obj and not obj:GetPrimaryAsset():IsLoaded()) then
+		obj:GetPrimaryAsset():LoadAsset();
+		self.assetTimer = self.assetTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			local obj = self:GetInnerObject();
+			if(obj and obj:IsValid()) then
+				if(obj:GetPrimaryAsset():IsLoaded()) then
+					-- tricky: this will update asset height for camera lookat height
+					obj:SetField("Size Scale", obj:GetField("Size Scale", 1))
+					LOG.std(nil, "debug", "EntityCamera", "camera entity geometry updated");
+				else
+					timer:Change(100)
+				end
+			end
+		end})
+		-- start the timer after 0 milliseconds, and signal every 1000 millisecond
+		self.assetTimer:Change(100)
+	end
 end
 
 -- called before focus is lost

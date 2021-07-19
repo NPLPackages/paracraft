@@ -26,6 +26,10 @@ function GetCategoryButtons()
     return BuilderFramePage.GetCategoryButtons();
 end
 
+function GetEmptyText()
+    return BuilderFramePage.EmptyText;
+end
+
 function DS_Items(index)
     if(index == nil) then
         return #BuilderFramePage.Current_Item_DS;
@@ -62,12 +66,12 @@ function OnClickBlocksShop()
 end
 
 function DS_GetBlockTemplates()
-   return BlockTemplatePage.GetAllTemplatesDS();
+    return BlockTemplatePage.GetAllTemplatesDS();
 end
 
 function OnClickRefreshAllTemplates()
-   BlockTemplatePage.GetAllTemplatesDS(true);
-   Page:Refresh(0.1);
+    BlockTemplatePage.GetAllTemplatesDS(true);
+    Page:Refresh(0.1);
 end
 
 function OnClickOpenTemplateDir()
@@ -126,7 +130,15 @@ end
 <div style="">
     <div style="margin-left:13px;margin-top:5px;width:210px;">
         <div style="width:210px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
-            <input type="text" EmptyText='<%=L"搜索: 输入ID或名字"%>' name="block_search_text_ctl" uiname="block_search_text_obj" CaretColor="#FFFFFFFF" style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" onmodify="SearchBlock" />
+            <input 
+                type="text" 
+                EmptyText='<%= GetEmptyText() %>' 
+                name="block_search_text_ctl" 
+                uiname="block_search_text_obj" 
+                CaretColor="#FFFFFFFF" 
+                style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" 
+                onmodify="SearchBlock" 
+            />
         </div>
     </div>
     <div style="width:240px;height:60px;margin-left:13px;margin-top:3px;">
@@ -180,7 +192,16 @@ end
                     <input type="button" name="fullwnd" style="position:relative;font-size:12px;color:#cccccc;background-color:#cccccc;align:right;" value='<%=L"管理"%>' tooltip='<%=L"打开模板管理窗口"%>' class="linkbutton" onclick="OnClickManageTemplateWnd"/>
                 </div>
             </div>
-            <pe:treeview name="gvwBlockTemplates" class="mc_border" VerticalScrollBarStep="20" RememberScrollPos="true" DataSource='<%=DS_GetBlockTemplates()%>' DefaultNodeHeight="20" OnClick="tvwOnClickNode()" style="margin-left:2px;margin-top:2px;margin-right:8px;width:218px;height:235px;">
+            <pe:treeview 
+                name="gvwBlockTemplates" 
+                class="mc_border" 
+                VerticalScrollBarStep="20" 
+                RememberScrollPos="true" 
+                DataSource='<%=DS_GetBlockTemplates()%>' 
+                DefaultNodeHeight="20" 
+                OnClick="tvwOnClickNode()" 
+                style="margin-left:2px;margin-top:2px;margin-right:8px;width:218px;height:235px;"
+            >
 	            <NodeTemplates>
                     <NodeTemplate DataType="official">
                         <pe:treenode text='<%=XPath("this|text")%>' style="color:#cccccc" expanded='<%=XPath("this|expanded")%>' OnClick="OnSelectOfficial"></pe:treenode>
@@ -190,8 +211,14 @@ end
                     </NodeTemplate>
 		            <NodeTemplate DataType="file">
                         <div style="height:20px;">
-                            <input type="button" class="listbutton_unselected" value='<%=XPath("this|text")%>' onclick='OnSelectNode'
-						        style="margin-top:0px;width:200px;height:20px;text-align:left;margin-top:0px;color:#cccccc;" MouseOver_BG="Texture/alphadot.png"/>
+                            <input 
+                                type="button" 
+                                class="listbutton_unselected" 
+                                value='<%=XPath("this|text")%>' 
+                                onclick='OnSelectNode'
+						        style="margin-top:0px;width:200px;height:20px;text-align:left;margin-top:0px;color:#cccccc;" 
+                                MouseOver_BG="Texture/alphadot.png"
+                            />
                         </div>
                     </NodeTemplate>
 	            </NodeTemplates>

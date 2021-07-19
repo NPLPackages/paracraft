@@ -33,7 +33,6 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 
 	-- the c++ ConvertToCanonicalForm may replace : with space for standard command line
 	local urlProtocol = self:GetParacraftProtocol(cmdline);
-
 	if urlProtocol then
 		NPL.load("(gl)script/ide/Encoding.lua");
 		urlProtocol = commonlib.Encoding.url_decode(urlProtocol);

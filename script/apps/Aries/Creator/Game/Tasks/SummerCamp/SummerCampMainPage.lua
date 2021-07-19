@@ -44,7 +44,7 @@ function SummerCampMainPage.OnCreate()
 end
 
 function SummerCampMainPage.ShowView(index)
-    SummerCampMainPage.select_type_index = index or 1
+    SummerCampMainPage.select_type_index = index or 2
 
     local view_width = 1107
     local view_height = 715

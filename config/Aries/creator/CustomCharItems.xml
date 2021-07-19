@@ -120,8 +120,30 @@ model id
     <item id="81076" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc2.png"></texture></item>
     <item id="81077" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_zhengc3.png"></texture></item>
     <item id="81078" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye1.png"></texture></item>
-
-
+   
+    <item id="81086" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_le.png"></texture></item>
+    <item id="81087" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_nu.png"></texture></item>
+    <item id="81088" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_xi.png"></texture></item>
+    <item id="81089" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_zhengchang.png"></texture></item>
+    <item id="81090" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_le.png"></texture></item>
+    <item id="81091" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_nu.png"></texture></item>
+    <item id="81092" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_fanpai_xi.png"></texture></item>
+    <item id="81093" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_ai.png"></texture></item>
+    <item id="81094" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_le.png"></texture></item>
+    <item id="81095" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_nu.png"></texture></item>
+    <item id="81096" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_xi.png"></texture></item>
+    <item id="81097" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_girl_zhengchang.png"></texture></item>
+    <item id="81098" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/yunhuhu.png"></texture></item>
+    <item id="81079" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/e1.png"></texture></item>
+    <item id="81080" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/mojing.png"></texture></item>
+    <item id="81081" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_001.png"></texture></item>
+    <item id="81082" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_01.png"></texture></item>
+    <item id="81083" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_02.png"></texture></item>
+    <item id="81084" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_A_fps14_emoji001.png"></texture></item>
+    <item id="81085" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_boy_G_012.png"></texture></item>
+    
+    
+     
     <!--      82000 82999  头饰  geoset category="0"   1头发              1短发 2丸子头 3呆毛短发 4长刘海短发 5赛亚人 6长刘海中分 7长散发 8单马尾 9呆毛双马尾 10呆毛长直    -->
     <item id="82001" model="actor;"><geoset category="0" id="1"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/1_Avatar_boy_hair_00.png"></texture></item>
     <item id="82002" model="actor;"><geoset category="0" id="1"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/1_Avatar_boy_hair_01.png"></texture></item>
@@ -919,8 +941,9 @@ model id
 <item id="87188" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87188_alloy_silver_shield.anim.x"></attachment></item>
 <item id="87189" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87189_alloy_green_shield.anim.x"></attachment></item>
 <item id="87190" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87190_alloy_red_shield.anim.x"></attachment></item>
-      <!--20210701新增-->
+    <!--20210701新增-->
 <item id="87191" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87191_keyboard.anim.x"></attachment></item>
+ 
 
     <!--    88000 88999  嘴巴                        4嘴巴          -->
     <item id="88001" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_08_01.png"></texture></item>
@@ -949,7 +972,10 @@ model id
     <item id="88024" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_05_01.png"></texture></item>
     <item id="88025" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_06_01.png"></texture></item>
     <item id="88026" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_07_01.png"></texture></item>
-
+    <!--无法适配
+    <item id="88027" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_02.png"></texture></item>
+    <item id="88028" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_03.png"></texture></item>
+    -->
     
     <!--    89000 89999  坐骑  暂不开放    -->
 
