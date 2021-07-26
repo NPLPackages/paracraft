@@ -155,6 +155,7 @@ local function TrackedCopyTextToClipboard(text)
 end
 
 function Macros:BeginRecord()
+	GameLogic.options:SetClickToContinue(false);
 	Macros.lastCopyTextToClipboard = nil;
 	ParaMisc.CopyTextToClipboard = TrackedCopyTextToClipboard
 	self:Init()
@@ -724,8 +725,9 @@ function Macros:BeginPlay()
 	Macros.SetNextKeyPressWithMouseMove(nil, nil)
 	MacroPlayer.ShowPage();
 	self:LockInput()
+	GameLogic.options:SetClickToContinue(false);
 
-	GameLogic.GetFilters():add_filter("ShowExitDialog", Macros.OnShowExitDialog);
+	GameLogic.GetFilters():add_filter("OnBeforeShowExitDialog", Macros.OnShowExitDialog);
 	
 	GameLogic.GetFilters():apply_filters("Macro_BeginPlay");
 end

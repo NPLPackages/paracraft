@@ -75,53 +75,44 @@ function World2In1UpRank.HandleData()
 end
 
 function World2In1UpRank.GoNow()
-    if true then
-        _guihelper.MessageBox("7月24号正式开通该功能");
-        return
-    end
+    -- if true then
+    --     _guihelper.MessageBox("7月24号正式开通该功能");
+    --     return
+    -- end
 
     World2In1UpRank.Close()
     World2In1Rank.Close()
-    
-    local my_project_data = World2In1UpRank.MyProjectData
 
-    local parent_id = GameLogic.options:GetProjectId() or 0
-    keepwork.world2in1.project_list({
-        parentId=parent_id,
-        ["x-per-page"] = 200,
-        ["x-page"] = 1,
-    }, function(err, msg, data)
-        -- print("iiiiiiiiiiiiiiiiiiiiiiii", err)
-        -- echo(data, true)
-        if err == 200 then
-            WorldCreatePage.SetWorldListData(data.rows)
-            if #data.rows == 0 then
-                WorldCreatePage.Show()
-            else
-                -- WorldCreatePage.OnClickSelect(1)
-                WorldCreatePage.Show()
-                World2In1.SetEnterCreateRegionCb(function()
-                    commonlib.TimerManager.SetTimeout(function()  
-                        GameLogic.RunCommand("/share")
-                    end,500);
-                end)
-                -- if my_project_data.rank > 200 then
-                --     WorldCreatePage.OnClickSelect(1)
-                -- else
-                --     for k, v in pairs(data.rows) do
-                --         if v.id == my_project_data.id then
-                --             WorldCreatePage.OnClickSelect(k)
-                --             World2In1.SetEnterCreateRegionCb(function()
-                --                 commonlib.TimerManager.SetTimeout(function()  
-                --                     GameLogic.RunCommand("/share")
-                --                 end,1000);
-                --             end)
-                --         end
-                --     end
-                -- end
+    local currentType = World2In1.GetCurrentType()
+    if currentType == "creator" then
+        GameLogic.RunCommand("/share")
+    else
+        local my_project_data = World2In1UpRank.MyProjectData
+
+        local parent_id = GameLogic.options:GetProjectId() or 0
+        keepwork.world2in1.project_list({
+            parentId=parent_id,
+            ["x-per-page"] = 200,
+            ["x-page"] = 1,
+        }, function(err, msg, data)
+            -- print("iiiiiiiiiiiiiiiiiiiiiiii", err)
+            -- echo(data, true)
+            if err == 200 then
+                WorldCreatePage.SetWorldListData(data.rows)
+                if #data.rows == 0 then
+                    WorldCreatePage.Show()
+                else
+                    -- WorldCreatePage.OnClickSelect(1)
+                    WorldCreatePage.Show()
+                    World2In1.SetEnterCreateRegionCb(function()
+                        commonlib.TimerManager.SetTimeout(function()  
+                            GameLogic.RunCommand("/share")
+                        end,500);
+                    end)
+                end
             end
-        end
-    end)
+        end)
+    end
 end
 
 function World2In1UpRank.ToCreate()

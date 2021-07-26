@@ -141,7 +141,9 @@ function BuilderFramePage.OnChangeCategory(index, bRefreshPage)
 	end
 
 	BuilderFramePage.isSearching = false;
-	page:Refresh(0);
+	if(page) then
+		page:Refresh(0);
+	end
 
 	-- TODO 国际化-搜索: 输入模板名字
 	ParaUI.GetUIObject("block_search_text_obj"):SetField(
@@ -193,6 +195,9 @@ BuilderFramePage.SearchBlock = commonlib.debounce(BuilderFramePage.SearchBlockOr
 --- @return nil
 function BuilderFramePage.SearchTemplate(search_text)
 	local name = "gvwBlockTemplates";
+	if(not page) then
+		return
+	end
 	local node = page:GetNode(name);
 
 	pe_treeview.SetDataSource(

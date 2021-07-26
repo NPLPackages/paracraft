@@ -83,7 +83,7 @@ function World2In1Rank.SelectType(index)
         if err == 200 then
             for i, v in ipairs(data.ranks) do
                 v.tool_name = v.user.username
-                v.username = Rank.GetLimitLabel(v.tool_name)
+                v.username = Rank.GetLimitLabel(v.tool_name, 12)
                 if v.tool_name == System.User.username then
                     v.is_my_rank = true
                 end

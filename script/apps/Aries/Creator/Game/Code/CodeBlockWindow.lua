@@ -107,7 +107,13 @@ function CodeBlockWindow.Show(bShow)
 		CodeBlockWindow:LoadSceneContext();
 		if(self.entity) then
 			EntityManager.SetLastTriggerEntity(self.entity)
+			
+			local langConfig = CodeHelpWindow.GetLanguageConfigByEntity(self.entity)
+			if(langConfig and langConfig.OnOpenCodeEditor) then
+				langConfig.OnOpenCodeEditor(entity)
+			end
 		end
+
 		if (self.IsSupportNplBlockly()) then
 			self.OpenBlocklyEditor();
 		end
@@ -235,6 +241,7 @@ end
 function CodeBlockWindow.OnWorldSave()
 	CodeBlockWindow.UpdateCodeToEntity();
 	CodeBlockWindow.UpdateNplBlocklyCode();
+	GameLogic.RunCommand("/compile")
 end
 
 function CodeBlockWindow.HighlightCodeEntity(entity)
@@ -431,12 +438,6 @@ function CodeBlockWindow.IsVisible()
 end
 
 function CodeBlockWindow.Close()
-	local codeBlock = CodeBlockWindow.GetCodeBlock();
-	if(codeBlock and codeBlock:GetEntity() and codeBlock:GetEntity():GetLanguageConfigFile() == "npl_camera") then
-		local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
-		camera.close();
-	end
-
 	GameLogic.GetCodeGlobal():Disconnect("logAdded", CodeBlockWindow, CodeBlockWindow.AddConsoleText);
 	CodeBlockWindow:UnloadSceneContext();
 	CodeBlockWindow.CloseEditorWindow();
@@ -454,11 +455,16 @@ function CodeBlockWindow.CloseEditorWindow()
 
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	if(codeBlock and codeBlock:GetEntity()) then
-		local entity = codeBlock:GetEntity();
+	local entity = codeBlock:GetEntity();
 		if(entity:IsPowered() and (not codeBlock:IsLoaded() or codeBlock:HasRunningTempCode())) then
 			entity:Restart();
 		elseif(not entity:IsPowered() and (codeBlock:IsLoaded() or codeBlock:HasRunningTempCode())) then
 			entity:Stop();
+		end
+
+		local langConfig = CodeHelpWindow.GetLanguageConfigByEntity(entity)
+		if(langConfig and langConfig.OnCloseCodeEditor) then
+			langConfig.OnCloseCodeEditor(entity)
 		end
 	end
     CodeBlockWindow.SetNplBrowserVisible(false);
@@ -562,10 +568,6 @@ function CodeBlockWindow.OnClickStop()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	if(codeBlock) then
 		codeBlock:StopAll();
-		if(codeBlock:GetEntity() and codeBlock:GetEntity():GetLanguageConfigFile() == "npl_camera") then
-			local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
-			camera.showWithEditor(codeBlock:GetEntity());
-		end
 	end
 end
 
@@ -899,6 +901,9 @@ function CodeBlockWindow.UpdateCodeEditorStatus()
 			end
 			if(page.url ~= codeUIUrl or langConfig.GetCustomToolbarMCML) then
 				page:Goto(codeUIUrl);
+				if(langConfig and langConfig.OnOpenCodeEditor) then
+					langConfig.OnOpenCodeEditor(entity)
+				end
 			end
 		end
 	end

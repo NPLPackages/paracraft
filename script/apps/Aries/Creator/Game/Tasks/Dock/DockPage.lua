@@ -277,7 +277,10 @@ function DockPage.OnClickTop(id)
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.checkin");    
     elseif(id == "codewar")then
         local StudyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/StudyPage.lua");
-        StudyPage.clickArtOfWar();
+        -- 玩学课堂二级页面
+        -- StudyPage.clickArtOfWar();
+        local Course = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Course/Course.lua");
+        Course.Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.code_war");    
     elseif(id == "user_tip")then        
         QuestPage.Show();

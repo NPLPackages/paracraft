@@ -19,3 +19,7 @@ HttpWrapper.Create("keepwork.project.list_favorite", "%MAIN%/core/v0/projects/fa
 
 --http://yapi.kp-para.cn/project/32/interface/api/3667
 HttpWrapper.Create("keepwork.project.favorite_search", "%MAIN%/core/v0/favorites/search", "POST", true);
+
+--http://yapi.kp-para.cn/project/32/interface/api/2767
+--更新项目
+HttpWrapper.Create("keepwork.project.update", "%MAIN%/core/v0/projects/:id", "PUT", true);

@@ -241,9 +241,8 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 		return
 	end
 	local myHomeWorldName = string.format(L"%s的家园", System.User.keepworkUsername);
+	local myHomeWorldName1 = string.format(L"%s_main", System.User.keepworkUsername);
 	local currentWorldName = WorldCommon.GetWorldTag("name");
-	echo(myHomeWorldName);
-	echo(currentWorldName);
 	local function uploadMiniWorld(projectId)
 		keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
 			if (data and type(data) == "table") then
@@ -281,7 +280,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	end
 	
 	if (WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
-		if myHomeWorldName == currentWorldName then
+		if myHomeWorldName == currentWorldName or myHomeWorldName1 == currentWorldName then
 			showSaveTip()
 		end		
 	end

@@ -94,6 +94,12 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 					if(result.blockX) then
 						result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 					end
+				elseif(block.nopicking) then
+					local curBlockId = EntityManager.GetPlayer():GetBlockInRightHand()
+					if(curBlockId ~= result.block_id) then
+						result.block_id = nil;
+						result.blockX, result.blockY, result.blockZ = nil, nil, nil
+					end
 				end
 			end
 			local root_ = ParaUI.GetUIObject("root");

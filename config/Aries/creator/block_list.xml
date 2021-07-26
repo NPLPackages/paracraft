@@ -255,7 +255,8 @@ uid: unique id used in macro recording
     <block name="pigeon"/>
     <block name="dog"/>
     <block name="chicken"/>
-    <block name="CodeBlock" uid="BlockPen" icon="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
+    <block name="CodeBlock" tip="方块画笔代码方块" uid="BlockPen" icon="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
+    <block name="CodeBlock" tip="摄影机代码方块" uid="CodeCamera" icon="Texture/blocks/items/ts_camera.png" server_data='{langConfigFile="npl_camera"}'/>
     <block name="AgentSignBlock"/>
     <block name="AgentItem"/>
 	</category>
@@ -343,6 +344,8 @@ uid: unique id used in macro recording
     
     <block name="InvisibleBlock" />
     <block name="InvisibleGlowStone" />
+    <block name="BanBlock" block_data="2730" tip="拿在手中时可编辑"/>
+    <block name="TransparentBanBlock" block_data="2730" tip="拿在手中时可编辑"/>
   
     <block name="AgentSignBlock" uid="MacroPlatform" tip="宏示教舞台" icon="Texture/blocks/items/agentMacroPlatform.png" server_data='{agentPackageName="macroplatform", tooltip="宏示教", agentUrl="Mod/Agents/macroplatform.xml", isGlobal=true,updateMethod="always"}'/>
     <block name="LinkBoy"/>

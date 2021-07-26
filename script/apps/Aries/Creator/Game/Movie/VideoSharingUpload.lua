@@ -16,8 +16,10 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.share.lua");
 local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing");
 local VideoSharingUpload = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingUpload");
 local QREncode = commonlib.gettable("MyCompany.Aries.Game.Movie.QREncode");
+local VideoSharingUploadSuccessMain = NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingUploadSuccessMain.lua") 
+local VideoSharingUploadSuccessCode = NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingUploadSuccessCode.lua") 
 
---local download_tip_url = "http://dev.kp-para.cn/p/video-share/";
+-- local download_tip_url = "http://dev.kp-para.cn/p/video-share/";
 local download_tip_url = "https://keepwork.com/p/video-share/";
 
 local page;
@@ -28,7 +30,9 @@ end
 function VideoSharingUpload.ShowPage(condition)
 	VideoSharingUpload.result = nil;
 	VideoSharingUpload.start_after_seconds = nil;
-	condition = condition or "?name=ready"
+	local isShowNext = condition == nil and true or false
+	condition = condition or "?name=upload"
+	
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Movie/VideoSharingUpload.html"..condition, 
 		name = "VideoSharingUpload.ShowPage", 
@@ -50,6 +54,9 @@ function VideoSharingUpload.ShowPage(condition)
 			height = 320,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	if(isShowNext) then
+		VideoSharingUpload.OnOK()
+	end
 end
 
 function VideoSharingUpload.OnClose()
@@ -57,6 +64,10 @@ function VideoSharingUpload.OnClose()
 		VideoSharingUpload.QRCodeWnd:Hide();
 	end
 	page:CloseWindow();
+end
+
+function VideoSharingUpload.ChangeRegionType(regionType)
+	VideoSharingUpload.regionType = regionType
 end
 
 function VideoSharingUpload.OnOK()
@@ -106,7 +117,8 @@ function VideoSharingUpload.OnOK()
 							VideoSharingUpload.UploadFailed("keepwork.shareUrl", err, data);
 							return;
 						end
-						VideoSharingUpload.ShowQRCode(data.data.."&attname="..file_name);
+						--VideoSharingUpload.ShowQRCode(data.data.."&attname="..file_name);
+						VideoSharingUpload.DoUpLoadSucces(data.data.."&attname="..file_name)						
 					end);
 
 					keepwork.shareFile.post({key = key}, function(err, msg, data)
@@ -117,8 +129,62 @@ function VideoSharingUpload.OnOK()
 		end)
 	end});
 	upload_timer:Change(100, nil);
-	page:CloseWindow();
-	VideoSharingUpload.ShowPage("?name=upload");
+	--page:CloseWindow();
+	--VideoSharingUpload.ShowPage("?name=upload");
+end
+
+function VideoSharingUpload.CheckMyWorld()
+	local currentWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld')--apply_filters('current_world');
+	if VideoSharingUpload.regionType == "creator" then
+		currentWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
+	end
+	if (currentWorld and currentWorld.user) then
+		local userId = Mod.WorldShare.Store:Get('user/userId')
+		if currentWorld.user.id and  userId == currentWorld.user.id then
+			return true
+		end
+	end
+	return false
+end
+
+function VideoSharingUpload.DoUpLoadSucces(url)
+	if not url then
+		return 
+	end
+	-- print("url=================",url) world/currentEnterWorld
+	VideoSharingUploadSuccessMain.SetVideoCdnUrl(download_tip_url..commonlib.Encoding.url_encode(url))
+	local currentWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld')--apply_filters('current_world');
+	if VideoSharingUpload.regionType == "creator" then
+		currentWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
+	end
+	if (currentWorld) then
+		--echo(currentWorld,true)
+		local kpProjectId = currentWorld.kpProjectId
+		local isMyWorld = VideoSharingUpload.CheckMyWorld()
+		--print("kpProjectId===============",kpProjectId)
+		if (kpProjectId and kpProjectId > 0) then
+			if isMyWorld then
+				keepwork.project.update({
+					router_params = {
+						id = kpProjectId,
+					},
+					extra={
+						video=url
+					}
+				},function(err,msg,data)
+					--print("err==============",err,kpProjectId)
+					--echo(data)
+					VideoSharingUpload.ShowQRCode("https://keepwork.com/p/project/detail?projectId="..kpProjectId,"main");
+				end)
+			else
+				VideoSharingUpload.ShowQRCode("https://keepwork.com/p/project/detail?projectId="..kpProjectId,"main");
+			end			
+		else
+			VideoSharingUpload.ShowQRCode(url,"code");			
+		end	
+		return
+	end
+	VideoSharingUpload.ShowQRCode(url,"code");
 end
 
 function VideoSharingUpload.UploadFailed(stage, error, data)
@@ -127,19 +193,29 @@ function VideoSharingUpload.UploadFailed(stage, error, data)
 	VideoSharingUpload.ShowPage("?name=error");
 end
 
-function VideoSharingUpload.ShowQRCode(url)
-	url = download_tip_url..commonlib.Encoding.url_encode(url);
-	local ok, result = QREncode.qrcode(url);
-	if (not ok) then
-		VideoSharingUpload.UploadFailed("QRCode", -1, {info = "url to qrcode error"});
-		return;
+function VideoSharingUpload.ShowQRCode(url,type)
+	if page then
+		page:CloseWindow();
 	end
+	if type == "main" then
+		url = url
+		VideoSharingUploadSuccessMain.ShowView(url)
+	elseif type == "code" then
+		url = download_tip_url..commonlib.Encoding.url_encode(url);
+		VideoSharingUploadSuccessCode.ShowView(url)
+	end
+	
+	-- local ok, result = QREncode.qrcode(url);
+	-- if (not ok) then
+	-- 	VideoSharingUpload.UploadFailed("QRCode", -1, {info = "url to qrcode error"});
+	-- 	return;
+	-- end
 
-	VideoSharingUpload.qrcode = result;
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/QRCodeWnd.lua");
-	VideoSharingUpload.QRCodeWnd = commonlib.gettable("MyCompany.Aries.Game.Movie.QRCodeWnd");
-	VideoSharingUpload.QRCodeWnd:Show();
+	-- VideoSharingUpload.qrcode = result;
+	-- NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/QRCodeWnd.lua");
+	-- VideoSharingUpload.QRCodeWnd = commonlib.gettable("MyCompany.Aries.Game.Movie.QRCodeWnd");
+	-- VideoSharingUpload.QRCodeWnd:Show();
 
-	page:CloseWindow();
-	VideoSharingUpload.ShowPage("?name=finish");
+	-- page:CloseWindow();
+	-- VideoSharingUpload.ShowPage("?name=finish");
 end

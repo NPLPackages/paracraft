@@ -518,6 +518,7 @@ function block_types.LoadFromFile(filename)
 				attr.blockcamera = attr.blockcamera == "true";
 				attr.invisible = attr.invisible == "true";
 				attr.handleNeighborChange = attr.handleNeighborChange == "true";
+				attr.nopicking = attr.nopicking == "true";
 				attr.framemove = attr.framemove == "true" or attr.tick_random == "true";
 				if(attr.itemModelScaling) then
 					attr.itemModelScaling = tonumber(attr.itemModelScaling);

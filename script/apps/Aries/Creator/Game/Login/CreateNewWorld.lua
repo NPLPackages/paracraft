@@ -274,14 +274,29 @@ function CreateNewWorld.OnClickCreateWorld()
 	if(status) then
 		return
 	end
+	
+	local world_name = CreateNewWorld.page:GetValue("new_world_name") or CreateNewWorld.default_worldname;
+	local item = CreateNewWorld.cur_terrain;
+	-- 迷你地块
+	if item and item.terrain == "paraworldMini" then
+		local CreateModulPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/CreateModulPage.lua")
+		CreateModulPage.Show(world_name)
 
+		CreateNewWorld.ClosePage()
+		return 
+	end
+
+	CreateNewWorld.CreateWorldByName(world_name, CreateNewWorld.cur_terrain.terrain or templ_world.world_generator)
+end
+
+function CreateNewWorld.CreateWorldByName(world_name, terrain)
 	-- _guihelper.MessageBox("OnClickCreateWorld"..CreateNewWorld.SelectedWorldTemplate_Index)	
 	--local templ_world = worlds_template[CreateNewWorld.SelectedWorldTemplate_Index];
 	local templ_world = worlds_template[CreateNewWorld.SelectedWorldTemplate_Index or 1];
 	if(not templ_world) then return end
 	
 	--local world_name = page:GetValue("NewWorldName") or "积木世界";
-	local world_name = CreateNewWorld.page:GetValue("new_world_name") or CreateNewWorld.default_worldname;
+	
 	world_name = world_name:gsub("[%s/\\]", "");
 
 	local world_name_locale = commonlib.Encoding.Utf8ToDefault(world_name);
@@ -300,7 +315,7 @@ function CreateNewWorld.OnClickCreateWorld()
 		title = world_name,
 		creationfolder = CreateNewWorld.GetWorldFolder(),
 		parentworld = templ_world.parent_world_path,
-		world_generator = CreateNewWorld.cur_terrain.terrain or templ_world.world_generator,
+		world_generator = terrain,
 		seed = templ_world.seed or world_name,
 		inherit_scene = true,
 		inherit_char = true,

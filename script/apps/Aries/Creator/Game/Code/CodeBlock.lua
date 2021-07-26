@@ -208,6 +208,13 @@ function CodeBlock:BeautifyRuntimeErrorMsg(msg)
 	return msg;
 end
 
+-- compile current code, return true if no compile error
+function CodeBlock:Compile()
+	self:CompileCode(self:GetEntity():GetCommand());
+	if(self.code_func or not self.errormsg) then
+		return true;
+	end
+end
 
 -- compile code and reload if code is changed. 
 -- @param code: string

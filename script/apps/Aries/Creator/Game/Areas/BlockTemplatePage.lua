@@ -306,9 +306,7 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh, searchText)
 				file.text = commonlib.Encoding.url_decode(commonlib.Encoding.DefaultToUtf8(file.text));
 				file.filename = GameLogic.current_worlddir.."blocktemplates/"..file.filename;
 
-				if(searchText == nil) then
-					folder_local[#folder_local+1] = { name="file", attr=file };
-				elseif(file.text:find(searchText)) then
+				if(searchText == nil or file.text:find(searchText)) then
 					folder_local[#folder_local+1] = { name="file", attr=file };
 				end
 			end

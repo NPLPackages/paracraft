@@ -699,7 +699,12 @@ model id
     <item id="85084" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85084_Avatar_girl_leg_74.png"></texture></item>
     <item id="85085" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85085_Avatar_girl_leg_75.png"></texture></item>
     <item id="85086" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85086_Avatar_girl_leg_76.png"></texture></item>
-
+    <item id="85087" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85087_Avatar_boy_leg_77.png"></texture></item>
+    <item id="85088" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85088_Avatar_boy_leg_78.png"></texture></item>
+    <item id="85089" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85089_Avatar_boy_leg_79.png"></texture></item>
+    <item id="85090" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85090_Avatar_girl_leg_80.png"></texture></item>
+    <item id="85091" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85091_Avatar_girl_leg_81.png"></texture></item>
+    <item id="85092" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85092_Avatar_girl_leg_82.png"></texture></item>
 
     <!--      86000 86999  背部  attachment id="15"    -->
     <!--第一批数据-->

@@ -809,7 +809,7 @@ function TouchMiniKeyboard:ShowMacroTip(buttons)
 	for text in buttons:gmatch("([%w_]+)") do
 		if text == "right" or text == "left" then
 			if text == "right" and self.rmb_lock_state ~= TouchMiniKeyboard.RMBLockStateList.LockRight or text == "left" and self.rmb_lock_state ~= TouchMiniKeyboard.RMBLockStateList.NoLock  then
-				self:ShowMacroCircle(self:GetRMBItem(), true)
+				--self:ShowMacroCircle(self:GetRMBItem(), true)
 				mouse_count = mouse_count + 1
 			end
 		else

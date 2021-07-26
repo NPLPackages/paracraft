@@ -16,6 +16,12 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local server_time = 0
 local page
+
+local show_all_mini_project_world = {
+    [72945] = 1,
+    [73156] = 1,
+    [20690] = 1,
+}
 function WorldCreatePage.OnInit()
     page = document:GetPageCtrl();
     page.OnClose = WorldCreatePage.CloseView
@@ -28,6 +34,7 @@ end
 function WorldCreatePage.FlushProjectList(cb)
     local world_id = WorldCommon.GetWorldTag("kpProjectId");
     world_id = world_id or 0
+
     keepwork.world2in1.project_list({
 		parentId=world_id,
         ["x-per-page"] = 200,
@@ -36,19 +43,47 @@ function WorldCreatePage.FlushProjectList(cb)
         -- print("iiiiiiiiiiiiiiiiiiiiiiii", err)
         -- echo(data, true)
         if err == 200 then
-            WorldCreatePage.WorldListData = data.rows
-            -- WorldCreatePage.WorldListData = {}
-            for index, v in ipairs(WorldCreatePage.WorldListData) do
-                v.limit_name = WorldCreatePage.GetLimitLabel(v.name)
-                v.time_desc = WorldCreatePage.GetTimeDesc(v.updatedAt)
-            end
+            if show_all_mini_project_world[world_id] then
+                keepwork.world2in1.all_mini_projects({}, function(err2, msg2, data2)
+                    if err == 200 then
+                        local rows = data2.list and data2.list.rows or {}
+                        if rows and #rows > 0 then
+                            for index, v in ipairs(rows) do
+                                data.rows[#data.rows + 1] = v
+                            end
+                        end
+                    end
 
-            -- for index = 1, 20 do
-            --     local tab = commonlib.copy(WorldCreatePage.WorldListData[#WorldCreatePage.WorldListData])
-            --     WorldCreatePage.WorldListData[#WorldCreatePage.WorldListData + 1] = tab
-            -- end
-            if cb then
-                cb()
+                    WorldCreatePage.WorldListData = {}
+                    -- WorldCreatePage.WorldListData = {}
+                    for index, v in ipairs(data.rows) do
+                        v.limit_name = WorldCreatePage.GetLimitLabel(v.name, 13)
+                        v.time_desc = WorldCreatePage.GetTimeDesc(v.updatedAt)
+    
+                        if not string.find(v.name, "_study") then
+                            WorldCreatePage.WorldListData[#WorldCreatePage.WorldListData + 1] = v
+                        end
+                    end
+        
+                    if cb then
+                        cb()
+                    end
+                end)
+            else
+                WorldCreatePage.WorldListData = {}
+                -- WorldCreatePage.WorldListData = {}
+                for index, v in ipairs(data.rows) do
+                    v.limit_name = WorldCreatePage.GetLimitLabel(v.name, 13)
+                    v.time_desc = WorldCreatePage.GetTimeDesc(v.updatedAt)
+
+                    if not string.find(v.name, "_study") then
+                        WorldCreatePage.WorldListData[#WorldCreatePage.WorldListData + 1] = v
+                    end
+                end
+    
+                if cb then
+                    cb()
+                end
             end
         end
     end)
@@ -174,15 +209,17 @@ function WorldCreatePage.OnClickSelect(index)
                 local name = world_data.name
                 World2In1.SetCreatorWorldName(name)
                 
-                local parentId = world_data.parentId
+                local parentId = world_data.parentId or 0
+
                 local cur_world_id = WorldCommon.GetWorldTag("kpProjectId");
                 if enter_create_region_cb then
                     World2In1.SetEnterCreateRegionCb(enter_create_region_cb)
                 end
-                if parentId ~= cur_world_id then
+                if parentId ~= 0 and parentId ~= cur_world_id then
                     local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
                     CommandManager:RunCommand(string.format('/loadworld -force -s %s', world_data.id))
                 else
+                    parentId = parentId == 0 and cur_world_id or parentId
                     CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update]], name, parentId))
                 end
             end

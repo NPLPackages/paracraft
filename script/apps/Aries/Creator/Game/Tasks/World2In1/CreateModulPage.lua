@@ -14,6 +14,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
+local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local server_time = 0
 local page
 
@@ -134,7 +135,6 @@ function CreateModulPage.ShowView()
         allowDrag = true,
         enable_esc_key = true,
         zorder = 0,
-        app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
         directPosition = true,
         
         align = "_ct",
@@ -256,6 +256,20 @@ function CreateModulPage.GetDesc1()
 end
 
 function CreateModulPage.OnClickCreate()
+    local project_name = page:GetValue("project_text") or ""
+    if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+        _guihelper.MessageBox(L"您尚未登录，只能创建普通的迷你世界", function()
+            page:CloseWindow()
+            CreateModulPage.close_cb = nil
+            CreateModulPage.CloseView()
+    
+            local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+            CreateNewWorld.CreateWorldByName(project_name, "paraworldMini")
+        end);
+
+        return
+    end
+
     if CreateModulPage.select_module_index == nil or CreateModulPage.select_module_index == 0 then
         GameLogic.AddBBS("create_module", L"请先选择模板", 5000, "255 0 0");
         return
@@ -265,10 +279,24 @@ function CreateModulPage.OnClickCreate()
     if select_module_data == nil then
         return
     end
+
     local parent_id = CreateModulPage.parent_id or 0
     local region_id = select_module_data.id
 
-    local project_name = page:GetValue("project_text") or ""
+    if HttpWrapper.GetDevVersion() == "RELEASE" then
+        region_id = 20692 -- rls七律长征
+    end
+
+    if parent_id == 0 and select_module_data.project_name == "empty" then
+        page:CloseWindow()
+        CreateModulPage.close_cb = nil
+        CreateModulPage.CloseView()
+
+        local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+        CreateNewWorld.CreateWorldByName(project_name, "paraworldMini")
+        return
+    end
+
     if string.find(project_name, "*") then
         GameLogic.AddBBS("create_module", string.format("含有敏感词，请修改", world), 5000, "255 0 0");
         return
@@ -319,7 +347,7 @@ function CreateModulPage.OnClickCreate()
             end)
             return
         else
-            CreateModulPage.to_path = "worlds/DesignHouse/" .. name
+            CreateModulPage.to_path = "worlds/DesignHouse/" .. project_name
             CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update -fork %d]], project_name, parent_id,region_id))
         end
     end
@@ -371,6 +399,9 @@ function CreateModulPage.SelectModule(index)
     end
 
     CreateModulPage.select_module_index = index
+    if CreateModulPage.create_project_name then
+        CreateModulPage.create_project_name = page:GetValue("project_text")
+    end
     CreateModulPage.FlushGridView()
 end
 
@@ -386,12 +417,12 @@ function CreateModulPage.FlushGridView()
 
     local project_name = ""
     if select_module_data then
-        project_name  = string.format("%s_%s_", System.User.username, select_module_data.project_name)
+        project_name  = string.format("%s_%s_", System.User.username or "", select_module_data.project_name)
     end
     
     if CreateModulPage.create_project_name then
         project_name = CreateModulPage.create_project_name
-        CreateModulPage.create_project_name = nil
+        -- CreateModulPage.create_project_name = nil
     end
 
     page:SetValue("project_text", project_name)

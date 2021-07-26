@@ -57,6 +57,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "cmd_open_url", url, options: hook `/open url` command to display a custom url via command
   - "InternetLoadWorld.ShowPage", bEnable, bShow: whether to show the default load world window. We can use this filter to replace the default load world window.
   - "SaveWorldPage.ShowSharePage", bEnable: We can use this filter to replace the default share world window.
+  - "OnBeforeShowExitDialog", true: return false to cancel
   - "ShowExitDialog", {text, callback}: use this filter to display a dialog when user exits the application, return nil if one wants to replace the implementation.
   - "show_custom_create_new_world", behavior("show" or "close"):use this filter to customize your CreateNewWorld page.
   - "show_custom_download_world", behavior("show" or "close"), url:use this filter to customize your DownloadWorld page.

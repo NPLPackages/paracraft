@@ -134,6 +134,8 @@ function ReplaceBlock:ReplaceBlock(x, y, z)
 							to_data = band(from_data, 0x00ff) + band(to_data, 0xff00);
 						elseif(fromBlock.color8_data) then
 							to_data = band(from_data, 0x00ff);
+						else
+							to_data = from_data or to_data
 						end
 					end
 				end

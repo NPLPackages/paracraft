@@ -103,7 +103,7 @@ function ItemCodeBlock:PickItemFromPosition(x,y,z)
 	end
 end
 
-local displayMap = { npl_blockpen = "pen", npl_teacher = "Teacher", npl_camera = "Camera"}
+local displayMap = { npl_blockpen = "pen", npl_teacher = "Teacher", npl_camera = "cam"}
 function ItemCodeBlock:GetLangIconDisplayText(langName)
 	return displayMap[langName or ""];
 end

@@ -352,6 +352,12 @@ function SoundManager:SaveTempSoundFile(voiceNarrator, md5_value, data)
 end
 
 function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback)
+	-- 没登录的话不允许请求这个接口
+    if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+        return
+    end
+
+
 	local spd = VoiceNarratorDefaulSpd[voiceNarrator] or 5
 	keepwork.user.playtext({
 		text = text,

@@ -153,6 +153,13 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         ["router_params"] = true,
     }
     local function activate(self, inputParams, callbackFunc, option)
+		if(tokenRequired and not HttpWrapper.GetToken())then
+			LOG.std(nil, "error","HttpWrapper", "token is required for request: (%s)%s", fullname, static_url);
+			if(callbackFunc)then
+                callbackFunc(-1, "token is required");
+            end
+			return
+		end
         local url = static_url;
         inputParams = inputParams or {};
         self.inputParams = inputParams;
@@ -191,6 +198,7 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         end
         input.headers = headers;
 
+		
         local input_cache_url = HttpWrapper.EncodeInputToUniqueURL(input);
         self.input_cache_url  = input_cache_url;
         LOG.std(nil, "debug","HttpWrapper input.url", input.url);

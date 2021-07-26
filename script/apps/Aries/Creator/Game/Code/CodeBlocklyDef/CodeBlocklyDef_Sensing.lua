@@ -416,9 +416,12 @@ elseif(answer == 2) then
 end
 
 ]]},
-{desc = "", canRun = true, code = [[
-local name = ask("what is your name?")
-say("hello "..tostring(name), 2)
+{desc = L"彩色按钮", canRun = true, code = [[
+ask("color <span style='color:#ff0000'>choices</span>", {
+	{text="choice A", color="#00FF00"}, 
+	{text="choice B", color="#0000FF"}, 
+	"choice C"
+})
 ]]},
 {desc = L"关闭对话框", canRun = true, code = [[
 run(function()

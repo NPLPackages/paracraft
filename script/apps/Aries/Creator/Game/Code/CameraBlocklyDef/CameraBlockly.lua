@@ -25,8 +25,8 @@ local all_cmds = {};
 local all_cmds_map = {};
 CameraBlockly.categories = {
 	{name = "Camera", text = "摄影机", colour = "#0078d7", },
-	{name = "Motion", text = L"运动", colour="#0078d7", },
-	{name = "Control", text = L"控制", colour="#d83b01", },
+	--{name = "Motion", text = L"运动", colour="#0078d7", },
+	--{name = "Control", text = L"控制", colour="#d83b01", },
 	{name = "Subtitle", text = L"字幕", colour="#d83b01", },
 };
 
@@ -90,27 +90,6 @@ camera.init(codeblock);
 	return s
 end
 
-function CameraBlockly.GetCustomToolbarMCML()
-	CameraBlockly.toolBarMcmlText = CameraBlockly.toolBarMcmlText or string.format([[
-		<div style="float:left;margin-top:8px;margin-left:4px;">
-			<pe:sliderbar uiname="EnvFramePage.timeSlider" name="timeSlider" min="0" max='<%%=MyCompany.Aries.Game.GameLogic.Camera_getTotalTimes()%%>' value='<%%=MyCompany.Aries.Game.GameLogic.Camera_getCurrentTime()%%>' style="width:80px;height:22px;" onchange="MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.OnTimeChanged()"></pe:sliderbar>
-		</div>
-		<div style="float:left;margin-top:5px;margin-left:5px;">
-			<pe:gridview style="width:135px;height:26px;" name="cameras" CellPadding="0" VerticalScrollBarStep="26" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight="26" DataSource='<%%=MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.GetAllCameras()%%>'>
-				<Columns>
-					<input type="button" style="margin-left:5px;width:26px;height:26px;color:#ffffff;font-size:14px;background:url(Texture/blocks/items/ts_camera.png)" name='<%%=Eval("index")%%>' onclick="MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.OnClickCamera"/>
-				</Columns>
-				<EmptyDataTemplate>
-				</EmptyDataTemplate>
-			</pe:gridview>
-		</div>
-		<div style="float:left;margin-left:0px;margin-top:7px;color:#ffffff;font-size:12px;">
-			<input type="button" uiname="CodeBlockWindow.record" name="record" value="%s" style="width:64px;height:25px;color:#ffffff;font-size:12px;" onclick="MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.RunAndExportVideo" class="mc_light_grey_button_with_fillet" />
-		</div>
-]], L"导出视频");
-	return CameraBlockly.toolBarMcmlText;
-end
-
 function CameraBlockly.OnTimeChanged(value)
 	if (value > 0) then
 		GameLogic.Camera_setCurrentTime(value);
@@ -146,3 +125,16 @@ function CameraBlockly.RunAndExportVideo()
 	end);
 end
 
+function CameraBlockly.GetCustomCodeUIUrl()
+	return "script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CodeBlockWindowCamera.html"
+end
+
+function CameraBlockly.OnOpenCodeEditor(entity)
+	local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+	camera.showWithEditor(entity);
+end
+
+function CameraBlockly.OnCloseCodeEditor(entity)
+	local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+	camera.close();
+end

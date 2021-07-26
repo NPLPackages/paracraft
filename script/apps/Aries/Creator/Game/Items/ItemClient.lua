@@ -558,7 +558,8 @@ function ItemClient.RegisterCustomItem(params)
 		new_block.icon = params.icon or new_block.texture or base_block.icon;
 		new_block.opacity = base_block.opacity;
 		new_block.handleNeighborChange = base_block.handleNeighborChange;
-
+		new_block.nopicking = base_block.nopicking;
+		
 		new_block.name = "customblock"..tostring(new_block.id);
 		new_block.class = base_block.class;
 		new_block.item_class = base_block.item_class;

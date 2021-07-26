@@ -152,6 +152,10 @@ function Entity:LoadBlocklyFromXMLNode(node)
 					local sub_node_code = sub_node[i];
 					code = code .. (type(sub_node_code) == "table" and sub_node_code[1] or sub_node_code);
 				end
+				
+				-- 直接用SaveBlocklyToXMLNode生成的节点, 不经过xml解析则会无法解析之前的转换, 这里手动替换, 如果文本中含有]]]]><![CDATA[> 则会被误替换
+				code = string.gsub(code, "%]%]%]%]><!%[CDATA%[>", "%]%]>");
+
 				if(type(code) == "string") then
 					if(sub_node.name == "xmlcode") then
 						self.blockly_xmlcode = code;

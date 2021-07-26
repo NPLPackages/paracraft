@@ -64,6 +64,7 @@ function camera.InvokeMethod(name, ...)
 	return camera.codeEnv[name](...);
 end
 
+-- @param pos: table of {x, y, z, yaw, pitch, roll}
 function camera.setCamera(i, pos)
 	local x, y, z = tonumber(pos.x), tonumber(pos.y), tonumber(pos.z);
 	GameLogic.positions[i] = {x, y, z};

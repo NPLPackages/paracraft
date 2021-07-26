@@ -375,6 +375,10 @@ function Desktop.OnExit(bForceExit, bRestart)
 				Desktop.ForceExit();
 			end
 		else
+			if(GameLogic.GetFilters():apply_filters("OnBeforeShowExitDialog", true) == false) then
+				return
+			end
+
 			Desktop.is_exiting = true;
 
 			-- local projectId = GameLogic.options:GetProjectId();
@@ -425,6 +429,9 @@ function Desktop.OnExit(bForceExit, bRestart)
 				Desktop.ForceExit();
 			end
 		else
+			if(GameLogic.GetFilters():apply_filters("OnBeforeShowExitDialog", true) == false) then
+				return
+			end
 			Desktop.is_exiting = true;
 
 			-- local projectId = GameLogic.options:GetProjectId();

@@ -14,6 +14,9 @@ local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.
 --http://yapi.kp-para.cn/project/32/interface/api/4222
 HttpWrapper.Create("keepwork.world2in1.project_list", "%MAIN%/core/v0/projects/getMyByParentId", "GET", true)
 
+--http://yapi.kp-para.cn/project/32/interface/api/4222
+HttpWrapper.Create("keepwork.world2in1.all_mini_projects", "%MAIN%/core/v0/projects/minis", "GET", true)
+
 --http://yapi.kp-para.cn/project/32/interface/api/4227
 HttpWrapper.Create("keepwork.world2in1.select_project", "%MAIN%/core/v0/projects/selectOneInParent", "PUT", true)
 

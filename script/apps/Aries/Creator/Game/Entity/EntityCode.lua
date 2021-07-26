@@ -152,18 +152,6 @@ function Entity:SaveToXMLNode(node, bSort)
 
 	self:SaveBlocklyToXMLNode(node);
 
-	if(self:GetLanguageConfigFile() == "npl_camera") then
-		local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
-		local cameraNode = {name="camera", };
-		node[#node+1] = cameraNode;
-		local cameras = GameLogic.Camera_getAllCameras();
-		for i, data in ipairs(cameras) do
-			local x, y, z = data:GetPosition();
-			local yaw, pitch, roll = data:GetFacing(), data:GetPitch(), data:GetRoll();
-			cameraNode[i] = {name="camera"..i, attr={x=x, y=y, z=z, yaw=yaw, pitch=pitch, roll=roll}};
-		end
-	end
-
 	return node;
 end
 
@@ -191,17 +179,6 @@ function Entity:LoadFromXMLNode(node)
 
 	if(self.triggerBoxString) then
 		self:SetTriggerBoxByString(self.triggerBoxString)
-	end
-
-	if(self:GetLanguageConfigFile() == "npl_camera") then
-		local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
-		for i = 1, #node do
-			if (node[i].name == "camera") then
-				for j = 1, #(node[i]) do
-					camera.setCamera(j, node[i][j].attr);
-				end
-			end
-		end
 	end
 end
 
@@ -413,10 +390,6 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			self:OpenEditor("entity", entity);
 		elseif(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 			self:OpenEditor("entity", entity);
-			if (self:GetLanguageConfigFile() == "npl_camera") then
-				local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
-				camera.showWithEditor(self);
-			end
 		end
 	end
 	return true;
@@ -893,3 +866,12 @@ function Entity:OnEntityLeaveTrigger(entityPlayer)
 	end
 end
 
+-- compile current code, return true if no compile error
+function Entity:Compile()
+	local codeBlock = self:GetCodeBlock(true)
+	if(codeBlock) then
+		return codeBlock:Compile()
+	else
+		return true
+	end
+end

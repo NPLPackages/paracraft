@@ -277,3 +277,29 @@ callfunction helloworld
 		end
 	end,
 };
+
+Commands["compile"] = {
+	name="compile", 
+	quick_ref="/compile", 
+	desc=[[compile all code blocks in the scene to check for compile error
+return true if all code blocks are compiled or false if not.
+e.g.
+/compile
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local entities = GameLogic.EntityManager.FindEntities({category="b", type="EntityCode"});
+		if(entities and #entities>0) then
+			local count = 0
+			for _, entity in ipairs(entities) do
+				if(not entity:IsCodeLoaded()) then
+					if(not entity:Compile()) then
+						count = count + 1
+					end
+				end
+			end
+			if(count > 0) then
+				GameLogic.AddBBS("compile", format(L"场景中存在%d个代码方块编译错误, 请看日志", count), 10000, "255 0 0");
+			end
+		end
+	end,
+};

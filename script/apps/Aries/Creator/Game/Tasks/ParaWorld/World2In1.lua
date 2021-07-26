@@ -9,6 +9,8 @@ local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/W
 World2In1.ShowPage();
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingUpload.lua");
+local VideoSharingUpload = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingUpload");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldMiniChunkGenerator.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
@@ -78,7 +80,7 @@ function World2In1.ShowPage(offset, reload)
 	--echo({hidePage,reload})
 	if (not hidePage and not reload) then
 		allMiniWorlds = {{}, {}, {}};
-		World2In1.OnEnterCourseRegion();
+		--World2In1.OnEnterCourseRegion();
 		
 	end
 	hidePage = false;
@@ -191,6 +193,7 @@ function World2In1.OnWorldUnload()
 	courcePosition = {18542,43,19197}
 	hidePage = false;
 	page_root = nil
+	VideoSharingUpload.ChangeRegionType(nil)
 end
 
 function World2In1.OnClose()
@@ -220,7 +223,7 @@ function World2In1.BroadcastTypeChanged()
 		GameLogic.RunCommand("/ggs user visible");
 		World2In1.HideCreateReward()	
 	end
-
+	VideoSharingUpload.ChangeRegionType(currentType)
 	-- World2In1.UnLoadcurrentWorldList()
 	GameLogic.GetCodeGlobal():BroadcastTextEvent("changeRegionType")
 end
@@ -671,8 +674,8 @@ function World2In1.OnSaveWorld()
 		GameLogic.RunCommand(string.format("/saveregionex %s 37 37",creatorWorldName))   
 
 		if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
-			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.macro.task", { from = "macrosave",  name = "clicksave",});
-			local RealNameTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RealNameTip/RealNameTip.lua") 
+			--GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.macro.task", { from = "macrosave",  name = "clicksave",});
+			local RealNameTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RealNameTip/RealNameTip.lua")
 			RealNameTip.ShowView()
 			return 
 		end
@@ -916,6 +919,10 @@ end
 function World2In1.SetCurrentType(type)
 	last_region_type = currentType
 	currentType = type;
+end
+
+function World2In1.GetCurrentType()
+	return currentType
 end
 
 function World2In1.LoadWorldTageXml(world_path)
