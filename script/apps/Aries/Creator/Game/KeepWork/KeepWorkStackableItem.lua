@@ -31,6 +31,10 @@ local requestOrderTimes = 0
 local requestOrderMaxTimes = 10
 local orderId = 0
 
+-- 皮肤碎片
+local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(ENUM_OF_GSID.FRAGMENT_GSID);
+local myFragmentOfSkin = copies or 0;
+
 function KeepWorkStackableItemPage.OnInit(data)
 	page = document:GetPageCtrl();
 end
@@ -95,17 +99,31 @@ function KeepWorkStackableItemPage.GetBuyDesc1()
 	local target_num = exchange_targets[1] and exchange_targets[1].goods[1].amount or 0
 	local result_target_num = target_num * buy_num
 
-	if result_price > my_money then
+	-- 物品置换类型为皮肤碎片获取
+	if (cost_data.gsId == ENUM_OF_GSID.FRAGMENT_GSID) and (not KeepWorkStackableItemPage.IsEnough()) then
+		return "前往创作区创作作品，可获得皮肤碎片奖励。"
+	end
+
+	if (cost_data.gsId == ENUM_OF_GSID.BEAN_ID) and (not KeepWorkStackableItemPage.IsEnough()) then
 		return "完成任务，可免费获得知识豆。"
 	end
-	
 	
 	local desc = string.format("需要%d个%s,确定要购买吗?", result_price, cost_name)
 	
 	return desc
 end
 
+--- 是否可购买
 function KeepWorkStackableItemPage.IsEnough()
+	-- 皮肤碎片
+	if(item_data.rule 
+		and item_data.rule.exchangeCosts 
+		and item_data.rule.exchangeCosts[1].gsId == ENUM_OF_GSID.FRAGMENT_GSID) 
+		then
+		return myFragmentOfSkin > item_data.rule.exchangeCosts[1].amount
+	end
+
+	-- 知识豆的逻辑
 	local rule = item_data.rule or {}
 
 	local exchange_costs = rule.exchangeCosts or {}

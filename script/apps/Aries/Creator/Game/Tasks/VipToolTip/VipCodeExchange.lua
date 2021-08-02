@@ -7,7 +7,12 @@
     VipCodeExchange.ShowView()
 ]]
 local VipCodeExchangeResult = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchangeResult.lua") 
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+NPL.load("(gl)script/ide/timer.lua");
+
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local VipCodeExchange = NPL.export()
 
 local page = nil
@@ -53,7 +58,13 @@ function VipCodeExchange.Exchange(code)
             if err == 200 then
                 VipCodeExchange.ClosePage()    
                 if data and type(data) == 'table' and data.message then
-                    VipCodeExchangeResult.ShowView("恭喜你激活了帕拉卡会员礼包")
+					VipCodeExchangeResult.ShowView("恭喜你激活了帕拉卡会员礼包")
+
+					commonlib.TimerManager.SetTimeout(function()  
+						KeepWorkItemManager.LoadProfile(true, function()  --刷新用户信息                  
+							GameLogic.GetFilters():apply_filters('became_vip')
+					   end)
+					end, 3000)
                 end    
                 return
             end

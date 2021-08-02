@@ -44,7 +44,14 @@ function getItemName()
 
     local name = item_data.mProductName or ""
     local num = item_data.quantity or 0
-    local desc = name .. "x" .. num
+    local desc;
+
+    if num <= 1 then
+        desc = name
+    else
+        desc = name .. "x" .. num
+    end;
+
     return desc
 end
 

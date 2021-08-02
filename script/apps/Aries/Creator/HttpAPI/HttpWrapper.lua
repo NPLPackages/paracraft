@@ -154,11 +154,7 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
     }
     local function activate(self, inputParams, callbackFunc, option)
 		if(tokenRequired and not HttpWrapper.GetToken())then
-			LOG.std(nil, "error","HttpWrapper", "token is required for request: (%s)%s", fullname, static_url);
-			if(callbackFunc)then
-                callbackFunc(-1, "token is required");
-            end
-			return
+			LOG.std(nil, "warn","HttpWrapper", "token is required for request: (%s)%s", fullname, static_url);
 		end
         local url = static_url;
         inputParams = inputParams or {};

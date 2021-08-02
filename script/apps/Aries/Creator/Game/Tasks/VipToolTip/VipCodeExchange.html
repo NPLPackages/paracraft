@@ -10,12 +10,28 @@
     end
     function OnClick()
         local code = Page:GetValue("vipcode")
+        if(code)then
+            code = string.gsub(code, "%s+", "")
+        end
         VipCodeExchange.Exchange(code)
+    end
+    function onKeyUp(name, mcmlNode, obj)
+        local code = Page:GetValue("vipcode")
+        if(code)then
+            local found = string.match(code, "[\r\n]+");
+            if(found)then
+                code = string.gsub(code, "[\r\n]+", "")
+                Page:SetUIValue("vipcode", code)
+                if(obj and obj.SetCaretPosition)then
+                    obj:SetCaretPosition(-1);
+                end
+            end
+        end
     end
 ]]></script>
 <kp:window width="400" height="200" mode="lite" title='<%= L"使用激活码"%>' onclose="ClosePage">
     <div style="margin-top: 60px; margin-left: 83px;width:232;height:32px;background:url(Texture/Aries/Creator/keepwork/friends/sousuo_16X16_32bits.png#0 0 16 16:4 4 4 4);">
-        <input type="text" EmptyText='<%=L"激活码"%>' name="vipcode" uiname="vipcode" CaretColor="#FFFFFFFF" style="margin-left:5px;textcolor:#dedede;height:28px;background:;" onkeyup="OnSearch" />
+        <input type="text" EmptyText='<%=L"激活码"%>' onkeyup="onKeyUp" name="vipcode" uiname="vipcode" CaretColor="#FFFFFFFF" style="margin-left:5px;textcolor:#dedede;height:28px;background:;" />
     </div>
     <input type="button" onclick="OnClick" value="确定" style="font-size: 24px;base-font-size:24px;font-weight: bold; height: 40px; width: 100px; margin-left: 150px; margin-top: 30px; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16);"/>
 </kp:window>

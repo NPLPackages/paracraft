@@ -48,7 +48,7 @@ function block:canPlaceBlockOnSide(x,y,z,side)
 		if(not neighbor_block) then
 			return false
 		elseif(neighbor_block.id == self.id) then
-			local neighbor_blockdata = BlockEngine:GetBlockData(x+dx, y+dy, z+dz);
+			local neighbor_blockdata = (BlockEngine:GetBlockData(x+dx, y+dy, z+dz) or 0) % 16;
 			local neightbor_side = data_to_side[neighbor_blockdata];
 			if(neightbor_side==side or neightbor_side == Direction.directionToOpFacing[side]) then
 				return false;

@@ -128,7 +128,8 @@ Entities that are farther way are destroyed when new entity is spawned.
 Examples:
 /spawn    : spawn randomly near the current player using items in the command block.
 /spawn -p ~ ~1 ~     : spawn on top of the command block.
-/spawn -p ~5 ~-1 ~-8 (3 0 4)	: in a cubic region relative to the command block.
+/spawn -p ~5 ~-1 ~-8 (3 0 4)   : in a cubic region relative to the command block.
+/spawn 20012 -p ~1 ~-1 ~1 	: spawn a rail car on track
 ]], 
 	category="logic",
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)

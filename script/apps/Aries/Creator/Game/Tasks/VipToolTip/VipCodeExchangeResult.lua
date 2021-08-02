@@ -27,7 +27,6 @@ function VipCodeExchangeResult.ShowView(desc)
         allowDrag = false,
         enable_esc_key = true,
         zorder = 5,
-        app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key,
         directPosition = true,
         align = "_ct",
             x = -view_width/2,

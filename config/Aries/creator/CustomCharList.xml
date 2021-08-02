@@ -722,6 +722,10 @@
 	</category>
 
 	<category name="right_hand_equipment" text="手持">
+    
+        <!--20210729新增-->
+		<item id="87192" gsid="86005" icon="Texture/Aries/Creator/keepwork/Avatar/icons/87192_purple_magicstick_32bits.png" name="蓝色魔棒"/>
+
         <!--20210701新增-->
 		<item id="87191" gsid="86003" icon="Texture/Aries/Creator/keepwork/Avatar/icons/87191_keyboard_32bits.png" name="键盘"/>
 
@@ -932,5 +936,10 @@
 		
 	</category>
 
+
+	<!-- 暂未开放
+	<category name="ride" text="坐骑">
+	</category>
+	-->
 
 </customcharlist>

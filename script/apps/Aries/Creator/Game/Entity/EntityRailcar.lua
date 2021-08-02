@@ -121,6 +121,8 @@ end
 
 -- @param Entity: the half radius of the object. 
 function Entity:init()
+	self.item_id = self.item_id or block_types.names["railcar"]
+
 	local item = self:GetItemClass();
 	if(item) then
 		self.rotationYaw = ((self.facing or 0)*180/math.pi)%360;

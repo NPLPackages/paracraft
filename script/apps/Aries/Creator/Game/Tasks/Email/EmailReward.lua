@@ -21,8 +21,8 @@ end
 
 function EmailReward.ShowView(rewards)
     EmailReward.rewards = rewards or test
-    print("zzzzzzzzzzzzzzz===============")
-    echo(EmailReward.rewards,true)
+    -- print("zzzzzzzzzzzzzzz===============")
+    -- echo(EmailReward.rewards,true)
     local view_width = 440
     local view_height = 310
     local params = {

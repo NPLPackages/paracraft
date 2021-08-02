@@ -606,7 +606,25 @@ function GameLogic.NewGame()
 end
 
 -- return current world directory (fast)
-function GameLogic.GetWorldDirectory()
+function GameLogic.GetWorldDirectory(bx, bz)
+	return GameLogic.current_worlddir;
+end
+
+-- @param bx, bz: if nil, we will use the current player position. 
+-- return current world directory (fast)
+function GameLogic.GetWorldDirectoryAt(bx, bz)
+	if(not bx) then
+		local by;
+		if(EntityManager.GetPlayer()) then
+			bx, by, bz = EntityManager.GetPlayer():GetBlockPos();
+		end
+	end
+	if(bx) then
+		local region = EntityManager.GetRegion(bx,bz)
+		if(region) then
+			return region:GetWorldDirectory()
+		end
+	end
 	return GameLogic.current_worlddir;
 end
 

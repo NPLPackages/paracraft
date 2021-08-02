@@ -155,7 +155,8 @@ function EmailManager.ReadEamil(id)
     },function(err, msg, data)
         if err == 200 then
             EmailManager.cur_email_content = data.data
-            --echo(EmailManager.cur_email_content,true)
+            print("email================")
+            echo(EmailManager.cur_email_content,true)
             if EmailManager.cur_email_content and EmailManager.cur_email_content[1] then
                 local content = EmailManager.cur_email_content[1]
                 if not content.rewards then
@@ -188,6 +189,7 @@ function EmailManager.GetEmailReward(id)
             local rewards = data.data            
             EmailReward.ShowView(rewards)
             EmailManager.RefreshEmail()
+            KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadItems");
         end
     end)
 end

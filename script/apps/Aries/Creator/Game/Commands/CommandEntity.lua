@@ -59,8 +59,11 @@ Commands["disableinput"] = {
 
 Commands["createentity"] = {
 	name="createentity", 
-	quick_ref="/createentity [class_name] [name] [x y z] [filename] [...]", 
-	desc="create a new entity based on class_name. Class name should be a registered entity class. " , 
+	quick_ref="/createentity class_name name [x y z] [filename] [...]", 
+	desc=[[create a new entity based on class_name. Class name should be a registered entity class. 
+e.g.
+/createentity EntityRailcar MyName 19196,6,19190
+]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local class_name, name, x, y, z, filename;
 		class_name, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);

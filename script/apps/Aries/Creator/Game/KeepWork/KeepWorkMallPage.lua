@@ -19,7 +19,14 @@ local level_to_index = {}
 local menu_item_index = 0
 local cur_classifyId = 0
 local bean_gsid = 998;
-local coin_gsid = 888
+local coin_gsid = 888;
+
+ENUM_OF_GSID = {
+	-- 皮肤碎片
+	FRAGMENT_GSID = 10006,
+	BEAN_ID = 998,
+}
+
 local menu_node_data = {}
 KeepWorkMallPage.isOpen = false
 KeepWorkMallPage.all_mod_list = {}
@@ -185,7 +192,7 @@ function KeepWorkMallPage.ChangeMenuItem(attr)
 end
 function KeepWorkMallPage.OnRefresh()
     if(page)then
-        page:Refresh(0.2);
+        page:Refresh(0);
     end
 end
 function KeepWorkMallPage.ChangeMenuType(level, index)
@@ -427,13 +434,15 @@ function KeepWorkMallPage.HandleDataSources()
 			local cost_item_data = KeepWorkMallPage.GetItemTemplate(v.rule.exchangeCosts[1]) or {}
 			v.cost_name = cost_item_data.name or ""
 
-			if cost_item_data.gsId == bean_gsid then
+			if cost_item_data.gsId == ENUM_OF_GSID.FRAGMENT_GSID then
+				v.is_cost_fragment = true;
+			elseif cost_item_data.gsId == bean_gsid then
 				v.is_cost_bean = true
 			elseif cost_item_data.gsId == coin_gsid then
 				v.is_cost_coin = true
 			end
 
-			if v.is_cost_bean or v.is_cost_coin then
+			if v.is_cost_bean or v.is_cost_coin or v.is_cost_fragment then
 				v.cost_desc = v.cost
 			else
 				v.cost_desc = v.cost .. v.cost_name
@@ -456,7 +465,7 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 
 	if item_data.is_use_in_player and item_data.bag_nums > 0 then
         local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-        page.ShowUserInfoPage({username = System.User.keepworkUsername});
+        page.ShowUserInfoPage({ username = System.User.keepworkUsername, });
 		return
 	end
 

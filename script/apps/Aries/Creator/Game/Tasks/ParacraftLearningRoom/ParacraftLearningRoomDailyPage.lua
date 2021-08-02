@@ -24,7 +24,7 @@ ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 185;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 196;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -213,29 +213,32 @@ Clone命令上升的气球
 处理并发的键盘消息
 接收鼠标消息
 取消接收消息
-并行执行
+并行执行:边走边跳
 自动启动代码方块
 用代码方块自动加载房间内景
 NPL图块
 NPL图块自动生成宏示教
-NPL自定义世界图块（上）
-NPL自定义世界图块（下）
-摄影机图块 (上)
-摄影机图块 (下)
+NPL自定义世界图块
+选择非方块物体
 批量替换方块
+不可编辑方块
+彩色的提问按钮
+密室解锁逻辑
 多人联网发消息
 多人联网共享数据
 多人联网排行榜
-新建世界模板展示
 手机版操作介绍（上）
 手机版操作介绍（下）
 给平板电脑加上键盘和鼠标
-2合1课程世界介绍（上）
-2合1课程世界介绍（下）
-3C教学法介绍
 发布手机App
 世界激活码 （上）
 世界激活码 （下）
+新建世界模板展示
+2合1课程世界介绍（上）
+2合1课程世界介绍（下）
+3C教学法介绍
+摄影机图块 (上)
+摄影机图块 (下)
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 

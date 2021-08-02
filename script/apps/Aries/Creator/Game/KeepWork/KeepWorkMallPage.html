@@ -318,6 +318,10 @@ end
     
                             <pe:if condition='<%=not IsShowFlag(XPath("this"))%>'>
                                 <div style="position:relative;margin-top:5px;margin-left:58px;padding-left:5px;font-size:12px;">
+                                    <pe:if condition='<%=Eval("is_cost_fragment") %>'>
+                                        <div style="margin-top:1px;float:left;width:22;height:22;background:url(Texture/Aries/Creator/keepwork/Mall/pifu_32bits.png#0 0 64 64:0 0 0 0);"></div> 
+                                    </pe:if>
+
                                     <pe:if condition='<%=Eval("is_cost_bean") %>'>
                                         <div style="margin-top:1px;float:left;width:22;height:21;background:url(Texture/Aries/Creator/keepwork/Mall/icon_douzi_22X21_32bits.png#0 0 22 21:0 0 0 0);"></div> 
                                         <!-- <pe:textsprite fontName="MallCost" name = "time_text_sprite_h" value = '<%=Eval("cost_desc")%>' style="width:50px;margin-left:0px;margin-top:0px;font-size:22;" /> -->

@@ -9,6 +9,10 @@ local Keepwork = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
 ]]
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/API/FileDownloader.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local FileDownloader = commonlib.gettable("MyCompany.Aries.Creator.Game.API.FileDownloader");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
@@ -133,7 +137,37 @@ function Keepwork:OnLogin()
     end
 
     self:CheckUserQRCode();
-    -- self:IsPrefectUserInfo();
+
+    local userinfo = self:GetUserInfo();
+    userinfo.extra = userinfo.extra or {};
+    userinfo.extra.ParacraftPlayerEntityInfo = userinfo.extra.ParacraftPlayerEntityInfo or {};
+    local old_skin = userinfo.extra.ParacraftPlayerEntityInfo.skin or "";
+    self:SetUserSkin(self:CheckSkin(self:GetUserSkin()));
+    local new_skin = self:GetUserSkin() or "";
+    
+    if (old_skin ~= new_skin and new_skin == "" and userinfo.extra.ParacraftPlayerEntityInfo.asset == CustomCharItems.defaultModelFile) then  
+        userinfo.extra.ParacraftPlayerEntityInfo.asset = "character/CC/02human/paperman/boy01.x" 
+    end 
+    
+    GameLogic.options:SetMainPlayerAssetName(userinfo.extra.ParacraftPlayerEntityInfo.asset);  
+    GameLogic.options:SetMainPlayerSkins(userinfo.extra.ParacraftPlayerEntityInfo.skin or "");  
+
+    local player = EntityManager.GetPlayer();
+    if (player) then 
+        player:SetSkin(userinfo.extra.ParacraftPlayerEntityInfo.skin);
+        player:SetMainAssetPath(userinfo.extra.ParacraftPlayerEntityInfo.asset);
+    end
+
+    if (old_skin ~= new_skin) then
+        keepwork.user.setinfo({
+            router_params = {id = userinfo.id},
+            extra = userinfo.extra,
+        }, function(status, msg, data) 
+            if (status < 200 or status >= 300) then 
+                LOG.std(nil, "error", "Keepwork", "更新玩家信息失败");
+            end
+        end);
+    end
 end
 
 -- 用户退出
@@ -191,4 +225,53 @@ function Keepwork:GetSchoolRegionId(callback)
             callback(data and data.info and data.info.state and data.info.state.id);
         end
     end)
+end
+
+function Keepwork:IsExperienceVipCloth()
+    for k,v in ipairs(KeepWorkItemManager.items) do
+        if(11000 < v.gsId and v.gsId <= 11999) then
+            local tpl = KeepWorkItemManager.GetItemTemplate(v.gsId);
+            if ((v.copies or 0) > 0 and tpl and (tpl.extra or {}).VIP_cloth_7days) then return true end 
+        end    
+    end
+    return false;
+end
+
+function Keepwork:IsVip()
+    return self:GetUserInfo().vip == 1;
+end
+
+function Keepwork:GetUserSkin()
+    return self:GetUserInfo().extra.ParacraftPlayerEntityInfo.skin;
+end
+
+function Keepwork:SetUserSkin(skin)
+    local userinfo = self:GetUserInfo();
+    userinfo.extra.ParacraftPlayerEntityInfo.skin = skin;
+end
+
+function Keepwork:CheckSkin(skin)
+    skin = skin or self:GetUserSkin();
+    if (not skin) then return skin end
+    local itemIds = commonlib.split(skin, ";");
+    if (not itemIds or #itemIds == 0) then return skin end
+    local isVip = self:IsExperienceVipCloth() or self:IsVip();
+
+    CustomCharItems:Init();
+
+    for _, id in ipairs(itemIds) do
+        local data = CustomCharItems:GetItemById(id);
+        local isOwned = true;
+        if (data) then
+            if (isVip) then 
+                if (data.gsid and not KeepWorkItemManager.HasGSItem(data.gsid)) then isOwned = false end
+            else
+                if (not data.gsid or (data.gsid and not KeepWorkItemManager.HasGSItem(data.gsid))) then isOwned = false end 
+            end
+
+            if (not isOwned) then skin = CustomCharItems:RemoveItemInSkin(skin, id) end
+        end
+    end
+
+    return skin;
 end

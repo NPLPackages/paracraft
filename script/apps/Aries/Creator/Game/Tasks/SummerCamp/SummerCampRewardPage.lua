@@ -118,6 +118,11 @@ function SummerCampRewardPage.OnClickGetReward(index)
             GameLogic.AddBBS("summer_reward", L"领取成功", 5000, "0 255 0");
             SummerCampRewardPage.InitData()
             page:Refresh(0)
+
+            if index == #SummerCampRewardPage.RewardData then
+                local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+                Page.ShowUserInfoPage({AvatarDefaulIndex = "right_hand_equipment"});
+            end
         end)
     end) 
 end

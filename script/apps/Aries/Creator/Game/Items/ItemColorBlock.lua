@@ -51,7 +51,9 @@ ItemColorBlock.lastBlinkTime = 0;
 -- @param template: icon
 -- @param radius: the half radius of the object. 
 function ItemColorBlock:ctor()
-	self.m_bIsOwnerDrawIcon = true;
+	if(self:HasColorData()) then
+		self.m_bIsOwnerDrawIcon = true;
+	end
 end
 
 local random_colors = {
@@ -126,15 +128,19 @@ end
 -- @param entityPlayer: can be nil
 -- @return isUsed: isUsed is true if something happens.
 function ItemColorBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)
-	-- create with currently selected pen
-	if(self:IsColorData8Bits()) then
-		local res = ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
-		if(res) then
-			self:PaintBlock(x,y,z, self:GetPenColor(itemStack))
+	if(self:HasColorData()) then
+		-- create with currently selected pen
+		if(self:IsColorData8Bits()) then
+			local res = ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
+			if(res) then
+				self:PaintBlock(x,y,z, self:GetPenColor(itemStack))
+			end
+			return res;
+		else
+			data = self:ColorToData(self:GetPenColor(itemStack));
+			return ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
 		end
-		return res;
 	else
-		data = self:ColorToData(self:GetPenColor(itemStack));
 		return ItemColorBlock._super.TryCreate(self, itemStack, entityPlayer, x,y,z, side, data, side_region);
 	end
 end
@@ -155,8 +161,10 @@ end
 
 -- when alt key is pressed to pick a block in edit mode. 
 function ItemColorBlock:PickItemFromPosition(x,y,z)
-	self:PickPenColorAtPos(x,y,z);
-	return ItemColorBlock._super.PickItemFromPosition(self, x,y,z);
+	if(self:HasColorData()) then
+		self:PickPenColorAtPos(x,y,z);
+		return ItemColorBlock._super.PickItemFromPosition(self, x,y,z);
+	end
 end
 
 function ItemColorBlock:PickPenColorAtPos(x,y,z)
@@ -215,43 +223,49 @@ end
 
 -- virtual function: when selected in right hand
 function ItemColorBlock:OnSelect(itemStack)
-	if(itemStack) then
-		local color = itemStack.color32
-		if(color) then
-			color = Color.ToValue(color);
-		end
-		if(not color) then
-			local data = itemStack:GetPreferredBlockData();
-			if(data) then
-				color = self:DataToColor(data);
-			else
-				color = itemStack:GetDataField("color")
-				if(color) then
-					color = Color.ToValue(color)
+	if(self:HasColorData()) then
+		if(itemStack) then
+			local color = itemStack.color32
+			if(color) then
+				color = Color.ToValue(color);
+			end
+			if(not color) then
+				local data = itemStack:GetPreferredBlockData();
+				if(data) then
+					color = self:DataToColor(data);
 				else
-					color = 0;
+					color = itemStack:GetDataField("color")
+					if(color) then
+						color = Color.ToValue(color)
+					else
+						color = 0;
+					end
 				end
 			end
+			self:SetPenColor(color)
 		end
-		self:SetPenColor(color)
+		GameLogic.SetStatus(L"Alt+鼠标左键可拾取颜色. Shift+滚轮调节亮度. +/-饱和度");
 	end
 	ItemColorBlock._super.OnSelect(self);
-	GameLogic.SetStatus(L"Alt+鼠标左键可拾取颜色. Shift+滚轮调节亮度. +/-饱和度");
 end
 
 function ItemColorBlock:OnDeSelect()
-	ItemColorBlock._super.OnDeSelect(self);
-	GameLogic.SetStatus(nil);
+	if(self:HasColorData()) then
+		ItemColorBlock._super.OnDeSelect(self);
+		GameLogic.SetStatus(nil);
+	end
 end
 
 
 function ItemColorBlock:keyPressEvent(event)
-	if(event.keyname == "DIK_ADD" or event.keyname == "DIK_EQUALS") then
-		-- increase color saturation
-		self:ChangePenColor(self.colorStep, 0);
-	elseif(event.keyname == "DIK_SUBTRACT" or event.keyname == "DIK_MINUS") then
-		-- decrease color saturation
-		self:ChangePenColor(-self.colorStep, 0);
+	if(self:HasColorData()) then
+		if(event.keyname == "DIK_ADD" or event.keyname == "DIK_EQUALS") then
+			-- increase color saturation
+			self:ChangePenColor(self.colorStep, 0);
+		elseif(event.keyname == "DIK_SUBTRACT" or event.keyname == "DIK_MINUS") then
+			-- decrease color saturation
+			self:ChangePenColor(-self.colorStep, 0);
+		end
 	end
 end
 
@@ -274,6 +288,9 @@ function ItemColorBlock:ChangePenColor(dSaturation, dLightness)
 end
 
 function ItemColorBlock:mouseReleaseEvent(event)
+	if(not self:HasColorData()) then
+		return
+	end
 	if(event:isAccepted()) then
 		return
 	end
@@ -299,6 +316,9 @@ function ItemColorBlock:mouseReleaseEvent(event)
 end
 
 function ItemColorBlock:mousePressEvent(event)
+	if(not self:HasColorData()) then
+		return
+	end
 	if(event.alt_pressed and not event.shift_pressed and event:button() == "left") then
 		event:accept();
 		self:PickPenColorAtMouse();
@@ -312,6 +332,9 @@ function ItemColorBlock:mouseMoveEvent(event)
 end
 
 function ItemColorBlock:mouseWheelEvent(event)
+	if(not self:HasColorData()) then
+		return
+	end
 	if(event.shift_pressed) then
 		local delta = event:GetDelta();
 		-- saturation
@@ -330,7 +353,7 @@ end
 -- called whenever this item is clicked on the user interface when it is holding in hand of a given player (current player). 
 function ItemColorBlock:OnClickInHand(itemStack, entityPlayer)
 	-- if there is selected blocks, we will replace selection with current block in hand. 
-	if(GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
+	if(self:HasColorData() and GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
 		local selected_blocks = Game.SelectionManager:GetSelectedBlocks();
 		if(selected_blocks) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
@@ -346,28 +369,34 @@ end
 -- @param width, height: size of the icon
 -- @param itemStack: this may be nil. or itemStack instance. 
 function ItemColorBlock:DrawIcon(painter, width, height, itemStack)
-	painter:SetPen(Color.ChangeOpacity(self:GetPenColor(itemStack)));
-	painter:DrawRect(0,0,width, height);
-	painter:SetPen("#ffffff");	
-	painter:DrawRectTexture(0, 0, width, height, self:GetIcon());
+	if(self:HasColorData()) then
+		painter:SetPen(Color.ChangeOpacity(self:GetPenColor(itemStack)));
+		painter:DrawRect(0,0,width, height);
+		painter:SetPen("#ffffff");	
+		painter:DrawRectTexture(0, 0, width, height, self:GetIcon());
 
-	if(itemStack) then
-		if(itemStack.count>1) then
-			-- draw count at the corner: no clipping, right aligned, single line
-			painter:SetPen("#000000");	
-			painter:DrawText(0, height-15+1, width, 15, tostring(itemStack.count), 0x122);
-			painter:SetPen("#ffffff");	
-			painter:DrawText(0, height-15, width-1, 15, tostring(itemStack.count), 0x122);
+		if(itemStack) then
+			if(itemStack.count>1) then
+				-- draw count at the corner: no clipping, right aligned, single line
+				painter:SetPen("#000000");	
+				painter:DrawText(0, height-15+1, width, 15, tostring(itemStack.count), 0x122);
+				painter:SetPen("#ffffff");	
+				painter:DrawText(0, height-15, width-1, 15, tostring(itemStack.count), 0x122);
+			end
 		end
+	else
+		ItemColorBlock._super.DrawIcon(self, painter, width, height, itemStack)
 	end
 end
 
 -- virtual function: 
 function ItemColorBlock:CreateTask(itemStack)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.lua");
-	local SelectColor = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectColor");
-	local task = SelectColor:new();
-	task:Connect("colorPicked", self, self.SetPickColor);
-	return task;
+	if(self:HasColorData()) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.lua");
+		local SelectColor = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectColor");
+		local task = SelectColor:new();
+		task:Connect("colorPicked", self, self.SetPickColor);
+		return task;
+	end
 end
 

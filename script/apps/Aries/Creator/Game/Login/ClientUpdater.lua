@@ -139,6 +139,18 @@ end
 
 function ClientUpdater:Restart()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
-	local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
-	ParaWorldLoginDocker.Restart(self.appname, format('paraworldapp="%s" nplver="%s"', self.appname, self:GetCurrentVersion()));
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
+
+	local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
+
+	local urlProtocol = UrlProtocolHandler:GetParacraftProtocol(ParaEngine.GetAppCommandLine() or '');
+	local restartCmd = '';
+
+	if (urlProtocol and type(urlProtocol) == 'string') then
+		restartCmd = format('%s paraworldapp="%s" nplver="%s"', 'paracraft://' .. urlProtocol, self.appname, self:GetCurrentVersion())
+	else
+		restartCmd = format('paraworldapp="%s" nplver="%s"', self.appname, self:GetCurrentVersion())
+	end
+
+	ParaWorldLoginDocker.Restart(self.appname, restartCmd);
 end

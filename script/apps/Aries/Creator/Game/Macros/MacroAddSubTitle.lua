@@ -89,7 +89,7 @@ function MacroAddSubTitle.OnOK()
 	local lastMacro = Macros:GetLastMacro()
 	if(lastMacro and lastMacro.name == "text") then
 		-- replace last text if any
-		Macros:PopMacro();
+		--Macros:PopMacro();
 		local lastMacro = Macros:GetLastMacro()
 		if(lastMacro and lastMacro.name == "Idle") then
 			Macros:PopMacro();

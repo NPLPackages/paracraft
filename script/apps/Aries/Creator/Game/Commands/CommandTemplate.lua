@@ -230,7 +230,7 @@ Commands["savemodel"] = {
 		templatename = templatename:gsub("^blocktemplates/", ""):gsub("%.bmax$", "");
 		templatename = commonlib.Encoding.Utf8ToDefault(templatename);
 		local relative_path = format("blocktemplates/%s.bmax", templatename);
-		local filename = GameLogic.current_worlddir..relative_path;
+		local filename = GameLogic.GetWorldDirectoryAt()..relative_path;
 
 		local function saveModel_()
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");

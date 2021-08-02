@@ -147,6 +147,15 @@ end
 
 function getRewardIcon(gsId)
     local icon = string.format("width: 48px; height: 48px; margin-left:6px; background: url(Texture/Aries/Creator/keepwork/items/item_%d_32bits.png#32 0 65 64);",gsId)
+    if gsId > 80000 then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+        local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+        local item = CustomCharItems:GetItemByGsid(tostring(gsId))
+        if item then
+            echo(item)
+            icon = string.format("width: 48px; height: 48px; margin-left:6px; background: url(%s);",item.icon) 
+        end
+    end
     return icon
 end
 

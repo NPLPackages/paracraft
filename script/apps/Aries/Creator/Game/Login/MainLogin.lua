@@ -183,10 +183,12 @@ function MainLogin:UpdateCoreClient()
 				-- GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
 
 				if(bSucceed and updater:isNeedUpdate()) then
+					System.options.isParacraftNeedUpdate = true;
+					
 					if GameLogic.GetFilters():apply_filters('cellar.client_update_dialog.show', false, updater, gamename) then
 						return
 					end
-
+					
 					System.App.Commands.Call("File.MCMLWindowFrame", {
 						url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s&curGame=%s", updater:getLatestVersion(), updater:getCurVersion(), gamename), 
 						name = "ClientUpdateDialog", 
