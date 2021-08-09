@@ -151,7 +151,7 @@ end
 
 -- Completely recalculates the track shape based on neighboring tracks
 function block:RefreshTrackShape(x,y,z, bForceUpdate)
-	if(not GameLogic.isRemote) then
+	if(not GameLogic.isRemote and not BlockEngine:IsUpdatingBlocks()) then
 		-- TODO: use more accurate version.
 		local data = self:GetMetaDataFromEnv(x,y,z);
 		local shapeData = data;

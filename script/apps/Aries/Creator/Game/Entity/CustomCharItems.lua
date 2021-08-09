@@ -12,7 +12,7 @@ CustomCharItems:Init();
 
 
 function CustomCharItems:AddItemToSkin(skin, item) 
-µ÷ÊÔÐÅÏ¢£ºgeosets index-1  = ccs index
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½geosets index-1  = ccs index
  geosets={ 2, [3]=1, [4]=1, [5]=1, [6]=1, [9]=1, [10]=1 },
  2#201#301#401#501#801#901
 -----------------------------------------------------------------
@@ -67,7 +67,7 @@ echo:"1#201#301#401#501#802#904#@1:Texture/blocks/CustomGeoset/hair/1_Avatar_boy
 
 
 
-¸üÐÂskinÎ»ÖÃ£º
+ï¿½ï¿½ï¿½ï¿½skinÎ»ï¿½Ã£ï¿½
 PlayerAssetFile:RefreshCustomGeosets(player, skin)
 pe_mc_player.SetAssetFile(mcmlNode, pageInst, filename)
 -------------------------------------------------------
@@ -144,6 +144,7 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school3.x"] = "80001;82029;84003;81018;88002;85002";
 	
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_archaeologist.x"] = "80001;82064;84015;81018;88002;85011";
+	-- TODO skin ids wrong no skin
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_host.x"] = "80001;82126;84038;81049;88002;85028";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_host.x"] = "80001;82011;84014;81005;88002;85011";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_staff_bank.x"] = "80001;82011;84014;81005;88002;85011";
@@ -157,19 +158,29 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunzhang.x"] = "80001;83158;84050;81018;88014;85067";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunming.x"] = "80001;82001;84046;81018;88014;85040";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84032;81018;88014;85027";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;82001;84003;81018;88014;85017";
+	-- TODO skin ids wrong 
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;82001;84062;81018;88014;85081";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy01.x"] = "80001;82001;84020;81018;88002;85058";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy02.x"] = "80001;82029;84015;81018;88002;85017";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy03.x"] = "80001;82065;84001;81018;88002;85011";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy04.x"] = "80001;82028;84010;81018;88002;85005"; -- ºÚ¹í£¬Ã»ÓÐºÚÁ³Æ¤·ô£¬Ä¬ÈÏÎªÑ§Éú×°
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy05.x"] = "80001;82047;84017;81018;88002;85019";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy06.x"] = "80001;82001;84027;81018;88002;85024";
+	-- TODO skin ids wrong
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy02.x"] = "80001;82032;84062;81018;88002;85081";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy03.x"] = "80001;82067;84064;81018;88002;85082";
+	-- TODO skin ids wrong no skin
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy04.x"] = "80001;82028;84010;81018;88002;85005"; -- ï¿½Ú¹ï¿½ï¿½ï¿½Ã»ï¿½Ðºï¿½ï¿½ï¿½Æ¤ï¿½ï¿½ï¿½ï¿½Ä¬ï¿½ï¿½ÎªÑ§ï¿½ï¿½×°
+	-- TODO skin ids wrong
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy05.x"] = "80001;82049;84017;81018;88002;85019";
+	-- TODO skin ids wrong
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy06.x"] = "80001;82001;84082;81018;88002;85101";
+	-- TODO skin ids wrong
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy07.x"] = "80001;82001;84016;81018;88002;85017";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl01.x"] = "80001;82004;84028;81018;88002;85029";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl02.x"] = "80001;82085;84013;81018;88002;85010";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl03.x"] = "80001;82126;84032;81018;88002;85049";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl04.x"] = "80001;82109;84039;81018;88002;85029";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl05.x"] = "80001;82170;84012;81018;88002;85009"; --ÕâÌ×ÒòÎªÇ°¶ÎÊ±¼ä²ÅÒ»´Î¸øµ½ÊÖ£¬Ã»À´µÃ¼°ÉÏ¼Ü£¬Ä¬ÈÏÎªÑ§Éú×°
+	-- TODO skin ids wrong
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl02.x"] = "80001;82087;84074;81049;88002;85085";
+	-- TODO skin ids wrong
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl03.x"] = "80001;82107;84066;81049;88002;85084";
+	-- TODO skin ids wrong 
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl04.x"] = "80001;82108;84073;81049;88002;85091";
+	-- TODO skin ids wrong no skin
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl05.x"] = "80001;82170;84012;81018;88002;85009"; --ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªÇ°ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ò»ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ö£ï¿½Ã»ï¿½ï¿½ï¿½Ã¼ï¿½ï¿½Ï¼Ü£ï¿½Ä¬ï¿½ï¿½ÎªÑ§ï¿½ï¿½×°
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/zaizai.x"] = "80001;82001;84022;81018;88020;85004";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/nuannuan.x"] = "80001;82010;84022;81049;88004;85004";
 	CustomCharItems.ReplaceableAvatars["character/CC/codewar/sunbinjunshixingtai_movie.x"] = "80001;83150;84049;81018;88014;85067";
@@ -230,6 +241,7 @@ function CustomCharItems:Init()
 					local item = {};
 					item.id = node.attr.id;
 					item.gsid = node.attr.gsid;
+					item.isVip = node.attr.isVip or "0";
 					item.icon = node.attr.icon;
 					item.name = node.attr.name;
 					item.avatarMode = node.attr.avatarMode;
@@ -295,6 +307,7 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 						data.id = item.id;
 						data.icon = item.icon;
 						data.name = item.name;
+						data.isVip = item.isVip;
 						itemList[#itemList+1] = data;
 					end
 				end

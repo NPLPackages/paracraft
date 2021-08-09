@@ -389,6 +389,21 @@ function World2In1.OnEnterSchoolRegion()
 	end)	
 end
 
+function World2In1.OnEnterAllRegion()
+	World2In1.SaveCreateTips(function()
+		World2In1.SetGameMode();
+		World2In1.ShowCreateReward()
+		World2In1.SetCurrentType("all")
+		World2In1.BroadcastTypeChanged()
+		local x, y,  z = World2In1.GetRegionCenterPos(3);
+		GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y, z + 64));	
+		World2In1.StartLoadTimer();
+		World2In1.LoadAllWorlds(currentType, function()
+			World2In1.LoadMiniWorld(currentType, 0, 0);
+		end);	
+	end)	
+end
+
 function World2In1.GetEmptyGridIndex(default_index, type)
 	-- 判断下该地块是否加载
 	local gridX, gridY = 0, 0
@@ -474,22 +489,8 @@ function World2In1.OnEnterRegionByProjectName(type, project_name)
 			-- worldIndex = worldIndex + 1;
 			World2In1.LoadMiniWorld(currentType, 0, 1 - worldIndex);
 		end
-	end);
-end
 
-function World2In1.OnEnterAllRegion()
-	World2In1.SaveCreateTips(function()
-		World2In1.SetGameMode();
-		World2In1.ShowCreateReward()
-		World2In1.SetCurrentType("all")
-		World2In1.BroadcastTypeChanged()
-		local x, y,  z = World2In1.GetRegionCenterPos(3);
-		GameLogic.RunCommand(string.format("/goto %d %d %d", x + 64, y, z + 64));	
-		World2In1.StartLoadTimer();
-		World2In1.LoadAllWorlds(currentType, function()
-			World2In1.LoadMiniWorld(currentType, 0, 0);
-		end);	
-	end)	
+	end);
 end
 
 function World2In1.StartLoadTimer()
@@ -783,6 +784,7 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 			ParaIO.CreateDirectory(miniTemplateDir);
 			local template_file = miniTemplateDir..world.id..".xml";
 			local file = ParaIO.open(template_file, "w");
+
 			if (file:IsValid()) then
 				file:write(content, #content);
 				file:close();
@@ -818,6 +820,7 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 	end
 
 	currentWorldList[key] = currentWorldList[key] or {loaded = true};
+	
 	local world = currentWorlds[serverDataIndex];
 	if (world) then
 		keepwork.world.detail({router_params = {id = world.id}}, function(err, msg, data)
@@ -946,4 +949,52 @@ function World2In1.GetWritablePath()
 	end
 	
 	return World2In1.write_table_path
+end
+
+function World2In1.IsInVisitPorject()
+	if page == nil then
+		return false
+	end
+
+	if currentType == "all" or currentType == "school" or currentType == "grade" then
+		return true
+	end
+
+	return false
+end
+
+function World2In1.GetCurProjectServerData()
+	if #currentWorlds == 0 then
+		return
+	end
+	serverDataIndex = serverDataIndex or 1
+	return currentWorlds[serverDataIndex]
+end
+-- 将原本的世界坐标 转换为迷你作品里的坐标
+function World2In1.TurnWorldPosToMiniPos(pos)
+	local pox_index = worldIndex - 1
+	local x, y, z
+	if currentType == "all" then
+		x, y,  z = World2In1.GetRegionCenterPos(3);
+		z = z + pox_index * 128;
+		-- GameLogic.RunCommand(string.format("/goto %d %d %d", 19231, 14, 18524));
+	elseif currentType == "school" then 
+		x, y,  z = World2In1.GetRegionCenterPos(2);
+		x = x + pox_index * 128;
+		-- GameLogic.RunCommand(string.format("/goto %d %d %d", x, y, z));
+	elseif currentType == "grade" then 
+		x, y,  z = World2In1.GetRegionCenterPos(1);
+		
+		z = z - pox_index * 128;
+		-- GameLogic.RunCommand(string.format("/goto %d %d %d", x, y, z));
+	end
+	if x then
+		local begain_pos = {19136,12,19136}
+		local targer_pos = {}
+		targer_pos[1] = pos[1] - begain_pos[1] + x
+		targer_pos[2] = pos[2] - begain_pos[2] + y
+		targer_pos[3] = z - (begain_pos[3] - pos[3])
+		
+		return targer_pos
+	end
 end

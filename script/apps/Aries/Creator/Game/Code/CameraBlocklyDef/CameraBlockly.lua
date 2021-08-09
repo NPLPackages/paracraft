@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 Title: 
 Author(s): chenjinxian
 Date: 
@@ -16,7 +16,8 @@ local CodeActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
 local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
-local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+local Camera = NPL.load("./Camera.lua");
+local Cameras = NPL.load("./Cameras.lua");
 local CameraBlockly = NPL.export();
 commonlib.setfield("MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly", CameraBlockly);
 
@@ -76,25 +77,26 @@ end
 
 -- @param relativePath: can be nil, in which case filepath will be used. 
 function CameraBlockly.GetCode(code)
-	if(not CameraBlockly.templateCode) then
-		CameraBlockly.templateCode = [[
-local CameraBlockly = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraBlockly.lua");
-local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Camera.lua");
-local subtitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Subtitle.lua");
-camera.init(codeblock);
-<code>
-]]
-		CameraBlockly.templateCode = CameraBlockly.templateCode:gsub("(\r?\n)", ""):gsub("<code>", "%%s")
-	end
-	local s = string.format(CameraBlockly.templateCode, code or "");
-	return s
+--	if(not CameraBlockly.templateCode) then
+--		CameraBlockly.templateCode = [[
+--local Camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Camera.lua");
+--local subtitle = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Subtitle.lua");
+--Camera.init(codeblock);
+--<code>
+--]]
+--		CameraBlockly.templateCode = CameraBlockly.templateCode:gsub("(\r?\n)", ""):gsub("<code>", "%%s")
+--	end
+--	local s = string.format(CameraBlockly.templateCode, code or "");
+	
+	return code
 end
 
 function CameraBlockly.OnTimeChanged(value)
 	if (value > 0) then
-		GameLogic.Camera_setCurrentTime(value);
+		Cameras.setTimeTarget(value);
 		CodeBlockWindow.OnClickCompileAndRun(function()
-			GameLogic.Camera_setCurrentTime(0);
+			Cameras.setTimeTarget(nil);
+			Cameras.setCurrentTime(0);
 		end);
 	end
 end
@@ -111,7 +113,7 @@ end
 
 function CameraBlockly.OnClickCamera(index)
 	if (CameraBlockly.cameras and CameraBlockly.cameras[index]) then
-		camera.showCamera(CameraBlockly.cameras[index].id, CodeBlockWindow.GetCodeEntity());
+		Camera.showCamera(CameraBlockly.cameras[index].id, CodeBlockWindow.GetCodeEntity());
 	end
 end
 
@@ -120,7 +122,7 @@ function CameraBlockly.RunAndExportVideo()
 	VideoSharing.ToggleRecording(1, function()
 		CodeBlockWindow.OnClickCompileAndRun(function()
 			VideoSharing.StopRecording();
-			camera.reopen();
+			Camera.reopen();
 		end);
 	end);
 end
@@ -130,11 +132,9 @@ function CameraBlockly.GetCustomCodeUIUrl()
 end
 
 function CameraBlockly.OnOpenCodeEditor(entity)
-	local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
-	camera.showWithEditor(entity);
+	Camera.showWithEditor(entity);
 end
 
 function CameraBlockly.OnCloseCodeEditor(entity)
-	local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
-	camera.close();
+	Camera.close();
 end

@@ -68,6 +68,10 @@ function ShaderManager:RegisterAllEffects()
 	self:RegisterEffect(effect);
 
 	-- TODO: add more
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/CartoonEffect.lua");
+	local CartoonEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.CartoonEffect");
+	local effect = CartoonEffect:new():Init(self);
+	self:RegisterEffect(effect);
 end
 
 -- register new effects such as from external mod. 

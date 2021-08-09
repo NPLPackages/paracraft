@@ -123,7 +123,8 @@ function CreateBlock:Run()
 		end
 
 		blocks = {};
-		local _, b;
+		
+		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.blocks) do
 			local x, y, z = b[1]+dx, b[2]+dy, b[3]+dz;
 			if(b[4]) then
@@ -134,6 +135,7 @@ function CreateBlock:Run()
 				end
 			end
 		end
+		BlockEngine:EndUpdate()
 	end
 	
 	if(add_to_history) then

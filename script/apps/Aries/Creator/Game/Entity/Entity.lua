@@ -2690,6 +2690,8 @@ function Entity:MountEntity(targetEntity)
         self.ridingEntity = targetEntity;
         targetEntity.riddenByEntity = self;
     end
+
+	GameLogic.GetFilters():apply_filters('PlayerMountEntity', self, targetEntity);
 end
 
 -- whether any trackable data is modified 

@@ -124,6 +124,10 @@ function KeepWorkItemManager.GetFilter()
 end
 function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
 	LOG.std(nil, "info", "KeepWorkItemManager", "OnKeepWorkLogin_Callback");
+    
+    -- 强制退出当前用户
+    KeepWorkItemManager.OnKeepWorkLogout_Callback();
+
     KeepWorkItemManager.Load(true, function()
 	    LOG.std(nil, "debug", "KeepWorkItemManager.globalstore", KeepWorkItemManager.globalstore);
 	    LOG.std(nil, "debug", "KeepWorkItemManager.extendedcost", KeepWorkItemManager.extendedcost);

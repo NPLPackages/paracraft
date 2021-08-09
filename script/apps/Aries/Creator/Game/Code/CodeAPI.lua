@@ -60,6 +60,7 @@ local s_env_methods = {
 	"getPos",
 	"setPos",
 	"setBlockPos",
+	"getPlayerPos",
 	-- Looks
 	"say",
 	"show",
@@ -78,6 +79,7 @@ local s_env_methods = {
 	"attachTo",
 	"focus",
 	"camera",
+	"getCamera",
 	"setMovie",
 	"isMatchMovie",
 	"playMatchedMovie",

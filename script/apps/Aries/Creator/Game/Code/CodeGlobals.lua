@@ -179,6 +179,7 @@ function CodeGlobals:ctor()
 		getMousePoint = function()
 			return self:GetMousePoint();
 		end,
+		Camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Camera.lua"),
 		----------------------
 		-- @NOTE: the following may not be safe to expose to users
 		----------------------
@@ -384,6 +385,10 @@ end
 
 function CodeGlobals:SetCurrentCoroutine(co)
 	self.cur_co = co;
+end
+
+function CodeGlobals:GetCurrentCodeBlock()
+	return self.cur_co and self.cur_co.codeBlock;
 end
 
 function CodeGlobals:AddCodeBlock(codeblock)

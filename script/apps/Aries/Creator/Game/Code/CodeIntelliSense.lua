@@ -168,6 +168,7 @@ function CodeIntelliSense.GetSharedAPIGlobals()
 			actor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor"),
 			codeblock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock"),
 			GI = GameLogic.GetCodeGlobal():GetSandboxAPI(),
+			Camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Camera.lua"),
 		}
 		CodeIntelliSense.shared_API = shared_API
 		return shared_API;

@@ -27,6 +27,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeUIActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeLightActor.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/LanguageConfigurations.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 local LanguageConfigurations = commonlib.gettable("MyCompany.Aries.Game.Code.LanguageConfigurations");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
@@ -1413,4 +1415,9 @@ function CodeBlock:NewCoroutine(bFromAutoReleasePool)
 		end
 	end
 	return co;
+end
+
+-- if this code block is being edited by the user
+function CodeBlock:IsEditing()
+	return CodeBlockWindow.GetCodeBlock() == self and CodeBlockWindow.IsVisible();
 end

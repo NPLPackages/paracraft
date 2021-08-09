@@ -1237,3 +1237,7 @@ end
 function QuestAction.UpdateLessonProgress(course_id,lessonId,progress,status,callback)
     Quest2in1Lesson.UpdateLessonProgress(course_id,lessonId,progress,status,callback)
 end
+
+function QuestAction.GetAppCommandLine(key, default)
+    return ParaEngine.GetAppCommandLineByParam(key, default)
+end

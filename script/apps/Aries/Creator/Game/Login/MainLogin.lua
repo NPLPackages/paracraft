@@ -496,7 +496,8 @@ function MainLogin:LoadPackages()
 	local BuildinMod = commonlib.gettable("MyCompany.Aries.Game.MainLogin.BuildinMod");
 	BuildinMod.AddBuildinMods();
 
-	self:PreloadDailyCheckinAndTeachingWnd();
+	-- disable preload cef3 window
+	--self:PreloadDailyCheckinAndTeachingWnd();
 
 	self:next_step({IsPackagesLoaded = true});
 end

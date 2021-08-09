@@ -668,6 +668,19 @@ function BlockEngine:IsRemote()
 	end
 end
 
+function BlockEngine:BeginUpdate()
+	self.isUpdating = true;
+end
+
+function BlockEngine:EndUpdate()
+	self.isUpdating = false;
+end
+
+-- return true if we are batching updating blocks such as during load template function. 
+function BlockEngine:IsUpdatingBlocks()
+	return self.isUpdating;
+end
+
 
 -- Sets the block ID and metadata at a given location. 
 -- @param flag: bitwise field. 1 will notify neighbor blocks. 2 or nil will be the default. 3 is update with notification to nearby blocks. 

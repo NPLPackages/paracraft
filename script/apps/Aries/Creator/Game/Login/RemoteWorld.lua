@@ -291,6 +291,9 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 					end
 					LOG.std(nil, "info", "RemoteWorld", "remote file size can not be determined. download again.");
 				end
+				if (showBBS == false) then
+					self.FileDownloader.isSilent = true
+				end
 				self.FileDownloader:Init(L"世界", src, dest, OnCallbackFunc, "access plus 5 mins", true);
 			end, "-I");
 		else
@@ -298,6 +301,9 @@ function RemoteWorld:DownloadRemoteFile(callbackFunc, refreshMode)
 			OnCallbackFunc(true, dest);
 		end
 	else
+		if (showBBS == false) then
+			self.FileDownloader.isSilent = true
+		end
 		self.FileDownloader:Init(L"世界", src_with_headers, dest, OnCallbackFunc, "access plus 5 mins", true);	
 	end
 end

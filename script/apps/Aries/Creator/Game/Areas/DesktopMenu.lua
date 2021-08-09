@@ -95,6 +95,9 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"NPL控制面板...".."  F11",name = "window.console", cmd="/open npl://console"},
 				-- {text = "NPL Debugger... (Ctrl+Alt+I)",name = "window.debugger", cmd="/open npl://debugger"},
 				{text = L"MOD插件管理...".."  Ctrl+M",name = "window.mod",cmd="/show mod"},
+				{Type = "Separator"},
+				{text = L"短视频分享...",name = "share.videosharing", cmd="/share"},
+				{text = L"全景图分享...",name = "share.panoramasharing", onclick=nil},
 			},
 		},
 		{text = L"帮助", order=7, name = "help",children = 
@@ -102,7 +105,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"新手引导",name = "help.userintroduction", onclick=nil},
 				{text = L"教学视频",name = "help.videotutorials", onclick=nil},
 				{text = L"学习资源",name = "help.learn", onclick=nil},
-				{text = L"成长日记...",name = "help.dailycheck", onclick=nil},
+				{text = L"推荐课程...",name = "help.dailycheck", onclick=nil},
 				{text = L"提问",name = "help.ask", onclick=nil},
 				{Type = "Separator"},
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
@@ -114,12 +117,6 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				--{text = L"开发文档",name = "help.ParacraftSDK", onclick=nil},
 				{text = L"关于Paracraft...",name = "help.about", onclick=nil},
 				-- {text = L"致谢",name = "help.Credits", onclick=nil},
-			},
-		},
-		{text = L"分享", order=8, name = "share",children = 
-			{
-				{text = L"短视频分享...",name = "share.videosharing", cmd="/share"},
-				{text = L"全景图分享...",name = "share.panoramasharing", onclick=nil},
 			},
 		},
 		--[[

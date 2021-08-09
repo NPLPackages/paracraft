@@ -33,6 +33,8 @@ local mathlib = commonlib.gettable("mathlib");
 local math_abs = math.abs;
 local math_random = math.random;
 local math_floor = math.floor;
+local RailCarPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarPage.lua")
+local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityRailcar"));
 local EntityRailcar = Entity;
@@ -93,6 +95,7 @@ function Entity:ctor()
 	self.MoveSoundPitch = 0;
 	self.RideSoundVolume = 0;
 	self.SoundPitch = 0;
+	self.move_block_distance = 0;
 end
 
 function Entity:GetPhysicsRadius()
@@ -282,6 +285,24 @@ function Entity:GetRollingDirection()
     return self.rolling_direction;
 end
 
+function Entity:SetOffsetFacing(offset_facing)
+	self.offset_facing = offset_facing
+end
+
+function Entity:GetOffsetFacing()
+	return self.offset_facing or 0
+end
+
+function Entity:ReSetAssetFile(assetPath)
+	self:SetMainAssetPath(assetPath)
+	local obj = self:GetInnerObject();
+	if obj then
+		if(obj:GetField("assetfile", "") ~= assetPath) then
+			obj:SetField("assetfile", assetPath);
+		end
+	end
+end
+
 local normal_ = {};
 -- Sets the rotation of the entity
 function Entity:SetRotation(yaw, pitch)
@@ -289,7 +310,8 @@ function Entity:SetRotation(yaw, pitch)
     self.rotationPitch = pitch % 360;
 	local obj = self:GetInnerObject();
 	if(obj) then
-		self.facing = -self.rotationYaw*math.pi/180;
+		local offset_facing =  self:GetOffsetFacing()
+		self.facing = -self.rotationYaw*math.pi/180 + offset_facing;
 		obj:SetFacing(self.facing);
 
 		local facing = self.facing;
@@ -312,6 +334,20 @@ function Entity:SetRotation(yaw, pitch)
 		end
 		
 		obj:SetField("normal", normal_);
+	end
+
+	local x, y, z = self:GetPosition();	
+	self.prevMoveAngel = self.moveAngel or 0
+
+	local distance_x = x - self.prevPosX
+	local distance_y = z - self.prevPosZ
+
+	self.moveAngel = math.atan2(distance_y,distance_x)
+	if self.rotationPitch ~= self.prevRotationPitch or self.prevRotationYaw ~= self.rotationYaw or self.moveAngel ~= self.prevMoveAngel then
+		if self.riddenByEntity and CameraController.IsLockRailCarFirstPersonView and CameraController.IsLockRailCarFirstPersonView() then
+			CameraController.UpdateCameraRotation(self.facing, self.rotationPitch, self.moveAngel, self.isMoving)
+		end
+		--CameraController.UpdateCameraRotation(self.facing, self.rotationPitch, self.moveAngel)
 	end
 end
 
@@ -441,8 +477,16 @@ function Entity:FrameMove(deltaTime)
 		end
     
 		self:NotifyBlockCollisions();
+
     
 		x, y, z = self:GetPosition();	
+
+		local last_move_block_distance = self.move_block_distance
+		self.move_block_distance = last_move_block_distance + self:DistanceSqTo(bx, by, bz)
+		if last_move_block_distance ~= self.move_block_distance then
+			self:OnBlockMoveChange()
+		end
+
 		local dirX = self.prevPosX - x;
 		local dirZ = self.prevPosZ - z;
 
@@ -915,6 +959,9 @@ function Entity:OnClick(x, y, z, mouse_button)
 						GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketEntityAction:new():Init(1, self));
 					else
 						player:MountEntity(self);	
+						if System.options.isDevMode then
+							RailCarPage.Show();
+						end
 					end
 				end
 			end
@@ -935,6 +982,10 @@ function Entity:GetDamage()
 end
 
 function Entity:DoKillSelf(damageSource, bDropItem)
+	if (self.riddenByEntity) then
+		self.riddenByEntity:MountEntity(nil);
+	end
+
 	self:SetDead();
 	-- play break animation. 
 	local item = ItemClient.GetItem(self.item_id);
@@ -945,6 +996,10 @@ function Entity:DoKillSelf(damageSource, bDropItem)
 	if(bDropItem) then
 		local itemStack = ItemStack:new():Init(self.item_id, 1);
 		self:EntityDropItem(itemStack, 0.0);
+	end
+
+	if self.kill_cb then
+		self.kill_cb()
 	end
 end
 
@@ -962,10 +1017,6 @@ end
             local isPlayerCreativeMode = damageSource:GetEntity() and damageSource:GetEntity():isa(EntityManager.EntityPlayer) and damageSource:GetEntity().capabilities:IsCreativeMode();
 
             if (isPlayerCreativeMode or self:GetDamage() > 40.0) then
-                if (self.riddenByEntity) then
-                    self.riddenByEntity:MountEntity(self);
-                end
-
                 if (isPlayerCreativeMode) then
                     self:DoKillSelf(damageSource, false);
                 else
@@ -1074,4 +1125,42 @@ function Entity:OnUpdateSound()
             SoundManager:StopEntitySound(self);
         end
     end
+end
+
+function Entity:SetKillSelfCallback(kill_cb)
+	self.kill_cb = kill_cb
+end
+
+function Entity:SetDestroyTime(sceond)
+	sceond = sceond or 0
+	if self.destroy_timmer == nil then
+
+		self.destroy_timmer = commonlib.Timer:new({callbackFunc = function(timer)
+			local x, y, z = self:GetPosition();
+			-- 位置信息没有变化的话 则删除
+			if not self:IsDead() and not self.riddenByEntity and self.last_pos_info and self.last_pos_info[1] == x and self.last_pos_info[2] == y and self.last_pos_info[3] == z then
+				self.destroy_timmer:Change()
+				self.last_pos_info = nil
+				self:DoKillSelf(DamageSource:CausePlayerDamage(EntityManager.GetPlayer()), false);
+			else
+				self.last_pos_info = {x, y, z}
+			end
+		end})
+		self.destroy_timmer:Change(100, sceond * 1000);
+	end
+
+end
+
+function Entity:OnBlockMoveChange()
+	if (self.riddenByEntity) then
+		RailCarPage.RefreshStepCount(self.move_block_distance)
+	end
+end
+
+function Entity:GetMoveAngel()
+	return self.moveAngel
+end
+
+function Entity:IsMoving()
+	return self.isMoving
 end

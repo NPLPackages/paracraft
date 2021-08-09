@@ -223,7 +223,7 @@ function EditCodeBlockContext:updateManipulators(delaySeconds)
 	end
 
 	if(codeEntity and codeEntity:GetLanguageConfigFile() == "npl_camera") then
-		--local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/camera.lua");
+		--local camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Camera.lua");
 		--camera.showWithEditor(codeEntity);
 		return
 	end

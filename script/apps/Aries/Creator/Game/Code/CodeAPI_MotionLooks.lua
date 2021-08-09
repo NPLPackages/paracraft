@@ -227,6 +227,14 @@ function env_imp:getPos(objName)
 	end
 end
 
+function env_imp:getPlayerPos(valueType)
+	local x, y, z = EntityManager.GetPlayer():GetPosition()
+	x, y, z = BlockEngine:block(x, y, z);
+	if (valueType == "x") then return x end 
+	if (valueType == "y") then return y end 
+	if (valueType == "z") then return z end 
+	return x, y, z;
+end
 
 -- moveTo to a given block position or a actor position
 -- @param x,y,z: if z is nil, y is z. 
@@ -819,6 +827,16 @@ function env_imp:velocity(cmd_text)
 		end
 		playerEntity:SetDummy(false);
 	end
+end
+
+function env_imp:getCamera(valueType)
+	local dist = GameLogic.options:GetCameraObjectDistance();
+	local pitch = math.floor((ParaCamera.GetAttributeObject():GetField("CameraLiftupAngle")) * 180 / math.pi);
+	local facing = math.floor((ParaCamera.GetAttributeObject():GetField("CameraRotY")) * 180 / math.pi);
+	if (valueType == "dist") then return dist end
+	if (valueType == "pitch") then return pitch end 
+	if (valueType == "facing") then return facing end
+	return dist, pitch, facing;
 end
 
 function env_imp:camera(dist, pitch, facing)

@@ -55,9 +55,11 @@ function ItemRailcar:OnCreate(result)
 		-- local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
 		local bx, by, bz = result.blockX, result.blockY, result.blockZ;
 		local block = BlockEngine:GetBlock(bx, by, bz);
+		
 		if(not BlockRailBase.isRailBlockAt(bx, by, bz)) then
 			local side = BlockEngine:GetOppositeSide(result.side);
 			bx, by, bz = BlockEngine:GetBlockIndexBySide(bx, by, bz,side)
+			
 			if(not BlockRailBase.isRailBlockAt(bx, by, bz)) then
 				return;
 			end
@@ -75,7 +77,7 @@ function ItemRailcar:OnCreate(result)
 			else
 				local entity = MyCompany.Aries.Game.EntityManager.EntityRailcar:Create({x=x,y=y,z=z, item_id = self.block_id});
 				EntityManager.AddObject(entity);
-				return true;
+				return true, entity;
 			end
 		end	
 	end

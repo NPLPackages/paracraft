@@ -39,7 +39,7 @@ model id
 <CustomCharItems>
   <items>
     <!--      80000 80999  头部  geoset category="3"    -->
-    <item id="80001" model="actor;"><geoset category="3" id="1"></geoset></item>    
+    <item id="80001" model="actor;"><geoset category="3" id="1"></geoset></item>      
 
     <!--      81000 81999  眼睛  geoset category="2"   3眼睛 4嘴巴        -->
     <item id="81001" model="actor;"><geoset category="2" id="1"></geoset><texture id="3" filename="Texture/blocks/Paperman/eye/eye_02_blackman.png"></texture></item>
@@ -602,7 +602,17 @@ model id
     <item id="84071" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84071_Avatar_girl_body_61.png"></texture></item>
     <item id="84072" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84072_Avatar_girl_body_62.png"></texture></item>
     <item id="84073" model="actor;"><geoset category="8" id="5"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84073_Avatar_girl_body_63.png"></texture></item>
-
+    
+    <!--20210805新增-->
+    <item id="84074" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84074_Avatar_girl_body_64.png"></texture></item>
+    <item id="84075" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84075_Avatar_girl_body_65.png"></texture></item>
+    <item id="84076" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84076_Avatar_girl_body_66.png"></texture></item>
+    <item id="84077" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84077_Avatar_girl_body_67.png"></texture></item>
+    <item id="84078" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84078_Avatar_girl_body_68.png"></texture></item>
+    <item id="84079" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84079_Avatar_girl_body_69.png"></texture></item>
+    <item id="84080" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84080_Avatar_girl_body_70.png"></texture></item>
+    <item id="84081" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84081_Avatar_girl_body_71.png"></texture></item>
+    <item id="84082" model="actor;"><geoset category="8" id="2"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84082_Avatar_girl_body_72.png"></texture></item>
 
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
@@ -705,6 +715,21 @@ model id
     <item id="85090" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85090_Avatar_girl_leg_80.png"></texture></item>
     <item id="85091" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85091_Avatar_girl_leg_81.png"></texture></item>
     <item id="85092" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85092_Avatar_girl_leg_82.png"></texture></item>
+
+    <!--20210805新增-->
+    <item id="85093" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85093_Avatar_boy_leg_83.png"></texture></item>
+    <item id="85094" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85094_Avatar_boy_leg_84.png"></texture></item>
+    <item id="85095" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85095_Avatar_boy_leg_85.png"></texture></item>
+    <item id="85096" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85096_Avatar_girl_leg_86.png"></texture></item>
+    <item id="85097" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85097_Avatar_girl_leg_87.png"></texture></item>
+    <item id="85098" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85098_Avatar_girl_leg_88.png"></texture></item>
+    <item id="85099" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85099_Avatar_boy_leg_89.png"></texture></item>
+    <item id="85100" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85100_Avatar_boy_leg_90.png"></texture></item>
+    <item id="85101" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85101_Avatar_boy_leg_91.png"></texture></item>
+    <item id="85102" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85102_Avatar_girl_leg_92.png"></texture></item>
+    <item id="85103" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85103_Avatar_girl_leg_93.png"></texture></item>
+    <item id="85104" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85104_Avatar_girl_leg_94.png"></texture></item>
+    <item id="85105" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85105_Avatar_girl_leg_95.png"></texture></item>
 
     <!--      86000 86999  背部  attachment id="15"    -->
     <!--第一批数据-->
@@ -948,7 +973,8 @@ model id
 <item id="87190" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87190_alloy_red_shield.anim.x"></attachment></item>
     <!--20210701新增-->
 <item id="87191" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87191_keyboard.anim.x"></attachment></item>
- 
+    <!--20210729新增-->
+<item id="87192" model="actor;"><attachment id="2" filename="character/CC/ObjectComponents/Hand/87192_purple_magicstick.anim.x"></attachment></item>
 
     <!--    88000 88999  嘴巴                        4嘴巴          -->
     <item id="88001" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_08_01.png"></texture></item>
@@ -982,7 +1008,8 @@ model id
     <item id="88028" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_boy_01_03.png"></texture></item>
     -->
     
-    <!--    89000 89999  坐骑  暂不开放    -->
+    <!--    89000 89999  坐骑      -->
+    <item id="89001" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/ride/89001_shubao.anim.x"></attachment></item>
 
   </items>
   <models type="actor">

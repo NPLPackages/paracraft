@@ -15,6 +15,9 @@ NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Desktop/GUIHelper/ClickToContinue.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/StereoVisionController.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Login/RemoteWorld.lua");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local StereoVisionController = commonlib.gettable("MyCompany.Aries.Game.StereoVisionController")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
@@ -24,6 +27,8 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
 local block = commonlib.gettable("MyCompany.Aries.Game.block")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local RemoteWorld = commonlib.gettable('MyCompany.Aries.Creator.Game.Login.RemoteWorld')
+local RailCarPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarPage.lua")
 
 ---------------------------
 -- create class
@@ -66,6 +71,19 @@ function CameraController.OnInit()
 	attr:SetField("CameraRollbackSpeed", GameLogic.options.CameraRollbackSpeed or 6);
 	-- "EnableMouseLeftDrag" boolean attribute is added to ParaCamera.
 	attr:SetField("EnableMouseLeftDrag", GameLogic.options.isMouseLeftDragEnabled == true);
+
+	CameraController.InitRailCarCameraData()
+end
+
+function CameraController.InitRailCarCameraData()
+	CameraController.RailCarCameraMod = {
+		lock_first_person = {mod_func = CameraController.LockRailCarFirstPersonView},
+		lock_surround = {mod_func = CameraController.LockRailCarSurroundView},
+		lock_fixed = {mod_func = CameraController.LockRailCarFixedView},
+		lock_movie_view = {mod_func = CameraController.LockRailCarMovieView},
+	}
+
+	GameLogic.GetFilters():add_filter("SyncWorldFinish", CameraController.OnSyncWorldFinish);
 end
 
 function CameraController.OnExit()
@@ -148,7 +166,13 @@ end
 -- may also toggle UI. 
 -- toggle between 3 modes
 -- @param IsFPSView: nil to toggle, otherwise to set
-function CameraController.ToggleCamera(IsFPSView)
+function CameraController.ToggleCamera(IsFPSView)	
+	if CameraController.cur_railcar_camera_mod then
+		CameraController.SetRailCarCameraMod(nil)
+		RailCarPage.SelectType()
+		IsFPSView = false
+	end
+
 	local self = CameraController;
 	if(IsFPSView == nil) then
 		self:SetMode((CameraController:GetMode()+1)%3);
@@ -571,4 +595,337 @@ function CameraController.ZoomInOut(bIsZoomIn)
 		end
 		attr:SetField("CameraObjectDistance", cam_dist);
 	end	
+end
+
+function CameraController.LockCamera(is_lock)
+	CameraController.is_lock_camera = is_lock
+
+    local att = ParaCamera.GetAttributeObject();
+	
+	if is_lock then
+		if CameraController.lock_temp_data == nil then
+			CameraController.lock_temp_data = {}
+			CameraController.lock_temp_data.enable_mouse_wheel = att:GetField("EnableMouseWheel");
+			CameraController.lock_temp_data.enable_mouse_right_drag = att:GetField("EnableMouseRightDrag");
+			CameraController.lock_temp_data.enable_mouse_left_drag = att:GetField("EnableMouseLeftDrag");
+		end
+
+		att:SetField("EnableMouseWheel", false);
+		att:SetField("EnableMouseRightDrag", false);
+		att:SetField("EnableMouseLeftDrag", false);
+	else
+		local temp_data = CameraController.lock_temp_data or {}
+		att:SetField("EnableMouseWheel", temp_data.enable_mouse_wheel or false);
+		att:SetField("EnableMouseRightDrag", temp_data.enable_mouse_right_drag or true);
+		att:SetField("EnableMouseLeftDrag", temp_data.enable_mouse_left_drag or true);
+
+		CameraController.lock_temp_data = nil
+	end
+end
+
+function CameraController.LockRailCarFirstPersonView()
+	local entity = EntityManager.GetFocus();
+	if entity and entity.ridingEntity then
+		CameraController.LockCamera(true)
+
+		local att = ParaCamera.GetAttributeObject();
+		att:SetField("MaxCameraObjectDistance", 0.3);
+		att:SetField("NearPlane", 0.1);
+		att:SetField("RotationScaler", 0.0025);
+		att:SetField("IsShiftMoveSwitched", true);
+		local facing = entity.ridingEntity:GetFacing()
+		local rotation_pitch = entity.ridingEntity:GetRotationPitch()
+		local move_angle = entity.ridingEntity:GetMoveAngel()
+		local is_moving = entity.ridingEntity:IsMoving()
+		CameraController.UpdateCameraRotation(facing, rotation_pitch, move_angle, is_moving)
+	end
+end
+
+function CameraController.LockRailCarSurroundView()
+	local entity = EntityManager.GetFocus();
+	if entity and entity.ridingEntity then
+		CameraController.LockCamera(true)
+
+		local att = ParaCamera.GetAttributeObject();
+		local facing = entity.ridingEntity:GetFacing()
+		local rotation_pitch = entity.ridingEntity:GetRotationPitch()
+		local target_facing = facing - math.pi/2
+		if CameraController.RailCarCamareTimer then
+			local cur_facing = att:GetField("CameraRotY")%(math.pi * 2)
+			target_facing = (math.floor(cur_facing/(math.pi/2)) + 1) * math.pi/2
+		end
+		
+		
+		att:SetField("CameraLiftupAngle", 0.2);
+		att:SetField("CameraRotY", target_facing);
+
+		CameraController.StartSurroundCamrea()
+	end
+end
+
+function CameraController.LockRailCarFixedView()
+	local fiexd_camera_data = CameraController.LoadFiexdCameraSetting()
+	if fiexd_camera_data == nil then
+		return
+	end
+
+	if fiexd_camera_data.movies_list == nil or #fiexd_camera_data.movies_list == 0 then
+		return
+	end
+
+	local movies_list = fiexd_camera_data.movies_list
+	local movies_pos_list = {}
+
+	local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+	if World2In1.IsInVisitPorject() then
+		for i, v in ipairs(movies_list) do
+			movies_pos_list[i] = World2In1.TurnWorldPosToMiniPos(v.pos)
+		end
+	else
+		for i, v in ipairs(movies_list) do
+			movies_pos_list[i] = v.pos
+		end
+	end
+
+	local time = fiexd_camera_data.change_time or 10
+	local is_random = fiexd_camera_data.is_random
+
+	CameraController.StartFiexdCamrea(movies_pos_list, time, is_random)
+end
+
+function CameraController.LockRailCarMovieView()
+	local movies_pos = GameLogic.GetFilters():apply_filters("railcar_fiexd_movie_pos");
+	if movies_pos then
+		local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+		local movie_entity = BlockEngine:GetBlockEntity(movies_pos[1] or 0, movies_pos[2] or 0, movies_pos[3] or 0);
+		if movie_entity.movieClip then
+			movie_entity:ExecuteCommand()
+		end
+
+		-- local channel = MovieManager:CreateGetMovieChannel("railcar_fiexd_moives");
+		-- if channel then
+		-- 	channel:SetStartBlockPosition(math.floor(movies_pos[1]),math.floor(movies_pos[2]),math.floor(movies_pos[3]));
+		-- 	local movieClip = channel:CreateGetStartMovieClip()
+		-- 	channel:PlayLooped(0, -1);
+		-- end
+	end
+end
+
+function CameraController.ClearRailCarCameraModData(is_toggle_camera)
+	CameraController.LockCamera(false)
+	CameraController.ChangeCameraFreeLookMod()
+	if CameraController.RailCarCamareTimer then
+		CameraController.RailCarCamareTimer:Change()
+		CameraController.RailCarCamareTimer = nil
+	end
+
+	local channel = MovieManager:CreateGetMovieChannel("railcar_fiexd_moives");
+	if channel then
+		channel:Stop();	
+	end
+
+	MovieManager:SetActiveMovieClip(nil)
+end
+
+function CameraController.SetRailCarCameraMod(mode)
+	CameraController.cur_railcar_camera_mod = mode
+	CameraController.ClearRailCarCameraModData(is_toggle_camera)
+
+	if mode == nil then
+		return
+	end
+
+	if CameraController.RailCarCameraMod[mode] then
+		local camera_mod_data = CameraController.RailCarCameraMod[mode]
+		if camera_mod_data.mod_func then
+			camera_mod_data.mod_func()
+		end
+	end
+end
+
+function CameraController.UpdateCameraRotation(facing, pitch, move_angel, is_moving)
+	
+	move_angel = move_angel and -move_angel or 0
+	local dir = move_angel >= 0 and 1 or -1
+	local att = ParaCamera.GetAttributeObject()
+	att:SetField("CameraLiftupAngle", (pitch*math.pi/180 + math.pi/15) * dir);
+	local camera_facing = is_moving and move_angel or facing
+	att:SetField("CameraRotY", camera_facing);
+end
+
+function CameraController.IsLockRailCarFirstPersonView()
+	return CameraController.cur_railcar_camera_mod == "lock_first_person"
+end
+
+function CameraController.StartSurroundCamrea()
+	if CameraController.RailCarCamareTimer then
+		CameraController.RailCarCamareTimer:Change()
+	end
+
+	local att = ParaCamera.GetAttributeObject()
+	local start_facing = att:GetField("CameraRotY")
+	CameraController.RailCarCamareTimer =  commonlib.Timer:new({callbackFunc = function()
+
+		local facing = att:GetField("CameraRotY")
+		if facing - start_facing >= math.pi then
+			local cur_facing = facing%(math.pi * 2)
+			target_facing = math.floor(cur_facing/(math.pi/2)) * math.pi/2
+			att:SetField("CameraRotY", target_facing);
+			CameraController.StartSurroundCamrea()
+			return
+		end
+
+		facing = facing + math.pi/180;
+		att:SetField("CameraRotY", facing);
+	end})
+	CameraController.RailCarCamareTimer:Change(5000,50);
+end
+
+function CameraController.StartFiexdCamrea(movies_pos_list, time, is_random)
+	if movies_pos_list == nil or #movies_pos_list == 0 then
+		local channel = MovieManager:CreateGetMovieChannel("railcar_fiexd_moives");
+		if channel then
+			channel:Stop();	
+		end
+		return
+	end
+
+	local remove_index = is_random and math.random(1, #movies_pos_list) or 1
+	local movies_pos = table.remove(movies_pos_list, remove_index)
+	local channel = MovieManager:CreateGetMovieChannel("railcar_fiexd_moives");
+	if channel then
+		channel:SetStartBlockPosition(math.floor(movies_pos[1]),math.floor(movies_pos[2]),math.floor(movies_pos[3]));
+		local movieClip = channel:CreateGetStartMovieClip()
+		channel:PlayLooped(0, -1);
+	end
+
+	CameraController.RailCarCamareTimer =  commonlib.Timer:new({callbackFunc = function()
+		CameraController.StartFiexdCamrea(movies_pos_list, time, is_random) 
+	end})
+	CameraController.RailCarCamareTimer:Change(time * 1000);
+end
+
+function CameraController.LoadFiexdCameraSetting()
+	local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+	-- 二合一世界作品区特殊处理
+	if World2In1.IsInVisitPorject() then
+		local world_info = World2In1.GetCurProjectServerData()
+		if world_info.extra and world_info.extra.railcar_fiexd_setting then
+			return world_info.extra.railcar_fiexd_setting
+		end
+		return
+	end
+
+	local filename = "railcar_setting.txt"
+    local world_data = Mod.WorldShare.Store:Get('world/currentWorld')
+	if world_data == nil then
+		return
+	end
+	
+    if GameLogic.GameMode:IsEditor() or (GameLogic.GameMode:GetMode() == "game" and not GameLogic.IsReadOnly()) then
+		local disk_folder = world_data.worldpath
+		local file_path = string.format("%s/%s", disk_folder, filename)
+		if ParaIO.DoesFileExist(file_path) then
+			local file = ParaIO.open(file_path, "r")
+			if(file:IsValid()) then
+				local data = file:GetText();
+				return commonlib.Json.Decode(data)
+			end
+		end
+	elseif GameLogic.IsReadOnly() then
+		local world = RemoteWorld.LoadFromHref(world_data.remotefile, "self")
+		local projectId = world_data.kpProjectId or 0
+		world:SetProjectId(projectId)
+		local fileUrl = world:GetLocalFileName()
+		if ParaIO.DoesFileExist(fileUrl) then
+			local path = fileUrl
+			local parentPath = path:gsub("[^/\\]+$", "")
+			ParaAsset.OpenArchive(path, true)
+		
+			local revision = 0
+			local output = {}
+			commonlib.Files.Find(output, "", 0, 10000, ":railcar_setting.txt", path)
+		
+			if #output ~= 0 then
+				local file = ParaIO.open(parentPath .. output[1].filename, "r")
+				if file:IsValid() then
+					local data = file:GetText();
+					return commonlib.Json.Decode(data)
+				end
+			end
+		
+			ParaAsset.CloseArchive(path)
+		end
+    end
+end
+
+function CameraController.ChangeCameraFreeLookMod()
+	local self = CameraController;
+	self:SetMode(CameraModes.ThirdPersonFreeLooking);
+	GameLogic.IsFPSView = false;
+	local att = ParaCamera.GetAttributeObject();
+	att:SetField("MaxCameraObjectDistance", 26);
+	att:SetField("IsAlwaysRotateCameraWhenFPS", false);
+	att:SetField("CameraObjectDistance", 8);
+	att:SetField("NearPlane", 0.1);
+	--att:SetField("FieldOfView", 60/180*3.1415926)
+
+	--att:SetField("MoveScaler", 5);
+	att:SetField("RotationScaler", 0.01);
+	--att:SetField("TotalDragTime", 0.5)
+	--att:SetField("SmoothFramesNum", 2)
+	att:SetField("EnableMouseWheel", false);
+
+	att:SetField("IsShiftMoveSwitched", true);
+	ParaScene.GetPlayer():SetDensity(GameLogic.options.NormalDensity);
+	ParaUI.ShowCursor(true);
+	ParaUI.LockMouse(false);
+	local _this = ParaUI.GetUIObject("FPS_Cursor");
+	if(_this:IsValid())then
+		_this.visible = false;
+	end
+	if(CameraController.FPS_MouseTimer) then
+		CameraController.FPS_MouseTimer:Change();
+	end
+end
+
+function CameraController.OnSyncWorldFinish()
+    local world_data = Mod.WorldShare.Store:Get('world/currentWorld')
+	if world_data == nil then
+		return
+	end
+
+	local disk_folder = world_data.worldpath
+	local filename = "railcar_setting.txt"
+
+	local file_path = string.format("%s/%s", disk_folder, filename)
+	if ParaIO.DoesFileExist(file_path) then
+		local file = ParaIO.open(file_path, "r")
+		local setting = nil
+		if(file:IsValid()) then
+			local data = file:GetText();
+			setting = commonlib.Json.Decode(data)
+			if setting and (not setting.has_upload or setting.kpProjectId ~= world_data.kpProjectId) then
+				local params = {
+					extra = {}
+				}
+				params.extra.railcar_fiexd_setting = setting;
+				local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
+				KeepworkServiceProject:UpdateProject(world_data.kpProjectId, params, function(data, err)
+					if err == 200 then
+						setting.has_upload = true
+						setting.kpProjectId = world_data.kpProjectId
+						data = commonlib.Json.Encode(setting);
+						file = ParaIO.open(file_path, "w");
+						if(file) then
+							file:write(data, #data);
+							file:close();
+						end
+					end
+
+					
+				end)
+			end
+		end
+	end
 end

@@ -200,8 +200,14 @@ Commands["menu"] = {
 		elseif(name == "help.learn") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/s");
 		elseif(name == "help.dailycheck") then
-			local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-			ParacraftLearningRoomDailyPage.DoCheckin();
+			local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+			if(not KeepWorkItemManager.GetToken())then
+				local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+				ParacraftLearningRoomDailyPage.DoCheckin();
+			else
+				local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
+				RedSummerCampRecCoursePage.Show();
+			end
 		elseif(name == "help.ask") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/FAQ/paracraft");
 		elseif(name == "help.lessons") then

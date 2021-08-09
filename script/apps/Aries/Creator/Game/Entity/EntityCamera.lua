@@ -15,6 +15,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
 NPL.load("(gl)script/ide/math/math3d.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TimeSeries.lua");
+local TimeSeries = commonlib.gettable("MyCompany.Aries.Game.Common.TimeSeries");
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
@@ -326,4 +328,56 @@ function Entity:FrameMove(deltaTime)
 	self:UpdatePosition();
 	EntityManager.Entity.FrameMove(self, deltaTime);
 	-- return Entity._super.FrameMove(self, deltaTime);
+end
+
+-- call this funciton before calling GetValue to fetch from time series
+function Entity:BindToItemStack(itemStack)
+	local timeseries = itemStack:GetDataField("timeseries");
+	if(not timeseries) then
+		timeseries = {};
+		itemStack:SetDataField("timeseries", timeseries);
+	end
+	self.TimeSeries = self.TimeSeries or TimeSeries:new{name = "Actor",};
+	self.TimeSeries:LoadFromTable(timeseries);
+end
+
+function Entity:GetVariable(keyname)
+	return self.TimeSeries and self.TimeSeries:GetVariable(keyname);
+end
+
+-- @param bStartFromFirstKeyFrame: whether we will only value after the time of first key frame. default to false.
+function Entity:GetValue(keyname, time, bStartFromFirstKeyFrame)
+	local v = self:GetVariable(keyname);
+	if(v and time) then
+		if(not bStartFromFirstKeyFrame) then
+			-- default to animId = 1
+			return v:getValue(1, time);
+		else
+			local firstTime = v:GetFirstTime();
+			if(firstTime and firstTime <= time) then
+				return v:getValue(1, time);
+			end
+		end
+	end
+end
+
+-- one needs to bind to a time series first before calling this function. 
+function Entity:PlayToTime(curTime)
+	local x = self:GetValue("lookat_x", curTime);
+	local y = self:GetValue("lookat_y", curTime);
+	local z = self:GetValue("lookat_z", curTime);
+	local eye_dist = self:GetValue("eye_dist", curTime) or 3;
+	self.eye_dist = eye_dist;
+	local eye_liftup = self:GetValue("eye_liftup", curTime) or 0;
+	local eye_rot_y = self:GetValue("eye_rot_y", curTime) or 0;
+	local eye_roll = self:GetValue("eye_roll", curTime) or 0;
+	self:SetPosition(x, y, z);
+	self:SetFacing(eye_rot_y);
+	self:SetRoll(eye_liftup);
+	self:SetPitch(eye_roll);
+	ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
+end
+
+function Entity:GetEyeDist()
+	return self.eye_dist or 3;
 end

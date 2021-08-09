@@ -173,6 +173,25 @@ turn greyblur effect on and off
 	end,
 };
 
+-- need to opt
+Commands["cartoon"] = {
+	name="cartoon", 
+	quick_ref="/cartoon [on|off]", 
+	desc=[[
+		turn cartoon effect on and off
+		/cartoon on
+		/cartoon off
+	]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local bIsOn;
+		bIsOn, cmd_text = CmdParser.ParseBool(cmd_text);	
+		local effect = GameLogic.GetShaderManager():GetEffect("Cartoon");
+		if(effect) then
+			effect:SetEnabled(bIsOn);
+		end
+	end,
+};
+
 Commands["grey"] = {
 	name="grey", 
 	quick_ref="/grey [r g b] [glow_r glow_g glow_b]", 

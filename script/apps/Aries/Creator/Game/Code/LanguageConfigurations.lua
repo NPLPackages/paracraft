@@ -40,6 +40,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/Microbit/Microbit.lua");
 	elseif(filename == "npl_camera") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraBlockly.lua");
+	elseif(filename == "game_inventor") then
+		langConfig = NPL.load("(gl)Mod/GeneralGameServerMod/GI/Independent/GIBlockly.lua");
 	else
 		filename = Files.GetWorldFilePath(filename)
 		if(filename) then

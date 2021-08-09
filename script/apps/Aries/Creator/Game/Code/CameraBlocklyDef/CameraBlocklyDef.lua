@@ -30,10 +30,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.use",
-	func_description = 'camera.use("%s")',
+	funcName = "Camera.use",
+	func_description = 'Camera.use("%s")',
 	ToNPL = function(self)
-		return string.format('camera.use("%s")\n', self:getFieldValue('cameraId'));
+		return string.format('Camera.use("%s")\n', self:getFieldValue('cameraId'));
 	end,
 	examples = {{desc = "使用指定的摄影机", canRun = true, code = [[
 ]]}},
@@ -68,10 +68,10 @@ NPL.export({
 	hide_in_toolbox = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.setPosition",
-	func_description = 'camera.setPosition(%d, %d, %d)',
+	funcName = "Camera.setPosition",
+	func_description = 'Camera.setPosition(%d, %d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.setPosition(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
+		return string.format('Camera.setPosition(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -99,10 +99,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.moveForward",
-	func_description = 'camera.moveForward(%d, %d)',
+	funcName = "Camera.moveForward",
+	func_description = 'Camera.moveForward(%d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.moveForward(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
+		return string.format('Camera.moveForward(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -130,10 +130,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.moveHorizontal",
-	func_description = 'camera.moveHorizontal(%d, %d)',
+	funcName = "Camera.moveHorizontal",
+	func_description = 'Camera.moveHorizontal(%d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.moveHorizontal(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
+		return string.format('Camera.moveHorizontal(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -161,10 +161,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.moveVertical",
-	func_description = 'camera.moveVertical(%d, %d)',
+	funcName = "Camera.moveVertical",
+	func_description = 'Camera.moveVertical(%d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.moveVertical(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
+		return string.format('Camera.moveVertical(%s, %s)\n', self:getFieldAsString('dist'), self:getFieldAsString('duration'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -192,10 +192,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.rotateYaw",
-	func_description = 'camera.rotateYaw(%d, %d)',
+	funcName = "Camera.rotateYaw",
+	func_description = 'Camera.rotateYaw(%d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.rotateYaw(%s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'));
+		return string.format('Camera.rotateYaw(%s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -223,10 +223,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.rotatePitch",
-	func_description = 'camera.rotatePitch(%d, %d)',
+	funcName = "Camera.rotatePitch",
+	func_description = 'Camera.rotatePitch(%d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.rotatePitch(%s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'));
+		return string.format('Camera.rotatePitch(%s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -254,10 +254,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.rotateRoll",
-	func_description = 'camera.rotateRoll(%d, %d)',
+	funcName = "Camera.rotateRoll",
+	func_description = 'Camera.rotateRoll(%d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.rotateRoll(%s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'));
+		return string.format('Camera.rotateRoll(%s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -291,10 +291,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.circle",
-	func_description = 'camera.circle(%d, %d, %d)',
+	funcName = "Camera.circle",
+	func_description = 'Camera.circle(%d, %d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.circle(%s, %s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'), self:getFieldAsString('radius'));
+		return string.format('Camera.circle(%s, %s, %s)\n', self:getFieldAsString('degree'), self:getFieldAsString('duration'), self:getFieldAsString('radius'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -322,10 +322,10 @@ NPL.export({
 	canRun = true,
 	previousStatement = true,
 	nextStatement = true,
-	funcName = "camera.play",
-	func_description = 'camera.play(%d, %d)',
+	funcName = "Camera.play",
+	func_description = 'Camera.play(%d, %d)',
 	ToNPL = function(self)
-		return string.format('camera.play(%s, %s)\n', self:getFieldAsString('bengin_time'), self:getFieldAsString('end_time'));
+		return string.format('Camera.play(%s, %s)\n', self:getFieldAsString('bengin_time'), self:getFieldAsString('end_time'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
@@ -345,12 +345,12 @@ NPL.export({
 	category = "Camera",
 	helpUrl = "", 
 	canRun = true,
-	funcName = "camera.wait",
+	funcName = "Camera.wait",
 	previousStatement = true,
 	nextStatement = true,
-	func_description = 'camera.wait(%s)',
+	func_description = 'Camera.wait(%s)',
 	ToNPL = function(self)
-		return string.format('camera.wait(%s)\n', self:getFieldAsString('time'));
+		return string.format('Camera.wait(%s)\n', self:getFieldAsString('time'));
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
