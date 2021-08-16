@@ -24,7 +24,7 @@ ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 196;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 200;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -223,22 +223,10 @@ NPL自定义世界图块
 批量替换方块
 不可编辑方块
 彩色的提问按钮
-密室解锁逻辑
-多人联网发消息
-多人联网共享数据
-多人联网排行榜
-手机版操作介绍（上）
-手机版操作介绍（下）
-给平板电脑加上键盘和鼠标
-发布手机App
-世界激活码 （上）
-世界激活码 （下）
-新建世界模板展示
-2合1课程世界介绍（上）
-2合1课程世界介绍（下）
-3C教学法介绍
-摄影机图块 (上)
-摄影机图块 (下)
+可点击的相册
+密室解锁逻辑（上）
+密室解锁逻辑（下）
+将电脑使用权还给孩子
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 

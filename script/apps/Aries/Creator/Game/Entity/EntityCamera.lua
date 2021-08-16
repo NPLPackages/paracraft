@@ -37,6 +37,7 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 Entity:Signal("cameraHidden");
 Entity:Signal("cameraShown");
 Entity:Signal("targetChanged", function(newTarget, oldTarget) end);
+Entity:Signal("beforeDestroyed")
 
 -- persistent object by default. 
 Entity.is_persistent = false;
@@ -237,6 +238,7 @@ function Entity:HasCollision()
 end
 
 function Entity:Destroy()
+	self:beforeDestroyed();
 	if(not self:HasCollision()) then
 		ParaCamera.GetAttributeObject():SetField("EnableBlockCollision", true);	
 	end
@@ -361,8 +363,40 @@ function Entity:GetValue(keyname, time, bStartFromFirstKeyFrame)
 	end
 end
 
+function Entity:GetEyeLifeup()
+	return self.eye_liftup;
+end
+
+function Entity:SetEyeLifeup(eye_liftup)
+	self.eye_liftup = eye_liftup;
+
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("HeadUpdownAngle", 0);
+		obj:SetField("HeadTurningAngle", 0);
+		local nx, ny, nz = mathlib.math3d.vec3Rotate(0, 1, 0, 0, 0, -(eye_liftup or 0))
+		nx, ny, nz = mathlib.math3d.vec3Rotate(nx, ny, nz, 0, self:GetFacing() or 0, 0)
+		obj:SetField("normal", {nx, ny, nz});
+	end
+end
+
+function Entity:GetEyeRoll()
+	return self.eye_roll;
+end
+
+function Entity:SetEyeRoll(eye_roll)
+	self.eye_roll = eye_roll;
+	local obj = self:GetInnerObject();
+	if(obj) then
+		obj:SetField("pitch", eye_roll);
+	end
+end
+
 -- one needs to bind to a time series first before calling this function. 
+-- @param curTime: if nil, we will play to current time or 0. 
 function Entity:PlayToTime(curTime)
+	curTime = curTime or self.curTime or 0;
+	self.curTime = curTime
 	local x = self:GetValue("lookat_x", curTime);
 	local y = self:GetValue("lookat_y", curTime);
 	local z = self:GetValue("lookat_z", curTime);
@@ -373,10 +407,16 @@ function Entity:PlayToTime(curTime)
 	local eye_roll = self:GetValue("eye_roll", curTime) or 0;
 	self:SetPosition(x, y, z);
 	self:SetFacing(eye_rot_y);
-	self:SetRoll(eye_liftup);
-	self:SetPitch(eye_roll);
-	ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
+	self:SetEyeLifeup(eye_liftup);
+	self:SetEyeRoll(eye_roll);
+
+	if(self:HasFocus()) then
+		ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
+	end
 end
+
+
+
 
 function Entity:GetEyeDist()
 	return self.eye_dist or 3;

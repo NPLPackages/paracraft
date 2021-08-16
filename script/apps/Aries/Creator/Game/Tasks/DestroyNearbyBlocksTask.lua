@@ -55,7 +55,6 @@ function DestroyNearbyBlocks:Run()
 		end
 
 		local destroy_blocks = {};
-		local i, j, k;
 		for i = 0, 2 do 
 			for j = 0, 2 do 
 				for k = 0, 2 do 
@@ -75,6 +74,7 @@ function DestroyNearbyBlocks:Run()
 	if(#(self.destroy_blocks) > 0)then
 		self.start_time = commonlib.TimerManager.GetCurrentTime();
 		TaskManager.AddTask(self);
+		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",self.destroy_blocks)
 	end
 end
 
@@ -97,20 +97,22 @@ function DestroyNearbyBlocks:FrameMove()
 		local pieces_granularity = 3/total_count;
 		local is_sound_played;
 		local count = 0;
-		local b;
 		for _, b in ipairs(self.destroy_blocks) do
 			local block_id, last_block_data, last_entity_data = BlockEngine:GetBlockFull(b[1],b[2],b[3]);
 			if(block_id and block_id > 0) then
+				b.block_id = block_id;
+				b.last_block_data = last_block_data;
+				b.last_entity_data = last_entity_data;
+			end
+		end
+		for _, b in ipairs(self.destroy_blocks) do
+			if(b.block_id and b.block_id > 0) then
 				-- keep block_id for redo. 
-				local block_template = block_types.get(block_id);
+				local block_template = block_types.get(b.block_id);
 				if(block_template) then
 					local color = block_template:GetDiffuseColor(b[1],b[2],b[3])
-					
 					local block_modified = block_template:Remove(b[1],b[2],b[3]);
 					if(block_modified and block_modified>=1) then
-						b.block_id = block_id;
-						b.last_block_data = last_block_data;
-						b.last_entity_data = last_entity_data;
 						count = count + 1;
 							
 						block_template:CreateBlockPieces(b[1],b[2],b[3], pieces_granularity, nil, nil, nil, nil, color);
@@ -144,7 +146,6 @@ function DestroyNearbyBlocks:FrameMove()
 	end
 
 	-- update the selector effect
-	local b;
 	for _, b in ipairs(self.destroy_blocks) do
 		ParaTerrain.SelectBlock(b[1],b[2],b[3], not self.finished);
 	end
@@ -153,24 +154,26 @@ end
 function DestroyNearbyBlocks:Redo()
 	if(self.count and self.count>0) then
 		-- update the selector effect
-		local b;
+		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.destroy_blocks) do
 			if(b.block_id) then
 				BlockEngine:SetBlockToAir(b[1],b[2],b[3], 3);
 			end
 		end
+		BlockEngine:EndUpdate()
 	end
 end
 
 function DestroyNearbyBlocks:Undo()
 	if(self.count and self.count>0) then
 		-- update the selector effect
-		local b;
+		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.destroy_blocks) do
 			if(b.block_id) then
 				BlockEngine:SetBlock(b[1],b[2],b[3], b.block_id, b.last_block_data, 3, b.last_entity_data);
 			end
 		end
+		BlockEngine:EndUpdate()
 		if(self.player_x) then
 			ParaScene.GetPlayer():SetPosition(self.player_x, self.player_y, self.player_z);
 		end

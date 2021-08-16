@@ -21,6 +21,8 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 
 local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 local page;
 CreatorDesktop.views = {
@@ -257,6 +259,18 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 
 	if(CreatorDesktop.IsExpanded) then
 		GameLogic:desktopLayoutRequested("CreatorDesktop");
+	end
+
+	CreatorDesktop.tabview_ds = {
+		{text=L"建造", name="building", url="script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html?version=1", enabled=true}, -- script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html
+		{text=L"环境", name="env", url="script/apps/Aries/Creator/Game/Areas/EnvFramePage.html?version=1", enabled=true}, -- script/apps/Aries/Creator/Game/Areas/EnvFramePage.html
+	}
+
+	-- 处理工具箱(只在二合一世界处理)
+	local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+	local world2in1_tool_data = World2In1.GetToolItems()
+	if world2in1_tool_data and #world2in1_tool_data > 0 then
+		table.insert(CreatorDesktop.tabview_ds, {text=L"世界", name="world", url="script/apps/Aries/Creator/Game/Areas/World2In1FramePage.html?version=1", enabled=true})
 	end
 
 	CreatorDesktop.new_page_params = CreatorDesktop.new_page_params  or {

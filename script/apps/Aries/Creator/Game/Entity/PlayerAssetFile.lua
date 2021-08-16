@@ -170,6 +170,8 @@ function PlayerAssetFile:GetDefaultCustomGeosets()
 	return CustomCharItems.defaultSkinString;
 end
 
+--- @param player All player obj in the scene
+--- @param skin 80001;21122;
 function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 	if (not skin or skin == "") then
 		skin = self:GetDefaultCustomGeosets();
@@ -177,13 +179,27 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 		skin = CustomCharItems:ItemIdsToSkinString(skin);
 	end
 
+	-- commonlib.echo("PlayerAssetFile:RefreshCustomGeosets:skin"); commonlib.echo(skin);
+	-- echo:"skin ds"
+	-- echo:return "6#201#301#401#501#801#901#
+	-- @1:Texture/blocks/CustomGeoset/hair/36_Avatar_boy_hair_02.png;
+	-- 2:Texture/blocks/CustomGeoset/body/84064_Avatar_boy_body_54.png;
+	-- 3:Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png;4:Texture/blocks/Paperman/mouth/mouth_boy_fps10_a001.png;
+	-- 5:Texture/blocks/CustomGeoset/leg/85082_Avatar_boy_leg_72.png;6:Texture/blocks/CustomGeoset/main/Avatar_tsj.png;
+	-- @2:character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x;
+	-- 15:character/v3/Item/ObjectComponents/Back/1735_ColiseumFireBackS1.anim.x;
+	-- 20:character/CC/ObjectComponents/ride/tank.anim.x;"
 	local geosets, textures, attachments =  string.match(skin, "([^@]+)@([^@]+)@?(.*)");
+
 	if (not geosets) then
 		geosets = skin;
 	end
 
 	local use_hair = false;
 	local charater = player:ToCharacter();
+
+	-- echo:"geosets"
+    -- echo:return "6#201#301#401#501#801#901#"
 	if (geosets) then
 		for geoset in string.gfind(geosets, "([^#]+)") do
 			local id = tonumber(geoset);
@@ -194,6 +210,8 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 		end
 	end
 
+	-- textures data structure
+	-- 1:Texture/blocks/CustomGeoset/hair/36_Avatar_boy_hair_02.png;2:Texture/blocks/CustomGeoset/body/84064_Avatar_boy_body_54.png;
 	if (textures) then
 		local replace_hand = false;
 		for id, filename in textures:gmatch("(%d+):([^;]+)") do
@@ -211,7 +229,27 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 	charater:RemoveAttachment(2, 2);
 	charater:RemoveAttachment(11, 11);
 	charater:RemoveAttachment(15, 15);
-	if (attachments) then
+
+	-- local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+	-- -- if GameLogic doesn't call init method
+	-- if(GameLogic.EntityManager == nil) then return end;
+	-- local curPlayer = GameLogic.EntityManager.GetPlayer();
+	-- local ATTACHMENT_ID_PET = 20;
+
+	-- attachments data structure
+	-- "2:character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x;
+	-- 15:character/v3/Item/ObjectComponents/Back/1735_ColiseumFireBackS1.anim.x;
+	-- 20:character/CC/ObjectComponents/ride/tank.anim.x;"
+	-- commonlib.echo("attachments"); commonlib.echo(attachments);
+	-- 是否包含坐骑皮肤
+	-- if(string.find(attachments, "20:") == nil and curPlayer) then
+	-- 	-- 如果是当前用户的player对象
+	-- 	if(curPlayer.obj_id == player.id) then
+	-- 		curPlayer:UnLoadPet();
+	-- 	end
+	-- end
+
+	if (string.len(attachments) > 0) then
 		for id, filename in attachments:gmatch("(%d+):([^;]+)") do
 			id = tonumber(id);
 			if (use_hair and id == 11) then
@@ -224,7 +262,38 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 					meshModel = ParaAsset.LoadStaticMesh("", filename);
 				end
 				if (meshModel) then
-					charater:AddAttachment(meshModel, id, id);
+					-- if(id == ATTACHMENT_ID_PET and (curPlayer.obj_id == player.id)) then
+					-- 	commonlib.echo("update current user info");
+					-- 	if(curPlayer.pet) then
+					-- 		-- curPlayer:MountOn(curPlayer.pet);
+					-- 		-- TODO update pet
+					-- 		return;
+					-- 	else
+					-- 		local x, y, z = curPlayer:GetPosition();
+
+					-- 		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPlayer.lua");
+					-- 		local EntityPlayer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPlayer")
+					-- 		local pet = EntityPlayer:new();
+					-- 		pet:init(curPlayer.worldObj);
+					-- 		pet:CreateInnerObject(filename, true, 0, 1);
+					-- 		pet:SetPosition(x, y, z);
+	
+					-- 		curPlayer:SetAnimation(187);
+					-- 		curPlayer:MountOn(pet);
+
+					-- 		-- commonlib.TimerManager.SetTimeout(function()
+					-- 		-- 	commonlib.echo("curPlayer:GetInnerObject():ToCharacter():IsMounted()");
+					-- 		-- 	commonlib.echo(curPlayer:GetInnerObject():ToCharacter():IsMounted());
+					-- 		-- 	pet:SetFocus();
+					-- 		-- end, 2000);
+
+					-- 		commonlib.echo("curPlayer:GetInnerObject():ToCharacter():IsMounted()");
+					-- 		commonlib.echo(curPlayer:GetInnerObject():ToCharacter():IsMounted());
+					-- 		commonlib.echo(pet:HasFocus());
+					-- 	end
+					-- else
+						charater:AddAttachment(meshModel, id, id);
+					-- end
 				end
 			end
 		end

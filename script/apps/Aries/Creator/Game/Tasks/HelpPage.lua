@@ -10,7 +10,7 @@ local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
 HelpPage.ShowPage();
 -------------------------------------------------------
 ]]
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestProvider.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/BuilderFramePage.lua");
@@ -21,6 +21,7 @@ local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BuilderFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BuilderFramePage");
 local BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest");
 local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
 
@@ -61,7 +62,10 @@ function HelpPage.ShowPage(category_name, subfolder_name)
 	});
 
 	HelpPage.SelectCategory(category_name, subfolder_name);
-	GameLogic.events:DispatchEvent({type = "ShowHelpPage"});
+
+	if GameLogic.events then
+		GameLogic.events:DispatchEvent({type = "ShowHelpPage"});
+	end
 end
 
 function HelpPage.ClosePage()

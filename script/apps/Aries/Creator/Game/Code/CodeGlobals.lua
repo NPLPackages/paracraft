@@ -245,10 +245,17 @@ function CodeGlobals:Reset()
 	LobbyServerViaTunnel.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 end
 
-function CodeGlobals:GetSandboxAPI()
-	if (self.__GI__) then return self.__GI__:GetCodeBlockAPI() end 
+function CodeGlobals:GetGI()
+	if (self.__GI__) then return self.__GI__ end
 	self.__GI__ = NPL.load("Mod/GeneralGameServerMod/GI/GI.lua");
-	return self.__GI__:GetCodeBlockAPI();
+	return self.__GI__;
+end
+
+function CodeGlobals:GetSandboxAPI()
+	-- 边学边玩可能不更新GGS代码 导致GI可能不存在
+	if (not self:GetGI()) then return end
+	
+	return self:GetGI():GetCodeBlockAPI();
 end
 
 function CodeGlobals:log(obj, ...)

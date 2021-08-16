@@ -99,10 +99,10 @@ Commands["sphere"] = {
 	name="sphere", 
 	quick_ref="/sphere radius [beSolid]", 
 	desc=[[create a sphere
-@param beSolid: default to true. 
+@param beSolid: default to false. 
 e.g.
 /sphere 4
-/sphere 4 false
+/sphere 4 true
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(not GameLogic.is_started) then

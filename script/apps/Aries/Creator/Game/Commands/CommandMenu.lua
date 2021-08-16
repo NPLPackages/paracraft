@@ -198,7 +198,7 @@ Commands["menu"] = {
 		elseif(name == "help.videotutorials") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/videoguide");
 		elseif(name == "help.learn") then
-			GameLogic.RunCommand("/open "..L"https://keepwork.com/s");
+			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/index");
 		elseif(name == "help.dailycheck") then
 			local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 			if(not KeepWorkItemManager.GetToken())then

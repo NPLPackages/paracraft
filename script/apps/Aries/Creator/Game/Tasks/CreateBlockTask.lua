@@ -171,9 +171,11 @@ function CreateBlock:Redo()
 	if(self.blockX and self.block_id) then
 		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.block_id, self.data, 3, self.entity_data);
 	elseif((#self.history)>0) then
+		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.history) do
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0, b[7], nil, b[8]);
 		end
+		BlockEngine:EndUpdate()
 	end
 end
 
@@ -181,8 +183,10 @@ function CreateBlock:Undo()
 	if(self.blockX and self.block_id) then
 		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.last_block_id or 0, self.last_block_data,3, self.last_entity_data);
 	elseif((#self.history)>0) then
+		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.history) do
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[5] or 0, b[6], nil, b[9]);
 		end
+		BlockEngine:EndUpdate()
 	end
 end

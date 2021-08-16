@@ -410,6 +410,7 @@ end
 function WorldCommon.ReplaceWorld(targetProjectId)
 	local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
 	WorldCommon.sourceWorldFolderName = currentEnterWorld and currentEnterWorld.foldername or WorldCommon.GetWorldTag("name");
+	WorldCommon.sourceWorldFolderName = commonlib.Encoding.Utf8ToDefault(WorldCommon.sourceWorldFolderName)
 	WorldCommon.sourceWorldName = WorldCommon.GetWorldTag("name");
 	WorldCommon.destWorldId = targetProjectId;
 	GameLogic:Connect("WorldLoaded", WorldCommon, WorldCommon.OnWorldLoaded, "UniqueConnection");
@@ -422,23 +423,25 @@ function WorldCommon.ReplaceWorldImp()
 		return false;
 	end
 
+	GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在使用当前世界替换原有的并行世界...', nil, nil, 450)
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
 	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 	local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. WorldCommon.sourceWorldFolderName.. "/";
+
 	WorldCommon.SaveWorldAsImp(targetFolder, function(result)
-		if (result) then
-			_guihelper.MessageBox(string.format(L"替换成功，即将进入【%s】。", WorldCommon.sourceWorldName));
-		end
 		local sourceWorldName = WorldCommon.sourceWorldName
 		WorldCommon.sourceWorldName = nil
+
 		commonlib.TimerManager.SetTimeout(function()
+			GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
 			WorldCommon.OpenWorld(targetFolder, true);
 
 			commonlib.TimerManager.SetTimeout(function()
-				WorldCommon.SetWorldTag("name", sourceWorldName);
+				WorldCommon.SetWorldTag("name", sourceWorldName or '');
 				WorldCommon.SaveWorldTag()
-			end, 2000);
-		end, 2000);
+			end, 8000);
+		end, 5000);
 	end);
 end
 
@@ -447,10 +450,12 @@ function WorldCommon.OnWorldLoaded()
 	local projectId = GameLogic.options:GetProjectId();
 	if (projectId and tostring(projectId) == tostring(WorldCommon.destWorldId)) then
 		commonlib.TimerManager.SetTimeout(function()
-			_guihelper.MessageBox(L"正在使用当前世界替换原有的并行世界...");
-		end, 3000);
-		commonlib.TimerManager.SetTimeout(function()
-			WorldCommon.ReplaceWorldImp()
-		end, 4000);
+			GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在使用当前世界替换原有的并行世界...', nil, nil, 450)
+
+			commonlib.TimerManager.SetTimeout(function()
+				GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+				WorldCommon.ReplaceWorldImp()
+			end, 4000);
+		end, 1000);
 	end
 end

@@ -459,19 +459,21 @@ end
 
 function BlockTemplate:Redo()
 	if(self.blockX and self.fill_id and (#self.history)>0) then
-		local _, b;
+		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.history) do
-			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or self.fill_id);
+			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or self.fill_id, b[7], nil, b[8]);
 		end
+		BlockEngine:EndUpdate()
 	end
 end
 
 function BlockTemplate:Undo()
 	if(self.blockX and self.fill_id and (#self.history)>0) then
-		local _, b;
+		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.history) do
-			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0);
+			BlockEngine:SetBlock(b[1],b[2],b[3], b[5] or 0, b[6], nil, b[9]);
 		end
+		BlockEngine:EndUpdate()
 	end
 end
 

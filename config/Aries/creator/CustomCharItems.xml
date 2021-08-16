@@ -1009,7 +1009,10 @@ model id
     -->
     
     <!--    89000 89999  坐骑      -->
-    <item id="89001" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/ride/89001_shubao.anim.x"></attachment></item>
+    <item id="89001" model="actor;">
+      <!-- id=20是固定的 -->
+      <attachment id="20" filename="character/CC/ObjectComponents/Ride/89001_tank.anim.x"></attachment>
+    </item>
 
   </items>
   <models type="actor">

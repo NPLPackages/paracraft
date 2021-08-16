@@ -54,8 +54,17 @@ function World2In1.OnInit()
 	page_root = page:GetParentUIObject()
 end
 
+function World2In1.Init()
+	World2In1.InitToolItems()
+
+	-- 绑定上传世界完成事件
+	GameLogic.GetFilters():add_filter("SyncWorldFinish", World2In1.OnSyncWorldFinish);
+end
+
 function World2In1.ShowPage(offset, reload)
 	offset = offset or 0;
+
+	World2In1.Init()
 	local params = {
 		url = "script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.html",
 		name = "World2In1.ShowPage", 
@@ -194,6 +203,8 @@ function World2In1.OnWorldUnload()
 	hidePage = false;
 	page_root = nil
 	VideoSharingUpload.ChangeRegionType(nil)
+	World2In1.SetIsWorld2In1(false)
+	World2In1.ItemsDataSource = nil
 end
 
 function World2In1.OnClose()
@@ -226,6 +237,10 @@ function World2In1.BroadcastTypeChanged()
 	VideoSharingUpload.ChangeRegionType(currentType)
 	-- World2In1.UnLoadcurrentWorldList()
 	GameLogic.GetCodeGlobal():BroadcastTextEvent("changeRegionType")
+
+	if last_region_type == "creator" then
+		World2In1.ChangeSkyBox("")
+	end
 end
 
 function World2In1.SaveCreateTips(callback)
@@ -541,6 +556,23 @@ function World2In1.GetEnterCreateRegionCb()
 	return World2In1.enter_create_region_cb
 end
 
+function World2In1.ChangeSkyBox(file)
+	local entity_sky = GameLogic.GetSkyEntity()
+	if file and (file ~= entity_sky.filename or entity_sky.IsSimulatedSky) then
+		if file == "" then
+			if not entity_sky.IsSimulatedSky then
+				NPL.load("(gl)script/apps/Aries/Creator/Env/SkyPage.lua");
+				local SkyPage = commonlib.gettable("MyCompany.Aries.Creator.SkyPage");
+				SkyPage.OnChangeSkybox(1);
+			end
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+			CommandManager:RunCommand("/sky "..file);
+		end
+	end
+end
+
 function World2In1.GotoCreateRegion(pos)
 	World2In1.EndLoadTimer();
 	World2In1UserInfo.ShowPage(nil);
@@ -548,6 +580,12 @@ function World2In1.GotoCreateRegion(pos)
 	World2In1.SetCurrentType("creator")
 	World2In1.BroadcastTypeChanged()
 	World2In1.ShowCreateReward(true)	
+
+	World2In1.GetCreateWorldServerData(function()
+		local extra = World2In1.create_world_server_data.extra or {}
+		World2In1.ChangeSkyBox(extra.sky_file)
+	end)
+
 	if World2In1.enter_create_region_cb then
 		World2In1.enter_create_region_cb()
 		World2In1.enter_create_region_cb = nil
@@ -764,8 +802,14 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 				GameLogic.AddBBS(nil, string.format(L"进入【%s】", currentWorldList[key].projectName), 3000, "0 255 0");
 				local params = currentWorldList[key]
 				World2In1UserInfo.ShowPage(params);
+				if currentWorldList[key].sky_file then
+					World2In1.ChangeSkyBox(currentWorldList[key].sky_file)
+				else
+					World2In1.ChangeSkyBox("")
+				end
 			else
 				World2In1UserInfo.ShowPage(nil);
+				World2In1.ChangeSkyBox("")
 			end
 			return;
 		end
@@ -799,6 +843,12 @@ function World2In1.LoadMiniWorld(type, gridX, gridY)
 				currentWorldList[key].gridY = gridY;
 				currentWorldList[key].typeIndex = typeIndex;
 
+				if world.extra and world.extra.sky_file then
+					currentWorldList[key].sky_file = world.extra.sky_file
+					World2In1.ChangeSkyBox(world.extra.sky_file)
+				else
+					World2In1.ChangeSkyBox("")
+				end
 				world.is_load = true
 				world.worldIndex = worldIndex
 				GameLogic.AddBBS(nil, string.format(L"欢迎来到【%s】", world.name), 3000, "0 255 0");				
@@ -996,5 +1046,151 @@ function World2In1.TurnWorldPosToMiniPos(pos)
 		targer_pos[3] = z - (begain_pos[3] - pos[3])
 		
 		return targer_pos
+	end
+end
+
+function World2In1.SetIsWorld2In1(flag)
+	World2In1.is_world2in1 = flag
+end
+
+function World2In1.GetIsWorld2In1()
+	return World2In1.is_world2in1
+end
+
+-- 初始化二合一世界工具栏物品数据
+function World2In1.InitToolItems()
+	if World2In1.ItemsDataSource then
+		return
+	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+	
+	local filename = "items/customlist.xml"
+	local file_path = Files.GetWorldFilePath(filename)
+	if not file_path then
+		return
+	end
+
+	World2In1.ItemsDataSource = {}
+	local xmlRoot = ParaXML.LuaXML_ParseFile(file_path);
+	if(xmlRoot) then
+		local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+		local item_class = block_types.GetItemClass("ItemWorld2In1")
+		local default_icon = {
+			["model"] = "Texture/blocks/items/ts_char_off.png",
+			["templates"] = "Texture/blocks/items/book_writable.png",
+			["movie"] = "Texture/blocks/items/movie.png",
+			["agent"] = "Texture/blocks/items/Command_Block.png",
+			["skybox"] = "Texture/blocks/items/metal_block.png",
+		}
+
+		for itemNode in commonlib.XPath.eachNode(xmlRoot, "/blocklist/category") do
+			local data = {}
+			data.text = itemNode.attr.text
+			data.type = itemNode.attr.name
+			
+			data.item_list = {}
+			if data.type == "skybox" then
+				local item_data = {}
+				item_data.name = "清空天空盒"
+				item_data.type = data.type
+				item_data.icon = default_icon[data.type]
+				data.item_list[#data.item_list + 1] = item_data
+			end
+
+			for i, v in ipairs(itemNode) do
+				local item_data = {}
+				item_data.name = v.attr.name
+				item_data.item_name = v.attr.name
+				item_data.isvip = v.attr.isvip
+				
+				item_data.type = data.type
+				item_data.obstruction = v.attr.obstruction == "true"
+				item_data.filename = v.attr.filename
+				local icon_path = Files.GetWorldFilePath(string.format("items/%s/icon/%s.png", data.type, item_data.name))
+				if icon_path then
+					item_data.icon = icon_path
+				else
+					item_data.icon = default_icon[data.type] or "Texture/blocks/items/ts_char_off.png"
+				end
+				if v.attr.id then
+					item_data.id = tonumber(v.attr.id)
+					item_data.block_id = item_data.id;
+					item = item_class:new(item_data);
+					ItemClient.AddItem(item_data.block_id, item);
+				end
+
+				data.item_list[#data.item_list + 1] = item_data
+			end
+
+			World2In1.ItemsDataSource[#World2In1.ItemsDataSource + 1] = data
+		end
+	end
+end
+
+function World2In1.GetToolItems()
+	return World2In1.ItemsDataSource or {}
+end
+
+function World2In1.GetCreateWorldServerData(cb)
+    local world_data = Mod.WorldShare.Store:Get('world/currentWorld')
+	if world_data == nil or world_data.kpProjectId == nil then
+		World2In1.create_world_server_data = nil
+		return
+	end
+
+	local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
+	KeepworkServiceProject:GetProject(world_data.kpProjectId, function(data, err)
+        if type(data) == 'table' then
+			World2In1.create_world_server_data = data
+			if cb then
+				cb()
+			end
+        end
+    end)
+end
+
+function World2In1.OnSyncWorldFinish()
+    local world_data = Mod.WorldShare.Store:Get('world/currentWorld')
+	if world_data == nil then
+		return
+	end
+
+	local sync_sky_func = function()
+		local extra = World2In1.create_world_server_data.extra or {}
+		local entity_sky = GameLogic.GetSkyEntity()
+		local server_sky_file = extra.sky_file
+		-- 等于nil 说明是第一次保存
+		local is_first_save = server_sky_file == nil
+		local sky_file = entity_sky.filename;
+		if entity_sky.IsSimulatedSky then
+			sky_file = ""
+		end
+
+		-- 第一次保存 且最后没选择天空盒
+		if is_first_save and entity_sky.filename == "" then
+			sky_file = nil
+		end
+		
+		if sky_file and sky_file ~= extra.sky_file then
+			keepwork.project.update({
+				router_params = {
+					id = world_data.kpProjectId,
+				},
+				extra={
+					sky_file=sky_file
+				}
+			},function(err,msg,data)
+				if err == 200 then
+					extra.sky_file = sky_file
+				end
+			end)			
+		end
+	end
+
+	if World2In1.create_world_server_data then
+		sync_sky_func()
+	else
+		World2In1.GetCreateWorldServerData(sync_sky_func)
 	end
 end

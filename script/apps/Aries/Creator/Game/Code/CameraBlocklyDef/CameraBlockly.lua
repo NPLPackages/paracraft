@@ -63,6 +63,11 @@ function CameraBlockly.GetAllCmds()
 	return all_cmds;
 end
 
+function CameraBlockly.OnClickRun()
+	Cameras.setTargetTime(nil);
+	CodeBlockWindow.OnClickCompileAndRun();
+end
+
 -- custom compiler here: 
 -- @param codeblock: code block object here
 function CameraBlockly.CompileCode(code, filename, codeblock)
@@ -93,10 +98,9 @@ end
 
 function CameraBlockly.OnTimeChanged(value)
 	if (value > 0) then
-		Cameras.setTimeTarget(value);
+		Cameras.setTargetTime(value);
 		CodeBlockWindow.OnClickCompileAndRun(function()
-			Cameras.setTimeTarget(nil);
-			Cameras.setCurrentTime(0);
+			Cameras.setTargetTime(nil);
 		end);
 	end
 end
@@ -112,9 +116,7 @@ function CameraBlockly.GetAllCameras()
 end
 
 function CameraBlockly.OnClickCamera(index)
-	if (CameraBlockly.cameras and CameraBlockly.cameras[index]) then
-		Camera.showCamera(CameraBlockly.cameras[index].id, CodeBlockWindow.GetCodeEntity());
-	end
+	Camera.showCamera(index, CodeBlockWindow.GetCodeEntity());
 end
 
 function CameraBlockly.RunAndExportVideo()
@@ -137,4 +139,11 @@ end
 
 function CameraBlockly.OnCloseCodeEditor(entity)
 	Camera.close();
+end
+
+function CameraBlockly.UpdateTimeSlider()
+	local page = CodeBlockWindow.GetPageCtrl()
+	if(page) then
+		page:SetUIValue("timeSlider", Cameras.getTotalTimes());
+	end
 end

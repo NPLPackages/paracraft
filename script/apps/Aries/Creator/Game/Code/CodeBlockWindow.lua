@@ -110,7 +110,7 @@ function CodeBlockWindow.Show(bShow)
 			
 			local langConfig = CodeHelpWindow.GetLanguageConfigByEntity(self.entity)
 			if(langConfig and langConfig.OnOpenCodeEditor) then
-				langConfig.OnOpenCodeEditor(entity)
+				langConfig.OnOpenCodeEditor(self.entity)
 			end
 		end
 
@@ -120,6 +120,10 @@ function CodeBlockWindow.Show(bShow)
 		
 		GameLogic.GetEvents():DispatchEvent({type = "CodeBlockWindowShow" , bShow = true, width = self.width});	
 	end
+end
+
+function CodeBlockWindow.GetPageCtrl()
+	return page;
 end
 
 function CodeBlockWindow.GetDefaultCodeUIUrl()

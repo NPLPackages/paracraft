@@ -93,7 +93,7 @@ end
 -- perform translation to final_blocks, by first removing all old blocks and then creating the new ones. 
 function TransformBlocks:DoTransform(blocks, final_blocks, bRemoveSourceBlocks)
 	if (#final_blocks > 0) then
-		local i;
+		BlockEngine:BeginUpdate()
 		if(bRemoveSourceBlocks) then
 			for i = 1, #(blocks) do
 				local b = blocks[i];
@@ -115,6 +115,7 @@ function TransformBlocks:DoTransform(blocks, final_blocks, bRemoveSourceBlocks)
 				self.history[#(self.history)+1] = {b[1],b[2],b[3], b[4], last_id, last_data, b[5],b[6],last_entity_data};
 			end
 		end
+		BlockEngine:EndUpdate()
 	end
 end
 
@@ -418,19 +419,21 @@ end
 
 function TransformBlocks:Redo()
 	if((#self.history)>0) then
-		local _, b;
+		BlockEngine:BeginUpdate()
 		for _, b in ipairs(self.history) do
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0, b[7], nil, b[8]);
 		end
+		BlockEngine:EndUpdate()
 	end
 end
 
 function TransformBlocks:Undo()
 	if((#self.history)>0) then
-		local i, b;
+		BlockEngine:BeginUpdate()
 		for i = #(self.history), 1, -1  do
 			local b = self.history[i];
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[5] or 0, b[6], nil, b[9]);
 		end
+		BlockEngine:EndUpdate()
 	end
 end

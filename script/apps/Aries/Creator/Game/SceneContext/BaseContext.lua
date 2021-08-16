@@ -166,9 +166,9 @@ function BaseContext:OnMouseDownTimer(timer)
 end
 
 function BaseContext:handleHookedEvent(event)
-	local __GI__ = GameLogic.GetCodeGlobal().__GI__;
-	if (not __GI__) then return end
-	__GI__:HandleMouseKeyBoardEvent(event);
+	local GI = GameLogic:GetCodeGlobal():GetGI();
+	if (not GI) then return end
+	GI:HandleMouseKeyBoardEvent(event);
 end
 
 -- return true if handled
@@ -665,6 +665,10 @@ function BaseContext:keyPressEvent(event)
 	if(event:isAccepted() or self:handleHookedKeyEvent(event) or self:HandleGlobalKey(event)) then
 		return true;
 	end
+end
+
+function BaseContext:keyReleaseEvent(event)
+	self:handleHookedEvent(event);
 end
 
 -- virtual function handle escape key

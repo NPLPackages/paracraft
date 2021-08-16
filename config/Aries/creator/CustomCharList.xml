@@ -961,9 +961,10 @@
 	</category>
 
 
-	<!-- 暂未开放
-	<category name="ride" text="坐骑">
+	
+	<category name="pet" text="坐骑">
+		<item id="89001" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/89001_tank_32bits.png" name="坦克"/>
 	</category>
-	-->
+	
 
 </customcharlist>

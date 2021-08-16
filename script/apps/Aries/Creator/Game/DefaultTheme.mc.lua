@@ -116,6 +116,14 @@ function DefaultTheme:Load()
 	_this.background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;382 175 40 18:8 4 8 4";
 	-- _guihelper.SetFontColor(_this, "#ffffff");
 
+	_this:SetCurrentState("highlight");
+	_this.color="220 220 220 255";
+	_this:SetCurrentState("pressed");
+	_this.color="180 180 180 255";	
+	_this:SetCurrentState("normal");
+	_this.color="255 255 255 255";
+
+
 	_this=ParaUI.GetDefaultObject("listbox");
 	_this.font = fontStr;
 	_this.background = "Texture/Aries/Common/ThemeKid/dropdown_bg.png:3 3 3 3";

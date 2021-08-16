@@ -154,6 +154,7 @@ end
 -- @return may return nil if theme not found or not finished.
 function UserProfile:GetBuildProgress(theme_index,category)
 	if(category) then
+		self.BuildProgress = self.BuildProgress or {};
 		local category_ds = self.BuildProgress[category];
 		if(category_ds) then
 			if(theme_index) then

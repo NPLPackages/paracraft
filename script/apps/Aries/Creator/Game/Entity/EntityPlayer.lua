@@ -99,6 +99,8 @@ function Entity:ctor()
 	self.dataMainAsset = dataWatcher:AddField(nil, nil);
 	self:SetPhysicsRadius(0.5);
 	self:SetPhysicsHeight(1.765);
+
+	self.pet = nil;
 end
 
 -- @param Entity: the half radius of the object. 
@@ -818,7 +820,7 @@ function Entity:ToggleFly(bFly)
 		-- this fixed camera direction in mobile device. 
 		player:SetField("FlyUsingCameraDir", true);
 
-		-- BroadcastHelper.PushLabel({id="fly_tip", label = "½øÈë·ÉÐÐÄ£Ê½£º°´×¡Êó±êÓÒ¼ü¿ØÖÆ·½Ïò, W¼üÇ°½ø", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+		-- BroadcastHelper.PushLabel({id="fly_tip", label = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½×¡ï¿½ï¿½ï¿½ï¿½Ò¼ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½, Wï¿½ï¿½Ç°ï¿½ï¿½", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 
 	elseif(bFly == false) then
 		-- restore to original density
@@ -830,7 +832,7 @@ function Entity:ToggleFly(bFly)
 		player:ToCharacter():SetSpeedScale(GameLogic.options.WalkSpeedScale * (self.speedscale or 1));
 		player:ToCharacter():FallDown();
 
-		-- BroadcastHelper.PushLabel({id="fly_tip", label = "ÍË³ö·ÉÐÐÄ£Ê½", max_duration=1500, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+		-- BroadcastHelper.PushLabel({id="fly_tip", label = "ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½", max_duration=1500, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	end
 	return self.bFlying;
 end
@@ -965,6 +967,20 @@ function Entity:MountOn(targetEntity, mountID)
 			target:SetField("EnableAnim", true);
 			-- make it normal movement style
 			target:SetField("MovementStyle", 0)
+
+			self.pet = targetEntity;
+			targetEntity:SetFocus();
 		end
 	end
 end
+
+function Entity:UnLoadPet()
+	commonlib.echo("Entity:UnLoadPet triggged");
+	local player = self:GetInnerObject();
+	if(player and self.pet) then
+		player:ToCharacter():UnMount();
+		self.pet:Destroy();
+		self.pet = nil;
+		self:SetFocus();
+	end
+end;

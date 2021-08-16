@@ -8,6 +8,7 @@ use the lib:
 local NplBrowserFrame = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserFrame.lua");
 NplBrowserFrame:Show("https://keepwork.com", "title", false, true);
 
+NplBrowserFrame:Show("https://keepwork.com", "title", true, true, { align = "_lt", left = 100, top = 0, right = 0, bottom = 0, });
 NplBrowserFrame:Show("https://keepwork.com", "title", true, true, { left = 100, top = 50, right = 100, bottom = 50});
 NplBrowserFrame:Show("https://keepwork.com", "title", false, false, { left = 100, top = 50, right = 100, bottom = 50, fixed = true, });
 NplBrowserFrame:Show("https://keepwork.com", "title", true, true, { left = 100, top = 50, right = 100, bottom = 50, fixed = true, candrag = true, });
@@ -113,6 +114,9 @@ function NplBrowserFrame:_Show(url)
 		    bg_obj = ParaUI.CreateUIObject("container", name .. "_bg", "_fi", 0, 0, 0, 0);
 		    bg_obj.background="";
 		    bg_obj:AttachToRoot();
+			bg_obj:SetScript("onsize", function()
+				self:OnResize();
+			end)
         end
     end
     
@@ -124,12 +128,14 @@ function NplBrowserFrame:_Show(url)
 		end
 		self.width = width;
 		self.height = height;
-		_this = ParaUI.CreateUIObject("container", name, "_ct", -width / 2, -height / 2, width, height);
+		if(self.options.align == "_lt")then
+			_this = ParaUI.CreateUIObject("container", name, "_lt", self.options.left or 0, self.options.top or 0, width, height);
+		else
+			_this = ParaUI.CreateUIObject("container", name, "_ct", -width / 2, -height / 2, width, height);
+		end
 		_this.background="";
         _this.candrag = candrag;
-		_this:SetScript("onsize", function()
-			self:OnResize();
-		end)
+		
 
         _this:SetScript("ondragmove", function(ui_obj)
 			self.is_draging = true;
@@ -249,13 +255,26 @@ function NplBrowserFrame:IsVisible()
 	end
 end
 function NplBrowserFrame:OnResize()
+	local options = self.options;
+	local left = options.left or 0;
+	local top = options.top or 0;
+	local right = options.right or 0;
+	local bottom = options.bottom or 0;
+		commonlib.echo("=====================resize 1");
+
 	local function Resize(width, height)
+		commonlib.echo("=====================resize");
+		commonlib.echo({width, height});
 		if(self.width ~= width or self.height ~= height)then
 			self.width = width;
 			self.height = height;
 
 			local _this = self:GetUIObject();
-			_this:Reposition("_ct", -width / 2, -height / 2, width, height);
+			if(options.align == "_lt")then
+				_this:Reposition("_lt", left, top , width, height);
+			else
+				_this:Reposition("_ct", -width / 2, -height / 2, width, height);
+			end
 			self.page:Refresh(0);
             if(self.callback)then
 			    self.callback("ONRESIZE");
@@ -270,9 +289,11 @@ function NplBrowserFrame:OnResize()
 		Resize(width, height);
 		return;
 	end
+		commonlib.echo("=====================resize 2");
     if(self.options.fixed or self.options.candrag)then
         return
     end
+		commonlib.echo("=====================resize 3");
 	local width, height  = self:CalculateSize();
 	Resize(width, height);
 end

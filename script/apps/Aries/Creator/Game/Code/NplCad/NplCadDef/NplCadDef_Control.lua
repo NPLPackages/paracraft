@@ -50,6 +50,7 @@ local cmds = {
 	nextStatement = true,
 	funcName = "for",
 	func_description = 'for %s=%d, %d do\\n%send',
+	func_description_js_match = 'for(var $var = $start_index; $var <= $end_index; $var++){\n$input\n}',
     func_description_js_provider = [[
     var name = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('var'), Blockly.Variables.NAME_TYPE) || 'i';
     var start_index = Blockly.JavaScript.valueToCode(block,'start_index', Blockly.JavaScript.ORDER_ATOMIC) || '""';
@@ -92,6 +93,7 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'if(%s) then\\n%send',
+	func_description_js_match = 'if($expression){\n$input_true\n}',
 	ToPython = function(self)
 		local input = self:getFieldAsString('input_true')
 		if input == '' then
@@ -139,6 +141,7 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	func_description = 'if(%s) then\\n%selse\\n%send',
+	func_description_js_match = 'if($expression){\n$input_true\n}else{\n$input_else\n}',
 	ToPython = function(self)
 		local input_true = self:getFieldAsString('input_true')
 		local input_else = self:getFieldAsString('input_else')

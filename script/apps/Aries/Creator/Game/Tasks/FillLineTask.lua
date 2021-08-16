@@ -75,7 +75,7 @@ function FillLine:FillLine(x, y, z)
 		self.new_blocks[#(self.new_blocks)+1] = {x,y,z};
 	end
 end
-
+local blocks = {}
 function FillLine:FrameMove()
 	self.step = self.step + 1;
 
@@ -87,6 +87,7 @@ function FillLine:FrameMove()
 
 	if((not block or (block.liquid and not block.obstruction)) and self.step <= self.radius) then
 		BlockEngine:SetBlock(self.blockX,self.blockY,self.blockZ, self.fill_id, self.fill_data, 3, self.fill_sdata);
+		blocks[#blocks + 1] = {self.blockX,self.blockY,self.blockZ, self.fill_id, self.fill_data}
 		if(GameLogic.GameMode:CanAddToHistory()) then
 			self.history[#(self.history)+1] = {self.blockX,self.blockY,self.blockZ, block and block.id or 0};
 		end
@@ -97,6 +98,8 @@ function FillLine:FrameMove()
 				UndoManager.PushCommand(self);
 			end
 		end
+		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",blocks)
+		blocks = {}
 	end
 end
 

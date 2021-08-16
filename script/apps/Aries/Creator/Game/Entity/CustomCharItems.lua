@@ -221,6 +221,8 @@ function CustomCharItems:Init()
 			items[#items+1] = item;
 		end
 
+		-- items DS
+		-- { data={ geoset={ 201 }, texture="3:Texture/blocks/Paperman/eye/eye_02_blackman.png" }, id="81001", model={ "actor" } }
 		for modelGroup in commonlib.XPath.eachNode(root, "/CustomCharItems/models") do
 			local type = modelGroup.attr.type;
 			local groups = {};
@@ -313,6 +315,19 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 				end
 			end
 		end
+
+		-- commonlib.echo("itemList, true");
+		-- itemList DS
+		-- echo:return {
+		-- 	{
+		-- 		attachment="20:character/CC/ObjectComponents/ride/tank.anim.x",
+		-- 		category="pet",
+		-- 		icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_07_01_32bits.png",
+		-- 		id="89001",
+		-- 		isVip="1",
+		-- 		name="坦克" 
+		-- 	} 
+		-- }
 		return itemList;
 	end
 end

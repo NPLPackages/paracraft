@@ -368,7 +368,6 @@ function Desktop.OnExit(bForceExit, bRestart)
 			-- double click to exit without saving. 
 			if (not System.options.isCodepku) then
 				GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
-					GameLogic.GetFilters():apply_filters('logout');
 					Desktop.ForceExit();
 				end);
 			else
@@ -381,19 +380,11 @@ function Desktop.OnExit(bForceExit, bRestart)
 
 			Desktop.is_exiting = true;
 
-			-- local projectId = GameLogic.options:GetProjectId();
-			-- if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
-			-- 	ParaWorldLoginAdapter.ShowExitWorld(true);
-			-- 	return true;
-			-- end
-
 			local dialog = {
 				text = L"确定要退出当前世界么？", 
 				callback = function(res)
 					Desktop.is_exiting = false;
 					if(res and res == _guihelper.DialogResult.Yes) then
-						-- GameLogic.GetFilters():apply_filters("user_behavior", 2, "stayWorld");
-
 						if (not System.options.isCodepku) then
 							ParaWorldLoginAdapter:EnterWorld(true);
 						else
@@ -408,6 +399,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 					end
 				end
 			};
+
 			local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);			
 			if(dialog and dialog.callback and dialog.text) then
 				_guihelper.MessageBox(dialog.text, 
@@ -422,7 +414,6 @@ function Desktop.OnExit(bForceExit, bRestart)
 			end
 			if (not System.options.isCodepku) then
 				GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
-					GameLogic.GetFilters():apply_filters('logout');
 					Desktop.ForceExit();
 				end);
 			else
@@ -433,12 +424,6 @@ function Desktop.OnExit(bForceExit, bRestart)
 				return
 			end
 			Desktop.is_exiting = true;
-
-			-- local projectId = GameLogic.options:GetProjectId();
-			-- if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
-			-- 	ParaWorldLoginAdapter.ShowExitWorld(true);
-			-- 	return true;
-			-- end
 
 			local dialog = {
 				text = string.format(L"%d秒内您没有保存过世界. <br/>退出前, 是否保存世界？", GameLogic.options:GetElapsedUnSavedTime()/1000), 

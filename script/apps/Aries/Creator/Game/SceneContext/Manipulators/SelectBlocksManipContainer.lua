@@ -153,6 +153,7 @@ function SelectBlocksManipContainer:mouseReleaseEvent(event)
 		local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blocks = selected_blocks})
 		task:Run();
 		event:accept();
+		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",selected_blocks)
 	elseif(self.op_mode == "select") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 		local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");

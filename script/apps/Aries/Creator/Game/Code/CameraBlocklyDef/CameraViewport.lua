@@ -21,46 +21,37 @@ end
 function CameraViewport.ShowPage(_index, onClose)
 	index = _index;
 	result = false;
-	if (page) then
-		page:CloseWindow();
-	end
-	local params = {
-		url = "script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraViewport.html", 
-		name = "CameraViewport.ShowPage", 
-		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-		isShowTitleBar = false,
-		DestroyOnClose = true,
-		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = false,
-		click_through = true, 
-		directPosition = true,
-		align = "_fi", 
-		x = 0,
-		y = 0,
-		width = 0,
-		height = 0,
-	};
-	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
-	params._page.OnClose = function()
-		if (onClose) then
-			onClose(result);
+	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+	local viewport = ViewportManager:GetSceneViewport();
+	local _parent = viewport:GetUIObject(true)
+
+	page = page or System.mcml.PageCtrl:new({
+		url="script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CameraViewport.html",
+		click_through = true,
+	});
+	CameraViewport.onCloseCallback = onClose;
+	page:Create("CameraViewport.ShowPage", _parent, "_ct", -200, -150, 400, 300)
+end
+
+function CameraViewport.CloseWindow()
+	if (page) then
+		page:Close();
+
+		if(CameraViewport.onCloseCallback) then
+			CameraViewport.onCloseCallback(result);
 		end
 	end
 end
 
 function CameraViewport.OnClose()
-	result = false;
-	if (page) then
-		page:CloseWindow();
-	end
+	CameraViewport.CloseWindow()
 end
 
 function CameraViewport.OnOK()
 	result = true;
-	if (page) then
-		page:CloseWindow();
-	end
+	CameraViewport.CloseWindow()
 end
 
 function CameraViewport.GetIndex()

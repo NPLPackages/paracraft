@@ -1378,7 +1378,7 @@ function SelectBlocks.FillSelection(fill_block_id)
 		local max = self.aabb:GetMax();
 
 		fill_block_id = fill_block_id or GameLogic.GetBlockInRightHand()
-		local x, y, z;
+		
 		for x = min[1], max[1] do
 			for y = min[2], max[2] do
 				for z = min[3], max[3] do
@@ -1399,7 +1399,7 @@ function SelectBlocks.ReplaceBlocks(from_block_id, to_block_id)
 			local max = self.aabb:GetMax();
 
 			local block_in_hand = GameLogic.GetBlockInRightHand()
-			local x, y, z;
+			
 			for x = min[1], max[1] do
 				for y = min[2], max[2] do
 					for z = min[3], max[3] do
