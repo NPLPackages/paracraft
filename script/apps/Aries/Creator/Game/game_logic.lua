@@ -505,8 +505,9 @@ end
 -- @param text: any HTML text
 -- @param target: nil or "<player>"
 -- @param duration: in seconds
-function GameLogic.SetTipText(text, target, duration)
-	GameLogic.GetTeacherAgent():ShowTipText(text, duration);
+-- @param onclickCallback: when user clicks the teacher icon. it can be "F1"
+function GameLogic.SetTipText(text, target, duration, onclickCallback)
+	GameLogic.GetTeacherAgent():ShowTipText(text, duration, onclickCallback);
 	GameLogic.GetTeacherAgent():ShowTipOnTarget(target, text, duration)
 end
 

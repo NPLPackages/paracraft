@@ -83,7 +83,9 @@ function CreateNewWorld.OnInit()
 end
 
 -- show page
-function CreateNewWorld.ShowPage()
+-- is_close:is only close page when click retturn button
+function CreateNewWorld.ShowPage(is_only_close)
+	CreateNewWorld.is_only_close = is_only_close
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
 	if(isCustomShow == "show") then
 		System.App.Commands.Call("File.MCMLWindowFrame", {

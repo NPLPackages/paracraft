@@ -30,7 +30,6 @@ TeacherAgent:Property("Name", "TeacherAgent");
 
 function TeacherAgent:ctor()
 	self.buttons = commonlib.ArrayMap:new();
-	TeacherIcon.SetEmptyClickCallback(TeacherAgent.OnClickTeacherIcon);
 end
 
 function TeacherAgent:Init()
@@ -83,12 +82,22 @@ function TeacherAgent:RefreshUI(delayTime)
 	end
 end
 
+-- @param onclickCallback: nil or function or "F1"
+function TeacherAgent:SetOnClickIconCallback(onclickCallback)
+	if(onclickCallback == "F1") then
+		onclickCallback = TeacherAgent.OnClickHelp;
+	end
+	TeacherIcon.SetEmptyClickCallback(onclickCallback);
+end
+
 -- @param max_duration: in seconds. if nil or -1 means always show
-function TeacherAgent:ShowTipText(htmlText, max_duration)
+-- @param onclickCallback: nil or function or "F1"
+function TeacherAgent:ShowTipText(htmlText, max_duration, onclickCallback)
 	if(htmlText and htmlText~="") then
 		TeacherIcon.Show(true)
 		TeacherIcon.SetTipText(htmlText);
-
+		self:SetOnClickIconCallback(onclickCallback)
+		
 		if(max_duration and max_duration > 0) then
 			self.mytimer = self.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
 				self:ShowTipText(nil);
@@ -149,9 +158,12 @@ function TeacherAgent:RemoveTaskButton(btnName)
 	end
 end
 
-function TeacherAgent:OnClickTeacherIcon()
-	-- TODO: 
+function TeacherAgent.OnClickTeacherIcon()
 	-- GameLogic.RunCommand("/menu help.help");
+end
+
+function TeacherAgent.OnClickHelp()
+	GameLogic.RunCommand("/menu help.help");
 end
 
 -- virtual function: a note is selected to teach

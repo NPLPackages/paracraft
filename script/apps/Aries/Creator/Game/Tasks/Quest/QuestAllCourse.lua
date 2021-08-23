@@ -346,6 +346,17 @@ function QuestAllCourse.RefreshCourseListData(callback)
         return
     end
 
+    local special_tooltip
+    local select_teacher_data = QuestAllCourse.TeacherListData[QuestAllCourse.SelectTeacherIndex]
+    -- 校园课程9月1号的特殊处理
+    if select_teacher_data.name == "校园课程" then
+        local time_stamp = os.time({year = 2021, month = 9, day = 1, hour=0, min=0, sec=0})
+        local server_time = QuestAction.GetServerTime()
+        if server_time < time_stamp then
+            special_tooltip = "本课程免费开放截止到9月1日。"
+        end
+    end
+
     QuestAllCourse.SelectCourseIndex = 0
 
     local id = select_level_data.id
@@ -407,7 +418,9 @@ function QuestAllCourse.RefreshCourseListData(callback)
                     end
                 end
 
-                
+                if special_tooltip then
+                    v.description = special_tooltip
+                end
 
                 -- 难度
                 v.level_desc = ""
@@ -654,7 +667,9 @@ function QuestAllCourse.RunCommand(index, is_pre)
         end)
     end
 
-    if System.User.isVip or QuestAllCourse.permissions_check then
+
+    local is_vip_school_and_lesson = System.User.isVipSchool and select_teacher_data.name == "校园课程"
+    if System.User.isVip or QuestAllCourse.permissions_check or is_vip_school_and_lesson then
         enter_world()
     else
         -- 需要vip才能进

@@ -1367,10 +1367,11 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 		CodeBlockWindow.SetNplBrowserVisible(false);
 	end
 
-	if (NplBlocklyEditorPage) then 
-		NplBlocklyEditorPage:CloseWindow();
-		NplBlocklyEditorPage = nil;
-	end
+	CodeBlockWindow.CloseNplBlocklyEditorPage();
+	-- if (NplBlocklyEditorPage) then 
+	-- 	NplBlocklyEditorPage:CloseWindow();
+	-- 	NplBlocklyEditorPage = nil;
+	-- end
 
 	local entity = CodeBlockWindow.GetCodeEntity();
 	if (not CodeBlockWindow.IsSupportNplBlockly()) then return end

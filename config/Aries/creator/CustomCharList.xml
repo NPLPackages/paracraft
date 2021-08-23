@@ -473,27 +473,32 @@
 
 
 	</category>
+        
+
 
 	<category name="shirt" text="衣服">
+
+	    <!--20210817新加-->
+		<item id="84083" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84083_white_longcoat_32bits.png" name="白大褂"/>
         <!--20210805新加-->
-		<item id="84074" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84074_32bits.png" name="衣服64"/>
-		<item id="84075" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84075_32bits.png" name="衣服65"/>
-		<item id="84076" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84076_32bits.png" name="衣服66"/>
-		<item id="84077" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84077_32bits.png" name="衣服67"/>
-		<item id="84078" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84078_32bits.png" name="衣服68"/>
-		<item id="84079" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84079_32bits.png" name="衣服69"/>
-		<item id="84080" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84080_32bits.png" name="衣服70"/>
-		<item id="84081" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84081_32bits.png" name="衣服71"/>
-		<item id="84082" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84082_32bits.png" name="衣服72"/>
+		<item id="84074" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84074_32bits.png" name="粉红时代"/>
+		<item id="84075" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84075_32bits.png" name="泳衣（红黑）"/>
+		<item id="84076" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84076_32bits.png" name="泳衣（蓝黑）"/>
+		<item id="84077" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84077_32bits.png" name="泳衣（绿黑）"/>
+		<item id="84078" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84078_32bits.png" name="泳衣（紫黑）"/>
+		<item id="84079" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84079_32bits.png" name="运动服（紫红）"/>
+		<item id="84080" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84080_32bits.png" name="运动服（红）"/>
+		<item id="84081" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84081_32bits.png" name="运动服（橙）"/>
+		<item id="84082" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84082_32bits.png" name="唐服（蓝）"/>
 		
 	    <!--20210720新加-->
-		<item id="84062" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84062_32bits.png" name="衣服52"/>
+		<item id="84062" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84062_32bits.png" name="班主任"/>
 		<item id="84063" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84063_32bits.png" name="衣服53"/>
 		<item id="84064" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84064_32bits.png" name="衣服54"/>
-		<item id="84065" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84065_32bits.png" name="衣服55"/>
-		<item id="84066" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84066_32bits.png" name="衣服56"/>
+		<item id="84065" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84065_32bits.png" name="夏日校服（男）"/>
+		<item id="84066" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84066_32bits.png" name="夏日校服（女）"/>
 		<item id="84067" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84067_32bits.png" name="衣服57"/>
-		<item id="84068" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84068_32bits.png" name="衣服58"/>
+		<item id="84068" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84068_32bits.png" name="黑色校服"/>
 		<item id="84069" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84069_32bits.png" name="衣服59"/>
 		<item id="84070" isVip="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84070_32bits.png" name="衣服60"/>
 		<item id="84071" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84071_32bits.png" name="衣服61"/>
@@ -517,39 +522,39 @@
 		<!--20210318新加衣服，活动用-->
 		<item id="84052"  gsid="83000" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_84052_32bits.png" name="黄色海魂衫"/>
 		<!--起始数据-->
-		<item id="84001" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_.png" name="衣服1"/>
-		<item id="84002" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_01.png" name="衣服2"/>
+		<item id="84001" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_.png" name="鲲鲲"/>
+		<item id="84002" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_01.png" name="布鲁斯李"/>
 		<item id="84003" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_011.png" name="衣服3"/>
 		<item id="84004" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_012.png" name="衣服4"/>
 		<item id="84005" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_013.png" name="衣服5"/>
 		<item id="84006" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_014.png" name="衣服6"/>
 		<item id="84007" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_015.png" name="衣服7"/>
 		<item id="84008" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_016.png" name="衣服8"/>
-		<item id="84009" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_017.png" name="衣服9"/>
-		<item id="84010" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_xiaofu.png" name="衣服10"/>
-		<item id="84011" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_girl_body_01.png" name="衣服11"/>
-		<item id="84012" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_girl_body_xiaofu.png" name="衣服12"/>
+		<item id="84009" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_017.png" name="豹纹"/>
+		<item id="84010" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_xiaofu.png" name="蓝色校服"/>
+		<item id="84011" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_girl_body_01.png" name="副校长"/>
+		<item id="84012" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_girl_body_xiaofu.png" name="红色校服"/>
 		<item id="84013" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_caomei_boy_body.png" name="衣服13"/>
-		<item id="84014" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_jingcha_body.png" name="衣服14"/>
+		<item id="84014" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_jingcha_body.png" name="校长"/>
 		<item id="84015" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_shangren_body.png" name="衣服15"/>
 		<item id="84016" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_shizhuang_body.png" name="衣服16"/>
-		<item id="84017" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_xizhuang.png" name="衣服17"/>
-		<item id="84018" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_xunlian_body.png" name="衣服18"/>
-		<item id="84020" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_01.png" name="衣服20"/>
-		<item id="84021" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_02.png" name="衣服21"/>
-		<item id="84022" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_03.png" name="衣服22"/>
-		<item id="84023" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_04.png" name="衣服23"/>
-		<item id="84024" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_05.png" name="衣服24"/>
-		<item id="84025" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_06.png" name="衣服25"/>
-		<item id="84026" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_07.png" name="衣服26"/>
-		<item id="84027" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_11.png" name="衣服27"/>
-		<item id="84028" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_01.png" name="衣服28"/>
-		<item id="84029" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_02.png" name="衣服29"/>
-		<item id="84030" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_03.png" name="衣服30"/>
-		<item id="84031" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_04.png" name="衣服31"/>
-		<item id="84032" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_05.png" name="衣服32"/>
-		<item id="84033" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_06.png" name="衣服33"/>
-		<item id="84034" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_07.png" name="衣服34"/>
+		<item id="84017" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_xizhuang.png" name="米色西服"/>
+		<item id="84018" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_xunlian_body.png" name="忍者"/>
+		<item id="84020" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_01.png" name="默认"/>
+		<item id="84021" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_02.png" name="幻想星球（男）"/>
+		<item id="84022" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_03.png" name="心愿使者（男）"/>
+		<item id="84023" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_04.png" name="樱花（男）"/>
+		<item id="84024" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_05.png" name="AI极客（男）"/>
+		<item id="84025" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_06.png" name="吉祥如意（男）"/>
+		<item id="84026" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_07.png" name="抗疫先锋（男）"/>
+		<item id="84027" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_11.png" name="黑色唐装"/>
+		<item id="84028" isVip="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_01.png" name="默认（女）"/>
+		<item id="84029" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_02.png" name="幻想星球（女）"/>
+		<item id="84030" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_03.png" name="心愿使者（女）"/>
+		<item id="84031" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_04.png" name="樱花（女）"/>
+		<item id="84032" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_05.png" name="AI极客（女）"/>
+		<item id="84033" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_06.png" name="吉祥如意（女）"/>
+		<item id="84034" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_07.png" name="抗疫先锋（女）"/>
 		<item id="84035" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paizinan1.png" name="衣服35"/>
 		<item id="84036" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinan2.png" name="衣服36"/>
 		<item id="84037" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinan3.png" name="衣服37"/>
@@ -576,27 +581,27 @@
 
 	<category name="pants" text="裤子">
         <!--20210805新增-->
-        <item id="85093" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85093_32bits.png" name="裤子83"/>
-		<item id="85094" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85094_32bits.png" name="裤子84"/>
-		<item id="85095" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85095_32bits.png" name="裤子85"/>
-		<item id="85096" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85096_32bits.png" name="裤子86"/>
-		<item id="85097" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85097_32bits.png" name="裤子87"/>
-		<item id="85098" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85098_32bits.png" name="裤子88"/>
-		<item id="85099" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85099_32bits.png" name="裤子89"/>
-		<item id="85100" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85100_32bits.png" name="裤子90"/>
-		<item id="85101" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85101_32bits.png" name="裤子91"/>
+        <item id="85093" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85093_32bits.png" name="唐服（蓝）"/>
+		<item id="85094" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85094_32bits.png" name="运动裤（橙）"/>
+		<item id="85095" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85095_32bits.png" name="运动裤（红）"/>
+		<item id="85096" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85096_32bits.png" name="运动裤（紫红）"/>
+		<item id="85097" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85097_32bits.png" name="泳裤（红黑）"/>
+		<item id="85098" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85098_32bits.png" name="泳裤（蓝黑）"/>
+		<item id="85099" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85099_32bits.png" name="泳裤（绿黑）"/>
+		<item id="85100" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85100_32bits.png" name="泳裤（紫黑）"/>
+		<item id="85101" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85101_32bits.png" name="唐装"/>
 		<item id="85102" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85102_32bits.png" name="裤子92"/>
 		<item id="85103" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85103_32bits.png" name="裤子93"/>
 		<item id="85104" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85104_32bits.png" name="裤子94"/>
         <item id="85105" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85105_32bits.png" name="裤子95"/>
 
 	    <!--20210720新增-->
-        <item id="85081" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85081_32bits.png" name="裤子71"/>
+        <item id="85081" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85081_32bits.png" name="黑色西裤"/>
 		<item id="85082" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85082_32bits.png" name="裤子72"/>
-		<item id="85083" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85083_32bits.png" name="裤子73"/>
-		<item id="85084" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85084_32bits.png" name="裤子74"/>
-		<item id="85085" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85085_32bits.png" name="裤子75"/>
-		<item id="85086" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85086_32bits.png" name="裤子76"/>
+		<item id="85083" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85083_32bits.png" name="夏日校服（男）"/>
+		<item id="85084" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85084_32bits.png" name="夏日校服（女）"/>
+		<item id="85085" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85085_32bits.png" name="粉红时代"/>
+		<item id="85086" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85086_32bits.png" name="黑色校服"/>
 		<item id="85087" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85087_32bits.png" name="裤子77"/>
 		<item id="85088" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85088_32bits.png" name="裤子78"/>
 		<item id="85089" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85089_32bits.png" name="裤子79"/>
@@ -625,31 +630,30 @@
 		<item id="85002" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_.png" name="裤子2"/>
 		<item id="85003" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_01.png" name="裤子3"/>
 		<item id="85004" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_03.png" name="裤子4"/>
-		<item id="85005" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_xiaofu.png" name="裤子5"/>
+		<item id="85005" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_xiaofu.png" name="蓝色校服"/>
 		<item id="85006" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_000.png" name="裤子6"/>
-		<item id="85007" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_03.png" name="裤子7"/>
-		<item id="85008" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_06.png" name="裤子8"/>
-		<item id="85009" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_xiaofu.png" name="裤子9"/>
+		<item id="85007" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_03.png" name="布鲁斯李短裤"/>
+		<item id="85008" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_06.png" name="布鲁斯李短裤"/>
+		<item id="85009" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_xiaofu.png" name="红色校服"/>
 		<item id="85010" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_caome_boy_leg.png" name="裤子10"/>
-		<item id="85011" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_jingcha_leg.png" name="裤子11"/>
+		<item id="85011" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_jingcha_leg.png" name="蓝色西裤"/>
 		<item id="85012" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui01.png" name="裤子12"/>
 		<item id="85013" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui02.png" name="裤子13"/>
 		<item id="85014" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui03.png" name="裤子14"/>
-		<item id="85015" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui04.png" name="裤子15"/>
+		<item id="85015" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui04.png" name="豹纹"/>
 		<item id="85016" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui05.png" name="裤子16"/>
-		<item id="85017" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_shangren_boy_leg.png" name="裤子17"/>
+		<item id="85017" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_shangren_boy_leg.png" name="棕色西裤"/>
 		<item id="85018" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_shangren_girl_leg.png" name="裤子18"/>
-		<item id="85019" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xizhuangku.png" name="裤子19"/>
-		<item id="85020" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xunlian_leg.png" name="裤子20"/>
-		<item id="85021" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xunlian_leg003.png" name="裤子21"/>
+		<item id="85019" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xizhuangku.png" name="米色西裤"/>
+		<item id="85020" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xunlian_leg.png" name="忍者"/>
+		<item id="85021" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xunlian_leg003.png" name="布鲁斯李"/>
 		<item id="85022" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_00Avatar_boy_body_01kuku2.png" name="裤子22"/>
 		<item id="85023" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_.png" name="裤子23"/>
-		<item id="85024" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_01.png" name="裤子24"/>
-		<item id="85025" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_03.png" name="裤子25"/>
+		<item id="85024" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_01.png" name="黑色唐装"/>
+		<item id="85025" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_03.png" name="幻想星球（男）"/>
 		<item id="85026" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_xiaofu.png" name="裤子26"/>
 		<item id="85027" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_000.png" name="裤子27"/>
-		<item id="85028" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_03.png" name="裤子28"/>
-		<item id="85029" isVip="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_06.png" name="裤子29"/>
+		<item id="85029" isVip="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_06.png" name="默认（女）"/>
 		<item id="85030" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_xiaofu.png" name="裤子30"/>
 		<item id="85031" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_caome_boy_leg.png" name="裤子31"/>
 		<item id="85032" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_jingcha_leg.png" name="裤子32"/>
@@ -663,22 +667,17 @@
 		<item id="85040" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xizhuangku.png" name="裤子40"/>
 		<item id="85041" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xunlian_leg.png" name="裤子41"/>
 		<item id="85042" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xunlian_leg003.png" name="裤子42"/>
-		<item id="85043" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_01.png" name="裤子43"/>
 		<item id="85044" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_02.png" name="裤子44"/>
-		<item id="85045" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_03.png" name="裤子45"/>
 		<item id="85046" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_04.png" name="裤子46"/>
 		<item id="85047" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_05.png" name="裤子47"/>
-		<item id="85048" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_000.png" name="裤子48"/>
 		<item id="85049" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_01.png" name="裤子49"/>
 		<item id="85050" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_02.png" name="裤子50"/>
-		<item id="85051" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_03.png" name="裤子51"/>
-		<item id="85052" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_06.png" name="裤子52"/>
 		<item id="85053" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu00.png" name="裤子53"/>
 		<item id="85054" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu01.png" name="裤子54"/>
 		<item id="85055" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu02.png" name="裤子55"/>
 		<item id="85056" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu03.png" name="裤子56"/>
 		<item id="85057" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu04.png" name="裤子57"/>
-		<item id="85058" isVip="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu00.png" name="裤子58"/>
+		<item id="85058" isVip="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu00.png" name="默认"/>
 		<item id="85059" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu01.png" name="裤子59"/>
 		<item id="85060" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu02.png" name="裤子60"/>
 		<item id="85061" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu03.png" name="裤子61"/>
@@ -963,7 +962,7 @@
 
 	
 	<category name="pet" text="坐骑">
-		<item id="89001" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/89001_tank_32bits.png" name="坦克"/>
+	    <item id="89001" isVip="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/89001_tank_32bits.png" name="坦克"/>
 	</category>
 	
 

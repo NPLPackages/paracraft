@@ -43,6 +43,7 @@ function GetDesc1()
 end
 
 function IsShowNeedVipDesc()
+    --return true
     return not GameLogic.IsVip()
 end
 
@@ -55,8 +56,8 @@ end
 <div style="position: relative;margin-top: 3px; base-font-size:22px;font-size: 22px;font-weight: bold;text-align: center;height: 41px;color: #ffffff;">我的地块</div>
 <div style="color:#ffffff;width:754;height:630px" class="kp_window_container">
     <pe:if condition='<%=IsShowNeedVipDesc()%>'>
-        <pe:container name="canvas" style="margin-left: 52px;margin-top: 408px; width: 680px;height: 36px;position: relative;background: ;" zorder="2">
-            <div style="float: left;color:#000000">
+        <pe:container name="canvas" style="margin-left: 30px;margin-top: 442px; width: 680px;height: 36px;position: relative;background: ;" zorder="2">
+            <div style="float: left;color:#000000;margin-top: 3px;">
                 你还不是会员，只能创建1个地块。立即加入会员，尽享创作吧！
             </div>
             <input type="button" width="86" height="29" value="" onclick="JoinVip" style="float: left; margin-left: 20px;margin-top: 0px;background:url(Texture/Aries/Creator/keepwork/World2In1/btn4_86X29_32bits.png#0 0 86 29)"/>
@@ -65,7 +66,7 @@ end
         </div> -->
     </pe:if>
     <div style="margin-left: 11px;margin-top:13px; width: 728px; height: 506px;background: url(Texture/Aries/Creator/keepwork/World2In1/BJK2_32bits.png#0 0 32 32:8 8 8 8);">
-        <div style="margin-left: 10px; margin-top: 20px; base-font-size:16;font-size: 16;height: 20px;color: #000000;"><%=GetDesc1()%></div>
+        <div style="margin-left: 18px; margin-top: 20px; base-font-size:16;font-size: 16;height: 20px;color: #000000;"><%=GetDesc1()%></div>
         <div style="margin-left: 15px;margin-top:15px; width: 684px; height: 28px;color: #ffffff;font-weight: bold;text-align: center;font-size: 16px; 
                     background: url(Texture/Aries/Creator/keepwork/World2In1/BJK3_32bits.png#0 0 32 28:8 8 8 8);">
             <div style="margin-top: 3px; width: 225px;float: left;">名称</div>

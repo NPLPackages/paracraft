@@ -165,6 +165,7 @@ function CodeIntelliSense.GetSharedAPIGlobals()
 			getBlockEntity = globals.getBlockEntity,
 			print = dummyFunc,
 			printStack = dummyFunc,
+			_guihelper = _guihelper,
 			actor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor"),
 			codeblock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock"),
 			GI = GameLogic.GetCodeGlobal():GetSandboxAPI(),

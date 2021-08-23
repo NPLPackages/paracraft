@@ -472,7 +472,7 @@ function BuildQuest:FinishBlock(block, i)
 		if(self.step) then
 			local text = self.step:GetTipText(self.bom:GetFinishedCount());
 			if(text) then
-				GameLogic.SetTipText(text, "<player>");
+				GameLogic.SetTipText(text, "<player>", nil, "F1");
 			end
 		end
 	end
@@ -483,6 +483,7 @@ function BuildQuest:FinishBlock(block, i)
 end
 
 function BuildQuest:OnFinished()
+	self.task:RunMacros();
 	local profile = UserProfile.GetUser();
 	profile:FinishBuilding(self.task:GetThemeID(), self.task:GetIndex(),HelpPage.cur_category);
 	self:OnExit();
@@ -711,9 +712,9 @@ function BuildQuest:FrameMove_SetOrigin()
 
 	if(is_valid) then
 		self.bx, self.by, self.bz = bx, by, bz;
-		GameLogic.SetTipText(L"按【X】键确认建造位置, 【W,A,S,D】键可以移动", "<player>");
+		GameLogic.SetTipText(L"按【X】键确认建造位置, 【W,A,S,D】键可以移动", "<player>", nil, "F1");
 	else
-		GameLogic.SetTipText(L"当前位置有障碍物, 请走到一个空旷的位置!", "<player>");
+		GameLogic.SetTipText(L"当前位置有障碍物, 请走到一个空旷的位置!", "<player>", nil, "F1");
 	end
 end
 
@@ -787,7 +788,7 @@ function BuildQuest:OnDoNextStep()
 			if(not text) then
 				text = format("%s", self.bom:GetTitle())
 			end
-			GameLogic.SetTipText(text, "<player>");
+			GameLogic.SetTipText(text, "<player>", nil, "F1");
 			
 			self:SetValue(self.bom:GetFinishedCount(), self.bom:GetMaxBlockCount());
 			self:ResetHints();

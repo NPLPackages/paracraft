@@ -201,7 +201,7 @@ end
 -- @param isReuseActor: whether we will reuse actor in the scene with the same name instead of creating a new entity. default to false.
 -- @param newName: if not provided, it will use the name in itemStack
 function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip)
-	self.actor_block:Init(itemStack, movieclipEntity);
+	self.actor_block:Init(itemStack, movieclipEntity, movieclip);
 	-- base class must be called last, so that child actors have created their own variables on itemStack. 
 	if(not Actor._super.Init(self, itemStack, movieclipEntity, movieclip)) then
 		return;

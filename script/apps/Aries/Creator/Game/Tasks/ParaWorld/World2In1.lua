@@ -241,6 +241,8 @@ function World2In1.BroadcastTypeChanged()
 	if last_region_type == "creator" then
 		World2In1.ChangeSkyBox("")
 	end
+
+	GameLogic.RunCommand("/unmount")
 end
 
 function World2In1.SaveCreateTips(callback)
@@ -728,6 +730,11 @@ function World2In1.OnSaveWorld()
 		local params = {};
 		params.pivot = string.format("%d,%d,%d", x, y, z)
 		params.relative_motion = true;
+
+		local World2In1FramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.World2In1FramePage");
+		if World2In1FramePage.has_bind then
+			World2In1FramePage.SaveToXml()
+		end
 		
 		local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
 			params = params,

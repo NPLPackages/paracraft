@@ -189,6 +189,7 @@ function CodeGlobals:ctor()
 		ParaIO = ParaIO,
 		GameLogic = GameLogic,
         NplOce = NplOce,
+		_guihelper = _guihelper,
 		Game = MyCompany.Aries.Game,
 	};
 	

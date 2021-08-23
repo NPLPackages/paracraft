@@ -128,6 +128,7 @@ function EntityManager.RegisterEntities()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityAnimCharacter.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityLightChar.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityAgentSign.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityNplCadEditor.lua");
 end
 
 -- register a new entity class

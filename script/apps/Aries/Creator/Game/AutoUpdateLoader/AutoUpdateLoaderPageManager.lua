@@ -57,3 +57,28 @@ function AutoUpdateLoaderPageManager.CreateOrGet_NodeJsRuntime()
     end
     return loader_page;
 end
+
+function AutoUpdateLoaderPageManager.CreateOrGet_NplExtensions(name)
+    name = name or "npl_extensions"
+    local loader_page = AutoUpdateLoaderPageManager.pages[name];
+
+	local version = ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE");
+    version = string.upper(version);
+	local config_filepath = "script/apps/Aries/Creator/Game/NplExtensionsUpdater/configs/npl_extensions.xml";
+	if( version ~= "ONLINE")then
+		config_filepath = "script/apps/Aries/Creator/Game/NplExtensionsUpdater/configs/npl_extensions.debug.xml";
+	end
+	LOG.std(nil, "info", "AutoUpdateLoaderPageManager", "npl_extensions load: %s", config_filepath);
+    if(not loader_page)then
+        loader_page = AutoUpdateLoaderPage:new():OnInit(
+            name,
+            name,
+            name,
+            config_filepath,
+            {
+            }
+        );
+        AutoUpdateLoaderPageManager.pages[name] = loader_page;
+    end
+    return loader_page;
+end

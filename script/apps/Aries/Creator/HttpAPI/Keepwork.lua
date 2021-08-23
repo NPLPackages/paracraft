@@ -139,11 +139,13 @@ function Keepwork:OnLogin()
     self:CheckUserQRCode();
 
     local userinfo = self:GetUserInfo();
+    LOG.std(nil, 'info', 'GetUserInfo', userinfo);
     userinfo.extra = userinfo.extra or {};
     userinfo.extra.ParacraftPlayerEntityInfo = userinfo.extra.ParacraftPlayerEntityInfo or {};
     local old_skin = userinfo.extra.ParacraftPlayerEntityInfo.skin or "";
-    self:SetUserSkin(self:CheckSkin(self:GetUserSkin()));
+    self:SetUserSkin(self:GetUserSkin());
     local new_skin = self:GetUserSkin() or "";
+    LOG.std(nil, 'info', 'new_skin', self:GetUserSkin());
     
     if (old_skin ~= new_skin and new_skin == "" and userinfo.extra.ParacraftPlayerEntityInfo.asset == CustomCharItems.defaultModelFile) then  
         userinfo.extra.ParacraftPlayerEntityInfo.asset = "character/CC/02human/paperman/boy01.x" 
@@ -250,7 +252,10 @@ function Keepwork:SetUserSkin(skin)
     userinfo.extra.ParacraftPlayerEntityInfo.skin = skin;
 end
 
+-- 对后端数据源的skin再做一层vip逻辑处理，VIP逻辑会有变动，这个方法弃用掉
 function Keepwork:CheckSkin(skin)
+    LOG.std(nil, 'info', 'Keepwork:CheckSkin:Input:Skin', skin);
+
     skin = skin or self:GetUserSkin();
     if (not skin) then return skin end
     local itemIds = commonlib.split(skin, ";");
@@ -273,5 +278,6 @@ function Keepwork:CheckSkin(skin)
         end
     end
 
+    LOG.std(nil, 'info', 'Keepwork:CheckSkin:Return:Skin', skin);
     return skin;
 end

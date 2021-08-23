@@ -28,6 +28,12 @@ function SelectedWorld(name,node)
 end
 
 function ReturnLastStep()
+    if CreateNewWorld.is_only_close then
+        page:CloseWindow();
+        CreateNewWorld.LastWorldName = nil
+        CreateNewWorld.is_only_close = nil
+        return
+    end
     page:CloseWindow();
     CreateNewWorld.LastWorldName = nil
     NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");

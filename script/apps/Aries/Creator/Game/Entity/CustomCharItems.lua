@@ -81,7 +81,10 @@ CustomCharItems.ReplaceableAvatars = {};
 
 local models = {};
 local items = {};
-local category_items = {};
+-- @Interface { 
+--		[key: string]: { icon:string, id: int, isVip: boolean, name: string }[]
+-- }
+CustomCharItems.category_items = {};
 
 -- called only once
 function CustomCharItems:Init()
@@ -160,6 +163,7 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84032;81018;88014;85027";
 	-- TODO skin ids wrong 
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;82001;84062;81018;88014;85081";
+	-- 系统默认男孩1的模型
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy01.x"] = "80001;82001;84020;81018;88002;85058";
 	-- TODO skin ids wrong
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy02.x"] = "80001;82032;84062;81018;88002;85081";
@@ -172,6 +176,7 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy06.x"] = "80001;82001;84082;81018;88002;85101";
 	-- TODO skin ids wrong
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy07.x"] = "80001;82001;84016;81018;88002;85017";
+	-- 系统默认女孩1的模型
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl01.x"] = "80001;82004;84028;81018;88002;85029";
 	-- TODO skin ids wrong
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl02.x"] = "80001;82087;84074;81049;88002;85085";
@@ -259,7 +264,7 @@ function CustomCharItems:Init()
 					end
 					groups[#groups+1] = item;
 				end
-				category_items[name] = groups;
+				CustomCharItems.category_items[name] = groups;
 			end
 		end
 
@@ -297,7 +302,7 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 	end
 	]]
 
-	local groups = category_items[category];
+	local groups = CustomCharItems.category_items[category];
 	if (groups) then
 		local itemList = {};
 		for _, item in ipairs(groups) do
@@ -667,7 +672,7 @@ function CustomCharItems:ReplaceSkinTexture(skin, texture)
 end
 
 function CustomCharItems:GetItemByGsid(gsid)
-	for k, v in pairs(category_items) do
+	for k, v in pairs(CustomCharItems.category_items) do
 		for k2, item in pairs(v) do
 			if (item.gsid == gsid) then
 				return item;

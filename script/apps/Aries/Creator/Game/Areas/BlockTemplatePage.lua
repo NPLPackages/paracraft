@@ -104,7 +104,7 @@ function BlockTemplatePage.CreateBuildingTaskFile(filename, blocksfilename, task
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then
 		
-		local o = {name="Task", attr = {name = taskname, click_once_deploy="true", icon = "", image = "", desc = desc or taskname, UseAbsolutePos = "false"},};
+		local o = {name="Task", attr = {name = taskname, click_once_deploy="false", icon = "", image = "", desc = desc or taskname, UseAbsolutePos = "false"},};
 
 		o[1] = {name="Step", attr = {auto_create = "true", src = blocksfilename:gsub("(.*)[^\\/]+$", ""),},};
 
@@ -125,7 +125,7 @@ function BlockTemplatePage.CreateBuildingTaskFile(filename, blocksfilename, task
 
 
 		o[1][1] = {name = "tip", attr = {block = string.format("0-%d",blocksNum - 1)},}
-
+		o[#o+1] = {name="macros", attr = {reset_tools = "true", isAutoPlay="false"}, {name="![CDATA[", [1] = "\n\n"}};
 		file:WriteString(commonlib.Lua2XmlString(o, true));
 		file:close();
 		return true;

@@ -110,7 +110,7 @@ function IsPersonalRank()
 end
 
 function IsProjectRank()
-    return GetSelectItemTypeIndex() == 3
+    return GetSelectItemTypeIndex() == 1
 end
 
 function ToWorld(index)
@@ -123,6 +123,8 @@ function ClickHead(name, mcmlNode)
     if data.username then
         local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
         user_page.ShowUserInfoPage({username=data.username});
+    elseif IsProjectRank() then
+        Rank.ToWorld(index)
     end
 
 end
@@ -202,13 +204,13 @@ end
                         <div style="float: left; margin-left: 50px;margin-top: 7px;width: 32px;height: 15px;background: url(Texture/Aries/Creator/keepwork/rank/zi12_32X15_32bits.png#0 0 32 15);"></div>
                     </pe:if>
     
-                    <pe:if condition='<%=GetSelectItemTypeIndex() == 1 %>'>
+                    <pe:if condition='<%=GetSelectItemTypeIndex() == 3 %>'>
                         <div style="float: left; margin-left: 130px;margin-top: 7px;width: 64px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi9_63X15_32bits.png#0 0 64 16);"></div>
                     </pe:if>
                     <pe:if condition='<%=GetSelectItemTypeIndex() == 2 %>'>
                         <div style="float: left; margin-left: 130px;margin-top: 7px;width: 64px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi6_63X15_32bits.png#0 0 64 16);"></div>
                     </pe:if>
-                    <pe:if condition='<%=GetSelectItemTypeIndex() == 3 %>'>
+                    <pe:if condition='<%=GetSelectItemTypeIndex() == 1 %>'>
                         <div style="float: left; margin-left: 130px;margin-top: 7px;width: 64px;height: 16px;background: url(Texture/Aries/Creator/keepwork/rank/zi10_63X15_32bits.png#0 0 64 16);"></div>
                     </pe:if>
                 </div>

@@ -20,6 +20,7 @@ local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.C
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+-- local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 
 local last_index = 1;
 
@@ -36,6 +37,7 @@ local default_scales = {
 local categories = {};
 local filename_to_name_map = {}
 local name_to_filename_map = {}
+PlayerAssetFile.mapPlayerIdToMountState = {};
 
 function PlayerAssetFile:Init()
 	if(self.isInited) then
@@ -170,9 +172,34 @@ function PlayerAssetFile:GetDefaultCustomGeosets()
 	return CustomCharItems.defaultSkinString;
 end
 
---- @param player All player obj in the scene
---- @param skin 80001;21122;
-function PlayerAssetFile:RefreshCustomGeosets(player, skin)
+function PlayerAssetFile:CreateMountPet(name, filename, x, y, z)
+	local obj = ObjEditor.CreateObjectByParams({
+		name = name,
+		IsCharacter = true,
+		AssetFile = filename,
+		x = x,
+		y = y,
+		z = z,
+		scaling = 1, 
+		facing = 0,
+		IsPersistent = false,
+		EnablePhysics = false,
+	});
+	if(obj) then
+		obj:SetAttribute(128, true);
+		obj:SetAttribute(0x8000, true);
+		obj:SetField("progress", 1);
+		obj:SetField("RenderDistance", 160);
+		ParaScene.Attach(obj);	
+	end
+	return obj;
+end
+
+
+--- @param player ParaObject: All player obj in the scene
+--- @param skin string: 80001;21122;
+--- @param playerUserName string: userAccount, self.username, make sure to get the right player that the user is controlling
+function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerUserName)
 	if (not skin or skin == "") then
 		skin = self:GetDefaultCustomGeosets();
 	elseif (not skin:match("^%d+#")) then
@@ -230,26 +257,59 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 	charater:RemoveAttachment(11, 11);
 	charater:RemoveAttachment(15, 15);
 
-	-- local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-	-- -- if GameLogic doesn't call init method
-	-- if(GameLogic.EntityManager == nil) then return end;
-	-- local curPlayer = GameLogic.EntityManager.GetPlayer();
-	-- local ATTACHMENT_ID_PET = 20;
+	local ATTACHMENT_ID_PET = 20;
+	local uniqueId = player.id or "";
+	local petId = uniqueId.."@pet";
+	local isPetSkinIdExist = string.find(attachments, "20:");
+	local isAttachmentStringExist = string.len(attachments) > 0;
+	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+	local isCurrentUserPlayerObj = playerUserName == commonlib.getfield("System.User.username");
+	local isPlayerMounted = PlayerAssetFile.mapPlayerIdToMountState[uniqueId];
+	-- render target scene obj?
+	local isMcPlayer = player.name == "mc_player" or player.name == "0"
 
-	-- attachments data structure
-	-- "2:character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x;
-	-- 15:character/v3/Item/ObjectComponents/Back/1735_ColiseumFireBackS1.anim.x;
-	-- 20:character/CC/ObjectComponents/ride/tank.anim.x;"
-	-- commonlib.echo("attachments"); commonlib.echo(attachments);
-	-- 是否包含坐骑皮肤
-	-- if(string.find(attachments, "20:") == nil and curPlayer) then
-	-- 	-- 如果是当前用户的player对象
-	-- 	if(curPlayer.obj_id == player.id) then
-	-- 		curPlayer:UnLoadPet();
-	-- 	end
-	-- end
+	-- unload pet
+	if(not isPetSkinIdExist and isPlayerMounted) then
+		charater:UnMount();
 
-	if (string.len(attachments) > 0) then
+		-- delete pet obj
+		local petObj = ParaScene.GetCharacter(petId)
+		if(petObj) then
+			ParaScene.Delete(petObj);
+		end
+
+		if(isCurrentUserPlayerObj) then
+			charater:SetFocus();
+		end
+
+		PlayerAssetFile.mapPlayerIdToMountState[uniqueId] = false;
+
+	elseif(isPetSkinIdExist and (not isPlayerMounted) and (not isMcPlayer)) then
+		-- mount on
+		local modelUrl = PlayerAssetFile:GetAttachmentModelUrlByID(ATTACHMENT_ID_PET, attachments)
+		local petObj = ParaScene.GetCharacter(petId)
+
+		-- check if the player already mounts on a pet
+		-- TODO update pet
+		local x, y, z = player:GetPosition();
+		local petObj = PlayerAssetFile:CreateMountPet(petId, modelUrl, x, y, z);
+
+		player:GetAttributeObject():SetField("HeadTurningAngle", 0);
+		player:SetAnimation(187);
+		charater:MountOn(petObj, -1);
+
+		if(isCurrentUserPlayerObj) then
+			petObj:ToCharacter():SetFocus();
+			-- PetObj can't focus when the user enters the world, so i add this
+			commonlib.TimerManager.SetTimeout(function()
+				petObj:ToCharacter():SetFocus();
+			end, 500);
+		end
+
+		PlayerAssetFile.mapPlayerIdToMountState[uniqueId] = true;
+	end
+
+	if (isAttachmentStringExist) then
 		for id, filename in attachments:gmatch("(%d+):([^;]+)") do
 			id = tonumber(id);
 			if (use_hair and id == 11) then
@@ -261,44 +321,25 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin)
 				else
 					meshModel = ParaAsset.LoadStaticMesh("", filename);
 				end
-				if (meshModel) then
-					-- if(id == ATTACHMENT_ID_PET and (curPlayer.obj_id == player.id)) then
-					-- 	commonlib.echo("update current user info");
-					-- 	if(curPlayer.pet) then
-					-- 		-- curPlayer:MountOn(curPlayer.pet);
-					-- 		-- TODO update pet
-					-- 		return;
-					-- 	else
-					-- 		local x, y, z = curPlayer:GetPosition();
-
-					-- 		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPlayer.lua");
-					-- 		local EntityPlayer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPlayer")
-					-- 		local pet = EntityPlayer:new();
-					-- 		pet:init(curPlayer.worldObj);
-					-- 		pet:CreateInnerObject(filename, true, 0, 1);
-					-- 		pet:SetPosition(x, y, z);
-	
-					-- 		curPlayer:SetAnimation(187);
-					-- 		curPlayer:MountOn(pet);
-
-					-- 		-- commonlib.TimerManager.SetTimeout(function()
-					-- 		-- 	commonlib.echo("curPlayer:GetInnerObject():ToCharacter():IsMounted()");
-					-- 		-- 	commonlib.echo(curPlayer:GetInnerObject():ToCharacter():IsMounted());
-					-- 		-- 	pet:SetFocus();
-					-- 		-- end, 2000);
-
-					-- 		commonlib.echo("curPlayer:GetInnerObject():ToCharacter():IsMounted()");
-					-- 		commonlib.echo(curPlayer:GetInnerObject():ToCharacter():IsMounted());
-					-- 		commonlib.echo(pet:HasFocus());
-					-- 	end
-					-- else
-						charater:AddAttachment(meshModel, id, id);
-					-- end
+				if (meshModel and (id ~= ATTACHMENT_ID_PET)) then
+					charater:AddAttachment(meshModel, id, id);
 				end
 			end
 		end
 	end
 end
+
+--- @param id number
+--- @param attachments string: e.g. 2:character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x;15:character/v3/Item/ObjectComponents/Back/1735_ColiseumFireBackS1.anim.x;
+function PlayerAssetFile:GetAttachmentModelUrlByID(id, attachments)
+	for _id, modelUrl in attachments:gmatch("(%d+):([^;]+)") do
+		if(tonumber(_id) == id) then
+			return modelUrl
+		end
+	end
+
+	return nil;
+end 
 
 function PlayerAssetFile:ShowWingAttachment(player, skin, show)
 	--[[

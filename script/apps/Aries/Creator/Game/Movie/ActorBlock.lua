@@ -30,8 +30,8 @@ function Actor:ctor()
 	self.blocks = self.TimeSeries_blocks:CreateVariableIfNotExist("blocks", "Discrete");
 end
 
-function Actor:Init(itemStack, movieclipEntity)
-	if(not Actor._super.Init(self, itemStack, movieclipEntity)) then
+function Actor:Init(itemStack, movieclipEntity, movieclip)
+	if(not Actor._super.Init(self, itemStack, movieclipEntity, movieclip)) then
 		return;
 	end
 	

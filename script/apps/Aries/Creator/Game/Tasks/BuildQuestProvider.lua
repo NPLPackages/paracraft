@@ -14,6 +14,7 @@ step:GetBom():PrintParts();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/API/UserProfile.lua");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local UserProfile = commonlib.gettable("MyCompany.Aries.Creator.Game.API.UserProfile");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -494,6 +495,12 @@ function task_class:Init(xml_node, theme, task_index, category)
 		--end
 		steps[#steps+1] = step_class:new(node.attr):Init(node, self);
 	end
+	for node in commonlib.XPath.eachNode(xml_node, "/macros") do
+		if(type(node[1]) == "string" and node[1]:match("%w")) then
+			self.macros_options = node.attr
+			self.macros_text = node[1]
+		end
+	end
 	self.theme = theme;
 	return self;
 end
@@ -518,8 +525,27 @@ function task_class:ClickOnceDeploy(bUseAbsolutePos)
 	for _, step in pairs(self.steps) do
 		step:ClickOnceDeploy(bUseAbsolutePos);
 	end
+	self:RunMacros();
 	local profile = UserProfile.GetUser();
 	profile:FinishBuilding(self:GetThemeID(), self:GetIndex(),self.category or "template");
+end
+
+-- this is run only after all steps have been successfully built. 
+function task_class:RunMacros()
+	if(self.macros_text and self.macros_options) then
+		local x, y, z = GameLogic.EntityManager.GetPlayer():GetBlockPos();
+		
+		GameLogic.Macros.SetPlayOrigin(x, y, z)
+		GameLogic.Macros.SetMacroOrigin()
+		GameLogic.Macros.SetAutoPlay(self.macros_options.isAutoPlay == "true");
+		GameLogic.Macros.SetHelpLevel(1);
+		GameLogic.Macros.SetPlaySpeed(1);
+		if(self.macros_options.reset_tools ~= "false") then
+			GameLogic.Macros:PrepareInitialBuildState()
+		end
+			
+		GameLogic.Macros:Play(self.macros_text);
+	end
 end
 
 -- reset task

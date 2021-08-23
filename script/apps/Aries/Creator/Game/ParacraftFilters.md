@@ -48,6 +48,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "TouchMiniKeyboard", TouchMiniKeyboard: custom touchMiniKeyboard.
   - "KeyPressEvent" , event:KeyEvent KeyPressEvent: custom KeyPressEvent
 - GUI:
+  - "File.MCMLWindowFrame", params: all mcml v1 pages goes through this filter. 
   - "cellar.main_login.show_login_mode_page": this is the first user interface shown. One must install this filter very early, such as in mod.loadOnStartup. 
   - "ShowClientUpdaterNotice": show client updater notice when stared updater.
   - "HideClientUpdaterNotice": hide client updater notice when finished updater.

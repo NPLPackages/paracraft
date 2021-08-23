@@ -128,18 +128,9 @@ end
 function Rank.InitData()
     Rank.RankTypeData = {
         {
-            name="type",attr={img="Texture/Aries/Creator/keepwork/rank/zi3_30X15_32bits.png", expanded = true},
+            name="type",attr={img="Texture/Aries/Creator/keepwork/rank/zi5_30X15_32bits.png", expanded = true},
             {
-                name="item",attr={name="院校综合榜",code="orgComprehensive", exid = 31000},
-            },
-            {
-                name="item",attr={name="院校人数榜", code="orgPower", exid = 31010},
-            },
-            {
-                name="item",attr={name="院校创作榜", code="orgCreate", exid = 31020},
-            },
-            {
-                name="item",attr={name="院校学习榜", code="orgStudy", exid = 31030},
+                name="item",attr={name="热门作品榜", code="projectHot", exid = 31060},
             },
         },
         {
@@ -152,9 +143,18 @@ function Rank.InitData()
             },
         },
         {
-            name="type",attr={img="Texture/Aries/Creator/keepwork/rank/zi5_30X15_32bits.png"},
+            name="type",attr={img="Texture/Aries/Creator/keepwork/rank/zi3_30X15_32bits.png"},
             {
-                name="item",attr={name="热门作品榜", code="projectHot", exid = 31060},
+                name="item",attr={name="院校综合榜",code="orgComprehensive", exid = 31000},
+            },
+            {
+                name="item",attr={name="院校人数榜", code="orgPower", exid = 31010},
+            },
+            {
+                name="item",attr={name="院校创作榜", code="orgCreate", exid = 31020},
+            },
+            {
+                name="item",attr={name="院校学习榜", code="orgStudy", exid = 31030},
             },
         },
     }
@@ -262,7 +262,7 @@ function Rank.HandleRankData(data)
         MyData.rank = "1000+"
         MyData.name = "-"
         
-        if Rank.GetSelectItemTypeIndex() == 1 then
+        if Rank.GetSelectItemTypeIndex() == 3 then
             MyData.name = profile.school and profile.school.name or "-"
         elseif Rank.GetSelectItemTypeIndex() == 2 then
             MyData.name = profile.nickname or profile.username
