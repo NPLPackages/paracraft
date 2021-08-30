@@ -30,7 +30,7 @@ ReplaceBlock.max_radius = 0;
 ReplaceBlock.to_data = 0;
 ReplaceBlock.from_data = 0;
 ReplaceBlock.preserveRotation = false;
-
+ReplaceBlock.replace_num = 0
 function ReplaceBlock:ctor()
 	self.step = 1;
 	self.blocks = self.blocks or {};
@@ -61,7 +61,6 @@ function ReplaceBlock:Run()
 			self:ReplaceBlock(block[1], block[2], block[3]);
 		end
 		TaskManager.AddTask(self);
-
 	elseif(self.blockX and self.to_id) then
 		if(not self.from_id) then
 			self.from_id, self.from_data = BlockEngine:GetBlockFull(self.blockX, self.blockY, self.blockZ);
@@ -111,6 +110,7 @@ function ReplaceBlock:ReplaceBlock(x, y, z)
 	if(not self.from_id) then
 		if(from_id ~= self.to_id or (self.to_data or 0) ~= from_data) then
 			BlockEngine:SetBlock(x,y,z, self.to_id, self.to_data or 0, 3);
+			ReplaceBlock.replace_num = ReplaceBlock.replace_num + 1
 			if(GameLogic.GameMode:CanAddToHistory()) then
 				self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
 			end
@@ -140,6 +140,7 @@ function ReplaceBlock:ReplaceBlock(x, y, z)
 					end
 				end
 				BlockEngine:SetBlock(x,y,z, self.to_id, to_data or 0, 3);
+				ReplaceBlock.replace_num = ReplaceBlock.replace_num + 1
 				if(GameLogic.GameMode:CanAddToHistory()) then
 					self.history[#(self.history)+1] = {x,y,z, from_id, from_data, from_entity_data};
 				end
@@ -174,6 +175,8 @@ function ReplaceBlock:FrameMove()
 				UndoManager.PushCommand(self);
 			end
 		end
+		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",ReplaceBlock.replace_num)
+		ReplaceBlock.replace_num = 0
 	end
 end
 

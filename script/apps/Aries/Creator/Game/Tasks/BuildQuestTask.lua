@@ -158,6 +158,7 @@ function BuildQuest:Run()
 		BuildQuest.EndEditing();
 		return;
 	end
+	self.task:Reload()
 	
 	if(self:TryClickOnceDeploy()) then
 		BuildQuest.EndEditing();
@@ -268,6 +269,13 @@ function BuildQuest:AutoEquipHandTools()
 	end
 end
 
+function BuildQuest:BuildBlock(block)
+	local bx, by, bz = self:GetOrigin();
+	local x, y, z = block[1], block[2], block[3];
+	BlockEngine:SetBlock(bx+x, by+y, bz+z, block_id, block[5], nil, block[6]);
+	block.has_set_user_data = true;
+end
+
 function BuildQuest:AutoPrebuildBlocks()
 	if(self.bom) then
 		local ignoreBlocks = self:GetIgnoreBlocks();
@@ -278,6 +286,7 @@ function BuildQuest:AutoPrebuildBlocks()
 
 		local bom = self.bom;
 		if(blocks and self.step) then
+			self.bom:CalculateRelativeMotion(bx, by, bz)
 			-- if auto prebuild, we will auto sort parts. 
 			if(self.step.auto_sort_blocks) then
 				self.bom:SortBlocks();
@@ -294,13 +303,11 @@ function BuildQuest:AutoPrebuildBlocks()
 						if(block1) then
 							local block_template = block_types.get(block1[4]);
 							if(block_template and block_template:isNormalCube()) then
-								BlockEngine:SetBlock(bx+block1[1], by+block1[2], bz+block1[3], block1[4], block1[5]);
-								block1.has_set_user_data = true;
+								self:BuildBlock(block1)
 							end
 						end
 					end
-					BlockEngine:SetBlock(bx+x, by+y, bz+z, block_id, block[5]);
-					block.has_set_user_data = true;
+					self:BuildBlock(block)
 					-- self:FinishBlock(block, i);
 				elseif(ignoreBlocks[block[4]]) then
 					self:FinishBlock(block, i);
@@ -311,8 +318,10 @@ function BuildQuest:AutoPrebuildBlocks()
 end
 
 function BuildQuest:StartEditing()
-	local profile = UserProfile.GetUser();
-	profile:GetEvents():DispatchEvent({type = "BuildProgressChanged" , status = "start",});
+	if(self.task and self.task:GetIndex()) then
+		local profile = UserProfile.GetUser();
+		profile:GetEvents():DispatchEvent({type = "BuildProgressChanged" , status = "start",});
+	end
 end
 
 -- @param bCommitChange: true to commit all changes made 
@@ -325,8 +334,10 @@ function BuildQuest.EndEditing(bCommitChange)
 		self:ResetHints();
 		self.finished = true;
 		cur_instance = nil;
-		local profile = UserProfile.GetUser();
-		profile:GetEvents():DispatchEvent({type = "BuildProgressChanged" , status = "end",});
+		if(self.task and self.task:GetIndex()) then
+			local profile = UserProfile.GetUser();
+			profile:GetEvents():DispatchEvent({type = "BuildProgressChanged" , status = "end",});
+		end
 	end
 end
 
@@ -483,9 +494,13 @@ function BuildQuest:FinishBlock(block, i)
 end
 
 function BuildQuest:OnFinished()
+	local bx, by, bz = self:GetOrigin();
+	self.task:SetDeployPlayerPos(bx, by, bz)
 	self.task:RunMacros();
-	local profile = UserProfile.GetUser();
-	profile:FinishBuilding(self.task:GetThemeID(), self.task:GetIndex(),HelpPage.cur_category);
+	if(self.task:GetIndex()) then
+		local profile = UserProfile.GetUser();
+		profile:FinishBuilding(self.task:GetThemeID(), self.task:GetIndex(),HelpPage.cur_category);
+	end
 	self:OnExit();
 end
 
@@ -524,7 +539,7 @@ function BuildQuest:FrameMove_Building()
 				-- block_id 
 				local dest_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z); 
 				local target_block = block_types.get(block_id);
-				if( dest_id == block_id or (target_block:IsAssociatedBlockID(dest_id))) then
+				if( dest_id == block_id or (target_block and target_block:IsAssociatedBlockID(dest_id))) then
 					if(self.step and self.step:isInvertCreate()) then
 						ParaTerrain.SelectBlock(x,y,z, true, groupindex_wrong);
 						ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint);
@@ -577,7 +592,7 @@ function BuildQuest:FrameMove_Building()
 						ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint_bling);
 					else
 						if(self.step and self.step:isAutoCreate(true) and not ignoreBlocks[block_id]) then
-							BlockEngine:SetBlock(x,y,z,block_id,block[5]);
+							BlockEngine:SetBlock(x,y,z,block_id,block[5], nil, block[6]);
 						end
 						if(self.show_hint) then
 							ParaTerrain.SelectBlock(x,y,z, true, groupindex_empty);
@@ -680,7 +695,7 @@ function BuildQuest:FrameMove_SetOrigin()
 
 	local is_valid = true;
 	for _, block in pairs(self.task:GetProjectionBlocks()) do
-		local x, y, z = bx+block[1],by,bz + block[3];
+		local x, y, z, blockId = bx+block[1],by,bz + block[3], block[4];
 		local snap_to_y = nil;
 		block.obstruction = nil;
 		for dy = math.min(-3,block[2]), 3 do

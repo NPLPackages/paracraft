@@ -10,6 +10,13 @@ local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.Build
 BuildQuestProvider.Init();
 local step = BuildQuestProvider.GetStep(1, 1, 1);
 step:GetBom():PrintParts();
+
+-- for standalone file
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.lua");
+local task = MyCompany.Aries.Game.Tasks.BuildQuestProvider.task_class:new():Init(filename);
+if(task) then
+	MyCompany.Aries.Game.Tasks.BuildQuest:new({task=task}):Run();
+end
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
@@ -233,6 +240,17 @@ function bom_class:PrintParts()
 	end
 end
 
+function bom_class:CalculateRelativeMotion(bx, by, bz)
+	if(not self.relativeMotionCalculated and self.relative_motion) then
+		self.relativeMotionCalculated = true;
+		if(self.blocks and bx) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+			BlockTemplate:CalculateRelativeMotion(self.blocks, bx, by, bz)
+		end
+	end
+end
+
 function bom_class:Init(filename, parent)
 	self.parent = parent;
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename or "");
@@ -243,6 +261,7 @@ function bom_class:Init(filename, parent)
 		local template_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
 		self.player_pos = template_node.attr.player_pos;
 		self.pivot = template_node.attr.pivot;
+		self.relative_motion = template_node.attr.relative_motion == "true";
 		self.name = template_node.attr.name;
 
 		local node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate/pe:blocks");
@@ -437,6 +456,10 @@ function step_class:ClickOnceDeploy(bUseAbsolutePos)
 		local x, y, z = ParaScene.GetPlayer():GetPosition();
 		bx, by, bz = BlockEngine:block(x, y+0.1, z);
 	end
+	local task = self.parent;
+	if(task) then
+		task:SetDeployPlayerPos(bx, by, bz)
+	end
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Load, filename = self:GetTemplateFilename(),
@@ -474,25 +497,23 @@ function task_class:AddID()
 		next_id = next_id + 1;
 	end
 end
-
-function task_class:Init(xml_node, theme, task_index, category)
-	self.UseAbsolutePos = if_else(self.UseAbsolutePos == "true" or self.beAbsolutePos == "true",true,false);
-	self.click_once_deploy = self.click_once_deploy == "true";
-	self:AddID()
-	self.task_index = task_index;
-	self.category =  category;
-	--if(themeKey == "blockwiki") then
-		--local task_name = string.match(self.name,"%d*_(.*)");
-		--self.name = task_name;
-	--end
 	
+function task_class:Reload()
+	local taskpath = self.filepath;
+	if(not taskpath) then return end
+	self.steps = {};
+	local taskXmlRoot = ParaXML.LuaXML_ParseFile(taskpath);
+	if(taskXmlRoot) then
+		for node in commonlib.XPath.eachNode(taskXmlRoot, "/Task") do
+			self:LoadFromXmlNode(node);
+		end
+	end
+end
+
+function task_class:LoadFromXmlNode(xml_node)
 	local steps = self.steps;
 	local default_src,default_name,default_dir;
 	for node in commonlib.XPath.eachNode(xml_node, "/Step") do
-		--if(category == "blockwiki") then
-			--local src = string.format("%s%s.blocks.xml",commonlib.Encoding.DefaultToUtf8(self.dir),self.name);
-			--node.attr.src = src;
-		--end
 		steps[#steps+1] = step_class:new(node.attr):Init(node, self);
 	end
 	for node in commonlib.XPath.eachNode(xml_node, "/macros") do
@@ -501,7 +522,33 @@ function task_class:Init(xml_node, theme, task_index, category)
 			self.macros_text = node[1]
 		end
 	end
+end
+
+-- @param xml_node: xml node or xml filename
+-- @param other params can be nil
+function task_class:Init(xml_node, theme, task_index, category)
+	if(type(xml_node) == "string") then
+		local taskpath = xml_node;
+		local taskXmlRoot = ParaXML.LuaXML_ParseFile(taskpath);
+		for node in commonlib.XPath.eachNode(taskXmlRoot, "/Task") do
+			xml_node = node
+			self.filepath = taskpath;
+			self.taskpath = taskpath;
+			commonlib.partialcopy(self, xml_node.attr)
+			break;
+		end
+	end
+	if(task_index) then
+		self:AddID()
+		self.task_index = task_index;
+	end
+	self.category =  category;
+	
+	self.UseAbsolutePos = if_else(self.UseAbsolutePos == "true" or self.beAbsolutePos == "true",true,false);
+	self.click_once_deploy = self.click_once_deploy == "true";
 	self.theme = theme;
+
+	self:LoadFromXmlNode(xml_node);
 	return self;
 end
 
@@ -530,10 +577,23 @@ function task_class:ClickOnceDeploy(bUseAbsolutePos)
 	profile:FinishBuilding(self:GetThemeID(), self:GetIndex(),self.category or "template");
 end
 
+function task_class:SetDeployPlayerPos(bx, by, bz)
+	self.deploy_x, self.deploy_y, self.deploy_z = bx, by, bz;
+end
+
+function task_class:GetDeployPlayerPos()
+	return self.deploy_x, self.deploy_y, self.deploy_z;
+end
+
 -- this is run only after all steps have been successfully built. 
 function task_class:RunMacros()
 	if(self.macros_text and self.macros_options) then
-		local x, y, z = GameLogic.EntityManager.GetPlayer():GetBlockPos();
+		local x, y, z = self:GetDeployPlayerPos()
+		if(not x) then
+			x, y, z = GameLogic.EntityManager.GetPlayer():GetBlockPos();
+		else
+			GameLogic.EntityManager.GetPlayer():SetBlockPos(x, y, z)
+		end
 		
 		GameLogic.Macros.SetPlayOrigin(x, y, z)
 		GameLogic.Macros.SetMacroOrigin()
@@ -625,24 +685,6 @@ end
 
 -- get all block types in this task
 function task_class:GetBlockTypes()
-	local function insertblock_type(blocks,block_type,min_index,max_index)
-		--local min_index = 1;
-		local min_block_type = blocks[min_index];
-		--local max_index = #blocks;
-		local max_block_type = blocks[max_index];
-		if(max_index - min_index == 1) then
-			table.insert(blocks,min_index,block_type);
-		else
-			local new_index = math.floor(max_index/2);
-			local new_block_type = blocks[new_index];
-			if(block_type < new_block_type) then
-				insertblock_type(blocks,block_type,min_index,new_index);
-			else
-				insertblock_type(blocks,block_type,new_index,max_index);
-			end
-		end
-	end
-
 	if(not self.block_types ) then
 		local appear_blocks = {};
 		local blocks = {};
@@ -651,33 +693,10 @@ function task_class:GetBlockTypes()
 		for _, step in pairs(self.steps) do
 			for i, block in ipairs(step:GetBom():GetBlocks()) do
 				local block_type = tonumber(block[4]);
-				if(not appear_blocks[block_type]) then
+				if(block_type ~= 0 and not appear_blocks[block_type]) then
 					appear_blocks[block_type] = true;
 					table.insert(blocks,{block_id = block_type});
 				end
-				--if(not next(blocks)) then
-					--table.insert(blocks,block_type);
-				--else
-					--local min_index = 1;
-					--local min_block_type = blocks[1];
-					--local max_index = #blocks;
-					--local max_block_type = blocks[#blocks];
-					--if(min_index == max_index) then
-						--if(block_type < max_block_type) then
-							--table.insert(blocks,max_index,block_type);
-						--else
-							--table.insert(blocks,(max_index + 1),block_type);
-						--end
-					--else
-						--insertblock_type(blocks,block_type,min_index,max_index);
-					--end
-				--end
-				--local block_index = GetBlockIndex(block[1], 0, block[3]);
-				--local last_block = blocks[block_index];
-				--if(not last_block or last_block[2]>block[2]) then
-					---- always store the lowest y. 
-					--blocks[block_index] = block;
-				--end
 			end
 		end
 	end
@@ -736,36 +755,6 @@ local function GetFiles(path,filter,zipfile)
 			end
 		end
 		return (#filename1) < (#filename2);
-
---		local a_date = a.createdate;
---		local b_date = b.createdate;
---		if(a_date == b_date) then
---			return false;
---		end
---		local a_year,a_month,a_day,a_hour,a_minute = string.match(a_date,"(%d*)-(%d*)-(%d*)-(%d*)-(%d*)");
---		a_year = tonumber(a_year);
---		a_month = tonumber(a_month);
---		a_day = tonumber(a_day);
---		a_hour = tonumber(a_hour);
---		a_minute = tonumber(a_minute);
---		local b_year,b_month,b_day,b_hour,b_minute = string.match(b_date,"(%d*)-(%d*)-(%d*)-(%d*)-(%d*)");
---		b_year = tonumber(b_year);
---		b_month = tonumber(b_month);
---		b_day = tonumber(b_day);
---		b_hour = tonumber(b_hour);
---		b_minute = tonumber(b_minute);
---		if(a_year ~= b_year) then
---			return a_year < b_year;
---		elseif(a_month ~= b_month) then
---			return a_month < b_month;
---		elseif(a_day ~= b_day) then
---			return a_day < b_day;
---		elseif(a_hour ~= b_hour) then
---			return a_hour < b_hour;
---		elseif(a_minute ~= b_minute) then
---			return a_minute < b_minute;
---		end
---		return false;
 	end);
 	local out = {};
 	for i = 1,#output do
@@ -855,12 +844,22 @@ function BuildQuestProvider.LoadFromTemplate(themeKey,themePath)
 	if(hasOldGlobalFiles and themeKey == "template") then
 		BuildQuestProvider.TranslateGlobalTemplateToBuildingTask();
 	end
+
+	local duplicatedNames = {};
+	local output1 = {};
 	for i = 1,#output do
 		if(output[i]:match("[/\\]")) then
 			output[i] = output[i]:match("[^/\\]+$");
 		end
+		local lowername = string.lower(output[i])
+		if(not duplicatedNames[lowername]) then
+			-- remove duplicated names
+			duplicatedNames[lowername] = true;
+			output1[#output1+1] = output[i];
+		end
 	end
-
+	output = output1;
+	
 	for i = 1,#output do
 		local theme_name = string.match(output[i],"^(.*).zip$");
 		local isThemeZipFile = false;
@@ -948,20 +947,6 @@ function BuildQuestProvider.LoadFromFile(filename)
 	themesDS = {};
 	themes = {};
 	localthemesDS = {};
-	-- BuildingTasks.xml文件内容转换到 creator\blocktemplates\buildingtask 文件夹中，不用在读取该文件内容  -- 2015.1.19
-	if(false) then
-		filename = filename or "config/Aries/creator/BuildingTasks.xml";
-		local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
-		if(xmlRoot) then
-			for node in commonlib.XPath.eachNode(xmlRoot, "/Themes/Theme") do
-				node.attr.official = true;
-				themesDS[#themesDS+1] = {};
-				commonlib.partialcopy(themesDS[#themesDS],node.attr);
-				local theme_index =  #themes+1;
-				themes[theme_index] = theme_class:new(node.attr):Init(node, theme_index, "template");
-			end
-		end
-	end
 
 	for k,v in pairs(categoryPaths) do
 		categoryDS[k]["themes"] = {};
@@ -1085,12 +1070,10 @@ function BuildQuestProvider.GetTasks_DS(theme_id,category)
 		if(theme.isThemeZipFile) then
 			tasks_output = GetFiles(theme_path,"*.","*.zip");
 		else
-			-- echo({"11111111111111", commonlib.Encoding.DefaultToUtf8(theme_path)})
 			tasks_output = GetFiles(theme_path,function (msg)
 				-- folder or zip
 				return msg.filesize == 0 or string.match(msg.filename,".zip");
 			end, "*.*");
-			-- echo({"2222222222", #tasks_output});
 		end
 
 		local tasksDS = theme.tasksDS;

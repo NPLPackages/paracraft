@@ -271,6 +271,8 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 	local world2in1_tool_data = World2In1.GetToolItems()
 	if world2in1_tool_data and #world2in1_tool_data > 0 then
 		table.insert(CreatorDesktop.tabview_ds, {text=L"世界", name="world", url="script/apps/Aries/Creator/Game/Areas/World2In1FramePage.html?version=1", enabled=true})
+	elseif CreatorDesktop.tabview_index == 3 then
+		CreatorDesktop.tabview_index = 1;
 	end
 
 	CreatorDesktop.new_page_params = CreatorDesktop.new_page_params  or {

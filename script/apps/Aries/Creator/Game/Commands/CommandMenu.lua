@@ -154,6 +154,16 @@ Commands["menu"] = {
 			task:Run();
 		elseif(name == "window.explore") then
 			GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
+		elseif (name == "window.role") then
+			GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",
+				function(result)
+					if (result) then
+						commonlib.TimerManager.SetTimeout(function()
+							local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+							page.ShowUserInfoPage({username = System.User.keepworkUsername});
+						end, 250);
+					end
+				end)
 		elseif(name == "window.schoolcenter") then
 			local SchoolCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/SchoolCenter.lua")
 			SchoolCenter.OpenPage()
@@ -200,14 +210,15 @@ Commands["menu"] = {
 		elseif(name == "help.learn") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/index");
 		elseif(name == "help.dailycheck") then
-			local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-			if(not KeepWorkItemManager.GetToken())then
-				local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-				ParacraftLearningRoomDailyPage.DoCheckin();
-			else
-				local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
-				RedSummerCampRecCoursePage.Show();
-			end
+			GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",
+				function(result)
+					if (result) then
+						local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
+						RedSummerCampRecCoursePage.Show();
+						--local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+						--ParacraftLearningRoomDailyPage.DoCheckin();
+					end
+				end)
 		elseif(name == "help.ask") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/FAQ/paracraft");
 		elseif(name == "help.lessons") then

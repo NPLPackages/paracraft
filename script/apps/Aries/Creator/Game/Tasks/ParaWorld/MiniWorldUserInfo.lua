@@ -12,6 +12,8 @@ MiniWorldUserInfo.ShowPage();
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.user.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local MiniWorldUserInfo = NPL.export();
 
@@ -106,7 +108,8 @@ function MiniWorldUserInfo.Refresh(userId)
 						skin = data.extra.ParacraftPlayerEntityInfo.skin;
 					end
 					page:CallMethod("UserPlayer", "SetAssetFile", asset);
-					page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+					LOG.std(nil, 'info', 'page:CallMethod', skin);
+					page:CallMethod("UserPlayer", "SetCustomGeosets", CustomCharItems:RemovePetIdFromSkinIds(skin));
 				end);
 			end);
 		end);
@@ -180,7 +183,7 @@ function MiniWorldUserInfo.OnClickStar()
 			starCount = starCount + 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
-			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", CustomCharItems:RemovePetIdFromSkinIds(skin));
 
 			GameLogic.QuestAction.SetDailyTaskValue("40012_1", nil, 1)
 		end
@@ -194,7 +197,7 @@ function MiniWorldUserInfo.OnClickFavorite()
 			favoriteCount = favoriteCount + 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
-			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", CustomCharItems:RemovePetIdFromSkinIds(skin));
 		end
 	end);
 end
@@ -206,7 +209,7 @@ function MiniWorldUserInfo.OnClickUnFavorite()
 			favoriteCount = favoriteCount - 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
-			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", CustomCharItems:RemovePetIdFromSkinIds(skin));
 		end
 	end);
 end

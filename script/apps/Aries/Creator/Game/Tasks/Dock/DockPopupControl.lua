@@ -31,7 +31,6 @@ function DockPopupControl.StartPopup(bCommand)
     if DockPopupControl.IsInSummerCampWorld() then
         return 
     end
-
     DockPopupControl.isShow = true
     DockPopupControl.popup_num = 0
     DockPopupControl.popup_index =1
@@ -77,11 +76,16 @@ function DockPopupControl.IsInSummerCampWorld()
 	if project_id == world_id 
         or project_id == 72966 
         or project_id == 73104
-        or project_id == 72945 then
+        or project_id == 72945
+        or project_id == 79969 then
 		return true
 	end
 
 	return false
+end
+
+function DockPopupControl.SetIsInSummerCampWorld(isIn)
+    DockPopupControl.bInSummerCampWorld = isIn
 end
 
 function DockPopupControl.ShowNotice()
@@ -171,6 +175,10 @@ function DockPopupControl.ShowGuide()
         return
     end
     DockPopupControl.GotoNextPopup()
+end
+
+function DockPopupControl.CloseAllPage()
+    
 end
 
 -- function DockPopupControl.InsertPopup(name)

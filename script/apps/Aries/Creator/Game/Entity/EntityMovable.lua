@@ -383,13 +383,18 @@ function Entity:SetSkin(skin)
 					LOG.std(nil, "warn", "Entity:SetSkin", "skin files does not exist %s", tostring(skin));
 				end
 			end
-			self:RefreshClientModel();
 		else
 			if (not self:HasCustomGeosets()) then
 				self.skin = skin;
 				self:RefreshSkin();
 			end
 		end
+
+		if(self.username == commonlib.getfield("System.User.username")) then
+			PlayerAssetFile.Store.skin = self.skin;
+		end
+
+		self:RefreshClientModel();
 	end
 end
 
@@ -407,7 +412,11 @@ function Entity:RefreshClientModel(bForceRefresh, playerObj)
 				self.skin = skin;
 				assetPath = self.mainAssetPath;
 				self:GetDataWatcher():SetField(self.dataMainAsset, assetPath);
-			end
+			else
+				-- check if the player got a custom modelPath & this modelpath doesn't map to skinIdString
+				-- make sure the pet is unloaded
+				PlayerAssetFile.ShowPetOrNot(playerObj, "", self, false, "");
+			end;
 			playerObj:SetField("assetfile", assetPath);
 		end
 		self.isCustomModel = PlayerAssetFile:IsCustomModel(assetPath);
@@ -425,6 +434,10 @@ function Entity:IsCustomModel()
 	return self.isCustomModel
 end
 
+function Entity:IsDefaultModelPath()
+	return self:GetMainAssetPath() == CustomCharItems.defaultModelFile;
+end
+
 function Entity:HasCustomGeosets()
 	return self.hasCustomGeosets
 end
@@ -440,7 +453,7 @@ function Entity:RefreshSkin(player)
 		end
 
 		if(self.hasCustomGeosets) then
-			PlayerAssetFile:RefreshCustomGeosets(player, skin, self.username);
+			PlayerAssetFile:RefreshCustomGeosets(player, skin, self);
 			return;
 		end
 
@@ -933,8 +946,22 @@ function Entity:FrameMoveRidding(deltaTime)
 	Entity._super.FrameMoveRidding(self, deltaTime);
 end
 
+function Entity:ShouldEntityLoadPet()
+	if(PlayerAssetFile.IsPetSkinIdExist(self.skin) and (not self.petObj)) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+		local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile");
+		local isAttachmentStringExist = attachments and string.len(attachments) > 0;
+
+		PlayerAssetFile.ShowPetOrNot(
+			self:GetInnerObject(), attachments, self, 
+			isAttachmentStringExist, self.skin)
+	end
+end
+
 -- called every frame
 function Entity:FrameMove(deltaTime)
+	-- self:ShouldEntityLoadPet()
+
 	if(GameLogic.isRemote and not self:HasFocus()) then
 		if (self.smoothFrames > 0) then
             local x = self.targetX - self.x

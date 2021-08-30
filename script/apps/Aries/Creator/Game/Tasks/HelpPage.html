@@ -392,7 +392,7 @@ function GetShortCutKeyStr()
 end
 
 ]]></script>
-<aries:window mode="thin" title='<%=L("帮助").." (F1)"%>' style="width:650px;height:450px;" uiname_onclose="ParacraftHelpPage.ClosePage" onclose="ClosePage">
+<aries:window mode="thin" title='<%=L("帮助").." (F1)"%>' style="width:680px;height:450px;" uiname_onclose="ParacraftHelpPage.ClosePage" onclose="ClosePage">
     <div style="float:left;margin-left:2px;margin-top:5px;width:131px;">
         <pe:treeview name="tvwHelp" DataSource='<%=GetTypeDS()%>' OnClick="ChangeType" ItemToggleSize="0" style="height:400px;background:" VerticalScrollBarOffsetX="6">
 	        <NodeTemplates>
@@ -413,10 +413,10 @@ end
                 <NodeTemplate DataType="item">
                     <div style="height:32px;margin-left:2px;" MouseOverBG="">
                         <pe:if condition='<%= ItemBeSelected(XPath("this|type_index"),XPath("this|item_index")) %>'>
-                            <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Item_"..XPath("this|name") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;" class="mc_button_blue"/>    
+                            <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Item_"..XPath("this|name") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_blue"/>    
                         </pe:if>
                         <pe:if condition='<%= not ItemBeSelected(XPath("this|type_index"),XPath("this|item_index")) %>'>
-                            <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Item_"..XPath("this|name") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;" class="mc_button_grey"/>    
+                            <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Item_"..XPath("this|name") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_grey"/>    
                         </pe:if>
                     </div>
                 </NodeTemplate>
@@ -424,29 +424,29 @@ end
         </pe:treeview>
     </div>
     <div style="float:left;margin-left:10px;margin-top:1px;width:1px;height:421px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 1)"/>
-    <div style="float:left;width:160px;padding-top:6px;">
+    <div style="float:left;width:180px;padding-top:6px;">
         <pe:gridview name="gvwMCTask" style="height:416px;" VerticalScrollBarStep="32" DefaultNodeHeight="32" DataSource="<%=GetGridview_DS%>" ItemsPerLine="1" AllowPaging="false" RememberScrollPos="true">
             <Columns>
                 <div style="height:32px;">
                     <pe:if condition='<%= IsCommandCategory() %>'>
                         <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
-                            <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:10px;margin-top:1px;width:120px;height:23px;color:#ffffff;text-align:left;" class="mc_button_blue"/>    
+                            <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:10px;margin-top:1px;width:140px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_blue"/>    
                         </pe:if>
                         <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
-                            <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:10px;margin-top:1px;width:120px;height:23px;color:#ffffff;text-align:left;" class="mc_button_grey"/>    
+                            <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:10px;margin-top:1px;width:140px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_grey"/>    
                         </pe:if>
                     </pe:if>
                     <pe:if condition='<%= not IsCommandCategory() %>'>
                         <pe:if condition='<%= IsTutorialCategory() %>'>
                             <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == true %>'>
-                                <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:5px;margin-top:1px;width:130px;height:23px;color:#ffffff;text-align:left;" class="mc_button_blue"/>    
+                                <input type="button" value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' enabled="false" style="margin-left:5px;margin-top:1px;width:150px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_blue"/>    
                             </pe:if>
                             <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == false %>'>
                                 <pe:if condition='<%= TaskIsFinished(Eval("task_index")) == true %>'>
-                                    <input type="button" uiname='<%="ParacraftHelpPage.Tutorial_"..Eval("task_index") %>' value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:1px;width:130px;height:23px;color:#ffffff;text-align:left;" class="mc_button_green"/>    
+                                    <input type="button" uiname='<%="ParacraftHelpPage.Tutorial_"..Eval("task_index") %>' value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:1px;width:150px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_green"/>    
                                 </pe:if>
                                 <pe:if condition='<%= TaskIsFinished(Eval("task_index")) == false %>'>
-                                    <input type="button" uiname='<%="ParacraftHelpPage.Tutorial_"..Eval("task_index") %>' value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:1px;width:130px;height:23px;color:#ffffff;text-align:left;" class="mc_button_grey"/>    
+                                    <input type="button" uiname='<%="ParacraftHelpPage.Tutorial_"..Eval("task_index") %>' value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:1px;width:150px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_grey"/>    
                                 </pe:if>  
                             </pe:if>
                         </pe:if>
@@ -455,24 +455,24 @@ end
                             <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == true %>'>
                                 <div style="margin-left:5px;width:137px;height:32px;" class="mc_button_blue">
                                     <pe:mc_block block_id='<%=Eval("block_id")%>' style="float:left;margin-left:4px;margin-top:4px;width:24px;height:24px;" isclickable="false"/>    
-                                    <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:100px;height:23px;color:#ffffff;text-align:left;background:"/>    
+                                    <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;background:"/>    
                                 </div>
                                     
                             </pe:if>
                             <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == false %>'>
                                 <div style="margin-left:5px;width:137px;height:32px;background:"  onclick="ChangeTask" param1='<%= Eval("task_index") %>'>
                                     <pe:mc_block block_id='<%=Eval("block_id")%>' style="float:left;margin-left:4px;margin-top:4px;width:24px;height:24px;" isclickable="false"/>    
-                                    <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:100px;height:23px;color:#ffffff;text-align:left;background:"/>
+                                    <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;background:"/>
                                 </div>
                                     
                             </pe:if>
                         </pe:if>
                         <pe:if condition='<%= IsShortCutKeyCategory() %>'>
                             <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
-                                <input type="button" uiname='<%="ParacraftHelpPage.Shortcut_"..Eval("index") %>' value='<%=Eval("name") %>' enabled="false" style="margin-left:20px;margin-top:1px;width:100px;height:23px;color:#ffffff;text-align:left;" class="mc_button_blue"/>    
+                                <input type="button" uiname='<%="ParacraftHelpPage.Shortcut_"..Eval("index") %>' value='<%=Eval("name") %>' enabled="false" style="margin-left:20px;margin-top:1px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_blue"/>    
                             </pe:if>
                             <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
-                                <input type="button" uiname='<%="ParacraftHelpPage.Shortcut_"..Eval("index") %>' value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:20px;margin-top:1px;width:100px;height:23px;color:#ffffff;text-align:left;" class="mc_button_grey"/>    
+                                <input type="button" uiname='<%="ParacraftHelpPage.Shortcut_"..Eval("index") %>' value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:20px;margin-top:1px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_grey"/>    
                             </pe:if>
                         </pe:if>
                     </pe:if>
@@ -501,7 +501,7 @@ end
             <textarea ReadOnly="false" rows="13" UseSystemControl="true" style="textcolor:#ffffff;margin-top:12px;margin-left:5px;margin-right:5px;margin-bottom:12px;height:400px;" value="<%= GetCmdStr()%>"></textarea>
         </pe:if>
         <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
-            <div style="margin-left:10px;margin-top:10px;width:320px;height:250px;color:#ffffff;text-align:left;">
+            <div style="margin-left:10px;margin-top:10px;margin-right:10px;min-width:330px;height:250px;color:#ffffff;text-align:left;">
                 <%=GetTaskDesc() %>
             </div>
             <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
@@ -539,7 +539,7 @@ end
                 </pe:if>
             </div>
             <div style="">
-                <input type="button" uiname="ParacraftHelpPage.StartBuild" value='<%= GetQuestTriggerText() %>' style="margin-left:120px;margin-top:10px;min-width:100px;height:23px;font-weight:bold;font-size:14px;" class="mc_button_orange" onclick="StartBuild" />
+                <input type="button" uiname="ParacraftHelpPage.StartBuild" value='<%= GetQuestTriggerText() %>' style="margin-left:125px;margin-top:4px;min-width:100px;height:29px;font-weight:bold;font-size:14px;" class="mc_button_orange" onclick="StartBuild" />
             </div>
         </pe:if>
     </div>

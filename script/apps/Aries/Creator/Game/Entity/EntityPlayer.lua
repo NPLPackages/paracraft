@@ -100,7 +100,6 @@ function Entity:ctor()
 	self:SetPhysicsRadius(0.5);
 	self:SetPhysicsHeight(1.765);
 
-	self.pet = nil;
 end
 
 -- @param Entity: the half radius of the object. 
@@ -774,7 +773,11 @@ function Entity:OnClick(x,y,z, mouse_button)
 end
 
 function Entity:RefreshRightHand(player)
-	if(GameLogic.isRemote or System.options.mc) then
+	if(self:HasPet()) then
+		BlockInEntityHand.RefreshRightHand(nil, self.inventory:GetItemInRightHand(), self.petObj)
+	end
+
+	if(GameLogic.isRemote or System.options.mc and (not self:HasPet())) then
 		BlockInEntityHand.RefreshRightHand(self, self.inventory:GetItemInRightHand(), player);	
 	end
 end
@@ -973,14 +976,3 @@ function Entity:MountOn(targetEntity, mountID)
 		end
 	end
 end
-
-function Entity:UnLoadPet()
-	commonlib.echo("Entity:UnLoadPet triggged");
-	local player = self:GetInnerObject();
-	if(player and self.pet) then
-		player:ToCharacter():UnMount();
-		self.pet:Destroy();
-		self.pet = nil;
-		self:SetFocus();
-	end
-end;

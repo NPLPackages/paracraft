@@ -112,6 +112,10 @@ local next_id = 0;
 function Entity:ctor()
 	next_id = next_id + 1;
 	self.entityId = next_id;
+	
+	-- added for pet feature
+	self.headUI_Params = nil;
+	self.petObj = nil;
 end
 
 -- this function can only be called before entity is attached, such as in Init() function. 
@@ -629,6 +633,8 @@ function Entity:SetHeadOnDisplay(params, headonIndex)
 			-- self:SetHeadonEntity(headonIndex, nil)
 		end
 	else
+		self.headUI_Params = commonlib.clone(params);		
+
 		if(params.bReuseWindow) then
 			local lastEntity = self:GetHeadonEntity(headonIndex)
 			if(lastEntity) then
@@ -685,11 +691,11 @@ function Entity:GetPortaitObjectParams(bForceRefresh)
 end
 
 -- this is helper function that derived class can use to create an inner mesh or character object. 
-function Entity:CreateInnerObject(filename, isCharacter, offsetY, scaling, skin)
+function Entity:CreateInnerObject(filename, isCharacter, offsetY, scaling, skin, name)
 	local x, y, z = self:GetPosition();
 
 	local obj = ObjEditor.CreateObjectByParams({
-		name = format("%d,%d,%d", self.bx or 0, self.by or 0, self.bz or 0),
+		name = name or format("%d,%d,%d", self.bx or 0, self.by or 0, self.bz or 0),
 		IsCharacter = isCharacter,
 		AssetFile = filename,
 		x = x,
@@ -1046,6 +1052,13 @@ function Entity:IsDead()
 end
 
 function Entity:Destroy()
+
+	-- unload pet
+	if(self.petObj) then
+		-- delete pet objq
+		ParaScene.Delete(self.petObj);
+	end
+
 	if(self.physic_obj) then
 		self.physic_obj:Destroy();
 		self.physic_obj = nil;
@@ -1177,6 +1190,24 @@ end
 
 -- when ever an event is received. 
 function Entity:OnBlockEvent(x,y,z, event_id, event_param)
+end
+
+function Entity:HasPet()
+    return self.petObj;
+end
+
+function Entity:UnloadPet()
+	if(self.petObj) then
+		-- delete pet obj
+		ParaScene.Delete(self.petObj);
+		self.petObj = nil;
+
+		-- reset player model
+		local modelPath = ParaAsset.LoadParaX("", self:GetMainAssetPath() or CustomCharItems.defaultModelFile);
+		local charater = self:GetInnerObject():ToCharacter();
+		charater:ResetBaseModel(modelPath);
+		self:SetHeadOnDisplay(self.headUI_Params)
+	end
 end
 
 --virtual function:

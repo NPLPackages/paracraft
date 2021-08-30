@@ -12,52 +12,14 @@ VideoSharing.ToggleRecording();
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingSettings.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingUpload.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoRecorder.lua");
+local VideoRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorder");
 local VideoSharingSettings = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingSettings");
 local VideoSharingUpload = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingUpload");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local VideoSharing = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharing");
 
--- TODO: modify this if you updated the plugin
-local download_url = "https://cdn.keepwork.com/paracraft/Mod/MovieCodecPluginV9.zip"
-local download_version = "0.0.9";
--- this is the minimum version 
-VideoSharing.MIN_MOVIE_CODEC_PLUGIN_VERSION = 8;
-
-
-local max_resolution = {4906, 2160};
-local default_resolution = {640, 480};
-local before_capture_resolution;
-
--- automatically download and install the plugin
-function VideoSharing.InstallPlugin(callbackFunc)
-	-- GameLogic.RunCommand("/install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12")
-	
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
-	local ModManager = commonlib.gettable("Mod.ModManager");
-	ModManager:GetLoader():InstallFromUrl(download_url, function(bSucceed, msg, package) 
-		LOG.std(nil, "info", "CommandInstall", "bSucceed:  %s: %s", tostring(bSucceed), msg or "");
-		if(bSucceed and package) then
-			ModManager:GetLoader():SetPluginInfo(package.name, {
-				url = download_url, 
-				displayName = L"电影导出插件", 
-				version = download_version,
-				author = "lixizhi",
-				packageId = 12, 
-				homepage = "https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12",
-		        projectType = "paracraft",
-			})
-			ModManager:GetLoader():RebuildModuleList();
-			ModManager:GetLoader():EnablePlugin(package.name, true, true);
-			ModManager:GetLoader():SaveModTableToFile();
-			ModManager:GetLoader():LoadPlugin(package.name);
-			
-		end
-		if(callbackFunc) then
-			callbackFunc(bSucceed);
-		end
-	end);
-end
 
 function VideoSharing.ToggleRecording(time, callback)
 	if (ParaMovie.IsRecording()) then
@@ -79,23 +41,12 @@ function VideoSharing.GetOutputFile()
 	return VideoSharing.output;
 end
 
--- @return true if plugin is enabled, false if installed but can not be enabled, nil if not installed
-function VideoSharing.HasFFmpegPlugin()
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/ModManager.lua");
-	local ModManager = commonlib.gettable("Mod.ModManager");
-	local plugin = ModManager:GetMod("MovieCodecPlugin");
-	if(plugin and plugin:GetVersion() >= VideoSharing.MIN_MOVIE_CODEC_PLUGIN_VERSION) then
-		local attr = ParaMovie.GetAttributeObject();
-		return attr:GetField("HasMoviePlugin",false);
-	end
-end
-
 -- @param callbackFunc: called when started. function(bSucceed) end
 function VideoSharing.BeginCapture(callbackFunc)
 	function startCapture()
 		VideoSharing.output = nil;
 		AudioEngine.SetGarbageCollectThreshold(99999);
-		VideoSharing.AdjustWindowResolution(function()
+		VideoRecorder.AdjustWindowResolution(function()
 			local start_after_seconds = VideoSharingSettings.start_after_seconds or 0;
 			local elapsed_seconds = 0;
 			local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
@@ -135,7 +86,7 @@ function VideoSharing.BeginCapture(callbackFunc)
 			mytimer:Change(0, 500);
 		end)
 	end
-	if(VideoSharing.HasFFmpegPlugin()) then
+	if(VideoRecorder.HasFFmpegPlugin()) then
 		if (VideoSharingSettings.total_time) then
 			VideoSharingSettings.OnClose();
 			startCapture();
@@ -150,13 +101,13 @@ function VideoSharing.BeginCapture(callbackFunc)
 				end
 			end);
 		end
-	elseif(VideoSharing.HasFFmpegPlugin()==false) then
+	elseif(VideoRecorder.HasFFmpegPlugin()==false) then
 		_guihelper.MessageBox(L"视频输出插件没有加载成功，请检查是否有其它客户端在使用")
 	else
 		_guihelper.MessageBox(L"你没有安装最新版的视频输出插件, 是否现在安装？", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				_guihelper.MessageBox(L"正在安装, 请稍候...");
-				VideoSharing.InstallPlugin(function(bSucceed)
+				VideoRecorder.InstallPlugin(function(bSucceed)
 					if(bSucceed) then
 						_guihelper.MessageBox(nil);
 						VideoSharing.BeginCapture(callbackFunc)
@@ -172,62 +123,12 @@ function VideoSharing.BeginCapture(callbackFunc)
 	end
 end
 
--- adjust window resolution
--- @param callbackFunc: function is called when window size is adjusted. 
-function VideoSharing.AdjustWindowResolution(callbackFunc)
-	local att = ParaEngine.GetAttributeObject();
-	local cur_resolution = att:GetField("WindowResolution", {400, 300}); 
-	local preferred_resolution = VideoSharingSettings.GetResolution();
-	
-	-- reserve space in resolution for render borders which indicates whether the screen is being recorded or not
-	local margin = VideoSharingSettings.GetMargin();
-	preferred_resolution[1] = preferred_resolution[1] + margin*2;
-	preferred_resolution[2] = preferred_resolution[2] + margin*2;
-	
-	if(cur_resolution[1] > max_resolution[1] or cur_resolution[2] > max_resolution[2]) then
-		if(not preferred_resolution or not preferred_resolution[1]) then
-			preferred_resolution = max_resolution;
-		end
-	end
-
-	if(preferred_resolution and preferred_resolution[1]) then
-		att:SetField("ScreenResolution", preferred_resolution); 
-		att:CallField("UpdateScreenMode");
-		before_capture_resolution = cur_resolution;
-		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-			if(callbackFunc) then
-				callbackFunc();
-			end
-		end})
-		mytimer:Change(1000, nil);
-	else
-		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-			if(callbackFunc) then
-				callbackFunc();
-			end
-		end})
-		mytimer:Change(100, nil);
-	end
-end
-
-function VideoSharing.RestoreWindowResolution()
-	if(before_capture_resolution) then
-		local att = ParaEngine.GetAttributeObject();
-		local cur_resolution = att:GetField("ScreenResolution", {400, 300}); 
-		if(cur_resolution[1] < before_capture_resolution[1] or cur_resolution[2] < before_capture_resolution[2]) then
-			att:SetField("ScreenResolution", before_capture_resolution); 
-			att:CallField("UpdateScreenMode");
-		end
-		before_capture_resolution = nil;
-	end
-end
-
 function VideoSharing.EndCapture(showUpload)
 	AudioEngine.SetGarbageCollectThreshold(10);
 	ParaMovie.EndCapture();
 	VideoSharing.ShowRecordingArea(false);
 	GameLogic.options:SetClickToContinue(true);
-	VideoSharing.RestoreWindowResolution();
+	VideoRecorder.RestoreWindowResolution();
 
 	if (showUpload) then
 		VideoSharingUpload.ShowPage();
@@ -237,7 +138,7 @@ end
 function VideoSharing.ShowRecordingArea(bShow)
 	NPL.load("(gl)script/kids/3DMapSystemApp/Assets/AsyncLoaderProgressBar.lua");
 	local AsyncLoaderProgressBar = commonlib.gettable("Map3DSystem.App.Assets.AsyncLoaderProgressBar");
-	if(VideoSharing.HasFFmpegPlugin()) then
+	if(VideoRecorder.HasFFmpegPlugin()) then
 		local _parent = ParaUI.GetUIObject("ShareSafeArea");
 		if(not bShow) then
 			if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then

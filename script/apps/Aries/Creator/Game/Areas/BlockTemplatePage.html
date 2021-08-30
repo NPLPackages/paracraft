@@ -62,15 +62,13 @@ end
             <img name="CurrentSnapshot" tooltip='<%=L"点击重新截图"%>' style="width:60px;height:60px;" onclick="OnClickTakeSnapshot" />
         </div>
         <div style="float:left;margin-left:10px;">
-            <pe:if condition='<%= System.options.isAB_SDK %>'>
-                <div>
-                    <div style="float:left;">
-                        <%=L"种类:"%>
-                    </div>
-                    <select name="template_type" AllowUserEdit="false" style="height:22px;" onclick="ChangeCategory" DataSource='<%=GetCategoryDS()%>'>
-                    </select>
-                </div>    
-            </pe:if>
+            <div>
+                <div style="float:left;">
+                    <%=L"种类:"%>
+                </div>
+                <select name="template_type" AllowUserEdit="false" style="height:22px;" onclick="ChangeCategory" DataSource='<%=GetCategoryDS()%>'>
+                </select>
+            </div>    
             <div>
                 <div style="float:left">
                     <input type="checkbox" id="checkboxRelativeMotion" name="checkboxRelativeMotion" style="margin-top:2px;"/>

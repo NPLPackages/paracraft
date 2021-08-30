@@ -349,6 +349,7 @@ uid: unique id used in macro recording
   
     <block name="AgentSignBlock" uid="MacroPlatform" tip="宏示教舞台" icon="Texture/blocks/items/agentMacroPlatform.png" server_data='{agentPackageName="macroplatform", tooltip="宏示教", agentUrl="Mod/Agents/macroplatform.xml", isGlobal=true,updateMethod="always"}'/>
     <block name="LinkBoy"/>
+    <block name="nplcad3" test_sdk="true"/>
 
   </category>
   <category name="others" text="其他">

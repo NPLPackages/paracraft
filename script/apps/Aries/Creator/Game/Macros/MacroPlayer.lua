@@ -1043,8 +1043,12 @@ function MacroPlayer.OnDragMove()
 		local endPoint = page:FindControl("endPoint");
 		if(curPoint) then
 			
-			local startX, startY = curPoint:GetAbsPosition();
-			local endX, endY = endPoint:GetAbsPosition();
+			local startX, startY, widthStart = curPoint:GetAbsPosition();
+			startX = startX + widthStart * 0.5
+			startY = startY + widthStart * 0.5
+			local endX, endY, widthEnd = endPoint:GetAbsPosition();
+			endX = endX + widthEnd * 0.5
+			endY = endY + widthEnd * 0.5
 			local diffDistance = math.sqrt((endX - startX)^2 + (endY - startY)^2)
 			local targetDistance = 16 * MacroPlayer.touch_scale
 			MacroPlayer.isReachedDragTarget = (diffDistance < targetDistance);

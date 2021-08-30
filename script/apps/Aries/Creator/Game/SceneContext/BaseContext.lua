@@ -337,13 +337,17 @@ function BaseContext:HighlightPickBlock(result)
 		end
 			
 		if(not selection_effect) then
-			ParaTerrain.SelectBlock(result.blockX,result.blockY, result.blockZ,true, GameLogic.options.wire_frame_group_id);	
-			GameLogic.events:DispatchEvent({type = "HighlightPickBlock" , x = result.blockX, y = result.blockY, z = result.blockZ, select = true});
+			if (result.blockX) then
+				ParaTerrain.SelectBlock(result.blockX,result.blockY, result.blockZ,true, GameLogic.options.wire_frame_group_id);	
+				GameLogic.events:DispatchEvent({type = "HighlightPickBlock" , x = result.blockX, y = result.blockY, z = result.blockZ, select = true});
+			end
 		elseif(selection_effect == "none") then
 			--  do nothing
 		else
 			-- TODO: other effect. 
-			ParaTerrain.SelectBlock(result.blockX,result.blockY, result.blockZ,true, GameLogic.options.wire_frame_group_id);	
+			if (result.blockX) then
+				ParaTerrain.SelectBlock(result.blockX,result.blockY, result.blockZ,true, GameLogic.options.wire_frame_group_id);	
+			end
 		end
 		click_data.last_select_block.blockX, click_data.last_select_block.blockY, click_data.last_select_block.blockZ = result.blockX,result.blockY, result.blockZ;
 	end
@@ -960,8 +964,17 @@ function BaseContext:handlePlayerKeyEvent(event)
 			GameLogic.GetPlayerController():ThrowBlockInHand();
 			event:accept();
 		elseif(dik_key == "DIK_F5") then
-			GameLogic.ToggleCamera();
-			event:accept();
+			-- if user has a petObj
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
+			local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+			local curPlayer = EntityManager.GetPlayer();
+			if(curPlayer.petObj) then
+				GameLogic.AddBBS('channel', '坐骑模式下不允许切换视角', 2000)
+			else
+				LOG.std(nil, 'info', 'F5 TRIGGGER');
+				GameLogic.ToggleCamera();
+				event:accept();
+			end;
 		elseif(dik_key == "DIK_X") then
 			GameLogic.TalkToNearestNPC();
 			event:accept();

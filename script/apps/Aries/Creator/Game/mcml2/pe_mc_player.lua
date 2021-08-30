@@ -96,7 +96,7 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 		if(obj_params.ReplaceableTextures[2]) then
 			local player = EntityManager.GetFocus();
 			if(player and player.GetSkin) then
-				obj_params.ReplaceableTextures[2] = player:GetSkin() or obj_params.ReplaceableTextures[2];
+				obj_params.ReplaceableTextures[2] = CustomCharItems:RemovePetIdFromSkinIds(player:GetSkin()) or obj_params.ReplaceableTextures[2];
 			end
 		end
 		
@@ -110,6 +110,11 @@ function pe_mc_player:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 	
 		local scaling = obj_params.scaling;
 		obj_params.scaling = 1;
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+		local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+		obj_params.CustomGeosets = CustomCharItems:RemovePetIdFromSkinIds(obj_params.CustomGeosets)
+
 		_this:ShowModel(obj_params);
 		obj_params.scaling = scaling;
 		_this:ShowModel(obj_params);

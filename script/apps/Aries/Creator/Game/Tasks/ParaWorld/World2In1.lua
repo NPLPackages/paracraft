@@ -55,6 +55,7 @@ function World2In1.OnInit()
 end
 
 function World2In1.Init()
+	World2In1.SetIsWorld2In1(true)
 	World2In1.InitToolItems()
 
 	-- 绑定上传世界完成事件
@@ -618,11 +619,12 @@ function World2In1.GotoCreateRegion(pos)
 	lock_timer = lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
 		local player = EntityManager.GetPlayer()
 		local x, y, z = player:GetBlockPos();
+		local dis = 50
 		local minX, minY, minZ = 19136, 12, 19136;
-		local maxX = minX+128;
-		local maxZ = minZ+128;
-		local newX = math.min(maxX-5, math.max(minX+4, x));
-		local newZ = math.min(maxZ-5, math.max(minZ+4, z));
+		local maxX = minX+128 + dis;
+		local maxZ = minZ+128 + dis;
+		local newX = math.min(maxX-5, math.max(minX-dis + 4, x));
+		local newZ = math.min(maxZ-5, math.max(minZ-dis + 4, z));
 		local newY = math.max(minY-1, y);
 		if(x~=newX or y~=newY or z~=newZ) then
 			player:SetBlockPos(newX, newY, newZ)
@@ -641,8 +643,12 @@ function World2In1.OnEnterCreatorRegion()
 	if (currentType == "creator") then
 		return;
 	end	
+	local project_id = WorldCommon.GetWorldTag("kpProjectId");
+	if project_id == 79969 then
+		GameLogic.RunCommand("/sendevent gotoCreate")
+		return 
+	end
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/WorldCreatePage.lua").Show();
-	--GameLogic.GetCodeGlobal():BroadcastTextEvent("gotoCreate");	
 end
 
 function World2In1.ShowCreateReward(isCreateRegion)
@@ -1102,6 +1108,7 @@ function World2In1.InitToolItems()
 				item_data.name = "清空天空盒"
 				item_data.type = data.type
 				item_data.icon = default_icon[data.type]
+				item_data.price = 0
 				data.item_list[#data.item_list + 1] = item_data
 			end
 
@@ -1114,6 +1121,8 @@ function World2In1.InitToolItems()
 				item_data.type = data.type
 				item_data.obstruction = v.attr.obstruction == "true"
 				item_data.filename = v.attr.filename
+				item_data.price = tonumber(v.attr.price) or 0
+				
 				local icon_path = Files.GetWorldFilePath(string.format("items/%s/icon/%s.png", data.type, item_data.name))
 				if icon_path then
 					item_data.icon = icon_path

@@ -178,15 +178,20 @@ function Notice.OnImageBgClick(data)
     --(data,true)
     
     local name = data.name 
-    
-     
-    if string.find(name, "夏令营") and string.find(name, "夏令营") > 0 then
+    if string.find(name, "神通杯") and string.find(name, "神通杯") > 0 then
         Notice.CloseView()
-        local SummerCampIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampIntro.lua") 
-        SummerCampIntro.ShowView()
-        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'summercamp' });
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/ShenTongNotice.lua").ShowView();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'shentong' });
         return
     end  
+     
+    -- if string.find(name, "夏令营") and string.find(name, "夏令营") > 0 then
+    --     Notice.CloseView()
+    --     local SummerCampIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampIntro.lua") 
+    --     SummerCampIntro.ShowView()
+    --     GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board1', fromName = 'summercamp' });
+    --     return
+    -- end  
     
     if string.find(name, "端午") and string.find(name, "端午") > 0 then
         Notice.CloseView()

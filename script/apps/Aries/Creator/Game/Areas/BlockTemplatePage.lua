@@ -15,6 +15,7 @@ NPL.load("(gl)script/ide/LuaXML.lua");
 NPL.load("(gl)script/ide/XPath.lua");
 NPL.load("(gl)script/kids/3DMapSystemUI/ScreenShot/SnapshotPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestProvider.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local BuildQuestProvider =  commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuestProvider");
 local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -46,13 +47,12 @@ function BlockTemplatePage.OnInit()
 
 	if(BlockTemplatePage.blocks) then
 		page:SetNodeValue("statsButton", format("%d", #(BlockTemplatePage.blocks)));
-		--if(System.options.mc) then
-			--page:SetNodeValue("statsButton", format("%d", #(BlockTemplatePage.blocks)));
-		--else
-			--page:SetNodeValue("statsButton", format("模板使用了%d个积木", #(BlockTemplatePage.blocks)));
-		--end
 	end
 	BlockTemplatePage.isSaveInBuildingTask = false;
+	page:SetValue("checkboxRelativeMotion", BlockTemplatePage.checkboxRelativeMotion == true);
+	page:SetValue("checkboxUsePivot", BlockTemplatePage.checkboxUsePivot == true);
+	page:SetValue("checkboxRefFiles", BlockTemplatePage.checkboxRefFiles == true);
+	page:SetValue("checkboxHollow", BlockTemplatePage.checkboxHollow == true);
 end
 
 -- @param blocks: array of {x,y,z,block_id}
@@ -62,31 +62,35 @@ function BlockTemplatePage.ShowPage(bShow, blocks, pivot)
 		BlockTemplatePage.OnClickTakeSnapshot();
 		BlockTemplatePage.blocks = blocks;
 	end
-	--local width = 400;
-	--local height = 250;
-	--if(System.options.mc) then
-		--width = 210;
-		--height = 290;
-	--end
-
+	
 	width = 420;
 	height = 400;
 
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-			url = "script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.html", 
-			name = "BlockTemplatePage.ShowPage", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = true,
-			bShow = bShow,
-			directPosition = true,
-				align = "_ct",
-				x = -width/2,
-				y = -height/2,
-				width = width,
-				height = height,
-		});
+	local params = {
+		url = "script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.html", 
+		name = "BlockTemplatePage.ShowPage", 
+		isShowTitleBar = false,
+		DestroyOnClose = true,
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		allowDrag = true,
+		bShow = bShow,
+		directPosition = true,
+			align = "_ct",
+			x = -width/2,
+			y = -height/2,
+			width = width,
+			height = height,
+	}
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	params._page.OnClose = function()
+		if(page) then
+			BlockTemplatePage.checkboxRelativeMotion = page:GetValue("checkboxRelativeMotion");
+			BlockTemplatePage.checkboxUsePivot = page:GetValue("checkboxUsePivot");
+			BlockTemplatePage.checkboxRefFiles = page:GetValue("checkboxRefFiles");
+			BlockTemplatePage.checkboxHollow = page:GetValue("checkboxHollow");
+			page = nil;
+		end
+	end
 end
 
 function BlockTemplatePage.OnClickTakeSnapshot()
@@ -160,10 +164,16 @@ function BlockTemplatePage.OnClickSave()
 	local isThemedTemplate = template_dir and template_dir ~= "";
 	local bSaveSnapshot = false; -- not isThemedTemplate and not isSaveInLocalWorld;
 
-    local filename,taskfilename;
+    local filename, taskfilename;
 
 	if(isSaveInLocalWorld) then
-		filename = format("%s%s.blocks.xml", GameLogic.current_worlddir.."blocktemplates/", name_normalized);
+		if(BlockTemplatePage.themeKey == "tutorial") then	
+			filename = format("%s%s/%s.blocks.xml", GameLogic.current_worlddir.."blocktemplates/", name_normalized, name_normalized);
+			taskfilename = format("%s%s/%s.xml", GameLogic.current_worlddir.."blocktemplates/", name_normalized, name_normalized);
+			ParaIO.CreateDirectory(filename);
+		else
+			filename = format("%s%s.blocks.xml", GameLogic.current_worlddir.."blocktemplates/", name_normalized);	
+		end
 	elseif(isThemedTemplate) then
 		ParaIO.CreateDirectory(template_base_dir);
 		local subdir = template_dir; -- commonlib.Encoding.Utf8ToDefault(template_dir);
@@ -174,8 +184,6 @@ function BlockTemplatePage.OnClickSave()
 	end
 
 	local function doSave_()
-		
-
 		local x, y, z = ParaScene.GetPlayer():GetPosition();
 		local bx, by, bz = BlockEngine:block(x,y,z)
 		local player_pos = string.format("%d,%d,%d",bx,by,bz);
@@ -190,6 +198,16 @@ function BlockTemplatePage.OnClickSave()
 			end
 		end
 
+		-- replace cob web block with air 0, if it is a task file.
+		if(taskfilename) then
+			local cobWebBlock = 118; -- id for cob web block. 
+			for _, b in ipairs(BlockTemplatePage.blocks) do
+				if(b[4] == cobWebBlock) then
+					b[4] = 0;
+				end
+			end
+		end
+
 		local pivot = string.format("%d,%d,%d",BlockTemplatePage.pivot[1],BlockTemplatePage.pivot[2],BlockTemplatePage.pivot[3]);
 		BlockTemplatePage.SaveToTemplate(filename, BlockTemplatePage.blocks, {
 			name = name,
@@ -201,7 +219,7 @@ function BlockTemplatePage.OnClickSave()
 			hollow = page:GetValue("checkboxHollow", false),
 			exportReferencedFiles = page:GetValue("checkboxRefFiles", false),
 		},function ()
-			if(isThemedTemplate) then
+			if(taskfilename) then
 				BlockTemplatePage.CreateBuildingTaskFile(taskfilename, commonlib.Encoding.DefaultToUtf8(filename), name, BlockTemplatePage.blocks,desc);
 				BuildQuestProvider.RefreshDataSource();
 			end
@@ -249,13 +267,27 @@ function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc
 	})
 
 	if(task:Run()) then
-		BroadcastHelper.PushLabel({id="BlockTemplatePage", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 		page:CloseWindow();
 		callbackFunc();
 		if(bSaveSnapshot) then
 			ParaIO.CopyFile(BlockTemplatePage.DefaultSnapShot, filename:gsub("xml$", "jpg"), true);	
 		end
-		_guihelper.MessageBox(L"保存成功！ 您可以从【建造】->【模板】中创建这个模板的实例了～");
+		if(BlockTemplatePage.themeKey == "tutorial") then
+			local relativePath = Files.GetRelativePath(filename);
+			relativePath = relativePath:gsub("%.blocks%.xml$", ".xml")
+			relativePath = commonlib.Encoding.DefaultToUtf8(relativePath)
+			local playMacroText = format("/macro play %s", relativePath)
+			BroadcastHelper.PushLabel({id="BlockTemplatePage", label = format(L"命令已经复制到裁剪板: %s", playMacroText), max_duration=10000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+			ParaMisc.CopyTextToClipboard(playMacroText)
+			_guihelper.MessageBox(L"新手教学模板保存成功! 你可以运行：".."<br/>"..L"播放教学:"..playMacroText.."<br/>"..L"录制教学宏:"..format("/macro record %s", relativePath).."<br/>"..L"是否打开模板目录?", function(res)
+				if(res and res == _guihelper.DialogResult.Yes) then
+					System.App.Commands.Call("File.WinExplorer", filename:gsub("([^/\\]+)[/\\]?$",""));
+				end
+			end, _guihelper.MessageBoxButtons.YesNo);
+		else
+			BroadcastHelper.PushLabel({id="BlockTemplatePage", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+			_guihelper.MessageBox(L"保存成功！ 您可以从【建造】->【模板】中创建这个模板的实例了～");
+		end
 	end
 end
 
@@ -367,5 +399,11 @@ function BlockTemplatePage.ChangeCategory(name,value)
 	BlockTemplatePage.template_save_dir = ds[index]["template_save_dir"];
 	local theme_category_ds = BlockTemplatePage.GetCategoryDS();
 	BlockTemplatePage.themeKey = theme_category_ds[BlockTemplatePage.category_index or 1]["tag"];
+	if(page) then
+		if(BlockTemplatePage.themeKey == "tutorial") then
+			page:SetValue("checkboxRelativeMotion", true);
+			page:SetValue("checkboxUsePivot", true);
+		end
+	end
 	ParaIO.CreateDirectory(BlockTemplatePage.template_save_dir);
 end

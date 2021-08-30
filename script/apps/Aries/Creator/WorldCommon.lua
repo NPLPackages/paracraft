@@ -1,19 +1,24 @@
 --[[
 Title: common functions for world
-Author(s): LiXizhi
-Date: 2010/2/5
+Author(s): LiXizhi, big
+CreateDate: 2010.02.05
+ModifyDate: 2021.08.26
 Desc: common world functions such as loading/saving tag/world. 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
-local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 WorldCommon.OpenWorld(worldpath);
 -------------------------------------------------------
 ]]
+
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
-local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
+
+local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+
+local EncryptWorld = NPL.load("(gl)script/apps/EncryptWorld/EncryptWorld.lua");
 		
 -- create class
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
@@ -59,10 +64,10 @@ end
 -- @param world_path: if nil, ParaWorld.GetWorldDirectory() is used. 
 -- @return nil or a table of {name, writedate, desc}
 function WorldCommon.LoadWorldTag(world_path)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
-	local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
 	WorldCommon.save_world_handler = SaveWorldHandler:new():Init(world_path);
 	WorldCommon.world_info = WorldCommon.save_world_handler:LoadWorldInfo();
+	WorldCommon.world_path = world_path or ParaWorld.GetWorldDirectory();
+
 	return WorldCommon.world_info;
 end
 
@@ -81,6 +86,68 @@ end
 -- load world info from tag.xml under the world_path
 -- @return true if succeeded. 
 function WorldCommon.SaveWorldTag()
+	if (WorldCommon.world_info and type(WorldCommon.world_info) == 'table') then
+		if (EncryptWorld) then
+			if (WorldCommon.world_info.instituteVipChangeOnly or
+				WorldCommon.world_info.instituteVipSaveAsOnly) then
+				if (not WorldCommon.world_info.privateKey or
+					WorldCommon.world_info.privateKey == "") then
+					WorldCommon.world_info.privateKey = EncryptWorld:GetSeed();
+				end
+			else
+				local function RecoverFile(filePath)
+					if ParaIO.DoesFileExist(filePath) then
+						local readFile = ParaIO.open(filePath, "r");
+		
+						if (readFile:IsValid()) then
+							local headLine = readFile:readline();
+
+							if (headLine == 'encode') then
+								local originData = EncryptWorld:DecodeFile(readFile:GetText(0, -1), WorldCommon.world_info.privateKey);
+
+								readFile:close()
+
+								local writeFile = ParaIO.open(filePath, "w")
+
+								if (writeFile:IsValid()) then
+									writeFile:write(originData, #originData);
+
+									writeFile:close();
+								end
+							else
+								readFile:close();
+							end
+						end
+					end
+				end
+
+				-- decode entity.xml file
+				local entityXmlPath = WorldCommon.world_path .. 'entity.xml';
+
+				RecoverFile(entityXmlPath)
+
+				-- decode *.region.xml files
+				local blockWorldLastSavePath = WorldCommon.world_path .. 'blockWorld.lastsave/';
+
+				if (ParaIO.DoesFileExist(blockWorldLastSavePath)) then
+					local files = commonlib.Files.Find({}, blockWorldLastSavePath, 0, 1000, "*.region.xml");
+
+					if (files and type(files) == 'table' and #files > 0) then
+						for key, item in ipairs(files) do
+							if (ParaIO.DoesFileExist(blockWorldLastSavePath .. item.filename)) then
+								local curFilePath = blockWorldLastSavePath .. item.filename
+
+								RecoverFile(curFilePath)
+							end
+						end
+					end
+				end
+
+				WorldCommon.world_info.privateKey = nil;
+			end
+		end
+	end
+
 	return WorldCommon.save_world_handler:SaveWorldInfo(WorldCommon.world_info);
 end
 
@@ -110,7 +177,7 @@ function WorldCommon.OpenWorld(worldpath, isNewVersion, force_nid)
 	else
 		-- load scene
 		local commandName = System.App.Commands.GetDefaultCommand("LoadWorld");
-	
+
 		local world_tag = WorldCommon.LoadWorldTag(worldpath);
 		local world_size = 1000; -- default world size if no tag is available. 
 		if(world_tag) then
@@ -256,7 +323,24 @@ function WorldCommon.SaveWorldAs()
 	
 	if(GameLogic.options:HasCopyright()) then
 		_guihelper.MessageBox(L"这个世界的作者申请了版权保护，无法复制世界。")
-		return
+		return;
+	end
+
+	-- ban not institute student save as
+	local instituteVipSaveAsOnly = WorldCommon.GetWorldTag('instituteVipSaveAsOnly');
+    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
+	local currentEnterWorldUserId = currentEnterWorld.user and currentEnterWorld.user.id or 0;
+    local userId = GameLogic.GetFilters():apply_filters('store_get', 'user/userId');
+	local userType = Mod.WorldShare.Store:Get('user/userType') or {};
+    local isStudent = userType.student;
+    local isTeacher = userType.teacher;
+
+	if instituteVipSaveAsOnly and
+	   currentEnterWorldUserId ~= userId and
+       not isStudent and
+	   not isTeacher then
+		_guihelper.MessageBox(L"这个世界只有机构用户和老师才能另存为。");
+		return;
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
@@ -291,8 +375,6 @@ end
 function WorldCommon.SaveWorldAsImp(folderName, callbackFunc)
 	local function Handle()
 		if(WorldCommon.CopyWorldTo(folderName)) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
-			local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler")
 			local save_world_handler = SaveWorldHandler:new():Init(folderName);
 			local xmlRoot = save_world_handler:LoadWorldXmlNode();
 			if(xmlRoot) then

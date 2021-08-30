@@ -13,7 +13,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/EnterGamePage.lua");
 NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
 NPL.load("(gl)script/apps/Aries/SlashCommand/SlashCommand.lua");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
-	
 local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
 local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");

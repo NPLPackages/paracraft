@@ -86,6 +86,9 @@ local items = {};
 -- }
 CustomCharItems.category_items = {};
 
+-- pet id string list
+CustomCharItems.PetIds = {};
+
 -- called only once
 function CustomCharItems:Init()
 	if(self.is_inited) then
@@ -263,6 +266,11 @@ function CustomCharItems:Init()
 						data.wing = node.attr.wing;
 					end
 					groups[#groups+1] = item;
+
+					-- record pet category item id
+					if name == "pet" then
+						CustomCharItems.PetIds[item.id] = 1;
+					end
 				end
 				CustomCharItems.category_items[name] = groups;
 			end
@@ -413,7 +421,7 @@ function CustomCharItems:SkinStringToTable(skin)
 	return skinTable;
 end
 
--- id:810001;82001;
+--- @return id string: 810001;82001;
 function CustomCharItems:SkinStringToItemIds(skin)
 	if (not skin) then return "" end;
 	local idString = "80001;";
@@ -495,6 +503,22 @@ function CustomCharItems:ChangeSkinStringToItems(skin)
 		skin = CustomCharItems:SkinStringToItemIds(skin);
 	end
 	return skin;
+end
+
+--- @param skin string: e.g. 80001;8291;2121;
+function CustomCharItems:RemovePetIdFromSkinIds(skin)
+	LOG.std(nil, 'info', 'CustomCharItems:RemovePetIdFromSkinIds', skin);
+	local newSkin = "";
+	local itemIds = commonlib.split(skin, ";");
+
+	for _, idString in ipairs(itemIds) do
+		if(not CustomCharItems.PetIds[idString]) then
+			newSkin = newSkin..idString..";";
+		end
+	end
+
+	LOG.std(nil, 'info', 'CustomCharItems:RemovePetIdFromSkinIds', newSkin);
+	return newSkin;
 end
 
 function CustomCharItems:IsWing(attachment)

@@ -136,7 +136,7 @@ function World2In1UserInfo.Refresh(userId)
 						skin = data.extra.ParacraftPlayerEntityInfo.skin;
 					end
 					page:CallMethod("UserPlayer", "SetAssetFile", asset);
-					page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+					page:CallMethod("UserPlayer", "SetCustomGeosets", CustomCharItems:RemovePetIdFromSkinIds(skin));
 				end);
 			end);
 		end);
@@ -179,7 +179,7 @@ function World2In1UserInfo.OnClickStar()
 			starCount = starCount + 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
-			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", CustomCharItems:RemovePetIdFromSkinIds(skin));
 
 			GameLogic.QuestAction.SetDailyTaskValue("40012_1", nil, 1)
 		elseif (err == 500) then
@@ -196,7 +196,7 @@ function World2In1UserInfo.OnClickFavorite()
 			favoriteCount = favoriteCount + 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
-			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", CustomCharItems:RemovePetIdFromSkinIds(skin));
 		elseif (err == 500) then
 			GameLogic.AddBBS("world2in1", L"该世界已被其作者删除");
 		end
@@ -211,7 +211,7 @@ function World2In1UserInfo.OnClickUnFavorite()
 			favoriteCount = favoriteCount - 1;
 			page:Refresh(0);
 			page:CallMethod("UserPlayer", "SetAssetFile", asset);
-			page:CallMethod("UserPlayer", "SetCustomGeosets", skin);
+			page:CallMethod("UserPlayer", "SetCustomGeosets", CustomCharItems:RemovePetIdFromSkinIds(skin));
 		elseif (err == 500) then
 			GameLogic.AddBBS("world2in1", L"该世界已被其作者删除");
 		end

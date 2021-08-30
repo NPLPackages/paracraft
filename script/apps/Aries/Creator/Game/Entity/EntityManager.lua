@@ -1,7 +1,8 @@
 --[[
 Title: Entity Manager in block world
-Author(s): LiXizhi
-Date: 2013/1/23
+Author(s): LiXizhi, big
+CreateDate: 2013.1.23
+ModifyDate: 2021.8.25
 Desc: It manages character object with AI in the block world. 
 use the lib:
 ------------------------------------------------------------
@@ -17,6 +18,7 @@ end
 EntityManager.HasEntityInBlock(bx, by, bz)
 -------------------------------------------------------
 ]]
+
 NPL.load("(gl)script/ide/STL.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/Entity.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
@@ -25,19 +27,23 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/RegionContainer.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ChunkLocation.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPool.lua");
+
 local EntityPool = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPool");
 local ChunkLocation = commonlib.gettable("MyCompany.Aries.Game.Common.ChunkLocation");
 local RegionContainer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.RegionContainer");
 local BlockContainer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockContainer");
-local EntityPlayer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPlayer")
-local EntityMob = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMob")
-local EntityNPC = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityNPC")
+local EntityPlayer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPlayer");
+local EntityMob = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMob");
+local EntityNPC = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityNPC");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
-local EntityCollectable = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCollectable")
-local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
-local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
-local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local EntityCollectable = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCollectable");
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
+local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager");
+local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+
+local EncryptWorld = NPL.load("(gl)script/apps/EncryptWorld/EncryptWorld.lua");
 
 local rshift = mathlib.bit.rshift;
 local lshift = mathlib.bit.lshift;
@@ -696,8 +702,17 @@ function EntityManager.SaveToFile(bSaveToLastSaveFolder)
 	for _, entity in ipairs(sortEntities) do
 		table.insert(root, entity.node);
 	end
-			
-	local xml_data = commonlib.Lua2XmlString(root,true, true) or "";
+
+	local xml_data = commonlib.Lua2XmlString(root, true, true) or "";
+
+	if (EncryptWorld) then
+		local privateKey = WorldCommon.GetWorldTag("privateKey")
+
+		if (privateKey and type(privateKey) == "string" and #privateKey > 20) then
+			xml_data = EncryptWorld:EncodeFile(xml_data, privateKey)
+		end
+	end
+
 	if (#xml_data >= 10240) then
 		local writer = ParaIO.CreateZip(filename, "");
 		if (writer:IsValid()) then

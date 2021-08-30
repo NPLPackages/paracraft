@@ -1,7 +1,8 @@
 --[[
 Title: entity region container
-Author(s): LiXizhi
-Date: 2013/12/14
+Author(s): LiXizhi, big
+CreateDate: 2013.12.14
+ModifyDate: 2021.08.25
 Desc: a container for regional(512*512) entities
 use the lib:
 ------------------------------------------------------------
@@ -9,10 +10,15 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/RegionContainer.lua");
 local RegionContainer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.RegionContainer");
 -------------------------------------------------------
 ]]
+
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
+
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+
+local EncryptWorld = NPL.load("(gl)script/apps/EncryptWorld/EncryptWorld.lua");
 
 local RegionContainer = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.EntityManager.RegionContainer"));
 
@@ -212,6 +218,15 @@ function RegionContainer:SaveXMLDataToFile(xmlRoot, filename)
 	local bSucceed = false;
 	if(xmlRoot) then
 		local xml_data = commonlib.Lua2XmlString(xmlRoot, true, true) or "";
+
+		if (EncryptWorld) then
+			local privateKey = WorldCommon.GetWorldTag("privateKey")
+	
+			if (privateKey and type(privateKey) == "string" and #privateKey > 20) then
+				xml_data = EncryptWorld:EncodeFile(xml_data, privateKey)
+			end
+		end
+
 		if (#xml_data >= 10240) then
 			local writer = ParaIO.CreateZip(filename, "");
 			if (writer:IsValid()) then
@@ -235,7 +250,76 @@ end
 function RegionContainer:LoadFromFile(filename)
 	filename = filename or self:GetRegionFileName();
 
-	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	local xmlRoot
+
+	if (EncryptWorld) then
+		local privateKey = WorldCommon.GetWorldTag("privateKey");
+	
+		local file = ParaIO.open(filename, "r");
+	
+		if (file:IsValid()) then
+			local head_line = file:readline();
+	
+			if (head_line == 'encode') then
+				local originData = EncryptWorld:DecodeFile(file:GetText(0, -1), privateKey);
+				xmlRoot = ParaXML.LuaXML_ParseString(originData);
+			else
+				local zipFile = ParaIO.open(filename, "r")
+	
+				local o = {}
+				local fileType = nil
+	
+				if (zipFile:IsValid()) then
+					zipFile:ReadBytes(2, o)
+		
+					if (o[1] and o[2]) then
+						fileType = o[1] .. o[2]
+					end
+				end
+	
+				if (fileType and fileType == "8075") then
+					local zipFilename = filename:gsub(".xml", ".zip");
+	
+					ParaIO.CopyFile(filename, zipFilename, true)
+	
+					ParaAsset.OpenArchive(zipFilename, true);
+	
+					local data = "";
+					local output = {};
+	
+					commonlib.Files.Find(output, "", 0, 100, ":data", zipFilename);
+	
+					local parentPath = zipFilename:gsub("[^/\\]+$", "")
+	
+					if #output ~= 0 then
+						local unZipFile = ParaIO.open(parentPath .. output[1].filename, "r");
+	
+						if unZipFile:IsValid() then
+							data = unZipFile:GetText(0, -1);
+							unZipFile:close();
+						end
+					end
+	
+					ParaAsset.CloseArchive(zipFilename);
+					ParaIO.DeleteFile(zipFilename);
+	
+					local originData = EncryptWorld:DecodeFile(data, privateKey);
+	
+					xmlRoot = ParaXML.LuaXML_ParseString(originData);
+				else
+					local data = file:GetText(0, -1);
+	
+					xmlRoot = ParaXML.LuaXML_ParseString(data);
+				end
+			end
+	
+			file:close();
+		end
+	else
+		xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	end
+
+
 	if(xmlRoot) then
 		local count = 0;
 		local node;

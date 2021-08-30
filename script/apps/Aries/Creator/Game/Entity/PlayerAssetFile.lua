@@ -20,6 +20,7 @@ local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.C
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+
 -- local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 
 local last_index = 1;
@@ -37,7 +38,6 @@ local default_scales = {
 local categories = {};
 local filename_to_name_map = {}
 local name_to_filename_map = {}
-PlayerAssetFile.mapPlayerIdToMountState = {};
 
 function PlayerAssetFile:Init()
 	if(self.isInited) then
@@ -145,8 +145,9 @@ function PlayerAssetFile:IsCustomModel(filename)
 	return "character/v3/Elf/Female/ElfFemale.xml" == filename;
 end
 
-function PlayerAssetFile:HasCustomGeosets(filename)
-	return filename ~= nil and string.find(filename, "CustomGeoset") ~= nil;
+--- @param assetModelPath string: e.g. character/CC/02human/CustomGeoset/actor.x
+function PlayerAssetFile:HasCustomGeosets(assetModelPath)
+	return assetModelPath ~= nil and string.find(assetModelPath, "CustomGeoset") ~= nil;
 end
 
 -- mostly for haqi character
@@ -172,34 +173,35 @@ function PlayerAssetFile:GetDefaultCustomGeosets()
 	return CustomCharItems.defaultSkinString;
 end
 
-function PlayerAssetFile:CreateMountPet(name, filename, x, y, z)
-	local obj = ObjEditor.CreateObjectByParams({
-		name = name,
-		IsCharacter = true,
-		AssetFile = filename,
-		x = x,
-		y = y,
-		z = z,
-		scaling = 1, 
-		facing = 0,
-		IsPersistent = false,
-		EnablePhysics = false,
-	});
-	if(obj) then
-		obj:SetAttribute(128, true);
-		obj:SetAttribute(0x8000, true);
-		obj:SetField("progress", 1);
-		obj:SetField("RenderDistance", 160);
-		ParaScene.Attach(obj);	
-	end
-	return obj;
-end
+function PlayerAssetFile:CreateMountPet(petId, modelUrl, x, y, z, skin)
 
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/Entity.lua");
+	local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+	local entity = MyCompany.Aries.Game.EntityManager.EntityPlayer:new({
+		x, y, z
+	});
+
+	entity:CreateInnerObject(modelUrl, true, nil, 1, skin, petId)
+
+	return entity;
+end
 
 --- @param player ParaObject: All player obj in the scene
 --- @param skin string: 80001;21122;
 --- @param playerUserName string: userAccount, self.username, make sure to get the right player that the user is controlling
-function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerUserName)
+function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerEntity)
+
+	if(not player) then
+		return;
+	end
+
+	local skinIds = skin;
+	local playerUserName;
+
+	if playerEntity then
+		playerUserName = playerEntity.username
+	end
+
 	if (not skin or skin == "") then
 		skin = self:GetDefaultCustomGeosets();
 	elseif (not skin:match("^%d+#")) then
@@ -257,58 +259,7 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerUserName)
 	charater:RemoveAttachment(11, 11);
 	charater:RemoveAttachment(15, 15);
 
-	local ATTACHMENT_ID_PET = 20;
-	local uniqueId = player.id or "";
-	local petId = uniqueId.."@pet";
-	local isPetSkinIdExist = string.find(attachments, "20:");
-	local isAttachmentStringExist = string.len(attachments) > 0;
-	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-	local isCurrentUserPlayerObj = playerUserName == commonlib.getfield("System.User.username");
-	local isPlayerMounted = PlayerAssetFile.mapPlayerIdToMountState[uniqueId];
-	-- render target scene obj?
-	local isMcPlayer = player.name == "mc_player" or player.name == "0"
-
-	-- unload pet
-	if(not isPetSkinIdExist and isPlayerMounted) then
-		charater:UnMount();
-
-		-- delete pet obj
-		local petObj = ParaScene.GetCharacter(petId)
-		if(petObj) then
-			ParaScene.Delete(petObj);
-		end
-
-		if(isCurrentUserPlayerObj) then
-			charater:SetFocus();
-		end
-
-		PlayerAssetFile.mapPlayerIdToMountState[uniqueId] = false;
-
-	elseif(isPetSkinIdExist and (not isPlayerMounted) and (not isMcPlayer)) then
-		-- mount on
-		local modelUrl = PlayerAssetFile:GetAttachmentModelUrlByID(ATTACHMENT_ID_PET, attachments)
-		local petObj = ParaScene.GetCharacter(petId)
-
-		-- check if the player already mounts on a pet
-		-- TODO update pet
-		local x, y, z = player:GetPosition();
-		local petObj = PlayerAssetFile:CreateMountPet(petId, modelUrl, x, y, z);
-
-		player:GetAttributeObject():SetField("HeadTurningAngle", 0);
-		player:SetAnimation(187);
-		charater:MountOn(petObj, -1);
-
-		if(isCurrentUserPlayerObj) then
-			petObj:ToCharacter():SetFocus();
-			-- PetObj can't focus when the user enters the world, so i add this
-			commonlib.TimerManager.SetTimeout(function()
-				petObj:ToCharacter():SetFocus();
-			end, 500);
-		end
-
-		PlayerAssetFile.mapPlayerIdToMountState[uniqueId] = true;
-	end
-
+	local isAttachmentStringExist = attachments and string.len(attachments) > 0;
 	if (isAttachmentStringExist) then
 		for id, filename in attachments:gmatch("(%d+):([^;]+)") do
 			id = tonumber(id);
@@ -327,6 +278,97 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerUserName)
 			end
 		end
 	end
+
+	if(playerEntity) then
+		PlayerAssetFile.ShowPetOrNot(player, attachments, playerEntity, isAttachmentStringExist, skinIds);
+	end
+end
+
+function PlayerAssetFile.ShowPetOrNot(player, attachments, playerEntity, isAttachmentStringExist, skinIds)
+
+	-- render target scene obj? 家园的player name为0?
+	-- local isMcPlayer = player.name == "mc_player" or player.name == "0"
+	local isMcPlayer = player.name == "mc_player"
+	-- 渲染纹理里的player不展示坐骑
+	if(isMcPlayer) then
+		return;
+	end
+
+	local player = player or playerEntity:GetInnerObject();
+	local playerUserName = playerEntity.username;
+	local charater = player:ToCharacter();
+	local ATTACHMENT_ID_PET = 20;
+	local isPetSkinIdExist = attachments and string.find(attachments, "20:");
+	local playerId = player.id or "";
+	local petId = playerId.."@pet";
+	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+	local isCurrentUserPlayerObj = playerUserName == commonlib.getfield("System.User.username");
+
+	-- unload pet
+	if(not isPetSkinIdExist and playerEntity.petObj) then
+		-- delete pet objq
+		playerEntity:UnloadPet();
+	end;
+
+	-- load pet
+	if(isPetSkinIdExist and (not playerEntity.petObj)) then
+		local modelUrl = PlayerAssetFile:GetAttachmentModelUrlByID(ATTACHMENT_ID_PET, attachments)
+
+		-- local petObj = ParaScene.GetCharacter(petId)
+		-- check if the player already mounts on a pet
+		-- TODO update pet
+		local x, y, z = player:GetPosition();
+		
+		-- TODO update dummmyPlayerEntity skin
+		local newSkin = PlayerAssetFile.RemovePetIdFromSkinIds(skinIds);
+		local dummmyPlayerEntity = PlayerAssetFile:CreateMountPet(
+			petId, CustomCharItems.defaultModelFile, 
+			x, y, z, 
+			newSkin);
+
+		local petModel = ParaAsset.LoadParaX("", modelUrl);
+		charater:ResetBaseModel(petModel);
+
+		local dummmyPlayerObj = dummmyPlayerEntity:GetInnerObject();
+		dummmyPlayerObj:ToCharacter():MountOn(player)
+		dummmyPlayerObj:SetAnimation(187);
+		playerEntity.petObj = dummmyPlayerObj;
+
+		commonlib.TimerManager.SetTimeout(function()
+			playerEntity:SetHeadOnDisplay(nil);
+			dummmyPlayerEntity:SetHeadOnDisplay(playerEntity.headUI_Params);
+		end, 200);
+	end
+	
+	-- force reset BaseModel
+	if(isPetSkinIdExist and playerEntity.petObj) then
+		local modelUrl = PlayerAssetFile:GetAttachmentModelUrlByID(ATTACHMENT_ID_PET, attachments)
+		local petModel = ParaAsset.LoadParaX("", modelUrl);
+		charater:ResetBaseModel(petModel);
+
+		-- refresh dummyPlayer skin
+		PlayerAssetFile:RefreshCustomGeosets(playerEntity.petObj, PlayerAssetFile.RemovePetIdFromSkinIds(skinIds));
+	end
+end 
+
+-- remove the PetSkin
+function PlayerAssetFile.RemovePetIdFromSkinIds(skin)
+	local newSkin = "";
+	local itemIds = commonlib.split(skin, ";");
+
+	for _, idString in ipairs(itemIds) do
+		if(not CustomCharItems.PetIds[idString]) then
+			newSkin = newSkin..idString..";";
+		end
+	end
+	return newSkin;
+end
+
+function PlayerAssetFile.IsPetSkinIdExist(skin)
+	local skinStr = CustomCharItems:ItemIdsToSkinString(skin);
+	local geosets, textures, attachments =  string.match(skinStr, "([^@]+)@([^@]+)@?(.*)");
+	local isPetSkinIdExist = attachments and string.find(attachments, "20:");
+	return isPetSkinIdExist;
 end
 
 --- @param id number
@@ -383,3 +425,9 @@ function PlayerAssetFile:ShowWingAttachment(player, skin, show)
 		end
 	end
 end
+
+PlayerAssetFile.Store = {
+	-- current user skin
+	skin = nil,
+	assetfiles = nil
+}

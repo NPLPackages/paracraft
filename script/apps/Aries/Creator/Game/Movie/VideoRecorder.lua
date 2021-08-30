@@ -28,7 +28,6 @@ VideoRecorder.MIN_MOVIE_CODEC_PLUGIN_VERSION = 8;
 
 
 local max_resolution = {4906, 2160};
-local default_resolution = {640, 480};
 local before_capture_resolution;
 
 -- automatically download and install the plugin
@@ -90,6 +89,10 @@ function VideoRecorder.HasFFmpegPlugin()
 		return attr:GetField("HasMoviePlugin",false);
 	end
 end
+
+function VideoRecorder.BeginCaptureImp()
+end
+
 
 -- @param callbackFunc: called when started. function(bSucceed) end
 function VideoRecorder.BeginCapture(callbackFunc)

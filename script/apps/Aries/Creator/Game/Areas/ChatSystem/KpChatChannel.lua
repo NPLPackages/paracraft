@@ -215,7 +215,7 @@ function KpChatChannel.ReConnect()
     if(KpChatChannel.try_connect_cnt > KpChatChannel.try_connect_max_cnt)then
         return
     end
-    local id = WorldCommon.GetWorldTag("kpProjectId");
+    local id = WorldCommon.GetWorldTag("kpProjectId") or 0;
     if(id)then
         id = tonumber(id);
         KpChatChannel.worldId_pending = id;

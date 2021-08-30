@@ -352,9 +352,15 @@ function ParacraftLearningRoomDailyPage.ClosePage()
 end
 function ParacraftLearningRoomDailyPage.DoCheckin(callback)
     if(not KeepWorkItemManager.GetToken())then
-			_guihelper.MessageBox(L"请先登录！");
+		GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",
+			function(result)
+				if (result) then
+					ParacraftLearningRoomDailyPage.DoCheckin(callback)
+				end
+			end)
 		return
 	end
+
 	ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 	local show_page = function()
 		ParacraftLearningRoomDailyPage.ShowPage();
@@ -529,9 +535,15 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 		end
 	end);
 end
+
 function ParacraftLearningRoomDailyPage.OnLearningLand()
 	if(not KeepWorkItemManager.GetToken())then
-		_guihelper.MessageBox(L"请先登录！");
+		GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",
+			function(result)
+				if (result) then
+					ParacraftLearningRoomDailyPage.OnLearningLand()
+				end
+			end)
 		return
 	end
 

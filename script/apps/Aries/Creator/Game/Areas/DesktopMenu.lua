@@ -80,6 +80,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		{text = L"窗口", order=6, mode="edit", name = "window",children = 
 			{
 				{text = L"探索...",name = "window.explore", onclick=nil},
+				{text = L"人物...",name = "window.role", onclick=nil},
 				--{text = L"角色换装...",name = "window.changeskin", onclick=nil},
 				{text = L"校园中心...",name = "window.schoolcenter",onclick=nil},
 				{text = L"材质包管理...",name = "window.texturepack",onclick=nil},

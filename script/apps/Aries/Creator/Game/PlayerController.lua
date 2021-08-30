@@ -25,6 +25,8 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
+local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockInEntityHand");
 
 -- create class
 local PlayerController = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.PlayerController"));
@@ -83,6 +85,12 @@ function PlayerController:GetSkinTexture()
 			skin = item:GetSkinFile();
 		end
 	end
+
+	-- hide pet skin
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+	local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+	CustomCharItems.RemovePetIdFromSkinIds(skin);
+
 	return skin;
 end
 
@@ -260,9 +268,14 @@ end
 -- set block in right hand
 -- @param blockid_or_item_stack:  block_id or ItemStack object. 
 function PlayerController:SetBlockInRightHand(blockid_or_item_stack)
+	LOG.std(nil, 'info', 'SetBlockInRightHand');
 	local player = EntityManager.GetPlayer();
 	if(player) then
-		return player:SetBlockInRightHand(blockid_or_item_stack);
+		if(player.petObj) then
+			BlockInEntityHand.RefreshRightHand(nil, blockid_or_item_stack, player.petObj)
+		end
+		
+		return player:SetBlockInRightHand(blockid_or_item_stack);		
 	end
 end
 

@@ -55,9 +55,9 @@ function HelpPage.ShowPage(category_name, subfolder_name)
 		zorder = 1,
 		directPosition = true,
 			align = "_ct",
-			x = -650/2,
+			x = -680/2,
 			y = -450/2,
-			width = 650,
+			width = 680,
 			height = 450,
 	});
 

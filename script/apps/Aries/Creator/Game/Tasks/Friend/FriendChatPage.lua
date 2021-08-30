@@ -127,7 +127,7 @@ function FriendChatPage.Show(user_data, chat_user_data)
 					allowDrag = true,
 					enable_esc_key = true,
 					zorder = 1,
-					app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+					--app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 					directPosition = true,
 						align = "_ct",
 						x = -760/2,

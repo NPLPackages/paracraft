@@ -52,8 +52,9 @@ function QuestDateCondition:IsValid()
     -- if self.cur_time == nil then
     --     return false
     -- end
-
-    local cur_time_stamp = GameLogic.QuestAction.GetServerTime()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+    local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+    local cur_time_stamp = QuestAction.GetServerTime()
 
     -- 先判断结束时间
     if self.endtime and self.endtime ~= "" then

@@ -39,8 +39,7 @@ function AddFriendsPage.Show(user_data)
             style = CommonCtrl.WindowFrame.ContainerStyle,
             allowDrag = true,
             enable_esc_key = true,
-            zorder = -1,
-            app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+            --app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
             directPosition = true,
             
             align = "_lt",
@@ -70,7 +69,7 @@ function AddFriendsPage.SearchFriend(text)
 	keepwork.user.search({
         ["$or"] = {username = {["$like"]=search_text}, nickname = {["$like"]=search_text}, cellphone = text}
 	},function(search_err, search_msg, search_data)
-        commonlib.echo(search_data, true)
+        --commonlib.echo(search_data, true)
 
         SearchIdList = {}
         local index = 0
@@ -104,8 +103,8 @@ function AddFriendsPage.ToFollow(userId)
 		objectType = 0,
 		objectId = userId,
 	},function(err, msg, data)
-		print("dwwwwwwwwwwwwwwwFriendsPage.Follow", err, msg)
-        commonlib.echo(data, true)
+		-- print("dwwwwwwwwwwwwwwwFriendsPage.Follow", err, msg)
+        -- commonlib.echo(data, true)
         GameLogic.AddBBS("statusBar", L"已向对方发出好友请求，请耐心等待回复。", 5000, "0 255 0");
 
         local function updata_cb()

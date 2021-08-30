@@ -14,6 +14,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 
 -- create class
 local pe_mc_player = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_player");
@@ -100,9 +102,13 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 	obj_params.facing = 1.57;
 	-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
 	obj_params.Attribute = 128;
+	obj_params.CustomGeosets = CustomCharItems:RemovePetIdFromSkinIds(obj_params.CustomGeosets or PlayerAssetFile.Store.skin)
+
+	if(string.find(obj_params.AssetFile, "character/CC/ObjectComponents/Ride/")) then
+		obj_params.AssetFile = "character/CC/02human/CustomGeoset/actor.x"
+	end
 
 	mcmlNode.obj_params = obj_params;
-
 	ctl:ShowModel(obj_params);
 	pe_mc_player.OnFrameMove(ctl, mcmlNode);
 end
