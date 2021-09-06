@@ -30,6 +30,12 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 -- call this when command
 function CommandManager:Init()
+	local cmd_class = SlashCommand.GetSingleton():GetSlashCommand("loadworld");
+	if(cmd_class) then
+		-- already initialized
+		return
+	end
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlocks.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandShapes.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua");

@@ -319,7 +319,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			return true;
 		end
 	else
-		if(self.onclickEvent) then
+		if(mouse_button == "left" and self.onclickEvent) then
 			local x, y, z = self:GetBlockPos();
 			GameLogic.RunCommand(format("/sendevent %s {x=%d, y=%d, z=%d}", self.onclickEvent, x, y, z))
 			return true;

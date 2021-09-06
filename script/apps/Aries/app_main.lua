@@ -2334,7 +2334,9 @@ function MyCompany.Aries.Handle_LoadWorld_Command(params)
 	WorldManager:SaveWorldSession(params, worldinfo.allow_recover_connection);
 	local is_standalone = params.is_standalone or worldinfo.is_standalone;
 	if(not System.User.nid or System.User.nid == 0) then
-		LOG.std(nil, "info", "Aries", "Forcing standalone mode since user is not connected. ")
+		if(not System.options.mc) then
+			LOG.std(nil, "info", "Aries", "Forcing standalone mode since user is not connected. ")
+		end
 		is_standalone = true;
 	end
 

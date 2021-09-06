@@ -17,9 +17,6 @@ local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
-
-local EncryptWorld = NPL.load("(gl)script/apps/EncryptWorld/EncryptWorld.lua");
-
 local RegionContainer = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.EntityManager.RegionContainer"));
 
 RegionContainer.entities = {};
@@ -217,21 +214,27 @@ end
 function RegionContainer:SaveXMLDataToFile(xmlRoot, filename)
 	local bSucceed = false;
 	if(xmlRoot) then
+		local privateKey = WorldCommon.GetWorldTag("privateKey");
+		if(privateKey) then
+			xmlRoot.attr = xmlRoot.attr or {};
+			xmlRoot.attr.privateKey = privateKey;
+		end
+		
 		local xml_data = commonlib.Lua2XmlString(xmlRoot, true, true) or "";
 
-		if (EncryptWorld) then
-			local privateKey = WorldCommon.GetWorldTag("privateKey")
-	
-			if (privateKey and type(privateKey) == "string" and #privateKey > 20) then
-				xml_data = EncryptWorld:EncodeFile(xml_data, privateKey)
-			end
-		end
-
-		if (#xml_data >= 10240) then
+		if (#xml_data >= 10240 or privateKey) then
 			local writer = ParaIO.CreateZip(filename, "");
 			if (writer:IsValid()) then
 				writer:ZipAddData("data", xml_data);
 				writer:close();
+
+				if(privateKey) then
+					NPL.load("(gl)script/ide/System/Util/ZipFile.lua");
+					local ZipFile = commonlib.gettable("System.Util.ZipFile");
+					if(not ZipFile.GeneratePkgFile(filename, filename)) then
+						LOG.std(nil, "warn", "RegionContainer",  "failed to encode file: %s", filename);
+					end
+				end
 				bSucceed = true;
 			end
 		else
@@ -239,7 +242,7 @@ function RegionContainer:SaveXMLDataToFile(xmlRoot, filename)
 			if(file:IsValid()) then
 				file:WriteString(xml_data);
 				file:close();
-				
+
 				bSucceed = true;
 			end
 		end
@@ -247,78 +250,38 @@ function RegionContainer:SaveXMLDataToFile(xmlRoot, filename)
 	return bSucceed;
 end
 
+-- tag is a string that is saved along with the region's raw block file. 
+function RegionContainer:GetRawRegionFileTag()
+	if(not self.tag) then
+		local attRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", self.region_x, self.region_z))
+		self.tag = attRegion:GetField("Tag", "");
+	end
+	return self.tag;
+end
+
+-- tag is a string that is saved along with the region's raw block file. 
+function RegionContainer:SetRawRegionFileTag(tag)
+	if(self.tag ~= tag) then
+		self.tag = tag;
+		local attRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", self.region_x, self.region_z))
+		attRegion:SetField("Tag", self.tag);
+	end
+end
+
 function RegionContainer:LoadFromFile(filename)
 	filename = filename or self:GetRegionFileName();
 
-	local xmlRoot
+	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	local privateKey = WorldCommon.GetWorldTag("privateKey");
 
-	if (EncryptWorld) then
-		local privateKey = WorldCommon.GetWorldTag("privateKey");
-	
-		local file = ParaIO.open(filename, "r");
-	
-		if (file:IsValid()) then
-			local head_line = file:readline();
-	
-			if (head_line == 'encode') then
-				local originData = EncryptWorld:DecodeFile(file:GetText(0, -1), privateKey);
-				xmlRoot = ParaXML.LuaXML_ParseString(originData);
-			else
-				local zipFile = ParaIO.open(filename, "r")
-	
-				local o = {}
-				local fileType = nil
-	
-				if (zipFile:IsValid()) then
-					zipFile:ReadBytes(2, o)
-		
-					if (o[1] and o[2]) then
-						fileType = o[1] .. o[2]
-					end
-				end
-	
-				if (fileType and fileType == "8075") then
-					local zipFilename = filename:gsub(".xml", ".zip");
-	
-					ParaIO.CopyFile(filename, zipFilename, true)
-	
-					ParaAsset.OpenArchive(zipFilename, true);
-	
-					local data = "";
-					local output = {};
-	
-					commonlib.Files.Find(output, "", 0, 100, ":data", zipFilename);
-	
-					local parentPath = zipFilename:gsub("[^/\\]+$", "")
-	
-					if #output ~= 0 then
-						local unZipFile = ParaIO.open(parentPath .. output[1].filename, "r");
-	
-						if unZipFile:IsValid() then
-							data = unZipFile:GetText(0, -1);
-							unZipFile:close();
-						end
-					end
-	
-					ParaAsset.CloseArchive(zipFilename);
-					ParaIO.DeleteFile(zipFilename);
-	
-					local originData = EncryptWorld:DecodeFile(data, privateKey);
-	
-					xmlRoot = ParaXML.LuaXML_ParseString(originData);
-				else
-					local data = file:GetText(0, -1);
-	
-					xmlRoot = ParaXML.LuaXML_ParseString(data);
-				end
-			end
-	
-			file:close();
+	if (privateKey and type(privateKey) == "string" and privateKey ~= "") then
+		if (xmlRoot[1].attr.privateKey ~= privateKey) then
+			return;
 		end
-	else
-		xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	end
-
+	local tag = self:GetRawRegionFileTag();
+	-- TODO: check if tag equals private key, here
+	
 
 	if(xmlRoot) then
 		local count = 0;

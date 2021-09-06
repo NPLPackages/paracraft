@@ -1371,7 +1371,8 @@ end
 -- global function to fill selection with given blocks. 
 -- TODO: making this function with undo manager
 -- @param fill_block_id: if nil, it will be the current block.  if 0, it is fast delete. 
-function SelectBlocks.FillSelection(fill_block_id)
+-- @param fill_block_data: can be nil.
+function SelectBlocks.FillSelection(fill_block_id, fill_block_data)
 	if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid()) then
 		local self = cur_instance;
 		local min = self.aabb:GetMin();
@@ -1382,7 +1383,7 @@ function SelectBlocks.FillSelection(fill_block_id)
 		for x = min[1], max[1] do
 			for y = min[2], max[2] do
 				for z = min[3], max[3] do
-					BlockEngine:SetBlock(x,y,z,fill_block_id);
+					BlockEngine:SetBlock(x,y,z,fill_block_id, fill_block_data);
 				end
 			end
 		end

@@ -14,6 +14,8 @@ local VideoSharingUpload = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoS
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldMiniChunkGenerator.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CreateRewardManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/CreateRewardManager.lua") 
 local World2In1UserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1UserInfo.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
@@ -56,7 +58,6 @@ end
 
 function World2In1.Init()
 	World2In1.SetIsWorld2In1(true)
-	World2In1.InitToolItems()
 
 	-- 绑定上传世界完成事件
 	GameLogic.GetFilters():add_filter("SyncWorldFinish", World2In1.OnSyncWorldFinish);
@@ -205,7 +206,16 @@ function World2In1.OnWorldUnload()
 	page_root = nil
 	VideoSharingUpload.ChangeRegionType(nil)
 	World2In1.SetIsWorld2In1(false)
+	World2In1.CelarToolData()
+end
+
+function World2In1.CelarToolData()
 	World2In1.ItemsDataSource = nil
+
+	if World2In1.CodeEditor then
+		World2In1.CodeEditor:clear()
+		World2In1.CodeEditor = nil
+	end
 end
 
 function World2In1.OnClose()
@@ -241,6 +251,7 @@ function World2In1.BroadcastTypeChanged()
 
 	if last_region_type == "creator" then
 		World2In1.ChangeSkyBox("")
+		World2In1.CelarToolData()
 	end
 
 	GameLogic.RunCommand("/unmount")
@@ -615,6 +626,8 @@ function World2In1.GotoCreateRegion(pos)
 	elseif pos then
 		GameLogic.RunCommand(format("/goto %d %d %d", pos[1], pos[2], pos[3]))
 	end
+
+	World2In1.InitToolItems()
 
 	lock_timer = lock_timer or commonlib.Timer:new({callbackFunc = function(timer)
 		local player = EntityManager.GetPlayer()
@@ -1086,9 +1099,9 @@ function World2In1.InitToolItems()
 
 	World2In1.ItemsDataSource = {}
 	local xmlRoot = ParaXML.LuaXML_ParseFile(file_path);
+	local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+	local item_class = block_types.GetItemClass("ItemWorld2In1")
 	if(xmlRoot) then
-		local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
-		local item_class = block_types.GetItemClass("ItemWorld2In1")
 		local default_icon = {
 			["model"] = "Texture/blocks/items/ts_char_off.png",
 			["templates"] = "Texture/blocks/items/book_writable.png",
@@ -1097,6 +1110,7 @@ function World2In1.InitToolItems()
 			["skybox"] = "Texture/blocks/items/metal_block.png",
 		}
 
+		local code_item_list = {}
 		for itemNode in commonlib.XPath.eachNode(xmlRoot, "/blocklist/category") do
 			local data = {}
 			data.text = itemNode.attr.text
@@ -1122,6 +1136,7 @@ function World2In1.InitToolItems()
 				item_data.obstruction = v.attr.obstruction == "true"
 				item_data.filename = v.attr.filename
 				item_data.price = tonumber(v.attr.price) or 0
+				item_data.tips = v.attr.tips
 				
 				local icon_path = Files.GetWorldFilePath(string.format("items/%s/icon/%s.png", data.type, item_data.name))
 				if icon_path then
@@ -1132,16 +1147,91 @@ function World2In1.InitToolItems()
 				if v.attr.id then
 					item_data.id = tonumber(v.attr.id)
 					item_data.block_id = item_data.id;
-					item = item_class:new(item_data);
+					local item = item_class:new(item_data);
 					ItemClient.AddItem(item_data.block_id, item);
 				end
 
-				data.item_list[#data.item_list + 1] = item_data
+				if data.type == "agent" and v.attr.is_run == "true" then
+					--World2In1.RunCode(item_data)
+					code_item_list[#code_item_list + 1] = item_data
+				else
+					data.item_list[#data.item_list + 1] = item_data
+				end
 			end
 
 			World2In1.ItemsDataSource[#World2In1.ItemsDataSource + 1] = data
 		end
+		if #code_item_list > 0 then
+			for index, item_data in ipairs(code_item_list) do
+				World2In1.RunCode(item_data)
+			end
+		end
 	end
+
+	-- 加入resource目录
+	local result = commonlib.Files.Find({}, GameLogic.current_worlddir.."items/resource/", 2, 500, function(item)
+		if(item.filename:match("%.bmax$") or item.filename:match("%.x$")) then
+			return true;
+		end
+	end)
+
+	if result and #result > 0 then
+		local start_id = 3900
+		local data = {}
+		data.text = "资源"
+		data.type = "resource"
+		data.item_list = {}
+		for i, file in ipairs(result) do
+			local item_data = {}
+			item_data.name = file.filename:match("([^/\\]+%.bmax)$")
+			if(not item_data.name) then
+				item_data.name = file.filename:match("([^/\\]+%.x)$")
+			end
+			item_data.item_name = item_data.name
+			item_data.isvip = false
+			
+			item_data.type = data.type
+			item_data.obstruction = false
+			item_data.filename = item_data.name
+			item_data.price = 0
+			item_data.icon = "Texture/blocks/items/ts_char_off.png"
+
+			item_data.id = start_id + i
+			item_data.block_id = item_data.id;
+			local item = item_class:new(item_data);
+			ItemClient.AddItem(item_data.block_id, item);
+
+			data.item_list[#data.item_list + 1] = item_data
+			--item_data.tips = item_data.name
+		end
+
+		World2In1.ItemsDataSource[#World2In1.ItemsDataSource + 1] = data
+	end
+end
+
+function World2In1.AddAgentItem(blcok_item_data)
+	if not World2In1.ItemsDataSource or #World2In1.ItemsDataSource == 0 then
+		return
+	end
+
+	local agetn_item_list
+	for i, v in ipairs(World2In1.ItemsDataSource) do
+		if v.type == "agent" then
+			agetn_item_list = v.item_list
+			break
+		end
+	end
+	if not agetn_item_list then
+		return
+	end
+
+	local item_data = {}
+	item_data.is_agent_item = true
+	item_data.icon = blcok_item_data.icon
+	item_data.tips = blcok_item_data.tooltip
+	item_data.price = 0
+	item_data.blcok_item_data = blcok_item_data
+	agetn_item_list[#agetn_item_list + 1] = item_data
 end
 
 function World2In1.GetToolItems()
@@ -1209,4 +1299,176 @@ function World2In1.OnSyncWorldFinish()
 	else
 		World2In1.GetCreateWorldServerData(sync_sky_func)
 	end
+end
+
+function World2In1.RunCode(item_data)
+	local template_path = Files.GetWorldFilePath(string.format("items/%s/%s.xml", item_data.type, item_data.name))
+	local xmlRoot = ParaXML.LuaXML_ParseFile(template_path or "");
+	if not xmlRoot then
+		return
+	end
+	
+	local Editor = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/UI/Editor.lua");
+	local node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate/pe:blocks");
+
+	if not node[1] then
+		return
+	end
+
+	local block_list = NPL.LoadTableFromString(node[1])
+	local code_list = {}
+	
+	local begain_pos
+	for index, v in ipairs(block_list) do
+		if v[4] == 219 then
+			code_list[#code_list + 1] = v
+		elseif v[4] == 190 then
+			begain_pos = {v[1], v[2], v[3]}
+		end
+	end
+
+	if #code_list == 0 then
+		return
+	end
+
+	local function get_distance(pos_list1, pos_list2)
+		return (pos_list1[1] - pos_list2[1])^2 + (pos_list1[2] - pos_list2[2])^2 + (pos_list1[3] - pos_list2[3])^2
+	end
+
+	local function sort_list(list)
+	-- 排序
+		table.sort(list, function(a, b) 
+			if a == b then
+				return false
+			end
+
+			local sort_num_a = 0
+			local sort_num_b = 0
+
+			local dis_to_begain_a = get_distance(a, begain_pos)
+			local dis_to_begain_b = get_distance(b, begain_pos)
+
+			--return dis_to_begain_b > dis_to_begain_a
+			-- 距离优先
+			if dis_to_begain_a > dis_to_begain_b then
+				sort_num_a = sort_num_a + 1000
+			end
+
+			if dis_to_begain_a < dis_to_begain_b then
+				sort_num_b = sort_num_b + 1000
+			end
+
+			if dis_to_begain_a == dis_to_begain_b then
+				-- 距离相等的情况下
+				-- 忽略y轴
+				-- x轴优先 小的优先
+				if a[1] < b[1] then
+					sort_num_a = sort_num_a + 100
+				end
+
+				if a[1] > b[1] then
+					sort_num_b = sort_num_b + 100
+				end
+
+				if a[1] == b[1] then
+					if a[3] < b[3] then
+						sort_num_a = sort_num_a + 10
+					else
+						sort_num_b = sort_num_b + 10
+					end
+				end
+			end
+
+			-- -- 降序
+			return sort_num_b > sort_num_a; 
+		end);	
+	end
+
+	if begain_pos then
+		-- 有开关的话 要找出里开关最近的那个方块
+		local begain_code_list = {}
+		local min_dis = 99999
+		for i, v in ipairs(code_list) do
+			local dis = get_distance(v, begain_pos)
+			if dis < min_dis then
+				min_dis = dis
+				begain_code_list = {}
+			end
+
+			if dis == min_dis then
+				begain_code_list[#begain_code_list + 1] = v
+			end
+		end
+
+		sort_list(begain_code_list)
+		local last_code = begain_code_list[1]
+		begain_pos = {last_code[1], last_code[2], last_code[3]}
+	else
+		begain_pos = {code_list[1][1], code_list[1][2], code_list[1][3]}
+	end
+	sort_list(code_list)
+
+	
+	if World2In1.CodeEditor == nil then
+		local SkySpacePairBlock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VisualScene/BlockPositionAllocations/SkySpacePairBlock.lua");
+		local block_pos = SkySpacePairBlock:new()
+		block_pos.start_x = 19136
+		block_pos.start_y = 250
+		block_pos.start_z = 19263
+		
+		World2In1.CodeEditor = Editor:new():onInit(block_pos);
+	end
+	local editor = World2In1.CodeEditor
+
+	local editor_list = {}
+	for index, v in ipairs(code_list) do
+		local code = v[6] or {}
+		for i2, v2 in ipairs(code) do
+			if v2.name == "cmd" then
+				local cmd_data = v2[1]
+				if(cmd_data) then
+					local cmd
+					if(type(cmd_data) == "string") then
+						cmd = cmd_data
+					elseif(type(cmd_data) == "table" and type(cmd_data[1]) == "string") then
+						cmd = cmd_data[1]
+					end
+
+					if cmd then
+						local node, code_component, movieclip_component = editor:createBlockCodeNode();
+						if code.attr and code.attr.displayName then
+							if code_component then
+								code_component.Name = code.attr.displayName;
+								local entity = code_component:getEntity()
+								if entity then
+									entity:SetDisplayName(code_component.Name)
+								end
+							end
+
+							if movieclip_component then
+								movieclip_component.Name = code.attr.displayName;
+							end
+
+							
+						end
+						if code_component then
+							code_component:setCode(cmd)
+							code_component:run()
+						end
+						editor_list[#editor_list + 1] = editor						
+					end
+				end
+			end
+		end
+	end
+
+	-- local editor = Editor:new():onInit();
+	-- local node, code_component, movieclip_component = editor:createBlockCodeNode();
+	-- if code_component then
+	-- 	code_component:setCode("")
+	-- 	code_component:run()
+	-- end
+
+	-- BlockEngine:SetBlock(19200,250,19200, 0);
+	-- BlockEngine:SetBlock(19200,250,19201, 0);
 end

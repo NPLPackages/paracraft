@@ -149,28 +149,29 @@ Commands["unflood"] = {
 
 Commands["fill"] = {
 	name="fill", 
-	quick_ref="/fill [block_id]", 
-	desc=[[fill the selected aabb area with the current block in hand
-format: /fill [block_id]
-if block_id is omitted, it will be the current block in hand. 
+	quick_ref="/fill [block_id:block_data]", 
+	desc=[[fill the selected aabb area with the current block in hand or given block id and data
+e.g.
+/fill 62
+/fill 10:3840    color block
+
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local options = {};
-		local option;
-		for option in cmd_text:gmatch("%s*%-(%w+)") do 
-			options[option] = true;
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
+		local fill_block_id, fill_block_data = cmd_text:match("%s*(%d+):?(%d*)$");
+		if(fill_block_data == "") then
+			fill_block_data = nil;
+		else
+			fill_block_data = tonumber(fill_block_data);
 		end
-
-		local value = cmd_text:match("%s*(%S*)$");
-
-		local fill_block_id;
-		-- remove all terrain where the player stand
-		if(value) then
-			fill_block_id = tonumber(value);
+		if(fill_block_id) then
+			fill_block_id = tonumber(fill_block_id);
 		end
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
-		MyCompany.Aries.Game.Tasks.SelectBlocks.FillSelection(fill_block_id);
+		MyCompany.Aries.Game.Tasks.SelectBlocks.FillSelection(fill_block_id, fill_block_data);
 	end,
 };
 

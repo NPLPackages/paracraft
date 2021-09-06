@@ -128,8 +128,6 @@ function Game.Start(filename_or_world, is_standalone, force_nid, gs_nid, ws_id, 
 		MyCompany.Aries.Combat.UI.BattleChatArea.Init(true);
 	end
 
-	-- leaving the previous block world. 
-	ParaTerrain.LeaveBlockWorld();
 
 	-- paraworld.PostLog({action = "mc_enter_world", ver=System.options.version, hasright=_right},"mc_enter_world", function(msg)  end);
 
@@ -265,6 +263,10 @@ function Game.Exit()
 		local Pet = commonlib.gettable("MyCompany.Aries.Pet");
 		Pet.ResetDefaultScaling(0.8, 1.6105, 1.6105);
 	end
+
+	-- leaving the previous block world. 
+	ParaTerrain.LeaveBlockWorld();
+	ParaScene.Reset();
 end
 
 -- @param mode: "game", "edit"

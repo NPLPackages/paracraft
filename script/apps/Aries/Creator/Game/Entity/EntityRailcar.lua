@@ -205,6 +205,10 @@ function Entity:LoadFromXMLNode(node)
 			self.rotationYaw = validateNumber(tonumber(attr.rotationYaw) or 0);
 			self.prevRotationYaw = self.rotationYaw;
 		end
+
+		if attr.mainAssetPath then
+			self:SetMainAssetPath(attr.mainAssetPath)
+		end
 	end
 end
 
@@ -229,6 +233,10 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	if (self.rotationYaw) then
 		attr.rotationYaw = self.rotationYaw;
+	end
+
+	if self.mainAssetPath then
+		attr.mainAssetPath = self.mainAssetPath;
 	end
 
 	return node;

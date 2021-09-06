@@ -252,6 +252,8 @@ function CustomCharItems:Init()
 					item.id = node.attr.id;
 					item.gsid = node.attr.gsid;
 					item.isVip = node.attr.isVip or "0";
+					item.type = node.attr.type
+					item.price = node.attr.price;
 					item.icon = node.attr.icon;
 					item.name = node.attr.name;
 					item.avatarMode = node.attr.avatarMode;
@@ -261,6 +263,8 @@ function CustomCharItems:Init()
 						data.id = item.id;
 						data.gsid = item.gsid;
 						data.icon = item.icon;
+						data.type = node.attr.type
+						data.price = node.attr.price;
 						data.name = item.name;
 						data.category = name;
 						data.wing = node.attr.wing;

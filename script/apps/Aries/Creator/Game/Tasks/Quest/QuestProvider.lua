@@ -92,30 +92,32 @@ function QuestProvider:OnInit()
         end
 
     end, nil, "QuestProvider_OnChanged")
-
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+    local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
     QuestProvider:GetInstance():AddEventListener(QuestProvider.Events.OnFinished,function(__, event)
         -- 埋点
         GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.quest_action.when_finish')
         if event.quest_item_container and event.quest_item_container.gsid then
             
             local exid = QuestProvider:GetInstance().gsid_exid_map[event.quest_item_container.gsid] or 0
-            if exid >= GameLogic.QuestAction.begain_exid and exid < GameLogic.QuestAction.end_exid then
+            
+            if exid >= QuestAction.begain_exid and exid < QuestAction.end_exid then
                 keepwork.wintercamp.finishcourse({
-                    gsId=GameLogic.QuestAction.winter_camp_jion_gsid,
+                    gsId=QuestAction.winter_camp_jion_gsid,
                     courseGsId=event.quest_item_container.gsid,
                 },function(err, msg, data)
                 end)
             end
 
-            if exid == GameLogic.QuestAction.end_exid or exid == 40027 then
+            if exid == QuestAction.end_exid or exid == 40027 then
                 local gsid = exid == 40027 and 60025 or 60026
                 keepwork.wintercamp.finishcertificate({
-                    gsId=GameLogic.QuestAction.winter_camp_jion_gsid,
+                    gsId=QuestAction.winter_camp_jion_gsid,
                     certificateGsId=gsid,
                 },function(err, msg, data)
                 end)
 
-                if exid == GameLogic.QuestAction.end_exid then
+                if exid == QuestAction.end_exid then
                     -- _guihelper.MessageBox("恭喜您顺利结业，证书已发放，点击确定前往查看", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
                     -- _guihelper.MsgBoxClick_CallBack = function(res)
                     --     if(res == _guihelper.DialogResult.OK) then
@@ -129,11 +131,11 @@ function QuestProvider:OnInit()
             -- 探索力处理
             for i, quest_item in ipairs(event.quest_item_container.children) do
                 if quest_item.template and quest_item.template.exp then
-                    GameLogic.QuestAction.AddExp(quest_item.template.exp, function()
+                    QuestAction.AddExp(quest_item.template.exp, function()
                         if i == #event.quest_item_container.children then
                             local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
                             if QuestPage and QuestPage.IsOpen() then
-                                local exp = GameLogic.QuestAction.GetExp()
+                                local exp = QuestAction.GetExp()
                                 QuestPage.ProgressToExp(true, exp)
                                 QuestPage.HandleGiftData()
                                 QuestPage.OnRefreshGiftGridView()
@@ -156,7 +158,7 @@ function QuestProvider:OnInit()
     end);
 
     GameLogic.GetFilters():add_filter("OnWorldLoaded", function()
-        GameLogic.QuestAction.OnWorldLoaded()
+        QuestAction.OnWorldLoaded()
     end);
 
     QuestProvider:GetInstance():OnInit__();

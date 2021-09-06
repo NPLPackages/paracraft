@@ -873,7 +873,7 @@ function GameLogic.BeforeRestart(appName)
 	GameLogic.GetFilters():apply_filters("OnBeforeRestart");
 end
 
-function GameLogic.Exit()
+function GameLogic.Exit(bSoft)
 	ModManager:OnWillLeaveWorld();
 
 	GameLogic.IsStarted = false;
@@ -908,7 +908,7 @@ function GameLogic.Exit()
 	if(playerController) then
 		playerController.force_can_fly = false;
 	end
-	CommandManager:Destroy();
+	-- CommandManager:Destroy();
 	BlockEngine:Disconnect();
 	GameLogic.is_started = false;
 	GameLogic.RemoveWorldFileWatcher();
@@ -1943,6 +1943,17 @@ function GameLogic.CheckVIPItem(isVip,openTime,freeTime,freeVipSchoolTime,isScho
 		return response
 	end
 
+	local projectId = GameLogic.options:GetProjectId()
+	GameLogic.GetFilters():apply_filters('service.keepwork_service_project.is_project_read_only',projectId,function(isReadOnly,code) 
+		if(code == 1) then
+			response.isInTime = true
+			response.strTip=""
+			response.type = 10 --可以进入，团购课程人员
+			return response
+		end
+	end)
+
+
 	if type(isSchoolTimeOnly) == "boolean" and isSchoolTimeOnly == true then
 		local week_day = os.date("*t",server_time).wday-1 == 0 and 7 or os.date("*t",server_time).wday-1
 		local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
@@ -2021,4 +2032,26 @@ end
 function GameLogic.IsLocalVersion()
 	local localVersion = ParaEngine.GetAppCommandLineByParam("localVersion", nil)    
     return localVersion == 'SCHOOL'
+end
+
+-- 判断是否校本课时间
+function GameLogic.CheckCanLearn(type)
+	local strType = type or "school_lesson"
+	local server_time = QuestAction.GetServerTime()
+	local year = tonumber(os.date("%Y", server_time))	
+	local month = tonumber(os.date("%m", server_time))
+	local day = tonumber(os.date("%d", server_time))
+	local week_day = os.date("*t",server_time).wday-1 == 0 and 7 or os.date("*t",server_time).wday-1
+	local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+	if strType == "school_lesson" then --校本课
+        if week_day ~= 6 and week_day ~= 7 then
+            local limit_time_stamp = today_weehours + 8 * 60 * 60 + 0 * 60
+			local limit_time_end_stamp = today_weehours + 15 * 60 * 60 + 30 * 60
+            if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
+                return false
+            end
+        end	
+		return false	
+	end
+	return true
 end

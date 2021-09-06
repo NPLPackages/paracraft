@@ -757,12 +757,26 @@ end
 function Entity:OnClick(x, y, z, mouse_button)
 	if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 		local old_value = self:GetCommand();
+		if(old_value) then
+			local cmd, path = old_value:match("^$%((.*)%)(.*)$")
+			if(cmd and cmd~="") then
+				old_value = format("$(%s)%s", commonlib.Encoding.Utf8ToDefault(cmd), path)
+			end
+		end
 		self:BeginEdit();
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
 		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 		OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
 			if(result) then
 				result = result:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
+
+				if(result) then
+					local cmd, path = result:match("^$%((.*)%)(.*)$")
+					if(cmd and cmd~="") then
+						result = format("$(%s)%s", commonlib.Encoding.DefaultToUtf8(cmd), path)
+					end
+				end
+
 				self:SetCommand(result);
 				self:Refresh(true);
 			end

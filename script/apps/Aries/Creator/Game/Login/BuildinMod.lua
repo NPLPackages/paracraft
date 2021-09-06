@@ -165,6 +165,7 @@ if (not isCodepku) then
 		text=L"系统内置插件",
 		version = "0.9",
 		homepage = "https://github.com/tatfook/ExplorerApp",
+		loadOnStartup = true, 
 	};
 	table.insert(buildInModList, worldShare);
 	table.insert(buildInModList, explorerApp);

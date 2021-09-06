@@ -14,12 +14,13 @@ WorldCommon.OpenWorld(worldpath);
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/FastRandom.lua");
+local FastRandom = commonlib.gettable("MyCompany.Aries.Game.Common.CustomGenerator.FastRandom");
+local Encoding = commonlib.gettable("System.Encoding.basexx");
 local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
-local EncryptWorld = NPL.load("(gl)script/apps/EncryptWorld/EncryptWorld.lua");
-		
 -- create class
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local Pet = commonlib.gettable("MyCompany.Aries.Pet");
@@ -83,68 +84,33 @@ function WorldCommon.SetTexturePackageInfo(package)
 	info.texture_pack_text = package.text;
 end
 
+
+function WorldCommon.GeneratePrivateKey()
+    local entityPlayer = EntityManager.GetFocus();
+    local x, y, z;
+    if entityPlayer then
+        x, y, z = entityPlayer:GetBlockPos();
+    else
+        x, y, z = 0, 0, 0;
+    end
+    local random1 = math.random() * 100;
+    local random2 = FastRandom.randomNoise(x, y, z, math.random());
+
+    return Encoding.to_base32(tostring(random1 + random2));
+end
+
 -- load world info from tag.xml under the world_path
 -- @return true if succeeded. 
 function WorldCommon.SaveWorldTag()
 	if (WorldCommon.world_info and type(WorldCommon.world_info) == 'table') then
-		if (EncryptWorld) then
-			if (WorldCommon.world_info.instituteVipChangeOnly or
-				WorldCommon.world_info.instituteVipSaveAsOnly) then
-				if (not WorldCommon.world_info.privateKey or
-					WorldCommon.world_info.privateKey == "") then
-					WorldCommon.world_info.privateKey = EncryptWorld:GetSeed();
-				end
-			else
-				local function RecoverFile(filePath)
-					if ParaIO.DoesFileExist(filePath) then
-						local readFile = ParaIO.open(filePath, "r");
-		
-						if (readFile:IsValid()) then
-							local headLine = readFile:readline();
-
-							if (headLine == 'encode') then
-								local originData = EncryptWorld:DecodeFile(readFile:GetText(0, -1), WorldCommon.world_info.privateKey);
-
-								readFile:close()
-
-								local writeFile = ParaIO.open(filePath, "w")
-
-								if (writeFile:IsValid()) then
-									writeFile:write(originData, #originData);
-
-									writeFile:close();
-								end
-							else
-								readFile:close();
-							end
-						end
-					end
-				end
-
-				-- decode entity.xml file
-				local entityXmlPath = WorldCommon.world_path .. 'entity.xml';
-
-				RecoverFile(entityXmlPath)
-
-				-- decode *.region.xml files
-				local blockWorldLastSavePath = WorldCommon.world_path .. 'blockWorld.lastsave/';
-
-				if (ParaIO.DoesFileExist(blockWorldLastSavePath)) then
-					local files = commonlib.Files.Find({}, blockWorldLastSavePath, 0, 1000, "*.region.xml");
-
-					if (files and type(files) == 'table' and #files > 0) then
-						for key, item in ipairs(files) do
-							if (ParaIO.DoesFileExist(blockWorldLastSavePath .. item.filename)) then
-								local curFilePath = blockWorldLastSavePath .. item.filename
-
-								RecoverFile(curFilePath)
-							end
-						end
-					end
-				end
-
-				WorldCommon.world_info.privateKey = nil;
+		if (WorldCommon.world_info.instituteVipChangeOnly or
+			WorldCommon.world_info.instituteVipSaveAsOnly) then
+			if (not WorldCommon.world_info.privateKey or
+				WorldCommon.world_info.privateKey == "") then
+				WorldCommon.world_info.privateKey = WorldCommon.GeneratePrivateKey();
 			end
+		else
+			WorldCommon.world_info.privateKey = nil;
 		end
 	end
 
@@ -539,5 +505,13 @@ function WorldCommon.OnWorldLoaded()
 				WorldCommon.ReplaceWorldImp()
 			end, 4000);
 		end, 1000);
+	end
+end
+
+-- return the private key or nil if not exist
+function WorldCommon.GetPrivateKey()
+	local privateKey = WorldCommon.GetWorldTag("privateKey");
+	if(type(privateKey) == "string" and (#privateKey) > 10) then
+		return privateKey
 	end
 end

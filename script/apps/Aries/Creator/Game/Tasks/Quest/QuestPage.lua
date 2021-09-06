@@ -536,7 +536,7 @@ function QuestPage.GetTaskStateByQuest(data, task_type)
 end
 
 function QuestPage.GetBgImg(task_data)
-	local img = "Texture/Aries/Creator/keepwork/Quest/bjtiao2_226X90_32bits.png#0 0 226 90:195 20 16 20"
+	local img = "Texture/Aries/Creator/keepwork/Quest/bjtiao2_226X90_32bits.png#0 0 230 90:195 20 16 20"
 	if task_data.is_main_task then
 		img = "Texture/Aries/Creator/keepwork/Quest/bjtiao_226X90_32bits.png#0 0 226 90:195 20 16 20"
 	end

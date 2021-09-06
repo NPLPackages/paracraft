@@ -97,6 +97,17 @@ function Entity:SetFocus()
 	return true;
 end
 
+-- called after focus is set
+function Entity:OnFocusIn()
+	Entity._super.OnFocusIn(self);
+
+	-- tricky: Overlay can not be focused, so we will emulate it by setting focus to a dummy object. 
+	if(not self:IsScreenMode()) then
+		local x, y, z = self:GetPosition();
+		ParaCamera.SetLookAtPos(x, y, z)
+	end
+end
+
 function Entity:init()
 	if(not Entity._super.init(self)) then
 		return;

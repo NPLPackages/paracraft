@@ -45,6 +45,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
+local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
 
 local CodeBlock = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock"));
 CodeBlock:Property("Name", "CodeBlock");
@@ -978,6 +979,10 @@ function CodeBlock:RegisterAgentEvent(text, callbackFunc)
 				itemDS.icon = icon;
 				itemDS.server_data = {name = agentName};
 				itemDS.tooltip = agentName;
+
+				if World2In1.GetIsWorld2In1() then
+					World2In1.AddAgentItem(itemDS)
+				end
 			end
 		end
 	end

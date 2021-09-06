@@ -43,8 +43,6 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 
-local EncryptWorld = NPL.load("(gl)script/apps/EncryptWorld/EncryptWorld.lua");
-
 local rshift = mathlib.bit.rshift;
 local lshift = mathlib.bit.lshift;
 local band = mathlib.bit.band;
@@ -675,8 +673,7 @@ end
 
 function EntityManager.SaveToFile(bSaveToLastSaveFolder)
 	local filename = format("%s%s", ParaWorld.GetWorldDirectory(), default_filename);
-	
-	
+
 	local root = {name='entities', attr={file_version="0.1"} }
 	local entity;
 	local sortEntities = {};
@@ -703,21 +700,26 @@ function EntityManager.SaveToFile(bSaveToLastSaveFolder)
 		table.insert(root, entity.node);
 	end
 
-	local xml_data = commonlib.Lua2XmlString(root, true, true) or "";
-
-	if (EncryptWorld) then
-		local privateKey = WorldCommon.GetWorldTag("privateKey")
-
-		if (privateKey and type(privateKey) == "string" and #privateKey > 20) then
-			xml_data = EncryptWorld:EncodeFile(xml_data, privateKey)
-		end
+	local privateKey = WorldCommon.GetPrivateKey();
+	if(privateKey) then
+		root.attr.privateKey = privateKey;
 	end
 
-	if (#xml_data >= 10240) then
+	local xml_data = commonlib.Lua2XmlString(root, true, true) or "";
+
+	if (#xml_data >= 10240 or privateKey) then
 		local writer = ParaIO.CreateZip(filename, "");
 		if (writer:IsValid()) then
 			writer:ZipAddData("data", xml_data);
 			writer:close();
+
+			if(privateKey) then
+				NPL.load("(gl)script/ide/System/Util/ZipFile.lua");
+				local ZipFile = commonlib.gettable("System.Util.ZipFile");
+				if(not ZipFile.GeneratePkgFile(filename, filename)) then
+					LOG.std(nil, "warn", "EntityManager",  "failed to encode file: %s", filename);
+				end
+			end
 		end
 	else
 		local file = ParaIO.open(filename, "w");
@@ -726,7 +728,7 @@ function EntityManager.SaveToFile(bSaveToLastSaveFolder)
 			file:close();
 		end
 	end
-		
+	
 	for _, region in pairs(regions) do
 		if(region:IsModified()) then
 			region:SaveToFile();

@@ -19,8 +19,6 @@ local WorldInfo = commonlib.gettable("MyCompany.Aries.Game.WorldInfo")
 local SavePlayerHandler = commonlib.gettable("MyCompany.Aries.Game.SavePlayerHandler")
 local SaveWorldHandler = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler"));
 
-local EncryptWorld = NPL.load("(gl)script/apps/EncryptWorld/EncryptWorld.lua");
-
 function SaveWorldHandler:ctor()
 end
 
@@ -55,40 +53,50 @@ end
 
 -- save world info to tag.xml under the world_path
 function SaveWorldHandler:SaveWorldXmlNode(node)
-	local world_path = self.world_path;
-	world_path = string.gsub(world_path, "[/\\]$", "");
-	local file = ParaIO.open(world_path .. "/tag.xml", "w");
-
-	if (world_path ~="" and file:IsValid()) then
-		local tagData = '';
-
-		if (EncryptWorld) then
-			local privateKey = '';
+	local worldPath = self.world_path;
+	worldPath = string.gsub(worldPath, "[/\\]$", "");
+	local tagPath = worldPath .. "/tag.xml";
 	
-			if (node[1].attr) then
-				privateKey = node[1].attr.privateKey;
-			else
-				-- zip file
-				privateKey = node[1][1].attr.privateKey;
-			end
-	
-			if (privateKey and type(privateKey) == 'string' and #privateKey > 20) then
-				tagData = EncryptWorld:EncodeFile(commonlib.Lua2XmlString(node, true, true));
-			else
-				tagData = commonlib.Lua2XmlString(node, true, true);
-			end
-		else
-			tagData = commonlib.Lua2XmlString(node, true, true);
+	local function HasPrivateKey()
+		local privateKey;	
+		if (node and node[1].attr) then
+			privateKey = node[1].attr.privateKey;
+		elseif (node and node[1][1]) then
+			privateKey = node[1][1].attr.privateKey;
 		end
+		if(type(privateKey) == 'string' and #privateKey > 20) then
+			return true;
+		end
+	end
 
-		-- create the tag.xml file under the world root directory. 
-		file:WriteString(tagData);
-		file:close();
-		LOG.std(nil, "info", "WorldInfo",  "saved");
-		-- save success
-		return true;
+	local xml_data = commonlib.Lua2XmlString(node, true, true) or ""
+
+	if (HasPrivateKey()) then
+		local writer = ParaIO.CreateZip(tagPath, "");
+		if (writer:IsValid()) then
+			writer:ZipAddData("data", xml_data);
+			writer:close();
+			
+			NPL.load("(gl)script/ide/System/Util/ZipFile.lua");
+			local ZipFile = commonlib.gettable("System.Util.ZipFile");
+			if(not ZipFile.GeneratePkgFile(tagPath, tagPath)) then
+				LOG.std(nil, "warn", "WorldInfo",  "failed to encode file: %s", tagPath);
+			end
+			return true;
+		else
+			return false, "创建tag.xml出错了";	
+		end
 	else
-		return false, "创建tag.xml出错了";	
+		local file = ParaIO.open(tagPath, "w");
+		if (worldPath ~="" and file:IsValid()) then
+			-- create the tag.xml file under the world root directory. 
+			file:WriteString(xml_data);
+			file:close();
+			LOG.std(nil, "info", "WorldInfo",  "saved");
+			return true;
+		else
+			return false, "创建tag.xml出错了";	
+		end
 	end
 end
 
@@ -109,32 +117,10 @@ function SaveWorldHandler:LoadWorldInfo()
 end
 
 function SaveWorldHandler:LoadWorldXmlNode()
-	local world_path = self.world_path;
-	world_path = string.gsub(world_path, "[/\\]$", "");
-	local tag_path = world_path .. "/tag.xml";
-	local xmlRoot;
+	local worldPath = self.world_path;
+	worldPath = string.gsub(worldPath, "[/\\]$", "");
 
-	if (EncryptWorld) then
-		local file = ParaIO.open(tag_path, "r");
-
-		if (file:IsValid()) then
-			local head_line = file:readline();
-
-			if (head_line == 'encode') then
-				local originData = EncryptWorld:DecodeFile(file:GetText(0, -1))
-
-				xmlRoot = ParaXML.LuaXML_ParseString(originData);
-			else
-				local data = file:GetText(0, -1);
-
-				xmlRoot = ParaXML.LuaXML_ParseString(data);
-			end
-
-			file:close();
-		end
-	else
-		xmlRoot = ParaXML.LuaXML_ParseFile(tag_path);
-	end
+	local xmlRoot = ParaXML.LuaXML_ParseFile(worldPath .. "/tag.xml");
 
 	if (xmlRoot) then
 		return xmlRoot;

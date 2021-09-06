@@ -635,6 +635,7 @@ function KeepWorkItemManager.LoadItems(bagNos, callback, error_callback)
             local new_items = data.data;
             KeepWorkItemManager.items = KeepWorkItemManager.UnionItems(KeepWorkItemManager.items, new_items)
             KeepWorkItemManager.GetFilter():apply_filters("LoadItems_Finished");
+            LOG.std(nil, 'info', 'KeepWorkItemManager.items', KeepWorkItemManager.items);
             if(callback)then
                 callback();
             end
@@ -733,6 +734,27 @@ function KeepWorkItemManager.LoadProfile(bForced, callback)
         end
     end)
 end
+
+function KeepWorkItemManager.GetUserInfoExtraSkinFromDataBase(callback)
+    local cache_policy = "access plus 0";
+    keepwork.user.profile({
+        cache_policy = cache_policy,
+    },function(err, msg, data)
+        if(err ~= 200)then
+            return
+        end
+
+        if(data and data.extra and data.extra.ParacraftPlayerEntityInfo and data.extra.ParacraftPlayerEntityInfo.skin)then
+            if(callback)then
+                local skinIds = commonlib.split(data.extra.ParacraftPlayerEntityInfo.skin, ";");
+                callback(skinIds);
+            else
+                callback(nil)
+            end;
+        end
+    end)
+end
+
 --[[
 {
   createdAt="2020-07-19T17:49:25.000Z",

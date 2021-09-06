@@ -458,6 +458,10 @@ function Entity:SetVisible(bVisible)
 		obj:SetVisible(bVisible == true);
 		self.visible = bVisible == true;
 	end
+
+	if(self.petObj) then
+		self.petObj:SetVisible(bVisible == true);
+	end
 end
 
 function Entity:IsVisible()

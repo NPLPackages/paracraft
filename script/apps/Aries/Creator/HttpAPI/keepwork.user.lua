@@ -54,6 +54,14 @@ HttpWrapper.Create("keepwork.user.followers", "%MAIN%/core/v0/users/followers", 
 -- 获取用户同学
 HttpWrapper.Create("keepwork.user.classmates", "%MAIN%/core/v0/users/classmates", "GET", true)
 
+-- http://yapi.kp-para.cn/project/32/interface/api/4392
+-- 知识豆购买服装
+HttpWrapper.Create("keepwork.user.buySkinUsingBean", "%MAIN%/core/v0/clothes/settlement", "POST", true)
+
+-- http://yapi.kp-para.cn/project/32/interface/api/4417
+-- 根据知识豆服装获取结算信息
+HttpWrapper.Create("keepwork.user.getCheckInfoFromSkin", "%MAIN%/core/v0/clothes/priceQuery", "POST", true)
+
 -- 查询
 HttpWrapper.Create("keepwork.user.search", "%MAIN%/core/v0/users/search", "POST", true)
 
