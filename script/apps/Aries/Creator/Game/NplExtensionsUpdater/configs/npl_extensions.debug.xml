@@ -1,0 +1,6 @@
+<configs>
+  <version>http://10.28.18.19/npl_extensions/version</version>
+  <hosts>
+    <host>http://10.28.18.19/npl_extensions/</host>
+  </hosts>
+</configs>

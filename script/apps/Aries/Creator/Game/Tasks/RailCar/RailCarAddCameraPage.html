@@ -1,0 +1,50 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarAddCameraPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="RailCarAddCameraPage.lua"><![CDATA[
+local RailCarAddCameraPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarAddCameraPage.lua");
+RailCarAddCameraPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    RailCarAddCameraPage.CloseView()
+end
+
+function ChangeIsRandom()
+    RailCarAddCameraPage.ChangeIsRandom()
+end
+
+function IsSelectRandom()
+    return RailCarAddCameraPage.SettingData.is_random
+end
+
+function TimeInputOnChange()
+    RailCarAddCameraPage.TimeInputOnChange()
+end
+
+function ClickOk()
+    RailCarAddCameraPage.ClickOk()
+end
+]]></script>
+<style type="text/mcss">
+</style>
+<div style="width: 335px;height: 227px;background:url(Texture/Aries/Creator/keepwork/RailCar/bg_2_335x227_32bits.png#0 0 335 227);">
+    <div style="width: 230px;height: 35px;color: #ffffff;margin-left: 50px;margin-top: 113px;">
+        <input type="text" name="pos_input" EmptyTextColor='#000000FF' onchange="TimeInputOnChange" value=''  EmptyText="0,0,0" width="90" height="35" style="textcolor: #000000;font-size: 22px;color: #000000;background: ;"/>
+    </div>
+    <div style="margin-top: 15px;">
+        <input type="button" onclick="ClickOk" style="float: left; margin-left: 45px; width: 81px;height: 50px;background: url(Texture/Aries/Creator/keepwork/RailCar/bt_2_81x50_32bits.png#0 0 81 50)"/>
+        <input type="button" onclick="ClosePage" style="float: left; margin-left: 90px; width: 81px;height: 50px;background: url(Texture/Aries/Creator/keepwork/RailCar/bt_1_81x50_32bits.png#0 0 81 50)"/>
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

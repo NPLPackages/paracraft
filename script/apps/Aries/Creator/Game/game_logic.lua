@@ -2037,6 +2037,9 @@ end
 -- 判断是否校本课时间
 function GameLogic.CheckCanLearn(type)
 	local strType = type or "school_lesson"
+	if GameLogic.IsVip() then
+		return true
+	end
 	local server_time = QuestAction.GetServerTime()
 	local year = tonumber(os.date("%Y", server_time))	
 	local month = tonumber(os.date("%m", server_time))
@@ -2046,7 +2049,7 @@ function GameLogic.CheckCanLearn(type)
 	if strType == "school_lesson" then --校本课
         if week_day ~= 6 and week_day ~= 7 then
             local limit_time_stamp = today_weehours + 8 * 60 * 60 + 0 * 60
-			local limit_time_end_stamp = today_weehours + 15 * 60 * 60 + 30 * 60
+			local limit_time_end_stamp = today_weehours + 16 * 60 * 60 + 20 * 60
             if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
                 return false
             end

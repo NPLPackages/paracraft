@@ -1,0 +1,400 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="RedSummerCampMainPage.lua">
+<![CDATA[
+local RedSummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainPage.lua");
+local CommonLoadWorld = NPL.load('(gl)Mod/WorldShare/cellar/Common/LoadWorld/CommonLoadWorld.lua')
+local InternetLoadWorld = commonlib.gettable('MyCompany.Aries.Creator.Game.Login.InternetLoadWorld')
+local CreateWorld = NPL.load("(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua")
+RedSummerCampMainPage.OnInit()
+
+local page = document:GetPageCtrl();
+
+function ClosePage()
+    local pageCtrl = document:GetPageCtrl();
+    pageCtrl:CloseWindow(true)
+    RedSummerCampMainPage.OnClose()
+
+    local is_enter_world = GameLogic.GetFilters():apply_filters('store_get', 'world/isEnterWorld');
+
+    if (is_enter_world) then
+        local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop")
+        local platform = System.os.GetPlatform()
+
+        if platform == 'win32' or platform == 'mac' then
+            Desktop.ForceExit(false)
+        elseif platform ~= 'win32' then
+            Desktop.ForceExit(true)
+        end
+    else
+        MyCompany.Aries.Game.MainLogin:next_step({ShowLoginModePage = true})
+    end
+end
+function OnOpen(name)
+    RedSummerCampMainPage.OpenPage(name)    
+end
+
+function OnClickRightBt(name)
+    RedSummerCampMainPage.OnClickRightBt(name)    
+end
+
+function OpenVip()
+    local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+    VipPage.ShowPage("red_summer_camp_main");
+end
+
+function GetHeadUrl()
+    return RedSummerCampMainPage.GetHeadUrl();
+end
+
+function GetItemData()
+    return RedSummerCampMainPage.ItemData
+end
+
+function GetRightBtData()
+    return RedSummerCampMainPage.RightBtData
+end
+
+function GetUserData(name)
+    return RedSummerCampMainPage.GetUserData(name)
+end
+
+function HasSchool()
+    return GameLogic.GetFilters():apply_filters('store_get', 'user/hasJoinedSchool')
+end
+
+function GetBgStyle(img)
+    return string.format("width:220px;height:220px; margin-left: 14px;margin-top: 8px;position: relative;background: url(%s)", img)
+end
+
+function GetBtIconStyle(img)
+    return string.format("width:64px;height:74px; margin-left: 0px;margin-top: 8px;background: url(%s)", img)
+end
+
+function ClickRealName()
+    RedSummerCampMainPage.ClickRealName()
+end
+
+function OpenHelpPage(btnId)
+    RedSummerCampMainPage.OpenHelpPage(btnId)
+end
+
+function ClickSchool()
+    RedSummerCampMainPage.ClickSchool()
+end
+
+function GetVipIcon()
+    return RedSummerCampMainPage.GetVipIcon()
+end
+
+function OnClickNotice1()
+    RedSummerCampMainPage.OnClickNotice(1)
+end
+
+function OnClickNotice2()
+    RedSummerCampMainPage.OnClickNotice(2)
+end
+
+function QuickStart()
+    RedSummerCampMainPage.QuickStart()
+end
+
+function show_certificate()
+    GameLogic.GetFilters():apply_filters('cellar.certificate.show_certificate_notice_page', function()
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+        KeepWorkItemManager.LoadProfile(false, function()
+            RedSummerCampMainPage.InitUserData()
+            page:Refresh(0)
+        end)
+    end)
+end
+
+function need_certificate()
+    local is_verified = GameLogic.GetFilters():apply_filters('store_get', 'user/isVerified');
+
+    if is_verified then
+        return false
+    else
+        return true
+    end
+end
+
+function open()
+    local opus_content = page:GetValue('opus_content', '')
+
+    local pid = get_project_id(opus_content)
+
+    if pid then
+        CommonLoadWorld:EnterWorldById(pid)
+    else
+        InternetLoadWorld.GotoUrl(opus_content)
+    end
+end
+
+function get_project_id(opus_content)
+    if (tonumber(opus_content or '') or 99999) < 99999 then
+        return opus_content
+    end
+
+    local pid = string.match(opus_content or '', "^p(%d+)$")
+
+    if not pid then
+        pid = string.match(opus_content or '', "/pbl/project/(%d+)")
+    end
+
+    return pid or false
+end
+
+function create_new_world()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
+    local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+    CreateNewWorld.ShowPage(true)
+    --CreateWorld:CreateNewWorld()
+end
+
+]]>
+</script>
+<style type="text/mcss">
+    {
+        green_button = {
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn_46X23_32bits.png#0 0 46 23",
+            ["base-font-size"] = 12,
+            ["font-size"] = 12,
+            ["font-weight"] = "bold",
+            ["text-align"] = "center",
+            width = 60,
+            height = 23,
+            float = "left",
+            color = "#000000",
+            ['text-offset-y'] = -3,
+        },
+
+        head_text = {
+            ["base-font-size"] = 14,
+            ["font-size"] = 14,
+            ["font-weight"] = "bold",
+            float = "left",
+            color = "#ffffff",
+        },
+
+        yellon_button = {
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/main/btnh_64X52_32bits.png#0 0 64 52:22 22 22 22",
+            ["base-font-size"] = 20,
+            ["font-size"] = 20,
+            ["font-weight"] = "bold",
+            width = 152,
+            height = 52,
+            float = "left",
+        },
+
+        opus_bar_button = {
+            background = 'Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#205 112 86 46',
+        },
+    }
+</style>
+
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#000000;">
+    <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+        <pe:container alignment="_rt" style="background:;">
+            <input type="button" value='' onclick="OpenVip" class="red_summer_camp_open_vip_btn" style="margin-right:15px;margin-top:15px;" />
+            <input name="helpBtn" type="button" value='' onclick="OpenHelpPage" style="margin-right:15px;margin-top:15px; width: 64px;height: 97px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bangzhu_97X27_32bits.png#0 0 64 97);" />
+            <input type="button" value='' onclick="ClosePage" style="margin-right:15px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn3_64X70_32bits.png#0 0 64 70);" />
+        </pe:container>
+        <div zorder="-2" style="float: left;width: 478px;height: 77px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bj2_478X77_32bits.png#0 0 478 77);">
+            <div style="float: left;margin-left: 16px;margin-top: 8px; width: 96px;height: 96px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/touxiang3_96X96_32bits.png#0 0 96 96:16 16 16 16);">
+                <!-- <img zorder="-1" src='<%=GetHeadUrl()%>' style="position: relative;margin-left: 3px;margin-top: 4px;" width="78" height="78" onclick=""/> -->
+                <pe:mc_player name="main_user_player" miniscenegraphname="AvatarUserCharacter" style="width:128px;height:128px;margin-left: -16px; margin-top: -34px;" IsInteractive="false" NoFrameMove="false" RenderTargetSize="256" DefaultCameraObjectDist="3.7" />
+                <!-- <div zorder="-2" style="position: relative;margin-left: 3px;margin-top: 4px; width: 90px;height: 90px;background-color: #808080;"></div> -->
+            </div>
+
+            <div style="float: left;margin-left: 10px;">
+                <div style="margin-top: 7px;height: 20px;">
+                    <div style="float: left;margin-left: 0px;margin-top: 1px; height: 20px;">
+                        <%=GetVipIcon()%>
+                    </div>
+
+                    <div tooltip='<%=GetUserData("nickname")%>' name="user_nickname" class="head_text" style="margin-left: 5px;margin-top: 0px;">
+                        <%=GetUserData("limit_nickname")%>
+                    </div>
+
+                    <!-- <pe:if condition='<%= not need_certificate() %>'>
+                        <div style="width:46px;
+                                    height:23px;
+                                    float:left;
+                                    margin-left: 5px;
+                                    margin-top: 1px;">
+                            <input type='button'
+                                   value='<%= L"已实名" %>'
+                                   class="green_button" />
+                        </div>
+                    </pe:if> -->
+                    
+                    <pe:if condition='<%= need_certificate()%>'>
+                        <div style="margin-left: 5px;margin-top: 1px; float: left;">
+                            <input type="button" value='' onclick="show_certificate" class="green_button" style="position: relative;" />
+                            <div class="green_button" style="position: relative;background: ;">实名认证</div>
+                        </div>
+                    </pe:if>
+                </div>
+                <div style="float: left;margin-top: 10px;">
+                    <div tooltip='<%=GetUserData("username")%>' name="user_name" style="position: relative;margin-left: 5px;margin-top: 0px;base-font-size:16px; font-size: 16px;color: #ffffff;">
+                        <%=GetUserData("limit_school_name")%>
+                    </div>
+
+                    <div style="position: relative;margin-left: 168px;margin-top: 0px;">
+                        <!-- <div tooltip='<%=GetUserData("school_name")%>' name="school_name" style="float: left; margin-left: 0px;margin-top: 0px;base-font-size:14px; font-size: 14px;color: #ffffff;">
+                            <%=GetUserData("limit_school_name")%>
+                        </div> -->
+    
+                        <!-- <pe:if condition='<%=HasSchool()%>'>
+                            <div style="margin-left: 5px;margin-top: 1px;float: left;">
+                                <input type="button" value='' onclick="ClickSchool" class="green_button" style="position: relative;" />
+                                <div class="green_button" style="position: relative;background: ;">更改</div>
+                            </div>
+                        </pe:if> -->
+        
+                        <!-- <pe:if condition='<%=not HasSchool()%>'>
+                            <div style="margin-left: 5px;margin-top: 1px;float: left;">
+                                <input type="button" value='' onclick="ClickSchool" class="green_button" style="position: relative;" />
+                                <div class="green_button" style="position: relative;background: ;">关联</div>
+                            </div>
+                        </pe:if>  -->
+                    </div> 
+                </div>              
+            </div>
+        </div>
+
+        <div style='float: left;margin-top: 25px;margin-left: 70px;'>
+            <!-- seach bar -->
+            <div style='background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#176 173 32 42: 7 7 7 7);
+                        width: 370px;
+                        height: 42px;
+                        margin-left: 10px;
+                        margin-top: 10px;'>
+                <div style='width: 495px;'>
+                    <input type='text'
+                            name='opus_content'
+                            spacing='10'
+                            EmptyText='<%= L"输入项目ID或课程ID或服务器地址" %>'
+                            EmptyTextColor='#FF25282E'
+                            style='width: 336px;
+                                    height: 42px;
+                                    font-size: 18px;
+                                    base-font-size: 18px;
+                                    text-valign: center;
+                                    background:;'/>
+                    <input type='button'
+                            class='opus_bar_button'
+                            DefaultButton='true'
+                            style='width: 86px;
+                                    height: 46px;
+                                    text-offset-y: -3px;
+                                    font-weight: bold;
+                                    font-size: 20px;
+                                    base-font-size: 20px;
+                                    margin-top: -2px;'
+                            name='open_button'
+                            onclick='open'
+                            value='<%= L"打开" %>' />
+                </div>
+            </div>
+        </div>
+        <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;background: ;">
+            <!--背景水印-->
+            <div>
+                <div style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+            </div>
+            <div style="float: left;margin-top: 52px; width: 1280px;height: 520px;">
+                <div style="float: left;width: 380px;">
+                    <div zorder="-2" style="margin-left: 22px;margin-top: 0px; width: 362px;height:496px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
+                        <!-- <div zorder style="position: relative;margin-left: 14px;margin-top: 8px; width: 404px;height: 468px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468);"></div> -->
+                        <!-- <input type="button" zorder="-1" value='' width="404" height="468" onclick="OnOpen" name='summer_camp' style="position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468)"/> -->
+                        <div zorder="-2" onclick="OnOpen" name='summer_camp' style="width:348px;height:478px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
+                        <div zorder="-1" style="width: 334px;height: 468px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468)"></div>
+                        <div style="margin-left: 14px;margin-top: 425px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
+                            <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
+                                帕拉卡红色夏令营
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div style="float: left;margin-top: 0px;">
+                    <pe:repeat DataSource="<%=GetItemData()%>">
+                        <pe:repeatitem>
+                            <div zorder="-2" style="float: left;margin-left: 19px;margin-top: 0px; width: 248px;height:248px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
+                                <!-- <input type="button" zorder="-1" value='' width="220" height="220" onclick="OnOpen" style='<%=GetBgStyle(Eval("img"))%>' name='<%=Eval("node_name")%>' /> -->
+                                <div zorder="-2" onclick="OnOpen" name='<%=Eval("node_name")%>' style="width:233px;height:233px; margin-left: 7px;margin-top: 3px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
+                                <div zorder="-1" style='<%=GetBgStyle(Eval("img"))%>'></div>
+                                <pe:if condition='<%=Eval("is_show_recommend") == true%>'>
+                                    <div style="position: relative;margin-left: -3px;margin-top: -2px; width: 110px;height: 32px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi1_32X32_32bits.png#0 0 32 32:14 5 7 12)">
+                                        <div style="base-font-size:12px;font-size: 12px;text-align: center;margin-left: 8px;margin-top: 3px;font-weight: bold;">国家级大赛</div>
+                                    </div>
+                                </pe:if>
+
+                                <pe:if condition='<%=Eval("is_show_vip")%>'>
+                                    <div style="position: relative;margin-left: -2px;margin-top: -11px; width: 48px;height: 53px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi2_48X53_32bits.png#0 0 48 53)"></div>
+                                </pe:if>
+                                <div style="margin-left: 14px;margin-top: 187px; position: relative;width: 220px;height:41px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
+                                    <div style="margin-top: 10px; text-align: center;base-font-size:18px;font-size: 18px;color: #ffffff;font-weight: bold;">
+                                        <%=Eval("name")%>
+                                    </div>
+                                </div>
+                            </div>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                </div>
+            </div>
+        </pe:container>
+        
+        <pe:container alignment="_ctr" width="87" height="550" style="margin-right: 0px;margin-top: -55px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bj3_98X128_32bits.png#0 0 98 128:20 40 20 40);">
+            <div style="margin-left: 15px;margin-top: 30px;">
+                <pe:repeat DataSource="<%=GetRightBtData()%>">
+                    <pe:repeatitem>
+                        <div onclick="OnClickRightBt" name='<%=Eval("node_name")%>' style='<%=GetBtIconStyle(Eval("img"))%>'></div>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+
+        </pe:container>
+
+        <pe:container alignment="_lb" width="676" height="36" style="margin-left: 28px;margin-bottom: 26px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/gundong_128X36_32bits.png#0 0 128 36:40 5 28 5);">
+            <pe:container SelfPaint="true" width="676" height="34" style="background:;">
+                <pe:container width="676" onclick="OnClickNotice1" height="36" uiname="notice_container_1" style="position: relative;background: ;">
+                    <pe:label value="" name="notic_text1" style="margin-left: 50px;margin-top: 6px; height: 30px;color: #000000;base-font-size:16px;font-size: 16px;font-weight: bold;"></pe:label>
+                </pe:container>
+                <pe:container width="676" onclick="OnClickNotice2" height="36" uiname="notice_container_2" style="position: relative;margin-top: 36px;background:">
+                    <pe:label value="" name="notic_text2" style="margin-left: 50px;margin-top: 6px; height: 30px;color: #000000;base-font-size:16px;font-size: 16px;font-weight: bold;"></pe:label>
+                </pe:container>
+            </pe:container>
+        </pe:container>
+
+        <pe:container alignment="_rb" width="554" height="82" style="margin-right: 0px;margin-bottom: 0px; background:url();">
+            <input type="button" value='新建世界' onclick="create_new_world" class="yellon_button" style="margin-left:118px;margin-top:10px;text-offset-y:-2;" />
+            <input type="button" value='加载世界' onclick="QuickStart" class="yellon_button" style="margin-left:25px;margin-top:10px;text-offset-y:-2;" />
+        </pe:container>
+            <!-- <input type="button" value='打开 神通杯' name="shentongbei" />
+            <input type="button" value='打开 推荐课程' name="RedSummerCampRecCoursePage" onclick="OnOpen" />
+            <input type="button" value='打开 我的作品' name="MyWorks" onclick="OnOpen" />
+            <input type="button" value='打开 家长指南' name="RedSummerCampParentsPage" onclick="OnOpen" /> -->
+        
+
+
+    </pe:container>
+</pe:container>
+
+</pe:mcml>
+</body>
+</html>
+

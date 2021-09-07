@@ -28,13 +28,34 @@
             end
         end
     end
+
+    function OnClickCustomerService()
+        ParaGlobal.ShellExecute('open', L'https://wpa1.qq.com/TxyKupLK?_type=wpa&qidian=true', '', '', 1)
+    end
 ]]></script>
-<kp:window width="400" height="200" mode="lite" title='<%= L"使用激活码"%>' onclose="ClosePage">
+<!-- <kp:window width="400" height="200" mode="lite" title='<%= L"使用激活码"%>' onclose="ClosePage">
     <div style="margin-top: 60px; margin-left: 83px;width:232;height:32px;background:url(Texture/Aries/Creator/keepwork/friends/sousuo_16X16_32bits.png#0 0 16 16:4 4 4 4);">
         <input type="text" EmptyText='<%=L"激活码"%>' onkeyup="onKeyUp" name="vipcode" uiname="vipcode" CaretColor="#FFFFFFFF" style="margin-left:5px;textcolor:#dedede;height:28px;background:;" />
     </div>
     <input type="button" onclick="OnClick" value="确定" style="font-size: 24px;base-font-size:24px;font-weight: bold; height: 40px; width: 100px; margin-left: 150px; margin-top: 30px; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16);"/>
-</kp:window>
+</kp:window> -->
+<div style="width: 390px; height: 290px; background: url(Texture/Aries/Creator/keepwork/vip/tipbj_32bits.png#0 0 32 32:14 14 14 14);">
+    <div style="width: 390; height: 30px;">
+        <input type="button" style="margin-left: 360px; margin-top: 6x; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        <div style="text-align: center; font-size: 18px;base-font-size: 18px; font-weight: bold; color: #ffffff;">请输入您获得的激活码</div>
+    </div>
+    <div style="margin-top: 40px; margin-left: 33px;width: 328px;height:32px;background:url(Texture/Aries/Creator/keepwork/vip/shuzishuru_32X32_32bits.png#0 0 32 32:14 14 14 14);">
+        <input type="text" EmptyText='<%=L"激活码"%>' onkeyup="onKeyUp" name="vipcode" uiname="vipcode" CaretColor="#000000ff" style="margin-left:5px;textcolor:#000000;height:28px;background:url();" />
+    </div>
+    <div style="text-align: left; font-size: 14px;base-font-size: 14px;  color: #ffffff; margin-left: 34px; margin-top: 6px;">
+        1.激活成功后，可享受对应的权益和服务<br/>
+        2.请在激活码有效期内使用，过期作废<br/>
+        3.请妥善保管激活码，遗失泄漏等不补<br/>
+        4.如有其它问题，请咨询<br/>
+    </div>
+    <input type="button" onclick="OnClickCustomerService" style="height: 20px; width: 52px; margin-left: 190px; margin-top: -20px; background: url(Texture/Aries/Creator/keepwork/vip/kf_52X20_32bits.png#0 0 52 20);"/>
+    <input type="button" onclick="OnClick" value="立即激活" style="font-size: 16px;base-font-size:16px;font-weight: bold; height: 44px; width: 114px; margin-left: 140px; margin-top: 30px; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);"/>
+</div>
 </pe:mcml>
 </body>
 </html>

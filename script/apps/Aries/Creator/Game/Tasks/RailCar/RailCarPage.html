@@ -1,0 +1,74 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="RailCarPage.lua"><![CDATA[
+local RailCarPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarPage.lua");
+RailCarPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    RailCarPage.CloseView()
+end
+
+function GoNow()
+    RailCarPage.GoNow()
+end
+
+function ToCreate()
+    RailCarPage.ToCreate()
+end
+
+function GetCameraTypeData()
+    return RailCarPage.CameraType
+end
+
+function ChangeCameraType(name, mcmlNode)
+    local index = mcmlNode:GetAttribute("param1")
+    RailCarPage.ChangeCameraType(tonumber(index))
+end
+
+function IsSelect(index)
+    return RailCarPage.select_cameratype_index == index 
+end
+
+function GetIcon(index)
+    return RailCarPage.GetIcon(index)
+end
+
+function OpenFiedCameraSetting()
+    RailCarPage.OpenFiedCameraSetting()
+end
+]]></script>
+<div ClickThrough = "true" style="width: 410px;height: 155px;">
+    <div ClickThrough = "true" style="height: 155px;">
+        <div style="margin-left: 0px;margin-top: 80px;float: left;">
+            <pe:repeat DataSource='<%=GetCameraTypeData()%>'>
+                <pe:repeatitem>
+                    <div style="float:left;width: 64px;height: 64px;margin-left: 3px;">
+                        <img zorder="0" onclick="ChangeCameraType" param1='<%=Eval("index")%>' src='<%=GetIcon(Eval("index"))%>'width="64" height="64" style="position: relative;"/>
+
+                        <pe:if condition='<%=Eval("type") == "lock_fixed"%>'>
+                            <img zorder="0" uiname="railcar_setting_icon" onclick="OpenFiedCameraSetting" param1='<%=Eval("index")%>' src='Texture/Aries/Creator/keepwork/RailCar/icon_7_32bits.png#0 0 64 64' width="64" height="64" style="position: relative;margin-top: -69;"/>
+                        </pe:if>
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+
+        <pe:container ClickThrough = "true" zorder="-1" style="margin-top: 40px;width: 100px; height:30px;float: left;margin-left: -103px;background: ;">
+            <pe:label name="step_count" alignment="_rt" value="0m" style="float: left;margin-top:0px;margin-left:0px;color:#000000;base-font-size:24px;font-size: 24px;height: 30px;text-align: right;"></pe:label>
+        </pe:container>
+        
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

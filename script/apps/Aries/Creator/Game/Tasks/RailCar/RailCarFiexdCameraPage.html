@@ -1,0 +1,151 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarFiexdCameraPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="RailCarFiexdCameraPage.lua"><![CDATA[
+local RailCarFiexdCameraPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarFiexdCameraPage.lua");
+RailCarFiexdCameraPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    RailCarFiexdCameraPage.CloseView()
+end
+
+function ChangeIsRandom()
+    RailCarFiexdCameraPage.ChangeIsRandom()
+end
+
+function IsSelectRandom()
+    return RailCarFiexdCameraPage.SettingData.is_random
+end
+
+function TimeInputOnChange()
+    RailCarFiexdCameraPage.TimeInputOnChange()
+end
+
+function Button_DS_Items(index)
+    if(index == nil) then
+        return #RailCarFiexdCameraPage.SettingData.movies_list;
+    else
+        return RailCarFiexdCameraPage.SettingData.movies_list[index];
+    end
+end
+
+function IsLastItem(index)
+    return index == #RailCarFiexdCameraPage.SettingData.movies_list
+end
+
+function Select(name, mcmlNode)
+    local index = mcmlNode:GetAttributeWithCode("param1")
+    RailCarFiexdCameraPage.Select(tonumber(index))
+end
+
+function Delete(name, mcmlNode)
+    local index = mcmlNode:GetAttributeWithCode("param1")
+    RailCarFiexdCameraPage.Delete(tonumber(index))
+end
+
+function ChangeUp(name, mcmlNode)
+    local index = mcmlNode:GetAttributeWithCode("param1")
+    RailCarFiexdCameraPage.ChangeUp(tonumber(index))
+end
+
+function ChangeDown(name, mcmlNode)
+    local index = mcmlNode:GetAttributeWithCode("param1")
+    RailCarFiexdCameraPage.ChangeDown(tonumber(index))
+end
+
+function ClickOk()
+    RailCarFiexdCameraPage.ClickOk()
+end
+
+function AddView()
+    RailCarFiexdCameraPage.AddView()
+end
+]]></script>
+<style type="text/mcss">
+    {
+        random_button = {
+            width = 147,
+            height = 40,
+            ["margin-left"] = 177
+            ["margin-top"] = 60
+        },  
+        item_button = {
+            width = 20,
+            height = 20,
+            ["margin-left"] = 6
+            ["margin-top"] = 2
+            float = "left",
+        },
+    }
+</style>
+<div style="width: 335px;height: 567px;background:url(Texture/Aries/Creator/keepwork/RailCar/bg_1_335x567_32bits.png#0 0 335 567);">
+
+    <pe:if condition='<%=IsSelectRandom()%>'>
+        <input type="button" onclick="ChangeIsRandom" class="random_button" style="background: url(Texture/Aries/Creator/keepwork/RailCar/bt_3_147x40_32bits.png#0 0 147 40)"/>
+   </pe:if>
+    
+    <pe:if condition='<%=not IsSelectRandom()%>'>
+        <input type="button" onclick="ChangeIsRandom" class="random_button" style="background: url(Texture/Aries/Creator/keepwork/RailCar/bt_4_147x40_32bits.png#0 0 147 40)"/>
+   </pe:if>
+
+   <div style="width: 90px;height: 35px;color: #ffffff;margin-left: 234px;margin-top: 16px;">
+        <input type="text" name="time_input" CaretColor="#ffffffff" onchange="TimeInputOnChange" value='10'  EmptyText="" width="90" height="35" style="textcolor: #ffffff;font-size: 22px;background: ;"/>
+    </div>
+
+    <div type ="box" style="width:238px;height:208px;margin-left: 50px;margin-top: 65px;float: left;">
+        <pe:gridview style="width:238px;height:208px;float:left" name="item_gridview" CellPadding="0" RememberScrollPos="true" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "34" 
+            DataSource='<%=Button_DS_Items%>'>
+            <Columns>
+                <div style="width: 238px;height: 34px;margin-left: 4px;">
+                    <pe:if condition='<%=Eval("is_select")%>'>
+                        <div style="margin-left: 0px;margin-top: 1px; color: #00a800;float: left;base-font-size:14px;font-size: 14px;font-weight: bold;"><%=Eval("desc")%></div>
+                   </pe:if>
+                    <pe:if condition='<%=not Eval("is_select")%>'>
+                        <div style="margin-left: 0px;margin-top: 1px; color: #d40000;float: left;base-font-size:14px;font-size: 14px;font-weight: bold;"><%=Eval("desc")%></div>
+                   </pe:if>
+                    
+                    <div onclick="Select" param1='<%=Eval("index")%>' class="item_button" style="margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/RailCar/bg_checkbox_32bits.png#0 0 32 32);">
+                        <pe:if condition='<%=Eval("is_select")%>'>
+                            <div style="float: left;width: 20px;height: 20px;margin-left: 0px;margin-top: 0px;background: url(Texture/Aries/Creator/keepwork/RailCar/img_gou_32bits.png#0 0 32 32);"></div>
+                       </pe:if>
+                        
+                    </div>
+
+                    <input type="button" onclick="Delete" param1='<%=Eval("index")%>' class="item_button" style="background: url(Texture/Aries/Creator/keepwork/RailCar/bt_delete_32bits.png#0 0 32 32)"/>
+                    <div class="item_button">
+                        <pe:if condition='<%=Eval("index") ~= 1%>'>
+                            <input type="button" onclick="ChangeUp" param1='<%=Eval("index")%>' style="width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/RailCar/bt_up_32bits.png#0 0 32 32)"/>
+                       </pe:if>
+                    </div>
+                    
+                    <div class="item_button" style="margin-left: 4;">
+                        <pe:if condition='<%=not IsLastItem(Eval("index"))%>'>
+                            <input type="button" onclick="ChangeDown" param1='<%=Eval("index")%>' style="width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/RailCar/bt_down_32bits.png#0 0 32 32)"/>
+                       </pe:if>
+                    </div>
+                </div>
+                
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+
+    <input type="button" onclick="AddView" style="margin-left: 130px;margin-top: 15px; width: 81px;height: 40px;background: url(Texture/Aries/Creator/keepwork/RailCar/bt_5_81x40_32bits.png#0 0 81 40)"/>
+    <div style="margin-top: 15px;">
+        <input type="button" onclick="ClickOk" style="float: left; margin-left: 45px; width: 81px;height: 50px;background: url(Texture/Aries/Creator/keepwork/RailCar/bt_2_81x50_32bits.png#0 0 81 50)"/>
+        <input type="button" onclick="ClosePage" style="float: left; margin-left: 90px; width: 81px;height: 50px;background: url(Texture/Aries/Creator/keepwork/RailCar/bt_1_81x50_32bits.png#0 0 81 50)"/>
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

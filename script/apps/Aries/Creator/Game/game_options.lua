@@ -324,6 +324,7 @@ function options:OnLoadWorld()
 --		GameLogic.RunCommand("/memlimit -v -s 200");
 --	end
 	GameLogic.AddBBS("options", nil);
+	self.isOfflineMode = System.options.loginmode == "local" or System.options.loginmode == "offline";
 
 	local player = ParaScene.GetPlayer();
 	self:ApplyTexturePack();
@@ -1348,4 +1349,8 @@ function options:SetFieldOfView(fov)
 		ParaCamera.GetAttributeObject():SetField("FieldOfView", fov);
 		return true;
 	end
+end
+
+function options:IsOfflineMode()
+	return self.isOfflineMode;
 end

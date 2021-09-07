@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CreateReward.lua" ><![CDATA[
+    local CreateReward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/CreateReward.lua");
+    CreateReward.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetCreateTime()
+        return  CreateReward.GetCreateTime()
+    end
+]]></script>
+<kp:window width="686" height="443"  title='<%= L"创造奖励"%>'>
+    <input type="button" onclick="ClosePage" style="height: 22px; width: 22px; margin-left: 650px; margin-top: 10px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+    <div style="margin-left: 12px;margin-top:18px; width: 661px; height: 380px;background: url(Texture/Aries/Creator/keepwork/World2In1/BJK2_32bits.png#0 0 32 32:8 8 8 8);">
+        <div style="margin-top: -2px;margin-left: -3px; width:667px;height:130px;background:url(Texture/Aries/Creator/keepwork/CreateReward/bjb_667X130_32bits.png#0 0 667 130);">
+            <pe:progressbar   name="expbar" Minimum = "1" Maximum = '3600' Value = '<%=GetCreateTime()%>' Step = "1"
+                style="margin-top: 78px; margin-left: 20px; width:605px;height:10px;" miniblockwidth="10"
+                blockimage="Texture/Aries/Creator/keepwork/CreateReward/jingdutiao_32X10_32bits.png;0 0 32 10:14 4 14 4"
+                background="Texture/Aries/Creator/keepwork/CreateReward/jingdutiao2_32X10_32bits.png;0 0 32 10:14 4 14 4"/>
+            <!-- 圆点 -->
+    
+        </div>
+        <div style="margin-top: 20px; margin-left: 25px; color: #000000; font-size: 16px; font-weight: bold; base-font-size: 16px;">
+            1、每日参与创作，累计时长5分钟、15分钟、30分钟、60分钟可领取奖励。<br/>
+            2、每个时间段完成后，即可在下方领取领取相应奖励。<br/>
+            3、奖励为知识豆、作品点赞数、皮肤碎片随机发放。
+        </div>
+    </div>
+    
+</kp:window>
+</pe:mcml>
+</body>
+</html>

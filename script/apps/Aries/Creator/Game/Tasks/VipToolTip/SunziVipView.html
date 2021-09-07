@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local SunziVipView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/SunziVipView.lua");
+    SunziVipView.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+    function GotoWorld()
+        ClosePage()
+        SunziVipView.GotoSummerWorld()
+    end
+]]></script>
+<div style=" width: 1024x; height: 629px; background: url(Texture/Aries/Creator/keepwork/vip/sunzi_bg_1024x629_32bits.png#0 0 1024 629);">
+    <div style="width: 920px; height: 60px;">
+        <input type="button" style="margin-left: 990px; margin-top: 5px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    </div>
+
+    <pe:container uiname="summer_decode_wxcode_root" style="margin-left: 802px;margin-top: 382px; float: left;width: 110;height: 110;background: url();"></pe:container>
+</div>
+</pe:mcml>
+</body>
+</html>

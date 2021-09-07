@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local VideoSharingUploadSuccessMain = NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingUploadSuccessMain.lua");
+    VideoSharingUploadSuccessMain.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+    function ShowVideoCode()
+        local VideoSharingUploadSuccessCode = NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingUploadSuccessCode.lua") 
+        VideoSharingUploadSuccessCode.ShowView(VideoSharingUploadSuccessMain.cndUrl)
+    end
+]]></script>
+<kp:window width="710" height="455"  title='<%= L"视频分享"%>' onclose="ClosePage">
+    <div style="margin-top: 46px; color: #181818; font-size: 16px; base-font-size: 16px; text-align: center;">
+        视频录制完成，文件已保存到电脑桌面，点击下方按钮可将视频下载到手机
+    </div>
+
+    <input onclick="ShowVideoCode" type="button" value="下载到手机" style="color: #181818; font-size: 18px; base-font-size: 18px;margin-left:280px ;margin-top: 20px; width: 142px; height: 42px; background: url(Texture/Aries/Creator/keepwork/macro/btn_8_32X32_32bits.png#0 0 32 32:15 15 15 15);" />
+    <div style="margin-top: 20px; color: #181818; font-size: 16px; base-font-size: 16px; text-align: center; font-weight: bold;">
+        快使用微信或QQ扫码后分享给好友为你点赞吧
+    </div>
+    <div style="margin-left: 252px; margin-top: 40px; width: 204px; height: 204px; background: url(Texture/Aries/Creator/keepwork/vip/shuzishuru_32X32_32bits.png#0 0 32 32:15 15 15 15);">
+
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>

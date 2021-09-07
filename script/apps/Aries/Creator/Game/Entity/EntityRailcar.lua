@@ -63,7 +63,7 @@ Entity.targetPitch = 0;
 Entity.smoothFrames = 0;
 
 
--- mapping from direction data to from:{x,y,z} to:{x,y,z} where mc_id  pc_id
+-- mapping from direction data to from:{x,y,z} to:{x,y,z} 
 local RailDirMatrix = {
 	[0] = {{ -1, 0, 0}, {1, 0, 0}}, -- 1 1
 	-- x,z straight

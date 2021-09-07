@@ -1,0 +1,214 @@
+<pe:mcml>
+	<script refresh="true" type="text/npl" src="Course.lua">
+		<![CDATA[
+			local Course = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Course/Course.lua");
+			local baseTexURL = "Texture/Aries/Creator/keepwork/CourseSelect/";
+
+			Course.OnInit();
+
+			function ClosePage()
+				Page:CloseWindow(0);
+			end
+
+			function GetDS() 
+				return Course.DS;
+			end
+
+			function GetListByID() 
+				return Course.CurrentItem;
+			end
+
+			function HandleSelect(name, mcmlNode)
+				Course.HandleSelect(mcmlNode:GetAttributeWithCode("param1", nil));
+			end
+
+			function GetIndex(index)
+				print("xxxxxxx", index)
+				return index
+			end
+
+			function handleImgClick(name, mcmlNode) 
+				Course.HandleImgClick(mcmlNode:GetAttributeWithCode("param1", nil));
+			end
+
+			function HandleVipBtnClick()
+				Course.HandleVipBtnClick();
+			end
+
+			function GoTo()
+				Course.GoTo();
+			end
+		]]>
+	</script>
+
+	<kp:window 
+		name="IframeCourse" 
+		width="890" 
+		height="675" 
+		onclose="ClosePage"
+		mode="lite"
+	>
+		<div style="margin-top: -2px;
+					margin-left: 10px; 
+					position: relative;
+					width:256px;
+					height:64px;
+					background: url(Texture/Aries/Creator/keepwork/CourseSelect/wanxue_32bits.png#0 0 256 64);"
+		/>
+
+		<!-- left -->
+		<div name="left_container" style="float:left;width:289px;height:462px;margin-top:50px;margin-left:30px;">
+			<pe:gridview 
+				style="margin:0px;width:282px;height:462px;float:left" 
+				name="CourseGridview" 
+				CellPadding="2" 
+				VerticalScrollBarStep="36" 
+				RememberScrollPos="true" 
+				VerticalScrollBarOffsetX="8" 
+				AllowPaging="false" 
+				ItemsPerLine="1" 
+				DefaultNodeHeight = "55" 
+				DataSource='<%= GetDS() %>'
+			>
+				<Columns>
+					<pe:if condition='<%= Eval("isSelected") %>'>
+						<div style="<%= format('margin-top:10px; width: 282px; height: 55px; background: url(Texture/Aries/Creator/keepwork/CourseSelect/%s.png#0 0 289 55);', Eval('highLightTexName') ) %>"/>
+					</pe:if>
+					<pe:if condition='<%= not Eval("isSelected") %>'>
+						<div
+							onclick="HandleSelect" 
+							param1="<%= Eval('id') %>"
+							style="<%= format('margin-top:10px; width: 282px; height: 55px; background: url(Texture/Aries/Creator/keepwork/CourseSelect/%s.png#0 0 289 55);', Eval('texName')) %>"
+						/>
+					</pe:if>
+				</Columns>
+			</pe:gridview>
+		</div>
+		
+		<!-- right -->
+		<div style="float:left;width:550px;height:655px;margin-top:57px;margin-left:10px;" >
+			<pe:gridview 
+				style="width:570px;height:605px;margin: 0px;" 
+				name="right_container" 
+				CellPadding="0" 
+				VerticalScrollBarStep="100" 
+				RememberScrollPos="true" 
+				AllowPaging="false" 
+				ItemsPerLine="1" 
+				DefaultNodeHeight = "22" 
+				DataSource='<%= GetListByID() %>'
+			>
+				<Columns>
+					<div style="width:610px; margin: 0px;">
+						<div 
+							zorder="-2" 
+							style="width: 526px;
+									height: 260px;
+									background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)"
+						>
+							<div 
+								name="header_ui"
+								style="<%= format('margin-left:13px; margin-top:7px; width: 510px;height: 244px;; background: url(Texture/Aries/Creator/keepwork/CourseSelect/%s.png#0 0 507 242);', GetIndex(Eval('hightShowImg'))) %>"
+							/>
+						</div>
+						
+						<div name="list" style="width: 600px; height: 85px; margin-top: -5px;">
+							<div 
+								zorder="-2" 
+								style="width: 138px;
+										height: 95px;
+										float: left;
+										background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)"
+							>
+								<div
+									onclick="handleImgClick"
+									param1="<%=1%>"
+									name="item_1" 
+									style="<%= format('margin-left:13px; margin-top:7px; float: left; width: 122px; height: 79px; background: url(Texture/Aries/Creator/keepwork/CourseSelect/%s.png#0 0 122 85);', Eval('listOfImg_1')) %>"
+								/>
+							</div>
+							<div 
+								zorder="-2" 
+								style="width: 138px;
+										height: 95px;
+										float: left;
+										margin-left: -10px;
+										background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)"
+							>
+								<div
+									onclick="handleImgClick"
+									param1="<%=2%>"
+									name="item_1" 
+									style="<%= format('margin-left:13px; margin-top:7px; float: left; width: 122px; height: 79px; background: url(Texture/Aries/Creator/keepwork/CourseSelect/%s.png#0 0 122 85);', Eval('listOfImg_2')) %>"
+								/>
+							</div>
+							<div 
+								zorder="-2" 
+								style="width: 138px;
+										height: 95px;
+										float: left;
+										margin-left: -10px;
+										background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)"
+							>
+								<div 
+									onclick="handleImgClick"
+									param1="<%=3%>"
+									name="item_1" 
+									style="<%= format('margin-left:13px; margin-top:7px; float: left; width: 122px; height: 79px; background: url(Texture/Aries/Creator/keepwork/CourseSelect/%s.png#0 0 122 85);', Eval('listOfImg_3')) %>"
+								/>
+							</div>
+							<div 
+								zorder="-2" 
+								style="width: 138px;
+										height: 95px;
+										float: left;
+										margin-left: -10px;
+										background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)"
+							>
+								<div
+									onclick="handleImgClick"
+									param1="<%=4%>" 
+									name="item_1" 
+									style="<%= format('margin-left:13px; margin-top:7px; float: left; width: 122px; height: 79px; background: url(Texture/Aries/Creator/keepwork/CourseSelect/%s.png#0 0 122 85);', Eval('listOfImg_4')) %>"
+								/>
+							</div>
+						</div>
+						<div style="margin-top: 5px; margin-left: 10px; float: left; width: 300px; font-size:18px; base-font-size:18px;font-weight:bold;">
+							<%= Eval("title") %>
+						</div>
+						<div style="margin-top: 2px; margin-left: 10px; float: left; width: 500px; line-height: 20px; font-size: 16px; base-font-size:16px; color: #000000;">
+							<%= Eval("content") %>
+						</div>
+						<div style="float: left; width: 600px; height: 55px;">
+							<input 
+								type="button" 
+								style="position: relative; 
+										margin-left: 340px;
+										margin-top: 5px;
+										font-size: 18px;
+										color: #1F1F1F;
+										font-weight: bold;
+										width: 169px;
+										height: 55px;" 
+								class="kp_yellow_button" 
+								value='<%=L"进入"%>' 
+								onclick="GoTo"
+							/>
+						</div>
+						<div style="<%= format('float: left; width: 508px; height: 92px; margin-top: 15px; background: url(Texture/Aries/Creator/keepwork/CourseSelect/%s.png#0 0 508 92);', Eval('bannerTex')) %>">
+							<input 
+								type="button" 
+								style="<%= format('position: relative; margin-left: %spx; margin-top: 32px; font-size: 14px; width: 96px; height: 29px; background: url(Texture/Aries/Creator/keepwork/CourseSelect/btn7_96X29_32bits.png#0 0 96 29);', Eval('marLeft')) %>" 
+								class="kp_yellow_button" 
+								value='<%=L"帕拉卡会员"%>' 
+								onclick="HandleVipBtnClick"
+							/>
+						</div>
+						<div name="blank" style="width: 506px; height: 20px;" />
+					</div>
+				</Columns>
+			</pe:gridview>
+		</div>
+		
+	</kp:window >
+</pe:mcml>

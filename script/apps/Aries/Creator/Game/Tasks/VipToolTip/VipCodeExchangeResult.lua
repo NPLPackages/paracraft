@@ -17,7 +17,7 @@ end
 function VipCodeExchangeResult.ShowView(desc) 
     VipCodeExchangeResult.desc  = desc   
     local view_width = 400
-    local view_height = 200
+    local view_height = 300
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchangeResult.html",
         name = "VipCodeExchangeResult.ShowView", 
@@ -26,7 +26,7 @@ function VipCodeExchangeResult.ShowView(desc)
         style = CommonCtrl.WindowFrame.ContainerStyle,
         allowDrag = false,
         enable_esc_key = true,
-        zorder = 5,
+        zorder = 0,
         directPosition = true,
         align = "_ct",
             x = -view_width/2,

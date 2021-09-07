@@ -1,0 +1,45 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeHelpWindow.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeHelpWindow.lua">
+<![CDATA[
+CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
+CodeHelpWindow.OnInit();
+]]></script>
+<div height="100%" style="width:200px;background-color:#43064a;" class="default">
+    <div style="margin-left:5px;">
+        <pe:repeat DataSource="<%=CodeHelpWindow.GetCategoryButtons()%>">
+            <pe:repeatitem style="float:left;">
+                <pe:if condition='<%=CodeHelpWindow.category_index == Eval("index") %>'>
+                    <input type="button" value='<%=Eval("text")%>' uiname='<%="CodeHelpWindow.Category_"..Eval("name")%>' name='<%=Eval("index")%>' style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                </pe:if>
+                <pe:if condition='<%=CodeHelpWindow.category_index ~= Eval("index") %>'>
+                    <input type="button" value='<%=Eval("text")%>' uiname='<%="CodeHelpWindow.Category_"..Eval("name")%>' name='<%=Eval("index")%>' onclick="CodeHelpWindow.OnChangeCategory" style="margin-top:5px;margin-right:5px;color:#ffffff;font-size:12px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+    <div class="mc_paper_panel" style="margin-top:5px;padding-top:10px;color:#4a6cd4">
+        <pe:gridview style="margin:0px;margin-left:4px;" uiname="CodeHelpWindow.gvwFunctions" name="gvwFunctions" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="28" RememberScrollPos="true"
+                        DataSource='<%=CodeHelpWindow.DS_CodeItems%>'>
+            <Columns>
+                <div style="width:300px">
+                    <pe:container style="background:url();margin-top:3px;margin-bottom:2px;padding-right:5px;"
+                                  uiname='<%=format("CodeHelpWindow.Item.%s.%s", CodeHelpWindow.category_name, Eval("name"))%>'
+                                  name='<%=Eval("name")%>' candrag="true" ondragend="CodeHelpWindow.OnDragEnd"
+                                  tooltip='<%=Eval("tooltip")%>' use_mouse_offset="false" is_lock_position="true" offset_ctrl_width="true" tooltip_offset_x="-2" tooltip_offset_y="-50" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="250"
+                                  onclick="CodeHelpWindow.OnClickItem">
+                        <div style="float:left;font-size:12px;max-width:178px" name='<%=Eval("name")%>'>
+                            <div style='<%=format("background-color:%s;color:#ffffff;padding-left:5px;padding:1px;padding-right:5px;", Eval("color"))%>'>
+                                <%=Eval("html")%>
+                            </div>
+                        </div>
+                    </pe:container>
+                </div>
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+</div>
+</pe:mcml>
+

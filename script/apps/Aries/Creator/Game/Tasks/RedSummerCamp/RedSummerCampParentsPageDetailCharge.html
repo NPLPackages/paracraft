@@ -1,0 +1,114 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPageDetail.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="RedSummerCampParentsPageDetail.lua">
+            <![CDATA[
+            local RedSummerCampParentsPageDetail = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPageDetail.lua");
+            RedSummerCampParentsPageDetail.OnInit()
+            function ClosePage()
+                local pageCtrl = document:GetPageCtrl();
+                pageCtrl:CloseWindow(true)
+            end
+
+            function GetItemData(index)
+                if index == nil then
+                    return #RedSummerCampParentsPageDetail.ItemData
+                else
+                    return RedSummerCampParentsPageDetail.ItemData[index]
+                end
+            end
+            
+            function ShowVip()
+                local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+                VipPage.ShowPage();
+            end
+            ]]>
+        </script>
+        <pe:container alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc">
+        </pe:container>
+        <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+            <!--Vip-->
+            <pe:container alignment="_rt" style="background:url();">
+                <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
+            </pe:container>
+            <!--Close-->
+            <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+                <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+            </pe:container>
+            
+            <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">
+                <!--背景水印-->
+                <div>
+                    <div style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <div style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <div style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <div style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                </div>
+                <div style="width: 177px; height: 59px; margin-left: 550px; margin-top: 0px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#420 860 177 59);"></div>
+                <div style="width:1190px;height:564px;margin-top:20px;margin-left: 56px;">
+                    <pe:gridview  style="margin-left:5px;" CellPadding="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="560"
+                                DataSource='<%=GetItemData%>'>
+                        <Columns>
+                            <div style="width: 1164px; height: 2230px; font-size: 20px; base-font-size: 20px;">
+                                <div style="height: 400px;">
+                                    <div>
+                                        ——成为《帕拉卡》会员畅享全部服务<br/>
+                                        成为《帕拉卡》会员后畅享全部在线课程及数款由帕拉卡教育联盟企业共同制作的精品软件以及在线一对一的软件技术解决服务。<br/>
+                                        每周《帕拉卡》都会有新课不断上线，只要在会员权益期限内，均可无限次享受新课程的学习体验。<br/>
+                                    </div>
+                                    <div style="margin-left: 60px;margin-top: 20px; width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#1355 3 300 170);"></div> 
+                                    <div style="margin-top: -170px; margin-left: 400px; width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#1035 3 300 170);"></div>
+                                    <div style="margin-top: -170px; margin-left: 740px;width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#1675 3 300 170);"></div>    
+                                    <div style="width: 400px; font-size: 20px; base-font-size: 20px; color: #717275;">
+                                        <pe:label value='专项赛事赛点精讲课程' style="position: relative; margin-top: 5px; margin-left: 28px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                        <pe:label value='AI宏示教辅助教学功能' style="position: relative; margin-top: 5px; margin-left: 240px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                        <pe:label value='联盟企业特色精品课程' style="position: relative; margin-top: 5px; margin-left: 980px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                    </div>
+                                </div>
+                                
+                                <div style="height: 590px;">
+                                    <div>
+                                        ——会员权益<br/>
+                                        《帕拉卡》会员服务分为家庭个人用户以及面向课外兴趣班的机构用户两种。如果您喜爱《帕拉卡》，并希望为自己孩子的作品建立专属终身保护，我们强烈建议您升级成为《帕拉卡》独立会员。<br/>
+                                    </div>
+                                    <div style="margin-left: 20px;margin-top: 20px; width: 1124px; height: 848px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#20 968 1124 848);"></div>
+                                    <div style="margin-top: 40px;">
+                                        --加入会员<br/>
+                                    </div>
+
+                                    <div style="text-align: center; font-weight: bold; position: relative; margin-left: 195px; margin-top: 40px; width: 326px; height: 203px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#157 95 80 80: 30 30 30 30);">
+                                        <div style="margin-top: 40px; color: #323232; font-size: 24px; base-font-size:24px;">6个月</div>
+                                        <div style="color: #d21b1b; font-size: 48px; base-font-size:48px;">￥498</div>
+                                        <div style="color: #323232; font-size: 18px; base-font-size:18px;">￥83/月</div>
+                                    </div>
+
+                                    <div style="text-align: center; font-weight: bold; position: relative; margin-left: 640px; margin-top: 40px; width: 326px; height: 203px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#157 95 80 80: 30 30 30 30);">
+                                        <div style="margin-top: 40px; color: #323232; font-size: 24px; base-font-size:24px;">12个月</div>
+                                        <div style="color: #d21b1b; font-size: 48px; base-font-size:48px;">￥880</div>
+                                        <div style="color: #323232; font-size: 18px; base-font-size:18px;">￥73/月</div>
+                                    </div>                                    
+                                </div>
+                                <div style="margin-top: 700px;">
+                                    <div style="width: 390px; height: 48px; margin-left: 386px; margin-top: 90px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#20 910 390 48);"></div>
+                                    <div style="width: 348px; height: 260px; margin-left: 386px; margin-top: 30px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#1015 198 348 260);"></div>  
+                                    <input value="成为会员" onclick="ShowVip" type="button" style="font-size: 28px; base-font-size: 28px;font-weight: bold; color: #1f1f1f; width: 200px; height: 60px; margin-left: 476px; margin-top: 30px; background: url(Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                                </div>
+                            </div>
+                        </Columns>
+                    </pe:gridview>
+                </div>
+            </pe:container>
+
+        </pe:container>
+
+    </pe:mcml>
+</body>
+</html>
+

@@ -69,13 +69,6 @@ local names = commonlib.createtable("MyCompany.Aries.Game.block_types.names", {
 	player = 30002,
 });
 
--- mapping from mc_id to our id
-block_types.mc_id_map = {
-	-- water blocks
-	[8] = 75, 
-	[9] = 75,
-};
-
 -- all block class definitions here
 block_types.block_classes = {
 	["block"] = block,
@@ -372,27 +365,6 @@ function block_model:GetMainTextureFileName()
 	return self.main_texture_filename;
 end
 
-function block_types.add_mc_id(mc_id, block_id)
-	if(type(mc_id) == "string") then
-		local id, data = mc_id:match("(%d+):(%d+)");
-		if(data) then
-			data = tonumber(data);
-			if(data ~= 0) then
-				mc_id = tonumber(id)*100+data;
-			else
-				mc_id = tonumber(id);
-			end
-		else
-			mc_id = tonumber(mc_id);
-		end
-		if(mc_id) then
-			block_types.mc_id_map[mc_id] = block_id;
-		end
-	elseif(type(mc_id) == "number") then
-		block_types.mc_id_map[mc_id] = block_id;
-	end
-end
-
 function block_types.LoadBlockTemplates(filename)
 	if(block_types.templates and not filename) then
 		return;
@@ -547,10 +519,6 @@ function block_types.LoadFromFile(filename)
 				end
 				if(attr.slipperiness) then
 					attr.slipperiness = tonumber(attr.slipperiness);
-				end
-
-				if(attr.mc_id) then
-					block_types.add_mc_id(attr.mc_id, block_id);
 				end
 
 				attr.texture = LocalTextures:GetBlockTexture(attr.texture);

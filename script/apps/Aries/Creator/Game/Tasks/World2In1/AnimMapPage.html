@@ -1,0 +1,85 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/World2In1/AnimMapPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="AnimMapPage.lua"><![CDATA[
+local AnimMapPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/AnimMapPage.lua");
+AnimMapPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    AnimMapPage.CloseView()
+end
+
+function WorldListData(index)
+    if(index == nil) then
+        return #AnimMapPage.WorldListData;
+    else
+        return AnimMapPage.WorldListData[index];
+    end
+end
+
+function OnClickCreate()
+    AnimMapPage.OnClickCreate()
+end
+
+function OnClickSelect(index)
+    index = tonumber(index)
+    AnimMapPage.OnClickSelect(index)
+end
+
+function OnClickDelete()
+    AnimMapPage.OnClickDelete()
+end
+
+function GetDesc1()
+    return AnimMapPage.GetDesc1()
+end
+
+function OnClickTest()
+end
+
+function OnClickTop()
+    AnimMapPage.OnClickTop()
+end
+
+function OnClickLeft()
+    AnimMapPage.OnClickLeft()
+end
+
+function OnClickToCreate()
+    AnimMapPage.OnClickToCreate()
+end
+
+function OnClickRight()
+    AnimMapPage.OnClickRight()
+end
+
+function OnClickBottom()
+    AnimMapPage.OnClickBottom()
+end
+]]></script>
+<pe:container alignment="_fi" onclick="ClosePage" width="100%" height="100%" style="background-color:#000000b4;">
+    <pe:container alignment="_lt" ClickThrough="false" uiname='text_root' width="0" height="0" style="margin-left:0px;margin-top:0px;background:;">
+         <div style="text-align: center; color: #ffffff;base-font-size:16px; font-size: 16px;width: 400px;"><%=GetDesc1()%></div>
+         <div style="text-align: center; color: #ffffff;base-font-size:16px; font-size: 16px;width: 400px;">创作自己的迷你地块，与其他同学一起PK。</div>
+         
+    </pe:container>
+    <pe:container alignment="_lt" onclick="OnClickTest" ClickThrough="false" uiname='world_2in1_anim_map' width="256" height="256" style="margin-left:0px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/World2In1/map_ani_bg2_212X212_32bits.png#0 0 256 256);">
+        <div onclick="OnClickTop" style="margin-left: 85px;margin-top: 0px; width: 85px;height: 85px;background;;"></div>
+        <div onclick="OnClickLeft" style="float: left;margin-left: 0px;margin-top: 0px; width: 85px;height: 85px;background;"></div>
+        <div onclick="OnClickToCreate" style="float: left; margin-left: 0px;margin-top: 0px; width: 85px;height: 85px;background;;"></div>
+        <div onclick="OnClickRight" style="float: left; margin-left: 0px;margin-top: 0px; width: 85px;height: 85px;background;;"></div>
+        <div onclick="OnClickBottom" style="margin-left: 85px;margin-top: 0px; width: 85px;height: 85px;background;;"></div>
+    </pe:container>
+</pe:container>
+
+    
+</pe:mcml>
+</body>
+</html>
+

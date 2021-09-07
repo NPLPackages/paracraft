@@ -1,0 +1,205 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Code/NplCad/NplCadEditorMenuPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="NplCadEditorMenuPage.lua">
+<![CDATA[
+        local NplExtensionsUpdater = NPL.load("(gl)script/apps/Aries/Creator/Game/NplExtensionsUpdater/NplExtensionsUpdater.lua");
+        NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+        NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+        local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NPLWebServer.lua");
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+        local NPLWebServer = commonlib.gettable("MyCompany.Aries.Game.Network.NPLWebServer");
+        local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+        local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+
+        local NplCadEditorMenuPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCadEditorMenuPage.lua");
+        NplCadEditorMenuPage.OnInit();
+        local entity = NplCadEditorMenuPage.entity
+        
+
+        local is_opening = false
+        function OnClose()
+            Page:CloseWindow();
+        end
+        
+        function GetName()
+            return NplCadEditorMenuPage.GetName()
+        end
+        function GetModelPath()
+            return  NplCadEditorMenuPage.GetModelPath(NplCadEditorMenuPage.GetName());
+        end
+        function GetModelParams()
+            local model_path = "model/blockworld/BlockModel/block_model_four.x";
+            local texture_path = "Texture/blocks/movie_three.png";
+            
+            local build_model_path = GetModelPath();
+            if(build_model_path and ParaIO.DoesFileExist(build_model_path))then
+                model_path = build_model_path;
+                texture_path = nil;
+            end
+
+            local objParams = {
+                IsCharacter = true,
+                AssetFile = model_path,
+                ReplaceableTextures = {[3] = texture_path },
+                x = 0,
+                y = 0,
+                z = 0,
+            }
+            return objParams;
+        end
+        function OutputParax()
+            NplCadEditorMenuPage.OutputParax(entity)
+        end
+        function OnOpenFolder()
+            local model_path = GetModelPath();
+            if(not model_path)then
+                return
+            end
+            local info = Files.ResolveFilePath(model_path)
+            if(info and info.relativeToWorldPath) then
+                local absPath = ParaIO.GetCurDirectory(0)..info.relativeToRootPath;
+                local absPathFolder = absPath:gsub("[^/\\]+$", "")
+                ParaGlobal.ShellExecute("open", absPathFolder, "", "", 1);
+            end
+        end
+        function OnOpen_(type)
+            if(not NplExtensionsUpdater.IsLoaded())then
+                GameLogic.AddBBS("statusBar", L"正在下载NPL代码库，请稍等片刻。。。", 5000, "255 0 0");
+                return
+            end
+            if(not entity)then
+                return
+            end
+            if(not NplBrowserLoaderPage.IsLoaded())then
+                GameLogic.AddBBS("statusBar", L"浏览器正在加载，请稍等！", 5000, "255 0 0");
+                return
+            end
+            if(is_opening)then
+                return
+            end
+            is_opening = true;
+            local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)	
+                is_opening = false;
+                local bx, by, bz = NplCadEditorMenuPage.GetBlockPos();
+                if(bz) then
+                    blockpos = string.format("%d,%d,%d", bx, by, bz);
+                end
+                local url = string.format("%snplcad3?blockpos=%s", site_url, blockpos);
+                if(type == "web")then
+                    GameLogic.RunCommand("/open "..url);
+                elseif(type == "local_web_cef3")then
+                    local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+                    NplBrowserManager:CreateOrGet("NplCadEditorBrowser"):Show(url, "", false, true, { align = "_lt", left = 265, top = 0, right = 0, bottom = 0});
+                elseif(type == "json")then
+                    if(entity)then
+                        local data = entity:GetIDEContent();
+                        local filepath = NplCadEditorMenuPage.GetJsonPath(blockpos)
+                        NplCadEditorMenuPage.SaveFile(filepath, data)
+                        local tips = string.format("成功导出数据到：%s，是否立即查看？", filepath)
+                        _guihelper.MessageBox(tips, function(res)
+                            if(res and res == _guihelper.DialogResult.Yes) then
+                                OnOpenFolder();
+                            else
+                            end
+                        end, _guihelper.MessageBoxButtons.YesNo);
+                    end
+                end
+            end)
+            if(not bStarted)then
+                GameLogic.AddBBS("statusBar", L"网络服务器正在启动，请稍等！", 5000, "255 0 0");
+            end
+            
+        end
+        function OnOpen()
+            OnOpen_("local_web_cef3")
+        end
+        function OnOpenWeb()
+            OnOpen_("web")
+        end
+        function OnOpenJson()
+            OnOpen_("json")
+        end
+        function OnTakeModel()
+            local model_path = GetModelPath();
+            if(not model_path)then
+                GameLogic.AddBBS("statusBar", L"文件不存在", 5000, "255 0 0");
+                return
+            end
+            local info = Files.ResolveFilePath(GetModelPath())
+            if(info and info.relativeToWorldPath) then
+                OnClose();
+                GameLogic.RunCommand(string.format("/take BlockModel {tooltip=\"%s\"}", commonlib.Encoding.DefaultToUtf8(info.relativeToWorldPath)));
+            end
+        end
+        function GetPreview()
+            local bx, by, bz = NplCadEditorMenuPage.GetBlockPos();
+            if(bz) then
+                local blockpos = string.format("%d,%d,%d", bx, by, bz);
+                local filepath = NplCadEditorMenuPage.GetModelPreviewPath(blockpos)
+                return filepath
+            end
+        end
+        
+]]>
+        </script>
+        <aries:window mode="thin" style="width:265px;height:420px;" title='<%=L""%>' onclose="OnClose">
+            <div style="color:#ffffff;height:550px;margin-left:0px;">
+                <div style="margin-top:5px;">
+                    <div>
+                        <div>
+                            <div style="position:relative;margin-left:190px;">
+                                <img style="width:64px;height:64px" src='<%=GetPreview()%>' />
+                            </div>
+                            <input type="button" name="editor_name" value='<%=GetName()%>' style="color:#ffffff;background:url();width:500px;text-align:left;" />
+                        </div>
+                    </div>
+                    <div style="margin-top:5px;">
+                        <div>
+                            <div style="float:left;">
+                                <div style="margin-top:0px;">
+                                    <pe:canvas3d miniscenegraphname="NplCad3_Preview" DefaultRotY="-1.57" DefaultCameraObjectDist="25" autoRotateSpeed="0.12" RenderTargetSize="256" style="width:256px;height:256px;" value='<%=GetModelParams()%>' />
+                                </div>
+                                <div style="float:left;margin-left:2px;">
+                                        
+                                        <div style="margin-top:10px;">
+                                            <div style="float:left;">
+                                                <input type="button" value="编辑" class="mc_blue_button_with_fillet" onclick="OnOpen" style="width:80px;height:55px;color:#ffffff;" />
+                                                <input type="button" value="网页编辑" class="mc_light_grey_button_with_fillet" onclick="OnOpenWeb" style="margin-left:5px;width:80px;height:55px;color:#ffffff;" />
+                                            </div>
+                                            <div style="float:left;">
+                                                <div>
+                                                    <input type="button" value="抓取模型" class="mc_light_grey_button_with_fillet" onclick="OnTakeModel" style="margin-left:5px;width:80px;height:25px;color:#ffffff;" />
+                                                </div>
+                                                <div>
+                                                    <input type="button" value="生成模型" class="mc_light_grey_button_with_fillet" onclick="OutputParax" tooltip='<%=GetModelPath()%>' style="margin-left:5px;margin-top:5px;width:80px;height:25px;color:#ffffff;" />
+                                                </div>
+                                                <div style="position:relative;">
+                                                    <input type="button" value="导出数据" class="mc_light_grey_button_with_fillet" onclick="OnOpenJson" tooltip='导出Json数据' style="margin-left:5px;margin-top:5px;width:80px;height:25px;color:#ffffff;" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top:5px;">
+                                            <h4>注意：避免多开浏览器</h4>
+                                        </div>
+
+                                    </div>
+                            </div>
+                           
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </aries:window>
+    </pe:mcml>
+</body>
+</html>

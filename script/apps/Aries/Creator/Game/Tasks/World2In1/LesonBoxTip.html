@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local LesonBoxTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LesonBoxTip.lua");
+    LesonBoxTip.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function StartCheck()
+        LesonBoxTip.StartCheck()
+    end
+
+    function StopCheck()
+        LesonBoxTip.StopCheck()
+    end
+
+    function OnClickPre()
+        LesonBoxTip.OnClickPre()
+    end
+
+    function OnClickNext()
+        LesonBoxTip.OnClickNext()
+    end
+
+    function OnStartMacroLearn()
+        if LesonBoxTip.CheckHasePlayMovie() then
+            GameLogic.AddBBS(nil,"先去老师区域，看完操作演示吧")
+            return
+        end
+        LesonBoxTip.OnStartMacroLearn()
+    end
+
+    function OnRetunMacro()
+        LesonBoxTip.OnRetunMacro()
+    end
+    function ReplayMovie()
+        LesonBoxTip.ReplayMovie()
+    end
+    function ChekShowBtn(nType)
+        return LesonBoxTip.CheckHaseNextErr(nType)
+    end
+    function RestartScene()
+        LesonBoxTip.ResetMyArea()
+    end
+]]></script>
+<!-- Texture/Aries/Creator/keepwork/macro/lessonbox/ -->
+<div width="100%" style="height: 220px; margin-top: 4px; background:url();">
+    <pe:container width="100" ClickThrough="true" name="right_top_container"  alignment="_rt" style="position:relative;margin-right:82px;height:250px;background:;">
+        <input type="button" onclick="OnRetunMacro" style="position: relative;  width: 181px; height: 57px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_back_181X57_32bits.png#0 0 181 57);"/>
+    </pe:container> 
+
+    <input type="button" onclick="RestartScene" style="position: relative; margin-left: 660px; width: 88px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_reset_88X47_32bits.png#0 0 88 47);"/>
+    <div style="width: 196px; height: 172px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/role_196X172_32bits.png#0 0 196 172);">
+        <pe:mc_player AssetFile="character/CC/02human/paperman/principal.x" name="teacher_role" miniscenegraphname="AvatarMyselfTabCharacter" style="width:220px;height:220px;margin-left: -14px; margin-top: -58px;"  IsInteractive="false" NoFrameMove="true" RenderTargetSize="256" DefaultCameraObjectDist="3.7" />
+    </div>
+    <div style="margin-top: -120px; margin-left: 158px; width: 592px; height: 120px; background:url(Texture/Aries/Creator/keepwork/macro/lessonbox/kuang_592X120_32bits.png#0 0 592 120)">
+        <pe:label name="role_tip" style="margin-left:70px;text-align:left;margin-top:10px;width:420px;height:80px;"></pe:label>
+        <input type="button" uiname="lesson_next_button" onclick="OnClickNext" style="position: relative; margin-left: 543px; margin-top: -20px; width: 36px; height: 36px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_next_36X36_32bits.png#0 0 36 36);"/>
+        <input type="button" uiname="lesson_pre_button" onclick="OnClickPre" style="position: relative; margin-left: 543px; margin-top: -80px;width: 36px; height: 36px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_pre_36X36_32bits.png#0 0 36 36);"/>
+    </div>
+    <div zorder="-1" style="margin-left: 54px;  width: 156px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/name_156X47_32bits.png#0 0 156 47)">
+        <pe:label name="role_name" style="margin-left:60px;text-align:left; font-size: 24px; color: #eca927; base-font-size: 24px; font-weight: bold; margin-top:6px;width:420px;height:80px;"></pe:label>
+    </div>
+    <div style="margin-left: 200px; margin-top: -46px; width: 300px; height: 120px;">
+        <input type="button" uiname="lesson_check_button" onclick="StartCheck"  style="position: relative; margin-left: 426px; width: 128px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_sc_128X47_32bits.png#0 0 128 47);"/>
+        <input type="button" onclick="OnStartMacroLearn" style="position: relative; margin-left: 130px; width: 106px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_follow_106X47_32bits.png#0 0 106 47);"/>
+        <input type="button" onclick="ReplayMovie"  style="position: relative; margin-left: 20px; width: 106px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_replay_106X47_32bits.png#0 0 106 47);"/>
+    </div>
+    <div style="position: relative;margin-top: -290px;margin-left: 160px; width: 421px;height: 46px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/img_title_421X46_32bits.png#0 0 421 46);">
+        <pe:label name="lesson_title" style="margin-top: 6px; margin-left: 20px;height:  60px; position: relative;color: #eca927;text-shadow:true;shadow-quality:8 font-size: 20px; base-font-size:20px;font-weight: bold;"></pe:label>
+    </div>
+    
+</div>
+</pe:mcml>
+</body>
+</html>

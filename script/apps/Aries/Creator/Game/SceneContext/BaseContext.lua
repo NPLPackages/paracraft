@@ -968,12 +968,16 @@ function BaseContext:handlePlayerKeyEvent(event)
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
 			local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 			local curPlayer = EntityManager.GetPlayer();
+
+			GameLogic.ToggleCamera();
+			event:accept();
+
 			if(curPlayer.petObj) then
-				GameLogic.AddBBS('channel', '坐骑模式下不允许切换视角', 2000)
-			else
-				LOG.std(nil, 'info', 'F5 TRIGGGER');
-				GameLogic.ToggleCamera();
-				event:accept();
+				if(GameLogic.IsFPSView) then
+					curPlayer.petObj:SetVisible(false)
+				else
+					curPlayer.petObj:SetVisible(true)
+				end
 			end;
 		elseif(dik_key == "DIK_X") then
 			GameLogic.TalkToNearestNPC();

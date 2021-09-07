@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ShenTongNotice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/ShenTongNotice.lua");
+    ShenTongNotice.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetDS(index)
+        if index == nil then
+            return #ShenTongNotice.m_datas
+        else
+            return ShenTongNotice.m_datas[index]
+        end
+    end
+
+]]></script>
+<kp:window width="750" height="510"  onclose="ClosePage">
+    <div style="width:750px;height:500px; margin-top: 30px;">
+        <pe:gridview name = "gridview_2" RememberScrollPos="true" style="height:468px;margin-top: 10px;margin-left: 10px;" VerticalScrollBarStep="100" AllowPaging="false" CellPadding="2" ItemsPerLine="1" DefaultNodeHeight = "10" 
+            DataSource='<%=GetDS%>'>
+            <Columns>
+                <div style="width: 749px; height: 2086px;background: url(Texture/Aries/Creator/keepwork/Noticev2/1_32bits.png#0 0 749 2086);"></div>
+            </Columns>                
+        </pe:gridview>
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>

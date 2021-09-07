@@ -1,0 +1,121 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPageDetail.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="RedSummerCampParentsPageDetail.lua">
+            <![CDATA[
+            local RedSummerCampParentsPageDetail = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPageDetail.lua");
+            local RedSummerCampParentsPageDetailConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPageDetailConfig.lua");
+            RedSummerCampParentsPageDetail.OnInit()
+            function ClosePage()
+                local pageCtrl = document:GetPageCtrl();
+                pageCtrl:CloseWindow(true)
+            end
+
+            function GetItemData(index)
+                if index == nil then
+                    return #RedSummerCampParentsPageDetail.ItemData
+                else
+                    return RedSummerCampParentsPageDetail.ItemData[index]
+                end
+            end
+
+            function GetDesc(index)
+                return RedSummerCampParentsPageDetailConfig.GetNetConfigDesc(index)
+            end
+
+            function GetImgDesc(idx1,idx2)
+                return RedSummerCampParentsPageDetailConfig.GetNetConfigImgDesc(idx1,idx2)
+            end
+
+            function ShowVip()
+                local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+                VipPage.ShowPage();
+            end
+
+            ]]>
+        </script>
+        <pe:container alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc">
+        </pe:container>
+        <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+            <!--Vip-->
+            <pe:container alignment="_rt" style="background:url();">
+                <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
+            </pe:container>
+            <!--Close-->
+            <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+                <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+            </pe:container>
+            
+            <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">
+                 <!--背景水印-->
+                 <div>
+                    <div style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <div style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <div style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <div style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                </div>
+                <div style="width: 380px; height: 40px; margin-left: 455px; margin-top: 0px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#14 866 380 40);"></div>
+                <div style="width:1190px;height:564px;margin-top:20px;margin-left: 56px;">
+                    <pe:gridview  style="margin-left:5px;" CellPadding="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="560"
+                                DataSource='<%=GetItemData%>'>
+                        <Columns>
+                            <div style="width: 1164px; height: 2660px; font-size: 20px; base-font-size: 20px;">
+                                <div style="height: 570px;">
+                                    <%=GetDesc(1)%> 
+                                    <div style="margin-left: 60px;margin-top: 20px; width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#636 662 300 170);"></div> 
+                                    <div style="margin-top: -170px; margin-left: 400px; width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#318 662 300 170);"></div>
+                                    <div style="margin-top: -170px; margin-left: 740px;width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#0 662 300 170);"></div>    
+                                    <div style="width: 350px; font-size: 20px; base-font-size: 20px; color: #717275;">
+                                        <div style="position: relative; margin-top: 5px; margin-left: 32px; width: 360px; text-align: center;height: 35px;font-weight: bold;"><%=GetImgDesc(1,1)%></div>
+                                        <div style="position: relative; margin-top: 5px; margin-left: 750px; text-align: center;height: 35px;font-weight: bold;"><%=GetImgDesc(1,2)%></div>
+                                        <div style="position: relative; margin-top: 5px; margin-left: 1380px; text-align: center;height: 35px;font-weight: bold;"><%=GetImgDesc(1,3)%></div>
+                                    </div>
+                                </div>
+                                <div style="height: 570px;">
+                                    <%=GetDesc(2)%> 
+                                    <div style="margin-left: 60px;margin-top: 20px; width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#0 475 300 170);"></div> 
+                                    <div style="margin-top: -170px; margin-left: 400px; width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#318 475 300 170);"></div>
+                                    <div style="margin-top: -170px; margin-left: 740px;width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#636 475 300 170);"></div>    
+                                    <div style="width: 400px; font-size: 20px; base-font-size: 20px; color: #717275;">
+                                        <pe:label value='<%=GetImgDesc(2,1)%>' style="position: relative; margin-top: 5px; margin-left: 28px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                        <pe:label value='<%=GetImgDesc(2,2)%>' style="position: relative; margin-top: 5px; margin-left: 240px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                        <pe:label value='<%=GetImgDesc(2,3)%>' style="position: relative; margin-top: 5px; margin-left: 980px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                    </div>
+                                </div>
+                                <div style="height: 570px;">
+                                    <%=GetDesc(3)%> 
+                                    <div style="margin-left: 60px;margin-top: 20px; width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#636 475 300 170);"></div> 
+                                    <div style="margin-top: -170px; margin-left: 400px; width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#318 475 300 170);"></div>
+                                    <div style="margin-top: -170px; margin-left: 740px;width: 300px; height: 170px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#0 475 300 170);"></div>    
+                                    <div style="width: 400px; font-size: 20px; base-font-size: 20px; color: #717275;">
+                                        <pe:label value='<%=GetImgDesc(3,1)%>' style="position: relative; margin-top: 5px; margin-left: 28px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                        <pe:label value='<%=GetImgDesc(3,2)%>' style="position: relative; margin-top: 5px; margin-left: 240px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                        <pe:label value='<%=GetImgDesc(3,3)%>' style="position: relative; margin-top: 5px; margin-left: 980px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
+                                    </div>
+                                </div>
+                                <div style="height: 590px;">
+                                    <%=GetDesc(4)%> 
+                                    <div style="margin-left: 60px;margin-top: 20px; width: 1016px; height: 268px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#0 0 1016 268);"></div>
+                                    <div style="width: 390px; height: 48px; margin-left: 386px; margin-top: 40px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#20 910 390 48);"></div>
+                                    <div style="width: 348px; height: 260px; margin-left: 386px; margin-top: 30px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/tu_32bits.png#1015 198 348 260);"></div>  
+                                    <input value="成为会员" type="button" onclick="ShowVip"  style="font-size: 28px; base-font-size: 28px;font-weight: bold; color: #1f1f1f; width: 200px; height: 60px; margin-left: 476px; margin-top: 30px; background: url(Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+                                </div>
+                            </div>
+                        </Columns>
+                    </pe:gridview>
+                </div>
+            </pe:container>
+
+        </pe:container>
+
+    </pe:mcml>
+</body>
+</html>
+

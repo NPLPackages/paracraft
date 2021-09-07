@@ -1,0 +1,6 @@
+<configs>
+  <version>http://cdn.keepwork.com/npl_extensions/version</version>
+  <hosts>
+    <host>http://cdn.keepwork.com/npl_extensions/</host>
+  </hosts>
+</configs>

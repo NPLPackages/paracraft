@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local LessonFinish = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonFinish.lua");
+    LessonFinish.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+    function GetText()
+        return string.format([[太棒了！%s，你完成了%s!]],System.User.NickName,LessonFinish.strTitle)
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style=" background-color: #00000080;">
+    <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;background: ;">
+        <div style="margin-top: -220px;margin-left: 140px; width: 1024x; height: 751px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/finish_1024X751_32bits.png#0 0 1024 751);">
+            <div style="margin-top: 600px; width: 1024px; height: 60px; ">
+                <pe:label value="<%=GetText()%>" style="margin-left: 160px; height: 60px;color:#ffffff;font-size: 30px;base-font-size:30px;"></pe:label>
+            </div>
+        </div>    
+        <input type="button" style="margin-left: 600px; margin-top: 30px; width:128px;height:47px;background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/ok_128X47_32bits.png#0 0 128 47);" onclick="ClosePage()"/>
+    </pe:container>    
+</pe:container>
+</pe:mcml>
+</body>
+</html>

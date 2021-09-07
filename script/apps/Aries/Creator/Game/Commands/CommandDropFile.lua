@@ -43,8 +43,6 @@ other files...
 		ext = ext and ext:lower();
 		if(ext == "zip") then
 			DragDropHandlers.handleZipFile(filename);
-		elseif(ext == "mca" or filename:match("%.mc[ra]%.tmp$")) then
-			DragDropHandlers.handleMCImporterFile(filename);
 		elseif(filename:match("%.blocks%.stream%.xml$")) then
 			DragDropHandlers.handleBlockStreamFile(filename)
 		elseif(ext == "fbx" or ext == "x" or ext == "bmax" or filename:match("%.blocks%.xml$")) then
@@ -138,25 +136,6 @@ function DragDropHandlers.handleBlockStreamFile(filename)
 		task:Run();
 	else
 		_guihelper.MessageBox(L"请先进入创意空间");
-	end
-end
-
-function DragDropHandlers.handleMCImporterFile(filename)
-	if(filename:match("%.mca$")) then
-		local folder = filename:gsub("region[/\\][^/\\]+%.mca$", "");
-		if(folder) then
-			_guihelper.MessageBox(format(L"你确定要导入世界%s? 可能需要0-1分钟.", folder), function()
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MCImporterTask.lua");
-				local task = MyCompany.Aries.Game.Tasks.MCImporter:new({folder=folder, min_y=0, bExportOpaque=false})
-				task:Run();	
-			end)
-		end
-	elseif(filename:match("%.mc[ra]%.tmp$")) then
-		_guihelper.MessageBox(format(L"你确定要导入世界%s? 可能需要0-1分钟.", filename), function()
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MCImporterTask.lua");
-			local task = MyCompany.Aries.Game.Tasks.MCImporter:new({})
-			task:cmd_create();
-		end)
 	end
 end
 

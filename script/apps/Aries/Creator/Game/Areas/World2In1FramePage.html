@@ -1,0 +1,226 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/World2In1FramePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="World2In1FramePage.lua"><![CDATA[
+EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
+block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
+World2In1FramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.World2In1FramePage");
+
+local uiversion = tonumber(Page:GetRequestParam("version")) or 0;
+World2In1FramePage.OnInit(uiversion);
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetCategoryButtons()
+    return World2In1FramePage.GetCategoryButtons();
+end
+
+function GetEmptyText()
+    return World2In1FramePage.EmptyText;
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return #World2In1FramePage.Current_Item_DS;
+    else
+        return World2In1FramePage.Current_Item_DS[index];
+    end
+end
+
+function OnClickBlock(index, mcmlNode)
+    --local item = mcmlNode:GetPreValue("this", true);
+    --World2In1FramePage.OnClickBlock(item);
+
+    World2In1FramePage.OnClickBlock(tonumber(index))
+end
+
+function OnChangeCategory(index)
+    World2In1FramePage.OnChangeCategory(index);
+end
+
+function DS_GetBlockTemplates()
+    return BlockTemplatePage.GetAllTemplatesDS();
+end
+
+function OnClickRefreshAllTemplates()
+    BlockTemplatePage.GetAllTemplatesDS(true);
+    Page:Refresh(0.1);  
+end
+
+function OnClickOpenTemplateDir()
+    BlockTemplatePage.OnClickOpenTemplateDir()
+end
+
+function OnSelectOfficial()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
+    local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+    QuickSelectBar.OnClickTemplate();
+end
+
+function OnSelectNode(name, mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    --Page:SetNodeValue("CurrentSnapshot", item.filename:gsub("xml$", "jpg"));
+    BlockTemplatePage.CreateFromTemplate(item.filename);
+end
+
+function SearchBlock(name,mcmlNode)
+    local search_ctl = Page:FindUIControl("block_search_text_ctl");
+    if(search_ctl and search_ctl.text) then
+        World2In1FramePage.SearchBlock(string.lower(search_ctl.text));
+    end
+end
+
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        if(index<=27) then
+            return {slotNumber = index+9};
+        else
+            return {slotNumber = index-27};
+        end
+    end
+end
+
+function OnClickManageTemplateWnd()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.lua");
+	local BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest");
+    BuildQuest.ShowPage();
+end
+
+function GetBlockUIName(id, data, uid)
+    local text;
+    if(uid)then
+        text = "World2In1FramePage.block_"..uid;
+    elseif(data and data~=0) then
+        text = format("World2In1FramePage.block_%d:%d", id, data)
+    else
+        text = format("World2In1FramePage.block_%d", id)
+    end
+    return text;
+end
+
+function IsSandTable()
+    return World2In1FramePage.IsSandTable()
+end
+
+function SetSign()
+    World2In1FramePage.SetSign()
+end
+
+function GetToolTip(index)
+    return World2In1FramePage.GetToolTip(tonumber(index))
+end
+
+function IsResourceType()
+    return World2In1FramePage.IsResourceType()
+end
+]]></script>
+<div style="">
+    <!-- <div style="margin-left:13px;margin-top:5px;width:210px;">
+        <div style="width:210px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
+            <input 
+                type="text" 
+                EmptyText='<%= GetEmptyText() %>' 
+                name="block_search_text_ctl" 
+                uiname="block_search_text_obj" 
+                CaretColor="#FFFFFFFF" 
+                style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:25px;background:;" 
+                onmodify="SearchBlock" 
+            />
+        </div>
+    </div> -->
+    <div style="width:240px;height:60px;margin-left:13px;margin-top:3px;">
+        <pe:repeat DataSource="<%=GetCategoryButtons()%>">
+            <pe:repeatitem style="float:left;width:60px;">
+                <pe:if condition='<%=World2In1FramePage.category_index == Eval("index") %>' >
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' uiname = '<%=format("World2In1FramePage.category_%d", Eval("index"))%>' onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#208 89 21 21:8 8 8 8)" />
+                </pe:if>
+                <pe:if condition='<%=World2In1FramePage.category_index ~= Eval("index") %>' >
+                    <input type="button" value='<%=Eval("text")%>' uiname = '<%=format("World2In1FramePage.category_%d", Eval("index"))%>'  name='<%=Eval("index")%>' onclick="OnChangeCategory" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+
+    <pe:if condition='<%=not IsResourceType()%>'>
+        <pe:if condition='<%=IsSandTable()%>'>
+            <div style="float: left;margin-left:13px;margin-top:10px;width:160px;">
+                <div style="base-font-size:14px;font-size: 14px; width:160px;height:27px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#32 364 32 32:8 8 8 8);">
+                    <input 
+                        type="text" 
+                        EmptyText='只支持15个英文或数字' 
+                        name="block_sign_text_ctl" 
+                        uiname="block_sign_text_obj" 
+                        CaretColor="#FFFFFFFF" 
+                        style="margin-top:2px;margin-left:5px;textcolor:#cccccc;height:22px;background:;" 
+                        onmodify="SearchBlock" 
+                    />
+                </div>
+            </div>
+    
+            <input type="button" value='签名' onclick="SetSign" style="float: left; margin-left:5px;margin-top:13px;margin-bottom:0px;color:#ffffff;font-size:14px;width:43px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+        </pe:if>
+        <div style="margin-left:8px;margin-top:10px;width:240px;height:335px;color:#cccccc">
+            <pe:gridview style="margin:0px" uiname="World2In1FramePage.gridviewItems" name="new_builder_gvwItems" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
+                DataSource='<%=DS_Items%>'>
+                <Columns>
+                    <div style="width:32px;height:32px;" >
+                        <!-- <pe:mc_block uiname = '<%=GetBlockUIName(Eval("block_id"))%>' block_id='<%=Eval("block_id")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" onclick="OnClickBlock"/>      -->
+                        <!-- <img zorder="0" tooltip='<%=Eval("name")"%>' src='<%=Eval("icon")%>' width="32" height="32"/> -->
+                        <pe:if condition='<%=Eval("isvip")%>'>
+                            <div zorder="1" style="position: relative; width: 22px;height: 25px; margin-top: -5px;margin-left: -8px; background:url(Texture/Aries/Creator/keepwork/AiCourse/VIP_48X53_32bits.png#0 0 48 53)"></div>
+                        </pe:if>
+                        <pe:if condition='<%=Eval("price") ~= 0%>'>
+                            <div zorder="1" style="position: relative;margin-top: -3px;margin-left: -14px;width:38px;height:19px; background:url(Texture/Aries/Creator/keepwork/items/item_998_32bits.png)"></div>
+                        </pe:if>
+        
+                        <div onclick="OnClickBlock" name='<%=Eval("index")%>' tooltip='<%=GetToolTip(Eval("index"))%>' style='<%=string.format("width:32px;height:32px;background: url(%s)", Eval("icon"))%>'></div>
+                    </div>
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </pe:if>
+
+    <pe:if condition='<%=IsResourceType()%>'>
+        <div style="margin-left:8px;margin-top:20px;width:218px;height:335px;background: url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#99 365 29 29:3 5 4 5)">
+            <pe:gridview style="margin-top:5px" uiname="World2In1FramePage.gridviewItems2" name="new_builder_gvwItems2" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "20" 
+                DataSource='<%=DS_Items%>'>
+                <Columns>
+                    <div style="height:20px;margin-left: 0px;">
+                        <div style="position: relative; margin-left:20px;width:200px;height:20px;text-align:left;margin-top:0px;color:#cccccc;font-size: 13px;"><%=XPath("this|name")%></div>
+                        <input 
+                            type="button" 
+                            class="listbutton_unselected" 
+                            value='' 
+                            name='<%=Eval("index")%>'
+                            onclick='OnClickBlock'
+                            style="position: relative;margin-top:0px;width:218px;height:20px;text-align:left;margin-top:0px;color:#cccccc;" 
+                            MouseOver_BG="Texture/alphadot.png"
+                        />
+                    </div>
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </pe:if>
+</div>
+
+</pe:mcml>
+</body>
+</html>
+

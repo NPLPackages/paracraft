@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="GetRewardResult.lua" ><![CDATA[
+    local GetRewardResult = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/GetRewardResult.lua");
+    GetRewardResult.OnInit()
+    function ClosePage()
+        if IsGetLikeItem() then
+            _guihelper.MessageBox(
+                L"是否使用礼包点赞奖励，窗口关闭则奖励失效！",
+                function(res)
+                    if res and res == _guihelper.DialogResult.OK then
+                        Page:CloseWindow();
+                        local DistributeLike = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/DistributeLike.lua") 
+                        DistributeLike.ShowView()
+                    end
+                    if res and res == _guihelper.DialogResult.Cancel then
+                        Page:CloseWindow();
+                    end
+                end,
+                _guihelper.MessageBoxButtons.OKCancel_CustomLabel
+            )
+            return
+        end 
+        Page:CloseWindow();       
+    end
+
+    function GetIcon()
+        return GetRewardResult.GetIconStyle()
+    end
+
+    function GetTipStr()
+        return GetRewardResult.GetRewardDesc()
+    end
+
+    function IsGetLikeItem()
+        return GetRewardResult.IsGetLikeItem()
+    end
+
+    function OnClick()
+        local DistributeLike = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/DistributeLike.lua") 
+        DistributeLike.ShowView()      
+    end
+]]></script>
+<div style=" width: 466px; height: 343px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44);">
+    <div style="width: 430x; height: 30px;">
+        <input type="button" onclick="ClosePage" style="height: 22px; width: 22px; margin-left: 430px; margin-top: 10px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+        <div style="margin-top: -46px; margin-left: 64px; width: 333px; height: 75px;  background: url(Texture/Aries/Creator/keepwork/CreateReward/gongxi_333X75_32bits.png#0 0 333 75);"></div>
+    </div>
+
+    <div style="margin-top: 90px; margin-left: 200px; width: 60px; height: 60px; background: url(Texture/Aries/Creator/keepwork/CreateReward/wupingdi_60X60_32bits.png#0 0 40 40#19 19 19 19);">
+        <div style='<%=GetIcon()%>'></div>
+    </div>    
+    <div style="text-align: center; margin-top: 40px; font-size:16px; base-font-size:16px;color: #000000;"><%=GetTipStr()%></div>
+    <pe:if condition='<%=IsGetLikeItem()%>'>
+        <input type="button" onclick="OnClick" style="margin-left: 190px; margin-top: 30px; width: 86px; height: 29px; background: url(Texture/Aries/Creator/keepwork/CreateReward/btn1_86X29_32bits.png#0 0 86 29); " />
+    </pe:if>
+
+</div>
+</pe:mcml>
+</body>
+</html>

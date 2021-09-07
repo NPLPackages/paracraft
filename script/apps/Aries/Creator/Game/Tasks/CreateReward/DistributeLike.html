@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local DistributeLike = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/DistributeLike.lua");
+    DistributeLike.OnInit()
+    function ClosePage()
+        DistributeLike.OnClosePage()
+    end
+
+    function GetWorldData(index)
+        if index == nil then
+            return #DistributeLike.worldDts
+        else
+            return DistributeLike.worldDts[index]
+        end
+    end
+
+    function GetTotalStr()
+        return DistributeLike.GetTotalStr()
+    end
+
+    function OnClickSelect(name)
+        local index = tonumber(name)
+        if index then
+            local dt = DistributeLike.worldDts[index]
+            if dt.isselect == 0 then
+                dt.isselect = 1
+            elseif dt.isselect == 1 then
+                dt.isselect = 0
+            end            
+        end  
+        UpdateSelectBtns()      
+    end
+
+    function UpdateSelectBtns()
+        local num = #DistributeLike.worldDts 
+        for i =1,num do
+            local isSel = DistributeLike.worldDts[i].isselect
+            local objInput = ParaUI.GetUIObject("selectBtn"..i)
+            if isSel == 0 then
+                objInput.background = "Texture/Aries/Creator/keepwork/CreateReward/btn3_20X20_32bits.png;0 0 20 20"
+            else
+                objInput.background = "Texture/Aries/Creator/keepwork/CreateReward/btn2_20X20_32bits.png;0 0 20 20"
+            end
+        end
+    end
+
+    function OnClickOk()
+        DistributeLike.OnClickOk()
+    end
+
+    function GetInputBtnName(index)
+        if not index then
+            return ""
+        end
+        return "inputBtn"..index
+    end
+
+    function OnTextChange(name, mcmlNode,btnObject)
+        local index = tonumber(string.sub(name,9,-1))
+        local isSel = DistributeLike.worldDts[index].isselect
+        if isSel == 0 then
+            GameLogic.AddBBS(nil,"请先点击左边的按钮选中这个世界")
+            btnObject.text = ""
+            return
+        end
+        local num = tonumber(btnObject.text)
+        if num == nil then
+            GameLogic.AddBBS(nil,"请输入数字")
+            return 
+        end        
+        DistributeLike.inputNums[index] = num
+    end
+    function PageIndexChanged(ctrlName, nPageIndex)
+        local startIndex = (nPageIndex-1) *7 + 1
+        local endIndex = nPageIndex * 7
+        for i=startIndex,endIndex do
+            local objInput = ParaUI.GetUIObject("inputBtn"..i)
+            if DistributeLike.inputNums[i] then
+                objInput.text = tostring(DistributeLike.inputNums[i])
+            end
+        end
+        UpdateSelectBtns()
+    end
+    
+    function GetSelectBtnName(index)
+        if not index then
+            return ""
+        end
+        return "selectBtn"..index
+    end
+
+]]></script>
+<kp:window width="750" height="580"  title='<%= L"我的作品"%>'>
+    <input type="button" onclick="ClosePage" style="height: 22px; width: 22px; margin-left: 720px; margin-top: 10px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+    <div style="margin-left: 10px;margin-top:15px; width: 728px; height: 516px;background: url(Texture/Aries/Creator/keepwork/World2In1/BJK2_32bits.png#0 0 32 32:8 8 8 8);">
+        <div style="margin-top: 30px; text-align: center; font-weight: bold; font-size: 16px; base-font-size: 16px; color: #000000;"><%=GetTotalStr()%></div>
+        <div style="margin-left: 22px;margin-top:15px; width: 684px; height: 28px;color: #ffffff;font-weight: bold;text-align: center;font-size: 16px; 
+                    background: url(Texture/Aries/Creator/keepwork/World2In1/BJK3_32bits.png#0 0 32 28:8 8 8 8);">
+            <div style="margin-top: 3px; width: 225px;float: left;">名称</div>
+            <div style="margin-top: 3px; width: 265px;float: left;">更新时间</div>
+            <div style="margin-top: 3px; float: left;">操作</div>
+        </div>
+        <div style="width:700px;height:390px;margin-top:10px; margin-left: 15px; ">
+            <pe:gridview name="world_list" style="margin-left:5px;" CellPadding="0" AllowPaging="true" pagesize="7" ItemsPerLine="1 " DefaultNodeHeight="40"
+                        DataSource='<%=GetWorldData%>'
+                        OnPageIndexChanged="PageIndexChanged()"
+                        >
+                <PagerSettings Position="Bottom" height="36" style="position:relative;width:700px;margin-top:2px;height:32px;" PreviousPageText="previous page" NextPageText="next page"/>
+                <PagerTemplate>
+                    <form>
+                        <input type="button" name="pre" zorder="2" style="width:18px;height:22px;margin-left:318px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan2_18X22_32bits.png#0 0 18 22);"/>
+                        <div style="float:left;margin-top:0px;text-singleline:true">
+                            <label name="page" style="base-font-size:22px;font-size: 22px;color:#000000;text-align:center;width:45px;height:30px;margin:4px"/>
+                        </div>
+                        <input type="button" name="next" zorder=2 style="width:18px;height:22px;margin-top:10px;background:url(Texture/Aries/Creator/keepwork/AiCourse/qiehuan1_18X22_32bits.png#0 0 18 22)"/>
+                    </form>
+                </PagerTemplate>
+                <Columns>
+                    <div style="width: 684px;height: 50px;text-align: center;base-font-size:20px; font-size: 20px;color: #000000;">
+                        <div tooltip='<%=Eval("name")%>' style="margin-top: 10px; width: 225px;float: left;"><%=Eval("limit_name") %></div>
+                        <div style="margin-top: 10px; width: 265px;float: left;"><%=Eval("updateAt") %></div>
+                        <div style="margin-top: 14px; float: left;"> 
+                            <input type="button" uiname='<%=GetSelectBtnName(Eval("index"))%>' name='<%=Eval("index") %>' style="margin-left: 43px; width: 20px;height: 20px;background: url(Texture/Aries/Creator/keepwork/CreateReward/btn3_20X20_32bits.png#0 0 20 20);" onclick="OnClickSelect"/>
+                            <input type="text" onchange="OnTextChange" uiname='<%=GetInputBtnName(Eval("index"))%>' name='<%=GetInputBtnName(Eval("index"))%>' textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" EmptyText='<%= L"请输入点赞数量" %>' style="margin-top: -10px; margin-left: 10px; width: 110px;height: 32px;background: url(Texture/Aries/Creator/keepwork/CreateReward/shousuo_36X33_32bits.png#0 0 32 32:15 15 15 15);" />                         
+                        </div>
+                    </div>
+                </Columns>
+            </pe:gridview>
+        </div>        
+        <input type="button" width="120" height="44" value="确定" onclick="OnClickOk" style="font-size: 20px; base-font-size:20px; margin-left: 570px;margin-top: -35px;background:url(Texture/Aries/Creator/keepwork/rank/btn_qiehuan1_32X32_32bits.png#0 0 32 32:8 8 8 8)"/>
+    </div>    
+</kp:window>
+</pe:mcml>
+</body>
+</html>

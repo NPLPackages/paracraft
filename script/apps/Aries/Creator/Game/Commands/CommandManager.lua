@@ -33,6 +33,8 @@ function CommandManager:Init()
 	local cmd_class = SlashCommand.GetSingleton():GetSlashCommand("loadworld");
 	if(cmd_class) then
 		-- already initialized
+		GameLogic.GetFilters():apply_filters("register_command", Commands, SlashCommand.GetSingleton());
+		self:Register(SlashCommand.GetSingleton());
 		return
 	end
 

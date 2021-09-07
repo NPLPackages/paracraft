@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="VideoSharingUploadSuccessCode.lua" ><![CDATA[
+    local VideoSharingUploadSuccessCode = NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingUploadSuccessCode.lua");
+    VideoSharingUploadSuccessCode.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+]]></script>
+<kp:window width="420" height="425"  title='<%= L"下载到手机"%>' onclose="ClosePage">
+    <div style="margin-top: 60px; color: #181818; font-size: 18px; base-font-size: 18px; text-align: center;">
+        视频准备完成<br/>
+        请用手机扫描二维码下载这个视频
+    </div>
+
+    <div style="margin-left: 104px; margin-top: 40px; width: 204px; height: 204px; background: url(Texture/Aries/Creator/keepwork/vip/shuzishuru_32X32_32bits.png#0 0 32 32:15 15 15 15);">
+
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>

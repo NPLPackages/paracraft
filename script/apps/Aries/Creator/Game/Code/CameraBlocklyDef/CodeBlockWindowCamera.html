@@ -1,0 +1,71 @@
+<!--script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/CodeBlockWindowCamera.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
+<![CDATA[
+CameraBlockly = NPL.load("./CameraBlockly.lua");
+Cameras = NPL.load("./Cameras.lua");
+CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+function OnClickEditMode(name)
+    CodeBlockWindow.OnClickEditMode(name)
+end
+]]></script>
+<div width="100%" height="100%" style="background-color:#43064a;" class="default">
+    <div style="margin:5px;height:37px;">
+        <div style="float:left;margin-left:2px;margin-top:3px">
+            <input type="button" uiname="CameraBlockly.run" name="run" tooltip='<%=L"编译并运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " onclick="CameraBlockly.OnClickRun" />
+            <input type="button" uiname="CodeBlockWindow.pause" name="pause" tooltip='<%=L"终止运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="CodeBlockWindow.OnClickStop" />
+        </div>
+        <div style="float:left;margin-top:8px;margin-left:4px;">
+			<pe:sliderbar uiname="CodeBlockCamera.timeSlider" name="timeSlider" min="0" max='<%=Cameras.getMaxTime()%>' value='0' style="width:180px;height:22px;" onchange="MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.OnTimeChanged()"></pe:sliderbar>
+		</div>
+		<div style="float:left;margin-top:5px;margin-left:10px;">
+			<pe:gridview style="width:145px;height:32px;" name="cameras" CellPadding="0" VerticalScrollBarStep="32" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight="32" DataSource='<%=CameraBlockly.GetAllCameras()%>'>
+				<Columns>
+					<input type="button" tooltip='<%=format(L"%d号摄影机", Eval("index"))%>' style="margin-left:3px;width:32px;height:32px;color:#ffffff;font-size:14px;background:url(Texture/blocks/items/ts_camera.png)" name='<%=Eval("index")%>' onclick="CameraBlockly.OnClickCamera"/>
+				</Columns>
+				<EmptyDataTemplate>
+				</EmptyDataTemplate>
+			</pe:gridview>
+		</div>
+		<div style="float:left;padding:2px;margin-left:5px;margin-top:5px;background-color:#0b9b3a;">
+            <input type="button" uiname="CodeBlockWindow.blockMode" name="blockMode" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用".."\n"..L"Ctrl+左键使用系统浏览器打开"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#808080;font-size:12px;height:25px;background:url(Texture/whitedot.png)"/>
+            <input type="button" uiname="CodeBlockWindow.codeMode" name="codeMode" value='<%=L"代码"%>' tooltip='<%=L"NPL代码编辑模式(推荐使用)".."\n"..L"左键选择, 右键可切换代码语言"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#0b9b3a;font-size:12px;height:25px;background:url(Texture/whitedot.png)" />
+        </div>
+        <input type="button" name="settings" tooltip='<%=L"设置"%>' style="margin-left: 0px;margin-top:4px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="CodeBlockWindow.OnClickSettings()"/>
+        <div style="float:left;margin-left:10px;margin-top:7px;color:#ffffff;font-size:12px;">
+			<input type="button" uiname="CodeBlockWindow.record" name="record" value="导出视频" style="width:64px;height:25px;color:#ffffff;font-size:12px;" onclick="MyCompany.Aries.Game.Code.CameraBlocklyDef.CameraBlockly.RunAndExportVideo" class="mc_light_grey_button_with_fillet" />
+		</div>
+        <div style="position:relative;float:left;width:82px;" align="right">
+            <input type="button" uiname="CodeBlockWindow.tutorial" tooltip='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-top:7px;color:#ffffff;font-size:12px;width:25px;height:25px;background:url(Texture/Aries/Combat/Battle/teen/help_32bits.png)" />
+            <input type="button" uiname="CodeBlockWindow.resizeBtn" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="CodeBlockWindow.ToggleSize()" style="margin-left:2px;margin-top:5px;width:28px;height:28px;background:url(Texture/3DMapSystem/Creator/Objects/Tool_Move.png);" />
+            <input type="button" uiname="CodeBlockWindow.saveAndClose" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_close_button" style="margin-left:2px;margin-top:10px;" />
+        </div>
+    </div>
+    <pe:if condition='<%=CodeBlockWindow.temp_nplbrowser_reload%>'>
+        <pe:container alignment="_fi" style="position:relative;margin-bottom:54px;background:url();">
+            <pe:nplbrowser name="nplbrowser_codeblock" min_width="600" min_height="550" url="<%=CodeBlockWindow.GetBlockEditorUrl()%>" style="background:url();" visible="<%=CodeBlockWindow.IsNPLBrowserVisible()%>"/>
+        </pe:container>
+        <pe:container name="browserLoadingTips" class="default" style="position:relative;margin:20px;background:url();"><%=L"正在加载图块， 首次加载或更新会比较慢，你也可以用外部浏览器编辑图块，再次点击上方图块按钮可查看图块代码"%></pe:container>
+    </pe:if>
+    <pe:container alignment="_fi" name="helpContainer" style="position:relative;margin-bottom:54px;margin-left:3px;width:200px;background:url();">
+        <iframe src= "CodeHelpWindowCamera.html" width="200"/>
+    </pe:container>
+    <pe:container alignment="_fi" name="codeContainer" class="mc_paper_panel" style="position:relative;margin-bottom:54px;margin-left:205px;">
+            <pe:container name="blocklyTip" zorder="1" alignment="_lt" style="color:#ffffff;display:none;padding-left:10px;padding-right:10px;position:relative;padding-bottom:3px;margin-left:60px;margin-top:60px;background-color:#0b9b3a80;" >
+                <%=L"点击上方'图块'按钮，可打开图块编辑器"%>
+            </pe:container>
+            <pe:if condition='<%=CodeBlockWindow.IsShowHelpWnd()%>'>
+                <iframe name="helpWnd" src='<%=CodeBlockWindow.GetHelpWndUrl()%>' height="230"></iframe>
+            </pe:if>
+            <pe:hotkey name="helpCodeHotkey" hotkey="DIK_F1" onclick="CodeBlockWindow.OnLearnMore"/>
+            <input uiname="CodeBlockWindow.code" name="code" rows="20" language="npl" height="100%" value='<%=CodeBlockWindow.GetCodeFromEntity() or ""%>' 
+                ReadOnly="<%=CodeBlockWindow.IsBlocklyEditMode()%>" OnMouseOverWordChange="CodeBlockWindow.OnMouseOverWordChange" OnRightClick="CodeBlockWindow.OnRightClick"
+                ShowLineNumber="true" UseSystemControl="true" enable_ime="false" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;line-height:17;font-family:Consolas" fontsize="13"/>
+    </pe:container>
+    <pe:container style="position:relative;vertical-align:bottom;height:54px;background:;">
+        <input name="console" value='<%=CodeBlockWindow.GetConsoleText()%>' AlwaysShowCurLineBackground="false" rows="3" height="100%" UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>
+    </pe:container>
+    <script type="text/npl" refresh="true">CodeBlockWindow.UpdateEditModeUI();</script>
+</div>
+</pe:mcml>
+
