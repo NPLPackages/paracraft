@@ -421,7 +421,6 @@ function InternetLoadWorld.GotoUrl(url)
 		if(cmdName) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-			CommandManager:Init()
 			CommandManager:RunCommand(url);
 			return true;
 		end
@@ -433,7 +432,6 @@ function InternetLoadWorld.GotoUrl(url)
 			LOG.std(nil, "debug", "OnAddSearchPage", {urlObj:GetHost(), urlObj:GetPort()});
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-			CommandManager:Init()
 			
 			local relativePath = urlObj:GetRelativePath() or ""
 			local room_key = relativePath:match("^@(.+)")

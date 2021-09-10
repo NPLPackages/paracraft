@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ActTeacher = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacher.lua");
+    ActTeacher.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+    function OnCreate()
+        GameLogic.GetFilters():apply_filters('show_create_page');
+    end
+
+    function OnSubmit()
+        GameLogic.RunCommand(format('/loadworld -s -force %d', ActTeacher.GetSubmitWorldId()))
+    end
+
+    function OnShowRank()
+        _guihelper.MessageBox(L"请在活动结束后，查看优秀作品");
+    end
+
+    function OnShowDetail()
+        local ActTeacherDetail = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacherDetail.lua") 
+        ActTeacherDetail.ShowView()
+    end
+]]></script>
+<style type="text/mcss">
+    {
+        yellon_button = {
+            background = "Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8",
+            ["base-font-size"] = 20,
+            ["font-size"] = 20,
+            ["font-weight"] = "bold",
+            width = 152,
+            height = 52,
+            float = "left",
+        },
+    }
+</style>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc">
+        </pe:container>
+        <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+            <!--Close-->
+            <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+                <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+            </pe:container>
+            
+            <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">
+                <!--背景水印-->
+                <div style="margin-top: -20px;">
+                    <div>
+                        <div style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                        <div style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                        <div style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                        <div style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                        <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    </div>
+                    <div style="margin-left: 100px; width: 1170px; height: 710px; background: url(Texture/Aries/Creator/keepwork/ActTeacher/tu_1169X709_32bits.png#0 0 1170 710);">
+                        <input type="button" value='立即创作' onclick="OnCreate" class="yellon_button" style="margin-left:168px;margin-top:560px;text-offset-y:-2;" />
+                        <input type="button" value='提交作品' onclick="OnSubmit" class="yellon_button" style="margin-left:110px;margin-top:560px;text-offset-y:-2;" />
+                        <input type="button" value='获奖名单' onclick="OnShowRank" class="yellon_button" style="margin-left:110px;margin-top:560px;text-offset-y:-2;" />
+                        <input type="button" onclick="OnShowDetail" style="position: relative; margin-top: 210px; margin-left: -70px; width: 96px; height: 29px; background: url(Texture/Aries/Creator/keepwork/ActTeacher/b1_96X29_32bits.png#0 0 96 29);"/>
+                    </div>
+                </div>
+            </pe:container>
+
+        </pe:container>
+
+</pe:mcml>
+</body>
+</html>

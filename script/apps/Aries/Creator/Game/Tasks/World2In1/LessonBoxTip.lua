@@ -3,8 +3,8 @@
     date:
     Desc:
     use lib:
-        local LesonBoxTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LesonBoxTip.lua") 
-        LesonBoxTip.ShowView()
+        local LessonBoxTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxTip.lua") 
+        LessonBoxTip.ShowView()
 ]]
 
 -- selection group index used to show the frame
@@ -15,8 +15,7 @@ local groupindex_hint = 5; -- when placeable but not matching hand block
 --check_button_status
 local check_width_bak = 0
 local check_height_bak = 0
-
---local movieBlockId = block_types.names.MovieClip;
+local ChatWindow = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatWindow");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/block_engine.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
@@ -26,7 +25,7 @@ local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local LessonBoxCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxCompare.lua");
 local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
-local LesonBoxTip = NPL.export()
+local LessonBoxTip = NPL.export()
 
 local compare_type = -1
 local tip_timer
@@ -34,7 +33,7 @@ local scale_timer
 local errblock_timer 
 local check_timer = nil
 local lockarea_timer
-LesonBoxTip.CheckBLockTips={
+LessonBoxTip.CheckBLockTips={
     [5]="我已经无法形容我的心情了！你已经可以担当一名小老师了！一起进行下一步吧！",
     [4]="我的天！你简直是一个天才！事不宜迟，马上开始下一步！",
     [3]="棒极了！你是我见到过的最聪明的学生！我想你已经等不及要下一步的吧？",
@@ -48,7 +47,7 @@ LesonBoxTip.CheckBLockTips={
     [-6]="好吧，我承认这个确实有一点难，我带着你手把手做一次吧？",
 }
 
-LesonBoxTip.RoleAni={
+LessonBoxTip.RoleAni={
     [5]={{3,"Texture/blocks/Paperman/eye/eye_boy_I_01.png"},{4,"Texture/blocks/Paperman/mouth/mouth_girl_03_01.png"}},
     [4]={{3,"Texture/blocks/Paperman/eye/eye_boy_I_01.png"},{4,"Texture/blocks/Paperman/mouth/mouth_boy_05_01.png"}},
     [3]={{3,"Texture/blocks/Paperman/eye/eye_fanpai_le.png"},{4,"Texture/blocks/Paperman/mouth/mouth_boy_05_01.png"}},
@@ -62,7 +61,7 @@ LesonBoxTip.RoleAni={
     [-6]={{3,"Texture/blocks/Paperman/eye/eye_boy_T_01.png"}},
 }
 
-LesonBoxTip.CheckMovieTips={
+LessonBoxTip.CheckMovieTips={
     slot = "没能在电影方块中找到对应的【摄影机】/【演员】，请先检查一下是否正确添加了【摄影机】/【演员】，或是调换了位置？",
     time = "电影方块的时长错了，正确的时长是【%s】，请重新设定",
     movie_clip = "没能在【摄影机】/【演员】上找到关键帧，请再核对一下",
@@ -72,7 +71,7 @@ LesonBoxTip.CheckMovieTips={
     actor_prop_vague = "",
 }
 
-LesonBoxTip.NomalTip = {
+LessonBoxTip.NomalTip = {
     check="仔细观察一下我这边，在绿色的格子中，摆放合适的方块吧！",
     movietarget="在电影方块中，%s",
     notfinish="像我这样，完成全部的操作吧！",
@@ -82,28 +81,30 @@ local page = nil
 local page_root = nil
 local lessonConfig = nil
 local checkBtnType ="start"
-LesonBoxTip.m_nCorrectCount = 0 --连续检查正确的次数
-LesonBoxTip.NeedChangeBlocks = {} --检查以后错误的方块
-LesonBoxTip.AllNeedBuildBlock = {} --小节开始时，所有需要创建或者删除的方块，用于备份
-LesonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方块
-LesonBoxTip.m_nCreateBoxCount = 0
-LesonBoxTip.m_nCurStageIndex = 0
-LesonBoxTip.m_nMaxStageIndex = 0
-LesonBoxTip.m_tblAllStageConfig = {}
+local isFinishStage = false
+LessonBoxTip.m_nCorrectCount = 0 --连续检查正确的次数
+LessonBoxTip.NeedChangeBlocks = {} --检查以后错误的方块
+LessonBoxTip.AllNeedBuildBlock = {} --小节开始时，所有需要创建或者删除的方块，用于备份
+LessonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方块
+LessonBoxTip.m_nCreateBoxCount = 0
+LessonBoxTip.m_nCurStageIndex = 0
+LessonBoxTip.m_nMaxStageIndex = 0
+LessonBoxTip.m_tblAllStageConfig = {}
 
-function LesonBoxTip.OnInit()
+function LessonBoxTip.OnInit()
     page = document:GetPageCtrl();
     if page and page:IsVisible() then
         page_root = page:GetParentUIObject()  
     end
 end
 
-function LesonBoxTip.ShowView()
+
+function LessonBoxTip.ShowView()
     local view_width = 620
     local view_height = 220
     local params = {
-        url = "script/apps/Aries/Creator/Game/Tasks/World2In1/LesonBoxTip.html",
-        name = "LesonBoxTip.ShowView", 
+        url = "script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxTip.html",
+        name = "LessonBoxTip.ShowView", 
         isShowTitleBar = false,
         DestroyOnClose = true,
         style = CommonCtrl.WindowFrame.ContainerStyle,
@@ -120,98 +121,108 @@ function LesonBoxTip.ShowView()
             height = 0,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);
-    LesonBoxTip.InitTeacherPlayer()
-    LesonBoxTip.UpdateCheckBtnScale(1.016)
-    LesonBoxTip.RegisterEvent()
+    LessonBoxTip.UpdateCheckBtnScale()
+    LessonBoxTip.RegisterEvent()
+    commonlib.TimerManager.SetTimeout(function ()
+        LessonBoxTip.InitTeacherPlayer()
+    end, 100);
 end
 
-function LesonBoxTip.RegisterEvent()
-    GameLogic:Connect("WorldUnloaded", LesonBoxTip, LesonBoxTip.OnWorldUnload, "UniqueConnection");
+
+function LessonBoxTip.RegisterEvent()
+    GameLogic:Connect("WorldUnloaded", LessonBoxTip, LessonBoxTip.OnWorldUnload, "UniqueConnection");
+    World2In1.SetIsLessonBox(true)
 end
 
-function LesonBoxTip.OnWorldUnload()
-    LesonBoxTip.EndTip()
+function LessonBoxTip.OnWorldUnload()
+    LessonBoxTip.EndTip()
     checkIndex = 0
     page = nil
     page_root = nil
     lessonConfig = nil
     checkBtnType ="start"
-    LesonBoxTip.m_nCorrectCount = 0 --连续检查正确的次数
-    LesonBoxTip.NeedChangeBlocks = {} --检查以后错误的方块
-    LesonBoxTip.AllNeedBuildBlock = {} --小节开始时，所有需要创建或者删除的方块，用于备份
-    LesonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方块
-    LesonBoxTip.m_nCreateBoxCount = 0
-    LesonBoxTip.m_nCurStageIndex = 0
-    LesonBoxTip.m_nMaxStageIndex = 0
-    LesonBoxTip.m_tblAllStageConfig = {}
-    LesonBoxTip.UnregisterHooks()
-    LesonBoxTip.ClearBlockTip()
-    LesonBoxTip.ClearErrorBlockTip()
-    LesonBoxTip.ClosePage()
-    LesonBoxTip.StopStageMovie()
-    LesonBoxTip.EndAllTimer()
+    LessonBoxTip.m_nCorrectCount = 0 --连续检查正确的次数
+    LessonBoxTip.NeedChangeBlocks = {} --检查以后错误的方块
+    LessonBoxTip.AllNeedBuildBlock = {} --小节开始时，所有需要创建或者删除的方块，用于备份
+    LessonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方块
+    LessonBoxTip.m_nCreateBoxCount = 0
+    LessonBoxTip.m_nCurStageIndex = 0
+    LessonBoxTip.m_nMaxStageIndex = 0
+    LessonBoxTip.m_tblAllStageConfig = {}
+    LessonBoxTip.UnregisterHooks()
+    LessonBoxTip.ClearBlockTip()
+    LessonBoxTip.ClearErrorBlockTip()
+    LessonBoxTip.ClosePage()
+    LessonBoxTip.StopStageMovie()
+    LessonBoxTip.EndAllTimer()
+    ChatWindow.is_shown = true
+    isFinishStage = false
 end
 
-function LesonBoxTip.InitTeacherPlayer()
-    local module_ctl = page:FindControl("teacher_role")
-	local scene = ParaScene.GetMiniSceneGraph(module_ctl.resourceName);
-	if scene and scene:IsValid() then
-		local player = scene:GetObject(module_ctl.obj_name);
-        if player then
-            player:SetScale(1)
-            player:SetFacing(1.57);
-			player:SetField("HeadUpdownAngle", 0.3);
-			player:SetField("HeadTurningAngle", 0);
-            player:SetField("assetfile","character/CC/02human/paperman/principal.x")
+function LessonBoxTip.InitTeacherPlayer()
+    if page and page:IsVisible() then
+        local module_ctl = page:FindControl("teacher_role")
+        local scene = ParaScene.GetMiniSceneGraph(module_ctl.resourceName);
+        if scene and scene:IsValid() then
+            local player = scene:GetObject(module_ctl.obj_name);
+            if player then
+                player:SetScale(1)
+                player:SetFacing(1.57);
+                player:SetField("HeadUpdownAngle", 0.3);
+                player:SetField("HeadTurningAngle", 0);
+                player:SetField("assetfile","character/CC/02human/paperman/principal.x")
+            end
         end
-	end
+    end
 end
 
 local reset_timer = nil
-function LesonBoxTip.PlayRoleAni(index)
-    local module_ctl = page:FindControl("teacher_role")
-	local scene = ParaScene.GetMiniSceneGraph(module_ctl.resourceName);
-	if scene and scene:IsValid() then
-		local player = scene:GetObject(module_ctl.obj_name);
-        local aniConfig = LesonBoxTip.RoleAni[index]
-        if aniConfig then
-            for i=1,#aniConfig do
-                local cur = aniConfig[i]
-                player:SetReplaceableTexture(cur[1],ParaAsset.LoadTexture("",cur[2],1))
+function LessonBoxTip.PlayRoleAni(index)
+    if page and page:IsVisible() then
+        local module_ctl = page:FindControl("teacher_role")
+        local scene = ParaScene.GetMiniSceneGraph(module_ctl.resourceName);
+        if scene and scene:IsValid() then
+            local player = scene:GetObject(module_ctl.obj_name);
+            local aniConfig = LessonBoxTip.RoleAni[index]
+            if aniConfig then
+                for i=1,#aniConfig do
+                    local cur = aniConfig[i]
+                    player:SetReplaceableTexture(cur[1],ParaAsset.LoadTexture("",cur[2],1))
+                end
             end
+            if(reset_timer) then
+                reset_timer:Change();
+            end
+            reset_timer = commonlib.TimerManager.SetTimeout(function ()
+                player:SetReplaceableTexture(3,player:GetDefaultReplaceableTexture(3))
+                player:SetReplaceableTexture(4,player:GetDefaultReplaceableTexture(4))
+            end, 1500);
         end
-        if(reset_timer) then
-			reset_timer:Change();
-		end
-		reset_timer = commonlib.TimerManager.SetTimeout(function ()
-            player:SetReplaceableTexture(3,player:GetDefaultReplaceableTexture(3))
-            player:SetReplaceableTexture(4,player:GetDefaultReplaceableTexture(4))
-		end, 1500);
     end
 end
 
-function LesonBoxTip.AddOperateCount(count)
+function LessonBoxTip.AddOperateCount(count)
     if type(count) == "number" then
-        LesonBoxTip.m_nCreateBoxCount = LesonBoxTip.m_nCreateBoxCount + count
+        LessonBoxTip.m_nCreateBoxCount = LessonBoxTip.m_nCreateBoxCount + count
         return 
     end
-    LesonBoxTip.m_nCreateBoxCount = LesonBoxTip.m_nCreateBoxCount + 1
+    LessonBoxTip.m_nCreateBoxCount = LessonBoxTip.m_nCreateBoxCount + 1
 end
 --/select 18870,13,19151(-19,1,-19)
-function LesonBoxTip.InitLessonConfig(config)
+function LessonBoxTip.InitLessonConfig(config)
     if config then
         lessonConfig = config
         echo(config,true)
-        LesonBoxTip.InitLessonData()
-        LesonBoxTip.m_nMaxStageIndex = #lessonConfig.taskCnf
-        LesonBoxTip.m_nCurStageIndex = LesonBoxTip.m_nCurStageIndex + 1
+        LessonBoxTip.InitLessonData()
+        LessonBoxTip.m_nMaxStageIndex = #lessonConfig.taskCnf
+        LessonBoxTip.m_nCurStageIndex = LessonBoxTip.m_nCurStageIndex + 1
         -- echo(lessonConfig.taskCnf,true)
-        -- print("maxstage============",LesonBoxTip.m_nMaxStageIndex,#lessonConfig.taskCnf)
-        LesonBoxTip.PrepareStageScene()
+        -- print("maxstage============",LessonBoxTip.m_nMaxStageIndex,#lessonConfig.taskCnf)
+        LessonBoxTip.PrepareStageScene()
     end
 end
 
-function LesonBoxTip.ClearLearnArea(area)
+function LessonBoxTip.ClearLearnArea(area)
     if not area or not area.pos or not area.size then
         return 
     end
@@ -225,10 +236,15 @@ end
 local Isprepare = false
 local isStopMovieBySelf = false
 --18663,12,19336(49,1,20)
-function LesonBoxTip.PrepareStageScene()
+function LessonBoxTip.PrepareStageScene()
+    if not lessonConfig then
+        GameLogic.AddBBS(nil,"课程初始化失败")
+        return 
+    end
     Isprepare = true
+    isFinishStage = false
     isStopMovieBySelf = false
-    LesonBoxTip.EndTip()
+    LessonBoxTip.EndTip()
     local stagePos = lessonConfig.teachStage
     if stagePos[1] then
         GameLogic.GetPlayer():MountEntity(nil);
@@ -238,25 +254,27 @@ function LesonBoxTip.PrepareStageScene()
     if lookPos then
         GameLogic.RunCommand(string.format("/lookat %d,%d,%d",lookPos[1],lookPos[2],lookPos[3]))
     end
-    GameLogic.RunCommand("/ggs user hidden");
+    LessonBoxTip.PlayLessonMusic("lesson")
+    ChatWindow.is_shown = false
     -- print("runcommand showMask===============start")
     GameLogic.RunCommand("/sendevent showMask")
     -- print("runcommand showMask===============end")
-    local taskCnf = lessonConfig.taskCnf[LesonBoxTip.m_nCurStageIndex]
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     local moivePos = taskCnf.moviePos
     if moivePos[1] then
         GameLogic.RunCommand("/sendevent hideNpc")
         GameLogic.GetCodeGlobal():BroadcastTextEvent("playstagemovie", {config = taskCnf});
     end
+    GameLogic.RunCommand("/ggs user hidden");
 end
 
 
-function LesonBoxTip.StopStageMovie()
+function LessonBoxTip.StopStageMovie()
     isStopMovieBySelf = true
     GameLogic.GetCodeGlobal():BroadcastTextEvent("stopStageMovie");
 end
 
-function LesonBoxTip.StartCurStage()
+function LessonBoxTip.StartCurStage()
     -- print("StartCurStage=============== 18692,13,19355")
     if isStopMovieBySelf then
         isStopMovieBySelf = false
@@ -266,11 +284,11 @@ function LesonBoxTip.StartCurStage()
     local taskArea = lessonConfig.stageArea
     local posTeacher = lessonConfig.templateteacher
     local posMy = lessonConfig.templatemy
-    local taskCnf = lessonConfig.taskCnf[LesonBoxTip.m_nCurStageIndex]
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     -- print("clear start")
-    LesonBoxTip.ClearLearnArea(taskArea)
+    LessonBoxTip.ClearLearnArea(taskArea)
     -- print("clear end")
-    LesonBoxTip.ShowView()
+    LessonBoxTip.ShowView()
     commonlib.TimerManager.SetTimeout(function()
         Isprepare = false
         local endTemp = taskCnf.finishtemplate
@@ -288,108 +306,109 @@ function LesonBoxTip.StartCurStage()
             GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
             GameLogic.RunCommand("/camerayaw 1.57")
         end
-        LesonBoxTip.StartTip()
-        LesonBoxTip.StartLearn()
+        LessonBoxTip.PlayLessonMusic("lesson_operate")
+        LessonBoxTip.StartTip()
+        LessonBoxTip.StartLearn()
     end,500)
 end
 
-function LesonBoxTip.ResetMyArea()
+function LessonBoxTip.ResetMyArea()
     if not lessonConfig then
         return 
     end
-    local taskCnf = lessonConfig.taskCnf[LesonBoxTip.m_nCurStageIndex]
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     local startTemp = taskCnf.starttemplate
     local posMy = lessonConfig.templatemy
     local regionsrc = lessonConfig.regionMy
-    LesonBoxTip.ClearLearnArea(regionsrc)
+    LessonBoxTip.ClearLearnArea(regionsrc)
     commonlib.TimerManager.SetTimeout(function()
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posMy[1],posMy[2],posMy[3],startTemp))
         GameLogic.AddBBS("resetArea","区域已恢复到初始状态")
     end,500)
 end
 
-function LesonBoxTip.InitLessonData()
+function LessonBoxTip.InitLessonData()
     checkIndex = 0
     checkBtnType ="start"
-    LesonBoxTip.m_nCorrectCount = 0 --连续检查正确的次数
-    LesonBoxTip.m_nCreateBoxCount = 0
-    LesonBoxTip.NeedChangeBlocks = {} --检查以后错误的方块
-    LesonBoxTip.AllNeedBuildBlock = {} --小节开始时，所有需要创建或者删除的方块，用于备份
-    LesonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方块
-    LesonBoxTip.CreatePos = nil
-    LesonBoxTip.SrcBlockOrigin = nil
-    LesonBoxTip.m_nCurStageIndex = 0
-    LesonBoxTip.m_nMaxStageIndex = 0
+    LessonBoxTip.m_nCorrectCount = 0 --连续检查正确的次数
+    LessonBoxTip.m_nCreateBoxCount = 0
+    LessonBoxTip.NeedChangeBlocks = {} --检查以后错误的方块
+    LessonBoxTip.AllNeedBuildBlock = {} --小节开始时，所有需要创建或者删除的方块，用于备份
+    LessonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方块
+    LessonBoxTip.CreatePos = nil
+    LessonBoxTip.SrcBlockOrigin = nil
+    LessonBoxTip.m_nCurStageIndex = 0
+    LessonBoxTip.m_nMaxStageIndex = 0
 end
 
-function LesonBoxTip.RegisterHooks()
-	GameLogic.events:AddEventListener("CreateBlockTask", LesonBoxTip.OnCreateBlockTask, LesonBoxTip, "LesonBoxTip");
-    GameLogic.events:AddEventListener("DestroyBlockTask", LesonBoxTip.OnDestroyBlockTask, LesonBoxTip, "LesonBoxTip");
+function LessonBoxTip.RegisterHooks()
+	GameLogic.events:AddEventListener("CreateBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip, "LessonBoxTip");
+    GameLogic.events:AddEventListener("DestroyBlockTask", LessonBoxTip.OnDestroyBlockTask, LessonBoxTip, "LessonBoxTip");
     GameLogic.GetFilters():add_filter("lessonbox_change_region_blocks",function(blocks)
         -- echo(commonlib.debugstack(),true)
         -- print("block num changes============",blocks and #blocks or 0)
         -- echo(blocks)
         if type(blocks) == "number" then
-            LesonBoxTip.AddOperateCount(blocks)
+            LessonBoxTip.AddOperateCount(blocks)
         elseif type(blocks) == "table" then
-            LesonBoxTip.AddOperateCount(#blocks)
+            LessonBoxTip.AddOperateCount(#blocks)
         end
         
     end)
 end
 
-function LesonBoxTip.UnregisterHooks()
-	GameLogic.events:RemoveEventListener("CreateBlockTask", LesonBoxTip.OnCreateBlockTask, LesonBoxTip);
-    GameLogic.events:RemoveEventListener("DestroyBlockTask", LesonBoxTip.OnDestroyBlockTask, LesonBoxTip);
+function LessonBoxTip.UnregisterHooks()
+	GameLogic.events:RemoveEventListener("CreateBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip);
+    GameLogic.events:RemoveEventListener("DestroyBlockTask", LessonBoxTip.OnDestroyBlockTask, LessonBoxTip);
     GameLogic.GetFilters():remove_filter("lessonbox_change_region_blocks", function() end);
-    LesonBoxTip.EndTip()
+    LessonBoxTip.EndTip()
 end
 
-function LesonBoxTip.OnDestroyBlockTask(self,event)
+function LessonBoxTip.OnDestroyBlockTask(self,event)
     -- print("OnCreateBlockTask=================1'")
     --echo(self,true)
     -- echo(event,true)
 	if(event.x) then
-        LesonBoxTip.AddOperateCount()
-        local startPos = LesonBoxTip.CreatePos and LesonBoxTip.CreatePos or lessonConfig.regionMy.pos
+        LessonBoxTip.AddOperateCount()
+        local startPos = LessonBoxTip.CreatePos and LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
 		local x, y, z = unpack(startPos);
 		x, y, z = event.x - x, event.y -y, event.z-z;
         -- echo(startPos)
-        -- echo(LesonBoxTip.CreatePos)
-		local block = LesonBoxTip.FindBlock(x, y, z);
+        -- echo(LessonBoxTip.CreatePos)
+		local block = LessonBoxTip.FindBlock(x, y, z);
         -- echo(block and block[4] > 6)
 		if(block) then --and block[4] == event.block_id
-            LesonBoxTip.FinishBlock(x, y, z)
+            LessonBoxTip.FinishBlock(x, y, z)
 		end
 	end
 end
 
-function LesonBoxTip.OnCreateBlockTask(self,event)
+function LessonBoxTip.OnCreateBlockTask(self,event)
     -- print("OnCreateBlockTask=================1'")
     --echo(self,true)
     -- echo(event,true)
 	if(event.x) then
-        LesonBoxTip.AddOperateCount()
-        local startPos = LesonBoxTip.CreatePos and LesonBoxTip.CreatePos or lessonConfig.regionMy.pos
+        LessonBoxTip.AddOperateCount()
+        local startPos = LessonBoxTip.CreatePos and LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
 		local x, y, z = unpack(startPos);
 		x, y, z = event.x - x, event.y -y, event.z-z;
         -- echo(startPos)
-        -- echo(LesonBoxTip.CreatePos)
-		local block = LesonBoxTip.FindBlock(x, y, z);
+        -- echo(LessonBoxTip.CreatePos)
+		local block = LessonBoxTip.FindBlock(x, y, z);
         -- echo(block and block[4] > 6)
 		if(block) then --and block[4] == event.block_id
-            LesonBoxTip.FinishBlock(x, y, z)
+            LessonBoxTip.FinishBlock(x, y, z)
 		end
 	end
 end
 
-function LesonBoxTip.UpdateCreateResult()
+function LessonBoxTip.UpdateCreateResult()
 
 end
 
 
 
-function LesonBoxTip.StartLearn()
+function LessonBoxTip.StartLearn()
     --print("StartLearn=================")
     if LessonBoxCompare and lessonConfig then
         -- GameLogic.RunCommand(string.format("/loadtemplate 18873,12,19156 %s",lessonConfig.starttemplate))
@@ -399,47 +418,47 @@ function LesonBoxTip.StartLearn()
         --echo({regionsrc,regiondest})
         LessonBoxCompare.CompareTwoAreas(regionsrc,regiondest,function(needbuild,pivotConfig)
             echo(needbuild)
-            LesonBoxTip.AllNeedBuildBlock = needbuild.blocks
-            LesonBoxTip.CurNeedBuildBlock = needbuild.blocks
-            LesonBoxTip.CreatePos = pivotConfig.createpos
-            LesonBoxTip.SrcBlockOrigin = pivotConfig.srcPivot
-            LesonBoxTip.SetLessonTitle()
+            LessonBoxTip.AllNeedBuildBlock = needbuild.blocks
+            LessonBoxTip.CurNeedBuildBlock = needbuild.blocks
+            LessonBoxTip.CreatePos = pivotConfig.createpos
+            LessonBoxTip.SrcBlockOrigin = pivotConfig.srcPivot
+            LessonBoxTip.SetLessonTitle()
             compare_type = needbuild.nAddType
             if(#needbuild.blocks == 0 and needbuild.nAddType == 3)then
                 local movieBlocks = needbuild.movies
                 local codeBlocks = needbuild.codes
-                LesonBoxTip.CompareCode(codeBlocks)
-                LesonBoxTip.CompareMovie(movieBlocks)
+                LessonBoxTip.CompareCode(codeBlocks)
+                LessonBoxTip.CompareMovie(movieBlocks)
             else
-                -- LesonBoxTip.AutoEquipHandTools()
-                LesonBoxTip.RegisterHooks()
+                -- LessonBoxTip.AutoEquipHandTools()
+                LessonBoxTip.RegisterHooks()
                 commonlib.TimerManager.SetTimeout(function()
-                    LesonBoxTip.SetTaskTip("check")
-                    LesonBoxTip.SetRoleName()
-                    LesonBoxTip.UpdateNextBtnStatus()
-                    LesonBoxTip.RenderBlockTip()
+                    LessonBoxTip.SetTaskTip("check")
+                    LessonBoxTip.SetRoleName()
+                    LessonBoxTip.UpdateNextBtnStatus()
+                    LessonBoxTip.RenderBlockTip()
                 end,200)
             end
         end)
     end
 end
 
-function LesonBoxTip.CompareCode(blocks)
+function LessonBoxTip.CompareCode(blocks)
     if type(blocks) == "table" then
         if #blocks == 0 then
-            LesonBoxTip.RemoveErrBlockTip()
-            LesonBoxTip.SetErrorTip(LesonBoxTip.m_nCorrectCount)
+            LessonBoxTip.RemoveErrBlockTip()
+            LessonBoxTip.SetErrorTip(LessonBoxTip.m_nCorrectCount)
             GameLogic.AddBBS(nil,"当前小节已完成，你可以点击检查进入下一小节")
             commonlib.TimerManager.SetTimeout(function()
-                LesonBoxTip.ClearErrorBlockTip()
-                LesonBoxTip.RemoveErrBlockTip()
-                LesonBoxTip.ClearBlockTip()
-                -- LesonBoxTip.GotoNextStage()
+                LessonBoxTip.ClearErrorBlockTip()
+                LessonBoxTip.RemoveErrBlockTip()
+                LessonBoxTip.ClearBlockTip()
+                -- LessonBoxTip.GotoNextStage()
                 
             end,1000)
         else
             for i=1,#blocks do
-                local possrc,posdest = LesonBoxTip.AddTwoPosition(blocks[i][1],LesonBoxTip.CreatePos),LesonBoxTip.AddTwoPosition(blocks[i][2],LesonBoxTip.SrcBlockOrigin)
+                local possrc,posdest = LessonBoxTip.AddTwoPosition(blocks[i][1],LessonBoxTip.CreatePos),LessonBoxTip.AddTwoPosition(blocks[i][2],LessonBoxTip.SrcBlockOrigin)
                 local entitySrc = EntityManager.GetBlockEntity(possrc)
                 local entityDest = EntityManager.GetBlockEntity(posdest)
                 local bSame,nType = LessonBoxCompare.CompareCode(entitySrc,entityDest)
@@ -452,21 +471,21 @@ function LesonBoxTip.CompareCode(blocks)
     end
 end
 
-function LesonBoxTip.CompareMovie(blocks)
+function LessonBoxTip.CompareMovie(blocks)
     if type(blocks) == "table" then
         if #blocks == 0 then
-            LesonBoxTip.RemoveErrBlockTip()
-            LesonBoxTip.SetErrorTip(LesonBoxTip.m_nCorrectCount)
+            LessonBoxTip.RemoveErrBlockTip()
+            LessonBoxTip.SetErrorTip(LessonBoxTip.m_nCorrectCount)
             GameLogic.AddBBS(nil,"当前小节已完成，你可以点击检查进入下一小节")
             commonlib.TimerManager.SetTimeout(function()
-                LesonBoxTip.ClearErrorBlockTip()
-                LesonBoxTip.RemoveErrBlockTip()
-                LesonBoxTip.ClearBlockTip()
-                -- LesonBoxTip.GotoNextStage()
+                LessonBoxTip.ClearErrorBlockTip()
+                LessonBoxTip.RemoveErrBlockTip()
+                LessonBoxTip.ClearBlockTip()
+                -- LessonBoxTip.GotoNextStage()
             end,1000)
         else
             for i=1,#blocks do
-                local possrc,posdest = LesonBoxTip.AddTwoPosition(blocks[i][1],LesonBoxTip.CreatePos),LesonBoxTip.AddTwoPosition(blocks[i][2],LesonBoxTip.SrcBlockOrigin)
+                local possrc,posdest = LessonBoxTip.AddTwoPosition(blocks[i][1],LessonBoxTip.CreatePos),LessonBoxTip.AddTwoPosition(blocks[i][2],LessonBoxTip.SrcBlockOrigin)
                 local entitySrc = EntityManager.GetBlockEntity(possrc)
                 local entityDest = EntityManager.GetBlockEntity(posdest)
                 local bSame,type = LessonBoxCompare.CompareMovieClip(entitySrc,entityDest)
@@ -480,7 +499,7 @@ function LesonBoxTip.CompareMovie(blocks)
     -- LessonBoxCompare.CompareMovieClip
 end
 
-function LesonBoxTip.AddTwoPosition(pos1,pos2)
+function LessonBoxTip.AddTwoPosition(pos1,pos2)
     if not pos1 or not pos2 then
         return 
     end
@@ -489,98 +508,98 @@ function LesonBoxTip.AddTwoPosition(pos1,pos2)
     return newPos
 end
 
-function LesonBoxTip.RenderBlockTip()
-    local startPos = LesonBoxTip.CreatePos and LesonBoxTip.CreatePos or lessonConfig.regionMy.pos
-    for i = 1,#LesonBoxTip.CurNeedBuildBlock do
-        local block = LesonBoxTip.CurNeedBuildBlock[i]
+function LessonBoxTip.RenderBlockTip()
+    local startPos = LessonBoxTip.CreatePos and LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
+    for i = 1,#LessonBoxTip.CurNeedBuildBlock do
+        local block = LessonBoxTip.CurNeedBuildBlock[i]
         local x,y,z = startPos[1]+block[1],startPos[2]+block[2],startPos[3]+block[3]
         ParaTerrain.SelectBlock(x,y,z, true, groupindex_hint_auto);
         -- print("pos=========",x,y,z)
     end
 end
 
-function LesonBoxTip.ClearBlockTip()
+function LessonBoxTip.ClearBlockTip()
     if not lessonConfig then
         return
     end
-    local startPos = LesonBoxTip.CreatePos and LesonBoxTip.CreatePos or lessonConfig.regionMy.pos
-    for i = 1,#LesonBoxTip.AllNeedBuildBlock do 
-        local block = LesonBoxTip.AllNeedBuildBlock[i]
+    local startPos = LessonBoxTip.CreatePos and LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
+    for i = 1,#LessonBoxTip.AllNeedBuildBlock do 
+        local block = LessonBoxTip.AllNeedBuildBlock[i]
         local x,y,z = startPos[1]+block[1],startPos[2]+block[2],startPos[3]+block[3]
         ParaTerrain.SelectBlock(x,y,z, false, groupindex_hint_auto);
         -- print("ClearBlockTip===========")
     end
 end
 
-function LesonBoxTip.RenderErrorBlockTip()
+function LessonBoxTip.RenderErrorBlockTip()
     --clear
-    local startPos = LesonBoxTip.CreatePos and LesonBoxTip.CreatePos or lessonConfig.regionMy.pos
-    for i = 1,#LesonBoxTip.NeedChangeBlocks do 
-        local block = LesonBoxTip.NeedChangeBlocks[i]
+    local startPos = LessonBoxTip.CreatePos and LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
+    for i = 1,#LessonBoxTip.NeedChangeBlocks do 
+        local block = LessonBoxTip.NeedChangeBlocks[i]
         local x,y,z = startPos[1]+block[1],startPos[2]+block[2],startPos[3]+block[3]
         ParaTerrain.SelectBlock(x,y,z, false, groupindex_wrong);
     end
     --set
-    local block = LesonBoxTip.NeedChangeBlocks[checkIndex]
+    local block = LessonBoxTip.NeedChangeBlocks[checkIndex]
     if block then
         local x,y,z = startPos[1]+block[1],startPos[2]+block[2],startPos[3]+block[3]
         ParaTerrain.SelectBlock(x,y,z, true, groupindex_wrong);
-        LesonBoxTip.UpdateErrArrow({block[1],block[2],block[3]})
+        LessonBoxTip.UpdateErrArrow({block[1],block[2],block[3]})
     end    
 end
 
-function LesonBoxTip.UpdateErrArrow(pos)
-    if not pos or not LesonBoxTip.CreatePos[1] or not LesonBoxTip.SrcBlockOrigin[1] then
+function LessonBoxTip.UpdateErrArrow(pos)
+    if not pos or not LessonBoxTip.CreatePos[1] or not LessonBoxTip.SrcBlockOrigin[1] then
         return
     end
-    local startPos = LesonBoxTip.CreatePos and LesonBoxTip.CreatePos or lessonConfig.regionMy.pos
+    local startPos = LessonBoxTip.CreatePos and LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
     local leftPos = {startPos[1]+pos[1],startPos[2]+pos[2],startPos[3]+pos[3]}
-    startPos = LesonBoxTip.SrcBlockOrigin and LesonBoxTip.SrcBlockOrigin or lessonConfig.regionOther.pos
+    startPos = LessonBoxTip.SrcBlockOrigin and LessonBoxTip.SrcBlockOrigin or lessonConfig.regionOther.pos
     local rightPos = {startPos[1]+pos[1],startPos[2]+pos[2],startPos[3]+pos[3]}
     GameLogic.GetCodeGlobal():BroadcastTextEvent("showArrow", {leftpos=leftPos,rightpos = rightPos});
 end
 
-function LesonBoxTip.ClearErrorBlockTip()
+function LessonBoxTip.ClearErrorBlockTip()
     if not lessonConfig then
         return
     end
-    local startPos = LesonBoxTip.CreatePos and LesonBoxTip.CreatePos or lessonConfig.regionMy.pos
-    for i = 1,#LesonBoxTip.NeedChangeBlocks do 
-        local block = LesonBoxTip.NeedChangeBlocks[i]
+    local startPos = LessonBoxTip.CreatePos and LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
+    for i = 1,#LessonBoxTip.NeedChangeBlocks do 
+        local block = LessonBoxTip.NeedChangeBlocks[i]
         local x,y,z = startPos[1]+block[1],startPos[2]+block[2],startPos[3]+block[3]
         ParaTerrain.SelectBlock(x,y,z, false, groupindex_wrong);
     end
     GameLogic.RunCommand("/sendevent hideArrow")
 end
 
-function LesonBoxTip.FindBlock(x, y, z)
-    for i = 1,#LesonBoxTip.AllNeedBuildBlock do
-        local block = LesonBoxTip.AllNeedBuildBlock[i]
+function LessonBoxTip.FindBlock(x, y, z)
+    for i = 1,#LessonBoxTip.AllNeedBuildBlock do
+        local block = LessonBoxTip.AllNeedBuildBlock[i]
         if block[1] == x and block[2] == y and block[3] == z then
             return block
         end
     end
 end
 
-function LesonBoxTip.FinishBlock(x, y, z)
-    for i = 1,#LesonBoxTip.CurNeedBuildBlock do
-        local block = LesonBoxTip.CurNeedBuildBlock[i]
+function LessonBoxTip.FinishBlock(x, y, z)
+    for i = 1,#LessonBoxTip.CurNeedBuildBlock do
+        local block = LessonBoxTip.CurNeedBuildBlock[i]
         if block[1] == x and block[2] == y and block[3] == z then
             block.finish = true
         end
     end
 end
 
-function LesonBoxTip.CheckFinishAll()
-    local curOperateNum = LesonBoxTip.m_nCreateBoxCount
-    -- print("num=============",LesonBoxTip.m_nCreateBoxCount,#LesonBoxTip.CurNeedBuildBlock)
-    if curOperateNum >= #LesonBoxTip.CurNeedBuildBlock then
+function LessonBoxTip.CheckFinishAll()
+    local curOperateNum = LessonBoxTip.m_nCreateBoxCount
+    -- print("num=============",LessonBoxTip.m_nCreateBoxCount,#LessonBoxTip.CurNeedBuildBlock)
+    if curOperateNum >= #LessonBoxTip.CurNeedBuildBlock then
         return true
     end
     return false
     -- local isFinish = true
-    -- for i = 1,#LesonBoxTip.CurNeedBuildBlock do
-    --     local block = LesonBoxTip.CurNeedBuildBlock[i]
+    -- for i = 1,#LessonBoxTip.CurNeedBuildBlock do
+    --     local block = LessonBoxTip.CurNeedBuildBlock[i]
     --     if not block.finish then
     --         isFinish = false
     --         break
@@ -589,13 +608,13 @@ function LesonBoxTip.CheckFinishAll()
     -- return isFinish
 end
 
-function LesonBoxTip.AutoEquipHandTools()
+function LessonBoxTip.AutoEquipHandTools()
     if not lessonConfig then
         return 
     end
     local part = {}
-    for i = 1,#LesonBoxTip.AllNeedBuildBlock do
-        local block = LesonBoxTip.AllNeedBuildBlock[i]
+    for i = 1,#LessonBoxTip.AllNeedBuildBlock do
+        local block = LessonBoxTip.AllNeedBuildBlock[i]
         if block and block[4] then
             part[block[4]] = block[4]
         end
@@ -623,7 +642,7 @@ end
 
 
 
-function LesonBoxTip.SetRoleName()
+function LessonBoxTip.SetRoleName()
     if page and lessonConfig then
         local name = lessonConfig.teacherName or "校长" 
         -- print("SetRoleName===",name)
@@ -632,9 +651,9 @@ function LesonBoxTip.SetRoleName()
     end
 end
 
-function LesonBoxTip.SetTaskTip(type)
+function LessonBoxTip.SetTaskTip(type)
     if page then
-        local strTip = LesonBoxTip.NomalTip[type]
+        local strTip = LessonBoxTip.NomalTip[type]
         page:SetValue("role_tip", strTip);
         if strTip then
             SoundManager:PlayText(strTip,10006)
@@ -642,36 +661,36 @@ function LesonBoxTip.SetTaskTip(type)
     end
 end
 
-function LesonBoxTip.SetErrorTip(index)
+function LessonBoxTip.SetErrorTip(index)
     if page then
-        local strTip = LesonBoxTip.CheckBLockTips[index]
+        local strTip = LessonBoxTip.CheckBLockTips[index]
         page:SetValue("role_tip", strTip);
         if strTip then
-            LesonBoxTip.PlayRoleAni(index)
+            LessonBoxTip.PlayRoleAni(index)
             SoundManager:PlayText(strTip,10006)
         end
     end
 end
 
-function LesonBoxTip.SetLessonTitle()
+function LessonBoxTip.SetLessonTitle()
     if lessonConfig and page then
-        local curStage = LesonBoxTip.m_nCurStageIndex
+        local curStage = LessonBoxTip.m_nCurStageIndex
         local taskCnf = lessonConfig.taskCnf[curStage]
         local strTitle = string.format("%s步骤%d-%s",lessonConfig.stageTitle,lessonConfig.learnIndex,taskCnf.name) 
         page:SetValue("lesson_title", strTitle);
     end
 end
 
-function LesonBoxTip.ReplayMovie()
-    if LesonBoxTip.CheckHasePlayMovie() or Isprepare == true then
+function LessonBoxTip.ReplayMovie()
+    if LessonBoxTip.CheckHasePlayMovie() or Isprepare == true then
         GameLogic.AddBBS(nil,"当前正在播放其他的动画或动画没有准备好,请稍后")
         return
     end
-    LesonBoxTip.EndTip()
-    local taskCnf = lessonConfig.taskCnf[LesonBoxTip.m_nCurStageIndex]
+    LessonBoxTip.EndTip()
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     local moivePos = taskCnf.moviePos
     if moivePos[1] then
-        LesonBoxTip.ClosePage() 
+        LessonBoxTip.ClosePage() 
         local stagePos = lessonConfig.teachStage
         if stagePos[1] then
             GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
@@ -684,12 +703,12 @@ function LesonBoxTip.ReplayMovie()
     end
 end
 --请按照园长的讲解，在自己的区域也练习一遍吧！
-function LesonBoxTip.ResumeLessonUI()
-    LesonBoxTip.ShowView()
-    LesonBoxTip.SetLessonTitle()
-    LesonBoxTip.SetTaskTip("check")
-    LesonBoxTip.SetRoleName()
-    LesonBoxTip.UpdateNextBtnStatus()
+function LessonBoxTip.ResumeLessonUI()
+    LessonBoxTip.ShowView()
+    LessonBoxTip.SetLessonTitle()
+    LessonBoxTip.SetTaskTip("check")
+    LessonBoxTip.SetRoleName()
+    LessonBoxTip.UpdateNextBtnStatus()
     GameLogic.RunCommand("/sendevent showNpc")
     GameLogic.RunCommand("/sendevent showMask")
     local stagePos = lessonConfig.myStage
@@ -697,33 +716,33 @@ function LesonBoxTip.ResumeLessonUI()
         GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
     end
     GameLogic.RunCommand("/tip")
-    LesonBoxTip.StartTip()
+    LessonBoxTip.StartTip()
     commonlib.TimerManager.SetTimeout(function()
-        LesonBoxTip.RenderBlockTip()
+        LessonBoxTip.RenderBlockTip()
     end,200)
 end
 
-function LesonBoxTip.StartTip(strType)
+function LessonBoxTip.StartTip(strType)
     tip_timer = tip_timer or commonlib.Timer:new({callbackFunc = function(timer)
 		GameLogic.AddBBS(nil,"请按照讲解练习一遍吧，练习好后点击按钮【开始检查】查看结果！",3000)
 	end})
 	tip_timer:Change(0, 10000);
 end
 
-function LesonBoxTip.EndTip()
+function LessonBoxTip.EndTip()
     if tip_timer then
         tip_timer:Change()
     end
 end
 
-function LesonBoxTip.CheckHaseNextErr(nDis)
-    if LesonBoxTip.NeedChangeBlocks[checkIndex + nDis] ~= nil then
+function LessonBoxTip.CheckHaseNextErr(nDis)
+    if LessonBoxTip.NeedChangeBlocks[checkIndex + nDis] ~= nil then
         return true
     end
     return false
 end
 
-function LesonBoxTip.ClosePage() 
+function LessonBoxTip.ClosePage() 
     if page then
         page:CloseWindow()
         page = nil
@@ -740,82 +759,99 @@ function LesonBoxTip.ClosePage()
     end
 end
 
-function LesonBoxTip.StartCheck()
+function LessonBoxTip.IsCompareAutoBlock()
+    local blocks = LessonBoxTip.AllNeedBuildBlock
+    if blocks and #blocks > 0 then
+        for i=1,#blocks do
+            if blocks[i][4] == 267 or blocks[i][4] == 103  then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function LessonBoxTip.StartCheck()
     if check_timer then
         check_timer:Change()
     end   
     check_timer = commonlib.TimerManager.SetTimeout(function()
-        if LesonBoxTip.CheckHasePlayMovie() then
+        if LessonBoxTip.CheckHasePlayMovie() then
             GameLogic.AddBBS(nil,"先去老师区域，看完操作演示吧")
             return
         end
-        if not LesonBoxTip.CheckFinishAll() then
+        if isFinishStage then
+            GameLogic.AddBBS(nil,"当前小节已经完成了，正在跳转下一小节，请等待")
+            return
+        end
+        if not LessonBoxTip.CheckFinishAll() and not LessonBoxTip.IsCompareAutoBlock() then
             if compare_type == 1  or compare_type == 3 then
-                LesonBoxTip.RemoveErrBlockTip()
-                LesonBoxTip.SetTaskTip("notfinish")
+                LessonBoxTip.RemoveErrBlockTip()
+                LessonBoxTip.SetTaskTip("notfinish")
                 compare_type = -1
                 return 
             end
         end
         checkBtnType = "stop"
-        LesonBoxTip.UpdateCheckBtnStatus(checkBtnType)
-        LesonBoxTip.ClearBlockTip()
-        LesonBoxTip.ClearErrorBlockTip()
+        LessonBoxTip.UpdateCheckBtnStatus(checkBtnType)
+        LessonBoxTip.ClearBlockTip()
+        LessonBoxTip.ClearErrorBlockTip()
         if LessonBoxCompare and lessonConfig then
             local regionsrc = lessonConfig.regionMy
             local regiondest = lessonConfig.regionOther
             LessonBoxCompare.CompareTwoAreas(regionsrc,regiondest,function(needbuild,pivot)
-                echo(needbuild,true)
+                -- echo(needbuild,true)
                 local isCorrect = false
                 local blocks = needbuild.blocks
                 if needbuild.nAddType ~= 3 then
-                    -- LesonBoxTip.m_nCorrectCount = 0
-                    LesonBoxTip.m_nCorrectCount = LesonBoxTip.m_nCorrectCount - 1
-                    LesonBoxTip.NeedChangeBlocks = blocks
+                    -- LessonBoxTip.m_nCorrectCount = 0
+                    LessonBoxTip.m_nCorrectCount = LessonBoxTip.m_nCorrectCount - 1
+                    LessonBoxTip.NeedChangeBlocks = blocks
                     checkIndex = 1
-                    LesonBoxTip.RenderErrorBlockTip()
-                    LesonBoxTip.UpdateNextBtnStatus()
+                    LessonBoxTip.RenderErrorBlockTip()
+                    LessonBoxTip.UpdateNextBtnStatus()
                 else
                     if #blocks == 0 then
-                        if LesonBoxTip.m_nCorrectCount < 0 then
-                            LesonBoxTip.m_nCorrectCount = 0
+                        if LessonBoxTip.m_nCorrectCount < 0 then
+                            LessonBoxTip.m_nCorrectCount = 0
                         end
                         isCorrect = true
-                        LesonBoxTip.m_nCorrectCount = LesonBoxTip.m_nCorrectCount + 1
+                        LessonBoxTip.m_nCorrectCount = LessonBoxTip.m_nCorrectCount + 1
                     else
-                        if LesonBoxTip.m_nCorrectCount > 0 then
-                            LesonBoxTip.m_nCorrectCount = 0
+                        if LessonBoxTip.m_nCorrectCount > 0 then
+                            LessonBoxTip.m_nCorrectCount = 0
                         end
-                        LesonBoxTip.m_nCorrectCount = LesonBoxTip.m_nCorrectCount - 1
-                        LesonBoxTip.NeedChangeBlocks = blocks
+                        LessonBoxTip.m_nCorrectCount = LessonBoxTip.m_nCorrectCount - 1
+                        LessonBoxTip.NeedChangeBlocks = blocks
                         checkIndex = 1
-                        LesonBoxTip.RenderErrorBlockTip()
-                        LesonBoxTip.UpdateNextBtnStatus()
+                        LessonBoxTip.RenderErrorBlockTip()
+                        LessonBoxTip.UpdateNextBtnStatus()
                     end
                 end
                 if isCorrect then
-                    LesonBoxTip.RemoveErrBlockTip()
-                    LesonBoxTip.SetErrorTip(LesonBoxTip.m_nCorrectCount)
+                    LessonBoxTip.RemoveErrBlockTip()
+                    LessonBoxTip.SetErrorTip(LessonBoxTip.m_nCorrectCount)
+                    isFinishStage = true
                     GameLogic.AddBBS(nil,"当前小节已完成，即将进入下一小节的学习")
                     commonlib.TimerManager.SetTimeout(function()
-                        LesonBoxTip.ClearErrorBlockTip()
-                        LesonBoxTip.RemoveErrBlockTip()
-                        LesonBoxTip.ClearBlockTip()
-                        LesonBoxTip.GotoNextStage()
-                    end,3000)
+                        LessonBoxTip.ClearErrorBlockTip()
+                        LessonBoxTip.RemoveErrBlockTip()
+                        LessonBoxTip.ClearBlockTip()
+                        LessonBoxTip.GotoNextStage()
+                    end,5000)
                     return
                 end
-                if LesonBoxTip.m_nCorrectCount <= -5 then
+                if LessonBoxTip.m_nCorrectCount <= -5 then
                     _guihelper.MessageBox("开启教学模式，跟着帕帕卡卡拉拉一起手把手一步一步完成课程的学习吧！",function()
-                        LesonBoxTip.OnStartMacroLearn()
+                        LessonBoxTip.OnStartMacroLearn()
                     end)
                 end
-                if LesonBoxTip.m_nCorrectCount < - 6 then LesonBoxTip.m_nCorrectCount = -6  end
-                if LesonBoxTip.m_nCorrectCount > 5 then LesonBoxTip.m_nCorrectCount = 5 end
-                if LesonBoxTip.m_nCorrectCount <=5 and LesonBoxTip.m_nCorrectCount >= -6 then
-                    LesonBoxTip.RemoveErrBlockTip()
-                    LesonBoxTip.SetErrorTip(LesonBoxTip.m_nCorrectCount)
-                    LesonBoxTip.DelayShowErrBlockTip()
+                if LessonBoxTip.m_nCorrectCount < - 6 then LessonBoxTip.m_nCorrectCount = -6  end
+                if LessonBoxTip.m_nCorrectCount > 5 then LessonBoxTip.m_nCorrectCount = 5 end
+                if LessonBoxTip.m_nCorrectCount <=5 and LessonBoxTip.m_nCorrectCount >= -6 then
+                    LessonBoxTip.RemoveErrBlockTip()
+                    LessonBoxTip.SetErrorTip(LessonBoxTip.m_nCorrectCount)
+                    LessonBoxTip.DelayShowErrBlockTip()
                     
                 end
             end)
@@ -824,15 +860,15 @@ function LesonBoxTip.StartCheck()
 end
 
 
-function LesonBoxTip.DelayShowErrBlockTip()
+function LessonBoxTip.DelayShowErrBlockTip()
     if errblock_timer then
         errblock_timer:Change();
     end
     errblock_timer = commonlib.TimerManager.SetTimeout(function ()
-        LesonBoxTip.SetErrBlockTip()
+        LessonBoxTip.SetErrBlockTip()
     end, 3000);
 end
-function LesonBoxTip.UpdateCheckBtnStatus(type)
+function LessonBoxTip.UpdateCheckBtnStatus(type)
     if type then
         local back1 = "Texture/Aries/Creator/keepwork/macro/lessonbox/btn_startcheck_32bits.png;0 0 121 40"
         local back2 = "Texture/Aries/Creator/keepwork/macro/lessonbox/btn_stopcheck_32bits.png;0 0 121 40"
@@ -844,112 +880,88 @@ function LesonBoxTip.UpdateCheckBtnStatus(type)
     end
 end
 
-
-function LesonBoxTip.UpdateCheckBtnScale(scale_dis)
+-- @param maxScaling: default to 0.9. usually between [0.8, 1.2]
+function LessonBoxTip.UpdateCheckBtnScale(maxScaling)
     local btnObject = ParaUI.GetUIObject("lesson_check_button")
     if (btnObject and btnObject:IsValid()) then
-        --备份原始大小
-        local x,y
-        if check_width_bak == 0 or check_height_bak == 0 then
-            check_width_bak = btnObject.width
-            check_height_bak = btnObject.height
-            x = btnObject.x
-            y = btnObject.y
-        end
-        local max_width = check_width_bak*1.0
-        local min_width = check_width_bak*0.9
-        local max_height = check_height_bak*1.0
-        local min_height = check_height_bak*0.9
-        local scale_state = "add"
-        local scale_dis = scale_dis or 1.02
+		maxScaling = maxScaling or 0.9;
+		local curScaling = 1;
+		local scale_state = "add"
+		local scaleStep = math.abs(maxScaling - 1) / 20;
+		local maxScale = math.max(1, maxScaling)
+		local minScale = math.min(1, maxScaling)
         scale_timer = commonlib.Timer:new({callbackFunc = function(timer)
             if scale_state == "add" then
-                local width = btnObject.width
-                local height = btnObject.height
-                btnObject.width = width *scale_dis
-                btnObject.height = height *scale_dis
-                if btnObject.width >= max_width then
-                    scale_state = "reduce"
-                    check_width_bak = btnObject.width
-                    check_height_bak = btnObject.height
-                    x = btnObject.x
-                    y = btnObject.y
-                end
-                btnObject.x = math.floor(x - (btnObject.width - check_width_bak) /2)
-                btnObject.y = math.floor(y - (btnObject.height - check_height_bak) /2)
+                curScaling = curScaling + scaleStep
+				if(curScaling > maxScale) then
+					curScaling = maxScale;
+					scale_state = "reduce"
+				end
+            elseif scale_state == "reduce" then
+				curScaling = curScaling - scaleStep
+				if(curScaling < minScale) then
+					curScaling = minScale;
+					scale_state = "add"
+				end
             end
-
-            if scale_state == "reduce" then
-                local width = btnObject.width
-                local height = btnObject.height
-                btnObject.width = width /scale_dis
-                btnObject.height = height /scale_dis
-                if btnObject.width <= min_width then
-                    scale_state = "add"
-                    check_width_bak = btnObject.width
-                    check_height_bak = btnObject.height
-                    x = btnObject.x
-                    y = btnObject.y
-                end
-                btnObject.x = math.floor(x + (check_width_bak - btnObject.width) /2)
-                btnObject.y = math.floor(y + (check_height_bak - btnObject.height) /2)
-            end
+			btnObject.scalingx = curScaling
+			btnObject.scalingy = curScaling
         end})
-        scale_timer:Change(0, 100);
+        scale_timer:Change(0, 30);
     end
 end
 
-function LesonBoxTip.UpdateNextBtnStatus()
+function LessonBoxTip.UpdateNextBtnStatus()
     local btnNextObject = ParaUI.GetUIObject("lesson_next_button")
     local btnPreObject = ParaUI.GetUIObject("lesson_pre_button")
     btnNextObject.visible = false
-    if LesonBoxTip.CheckHaseNextErr(1) then
+    if LessonBoxTip.CheckHaseNextErr(1) then
         btnNextObject.visible = true
     end
     btnPreObject.visible = false
-    if LesonBoxTip.CheckHaseNextErr(-1) then
+    if LessonBoxTip.CheckHaseNextErr(-1) then
         btnPreObject.visible = true
     end
 end
 
-function LesonBoxTip.StopCheck()
-    LesonBoxTip.ClearBlockTip()
-    LesonBoxTip.ClearErrorBlockTip()
+function LessonBoxTip.StopCheck()
+    LessonBoxTip.ClearBlockTip()
+    LessonBoxTip.ClearErrorBlockTip()
     checkIndex = 0
-    LesonBoxTip.NeedChangeBlocks = {}
-    LesonBoxTip.UpdateNextBtnStatus()
+    LessonBoxTip.NeedChangeBlocks = {}
+    LessonBoxTip.UpdateNextBtnStatus()
 end
 
-function LesonBoxTip.OnClickPre()
-    if not LesonBoxTip.CheckHaseNextErr(-1) then
+function LessonBoxTip.OnClickPre()
+    if not LessonBoxTip.CheckHaseNextErr(-1) then
         GameLogic.AddBBS(nil,"没有更多的错误方块了")
         return 
     end
     checkIndex = checkIndex - 1
-    LesonBoxTip.RenderErrorBlockTip()
-    LesonBoxTip.UpdateNextBtnStatus()
-    LesonBoxTip.SetErrBlockTip()
+    LessonBoxTip.RenderErrorBlockTip()
+    LessonBoxTip.UpdateNextBtnStatus()
+    LessonBoxTip.SetErrBlockTip()
 end
 
-function LesonBoxTip.OnClickNext()
-    if not LesonBoxTip.CheckHaseNextErr(1) then
+function LessonBoxTip.OnClickNext()
+    if not LessonBoxTip.CheckHaseNextErr(1) then
         GameLogic.AddBBS(nil,"没有更多的错误方块了")
         return 
     end
     checkIndex = checkIndex + 1
-    LesonBoxTip.RenderErrorBlockTip()
-    LesonBoxTip.UpdateNextBtnStatus()
-    LesonBoxTip.SetErrBlockTip()
+    LessonBoxTip.RenderErrorBlockTip()
+    LessonBoxTip.UpdateNextBtnStatus()
+    LessonBoxTip.SetErrBlockTip()
 end
 
 --[[红色方框中的方块错了，正确的应该是【iocn】【方块名称】（编号：【方块编号】）。]]
-function LesonBoxTip.SetErrBlockTip()
+function LessonBoxTip.SetErrBlockTip()
     if not page or not page_root or not page:IsVisible() then
         print("界面初始化失败~")
         return
     end
-    local posSrc = LesonBoxTip.SrcBlockOrigin
-    local block = LesonBoxTip.NeedChangeBlocks[checkIndex]
+    local posSrc = LessonBoxTip.SrcBlockOrigin
+    local block = LessonBoxTip.NeedChangeBlocks[checkIndex]
     local startPos = posSrc or lessonConfig.regionOther.pos
     if block then
         if page then
@@ -1005,46 +1017,46 @@ function LesonBoxTip.SetErrBlockTip()
     end  
 end
 
-function LesonBoxTip.RemoveErrBlockTip()
+function LessonBoxTip.RemoveErrBlockTip()
     if page_root then
         ParaUI.Destroy("lessonbox_err_text")
         ParaUI.Destroy("lessonbox_err_block")
     end
 end
 
-function LesonBoxTip.OnStartMacroLearn()
+function LessonBoxTip.OnStartMacroLearn()
     local taskArea = lessonConfig.stageArea
     local posTeacher = lessonConfig.templateteacher
     local posMy = lessonConfig.templatemy
-    local taskCnf = lessonConfig.taskCnf[LesonBoxTip.m_nCurStageIndex]
-    LesonBoxTip.ClearLearnArea(taskArea)
-    LesonBoxTip.EndTip()
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
+    LessonBoxTip.ClearLearnArea(taskArea)
+    LessonBoxTip.EndTip()
     commonlib.TimerManager.SetTimeout(function()
         local endTemp = taskCnf.finishtemplate
         local startTemp = taskCnf.starttemplate
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posTeacher[1],posTeacher[2],posTeacher[3],endTemp))
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posMy[1],posMy[2],posMy[3],startTemp))
-        LesonBoxTip.ClearBlockTip()
-        LesonBoxTip.ClearErrorBlockTip()
-        LesonBoxTip.ClosePage()
-        LesonBoxTip.StopStageMovie()
+        LessonBoxTip.ClearBlockTip()
+        LessonBoxTip.ClearErrorBlockTip()
+        LessonBoxTip.ClosePage()
+        LessonBoxTip.StopStageMovie()
         GameLogic.GetCodeGlobal():BroadcastTextEvent("playFollowMacro", {macroPos = taskCnf.follow});
     end,200)
 end
 
-function LesonBoxTip.OnRetunMacro(isFinish)
-    LesonBoxTip.ClosePage() 
-    LesonBoxTip.UnregisterHooks()
-    LesonBoxTip.ClearBlockTip()
-    LesonBoxTip.ClearErrorBlockTip()
-    LesonBoxTip.StopStageMovie()
-    LesonBoxTip.EndTip()
+function LessonBoxTip.OnRetunMacro(isFinish)
+    LessonBoxTip.ClosePage() 
+    LessonBoxTip.UnregisterHooks()
+    LessonBoxTip.ClearBlockTip()
+    LessonBoxTip.ClearErrorBlockTip()
+    LessonBoxTip.StopStageMovie()
+    LessonBoxTip.EndTip()
     GameLogic.RunCommand("/sendevent hideNpc")
     GameLogic.RunCommand("/ggs user visible");
     GameLogic.GetCodeGlobal():BroadcastTextEvent("enterMacroMode", {isFinish = isFinish or false});
 end
 
-function LesonBoxTip.CheckHasePlayMovie()
+function LessonBoxTip.CheckHasePlayMovie()
     local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 	if(#MovieManager.active_clips > 0) then
 		return true
@@ -1052,44 +1064,45 @@ function LesonBoxTip.CheckHasePlayMovie()
     return false
 end
 
-function LesonBoxTip.FinishCurStageMacro()
-    LesonBoxTip.GotoNextStage()
+function LessonBoxTip.FinishCurStageMacro()
+    LessonBoxTip.GotoNextStage()
 end
 
-function LesonBoxTip.GotoNextStage()
-    LesonBoxTip.ClosePage() 
+function LessonBoxTip.GotoNextStage()
+    LessonBoxTip.ClosePage() 
     GameLogic.RunCommand("/sendevent hideNpc")
     GameLogic.RunCommand("/sendevent showMask")
     checkIndex = 0
     checkBtnType ="start"
-    -- LesonBoxTip.m_nCorrectCount = 0 --连续检查正确的次数
-    LesonBoxTip.m_nCreateBoxCount = 0
-    LesonBoxTip.NeedChangeBlocks = {} --检查以后错误的方块
-    LesonBoxTip.AllNeedBuildBlock = {} --小节开始时，所有需要创建或者删除的方块，用于备份
-    LesonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方块
-    LesonBoxTip.CreatePos = nil
-    LesonBoxTip.SrcBlockOrigin = nil
-    LesonBoxTip.m_nCurStageIndex = LesonBoxTip.m_nCurStageIndex + 1
-    --print("LesonBoxTip stage===========",LesonBoxTip.m_nCurStageIndex,LesonBoxTip.m_nMaxStageIndex,LesonBoxTip.m_nCurStageIndex )
-    if LesonBoxTip.m_nCurStageIndex > LesonBoxTip.m_nMaxStageIndex then
-        LesonBoxTip.m_nCurStageIndex = 0
-        LesonBoxTip.m_nMaxStageIndex = 0
+    isFinishStage = false
+    -- LessonBoxTip.m_nCorrectCount = 0 --连续检查正确的次数
+    LessonBoxTip.m_nCreateBoxCount = 0
+    LessonBoxTip.NeedChangeBlocks = {} --检查以后错误的方块
+    LessonBoxTip.AllNeedBuildBlock = {} --小节开始时，所有需要创建或者删除的方块，用于备份
+    LessonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方块
+    LessonBoxTip.CreatePos = nil
+    LessonBoxTip.SrcBlockOrigin = nil
+    LessonBoxTip.m_nCurStageIndex = LessonBoxTip.m_nCurStageIndex + 1
+    --print("LessonBoxTip stage===========",LessonBoxTip.m_nCurStageIndex,LessonBoxTip.m_nMaxStageIndex,LessonBoxTip.m_nCurStageIndex )
+    if LessonBoxTip.m_nCurStageIndex > LessonBoxTip.m_nMaxStageIndex then
+        LessonBoxTip.m_nCurStageIndex = 0
+        LessonBoxTip.m_nMaxStageIndex = 0
         -- GameLogic.AddBBS(nil,"当前步骤的所有课程已经全部完成，你可以点击下一个步骤继续学习")
-        LesonBoxTip.OnRetunMacro(true)
+        LessonBoxTip.OnRetunMacro(true)
         return 
     end
-    LesonBoxTip.EndTip()
-    LesonBoxTip.UpdateCheckBtnStatus(checkBtnType)
-    LesonBoxTip.UpdateNextBtnStatus()
-    LesonBoxTip.PrepareStageScene()
+    LessonBoxTip.EndTip()
+    LessonBoxTip.UpdateCheckBtnStatus(checkBtnType)
+    LessonBoxTip.UpdateNextBtnStatus()
+    LessonBoxTip.PrepareStageScene()
 end
 
-function LesonBoxTip.ExitLesson()
+function LessonBoxTip.ExitLesson()
     
 end
 
 
-function LesonBoxTip.LockLessonArea()
+function LessonBoxTip.LockLessonArea()
     lockarea_timer = lockarea_timer or commonlib.Timer:new({callbackFunc = function(timer)
 		if World2In1.GetCurrentType() == "course" then
             local player = EntityManager.GetPlayer()
@@ -1112,14 +1125,14 @@ function LesonBoxTip.LockLessonArea()
     
 end
 
-function LesonBoxTip.EndLockArea()
+function LessonBoxTip.EndLockArea()
     if lockarea_timer then
         lockarea_timer:Change()
         lockarea_timer = nil
     end
 end
 
-function LesonBoxTip.EndAllTimer()
+function LessonBoxTip.EndAllTimer()
     if lockarea_timer then
         lockarea_timer:Change()
         lockarea_timer = nil
@@ -1139,6 +1152,23 @@ function LesonBoxTip.EndAllTimer()
     if check_timer then
         check_timer:Change()
         check_timer = nil
+    end
+end
+
+function LessonBoxTip.PlayLessonMusic(strType)
+    local strType = strType or "free_world"
+    if strType == "login" then
+        World2In1.PlayLogoMusic()
+    elseif strType == "free_world" then
+        World2In1.PlayWorldMusic()
+    elseif strType == "lesson" then
+        World2In1.PlayLessonMusic()
+    elseif strType == "lesson_operate" then
+        World2In1.PlayOperateMusic()
+    elseif strType == "creator" then
+        World2In1.PlayCreatorMusic()
+    elseif strType == "other" then
+        World2In1.PlayOtherMusic()
     end
 end
 

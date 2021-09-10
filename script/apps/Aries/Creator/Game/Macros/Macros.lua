@@ -162,9 +162,7 @@ function Macros:BeginRecord()
 	self.isRecording = true;
 	self.macros = {};
 	
-	local lastCamera = self:GetLastCameraParams()
-	lastCamera.lookatX, lastCamera.lookatY, lastCamera.lookatZ = nil, nil, nil;
-	lastCamera.camobjDist, lastCamera.LiftupAngle, lastCamera.CameraRotY = 8, 0.4, 0;
+	self:ResetLastCameraParams()
 
 	startTime = commonlib.TimerManager.GetCurrentTime();
 	idleStartTime = startTime;
@@ -574,6 +572,12 @@ function Macros:GetLastCameraParams()
 	return lastCamera;
 end
 
+function Macros:ResetLastCameraParams()
+	local lastCamera = self:GetLastCameraParams()
+	lastCamera.lookatX, lastCamera.lookatY, lastCamera.lookatZ = nil, nil, nil;
+	lastCamera.camobjDist, lastCamera.LiftupAngle, lastCamera.CameraRotY = 8, 0.4, 0;
+end
+
 function Macros:LockInput()
 	System.os.options.DisableInput(true);
 end
@@ -720,6 +724,8 @@ end
 function Macros:BeginPlay()
 	self:EndRecord()
 	self:Init();
+	
+	self:ResetLastCameraParams()
 
 	self.isPlaying = true;
 	Macros.SetNextKeyPressWithMouseMove(nil, nil)

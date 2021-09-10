@@ -45,6 +45,38 @@ function OpenVip()
     local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
     VipPage.ShowPage(name);
 end
+
+function IsAiSchoolType()
+    return RedSummerCampCommonPage.IsAiSchoolType()
+end
+
+function ClickCustomerService()
+    --GameLogic.AddBBS(nil, L"敬请期待");
+    ParaGlobal.ShellExecute('open', L'https://wpa1.qq.com/TxyKupLK?_type=wpa&qidian=true', '', '', 1)
+end
+
+function ClickVisitSchool()
+    local ParaWorldList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldList.lua");
+    ParaWorldList.ShowPage();
+    --GameLogic.GetFilters():apply_filters('show_offical_worlds_page', nil, nil, "场景")
+end
+
+function ClickApply()
+    --[[GameLogic.GetFilters():apply_filters('cellar.my_school.after_selected_school', function ()
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+        KeepWorkItemManager.LoadProfile(false, function()
+            local profile = KeepWorkItemManager.GetProfile()
+            -- 是否选择了学校
+            if profile and profile.schoolId and profile.schoolId > 0 then
+                NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+                local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+                QuestAction.AchieveTask("40003_1", 1, true)
+            end
+        end)
+    end);]]--
+
+    GameLogic.AddBBS(nil, L"敬请期待");
+end
 ]]>
 </script>
 <style type="text/mcss">
@@ -111,10 +143,22 @@ end
                 </div>
             </div>
 
-            <div style="width: 1242px;">
-                <input type="button" onclick="ClickLBBt" value='<%=GetData("lb_bt_desc")%>' style="position: relative; margin-left: 150px; margin-top: 0px;color: #1335a0;font-weight: bold; font-size: 16px; base-font-size:16px;width: 120px; height: 80px; background:;"/>
-                <input type="button" value='<%=GetData("rb_bt_desc")%>' onclick="ClickRBBt" class="yellon_button" style="margin-left:1010px;margin-top:15px;" />
-            </div>
+            <pe:if condition="<%=IsAiSchoolType()%>">
+                <div style="width: 1242px;">
+                    <!-- <input type="button" onclick="ClickLBBt" value='<%=GetData("lb_bt_desc")%>' style="position: relative; margin-left: 150px; margin-top: 0px;color: #1335a0;font-weight: bold; font-size: 16px; base-font-size:16px;width: 120px; height: 80px; background:;"/> -->
+                    <input type="button" value='' onclick="ClickCustomerService" style="float: left; margin-left:540px;margin-top:32px;width: 63px;height: 20px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi3_63X20_32bits.png#0 0 63 20)" />
+                    <input type="button" value='' onclick="ClickVisitSchool" style="float: left; margin-left:20px;margin-top:32px;width: 191px;height: 20px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi2_191X20_32bits.png#0 0 191 20)" />
+                    <input type="button" value='' onclick="ClickApply" style="float: left; margin-left:-20px;margin-top:32px;width: 191px;height: 20px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi1_191X20_32bits.png#0 0 191 20)" />
+                    <input type="button" value='<%=GetData("rb_bt_desc")%>' onclick="ClickRBBt" class="yellon_button" style="float: left;margin-left:20px;margin-top:15px;" />
+                </div>
+            </pe:if>
+            <pe:if condition="<%=not IsAiSchoolType()%>">
+                <div style="width: 1242px;">
+                    <input type="button" onclick="ClickLBBt" value='<%=GetData("lb_bt_desc")%>' style="position: relative; margin-left: 150px; margin-top: 0px;color: #1335a0;font-weight: bold; font-size: 16px; base-font-size:16px;width: 120px; height: 80px; background:;"/>
+                    <input type="button" value='<%=GetData("rb_bt_desc")%>' onclick="ClickRBBt" class="yellon_button" style="margin-left:1010px;margin-top:15px;" />
+                </div>
+            </pe:if>
+
         </div>
     </pe:container>
     <pe:container alignment="_lb" style ="width: 100px;height: 60px;background:url();">

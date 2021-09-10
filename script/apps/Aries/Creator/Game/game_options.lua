@@ -1056,7 +1056,7 @@ function options:SetUIScaling(value)
 			scaling = frame_height / self.min_ui_height;
 		end
 	end
-	screen:SetUIScale(scaling, scaling)
+	Screen:SetUIScale(scaling, scaling)
 end
 
 function options:GetUIScaling()

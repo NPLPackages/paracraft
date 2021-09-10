@@ -62,21 +62,25 @@ function ItemWorld2In1:FrameMove()
 end
 
 function ItemWorld2In1:GetTargetFilePath()
+	local path
 	if self.type == "model" then
-		local model_path = Files.GetWorldFilePath(string.format("items/%s/%s.x", self.type, self.name))
+		local model_path = Files.GetWorldFilePath(string.format("items/%s/%s.x", self.type, self.filename))
 		if not model_path then
-			model_path = Files.GetWorldFilePath(string.format("items/%s/%s.bmax", self.type, self.name))
+			model_path = Files.GetWorldFilePath(string.format("items/%s/%s.bmax", self.type, self.filename))
 		end
 		
-		return model_path
+		path = model_path
+		
 	elseif self.type == "resource" then
-		local model_path = Files.GetWorldFilePath(string.format("items/%s/%s", self.type, self.name))
-		return model_path
+		local model_path = Files.GetWorldFilePath(string.format("items/%s/%s", self.type, self.filename))
+		path = model_path
 	else
-		local template_path = Files.GetWorldFilePath(string.format("items/%s/%s.xml", self.type, self.name))
-
-		return template_path
+		local template_path = Files.GetWorldFilePath(string.format("items/%s/%s.blocks.xml", self.type, self.filename))
+		path = template_path
 	end
+
+	path = commonlib.Encoding.DefaultToUtf8(path)
+	return path
 end
 
 function ItemWorld2In1:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_region)

@@ -39,6 +39,8 @@ local CodeBlockWindow = commonlib.inherit(commonlib.gettable("System.Core.ToolBa
 
 -- whether we are using big code window size
 CodeBlockWindow:Property({"BigCodeWindowSize", false, "IsBigCodeWindowSize", "SetBigCodeWindowSize"});
+-- code text size
+CodeBlockWindow:Property({"fontSize", 13, "GetFontSize", "SetFontSize"});
 
 -- when entity being edited is changed. 
 CodeBlockWindow:Signal("entityChanged", function(entity) end)
@@ -1404,6 +1406,17 @@ function CodeBlockWindow.CloseNplBlocklyEditorPage()
 	CodeBlockWindow.UpdateNplBlocklyCode();
 	NplBlocklyEditorPage:CloseWindow();
 	NplBlocklyEditorPage = nil;
+end
+
+function CodeBlockWindow.SetFontSize(value)
+	CodeBlockWindow.fontSize = value or 13;
+	if(page) then
+		page:Refresh(0.01);
+	end
+end
+
+function CodeBlockWindow.GetFontSize()
+	return CodeBlockWindow.fontSize or 13;
 end
 
 CodeBlockWindow:InitSingleton();

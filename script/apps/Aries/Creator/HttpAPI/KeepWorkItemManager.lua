@@ -1055,3 +1055,15 @@ function KeepWorkItemManager.IsVip()
 	local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(gsid)
 	return (copies and copies > 0) or (System and System.User and System.User.isVip);
 end
+
+-- 是否为机构会员
+function KeepWorkItemManager.IsOrgVip()
+	local profile = KeepWorkItemManager.GetProfile();
+    return (profile.student == 1) or (profile.orgAdmin == 1) or (profile.tLevel == 1)
+end
+
+-- 是否为机构学生会员
+function KeepWorkItemManager.IsOrgStudentVip()
+	local profile = KeepWorkItemManager.GetProfile();
+    return (profile.student == 1);
+end

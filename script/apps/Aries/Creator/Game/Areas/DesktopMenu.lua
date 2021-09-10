@@ -77,7 +77,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 			},
 		},
 		]]
-		{text = L"窗口", order=6, mode="edit", name = "window",children = 
+		{text = L"窗口", order=6, name = "window",children = 
 			{
 				{text = L"探索...",name = "window.explore", onclick=nil},
 				{text = L"人物...",name = "window.role", onclick=nil},
@@ -103,16 +103,16 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		},
 		{text = L"帮助", order=7, name = "help",children = 
 			{
-				-- {text = L"新手引导",name = "help.userintroduction", onclick=nil},
+				{text = L"新手引导",name = "help.userintroduction", onclick=nil},
 				{text = L"教学视频",name = "help.videotutorials", onclick=nil},
-				{text = L"学习资源",name = "help.learn", onclick=nil},
+				{text = L"官方文档",name = "help.learn", onclick=nil},
 				{text = L"推荐课程...",name = "help.dailycheck", onclick=nil},
-				{text = L"提问",name = "help.ask", onclick=nil},
 				{Type = "Separator"},
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"帮助...".."  F1",name = "help.help", onclick=nil},
 				{text = L"快捷键",name = "help.help.shortcutkey", onclick=nil},
 				{Type = "Separator"},
+				{text = L"提问",name = "help.ask", onclick=nil},
 				{text = L"提交意见与反馈",name = "help.bug", onclick=nil},
 				--{text = L"NPL Code Wiki...(F11)",name = "help.npl_code_wiki", autoclose=true, onclick=nil},
 				--{text = L"开发文档",name = "help.ParacraftSDK", onclick=nil},

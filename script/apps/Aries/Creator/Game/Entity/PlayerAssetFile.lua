@@ -332,8 +332,13 @@ function PlayerAssetFile.ShowPetOrNot(player, attachments, playerEntity, isAttac
 		local dummmyPlayerObj = dummmyPlayerEntity:GetInnerObject();
 		dummmyPlayerObj:ToCharacter():MountOn(player)
 		dummmyPlayerObj:SetAnimation(187);
-		playerEntity.petObj = dummmyPlayerObj;
+		
+		-- if user has already hidden
+		if(not playerEntity:IsVisible()) then
+			dummmyPlayerObj:SetVisible(false)
+		end
 
+		playerEntity.petObj = dummmyPlayerObj;
 		commonlib.TimerManager.SetTimeout(function()
 			playerEntity:SetHeadOnDisplay(nil);
 			dummmyPlayerEntity:SetHeadOnDisplay(playerEntity.headUI_Params);

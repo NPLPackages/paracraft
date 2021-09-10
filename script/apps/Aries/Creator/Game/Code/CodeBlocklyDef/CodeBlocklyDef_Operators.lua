@@ -397,7 +397,7 @@ end
 				{ L"向下取整", "floor"},
 				{ "tab", "tan"},
 				{ "atan", "atan"},
-				{ "sin", "exp"},
+				{ "log", "log"},
 				{ "log10", "log10"},
 				{ "exp", "exp"},
 				{ L"转成数字", "tonumber"},

@@ -24,7 +24,7 @@ ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 200;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 209;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -227,6 +227,36 @@ NPL自定义世界图块
 密室解锁逻辑（上）
 密室解锁逻辑（下）
 将电脑使用权还给孩子
+禁止世界另存为
+设置世界的多人编辑权限
+世界权限分组与只读权限
+更改光源颜色
+新手模板F1
+创建新手模板（上）
+创建新手模板（下）
+分享作品视频和点赞
+搜索官方文档
+制作有待机动画的方块模型
+制作有行走动作的方块模型
+自主动画方块模型
+基于角色扮演的动画制作
+摄影机与蒙太奇动画
+《创意空间》介绍
+自我检测表
+多人联网共享数据
+多人联网排行榜
+手机版操作介绍（上）
+手机版操作介绍（下）
+给平板电脑加上键盘和鼠标
+发布手机App
+世界激活码（上）
+世界激活码（下）
+新建世界模板展示
+2合1课程世界介绍（上）
+2合1课程世界介绍（下）
+3C教学法介绍
+摄影机图块(上)
+摄影机图块(下)
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 
@@ -409,7 +439,7 @@ function ParacraftLearningRoomDailyPage.OnCheckinToday()
 	ParacraftLearningRoomDailyPage.OnOpenWeb(index)
 end
 function ParacraftLearningRoomDailyPage.IsVip()
-	return KeepWorkItemManager.IsVip()
+	return KeepWorkItemManager.IsVip() or KeepWorkItemManager.IsOrgVip()
 end
 function ParacraftLearningRoomDailyPage.GetNextDay()
 	local copies = ParacraftLearningRoomDailyPage.copies or 0;

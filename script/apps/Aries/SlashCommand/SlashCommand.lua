@@ -40,10 +40,7 @@ local proxy_addr_templ = "(%s)%s:script/apps/Aries/Debug/GMCmd_Server.lua";
 -- the global instance, because there is only one instance of this object
 local g_singleton;
 
--- array of supported slash command. each command is a table of {name={"name1", "name2"}, quick_ref="", desc="", handler = function(cmd_name, cmd_text, cmd_params) end}
-local slash_command_list = {};
-SlashCommand.slash_command_list = slash_command_list;
--- mapping from names to command table.
+-- mapping from names to command table.each command is a table of {name={"name1", "name2"}, quick_ref="", desc="", handler = function(cmd_name, cmd_text, cmd_params) end}
 local slash_command_maps = {};
 SlashCommand.slash_command_maps = slash_command_maps;
 
@@ -99,28 +96,23 @@ end
 -- register a slash command
 -- @param cmd_table: a table of {name="", alter_names={"", ""}, quick_ref="", desc="", handler = function(cmd_name, cmd_text, cmd_params) end}
 function SlashCommand:RegisterSlashCommand(cmd_table)
-	local bHasCommand;
-
 	if(not cmd_table.ctor) then
 		-- create a new table
 		cmd_table = Command:new(cmd_table);
 	end
 
 	if(type(cmd_table.name) == "string") then
-		bHasCommand = SlashCommand.GetSlashCommand(cmd_table.name);
-		slash_command_maps[cmd_table.name] = cmd_table;
-	elseif(type(cmd_table.name) == "table") then
-		local _, cmd_name;
-		for _, cmd_name in ipairs(cmd_table.name) do
-			bHasCommand = bHasCommand or SlashCommand.GetSlashCommand(cmd_name);
-			slash_command_maps[cmd_name] = cmd_table;
+		local oldCommand = SlashCommand.GetSlashCommand(cmd_table.name);
+		if(oldCommand ~= cmd_table) then
+			slash_command_maps[cmd_table.name] = cmd_table;
 		end
-	end
-
-	if(not bHasCommand) then
-		slash_command_list[#slash_command_list+1] = cmd_table;
-	else
-		LOG.std(nil, "warn", "SlashCommand", "duplicated slash command registered: %s", commonlib.serialize_compact(cmd_table.name));
+	elseif(type(cmd_table.name) == "table") then
+		for _, cmd_name in ipairs(cmd_table.name) do
+			local oldCommand = SlashCommand.GetSlashCommand(cmd_name);
+			if(oldCommand ~= cmd_table) then
+				slash_command_maps[cmd_name] = cmd_table;
+			end
+		end
 	end
 end
 
@@ -136,9 +128,8 @@ function SlashCommand:RemoveSlashCommand(name)
 	if(type(name) == "string") then
 		slash_command_maps[name] = nil;
 	elseif(type(name) == "table") then
-		local _, cmd_name;
 		for _, cmd_name in ipairs(name) do
-			slash_command_maps[name] = nil;
+			slash_command_maps[cmd_name] = nil;
 		end
 	end
 end

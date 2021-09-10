@@ -67,7 +67,19 @@ RedSummerCampCommonPage.pageData = {
 			加入帕拉卡会员，即可同大家一起踏上重走长征路与人工智能相结合的新征程！
 		]]
 	},
-		
+
+    main_world = {	
+		title="创意空间",
+		lb_bt_desc = "<<< 家长指南",
+		rb_bt_desc = "进入创意大厅",
+		img = "Texture/Aries/Creator/keepwork/RedSummerCamp/common/bg_zhengcheng_602x374_32bits.png#0 0 602 374",
+		begain_time = "",
+		end_time = "",
+		content=[[
+《创意空间》是一种利用人工智能技术的全新的<b>自主学习</b>场所。物理上可以利用学校的计算机教室，或通过学生自带电脑(平板)在普通教室中完成。<br/><div style="height: 10px;"></div>
+《创意空间》是对传统编程教育的软件工具、教学方法、教学内容的<b>全面升级</b>。在创意空间中，老师和学生可以一同学习和成长，老师可以最大化的发挥出自己的特长，例如语文、英语、数学、美术、编剧、口才等等。
+		]]
+	},
 }
 
 local page
@@ -137,8 +149,23 @@ function RedSummerCampCommonPage.ClickRBBt()
 		local world_id = id_list[httpwrapper_version]
 		GameLogic.RunCommand(format('/loadworld -s -force %d', world_id))
 	elseif RedSummerCampCommonPage.name == "ai_school" then
-		GameLogic.RunCommand(format('/loadworld -s -force %d', 52217))
+		local id_list = {
+			ONLINE = 52217,
+			RELEASE = 20617,
+		}
+		local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+		local httpwrapper_version = HttpWrapper.GetDevVersion();
+		local world_id = id_list[httpwrapper_version]
+		GameLogic.RunCommand(format('/loadworld -s -force %d', world_id))
 	elseif RedSummerCampCommonPage.name == "zhengcheng" then
 		GameLogic.RunCommand(format('/loadworld -s -force %d', 73139))
 	end
+end
+
+function RedSummerCampCommonPage.IsAiSchoolType()
+	return RedSummerCampCommonPage.name == "ai_school"
+end
+
+function RedSummerCampCommonPage.IsMainWorld()
+	return RedSummerCampCommonPage.name == "main_world"
 end

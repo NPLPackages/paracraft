@@ -104,6 +104,11 @@
                     return string.format("(%s)",VipPage.desc);
                 end
             end
+
+            function GetDesc2()
+                return VipPage.GetDesc2();
+            end
+
             function GetVipStateDesc()
                 return VipPage.GetVipStateDesc()
             end
@@ -148,7 +153,9 @@
                                 </div>
                             </pe:if>
                             
-                            <div style="position:relative;margin-left:16px;margin-top:43px;font-size:14px;color:#000000;">电脑、手机、ipad均可使用~</div>
+                            <div style="position:relative;margin-left:16px;margin-top:43px;font-size:14px;color:#000000;">
+                                <%= GetDesc2() %>
+                            </div>
                             <!--twelve_month_vip-->
                             <pe:if condition='<%= IsSelected("twelve_month_vip")%>'>
                                 <div style="position:relative;margin-left:89px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_1_32bits.png#0 0 235 32: 10 10 10 10)">

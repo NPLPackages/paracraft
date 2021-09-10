@@ -118,7 +118,7 @@ function CreateRewardManager.ShowGiftBtn(parentRoot,isCreateRegion)
 
         local txtTip = ParaUI.CreateUIObject("button", "gifttip_text", "_lt", 230, 8, 91, 30);
         txtTip.enabled = false;
-        txtTip.text = "+1奖励可领取";
+        txtTip.text = "可领取";
         txtTip.background = "";
         txtTip.font = "System;12;bold";
         txtTip.visible = false

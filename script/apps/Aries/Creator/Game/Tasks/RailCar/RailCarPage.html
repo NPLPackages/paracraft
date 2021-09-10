@@ -50,7 +50,7 @@ end
             <pe:repeat DataSource='<%=GetCameraTypeData()%>'>
                 <pe:repeatitem>
                     <div style="float:left;width: 64px;height: 64px;margin-left: 3px;">
-                        <img zorder="0" onclick="ChangeCameraType" param1='<%=Eval("index")%>' src='<%=GetIcon(Eval("index"))%>'width="64" height="64" style="position: relative;"/>
+                        <img zorder="0" tooltip='<%=Eval("name")%>' onclick="ChangeCameraType" param1='<%=Eval("index")%>' src='<%=GetIcon(Eval("index"))%>'width="64" height="64" style="position: relative;"/>
 
                         <pe:if condition='<%=Eval("type") == "lock_fixed"%>'>
                             <img zorder="0" uiname="railcar_setting_icon" onclick="OpenFiedCameraSetting" param1='<%=Eval("index")%>' src='Texture/Aries/Creator/keepwork/RailCar/icon_7_32bits.png#0 0 64 64' width="64" height="64" style="position: relative;margin-top: -69;"/>

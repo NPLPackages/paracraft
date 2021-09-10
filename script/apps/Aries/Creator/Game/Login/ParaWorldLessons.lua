@@ -331,7 +331,6 @@ function ParaWorldLessons.OnClickEnterWorld()
 		if(txtLessonId and txtLessonId~="") then
 			local pid = GameLogic.GetFilters():apply_filters('get_project_id_by_lesson_id', txtLessonId)
 			if pid then
-				CommandManager:Init()
 				CommandManager:Run(format('/loadworld -s %d', pid))
 			else
 				ParaWorldLessons.EnterWorldById(txtLessonId);
@@ -522,8 +521,6 @@ end
 -- @param callbackFunc: function(bBeginLesson) end
 -- @return true if we have processed the world id
 function ParaWorldLessons.EnterWorldById(id, callbackFunc)
-	CommandManager:Init()
-
 	local classIdMapsToProjectId = {
 		-- 455
 		['8x27'] = 455,

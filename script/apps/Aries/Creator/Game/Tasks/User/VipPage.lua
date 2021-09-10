@@ -364,8 +364,10 @@ function VipPage.GetVipStateDesc()
     local profile = KeepWorkItemManager.GetProfile()
     local state = profile.vip == 1 and "已开通" or "未开通"
     local date_desc = ""
+	local b_life_time;
     if profile.vip == 1 and profile.vipDeadline == nil then
         date_desc = "永久"
+		b_life_time = true;
     elseif profile.vip ~= 1 then
         date_desc = "未开通"
     else
@@ -376,8 +378,13 @@ function VipPage.GetVipStateDesc()
 	if profile.vip ~= 1 then
         return "你还不是会员"
     end
-
-    return string.format("你的会员在%s后到期，续费后将自动延期", date_desc)
+	local s; 
+	if(b_life_time)then
+		s = "永久会员";
+	else
+		s = string.format("你的会员在%s后到期，续费后将自动延期", date_desc)
+	end
+    return s;
 
 --    if profile.vip ~= 1 then
 --        return string.format("会员状态：%s", state)
@@ -461,4 +468,17 @@ function VipPage.IsDevMode()
     if(System and System.options)then
         return System.options.isDevEnv;
     end
+end
+
+function VipPage.GetDesc2()
+    local notOrganizationVipDesc = "电脑、手机、ipad均可使用~"
+
+	if(KeepWorkItemManager.IsOrgStudentVip()) then
+		local studentDeadline = KeepWorkItemManager.GetProfile().studentDeadline or "";
+		studentDeadline = commonlib.timehelp.GetTimeStampByDateTime(studentDeadline)
+        studentDeadline = os.date("%Y.%m.%d", studentDeadline)
+		return "机构权限已激活，到期时间为 "..studentDeadline;
+	end
+
+	return notOrganizationVipDesc;
 end

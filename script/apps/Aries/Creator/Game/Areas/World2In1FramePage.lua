@@ -89,7 +89,12 @@ function World2In1FramePage.OnClickBlock(index)
 		-- 有价格的话 查询表 看是否已经购买
 		local result = World2In1FramePage.CheckItemPurchases(block_item)
 		if not result then
-			local desc = string.format("%s需要%s个知识豆，确定购买吗", block_item.name, block_item.price)
+			local item_name = block_item.name
+			if not item_name or item_name == "" then
+				item_name = block_item.tips or ""
+			end
+			--block_item.price = 1
+			local desc = string.format("%s需要%s个知识豆，确定购买吗", item_name, block_item.price)
 			_guihelper.MessageBox(desc, function()	
 				local bean_gsid = 998;
 				local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
@@ -116,6 +121,9 @@ function World2In1FramePage.OnClickBlock(index)
 						World2In1FramePage.SaveToXml()
 
 						World2In1FramePage.OnClickBlock(index)
+						if(page) then
+							page:Refresh(0);
+						end
 					end
 				end)
 			end)
@@ -139,7 +147,7 @@ function World2In1FramePage.OnClickBlock(index)
 	elseif block_item.type == "sandtable" then
 		local filename = block_item.filename
 		if filename then
-			local file = string.format("config/Aries/creator/template/sandtable/%s.xml", filename)
+			local file = string.format("config/Aries/creator/template/sandtable/%s.blocks.xml", filename)
 			--CommandManager:RunCommand("/loadtemplate "..file);
 			World2In1FramePage.SelectTemplatePath = file
 			World2In1FramePage.CreateSandTable()
@@ -461,4 +469,21 @@ function World2In1FramePage.IsResourceType()
 	end
 
 	return category_data.type == "resource"
+end
+
+function World2In1FramePage.IsShowBeanIcon(index)
+	local block_item =  World2In1FramePage.Current_Item_DS[index]
+
+	if not block_item then
+		return false
+	end
+
+	local price = block_item.price
+	if not price or price == 0 then
+		return false
+	end
+
+	local result = World2In1FramePage.CheckItemPurchases(block_item)
+
+	return not result
 end

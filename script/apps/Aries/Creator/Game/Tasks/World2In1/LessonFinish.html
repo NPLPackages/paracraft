@@ -11,15 +11,26 @@
     function GetText()
         return string.format([[太棒了！%s，你完成了%s!]],System.User.NickName,LessonFinish.strTitle)
     end
+    function GetUserName()
+        return commonlib.GetLimitLabel(System.User.NickName,11)
+    end
+    function GetTitle()
+        return LessonFinish.strTitle
+    end
 ]]></script>
 <pe:container alignment="_fi" width="100%" height="100%" style=" background-color: #00000080;">
     <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;background: ;">
         <div style="margin-top: -220px;margin-left: 140px; width: 1024x; height: 751px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/finish_1024X751_32bits.png#0 0 1024 751);">
-            <div style="margin-top: 600px; width: 1024px; height: 60px; ">
-                <pe:label value="<%=GetText()%>" style="margin-left: 160px; height: 60px;color:#ffffff;font-size: 30px;base-font-size:30px;"></pe:label>
+            <div style="margin-top: 600px; width: 1024px; height: 120px; font-weight: bold; ">
+                <div style="position: relative; margin-left: 120px; height: 60px;color:#eca927;font-size: 30px;base-font-size:30px;">太棒了！</div>
+                <div style="position: relative; margin-left: 246px; height: 60px;color:#ffffff;font-size: 30px;base-font-size:30px;"><%=GetUserName()%></div>
+                <div style="position: relative; margin-left: 440px; height: 60px;color:#eca927;font-size: 30px;base-font-size:30px;">，你完成了</div>
+                <div style="position: relative; margin-left: 592px; height: 60px;color:#ffffff;font-size: 30px;base-font-size:30px;"><%=GetTitle()%></div>
+                <!-- <div style="position: relative; margin-left: 840px; height: 60px;color:#eca927;font-size: 30px;base-font-size:30px;">！</div> -->
             </div>
         </div>    
         <input type="button" style="margin-left: 600px; margin-top: 30px; width:128px;height:47px;background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/ok_128X47_32bits.png#0 0 128 47);" onclick="ClosePage()"/>
+        <pe:label name="close_cutdown" style="margin-top: 33px; margin-left: -46px;height:  60px; position: relative;color: #000000; font-size: 26px; base-font-size:26px;font-weight: bold;"></pe:label>
     </pe:container>    
 </pe:container>
 </pe:mcml>

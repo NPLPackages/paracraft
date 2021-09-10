@@ -202,6 +202,8 @@ function BuildinMod.AddBuildinMods()
 	local ModManager = commonlib.gettable("Mod.ModManager");
 	local pluginloader = ModManager:GetLoader();
 
+	LOG.std(nil, "info", "BuildinMod", "loading buildin mods");
+
 	-- ensure that the same package_path are only loaded once.
 	local loaded_packages = {};
 	for _, mod in ipairs(BuildinMod.buildin_mods) do

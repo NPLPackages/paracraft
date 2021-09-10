@@ -10,9 +10,7 @@
         <script refresh="true" type="text/npl" src="RedSummerCampMainPage.lua">
 <![CDATA[
 local RedSummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainPage.lua");
-local CommonLoadWorld = NPL.load('(gl)Mod/WorldShare/cellar/Common/LoadWorld/CommonLoadWorld.lua')
 local InternetLoadWorld = commonlib.gettable('MyCompany.Aries.Creator.Game.Login.InternetLoadWorld')
-local CreateWorld = NPL.load("(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua")
 RedSummerCampMainPage.OnInit()
 
 local page = document:GetPageCtrl();
@@ -71,7 +69,7 @@ function HasSchool()
 end
 
 function GetBgStyle(img)
-    return string.format("width:220px;height:220px; margin-left: 14px;margin-top: 8px;position: relative;background: url(%s)", img)
+    return string.format("width:220px;height:202px; margin-left: 14px;margin-top: 8px;position: relative;background: url(%s)", img)
 end
 
 function GetBtIconStyle(img)
@@ -132,7 +130,7 @@ function open()
     local pid = get_project_id(opus_content)
 
     if pid then
-        CommonLoadWorld:EnterWorldById(pid)
+        GameLogic.RunCommand("/loadworld " .. pid)
     else
         InternetLoadWorld.GotoUrl(opus_content)
     end
@@ -156,7 +154,11 @@ function create_new_world()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
     local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
     CreateNewWorld.ShowPage(true)
-    --CreateWorld:CreateNewWorld()
+end
+
+function OpenRole()
+    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+    last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
 end
 
 ]]>
@@ -210,7 +212,7 @@ end
         <div zorder="-2" style="float: left;width: 478px;height: 77px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bj2_478X77_32bits.png#0 0 478 77);">
             <div style="float: left;margin-left: 16px;margin-top: 8px; width: 96px;height: 96px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/touxiang3_96X96_32bits.png#0 0 96 96:16 16 16 16);">
                 <!-- <img zorder="-1" src='<%=GetHeadUrl()%>' style="position: relative;margin-left: 3px;margin-top: 4px;" width="78" height="78" onclick=""/> -->
-                <pe:mc_player name="main_user_player" miniscenegraphname="AvatarUserCharacter" style="width:128px;height:128px;margin-left: -16px; margin-top: -34px;" IsInteractive="false" NoFrameMove="false" RenderTargetSize="256" DefaultCameraObjectDist="3.7" />
+                <pe:mc_player onclick="OpenRole" name="main_user_player" miniscenegraphname="AvatarUserCharacter" style="width:128px;height:128px;margin-left: -16px; margin-top: -34px;" IsInteractive="false" NoFrameMove="false" RenderTargetSize="256" DefaultCameraObjectDist="3.7" />
                 <!-- <div zorder="-2" style="position: relative;margin-left: 3px;margin-top: 4px; width: 90px;height: 90px;background-color: #808080;"></div> -->
             </div>
 
@@ -317,25 +319,25 @@ end
             </div>
             <div style="float: left;margin-top: 52px; width: 1280px;height: 520px;">
                 <div style="float: left;width: 380px;">
-                    <div zorder="-2" style="margin-left: 22px;margin-top: 0px; width: 362px;height:496px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
+                    <div zorder="-2" style="margin-left: 22px;margin-top: 0px; width: 362px;height:449px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
                         <!-- <div zorder style="position: relative;margin-left: 14px;margin-top: 8px; width: 404px;height: 468px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468);"></div> -->
                         <!-- <input type="button" zorder="-1" value='' width="404" height="468" onclick="OnOpen" name='summer_camp' style="position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468)"/> -->
-                        <div zorder="-2" onclick="OnOpen" name='summer_camp' style="width:348px;height:478px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
-                        <div zorder="-1" style="width: 334px;height: 468px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468)"></div>
-                        <div style="margin-left: 14px;margin-top: 425px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
+                        <div zorder="-2" onclick="OnOpen" name='main_world' style="width:348px;height:431px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
+                        <div zorder="-1" style="width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/6_334X421_32bits.png#0 0 334 421)"></div>
+                        <div style="margin-left: 14px;margin-top: 378px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                             <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
-                                帕拉卡红色夏令营
+                                创意空间
                             </div>
                         </div>
                     </div>
                 </div>
     
-                <div style="float: left;margin-top: 0px;">
+                <div style="float: left;margin-top: 2px;">
                     <pe:repeat DataSource="<%=GetItemData()%>">
                         <pe:repeatitem>
-                            <div zorder="-2" style="float: left;margin-left: 19px;margin-top: 0px; width: 248px;height:248px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
+                            <div zorder="-2" style="float: left;margin-left: 19px;margin-top: -6px; width: 248px;height:230px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
                                 <!-- <input type="button" zorder="-1" value='' width="220" height="220" onclick="OnOpen" style='<%=GetBgStyle(Eval("img"))%>' name='<%=Eval("node_name")%>' /> -->
-                                <div zorder="-2" onclick="OnOpen" name='<%=Eval("node_name")%>' style="width:233px;height:233px; margin-left: 7px;margin-top: 3px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
+                                <div zorder="-2" onclick="OnOpen" name='<%=Eval("node_name")%>' style="width:233px;height:215px; margin-left: 7px;margin-top: 3px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
                                 <div zorder="-1" style='<%=GetBgStyle(Eval("img"))%>'></div>
                                 <pe:if condition='<%=Eval("is_show_recommend") == true%>'>
                                     <div style="position: relative;margin-left: -3px;margin-top: -2px; width: 110px;height: 32px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi1_32X32_32bits.png#0 0 32 32:14 5 7 12)">
@@ -346,7 +348,7 @@ end
                                 <pe:if condition='<%=Eval("is_show_vip")%>'>
                                     <div style="position: relative;margin-left: -2px;margin-top: -11px; width: 48px;height: 53px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi2_48X53_32bits.png#0 0 48 53)"></div>
                                 </pe:if>
-                                <div style="margin-left: 14px;margin-top: 187px; position: relative;width: 220px;height:41px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
+                                <div style="margin-left: 14px;margin-top: 169px; position: relative;width: 220px;height:41px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                                     <div style="margin-top: 10px; text-align: center;base-font-size:18px;font-size: 18px;color: #ffffff;font-weight: bold;">
                                         <%=Eval("name")%>
                                     </div>
@@ -369,20 +371,20 @@ end
 
         </pe:container>
 
-        <pe:container alignment="_lb" width="676" height="36" style="margin-left: 28px;margin-bottom: 26px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/gundong_128X36_32bits.png#0 0 128 36:40 5 28 5);">
-            <pe:container SelfPaint="true" width="676" height="34" style="background:;">
-                <pe:container width="676" onclick="OnClickNotice1" height="36" uiname="notice_container_1" style="position: relative;background: ;">
-                    <pe:label value="" name="notic_text1" style="margin-left: 50px;margin-top: 6px; height: 30px;color: #000000;base-font-size:16px;font-size: 16px;font-weight: bold;"></pe:label>
+        <pe:container alignment="_lb" width="598" height="60" style="margin-left: 32px;margin-bottom: 48px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/di_32X60_32bits.png#0 0 32 60:8 8 8 8);">
+            <pe:container SelfPaint="true" width="598" height="60" style="background:;">
+                <pe:container width="598" onclick="OnClickNotice1" height="62" uiname="notice_container_1" style="position: relative;background: ;">
+                    <pe:label value="" name="notic_text1" style="margin-left: 16px;margin-top: 18px; height: 60px;color: #000000;base-font-size:16px;font-size: 16px;font-weight: bold;"></pe:label>
                 </pe:container>
-                <pe:container width="676" onclick="OnClickNotice2" height="36" uiname="notice_container_2" style="position: relative;margin-top: 36px;background:">
-                    <pe:label value="" name="notic_text2" style="margin-left: 50px;margin-top: 6px; height: 30px;color: #000000;base-font-size:16px;font-size: 16px;font-weight: bold;"></pe:label>
+                <pe:container width="598" onclick="OnClickNotice2" height="62" uiname="notice_container_2" style="position: relative;margin-top: 36px;background:">
+                    <pe:label value="" name="notic_text2" style="margin-left: 16px;margin-top: 18px; height: 60px;color: #000000;base-font-size:16px;font-size: 16px;font-weight: bold;"></pe:label>
                 </pe:container>
             </pe:container>
         </pe:container>
 
-        <pe:container alignment="_rb" width="554" height="82" style="margin-right: 0px;margin-bottom: 0px; background:url();">
-            <input type="button" value='新建世界' onclick="create_new_world" class="yellon_button" style="margin-left:118px;margin-top:10px;text-offset-y:-2;" />
-            <input type="button" value='加载世界' onclick="QuickStart" class="yellon_button" style="margin-left:25px;margin-top:10px;text-offset-y:-2;" />
+        <pe:container alignment="_rb" width="465" height="102" style="margin-right: 98px;margin-bottom: 26px;background:;">
+            <input type="button" value='' onclick="create_new_world" style="width: 156px;height: 56px; margin-left:0px;margin-top:26px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b3_156X56_32bits.png#0 0 156 56)" />
+            <input type="button" value='' onclick="QuickStart" style="margin-left:25px;margin-top:0px; width: 279px;height: 110px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b4_279X110_32bits.png#0 0 279 110)" />
         </pe:container>
             <!-- <input type="button" value='打开 神通杯' name="shentongbei" />
             <input type="button" value='打开 推荐课程' name="RedSummerCampRecCoursePage" onclick="OnOpen" />

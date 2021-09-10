@@ -285,9 +285,6 @@ function Game.StartServer(worldpath)
 
 	Game.Start(worldpath, nil, 0, nil, nil, function()
 		LOG.std(nil, "info", "Game", "server mode load world: %s", worldpath);
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
-		local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-		CommandManager:Init();
 		local ip = ParaEngine.GetAppCommandLineByParam("ip", "0.0.0.0");
 		local port = ParaEngine.GetAppCommandLineByParam("port", "");
 		local autosaveInterval = ParaEngine.GetAppCommandLineByParam("autosave", "");

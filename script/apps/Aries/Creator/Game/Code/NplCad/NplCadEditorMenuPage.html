@@ -55,6 +55,9 @@
             }
             return objParams;
         end
+        function OnFillMovieClip()
+            NplCadEditorMenuPage.OnFillMovieClip(entity)
+        end
         function OutputParax()
             NplCadEditorMenuPage.OutputParax(entity)
         end
@@ -176,11 +179,12 @@
                                             </div>
                                             <div style="float:left;">
                                                 <div>
-                                                    <input type="button" value="抓取模型" class="mc_light_grey_button_with_fillet" onclick="OnTakeModel" style="margin-left:5px;width:80px;height:25px;color:#ffffff;" />
+                                                    <input type="button" value="生成模型" class="mc_light_grey_button_with_fillet" onclick="OutputParax" tooltip='<%=GetModelPath()%>' style="margin-left:5px;width:80px;height:25px;color:#ffffff;" />
                                                 </div>
                                                 <div>
-                                                    <input type="button" value="生成模型" class="mc_light_grey_button_with_fillet" onclick="OutputParax" tooltip='<%=GetModelPath()%>' style="margin-left:5px;margin-top:5px;width:80px;height:25px;color:#ffffff;" />
+                                                    <input type="button" value="电影方块" class="mc_light_grey_button_with_fillet" onclick="OnFillMovieClip" style="margin-left:5px;margin-top:5px;width:80px;height:25px;color:#ffffff;" />
                                                 </div>
+                                                
                                                 <div style="position:relative;">
                                                     <input type="button" value="导出数据" class="mc_light_grey_button_with_fillet" onclick="OnOpenJson" tooltip='导出Json数据' style="margin-left:5px;margin-top:5px;width:80px;height:25px;color:#ffffff;" />
                                                 </div>

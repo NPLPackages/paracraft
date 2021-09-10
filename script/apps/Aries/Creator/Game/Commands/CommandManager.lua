@@ -28,74 +28,79 @@ local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 
--- call this when command
-function CommandManager:Init()
-	local cmd_class = SlashCommand.GetSingleton():GetSlashCommand("loadworld");
-	if(cmd_class) then
-		-- already initialized
-		GameLogic.GetFilters():apply_filters("register_command", Commands, SlashCommand.GetSingleton());
-		self:Register(SlashCommand.GetSingleton());
-		return
+function CommandManager:TryInit()
+	if(not self.is_registered) then
+		self:Init()
 	end
+end
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlocks.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandShapes.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandInstall.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandPlayer.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMovie.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandRules.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandProgram.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandItem.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTime.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTemplate.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandCamera.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandAudio.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandActivate.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlockType.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTexture.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSet.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandOpen.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlockTransform.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEntity.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandPublishSourceScript.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandActor.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandRecord.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandConvert.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandNetwork.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEffect.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSelect.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandCreate.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandCCS.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandShow.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDropFile.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMenu.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSystem.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDump.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSky.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTeleport.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWalk.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSay.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDoc.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEvent.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSpawn.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandProperty.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandLanguage.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMount.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandQuest.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWiki.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDiff.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTerrain.lua");
+-- call this when command
+function CommandManager:Init(bRefresh)
+	if(not self.isInited) then
+		self.isInited = true;
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlocks.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandShapes.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandInstall.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandPlayer.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMovie.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandRules.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandProgram.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandItem.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTime.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTemplate.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandCamera.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandAudio.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandActivate.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlockType.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTexture.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSet.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandOpen.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandBlockTransform.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEntity.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandPublishSourceScript.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandActor.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandRecord.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandConvert.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandNetwork.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEffect.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSelect.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandCreate.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandCCS.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandShow.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDropFile.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMenu.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSystem.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDump.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSky.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTeleport.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWalk.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSay.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDoc.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEvent.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSpawn.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandProperty.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandLanguage.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMount.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandQuest.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWiki.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandDiff.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandTerrain.lua");
+
+		-- TODO: add more system command here
+	end
 
 	GameLogic.GetFilters():apply_filters("register_command", Commands, SlashCommand.GetSingleton());
 
-	self:Register(SlashCommand.GetSingleton());
+	self:Register(SlashCommand.GetSingleton(), bRefresh);
 end
 
 -- run one text command
 -- @param cmd_name: this can be command name or full command text that begin with "/" or nothing. 
 function CommandManager:RunCommand(cmd_name, cmd_text, ...)
+	self:TryInit()
 	if(not cmd_text or cmd_text == "") then
 		cmd_name, cmd_text = cmd_name:match("^/*(%w+)%s*(.*)$");
 	end
@@ -229,21 +234,9 @@ function CommandManager:RunFromConsole(cmd, player)
 	end
 end
 
--- destroy the command manager
-function CommandManager:Destroy()
-	if(self.slash_command) then
-		local slash_command = self.slash_command;
-		local name, value
-		for name, value in pairs(Commands) do
-			slash_command:RemoveSlashCommand(name);
-		end
-		self.is_registered = false;
-	end
-end
-
 -- call this function to register the slash command and init
-function CommandManager:Register(slash_command)
-	if(self.is_registered) then
+function CommandManager:Register(slash_command, bRefresh)
+	if(self.is_registered and not bRefresh) then
 		return;
 	end
 	self.is_registered = true;

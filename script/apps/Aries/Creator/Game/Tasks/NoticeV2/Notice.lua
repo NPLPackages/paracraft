@@ -215,6 +215,14 @@ function Notice.OnImageBgClick(data)
         GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board4', fromName = 'sf_res' });
         return
     end   
+
+    if string.find(name, "老师的礼物") and string.find(name, "老师的礼物") > 0 then
+        Notice.CloseView()
+        local ActTeacher = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacher.lua") 
+        ActTeacher.ShowView()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1 ,"click.promotion.announcement", { from='board4', fromName = 'act_teacher' });
+        return
+    end   
     
     if string.find(name, "人工智能") and string.find(name, "人工智能") > 0 then
         Notice.CloseView()

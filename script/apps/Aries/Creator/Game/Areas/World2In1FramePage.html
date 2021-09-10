@@ -126,6 +126,10 @@ end
 function IsResourceType()
     return World2In1FramePage.IsResourceType()
 end
+
+function IsShowBeanIcon(index)
+    return World2In1FramePage.IsShowBeanIcon(tonumber(index))
+end
 ]]></script>
 <div style="">
     <!-- <div style="margin-left:13px;margin-top:5px;width:210px;">
@@ -182,8 +186,8 @@ end
                         <pe:if condition='<%=Eval("isvip")%>'>
                             <div zorder="1" style="position: relative; width: 22px;height: 25px; margin-top: -5px;margin-left: -8px; background:url(Texture/Aries/Creator/keepwork/AiCourse/VIP_48X53_32bits.png#0 0 48 53)"></div>
                         </pe:if>
-                        <pe:if condition='<%=Eval("price") ~= 0%>'>
-                            <div zorder="1" style="position: relative;margin-top: -3px;margin-left: -14px;width:38px;height:19px; background:url(Texture/Aries/Creator/keepwork/items/item_998_32bits.png)"></div>
+                        <pe:if condition='<%=IsShowBeanIcon(Eval("index"))%>'>
+                            <div zorder="1" style="position: relative;margin-top: -3px;margin-left: -14px;width:34px;height:17px; background:url(Texture/Aries/Creator/keepwork/items/item_998_32bits.png)"></div>
                         </pe:if>
         
                         <div onclick="OnClickBlock" name='<%=Eval("index")%>' tooltip='<%=GetToolTip(Eval("index"))%>' style='<%=string.format("width:32px;height:32px;background: url(%s)", Eval("icon"))%>'></div>

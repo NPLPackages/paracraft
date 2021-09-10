@@ -599,23 +599,6 @@ function QuestAllCourse.RunCommand(index, is_pre)
                 end
             end
 
-            -- 入校课程的话 需要每天8:00-15:30才能做
-            if data.isForSchool == 1 then
-                -- 判断是不是周末
-                local week_day = QuestAllCourse.GetWeekNum(server_time)
-                if week_day == 6 or week_day == 7 then
-                    _guihelper.MessageBox("现在不是上课时间哦，请在上课时间（周一至周五8:00-16:10）内再来上课吧。")
-                    return
-                else
-                    local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
-                    local limit_time_stamp = today_weehours + 8 * 60 * 60
-                    local limit_time_end_stamp = today_weehours + 16 * 60 * 60 + 10 * 60
-                    if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
-                        _guihelper.MessageBox("现在不是上课时间哦，请在上课时间（周一至周五8:00-16:10）内再来上课吧。")
-                        return
-                    end
-                end
-            end
         end
 
         keepwork.quest_complete_course.get({
@@ -694,6 +677,26 @@ function QuestAllCourse.RunCommand(index, is_pre)
         if data.isVip == 1 then
             -- local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
             -- VipToolNew.Show("AI_lesson")
+            
+            -- 入校课程的话 需要每天8:00-16:20才能做
+            if data.isForSchool == 1 then
+                -- 判断是不是周末
+                local server_time = QuestAction.GetServerTime()
+                local week_day = QuestAllCourse.GetWeekNum(server_time)
+                if week_day == 6 or week_day == 7 then
+                    _guihelper.MessageBox("现在不是上课时间哦，请在上课时间（周一至周五8:00-16:20）内再来上课吧。")
+                    return
+                else
+                    local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+                    local limit_time_stamp = today_weehours + 8 * 60 * 60
+                    local limit_time_end_stamp = today_weehours + 16 * 60 * 60 + 20 * 60
+                    if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
+                        _guihelper.MessageBox("现在不是上课时间哦，请在上课时间（周一至周五8:00-16:20）内再来上课吧。")
+                        return
+                    end
+                end
+            end
+
             local function sure_callback()
                 GameLogic.IsVip("AI_lesson", true, function(result)
                     if result then

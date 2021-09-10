@@ -3,47 +3,47 @@
 <body>
 <pe:mcml>
 <script refresh="true" type="text/npl" src=".lua" ><![CDATA[
-    local LesonBoxTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LesonBoxTip.lua");
-    LesonBoxTip.OnInit()
+    local LessonBoxTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxTip.lua");
+    LessonBoxTip.OnInit()
     function ClosePage()
         Page:CloseWindow();
     end
 
     function StartCheck()
-        LesonBoxTip.StartCheck()
+        LessonBoxTip.StartCheck()
     end
 
     function StopCheck()
-        LesonBoxTip.StopCheck()
+        LessonBoxTip.StopCheck()
     end
 
     function OnClickPre()
-        LesonBoxTip.OnClickPre()
+        LessonBoxTip.OnClickPre()
     end
 
     function OnClickNext()
-        LesonBoxTip.OnClickNext()
+        LessonBoxTip.OnClickNext()
     end
 
     function OnStartMacroLearn()
-        if LesonBoxTip.CheckHasePlayMovie() then
+        if LessonBoxTip.CheckHasePlayMovie() then
             GameLogic.AddBBS(nil,"先去老师区域，看完操作演示吧")
             return
         end
-        LesonBoxTip.OnStartMacroLearn()
+        LessonBoxTip.OnStartMacroLearn()
     end
 
     function OnRetunMacro()
-        LesonBoxTip.OnRetunMacro()
+        LessonBoxTip.OnRetunMacro()
     end
     function ReplayMovie()
-        LesonBoxTip.ReplayMovie()
+        LessonBoxTip.ReplayMovie()
     end
     function ChekShowBtn(nType)
-        return LesonBoxTip.CheckHaseNextErr(nType)
+        return LessonBoxTip.CheckHaseNextErr(nType)
     end
     function RestartScene()
-        LesonBoxTip.ResetMyArea()
+        LessonBoxTip.ResetMyArea()
     end
 ]]></script>
 <!-- Texture/Aries/Creator/keepwork/macro/lessonbox/ -->

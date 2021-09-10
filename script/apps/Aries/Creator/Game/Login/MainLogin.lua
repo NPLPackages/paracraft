@@ -599,9 +599,6 @@ function MainLogin:CheckLoadWorldFromCmdLine(bForceLoad)
 			local Game = commonlib.gettable("MyCompany.Aries.Game")
 			Game.Start(worldpath, nil, 0, nil, nil, function()
 				LOG.std(nil, "info", "MainLogin", "server mode load world: %s", worldpath);
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
-				local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-				CommandManager:Init();
 				local ip = ParaEngine.GetAppCommandLineByParam("ip", "0.0.0.0");
 				local port = ParaEngine.GetAppCommandLineByParam("port", "");
 				local autosaveInterval = ParaEngine.GetAppCommandLineByParam("autosave", "");
@@ -623,9 +620,6 @@ function MainLogin:CheckLoadWorldFromCmdLine(bForceLoad)
 
 		elseif(worldpath:match("^https?://")) then
 			LOG.std(nil, "info", "MainLogin", "loading world: %s", worldpath);
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
-			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-			CommandManager:Init();
 			GameLogic.RunCommand("loadworld", worldpath);
 		else
 			NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");

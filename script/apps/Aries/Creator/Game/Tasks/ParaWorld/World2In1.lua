@@ -15,6 +15,8 @@ NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldMiniChunkGenerator.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
+local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CreateRewardManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/CreateRewardManager.lua") 
 local World2In1UserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1UserInfo.lua");
@@ -49,6 +51,7 @@ local courcePosition = {18542,43,19197}
 
 local hidePage = false;
 local page_root = nil
+local music_path = "Audio/Haqi/keepwork/common/"
 
 World2In1.ServerWorldData = {}
 function World2In1.OnInit()
@@ -207,6 +210,7 @@ function World2In1.OnWorldUnload()
 	VideoSharingUpload.ChangeRegionType(nil)
 	World2In1.SetIsWorld2In1(false)
 	World2In1.CelarToolData()
+	World2In1.SetIsLessonBox(false)
 end
 
 function World2In1.CelarToolData()
@@ -255,6 +259,51 @@ function World2In1.BroadcastTypeChanged()
 	end
 
 	GameLogic.RunCommand("/unmount")
+	local project_id = WorldCommon.GetWorldTag("kpProjectId");
+	if project_id == 79969 then
+		World2In1.StopWorldMusic()
+		if currentType == "creator" then
+			World2In1.PlayCreatorMusic()
+		elseif currentType == "all" or currentType == "school" or currentType == "grade" then
+			World2In1.PlayOtherMusic()
+		elseif currentType == "course" then
+			World2In1.PlayWorldMusic()
+		end
+	end
+end
+
+function World2In1.PlayWorldMusic()
+	local filename = music_path.."bigworld_bgm.ogg"
+	GameLogic.RunCommand("/music "..(filename or ""));
+end
+
+function World2In1.PlayLessonMusic()
+	local filename = music_path.."offline_bgm.ogg"
+	GameLogic.RunCommand("/music "..(filename or ""));
+end
+
+function World2In1.PlayOperateMusic()
+	local filename = music_path.."guide_bgm.ogg"
+	GameLogic.RunCommand("/music "..(filename or ""));
+end
+
+function World2In1.PlayCreatorMusic()
+	local filename = music_path.."planet_bgm.ogg"
+	GameLogic.RunCommand("/music "..(filename or ""));
+end
+
+function World2In1.PlayOtherMusic()
+	local filename = music_path.."minigame_bgm.ogg"
+	GameLogic.RunCommand("/music "..(filename or ""));
+end
+
+function World2In1.PlayLogoMusic()
+	local filename = music_path.."login_bgm.ogg"
+	GameLogic.RunCommand("/music "..(filename or ""));
+end
+
+function World2In1.StopWorldMusic()
+	BackgroundMusic:Stop();
 end
 
 function World2In1.SaveCreateTips(callback)
@@ -1083,6 +1132,14 @@ function World2In1.GetIsWorld2In1()
 	return World2In1.is_world2in1
 end
 
+function World2In1.SetIsLessonBox(flag)
+	World2In1.is_lessonbox = flag
+end
+
+function World2In1.GetIsLessonBox()
+	return World2In1.is_lessonbox
+end
+
 -- 初始化二合一世界工具栏物品数据
 function World2In1.InitToolItems()
 	if World2In1.ItemsDataSource then
@@ -1130,7 +1187,7 @@ function World2In1.InitToolItems()
 				local item_data = {}
 				item_data.name = v.attr.name
 				item_data.item_name = v.attr.name
-				item_data.isvip = v.attr.isvip
+				item_data.isvip = v.attr.isvip == "true"
 				
 				item_data.type = data.type
 				item_data.obstruction = v.attr.obstruction == "true"
@@ -1138,7 +1195,7 @@ function World2In1.InitToolItems()
 				item_data.price = tonumber(v.attr.price) or 0
 				item_data.tips = v.attr.tips
 				
-				local icon_path = Files.GetWorldFilePath(string.format("items/%s/icon/%s.png", data.type, item_data.name))
+				local icon_path = Files.GetWorldFilePath(string.format("items/%s/icon/%s.png", data.type, item_data.filename))
 				if icon_path then
 					item_data.icon = icon_path
 				else
@@ -1151,7 +1208,7 @@ function World2In1.InitToolItems()
 					ItemClient.AddItem(item_data.block_id, item);
 				end
 
-				if data.type == "agent" and v.attr.is_run == "true" then
+				if data.type == "agent" and v.attr.isrun == "true" then
 					--World2In1.RunCode(item_data)
 					code_item_list[#code_item_list + 1] = item_data
 				else

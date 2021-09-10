@@ -694,20 +694,21 @@ function CameraController.LockRailCarFixedView()
 end
 
 function CameraController.LockRailCarMovieView()
-	local movies_pos = GameLogic.GetFilters():apply_filters("railcar_fiexd_movie_pos");
+	local movies_pos = {18674,2,19141}
 	if movies_pos then
-		local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-		local movie_entity = BlockEngine:GetBlockEntity(movies_pos[1] or 0, movies_pos[2] or 0, movies_pos[3] or 0);
-		if movie_entity.movieClip then
-			movie_entity:ExecuteCommand()
-		end
-
-		-- local channel = MovieManager:CreateGetMovieChannel("railcar_fiexd_moives");
-		-- if channel then
-		-- 	channel:SetStartBlockPosition(math.floor(movies_pos[1]),math.floor(movies_pos[2]),math.floor(movies_pos[3]));
-		-- 	local movieClip = channel:CreateGetStartMovieClip()
-		-- 	channel:PlayLooped(0, -1);
+		-- local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+		-- local movie_entity = BlockEngine:GetBlockEntity(movies_pos[1] or 0, movies_pos[2] or 0, movies_pos[3] or 0);
+		-- if movie_entity.movieClip then
+		-- 	movie_entity:ExecuteCommand()
 		-- end
+
+		local channel = MovieManager:CreateGetMovieChannel("railcar_fiexd_moives");
+		if channel then
+			channel:SetStartBlockPosition(math.floor(movies_pos[1]),math.floor(movies_pos[2]),math.floor(movies_pos[3]));
+			local movieClip = channel:CreateGetStartMovieClip()
+			channel:PlayLooped(0, -1);
+		end
+		
 	end
 end
 

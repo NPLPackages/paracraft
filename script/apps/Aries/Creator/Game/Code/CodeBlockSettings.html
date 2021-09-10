@@ -30,6 +30,17 @@ end
             <input type="button" style="margin-left:5px" class="button" uiname="CodeBlockSettings.btnChangeLang" name="btnChangeLang" value='<%=L"自定义语言..."%>' onclick="CodeBlockSettings.OnClickCustomLanguage"/>
         </div>
     </div>
+    <div style="margin-bottom:10px;">
+        <%=L"字号: "%>
+        <select uiname="CodeBlockSettings.FontSize" name="FontSize" style="height:25px;margin-top:-1px;" onselect="CodeBlockSettings.OnChangeFontSize" AllowUserEdit="false">
+            <option value="13" selected="selected">13px</option>
+            <option value="16">16px</option>
+            <option value="18">18px</option>
+            <option value="24">24px</option>
+            <option value="36">36px</option>
+            <option value="48">48px</option>
+        </select>
+    </div>
     <!--<div style="margin-bottom:10px;">
         <input type="checkbox" uiname="CodeBlockSettings.isAutoActiveActor" name="isAutoActiveActor" style="margin-top:2px" onclick="CodeBlockSettings.OnChangeAutoActiveActor"/>
         <div uiname="CodeBlockSettings.isAutoActiveActorFor" for="isAutoActiveActor" style="float:left;margin-left:5px;" >

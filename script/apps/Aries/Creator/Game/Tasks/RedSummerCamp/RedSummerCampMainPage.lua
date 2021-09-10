@@ -20,17 +20,18 @@ local page
 local notice_time = 3000
 RedSummerCampMainPage.UserData = {}
 RedSummerCampMainPage.ItemData = {
-	{name="神通杯编程大赛", is_show_vip=false, is_show_recommend=true, node_name = "shentongbei", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_1_220x220_32bits.png#0 0 220 220"},
+	{name="创意大赛", is_show_vip=false, is_show_recommend=true, node_name = "shentongbei", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_1_220x220_32bits.png#0 0 220 220"},
 	{name="推荐课程", is_show_vip=false, is_show_recommend=false, node_name = "course_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_2_220x220_32bits.png#0 0 220 220"},
 	{name="《征程》", is_show_vip=true, is_show_recommend=false, node_name = "zhengcheng", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_3_220x220_32bits.png#0 0 220 220"},
 	{name="推荐列表", is_show_vip=false, is_show_recommend=false, node_name = "explore", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"},
-	{name="帕拉卡AI虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
+	{name="虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
 	{name="家长指南", is_show_vip=false, is_show_recommend=false, node_name = "parent_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_6_220x220_32bits.png#0 0 220 220"},
 }
 
 local notice_desc = {
+	{desc = [[教师节快乐！你想送给老师一件什么礼物？]], name="teacher_day"},
 	{desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
-	{desc = [[喜庆党的生日，帕拉卡红色夏令营开营通知]], name="summer_camp"},
+	{desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
 	{desc = [[重温红色记忆，重走《征程》之约]], name="zhengcheng"},
 	{desc = [[为校争光，我的虚拟校园等你来建设]], name="ai_school"},
 }
@@ -61,9 +62,6 @@ function RedSummerCampMainPage.Show()
 		Game.Exit()
 	end
 
-	-- NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityManager.lua");
-	-- local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-	-- EntityManager.InitPlayers()
 	if page then
 		page:CloseWindow(true)
 		RedSummerCampMainPage.OnClose()
@@ -241,7 +239,7 @@ local listOfHelpNode = {
 		cmdName = "help.videotutorials"
 	},
 	{
-		text = "学习资源",
+		text = "官方文档",
 		cmdName = "help.learn"
 	},
 	{
@@ -301,7 +299,7 @@ function RedSummerCampMainPage.StartNoticeAnim()
 	end
 
 	local time = 1
-	local default_height = 36
+	local default_height = 62
 	local notice_container_1 = ParaUI.GetUIObject("notice_container_1");
 	if notice_container_1.y > 5 then
 		notice_container_1.y = -default_height
@@ -454,6 +452,9 @@ function RedSummerCampMainPage.OpenPage(name)
     elseif(name == "shentongbei")then
         local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
         Page.ShowShenTongBeiPage();
+    elseif(name == "teacher_day")then
+		local ActTeacher = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacher.lua") 
+		ActTeacher.ShowView()
     elseif(name == "my_works")then
         local Opus = NPL.load("(gl)Mod/WorldShare/cellar/Opus/Opus.lua")
         Opus:Show()
@@ -469,7 +470,10 @@ function RedSummerCampMainPage.OpenPage(name)
     elseif(name == "summer_camp")then
         local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("summer_camp");
-	elseif(name == "explore")then
+    elseif(name == "main_world")then
+		local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
+		RedSummerCampMainWorldPage.Show();
+    elseif(name == "explore")then
 		GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
     end
 end

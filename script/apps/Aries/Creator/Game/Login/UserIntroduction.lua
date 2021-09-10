@@ -7,8 +7,6 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserIntroduction.lua");
 local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")
-UserIntroduction.StaticInit()
-
 UserIntroduction.ShowPage()
 -------------------------------------------------------
 ]]
@@ -38,6 +36,7 @@ end
 
 function UserIntroduction.OnInit()
 	UserIntroduction.page = document:GetPageCtrl();
+	UserIntroduction.StaticInit()
 end
 
 function UserIntroduction.ShowPage()

@@ -336,7 +336,7 @@ function GameLogic.Init(worldObj)
 	GameLogic.world_revision = WorldRevision:new():init();
 	GameLogic.world_revision:Checkout();
 
-	CommandManager:Init();
+	CommandManager:Init(true);
 
 	MovieManager:Init();
 	
@@ -908,7 +908,7 @@ function GameLogic.Exit(bSoft)
 	if(playerController) then
 		playerController.force_can_fly = false;
 	end
-	-- CommandManager:Destroy();
+	
 	BlockEngine:Disconnect();
 	GameLogic.is_started = false;
 	GameLogic.RemoveWorldFileWatcher();
@@ -2040,6 +2040,7 @@ function GameLogic.CheckCanLearn(type)
 	if GameLogic.IsVip() then
 		return true
 	end
+	local strTip = "现在不是上课时间哦，请在上课时间（周一至周五8:00-16:20）内再来上课吧。"
 	local server_time = QuestAction.GetServerTime()
 	local year = tonumber(os.date("%Y", server_time))	
 	local month = tonumber(os.date("%m", server_time))
@@ -2051,10 +2052,10 @@ function GameLogic.CheckCanLearn(type)
             local limit_time_stamp = today_weehours + 8 * 60 * 60 + 0 * 60
 			local limit_time_end_stamp = today_weehours + 16 * 60 * 60 + 20 * 60
             if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
-                return false
+                return false,strTip
             end
         end	
-		return false	
+		return false,strTip	
 	end
-	return true
+	return true,""
 end

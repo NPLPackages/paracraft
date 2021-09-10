@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ActTeacherDetail = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacherDetail.lua");
+    ActTeacherDetail.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+]]></script>
+<div style="width: 460px; height: 320px; background: url(Texture/Aries/Creator/keepwork/vip/tipbj_32bits.png#0 0 32 32:14 14 14 14);">
+    <div style="width: 460; height: 30px;">
+        <input type="button" style="margin-left: 430px; margin-top: 6x; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        <div style="text-align: center; font-size: 18px;base-font-size: 18px; font-weight: bold; color: #ffffff;">活动规则</div>
+    </div>
+    <div style="text-align: left; font-size: 16px;base-font-size: 16px;  color: #ffffff; margin-left: 14px; margin-top: 40px;">
+        活动时间：2021年9月9日-2021年9月30日<br/>
+    </div>
+    <div style="text-align: left; font-size: 14px;base-font-size: 14px;  color: #ffffff; margin-left: 14px; margin-top: 10px;">
+        活动内容：<br/>
+        同学们可以通过搭建、动画、编程等形式表达<br/>
+        对于老师的情感。<br/>
+        完成后点击“提交作品”按键，进入作品大厅并选定作品提交<br/>
+        即可获得奖励。<br/>
+        活动奖励：<br/>
+        提交作品——花束（10天）<br/>
+        获得优秀作品——作品进入资源库，并标注作者姓名，500知识豆<br/>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

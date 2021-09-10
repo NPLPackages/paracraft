@@ -966,10 +966,8 @@ function Entity:OnClick(x, y, z, mouse_button)
 					if(GameLogic.isRemote) then
 						GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketEntityAction:new():Init(1, self));
 					else
-						player:MountEntity(self);	
-						if System.options.isDevMode then
-							RailCarPage.Show();
-						end
+						player:MountEntity(self);
+						RailCarPage.Show();
 					end
 				end
 			end

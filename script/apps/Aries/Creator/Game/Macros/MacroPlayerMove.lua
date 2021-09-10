@@ -10,6 +10,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Macros.lua");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.Macros");
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local mathlib = commonlib.gettable("mathlib");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -54,18 +56,24 @@ function Macros.PlayerMove(bx, by, bz, facing)
 			if(interval == 0) then
 				interval = 500
 			end
+			local x1, y1, z1 = player:GetPosition()
+			local x2, y2, z2 = BlockEngine:real_bottom(bx, by, bz);
+
 			local bIsControlled = player:IsControlledExternally()
 			if(not bIsControlled) then
 				player:SetControlledExternally(true)
+				local facing = Direction.GetFacingFromOffset(x2 - x1, 0, z2 - z1)
+				player:SetFacing(facing);
+				player:SetAnimation(4);
 			end
 
 			local function RestorePlayerControl_()
 				if(not bIsControlled) then
 					player:SetControlledExternally(false)
+					player:SetAnimation(0);
 				end
 			end
-			local x1, y1, z1 = player:GetPosition()
-			local x2, y2, z2 = BlockEngine:real_bottom(bx, by, bz);
+			
 					
 			local callback = {};
 			local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
@@ -73,6 +81,7 @@ function Macros.PlayerMove(bx, by, bz, facing)
 					local dist = math.sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2);
 					local speed = 0.3;
 					if(dist > speed) then
+
 						local r = speed / dist;
 						x1 = x2 * r + x1 * (1-r);
 						y1 = y2 * r + y1 * (1-r);

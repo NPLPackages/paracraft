@@ -54,7 +54,9 @@ function CodeBlockSettings.OnInit()
 		page:SetValue("isOpenSource", type(entity.IsOpenSource) == "function" and entity:IsOpenSource() == true);
 		page:SetValue("isUseNplBlockly", type(entity.IsUseNplBlockly) == "function" and entity:IsUseNplBlockly() == true);
 		page:SetValue("isUseCustomBlock", type(entity.IsUseCustomBlock) == "function" and entity:IsUseCustomBlock() == true);
+		page:SetValue("FontSize", tostring(CodeBlockWindow.GetFontSize()));
 		
+
 		local languageFile = entity:GetLanguageConfigFile();
 		if(languageFile == "" or languageFile == "NPL" or languageFile=="npl") then
 			languageFile = ""
@@ -102,6 +104,15 @@ function CodeBlockSettings.OnSelectLang(name, value)
 		CodeBlockWindow.UpdateCodeEditorStatus()
 	end
 end
+
+function CodeBlockSettings.OnChangeFontSize(name, value)
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity) then
+		value = tonumber(value)
+		CodeBlockWindow.SetFontSize(value)
+	end
+end
+
 
 function CodeBlockSettings.OnSetOpenSource(value)
 	local entity = CodeBlockWindow.GetCodeEntity()

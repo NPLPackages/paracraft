@@ -73,3 +73,7 @@ function(self, err, msg, data)
     return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.quiz.getuserworld.get", callbackFunc); 
 end
 )
+
+--http://yapi.kp-para.cn/project/158/interface/api/2382
+--params  username activityid
+HttpWrapper.Create("keepwork.quiz.registrate", "%MAIN%/online-quiz/v0/activityUser/registrate", "POST", true)

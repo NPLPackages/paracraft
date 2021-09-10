@@ -95,17 +95,19 @@ end
 
 function RailCarPage.InitData()
     RailCarPage.CameraType = {
-        {type = "lock_first_person", icon="icon_1_32bits.png", select_icon = "icon_1_select_32bits.png"},
-        {type = "lock_surround", icon="icon_2_32bits.png", select_icon = "icon_2_select_32bits.png"},
-        {type = "lock_fixed", icon="icon_3_32bits.png", select_icon = "icon_3_select_32bits.png"},
-        {type = "lock_movie_view", icon="icon_4_32bits.png", select_icon = "icon_4_select_32bits.png"},
-        -- {type = "lock_random", icon="icon_5_32bits.png", select_icon = "icon_5_select_32bits.png"},
-        {type = "unlock", icon="icon_6_32bits.png", select_icon = "icon_6_select_32bits.png"},
+        {type = "lock_first_person", icon="icon_1_32bits.png", name ="第一人称模式", select_icon = "icon_1_select_32bits.png"},
+        {type = "lock_surround", icon="icon_2_32bits.png", name ="第三人称跟随拍摄", select_icon = "icon_2_select_32bits.png"},
+        {type = "lock_fixed", icon="icon_3_32bits.png", name ="固定机位拍摄", select_icon = "icon_3_select_32bits.png"},
+        -- {type = "lock_movie_view", icon="icon_4_32bits.png", name ="haha", select_icon = "icon_4_select_32bits.png"},
+        {type = "lock_random", icon="icon_5_32bits.png", name ="随机", select_icon = "icon_5_select_32bits.png"},
+        {type = "unlock", icon="icon_6_32bits.png", name ="标准模式（默认）", select_icon = "icon_6_select_32bits.png"},
     }
 
-    local movies_pos = GameLogic.GetFilters():apply_filters("railcar_fiexd_movie_pos");
-    if movies_pos then
-        table.insert(RailCarPage.CameraType, 5, {type = "lock_random", icon="icon_5_32bits.png", select_icon = "icon_5_select_32bits.png"})
+    -- local movies_pos = GameLogic.GetFilters():apply_filters("railcar_fiexd_movie_pos");
+    local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+    local is_in_lessonbox = World2In1.GetIsLessonBox()
+    if is_in_lessonbox and World2In1.GetRegionType() == "creator" then
+        table.insert(RailCarPage.CameraType, 4, {type = "lock_movie_view", icon="icon_4_32bits.png", name ="环绕拍摄", select_icon = "icon_4_select_32bits.png"})
     end
 
     RailCarPage.select_cameratype_index = #RailCarPage.CameraType
