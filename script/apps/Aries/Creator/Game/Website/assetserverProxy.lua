@@ -37,6 +37,16 @@ function assetserverProxy.GetLocalFile(filename)
 	return cachePath..filename;
 end
 
+function assetserverProxy.SetAssetServerUrl(url)
+	if (url == localAssetServer) then return end 
+	localAssetServer = url;
+	ParaAsset.SetAssetServerUrl(localAssetServer);
+end
+
+function assetserverProxy.GetAssetServerUrl()
+	return localAssetServer;
+end
+
 function assetserverProxy.AddToMemcache(filename, data)
 	if(data) then
 		memcached:push(filename, {data = data, hitTime = commonlib.TimerManager.timeGetTime()})

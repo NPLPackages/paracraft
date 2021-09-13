@@ -1116,7 +1116,7 @@ function LessonBoxTip.LockLessonArea()
                 local newZ = math.min(maxZ-5, math.max(minZ , z));
                 local newY = math.max(minY-1, y);
                 if(x~=newX or y~=newY or z~=newZ) then
-                    player:SetBlockPos(newX, newY, newZ)
+                    player:SetBlockPos(newX, 12, newZ)
                 end
             end
         end
