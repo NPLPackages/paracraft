@@ -92,6 +92,7 @@ function RedSummerCampMainPage.Show()
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);	
 
+
 	page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
 	RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
 		RedSummerCampMainPage.StartNoticeAnim()
@@ -287,8 +288,12 @@ function RedSummerCampMainPage.OpenTreeNode()
 	end
 end
 
+function RedSummerCampMainPage.IsVisible()
+	return page and page:IsVisible()
+end
+
 function RedSummerCampMainPage.StartNoticeAnim()
-	RedSummerCampMainPage.ClearTween()
+	-- RedSummerCampMainPage.ClearTween()
 	if not page or not page:IsVisible() then
 		if page and not page:IsVisible() then
 			page:CloseWindow()
@@ -306,13 +311,22 @@ function RedSummerCampMainPage.StartNoticeAnim()
 		page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
 	end
 
-    RedSummerCampMainPage.tween_y_1 =CommonCtrl.Tween:new{
-		obj=notice_container_1,
-		prop="y",
-		begin=notice_container_1.y,
-		change=default_height,
-		duration=time,
-	}
+	if RedSummerCampMainPage.tween_y_1 == nil then
+		RedSummerCampMainPage.tween_y_1 =CommonCtrl.Tween:new{
+			obj=notice_container_1,
+			prop="y",
+			begin=notice_container_1.y,
+			change=default_height,
+			duration=time,
+		}
+	else
+		RedSummerCampMainPage.tween_y_1.obj=notice_container_1
+		RedSummerCampMainPage.tween_y_1.prop="y"
+		RedSummerCampMainPage.tween_y_1.begin=notice_container_1.y
+		RedSummerCampMainPage.tween_y_1.change=default_height
+		RedSummerCampMainPage.tween_y_1.duration=time
+	end
+
 
 	RedSummerCampMainPage.tween_y_1.func=CommonCtrl.TweenEquations.easeNone;
 	RedSummerCampMainPage.tween_y_1:Start();
@@ -323,20 +337,35 @@ function RedSummerCampMainPage.StartNoticeAnim()
 		page:SetValue("notic_text2", RedSummerCampMainPage.GetAutoNoticeText())
 	end
 
-    RedSummerCampMainPage.tween_y_2 =CommonCtrl.Tween:new{
-		obj=notice_container_2,
-		prop="y",
-		begin=notice_container_2.y,
-		change=default_height,
-		duration=time,
-		MotionFinish = function()
-			RedSummerCampMainPage.ClearTween()
+	if RedSummerCampMainPage.tween_y_2 == nil then
+		RedSummerCampMainPage.tween_y_2 =CommonCtrl.Tween:new{
+			obj=notice_container_2,
+			prop="y",
+			begin=notice_container_2.y,
+			change=default_height,
+			duration=time,
+			MotionFinish = function()
+				-- RedSummerCampMainPage.ClearTween()
+				RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
+					RedSummerCampMainPage.StartNoticeAnim()
+				end})
+				RedSummerCampMainPage.Timer:Change(notice_time, nil);
+			end
+		}
+	else
+		RedSummerCampMainPage.tween_y_2.obj=notice_container_2
+		RedSummerCampMainPage.tween_y_2.prop="y"
+		RedSummerCampMainPage.tween_y_2.begin=notice_container_2.y
+		RedSummerCampMainPage.tween_y_2.change=default_height
+		RedSummerCampMainPage.tween_y_2.duration=time
+		RedSummerCampMainPage.tween_y_2.MotionFinish = function()
+			-- RedSummerCampMainPage.ClearTween()
 			RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
 				RedSummerCampMainPage.StartNoticeAnim()
 			end})
 			RedSummerCampMainPage.Timer:Change(notice_time, nil);
 		end
-	}
+	end
 
 	RedSummerCampMainPage.tween_y_2.func=CommonCtrl.TweenEquations.easeNone;
 	RedSummerCampMainPage.tween_y_2:Start();
@@ -505,6 +534,23 @@ function RedSummerCampMainPage.RefreshPage()
 	end
 end
 function RedSummerCampMainPage.OnClickRightBt(name)
+	if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+		GameLogic.GetFilters():apply_filters('check_signed_in', "请先登录", function(result)
+			if result == true then
+				commonlib.TimerManager.SetTimeout(function()
+					if page == nil then
+						return
+					end
+					RedSummerCampMainPage.RefreshPage()
+					RedSummerCampMainPage.OnClickRightBt(name)
+				end, 500)
+			end
+		end)
+
+		return
+	end
+
+
     if name == "skin" then
 		local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
 		last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="skin", username = System.User.keepworkUsername});

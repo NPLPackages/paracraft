@@ -75,23 +75,34 @@ function QuestAllCourse.Show(target_course_id)
     --     _guihelper.MessageBox("人工智能课程即日开启，敬请期待", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
     --     return
     -- end
+    local show_page = function()
+        local params = {
+            url = "script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.html",
+            name = "QuestAllCourse.Show", 
+            isShowTitleBar = false,
+            DestroyOnClose = true,
+            style = CommonCtrl.WindowFrame.ContainerStyle,
+            allowDrag = true,
+            enable_esc_key = true,
+            zorder = 0,
+            -- app_key = "", 
+            directPosition = true,
+            
+            align = "_ct",
+            x = -926/2,
+            y = -562/2,
+            width = 926,
+            height = 562,
+        };
+        System.App.Commands.Call("File.MCMLWindowFrame", params);
+    end
+
     if page and page:IsVisible() then
+        show_page()
         return
     end
 
-	-- if not QuestAllCourse.BindFilter then
-	-- 	GameLogic.GetFilters():add_filter("became_vip", function()
-    --         if page then
-    --             QuestAllCourse.RefreshCourseListData(function()
-    --                 -- 刷新课程列表控件
-    --                 QuestAllCourse.FreshGridView("course_list")
-    --                 local mcmlNode = page:GetNode("course_list");
-    --                 pe_gridview.GotoPage(mcmlNode, "course_list", 1);
-    --             end)
-    --         end
-    --     end);
-	-- 	QuestAllCourse.BindFilter = true
-	-- end
+    show_page()
 
     local client_data = QuestAction.GetClientData()
 
@@ -106,26 +117,6 @@ function QuestAllCourse.Show(target_course_id)
     QuestAllCourse.target_course_id = target_course_id
     QuestAllCourse.target_teacher_id = client_data.course_teacher_id
     QuestAllCourse.target_level_id = client_data.course_level_id
-
-    local params = {
-        url = "script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.html",
-        name = "QuestAllCourse.Show", 
-        isShowTitleBar = false,
-        DestroyOnClose = true,
-        style = CommonCtrl.WindowFrame.ContainerStyle,
-        allowDrag = true,
-        enable_esc_key = true,
-        zorder = 0,
-        -- app_key = "", 
-        directPosition = true,
-        
-        align = "_ct",
-        x = -926/2,
-        y = -562/2,
-        width = 926,
-        height = 562,
-    };
-    System.App.Commands.Call("File.MCMLWindowFrame", params);
 
     keepwork.quest_course_catalogs.get({}, function(err2, msg2, data2)
         if err2 == 200 then

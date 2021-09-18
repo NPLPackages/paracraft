@@ -647,7 +647,13 @@ function Item:CompareItems(left, right)
 	if(left == right) then
 		return true;
 	elseif(left and right) then
-		return left.id == right.id and left.blockData==right.blockData;
+		if(left.id == right.id and left.blockData==right.blockData) then
+			if(not left.serverdata and not right.serverdata) then
+				return true;
+			elseif(commonlib.compare(left.serverdata, right.serverdata)) then
+				return true;
+			end
+		end
 	end
 end
 

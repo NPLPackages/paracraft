@@ -2037,7 +2037,7 @@ end
 -- 判断是否校本课时间
 function GameLogic.CheckCanLearn(type)
 	local strType = type or "school_lesson"
-	if GameLogic.IsVip() then
+	if GameLogic.IsVip()  or System.User.isVipSchool then
 		return true
 	end
 	local strTip = "现在不是上课时间哦，请在上课时间（周一至周五8:00-16:20）内再来上课吧。"
@@ -2051,11 +2051,10 @@ function GameLogic.CheckCanLearn(type)
         if week_day ~= 6 and week_day ~= 7 then
             local limit_time_stamp = today_weehours + 8 * 60 * 60 + 0 * 60
 			local limit_time_end_stamp = today_weehours + 16 * 60 * 60 + 20 * 60
-            if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
-                return false,strTip
+            if server_time >= limit_time_stamp and server_time <= limit_time_end_stamp then
+                return true,""
             end
         end	
-		return false,strTip	
 	end
-	return true,""
+	return false,strTip
 end

@@ -869,13 +869,16 @@ function LessonBoxTip.DelayShowErrBlockTip()
     end, 3000);
 end
 function LessonBoxTip.UpdateCheckBtnStatus(type)
-    if type then
-        local back1 = "Texture/Aries/Creator/keepwork/macro/lessonbox/btn_startcheck_32bits.png;0 0 121 40"
-        local back2 = "Texture/Aries/Creator/keepwork/macro/lessonbox/btn_stopcheck_32bits.png;0 0 121 40"
-        local background = back1--type == "stop" and back2 or back1
+    if type == "stop" then
+        local back1 = "Texture/Aries/Creator/keepwork/macro/lessonbox/btn_sc_128X47_32bits.png;0 0 128 47"
+        local back2 = "Texture/Aries/Creator/keepwork/macro/lessonbox/btn_sc1_128X47_32bits.png;0 0 128 47"
+        
         local btnObject = ParaUI.GetUIObject("lesson_check_button")
         if (btnObject) then
-            --btnObject.background = background
+            btnObject.background = back2
+            commonlib.TimerManager.SetTimeout(function()
+                btnObject.background = back1
+            end,1000)
         end
     end
 end
@@ -1053,6 +1056,7 @@ function LessonBoxTip.OnRetunMacro(isFinish)
     LessonBoxTip.EndTip()
     GameLogic.RunCommand("/sendevent hideNpc")
     GameLogic.RunCommand("/ggs user visible");
+    LessonBoxTip.PlayLessonMusic("free_world")
     GameLogic.GetCodeGlobal():BroadcastTextEvent("enterMacroMode", {isFinish = isFinish or false});
 end
 
@@ -1171,4 +1175,5 @@ function LessonBoxTip.PlayLessonMusic(strType)
         World2In1.PlayOtherMusic()
     end
 end
+
 

@@ -776,7 +776,7 @@ end
 -- @param bExactMatch: if for exact match
 -- return bFound, filename, filenames: if the file text is found. filename contains the full filename
 function Entity:FindFile(text, bExactMatch)
-	local code = self:GetText()
+	local code = self:GetCommand()
 	if(code) then
 		local bFound, filename, filenames = mathlib.StringUtil.FindTextInLine(code, text, bExactMatch)
 		if(bFound) then

@@ -7,6 +7,7 @@
     SummerCampNoticeIntro.ShowView(1)
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+local RedSummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainPage.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local SummerCampNoticeIntro = NPL.export()
 SummerCampNoticeIntro.strImgPath = "Texture/Aries/Creator/keepwork/SummerCamp/"
@@ -39,15 +40,13 @@ function SummerCampNoticeIntro.GetSummerWorldId()
 end
 
 function SummerCampNoticeIntro.OnClickGo()
-    if not SummerCampNoticeIntro.IsInSummerCampWorld() then
-        if page then
-            page:CloseWindow()
-        end
-        GameLogic.RunCommand(string.format("/loadworld -force -s %d", SummerCampNoticeIntro.GetSummerWorldId()));
-        return
-    end
     if page then
         page:CloseWindow()
+    end
+
+    if RedSummerCampMainPage.IsVisible() or not SummerCampNoticeIntro.IsInSummerCampWorld() then
+        GameLogic.RunCommand(string.format("/loadworld -force -s %d", SummerCampNoticeIntro.GetSummerWorldId()));
+        return
     end
     if SummerCampNoticeIntro.n_curIndex == 1 then
         --[[当用户点击【立即前往】的按钮时，如果用户不在夏令营的世界中，则首先拉起世界。随后打开【梦回摇篮】护照的面板（YJ出）]]
@@ -81,7 +80,7 @@ function SummerCampNoticeIntro.ShowView(index)
         allowDrag = true,
         enable_esc_key = true,
         zorder = 4,
-        app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key,
+        -- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key,
         directPosition = true,
         align = "_ct",
             x = -view_width/2,

@@ -26,7 +26,7 @@ function VipCodeExchangeResult.ShowView(desc)
         style = CommonCtrl.WindowFrame.ContainerStyle,
         allowDrag = false,
         enable_esc_key = true,
-        zorder = 0,
+        zorder = 11,
         directPosition = true,
         align = "_ct",
             x = -view_width/2,

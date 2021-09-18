@@ -156,15 +156,16 @@ Commands["density"] = {
 
 Commands["speedscale"] = {
 	name="speedscale", 
-	quick_ref="/speedscale [value|1]", 
-	desc=[[ speed scale of the player. 1 is original speed
-/speed [value|1]
+	quick_ref="/speedscale [@playername] [value|1]", 
+	desc=[[speed scale of the player. 1 is original speed
+/speedscale [value|1]
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
-		local speed;
+		local speed, playerEntity;
+		playerEntity = CmdParser.ParsePlayer(cmd_text);
 		speed, cmd_text = CmdParser.ParseInt(cmd_text);
 		if(speed) then
-			local player = EntityManager:GetFocus();
+			local player = playerEntity or EntityManager:GetFocus();
 			if(player) then
 				player:SetSpeedScale(speed);
 			end

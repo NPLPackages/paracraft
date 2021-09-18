@@ -88,7 +88,7 @@ function VipPage.ShowPage__(key, desc)
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = true,
 			enable_esc_key = true,
-			zorder = 0,
+			zorder = 10,
 			directPosition = true,
 				align = "_ct",
 				x = -690/2,

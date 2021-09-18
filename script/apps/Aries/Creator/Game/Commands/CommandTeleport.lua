@@ -144,6 +144,9 @@ Examples:
 				end
 
 				if(x and y and z and playerEntity) then
+					x = math.floor(x);
+					y = math.floor(y);
+					z = math.floor(z);
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeleportPlayerTask.lua");
 					local task = MyCompany.Aries.Game.Tasks.TeleportPlayer:new({blockX=x, blockY=y, blockZ=z, playerEntity=playerEntityCmd})
 					task:Run();

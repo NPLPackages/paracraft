@@ -32,7 +32,7 @@ function RedSummerCampMainWorldPage.OnInit()
 end
 
 function RedSummerCampMainWorldPage.Show()
-	name = "main_world"
+	local name = "main_world"
 	RedSummerCampMainWorldPage.name = name
 	RedSummerCampMainWorldPage.InitData(name)
 	local enable_esc_key = System.options.isDevMode

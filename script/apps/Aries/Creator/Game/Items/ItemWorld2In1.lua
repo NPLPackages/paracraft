@@ -105,6 +105,15 @@ function ItemWorld2In1:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 			local block_id = self.obstruction and 254 or 22
 			self:CreateBlock(x,y,z, block_id, nil, entity_data)
 		end
+	-- event.ctrl_pressed
+	elseif self.is_template_type then
+		if self.target_file_path then
+			local entity_data = {tooltip=self.target_file_path}
+			local x,y,z = ParaScene.GetPlayer():GetPosition();
+			local bx, by, bz = BlockEngine:block(x, y+0.1, z);
+			self:CreateBlock(bx, by, bz, 254, nil, entity_data)
+			self:ClearShowTemplate()
+		end
 	end
 end
 
@@ -138,7 +147,7 @@ function ItemWorld2In1:CreatShowTemplate()
 	end})
 	self.frame_timer:Change(200,200);
 
-	GameLogic.AddBBS("desktop", L"按【X】键确认建造位置, 【W,A,S,D】键可以移动");
+	GameLogic.AddBBS("desktop", L"按【鼠标右键】键确认建造位置, 【W,A,S,D】键可以移动");
 end
 
 function ItemWorld2In1:ClearShowTemplate()
@@ -187,16 +196,7 @@ function ItemWorld2In1:LoadTemplateFile(filename)
 end
 
 function ItemWorld2In1:keyPressEvent(event)
-	-- event.ctrl_pressed
-	if self.is_template_type and event.keyname == "DIK_X" then
-		if self.target_file_path then
-			local entity_data = {tooltip=self.target_file_path}
-			local x,y,z = ParaScene.GetPlayer():GetPosition();
-			local bx, by, bz = BlockEngine:block(x, y+0.1, z);
-			self:CreateBlock(bx, by, bz, 254, nil, entity_data)
-			self:ClearShowTemplate()
-		end
-	end
+
 end
 
 function ItemWorld2In1:OnClick()

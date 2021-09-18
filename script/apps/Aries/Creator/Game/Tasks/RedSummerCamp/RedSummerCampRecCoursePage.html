@@ -60,6 +60,12 @@ function ShowVip()
     local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
     VipPage.ShowPage();
 end
+
+function open_all()
+    local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")
+    QuestAllCourse.Show();
+end
+
 function goto_world(item)
     if(not item or not item.id)then
         return
@@ -227,6 +233,11 @@ end
         <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
             <!--Vip-->
             <pe:container alignment="_rt" style="background:url();">
+                <input type='button'
+                    DefaultButton='true'
+                    style='width: 67px;height: 70px;margin-right:45px;margin-top: 6px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/q_67X70_32bits.png#0 0 67 70);'
+                    name='open_word'
+                    onclick='open_all' />   
                 <input type='button'
                     class='opus_bar_button'
                     DefaultButton='true'

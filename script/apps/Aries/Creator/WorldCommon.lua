@@ -16,7 +16,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/SaveWorldHandler.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/FastRandom.lua");
 local FastRandom = commonlib.gettable("MyCompany.Aries.Game.Common.CustomGenerator.FastRandom");
-local Encoding = commonlib.gettable("System.Encoding.basexx");
 local SaveWorldHandler = commonlib.gettable("MyCompany.Aries.Game.SaveWorldHandler");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -96,7 +95,7 @@ function WorldCommon.GeneratePrivateKey()
     local random1 = math.random() * 100;
     local random2 = FastRandom.randomNoise(x, y, z, math.random());
 
-    return Encoding.to_base32(tostring(random1 + random2));
+    return commonlib.Encoding.base64(tostring(random1 + random2));
 end
 
 -- load world info from tag.xml under the world_path

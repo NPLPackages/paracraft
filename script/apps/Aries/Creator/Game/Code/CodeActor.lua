@@ -252,16 +252,18 @@ function Actor:Bounce()
 	local aabb = self.entity:GetCollisionAABB();
 	local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(aabb, self.entity, CanBeCollidedWith_);
 
+	local errorRange = math.min(0.3, aabb:GetMinExtent() * 0.3);
+
 	local facing = self.entity:GetFacing();
 	local dx, dz;
 	dx = math.cos(facing) * 0.1;
 	dz = -math.sin(facing) * 0.1;
 	local offsetX, offsetZ = dx, dz;
 	for i= 1, listCollisions:size() do
-		offsetX = listCollisions:get(i):CalculateXOffset(aabb, offsetX, 0.3);
+		offsetX = listCollisions:get(i):CalculateXOffset(aabb, offsetX, errorRange);
 	end
 	for i= 1, listCollisions:size() do
-		offsetZ = listCollisions:get(i):CalculateZOffset(aabb, offsetZ, 0.3);
+		offsetZ = listCollisions:get(i):CalculateZOffset(aabb, offsetZ, errorRange);
 	end
 	if(offsetX~=dx and offsetX*dx<0) then
 		dx = -dx

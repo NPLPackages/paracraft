@@ -157,8 +157,25 @@ function create_new_world()
 end
 
 function OpenRole()
-    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-    last_page_ctrl = page.ShowUserInfoPage({username = System.User.keepworkUsername});
+    if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+        GameLogic.GetFilters():apply_filters('check_signed_in', "请先登录", function(result)
+            if result == true then
+                commonlib.TimerManager.SetTimeout(function()
+                    if page == nil then
+                        return
+                    end
+                    RedSummerCampMainPage.RefreshPage()
+                    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+                    page.ShowUserInfoPage({username = System.User.keepworkUsername});
+                end, 500)
+            end
+        end)
+
+        return
+    end
+
+    local role_page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+    role_page.ShowUserInfoPage({username = System.User.keepworkUsername});
 end
 
 ]]>
@@ -383,8 +400,8 @@ end
         </pe:container>
 
         <pe:container alignment="_rb" width="465" height="102" style="margin-right: 98px;margin-bottom: 26px;background:;">
-            <input type="button" value='' onclick="create_new_world" style="width: 156px;height: 56px; margin-left:0px;margin-top:26px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b3_156X56_32bits.png#0 0 156 56)" />
-            <input type="button" value='' onclick="QuickStart" style="margin-left:25px;margin-top:0px; width: 279px;height: 110px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b4_279X110_32bits.png#0 0 279 110)" />
+            <input type="button" value='' uiname="RedSummerCampMainPage.create_new_world" onclick="create_new_world" style="width: 156px;height: 56px; margin-left:0px;margin-top:26px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b3_156X56_32bits.png#0 0 156 56)" />
+            <input type="button" value='' uiname="RedSummerCampMainPage.QuickStart" onclick="QuickStart" style="margin-left:25px;margin-top:0px; width: 279px;height: 110px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b4_279X110_32bits.png#0 0 279 110)" />
         </pe:container>
             <!-- <input type="button" value='打开 神通杯' name="shentongbei" />
             <input type="button" value='打开 推荐课程' name="RedSummerCampRecCoursePage" onclick="OnOpen" />

@@ -51,6 +51,7 @@ local courcePosition = {18542,43,19197}
 
 local hidePage = false;
 local page_root = nil
+local last_audio_src
 local music_path = "Audio/Haqi/keepwork/common/"
 
 World2In1.ServerWorldData = {}
@@ -211,6 +212,7 @@ function World2In1.OnWorldUnload()
 	World2In1.SetIsWorld2In1(false)
 	World2In1.CelarToolData()
 	World2In1.SetIsLessonBox(false)
+	World2In1.StopMusic()
 end
 
 function World2In1.CelarToolData()
@@ -274,32 +276,83 @@ end
 
 function World2In1.PlayWorldMusic()
 	local filename = music_path.."bigworld_bgm.ogg"
-	GameLogic.RunCommand("/music "..(filename or ""));
+	-- GameLogic.RunCommand("/music "..(filename or ""));
+	World2In1.PlayMusic(filename,0.5)
 end
 
 function World2In1.PlayLessonMusic()
 	local filename = music_path.."offline_bgm.ogg"
-	GameLogic.RunCommand("/music "..(filename or ""));
+	-- GameLogic.RunCommand("/music "..(filename or ""));
+	World2In1.PlayMusic(filename,0.5)
 end
 
 function World2In1.PlayOperateMusic()
 	local filename = music_path.."guide_bgm.ogg"
-	GameLogic.RunCommand("/music "..(filename or ""));
+	-- GameLogic.RunCommand("/music "..(filename or ""));
+	World2In1.PlayMusic(filename,0.5)
 end
 
 function World2In1.PlayCreatorMusic()
 	local filename = music_path.."planet_bgm.ogg"
-	GameLogic.RunCommand("/music "..(filename or ""));
+	-- GameLogic.RunCommand("/music "..(filename or ""));
+	World2In1.PlayMusic(filename,0.5)
 end
 
 function World2In1.PlayOtherMusic()
 	local filename = music_path.."minigame_bgm.ogg"
-	GameLogic.RunCommand("/music "..(filename or ""));
+	-- GameLogic.RunCommand("/music "..(filename or ""));
+	World2In1.PlayMusic(filename,0.5)
 end
 
 function World2In1.PlayLogoMusic()
 	local filename = music_path.."login_bgm.ogg"
-	GameLogic.RunCommand("/music "..(filename or ""));
+	-- GameLogic.RunCommand("/music "..(filename or ""));
+	World2In1.PlayMusic(filename,0.5)
+end
+
+--local filename = "Audio/Haqi/keepwork/common/offline_bgm.ogg"
+function World2In1.PlayMusic(filename,volume,pitch)
+    local volume = volume or 1
+    local music_audio = World2In1.GetMusic(filename)
+    if last_audio_src ~= music_audio then
+        if(last_audio_src) then
+            last_audio_src:stop();
+        end
+        last_audio_src = music_audio
+    end
+    if music_audio then
+        music_audio:play2d(volume,pitch);
+    end
+end
+
+function World2In1.GetMusic(filename)
+	if(not filename or filename=="") then
+		return;
+	end
+	filename = commonlib.Encoding.Utf8ToDefault(filename)
+
+	local audio_src = AudioEngine.Get(filename);
+	if(not audio_src) then
+		if(not ParaIO.DoesAssetFileExist(filename, true)) then
+			filename = ParaWorld.GetWorldDirectory()..filename;
+			if(not ParaIO.DoesAssetFileExist(filename, true)) then
+				return;
+			end
+		end		
+		audio_src = AudioEngine.CreateGet(filename);
+		audio_src.loop = true;
+		audio_src.file = filename;
+		audio_src.isBackgroundMusic = true;
+	end
+	
+	return audio_src;
+end
+
+function World2In1.StopMusic()
+	if last_audio_src then
+		last_audio_src:stop();
+		last_audio_src = nil;
+	end
 end
 
 function World2In1.StopWorldMusic()
@@ -706,7 +759,7 @@ function World2In1.OnEnterCreatorRegion()
 		return;
 	end	
 	local project_id = WorldCommon.GetWorldTag("kpProjectId");
-	if project_id == 79969 then
+	if project_id == 79969 or project_id == 76739 or project_id == 83044 then
 		GameLogic.RunCommand("/sendevent gotoCreate")
 		return 
 	end
@@ -809,12 +862,59 @@ function World2In1.OnSaveWorld()
 			exportReferencedFiles = true,
 			blocks = blocks})
 		task:Run();
-	
-		GameLogic.GetFilters():apply_filters("cellar.sync.sync_main.sync_to_data_source_by_world_name", creatorWorldName, function(res)
-			if (res) then
-			end
-		end);	
+		
+		
+		World2In1.UpLoadWorld()
+		-- GameLogic.GetFilters():apply_filters("cellar.sync.sync_main.sync_to_data_source_by_world_name", creatorWorldName, function(res)
+		-- 	if (res) then
+		-- 	end
+		-- end);	
 	end
+end
+
+function World2In1.UpLoadWorld()
+	local curProjectId = World2In1.GetProjectIdByWorldName(creatorWorldName)
+	if curProjectId <= 0 then
+		GameLogic.GetFilters():apply_filters("service.local_service_world.set_world_instance_by_foldername", creatorWorldName);	
+		local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
+		if world_data and world_data.kpProjectId then
+			-- curProjectId = world_data.kpProjectId
+			GameLogic.GetFilters():apply_filters(
+			'service.sync_to_data_source.init',
+			function(result, option)
+				if option.method == 'UPDATE-PROGRESS-FINISH' then
+					GameLogic.AddBBS(nil,"上传创作区成功")
+				end
+			end)
+			return
+		end
+	end
+	GameLogic.GetFilters():apply_filters(
+		'service.keepwork_service_world.set_world_instance_by_pid',
+		tonumber(curProjectId),
+		function()
+			GameLogic.GetFilters():apply_filters(
+				'service.sync_to_data_source.init',
+				function(result, option)
+					if option.method == 'UPDATE-PROGRESS-FINISH' then
+						GameLogic.AddBBS(nil,"上传创作区成功")
+					end
+				end)
+		end
+	)
+end
+
+function World2In1.GetProjectIdByWorldName(worldName)
+	local worldName = worldName or creatorWorldName	
+	local targetFolder = World2In1.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(worldName).."/"
+	if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
+		local tag_xml_data = World2In1.LoadWorldTageXml(targetFolder) 
+		echo(tag_xml_data)
+		if tag_xml_data and tag_xml_data.attr and tag_xml_data.attr.kpProjectId then
+			return tonumber(tag_xml_data.attr.kpProjectId)
+		end 
+	end
+	return -1
 end
 
 function World2In1.UnLoadcurrentWorldListByName(name)

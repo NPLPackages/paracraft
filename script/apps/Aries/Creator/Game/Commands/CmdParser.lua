@@ -88,7 +88,7 @@ function CmdParser.ParsePos(cmd_text, entity)
 	else
 		origin_x, origin_y, origin_z = EntityManager.GetPlayer():GetBlockPos();
 	end
-	local x, y, z, cmd_text_remain = cmd_text:match("^([~%-%d]%-?%d*)[%s,]+([~%-%d]%-?%d*)[%s,]+([~%-%d]%-?%d*)%s*(.*)$");
+	local x, y, z, cmd_text_remain = cmd_text:match("^([~%-%d]%-?[%d%.]*)[%s,]+([~%-%d]%-?[%d%.]*)[%s,]+([~%-%d]%-?[%d%.]*)%s*(.*)$");
 	if(x) then
 		if(x:match("^~")) then
 			x = x:match("^~(.*)");

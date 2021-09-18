@@ -32,7 +32,7 @@ function VipCodeExchange.ShowView()
         style = CommonCtrl.WindowFrame.ContainerStyle,
         allowDrag = true,
         enable_esc_key = true,
-        zorder = 0,
+        zorder = 11,
         --app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key,
         directPosition = true,
         align = "_ct",

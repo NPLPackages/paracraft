@@ -68,7 +68,7 @@ end
     <div style="float:left;width: 150px;margin-top: 5px;">
         <pe:repeat DataSource="<%=GetTypeBtData()%>">
             <pe:repeatitem>
-                <div onclick='SelectType' param1='<%=Eval("index")%>'  style="margin-left: 22px;margin-top: 8px; float: left; width: 108px;height: 36px; background:;">
+                <div onclick='SelectType' uiname='<%="CreateModulPage.SelectType" .. Eval("index")%>' param1='<%=Eval("index")%>'  style="margin-left: 22px;margin-top: 8px; float: left; width: 108px;height: 36px; background:;">
                     <img zorder="0" src='<%=GetBgImg(Eval("index"))%>' style="position: relative;" width="108" height="36"/>
                     <img zorder="0" src='<%=Eval("background")%>' style="position: relative;margin-left: 0px;margin-top: 0px;" width="108" height="36"/>
                 </div>
@@ -93,7 +93,7 @@ end
                 </PagerTemplate>
                 <Columns>
                     <div style="width: 200px; height: 178px;">
-                        <input zorder="2" type="button" onclick="SelectModule" name='<%=Eval("index")%>' style="position: relative; width: 200px;height: 178px;background: ;"/>
+                        <input zorder="2" type="button" onclick="SelectModule" uiname='<%="CreateModulPage.SelectModule" .. Eval("index")%>' name='<%=Eval("index")%>' style="position: relative; width: 200px;height: 178px;background: ;"/>
 
                         <pe:if condition='<%=IsSelectModule(Eval("index"))%>'>
                             <div zorder="-1" style="position: relative; width: 200px;height: 178px; background:url(Texture/Aries/Creator/keepwork/World2In1/BJK4_1_200X178_32bits.png#0 0 200 178)"></div>

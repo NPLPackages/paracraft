@@ -468,20 +468,34 @@ function Desktop.ForceExit(bRestart)
 	GameLogic.GetFilters():apply_filters("user_event_stat", "desktop", "ForceExit", nil, nil);
 
 	local platform = System.os.GetPlatform();
-	if(platform == "android" or platform == "ios" ) then
-		GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
-		-- disable close on these platform. 
-		MyCompany.Aries.Game.Exit();
-		-- soft restart the NPL runtime state to login screen. 
-		System.App.Commands.Call("Profile.Aries.Restart", {method="soft"});
-	elseif(System.options.IsMobilePlatform) then
+
+	if (platform == "android" or platform == "ios" ) then
+		local function Restart()
+			GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
+			-- disable close on these platform. 
+			MyCompany.Aries.Game.Exit();
+			-- soft restart the NPL runtime state to login screen. 
+			System.App.Commands.Call("Profile.Aries.Restart", {method="soft"});
+		end
+
+		if (bRestart) then
+			Restart();
+		elseif (platform == "android") then
+			local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
+			ClassManager.OnExitApp();
+			Game.Exit();
+			ParaGlobal.ExitApp();
+		else
+			Restart();
+		end
+	elseif (System.options.IsMobilePlatform) then
 		GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
 		MyCompany.Aries.Game.Exit();
 		-- soft restart the NPL runtime state to login screen. 
 		Map3DSystem.App.Commands.Call("Profile.Aries.MobileRestart");
 	else
 		ParaEngine.GetAttributeObject():SetField("IsWindowClosingAllowed", true);
-		if(bRestart) then
+		if (bRestart) then
 			GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
 			Game.Exit();
 

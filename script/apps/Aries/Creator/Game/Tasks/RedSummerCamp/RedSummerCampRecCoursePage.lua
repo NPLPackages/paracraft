@@ -15,7 +15,7 @@ local RedSummerCampRecCoursePage = NPL.export();
 RedSummerCampRecCoursePage.courses_1 = {
  { id = 29477, label = L"欢迎来到帕拉卡",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/welcome_32bits.png;0 0 128 84",  },
  { id = 455, label = L"有了想法怎么做",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/idea_32bits.png;0 0 128 84",  },
- { id = 70351, label = L"夏令营每日一课",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/list_32bits.png;0 0 128 84",  },
+ { id = 79969, label = L"乐园设计师",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/1_211X106_32bits.png;0 0 211 106",  },
 }
 
 RedSummerCampRecCoursePage.courses_2 = {
@@ -25,9 +25,9 @@ RedSummerCampRecCoursePage.courses_2 = {
 }
 
 RedSummerCampRecCoursePage.courses_3 = {
- { id = 71346, label = L"盖世英雄",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/hero_32bits.png;0 0 128 84",  },
  { id = 19405, label = L"孙子兵法",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/sunzibingfa_32bits.png;0 0 128 84",  },
- { id = "all", label = L"全部课程",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/all_32bits.png;0 0 128 84",  },
+ { id = 70351, label = L"夏令营每日一课",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/list_32bits.png;0 0 128 84",  },
+ { id = 71346, label = L"盖世英雄",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/hero_32bits.png;0 0 128 84",  },
 }
 function RedSummerCampRecCoursePage.Show()
 	ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp();

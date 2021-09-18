@@ -132,10 +132,25 @@ end
 
 -- @param cmd: full commands or just command name
 -- @param params: parameters or nil. 
-function env_imp:cmd(cmd, params)
-	if(params ~= nil and params~="") then
-		cmd = cmd.." "..tostring(params);
+function env_imp:cmd(cmd, p1, p2, p3, p4)
+	if(p1 ~= nil and p1~="") then
+		cmd = cmd.." "..tostring(p1);
+		if(p2 ~= nil) then
+			cmd = cmd.." "..tostring(p2);
+			if(p3 ~= nil) then
+				cmd = cmd.." "..tostring(p3);
+				if(p4 ~= nil) then
+					cmd = cmd.." "..tostring(p4);
+				end
+			end
+		end
 	end
+--	if(self.actor) then
+--		local entity = self.actor:GetEntity();
+--		if(entity:isa(EntityManager.EntityNPC)) then
+--			EntityManager.SetLastTriggerEntity(entity);
+--		end
+--	end
 	return self.codeblock:RunCommand(cmd)
 end
 
