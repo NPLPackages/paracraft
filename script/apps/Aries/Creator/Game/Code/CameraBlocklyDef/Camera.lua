@@ -39,14 +39,26 @@ local function cameraTryInit(entity)
 end
 
 function Camera.init(codeblock)
-	Cameras.clear()
+	if(Camera.isIniting) then
+		return
+	end
+	Camera.isIniting = true
 	Camera.codeBlock = codeblock
 	Camera.codeEnv = codeblock:GetCodeEnv();
+	Cameras.clear()
 	local entity = Camera.codeBlock:GetEntity();
 	
 	codeblock:Connect("codeUnloaded", function()
-		Camera.close();
+		if(Camera.codeBlock == codeblock) then
+			Camera.close();
+		end
 	end)
+
+	codeblock:GetEntity():Connect("beforeRemoved", function()
+		if(Camera.codeBlock == codeblock) then
+			Camera.close();
+		end
+	end);
 	codeblock:GetEntity():Connect("afterRunThisBlock", function()
 		if(Cameras.getTargetTime() >= 0) then
 			
@@ -54,6 +66,7 @@ function Camera.init(codeblock)
 			EntityManager.SetFocus(EntityManager.GetPlayer());
 		end
 	end);
+	Camera.isIniting = false;
 end
 
 function Camera.InvokeMethod(name, ...)
@@ -83,6 +96,7 @@ function Camera.showWithEditor(entity)
 	EntityManager.SetFocus(EntityManager.GetPlayer());
 end
 
+-- called from UI click event when user wants to define the initial position of the camera in movie block
 function Camera.showCamera(index, entity)
 	cameraTryInit(entity);
 	Cameras.setCurrentCameraId(index);
@@ -105,10 +119,43 @@ function Camera.showCamera(index, entity)
 			local eye_dist, eye_liftup, eye_rot_y = ParaCamera.GetEyePos();
 			Cameras.eyeDist = eye_dist;
 			Camera.setMovieCameraPosition(index, entity, {x, y, z}, {eye_dist, eye_liftup, eye_rot_y});
+			local myItemStack = Camera.CreateGetCameraItemStackInMovieblock(index, entity);
+			if(myItemStack) then
+				-- force rebind, since there may be edit
+				currentCamera:BindToItemStack(myItemStack)
+				currentCamera:PlayToTime(0)
+			end
 		end
 		
 		EntityManager.SetFocus(EntityManager.GetPlayer());
 	end)
+end
+
+-- this is a private function: create if not exist
+-- @param index: camera index like [1, 8]
+-- @param entity: code entity
+function Camera.CreateGetCameraItemStackInMovieblock(index, entity)
+	local movieEntity = entity:FindNearByMovieEntity();
+	local myItemStack;
+	if(movieEntity and movieEntity.inventory) then
+		local clip = movieEntity:GetMovieClip();
+		local slot = 0;
+		for j = 1, movieEntity.inventory:GetSlotCount() do
+			local itemStack = movieEntity.inventory:GetItem(j)
+			if(itemStack and itemStack.id == block_types.names.TimeSeriesCamera) then
+				slot = slot + 1;
+				if(slot == index) then
+					myItemStack = itemStack;
+					break;
+				end
+			end 
+		end
+		if(not myItemStack) then
+			-- add EntityCamera in movie block
+			myItemStack = movieEntity:CreateCamera()
+		end
+		return myItemStack;
+	end
 end
 
 function Camera.createCamera(index, entity)
@@ -132,24 +179,8 @@ function Camera.createCamera(index, entity)
 			allCameras[i]:Attach();
 
 			local movieEntity = entity:FindNearByMovieEntity();
-			local myItemStack;
-			if(movieEntity and movieEntity.inventory) then
-				local clip = movieEntity:GetMovieClip();
-				local slot = 0;
-				for j = 1, movieEntity.inventory:GetSlotCount() do
-					local itemStack = movieEntity.inventory:GetItem(j)
-					if(itemStack and itemStack.id == block_types.names.TimeSeriesCamera) then
-						slot = slot + 1;
-						if(slot == i) then
-							myItemStack = itemStack;
-							break;
-						end
-					end 
-				end
-				if(not myItemStack) then
-					-- add EntityCamera in movie block
-					myItemStack = movieEntity:CreateCamera()
-				end
+			local myItemStack = Camera.CreateGetCameraItemStackInMovieblock(i, entity);
+			if(myItemStack) then
 				allCameras[i]:BindToItemStack(myItemStack)
 				allCameras[i]:PlayToTime(0)
 			end
@@ -157,9 +188,11 @@ function Camera.createCamera(index, entity)
 	end
 end
 
+-- @param pos: array of {x, y, z}
+-- @param rot: array of {eye_dist, eye_liftup, eye_rot_y}
 function Camera.setMovieCameraPosition(index, entity, pos, rot)
 	cameraTryInit(entity);
-	function setActorData(actor, x, y, z, eye_dist, eye_rot_y, eye_liftup)
+	local function setActorData(actor, x, y, z, eye_dist, eye_liftup, eye_rot_y)
 		actor:BeginUpdate();
 		local time = 0;
 		actor:AddKeyFrameByName("lookat_x", time, x);
@@ -182,7 +215,7 @@ function Camera.setMovieCameraPosition(index, entity, pos, rot)
 				slot = slot + 1;
 				if(slot == index) then
 					local actor = clip:GetActorFromItemStack(itemStack, true);
-					setActorData(actor, pos[1], pos[2], pos[3], Cameras.eyeDist, rot[1], rot[2]);
+					setActorData(actor, pos[1], pos[2], pos[3], Cameras.eyeDist, rot[2], rot[3]);
 					return;
 				end
 			end 
@@ -190,7 +223,7 @@ function Camera.setMovieCameraPosition(index, entity, pos, rot)
 
 		local itemStack = movieEntity:CreateCamera();
 		local actor = clip:GetActorFromItemStack(itemStack, true);
-		setActorData(actor, pos[1], pos[2], pos[3], Cameras.eyeDist, rot[1], rot[2]);
+		setActorData(actor, pos[1], pos[2], pos[3], Cameras.eyeDist, rot[2], rot[3]);
 	end
 end
 

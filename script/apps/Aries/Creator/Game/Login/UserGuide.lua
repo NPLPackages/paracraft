@@ -7,7 +7,7 @@ use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserGuide.lua");
 local UserGuide = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserGuide")
-UserGuide.ShowPage()
+UserGuide.Start()
 -------------------------------------------------------
 ]]
 
@@ -20,6 +20,10 @@ local isMouseMove = false;
 local groupindex_hint = 4;
 local groupindex_hint_bling = 5;
 local groupindex_hint_auto = 6;
+
+function UserGuide.Start()
+	UserGuide.Step1();
+end
 
 function UserGuide.OnInit()
 	if(UserGuide.bounce == nil and UserGuide.bar == nil) then
@@ -262,6 +266,7 @@ function UserGuide.CloseWindow()
 	GameLogic.events:RemoveEventListener("ShowCreatorDesktop", UserGuide.Step9, UserGuide);
 	GameLogic.events:RemoveEventListener("ShowHelpMenu", UserGuide.Step10, UserGuide);
 	GameLogic.events:RemoveEventListener("ShowHelpPage", UserGuide.Step10, UserGuide);
+	GameLogic.events:RemoveEventListener("ShowHelpPage", UserGuide.StepEnd, UserGuide);
 	CommonCtrl.os.hook.UnhookWindowsHook({hookName = "UserGuideMouseDown", hookType = CommonCtrl.os.hook.HookType.WH_CALLWNDPROC});
 	CommonCtrl.os.hook.UnhookWindowsHook({hookName = "UserGuideMouseMove", hookType = CommonCtrl.os.hook.HookType.WH_CALLWNDPROC});
 	CommonCtrl.os.hook.UnhookWindowsHook({hookName = "UserGuideMouseUp", hookType = CommonCtrl.os.hook.HookType.WH_CALLWNDPROC});

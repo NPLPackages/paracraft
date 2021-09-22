@@ -41,6 +41,7 @@ function CameraViewport.CloseWindow()
 
 		if(CameraViewport.onCloseCallback) then
 			CameraViewport.onCloseCallback(result);
+			CameraViewport.onCloseCallback = nil;
 		end
 	end
 end

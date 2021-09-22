@@ -88,7 +88,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"背包...",name = "window.userbag",onclick=nil},
 				-- {text = L"元件库...",name = "window.onlinestore", cmd="/open store"},
 				{text = L"视频录制...".."  F9",name = "window.videorecoder", cmd="/record"},
-				--{text = L"短视频分享...",name = "window.videosharing", cmd="/share"},
+				--{text = L"视频分享...",name = "window.videosharing", cmd="/share"},
 				{Type = "Separator"},
 				{text = L"信息".."  F3",name = "window.info",onclick=nil},
 				-- {text = L"位置坐标...",name = "window.pos",onclick=nil},
@@ -104,9 +104,10 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		{text = L"帮助", order=7, name = "help",children = 
 			{
 				{text = L"新手引导",name = "help.userintroduction", onclick=nil},
-				{text = L"教学视频",name = "help.videotutorials", onclick=nil},
-				{text = L"官方文档",name = "help.learn", onclick=nil},
+				-- {text = L"教学视频",name = "help.videotutorials", onclick=nil},
+				{text = L"官方文档".." & "..L"教学视频",name = "help.learn", onclick=nil},
 				{text = L"推荐课程...",name = "help.dailycheck", onclick=nil},
+				{text = L"创意空间...",name = "help.creativespace", onclick=nil},
 				{Type = "Separator"},
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"帮助...".."  F1",name = "help.help", onclick=nil},

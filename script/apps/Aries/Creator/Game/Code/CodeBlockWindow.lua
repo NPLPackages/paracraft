@@ -98,6 +98,7 @@ function CodeBlockWindow.Show(bShow)
 		end
 
 		_this.visible = true;
+		CodeBlockWindow.isTextCtrlHasFocus = false;
 		CodeBlockWindow:OnViewportChange();
 		local viewport = ViewportManager:GetSceneViewport();
 		viewport:SetMarginRight(self.margin_right);
@@ -222,6 +223,10 @@ function CodeBlockWindow:OnViewportChange()
 			local _this = ParaUI.GetUIObject(code_block_window_name);
 			_this:Reposition("_mr", 0, self.top, self.width, self.bottom);
 			if(page) then
+				local ctrl = CodeBlockWindow.GetTextControl();
+				if(ctrl) then
+					CodeBlockWindow.isTextCtrlHasFocus = ctrl:hasFocus()
+				end
 				CodeBlockWindow.UpdateCodeToEntity();
 				CodeBlockWindow.RestoreCursorPosition()
 				page:Rebuild();
@@ -237,6 +242,9 @@ function CodeBlockWindow:OnViewportChange()
 			end
 		end
 
+		if(not CodeBlockWindow.IsBlocklyEditMode() and CodeBlockWindow.isTextCtrlHasFocus) then
+			CodeBlockWindow.SetFocusToTextControl();
+		end
 	end
 end
 

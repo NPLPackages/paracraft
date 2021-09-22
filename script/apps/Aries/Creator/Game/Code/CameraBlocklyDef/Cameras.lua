@@ -8,7 +8,7 @@ use the lib:
 local Cameras = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Cameras.lua");
 -------------------------------------------------------
 ]]
-
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Cameras = NPL.export();
 
 -- get and set Camera code block
@@ -20,8 +20,12 @@ Cameras.currentTime = 0;
 
 function Cameras.clear()
 	for i = 1, #cameras do
-		if(cameras[i]) then
-			cameras[i]:Destroy();
+		local camera = cameras[i]
+		if(camera) then
+			if(EntityManager.GetFocus() == camera) then
+				EntityManager.SetFocus(EntityManager.GetPlayer());
+			end
+			camera:Destroy();
 		end
 	end
 	cameras = {}

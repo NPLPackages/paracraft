@@ -1402,5 +1402,20 @@ function MacroPlayer.AutoAdjustControlPosition(x1, y1, x2, y2)
 				MacroPlayer.lastSavedTipPos = nil;
 			end
 		end
+		local progressController = page:FindControl("progressController");
+		if(progressController and progressController.visible) then
+			if(x1 and y1) then
+				local x, y, width, height = progressController:GetAbsPosition();
+
+				local newX, newY = MoveRectDownOutOfRect(x, y, width, height, x1, y1, x2, y2, 32) 
+				if(newX and newY) then
+					MacroPlayer.lastSavedProgressPos = {x=x, y=y, width=width, height=height};
+					progressController:Reposition("_lt", newX, newY, width, height);
+				end
+			elseif(MacroPlayer.lastSavedProgressPos) then
+				progressController:Reposition("_lt", MacroPlayer.lastSavedProgressPos.x, MacroPlayer.lastSavedProgressPos.y, MacroPlayer.lastSavedProgressPos.width, MacroPlayer.lastSavedProgressPos.height);
+				MacroPlayer.lastSavedProgressPos = nil;
+			end
+		end
 	end
 end

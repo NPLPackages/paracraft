@@ -46,6 +46,7 @@ Commands["menu"] = {
 /menu help.about
 /menu help.npl_code_wiki
 /menu help.actiontutorial
+/menu help.newuserguide
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		-- apply filter
@@ -213,16 +214,25 @@ Commands["menu"] = {
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/videoguide");
 		elseif(name == "help.learn") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/index");
-		elseif(name == "help.dailycheck") then
+		elseif(name == "help.dailycheck" or name == "help.creativespace") then
 			GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",
 				function(result)
 					if (result) then
-						local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
-						RedSummerCampRecCoursePage.Show();
-						--local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-						--ParacraftLearningRoomDailyPage.DoCheckin();
+						if(name == "help.dailycheck") then
+							local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
+							RedSummerCampRecCoursePage.Show();
+							--local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
+							--ParacraftLearningRoomDailyPage.DoCheckin();
+						elseif(name == "help.creativespace") then
+							local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
+							RedSummerCampMainWorldPage.Show();
+						end
 					end
 				end)
+		elseif(name == "help.newuserguide") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserGuide.lua");
+			local UserGuide = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserGuide")
+			UserGuide.Start()
 		elseif(name == "help.ask") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/FAQ/paracraft");
 		elseif(name == "help.lessons") then
