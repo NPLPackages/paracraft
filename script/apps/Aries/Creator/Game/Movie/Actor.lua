@@ -52,7 +52,7 @@ end
 function Actor:Init(itemStack, movieclipEntity, movieclip)
 	self:SetItemStack(itemStack)
 	self.movieclipEntity = movieclipEntity;
-	self:SetMovieClip(movieclip or self.movieclipEntity:GetMovieClip())
+	self:SetMovieClip(movieclip or (self.movieclipEntity and self.movieclipEntity:GetMovieClip()))
 	return self;
 end
 

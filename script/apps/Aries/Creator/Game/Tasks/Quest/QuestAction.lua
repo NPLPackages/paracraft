@@ -44,7 +44,7 @@ end
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-
+local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestProvider.lua");
 local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
@@ -334,6 +334,11 @@ function QuestAction.DailyWorldTask()
 	local world_generator = WorldCommon.GetWorldTag("world_generator");
 	local world_id = WorldCommon.GetWorldTag("kpProjectId");
 	local world_name = WorldCommon.GetWorldTag("name");
+
+    -- 在这里加ppt的世界访问
+    if world_id then
+        RedSummerCampPPtPage.CompleteCourseTask(nil, world_id)
+    end
 
 	local key = world_id
 	if key == nil then

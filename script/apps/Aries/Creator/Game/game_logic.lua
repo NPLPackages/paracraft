@@ -851,6 +851,8 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 	ModManager:OnWorldSave();
 	GameLogic.world_revision:UpdateWorldFileSize();
 	GameLogic:WorldSaved(); -- signal
+
+	GameLogic.GetFilters():apply_filters("OnSaveWrold");
 end
 
 -- let a given character to play an animation. 

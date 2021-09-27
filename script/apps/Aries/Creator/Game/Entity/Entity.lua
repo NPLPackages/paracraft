@@ -79,7 +79,8 @@ Entity:Signal("focusIn");
 Entity:Signal("focusOut");
 -- position changed
 Entity:Signal("valueChanged");
-
+Entity:Signal("facingChanged");
+Entity:Signal("scalingChanged");
 
 local math_abs = math.abs;
 
@@ -1218,8 +1219,11 @@ end
 function Entity:SetScaling(v)
 	local obj = self:GetInnerObject();
 	if(obj) then
-		self.scaling = v;
 		obj:SetScale(v);
+	end
+	if(self.scaling ~= v) then
+		self.scaling = v;
+		self:scalingChanged()
 	end
 end
 
@@ -1245,11 +1249,14 @@ end
 function Entity:SetFacing(facing)	
 	local obj = self:GetInnerObject();
 	if(obj) then
-		self.facing = facing;
 		if(self.rotationYaw) then
 			self.rotationYaw = facing;
 		end
 		obj:SetFacing(facing);
+	end
+	if(self.facing ~= facing) then
+		self.facing = facing;
+		self:facingChanged();
 	end
 end
 

@@ -655,8 +655,13 @@ function Macros:LoadMacrosFromText(text)
 end
 
 
+function Macros:HasUnplayedPreparedMode()
+	return Macros.hasUnplayedPreparedMode;
+end
+
 -- @param cx, cy, cz: if nil, we will not play using absolute position. otherwise, we will play relatively. 
 function Macros:PrepareDefaultPlayMode(cx, cy, cz, isAutoPlay, bNoHelp, nSpeed)
+	Macros.hasUnplayedPreparedMode = true;
 	Macros.SetPlayOrigin(cx, cy, cz)
     Macros.SetAutoPlay(isAutoPlay);
     Macros.SetHelpLevel(bNoHelp and 0 or 1);
@@ -712,7 +717,9 @@ function Macros:PrepareInitialBuildState()
 end
 
 -- @param text: text lines of macros. if nil, it will play from clipboard
-function Macros:Play(text, speed, maxPrepareTime)	
+-- @param maxPrepareTime: max number of seconds, if prepare downloading text-to-speech audio files if any. default to 3 seconds. 
+function Macros:Play(text, speed, maxPrepareTime)
+	Macros.hasUnplayedPreparedMode = false;
 	text = text or ParaMisc.GetTextFromClipboard() or "";
 	self.maxPrepareTime = maxPrepareTime or 3;
 	local macros = self:LoadMacrosFromText(text)
@@ -846,15 +853,15 @@ function Macros:PlayMacros(macros, fromLine, speed)
 
 	if (fromLine == 1) then
 		self.firstTextPrepared = false;
-		local second = 0;
+		self.elapsedPrepareTime = 0;
 		self.checkText = self.checkText or commonlib.Timer:new({callbackFunc = function(timer)
-			second = second + 1;
-			if (second >= self.maxPrepareTime or self.firstTextPrepared) then
+			self.elapsedPrepareTime = self.elapsedPrepareTime + 1;
+			if (not has_playtext or self.elapsedPrepareTime >= self.maxPrepareTime or self.firstTextPrepared) then
 				self.checkText:Change();
 				play();
 			end
 		end});
-		self.checkText:Change(1000, 1000);
+		self.checkText:Change(1, 1000);
 	else
 		play();
 	end
@@ -862,6 +869,9 @@ end
 
 
 function Macros:Stop()
+	if(self.checkText) then
+		self.checkText:Change();
+	end
 	if(self:IsRecording()) then
 		self:EndRecord()
 	elseif(self:IsPlaying()) then
@@ -1027,15 +1037,18 @@ function Macros:PreparePlayText(prepare_nums)
 		if item then
 			if item.name == "text" and item.params then
 				local params = type(item.params) == "table" and item.params or commonlib.split(item.params,",")
-				local text = params[1] or ""
-				if (string.find(text, "\"", 1) == 1 and string.find(text, "\"", string.len(text)) == string.len(text)) then
-					text = string.sub(text, 2, string.len(text) - 1);
-				end
-				if text ~= "" then
-					SoundManager:PrepareText(text,  params[4], function(file_path)
-						self.firstTextPrepared = true;
-					end)
-					pre_count = pre_count + 1
+				-- if there is audio.  
+				if(params[4] ~= "-1" and params[4] ~= -1) then
+					local text = params[1] or ""
+					if (string.find(text, "\"", 1) == 1 and string.find(text, "\"", string.len(text)) == string.len(text)) then
+						text = string.sub(text, 2, string.len(text) - 1);
+					end
+					if text ~= "" then
+						SoundManager:PrepareText(text,  params[4], function(file_path)
+							self.firstTextPrepared = true;
+						end)
+						pre_count = pre_count + 1
+					end
 				end
 			end
 			

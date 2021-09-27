@@ -1186,7 +1186,7 @@ function Actor:ComputeBoneWorldPosAndRot(boneName, localPos, localRot, bUseParen
 			self.parentTrans = self.parentTrans or mathlib.Matrix4:new();
 			self.parentTrans = parentObj:GetField("LocalTransform", self.parentTrans);
 			self.parentPivot:multiplyInPlace(self.parentTrans);
-			self.parentQuat = self.parentQuat or mathlib.Quaternion:new();
+			self.parentQuat = self.parentQuat or Quaternion:new();
 			if(parentScale~=1) then
 				self.parentTrans:RemoveScaling();
 			end
@@ -1232,14 +1232,108 @@ function Actor:GetParentInfo()
 	return self.parentInfo;
 end
 
+
+-- LinkTo is similar to AttachTo, but we use the current relative position between this and link target. 
+-- and if we move the current actor after the a link is established, we will modify the relative position.
+-- when the linkTarget's position and facing changes, the actor will also move according to the last relative position. 
+-- LinkTo function is suitable for linking between two static objects, like an apple can be linked to a table. 
+-- if we already attachedTo an object, we will detach from it, before link to it. 
+-- @param targetActor: string or actor object. which actor to link to. if nil, it will detach from existing actor. 
+function Actor:LinkTo(targetActor)
+	if(type(targetActor) == "string") then
+		targetActor = GameLogic.GetCodeGlobal():GetActorByName(targetActor);
+	end
+	if(targetActor) then
+		if(self.parentInfo) then
+			self:AttachTo(nil);
+		end
+		self.linkInfo = self.linkInfo or {};
+		local srcEntity = self:GetEntity()
+		local targetEntity = targetActor:GetEntity()
+		local x, y, z = srcEntity:GetPosition()
+		local tx, ty, tz = targetEntity:GetPosition()
+
+		local quatRot = Quaternion:new():FromAngleAxis(-targetEntity:GetFacing(), mathlib.vector3d.unit_y)
+		self.linkInfo.x, self.linkInfo.y, self.linkInfo.z = quatRot:RotateVector3(x - tx, y - ty, z - tz)
+		self.linkInfo.facing = srcEntity:GetFacing() - targetEntity:GetFacing();
+		self.linkInfo.scaling = targetEntity:GetScaling()
+		self.linkInfo.quatRot = quatRot;
+		
+
+		if(self.linkInfo.actor ~= targetActor) then
+			self:UnLinkActor(self.linkInfo.actor)
+			self.linkInfo.actor = targetActor
+			targetEntity:Connect("valueChanged", self, self.UpdateActorLink);
+			targetEntity:Connect("facingChanged", self, self.UpdateActorLink);
+			targetEntity:Connect("scalingChanged", self, self.UpdateActorLink);
+			targetActor:Connect("beforeRemoved", self, self.UnLink);
+
+			self.linkInfo.isLastControlledExternally = srcEntity:IsControlledExternally()
+			if(not self.linkInfo.isLastControlledExternally) then
+				srcEntity:SetControlledExternally(true);
+			end
+		end
+	else
+		self:UnLink();
+	end
+end
+
+function Actor:UnLinkActor(actor)
+	if(actor) then
+		local entity = actor:GetEntity()
+		entity:Disconnect("valueChanged", self, self.UpdateActorLink);
+		entity:Disconnect("facingChanged", self, self.UpdateActorLink);
+		entity:Disconnect("scalingChanged", self, self.UpdateActorLink);
+		actor:Disconnect("beforeRemoved", self, self.UnLink);
+		if(not self.linkInfo.isLastControlledExternally) then
+			self:GetEntity():SetControlledExternally(false);
+		end
+	end
+end
+
+function Actor:UnLink()
+	if(self.linkInfo) then
+		self:UnLinkActor(self.linkInfo.actor)
+		self.linkInfo = nil;
+	end
+end
+
+-- update this actor's position according to its link target
+function Actor:UpdateActorLink()
+	if(self.linkInfo) then
+		local targetEntity = self.linkInfo.actor:GetEntity()
+		if(targetEntity) then
+			local x, y, z = targetEntity:GetPosition();
+			self.linkInfo.quatRot:FromAngleAxis(targetEntity:GetFacing(), mathlib.vector3d.unit_y)
+			local rx, ry, rz = self.linkInfo.quatRot:RotateVector3(self.linkInfo.x, self.linkInfo.y, self.linkInfo.z)
+			local entity = self:GetEntity();
+			local curScaling = targetEntity:GetScaling();
+			if(curScaling ~= self.linkInfo.scaling) then
+				local scaling = curScaling / self.linkInfo.scaling;
+				rx, ry, rz = rx * scaling, ry * scaling, rz * scaling;
+			end
+			entity:SetPosition(x + rx, y + ry, z + rz)
+			entity:SetFacing(targetEntity:GetFacing() + self.linkInfo.facing);
+		end
+	end
+end
+
 -- attach this code actor to another code actor. 
 -- @param parentActor: which actor to attach to. if nil, it will detach from existing actor. 
--- @param boneName: which bone of the parent actor to attach to. default to root bone. 
+-- @param boneName: which bone of the parent actor to attach to. default to root bone. If "link" or "~", we will use LinkTo instead of bones
 -- @param pos: nil or 3d position offset
 -- @param rot: nil or 3d rotation 
 -- @param bUseRotation: whether to use the parent bone's rotation. default to true
 function Actor:AttachTo(parentActor, boneName, pos, rot, bUseRotation)
+	if(boneName == "link" or boneName == "~") then
+		self:LinkTo(parentActor);
+		return;
+	end
+
 	if(parentActor and parentActor.ComputeBoneWorldPosAndRot) then
+		if(self.linkInfo) then
+			self:LinkTo(nil);
+		end
 		self.parentInfo = self.parentInfo or {};
 		local parent = self.parentInfo;
 		if(parent.actor ~= parentActor) then
@@ -1260,6 +1354,7 @@ function Actor:AttachTo(parentActor, boneName, pos, rot, bUseRotation)
 		end
 		self.parentInfo = nil;
 		self:KillTimer();
+		self:UnLink();
 	end
 end
 

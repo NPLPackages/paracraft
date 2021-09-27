@@ -165,8 +165,9 @@ function MainLogin:UpdateCoreClient()
 	local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
 
 	local testCoreClient = false;
-	if (not testCoreClient and platform == "win32") then
-		-- win32 will check for latest version, but will not force update instead it just pops up a dialog. 
+	if (not testCoreClient and platform == "win32" and not System.os.IsWindowsXP()) then
+		-- For windows10/7/vista we will check for latest version, but will not force update 
+		-- instead it just pops up a dialog and ask user to use launcher Paracraft.exe to update.  
 		self:next_step({IsUpdaterStarted = true});
 		if (not System.options.isAB_SDK and
 		    ParaEngine.GetAppCommandLineByParam("noclientupdate", "") == "") then
@@ -184,7 +185,7 @@ function MainLogin:UpdateCoreClient()
 
 				if(bSucceed and updater:isNeedUpdate()) then
 					System.options.isParacraftNeedUpdate = true;
-					
+
 					if GameLogic.GetFilters():apply_filters('cellar.client_update_dialog.show', false, updater, gamename) then
 						return
 					end
@@ -208,85 +209,84 @@ function MainLogin:UpdateCoreClient()
 				end
 			end);
 		end
-		return
-	end
-	
-	-- Following are android, mac, iOS logic.
-	-- check for mini-allowed core nplruntime version
-	local updater = ClientUpdater:new();
+	else
+		-- For android, mac, iOS, winXP, it will always use latest version and download pkg to apps/haqi/ folder without updating executable. 
+		-- check for mini-allowed core nplruntime version
+		-- NOTE: version smaller than this are not allowed to run. one must upgrade the NPL runtime. 
+		local minVer = {0, 7, 509}
 
-	if ParaEngine.GetAppCommandLineByParam("noclientupdate", "") == "true" then
-		self:next_step({IsUpdaterStarted = true});
-		return;
-	end
-
-	local function CheckMiniVersion_(ver)
-		local v1,v2,v3 = ver:match("(%d+)%D(%d+)%D(%d+)");
-
-		if (v3) then
-			v1,v2,v3 = tonumber(v1),tonumber(v2), tonumber(v3)
-
-			local isCodepku = ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true";
-
-			-- NOTE: version here 0.7.509
-			local minVer = {0, 7, 509}
-			if (not isCodepku and
-			    (v1 < minVer[1] or
-				 (v1 == minVer[1] and v2 < minVer[2]) or
-				 (v1 == minVer[1] and v2 == minVer[2] and v3 < minVer[3])
-				)
-			   ) then
-				_guihelper.MessageBox(format(L"您的版本%s低于最低要求,请尽快更新", ver), function(res)
-					if (res and res == _guihelper.DialogResult.Yes) then
-						ClientUpdater:OnClickUpdate();
-					end
-
-					self:next_step({IsUpdaterStarted = true});
-				end, _guihelper.MessageBoxButtons.YesNo);
-
-				return false;
-			end
-		end
-
-		return true;
-	end
-
-	if (System.options.paraworldapp == ClientUpdater.appname) then
-		local ver = ParaEngine.GetAppCommandLineByParam("nplver", "");
-
-		if (CheckMiniVersion_(ver)) then
+		local updater = ClientUpdater:new();
+		if ParaEngine.GetAppCommandLineByParam("noclientupdate", "") == "true" then
 			self:next_step({IsUpdaterStarted = true});
+			return;
 		end
 
-		return;
-	end
+		local function CheckMiniVersion_(ver)
+			local v1,v2,v3 = ver:match("(%d+)%D(%d+)%D(%d+)");
 
-	GameLogic.GetFilters():apply_filters("ShowClientUpdaterNotice");
+			if (v3) then
+				v1,v2,v3 = tonumber(v1),tonumber(v2), tonumber(v3)
 
-	updater:Check(function(bNeedUpdate, latestVersion, comparedVersion)
-		GameLogic.GetFilters():apply_filters("HideClientUpdaterNotice");
+				local isCodepku = ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true";
 
-		if (bNeedUpdate) then
-			updater:Download(function(bSucceed)
-				if(bSucceed) then
+				if (not isCodepku and
+					(v1 < minVer[1] or
+					 (v1 == minVer[1] and v2 < minVer[2]) or
+					 (v1 == minVer[1] and v2 == minVer[2] and v3 < minVer[3])
+					)
+				   ) then
+					_guihelper.MessageBox(format(L"您的版本%s低于最低要求,请尽快更新", ver), function(res)
+						if (res and res == _guihelper.DialogResult.Yes) then
+							ClientUpdater:OnClickUpdate();
+						end
+
+						self:next_step({IsUpdaterStarted = true});
+					end, _guihelper.MessageBoxButtons.YesNo);
+
+					return false;
+				end
+			end
+
+			return true;
+		end
+
+		if (System.options.paraworldapp == ClientUpdater.appname) then
+			local ver = ParaEngine.GetAppCommandLineByParam("nplver", "");
+
+			if (CheckMiniVersion_(ver)) then
+				self:next_step({IsUpdaterStarted = true});
+			end
+
+			return;
+		end
+
+		GameLogic.GetFilters():apply_filters("ShowClientUpdaterNotice");
+
+		updater:Check(function(bNeedUpdate, latestVersion, comparedVersion)
+			GameLogic.GetFilters():apply_filters("HideClientUpdaterNotice");
+
+			if (bNeedUpdate) then
+				updater:Download(function(bSucceed)
+					if(bSucceed) then
+						updater:Restart();
+					else
+						self:next_step({IsUpdaterStarted = true});
+					end
+				end);
+			else
+				if (comparedVersion == 100) then
+					self:next_step({IsUpdaterStarted = true});
+					return;
+				end
+
+				if (updater:GetCurrentVersion() ~= latestVersion) then
 					updater:Restart();
 				else
 					self:next_step({IsUpdaterStarted = true});
 				end
-			end);
-		else
-			if (comparedVersion == 100) then
-				self:next_step({IsUpdaterStarted = true});
-				return;
 			end
-
-			if (updater:GetCurrentVersion() ~= latestVersion) then
-				updater:Restart();
-			else
-				self:next_step({IsUpdaterStarted = true});
-			end
-		end
-	end);
+		end);
+	end
 end
 
 

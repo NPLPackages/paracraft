@@ -36,6 +36,10 @@ function mcml_controls.register_all()
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_usertag.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_window.lua");
 
+	-- lessons ppt
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/step.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/action.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/notes.lua");
 
 	-- mc tags
 	Map3DSystem.mcml_controls.RegisterUserControl("pe:mc_player", MyCompany.Aries.Game.mcml.pe_mc_player);
@@ -52,4 +56,7 @@ function mcml_controls.register_all()
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:window", MyCompany.Aries.Game.mcml.kp_window);
     local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
     Map3DSystem.mcml_controls.RegisterUserControl("pe:nplbrowser", pe_nplbrowser);
+	Map3DSystem.mcml_controls.RegisterUserControl("step", MyCompany.Aries.Game.mcml.lessons_ppt.step);
+	Map3DSystem.mcml_controls.RegisterUserControl("action", MyCompany.Aries.Game.mcml.lessons_ppt.action);
+	Map3DSystem.mcml_controls.RegisterUserControl("notes", MyCompany.Aries.Game.mcml.lessons_ppt.notes);
 end

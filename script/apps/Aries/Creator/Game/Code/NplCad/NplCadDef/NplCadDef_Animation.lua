@@ -33,6 +33,7 @@ local cmds = {
 	category = "Animation", 
 	helpUrl = "", 
 	canRun = false,
+	previousStatement = true,
 	nextStatement = true,
 	funcName = "createAnimation",
 	func_description = 'createAnimation(%s,%s)',

@@ -431,9 +431,11 @@ function CommandManager:RunCmdSegment(cmd_list, fromLine, toLine, variables, fro
 	end
 	if(macros) then
 		local text = table.concat(macros, "\n");
-		local player = GameLogic.EntityManager.GetPlayer()
-		local cx, cy, cz = player:GetBlockPos();
-		GameLogic.Macros:PrepareDefaultPlayMode(cx, cy, cz)
+		if(not GameLogic.Macros:HasUnplayedPreparedMode()) then
+			local player = GameLogic.EntityManager.GetPlayer()
+			local cx, cy, cz = player:GetBlockPos();
+			GameLogic.Macros:PrepareDefaultPlayMode(cx, cy, cz)
+		end
 		GameLogic.Macros:PrepareInitialBuildState()
 		GameLogic.Macros:Play(text);
 	end

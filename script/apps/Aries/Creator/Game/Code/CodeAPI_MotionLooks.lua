@@ -1134,7 +1134,7 @@ function env_imp:attachTo(parentActor, boneName, pos, rot, bUseRotation)
 			parentActor = GameLogic.GetCodeGlobal():GetActorByName(parentActor)
 		end
 		if(not parentActor or parentActor=="") then
-			actor:AttachTo(nil);
+			actor:AttachTo(nil, boneName);
 		elseif(parentActor and parentActor.AttachTo and actor~=parentActor) then
 			if(boneName == "") then
 				boneName = nil;

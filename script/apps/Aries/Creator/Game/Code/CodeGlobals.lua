@@ -22,6 +22,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Network/LobbyService/LobbyServerVia
 NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
+local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
@@ -231,6 +233,7 @@ function CodeGlobals:Reset()
 	self.text_events = {};
 
 	self.actors = {};
+	self.playerActor = nil;
 
 	-- active code blocks
 	self.codeblocks= {};
@@ -432,6 +435,19 @@ function CodeGlobals:OnActorNameChange(actor, oldName, newName)
 	if(newName) then
 		self.actors[newName] = actor;
 	end
+end
+
+function CodeGlobals:GetPlayerActor()
+	if(not self.playerActor) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeActor.lua");
+		local CodeActor = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemStack.lua");
+		local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
+		local item = ItemStack:new():Init(block_types.names.TimeSeriesNPC, 1);
+		self.playerActor = CodeActor:new():Init(item);
+		self.playerActor:BecomeAgent(EntityManager.GetPlayer())
+	end
+	return self.playerActor;
 end
 
 -- return the last added actor by name

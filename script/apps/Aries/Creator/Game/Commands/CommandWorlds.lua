@@ -118,12 +118,13 @@ e.g.
 
 Commands["loadworld"] = {
 	name="loadworld", 
-	quick_ref="/loadworld [-i|e|force|personal] [worldname|url|filepath|projectId|home|back]", 
+	quick_ref="/loadworld [-i|e|force|personal|d] [worldname|url|filepath|projectId|home|back]", 
 	mode_deny = "", -- allow load world in all game modes
 	desc=[[load a world by worldname or url or filepath relative to parent directory
 @param -i: interactive mode, which will ask the user whether to use existing world or not. 
 @param -e: always use existing world if it exist without checking if it is up to date.  
 @param -s: slient load.
+@param -d: download the world without loading it. Upon finish, it will /sendevent download_offline_world_finish project_id
 @param -force: always use online world without checking if it is different to local. 
 @param -inplace: if the entered world is equal to the current world, the subsequent /sendevent command will be executed directly. otherwise, the command will be executed after entering the world. For security reasons, only event that begins with "global" can be sent
 @param -personal: login required. always sync online world to local folder, then enter.
@@ -139,6 +140,7 @@ e.g.
 /loadworld back
 /loadworld -s -inplace 530 | /sendevent globalSetPos  {x, y, z}
 /loadworld -s -fork 530 new_world_name
+/loadworld -d 530
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");

@@ -442,8 +442,8 @@ walkForward(0.1, 0.1, true)
 		{
 			name = "boneName",
 			type = "input_value",
-			shadow = { type = "text", value = "",},
-			text = "",
+			shadow = { type = "text", value = "link",},
+			text = "link",
 		},
 	},
 	category = "Motion", 
@@ -470,6 +470,12 @@ attachTo(nil)
 parent = getActorValue("parent")
 setActorValue("parentOffset", "0, 2, 0")
 setActorValue("parentRot", {0, 3.14, 0})
+]]},
+{desc = L"连接到父角色", canRun = false, code = [[
+-- link according to current relative position
+attachTo("parent", "link")
+-- unlink
+attachTo(nil, "link")
 ]]},
 },
 },

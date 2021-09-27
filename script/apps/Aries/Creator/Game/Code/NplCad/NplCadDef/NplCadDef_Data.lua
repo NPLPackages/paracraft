@@ -470,6 +470,7 @@ end
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,
+	hide_in_toolbox = true,
 	previousStatement = true,
 	nextStatement = true,
 	func_description = '--[[\\n%s\\n]]',
@@ -556,6 +557,7 @@ end
 	category = "Data", 
 	helpUrl = "", 
 	canRun = false,
+	previousStatement = true,
 	nextStatement = true,
 	func_description = 'setMaxTrianglesCnt(%s)',
 	ToNPL = function(self)

@@ -1015,6 +1015,11 @@ local x, y, z = runForActor(actor, function()
 end)
 say(x..y..z, 1)
 ]]},
+{desc = L"控制当前玩家", canRun = true, code = [[
+runForActor("@p", function()
+    say("hello", 1)
+end)
+]]},
 },
 },
 

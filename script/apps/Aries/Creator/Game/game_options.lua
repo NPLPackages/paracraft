@@ -324,7 +324,7 @@ function options:OnLoadWorld()
 --		GameLogic.RunCommand("/memlimit -v -s 200");
 --	end
 	GameLogic.AddBBS("options", nil);
-	self.isOfflineMode = System.options.loginmode == "local" or System.options.loginmode == "offline";
+	self.isOfflineMode = System.options.loginmode == "local" or System.options.loginmode == "offline" or System.os.IsWindowsXP();
 
 	local player = ParaScene.GetPlayer();
 	self:ApplyTexturePack();

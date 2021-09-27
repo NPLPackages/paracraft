@@ -176,7 +176,7 @@ end
             <input type="button" value='<%=GameLogic.IsReadOnly() and L"另存为..." or L"保存世界"%>' tooltip="Ctrl+S" name="saveWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
         <div style="margin-top:8px;">
-            <input type="button" value='<%=L"新建世界"%>' name="createNewWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=L"新建世界"%>' name="createNewWorld" uiname="EscFramePage.createNewWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
             <input type="button" value='<%=L"加载世界"%>' tooltip="Ctrl+O" uiname="EscFramePage.loadWorld" name= "loadWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
         <pe:if condition='<%=not System.options.mc %>'>

@@ -15,6 +15,7 @@ local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.C
 NPL.load("(gl)script/ide/Transitions/Tween.lua");
 local RedSummerCampMainPage = NPL.export();
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua");
 local page
 local notice_time = 3000
@@ -92,6 +93,13 @@ function RedSummerCampMainPage.Show()
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);	
 
+	if RedSummerCampPPtPage.GetIsReturnOpenPage() then
+		local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
+		RedSummerCampCourseScheduling.ShowView()
+
+		RedSummerCampPPtPage.Show(course_name, pptIndex)
+	end
+
 
 	page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
 	RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
@@ -128,6 +136,7 @@ function RedSummerCampMainPage.Show()
 			end)
 		end)
 	end
+
 end
 
 function RedSummerCampMainPage.OnClose()

@@ -560,11 +560,8 @@ function NplBrowserPlugin.OsSupported()
 
             -- disable for windows XP
             if(NplBrowserPlugin.isSupported) then
-                local stats = System.os.GetPCStats();
-                if(stats and stats.os) then
-                    if(stats.os:lower():match("windows xp")) then
-                        NplBrowserPlugin.isSupported = false;
-                    end
+                if(System.os.IsWindowsXP()) then
+                    NplBrowserPlugin.isSupported = false;
                 end
             end
         elseif System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then

@@ -24,7 +24,7 @@ ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 209;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 214;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -236,6 +236,12 @@ NPL自定义世界图块
 创建新手模板（下）
 分享作品视频和点赞
 搜索官方文档
+给图块添加注释
+相册的使用
+永远面向摄影机
+会员种类和权限说明
+免费用户的世界访问权限
+制作交互示课件
 制作有待机动画的方块模型
 制作有行走动作的方块模型
 自主动画方块模型

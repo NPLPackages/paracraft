@@ -164,6 +164,7 @@ function env_imp:getX(objName)
 end
 
 -- get block position Y (prefer integer, unless not in the center of block)
+-- @param objName: if nil or "self", it means the calling actor
 function env_imp:getY(objName)
 	local actor = self.actor;
 	local entity = getActorEntity_(actor, objName);
@@ -183,6 +184,7 @@ function env_imp:getY(objName)
 end
 
 -- get block position Z (prefer integer, unless not in the center of block)
+-- @param objName: if nil or "self", it means the calling actor
 function env_imp:getZ(objName)
 	local actor = self.actor;
 	local entity = getActorEntity_(actor, objName);

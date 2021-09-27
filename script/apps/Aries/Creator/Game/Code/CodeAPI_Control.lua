@@ -140,12 +140,16 @@ function env_imp:run(mainFunc)
 end
 
 -- run function under the context of a given actor and wait for its return value
--- @param actor: actor name or the actor object
+-- @param actor: actor name or the actor object, "@p" for current player
 function env_imp:runForActor(actor, mainFunc)
 	if(actor == "myself" or not actor) then
 		actor = self.actor;
 	elseif(type(actor) == "string") then
-		actor = GameLogic.GetCodeGlobal():GetActorByName(actor);
+		if(actor == "@p") then
+			actor = GameLogic.GetCodeGlobal():GetPlayerActor();
+		else
+			actor = GameLogic.GetCodeGlobal():GetActorByName(actor);
+		end
 	end
 	if(type(actor) == "table" and type(mainFunc) == "function") then
 		local isFinished = false;

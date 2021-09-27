@@ -86,6 +86,11 @@ function ClickItem(name)
     end
     ParaGlobal.ShellExecute("open", url, "", "", 1); 
 end
+
+function ClickLearnBt()
+    local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
+    RedSummerCampCourseScheduling.ShowView()
+end
 ]]>
 </script>
 <style type="text/mcss">
@@ -188,7 +193,7 @@ end
             <div></div>
 
             <div style="width: 1242px;">
-                <!-- <input type="button" onclick="ClickLBBt" value='<%=GetData("lb_bt_desc")%>' style="position: relative; margin-left: 150px; margin-top: 0px;color: #1335a0;font-weight: bold; font-size: 16px; base-font-size:16px;width: 120px; height: 80px; background:;"/> -->
+                <input type="button" value='学习计划' class="yellon_button" onclick="ClickLearnBt" style="position: relative;width: 143px; margin-left: 825px; margin-top: 20px;"/>
                 <input type="button" value='<%=GetData("rb_bt_desc")%>' onclick="ClickRBBt" class="yellon_button" style="margin-left:985px;margin-top:20px;" />
             </div>
 
