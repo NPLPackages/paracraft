@@ -142,7 +142,7 @@ end
 
 
 function PlayerAssetFile:IsCustomModel(filename)
-	return "character/v3/Elf/Female/ElfFemale.xml" == filename;
+	return filename == "character/v3/Elf/Female/ElfFemale.xml";
 end
 
 --- @param assetModelPath string: e.g. character/CC/02human/CustomGeoset/actor.x

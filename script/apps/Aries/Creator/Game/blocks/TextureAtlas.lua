@@ -12,6 +12,10 @@ texture_atlas:AddRegionByBlockId(62);
 texture_atlas:AddRegionByBlockId(5);
 texture_atlas:AddRegionByBlockId(26);
 
+local region = texture_atlas:CreateGetRegion("slot1", 64, 64); 
+region:SetModelFileAndSkin("blocktemplates/battery_on.bmax")
+region:Print();
+
 local region = texture_atlas:CreateGetRegion("block1", 32, 32); region:Print();
 local region = texture_atlas:CreateGetRegion("block2", 32, 32); region:Print();
 local region = texture_atlas:CreateGetRegion("block3", 32, 32); region:Print();
@@ -23,6 +27,12 @@ NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 NPL.load("(gl)script/ide/mathlib.lua");
 NPL.load("(gl)script/ide/EventDispatcher.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Color = commonlib.gettable("System.Core.Color");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
@@ -73,6 +83,38 @@ function TextureRegion:SetBlockId(block_id)
 	end
 end
 
+function TextureRegion:Touch()
+	self.lastTouchTime = commonlib.TimerManager.GetCurrentTime();
+end
+
+function TextureRegion:GetTouchTime()
+	return self.lastTouchTime;
+end
+
+-- @param assetfile: ParaX file path, can be relative to world directory or root directory. 
+--  it can be bmax, fbx or x file. 
+-- @param skin: skin or custom character string. 
+function TextureRegion:SetModelFileAndSkin(assetfile, skin)
+	if(self.assetfile~=assetfile or self.skin~=skin) then
+		self.assetfile = assetfile;
+		self.skin = skin;
+		self.block_id = nil; 
+		self:RefreshBlock();
+	end
+end
+
+function TextureRegion:GetModelFilename()
+	return self.assetfile
+end
+
+function TextureRegion:GetModelSkin()
+	return self.skin;
+end
+
+function TextureRegion:GetModelScaling()
+	return self.modelScaling or 1
+end
+
 function TextureRegion:GetDiffuseColor()
 	return self.diffuseColor;
 end
@@ -95,33 +137,82 @@ function TextureRegion:RefreshBlock()
 end
 
 function TextureRegion:OnTick()
-	if(not self.block_id) then
-		return;
-	end
-	self.tickCount = self.tickCount + 1;
-	local block_template = block_types.get(self.block_id);
-	if(block_template) then
-		local tex = block_template:GetTextureObj();
-		if(tex) then
-			local isAssetLoaded;
-			tex:LoadAsset();
-			if(tex:IsLoaded()) then
-				local model_filename = block_template:GetItemModel();	
-				if(model_filename and model_filename ~= "icon") then
-					local asset = ParaAsset.LoadStaticMesh("", model_filename);
-					if(asset) then
-						asset:LoadAsset();
-						if(asset:IsLoaded()) then
-							self:MakeDirty();
-							return;
+	if(self.block_id) then
+		local block_template = block_types.get(self.block_id);
+		if(block_template) then
+			local tex = block_template:GetTextureObj();
+			if(tex) then
+				local isAssetLoaded;
+				tex:LoadAsset();
+				if(tex:IsLoaded()) then
+					local model_filename = block_template:GetItemModel();	
+					if(model_filename and model_filename ~= "icon") then
+						local asset = ParaAsset.LoadStaticMesh("", model_filename);
+						if(asset) then
+							asset:LoadAsset();
+							if(asset:IsLoaded()) then
+								self:MakeDirty();
+								return;
+							end
 						end
 					end
 				end
+				self.tickCount = self.tickCount + 1;
+				if(self.tickCount < 20) then
+					self:ChangeTimer(self.tickCount*300);
+				else
+					LOG.std(nil, "error", "TextureRegion", "failed to load texture %d", self.block_id);
+				end
 			end
-			if(self.tickCount < 20) then
-				self:ChangeTimer(self.tickCount*300);
-			else
-				LOG.std(nil, "error", "TextureRegion", "failed to load texture %d", self.block_id);
+		end
+	elseif(self:GetModelFilename()) then
+		local model_filename = Files.FindFile(self:GetModelFilename())
+		if(model_filename) then
+			local asset = ParaAsset.LoadParaX("", model_filename);
+			if(asset) then
+				asset:LoadAsset();
+				if(asset:IsLoaded()) then
+					local boundingBox = asset:GetBoundingBox({})
+					local max_height = 1.4;
+					local maxSize;
+					if(boundingBox.max_y) then
+						maxSize = math.max(math.max(boundingBox.max_y, boundingBox.max_x), boundingBox.max_z)
+					end
+					if(maxSize and maxSize > max_height) then
+						self.modelScaling = max_height / maxSize;
+					else
+						self.modelScaling = nil;
+					end
+					
+					local fileExtension = model_filename:match("%.(%w+)$")
+					if(fileExtension == "x" or fileExtension == "xml" or fileExtension == "fbx") then
+						if(self.tickCount >= 0) then
+							-- render the model, possibly without texture
+							self:MakeDirty();
+							-- tricky: we will try load textures 
+							self.tickCount = -1; 
+							self:ChangeTimer(200);
+						else
+							local nItemLeft = ParaEngine.GetAsyncLoaderItemsLeft(-1);
+							if(nItemLeft > 0 and self.tickCount > -10) then
+								-- we will wait until no textures are loading or a good amount of time like 3 seconds have passed.
+								self.tickCount = math.min(-1, self.tickCount - 1);
+								self:ChangeTimer(300);
+							else
+								self:MakeDirty();
+							end
+						end
+					else
+						self:MakeDirty();
+					end
+				else
+					self.tickCount = self.tickCount + 1;
+					if(self.tickCount < 20) then
+						self:ChangeTimer(self.tickCount*300);
+					else
+						LOG.std(nil, "error", "TextureRegion", "failed to load ParaX file %s", model_filename);
+					end	
+				end
 			end
 		end
 	end
@@ -315,48 +406,112 @@ function TexturePacker:RebuildScene(bClearAll)
 
 	local height = self:GetHeight();
 	local q = mathlib.QuatFromAxisAngle(angleLength, 0, angleLength, -view_angle);
+	local roll, pitch, yaw = mathlib.Quaternion:new({q.x, q.y, q.z, q.w}):ToEulerAnglesSequence("zxy");
 	for i = 1, #(self.regions) do
 		local region = self.regions[i];
-		local block_id = region:GetBlockId();
-		if(region.rectangle and block_id) then
-			local block_template = block_types.get(block_id);
-			if(block_template) then
-				-- region:Print();
+		
+		if(region.rectangle) then
+			local block_id = region:GetBlockId();
+			if(block_id) then
+				local block_template = block_types.get(block_id);
+				if(block_template) then
+					-- region:Print();
 				
-				local model_filename = block_template:GetItemModel();	
-				if(model_filename and model_filename ~= "icon") then
-					local model_offset_y = block_template:GetOffsetY();
+					local model_filename = block_template:GetItemModel();	
+					if(model_filename and model_filename ~= "icon") then
+						local model_offset_y = block_template:GetOffsetY();
+						local obj_name = region:GetName();
+						local obj = scene:GetObject(obj_name);
+						if(not obj or not obj:IsValid()) then
+							obj = ObjEditor.CreateObjectByParams({
+								name = obj_name,
+								IsCharacter = false,
+								AssetFile = model_filename,
+								x = (region.rectangle.x + region.rectangle.width*0.5)*unit_size_inverse,
+								y = (height - region.rectangle.y - region.rectangle.height*offset_y)*unit_size_inverse + model_offset_y * scaling,
+								z = 0,
+								facing = facing,
+								scaling = scaling,
+							});
+							obj:SetField("progress", 1);
+							obj:SetRotation(q);
+
+							-- diffuse color
+							local colorDiffuse = region:GetDiffuseColor();
+							if(colorDiffuse) then
+								obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorDiffuse", colorDiffuse);
+								if(region:GetAmbientColor()) then
+									obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorAmbient", region:GetAmbientColor());
+								end
+							end
+							scene:AddChild(obj);
+						end
+					
+						local tex = block_template:GetTextureObj();
+						if(tex) then
+							tex:LoadAsset();
+							obj:SetReplaceableTexture(2, tex);
+						end
+					end
+				end
+			elseif(region:GetModelFilename()) then
+				local model_filename = Files.FindFile(region:GetModelFilename())
+				if(model_filename) then
+					local model_offset_y = 0;
 					local obj_name = region:GetName();
 					local obj = scene:GetObject(obj_name);
+					local localScale = scaling * region:GetModelScaling()
 					if(not obj or not obj:IsValid()) then
 						obj = ObjEditor.CreateObjectByParams({
 							name = obj_name,
-							IsCharacter = false,
+							IsCharacter = true,
 							AssetFile = model_filename,
 							x = (region.rectangle.x + region.rectangle.width*0.5)*unit_size_inverse,
 							y = (height - region.rectangle.y - region.rectangle.height*offset_y)*unit_size_inverse + model_offset_y * scaling,
 							z = 0,
-							facing = facing,
-							scaling = scaling,
+							facing = 0,
+							scaling = localScale,
 						});
 						obj:SetField("progress", 1);
-						obj:SetRotation(q);
+						-- there is no SetRotation function in biped object, we will use raw, pitch, roll instead. 
+						--obj:SetRotation(q);
+						obj:SetFacing(facing+yaw);
+						obj:SetField("pitch", pitch);
+						obj:SetField("roll", roll);
+						scene:AddChild(obj);
 
-						-- diffuse color
-						local colorDiffuse = region:GetDiffuseColor();
-						if(colorDiffuse) then
-							obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorDiffuse", colorDiffuse);
-							if(region:GetAmbientColor()) then
-								obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorAmbient", region:GetAmbientColor());
+						local isCustomModel = PlayerAssetFile:IsCustomModel(model_filename);
+						local hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(model_filename);
+						local skin = region:GetModelSkin();
+
+						if(isCustomModel) then
+							PlayerAssetFile:RefreshCustomModel(obj, skin)
+						elseif(hasCustomGeosets) then
+							PlayerAssetFile:RefreshCustomGeosets(obj, skin);
+						elseif(skin and skin~="") then
+							if(skin:match("^(%d+):")) then
+								for id, filename in skin:gmatch("(%d+):([^;]+)") do
+									id = tonumber(id)
+									obj:SetReplaceableTexture(id, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(filename), 1));
+								end
+							elseif(skin:match("^%d+#")) then
+								-- ignore ccs skins
+							elseif(skin:match("^%d+;")) then
+								-- custom geosets
+							else
+								obj:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
+							end
+						else
+							if(PlayerSkins:CheckModelHasSkin(model_filename)) then
+								local skin = PlayerSkins:GetDefaultSkinForModel(model_filename)
+								if(skin) then
+									obj:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
+								end
 							end
 						end
-						scene:AddChild(obj);
-					end
-					
-					local tex = block_template:GetTextureObj();
-					if(tex) then
-						tex:LoadAsset();
-						obj:SetReplaceableTexture(2, tex);
+					else
+						-- when asset is loaded, auto-scaling maybe changed, we will set it anyway
+						obj:SetScale(localScale);
 					end
 				end
 			end
@@ -411,8 +566,7 @@ end
 function TexturePacker:RefreshAllBlocks()
 	for i = 1, #(self.regions) do
 		local region = self.regions[i];
-		local block_id = region:GetBlockId();
-		if(block_id) then
+		if(region:GetBlockId() or region:GetModelFilename()) then
 			region:RefreshBlock();
 		end
 	end
@@ -542,6 +696,24 @@ function TextureAtlas:Clear()
 	end
 end
 
+-- remove all regions which have not been touched in the last deltaTime
+-- @param deltaTime: milliseconds, default to 1000
+function TextureAtlas:RemoveUnTouched(deltaTime)
+	deltaTime = deltaTime or 1000
+	local curTime = commonlib.TimerManager.GetCurrentTime();
+	local untouched = {};
+	for name, region in pairs(self.regions) do
+		local lastTouchTime = region:GetTouchTime()
+		if(lastTouchTime and (lastTouchTime + deltaTime) < curTime) then
+			untouched[name] = true;
+		end
+	end
+	for name, _ in pairs(untouched) do
+		self:RemoveRegion(name)
+	end
+end
+
+
 -- block related, shall we move this to a new class? 
 function TextureAtlas:AddRegionByBlockId(block_id, block_data)
 	local region_name = format("block_%d", block_id);
@@ -576,6 +748,44 @@ function TextureAtlas:AddRegionByBlockId(block_id, block_data)
 		end
 	end
 	return region;
+end
+
+function TextureAtlas:ComputeRegionName(p1, p2)
+	if(not p2) then
+		return p1
+	else
+		return p1..p2;
+	end
+end
+
+-- block related, shall we move this to a new class? 
+-- @param filename: such as x,bmax files can be relative to world directory or SDK root. 
+-- @param skin: can be nil, or custom character string, like used in a movie block skin.  
+-- @return region, isNewlyCreated: isNewlyCreated is true if we have just created the region
+function TextureAtlas:AddModel(filename, skin)
+	local region_name = self:ComputeRegionName(filename, skin);
+	local region = self:GetRegion(region_name);
+	if(region) then
+		return region;
+	else
+		region = self:CreateGetRegion(region_name, nil, nil); 
+		region:SetModelFileAndSkin(filename, skin)
+		return region, true;
+	end
+end
+
+-- @return nil if not exist
+function TextureAtlas:GetModelRegion(filename, skin)
+	local region_name = self:ComputeRegionName(filename, skin);
+	return self:GetRegion(region_name);
+end
+
+function TextureAtlas:RemoveModel(filename, skin)
+	local region = self:GetModelRegion(filename, skin)
+	if(region) then
+		self:RemoveRegion(region:GetName());
+		return true;
+	end
 end
 
 -- save each region as a separate file. 

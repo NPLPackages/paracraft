@@ -147,7 +147,7 @@ function Entity:GetFullFilePath(filename)
 	local bExist
 	local old_filename = filename;
 	if(filename and filename~="") then
-		if(filename:match("^https?://")) then
+		if(filename:match("^https?://") or filename:match("^_miniscenegraph")) then
 			bExist = true;
 		else
 			filename = filename:gsub("[;:].*$", "")

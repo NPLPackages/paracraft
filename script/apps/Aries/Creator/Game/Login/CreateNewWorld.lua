@@ -337,6 +337,7 @@ function CreateNewWorld.CreateWorldByName(world_name, terrain)
 		CreateNewWorld.ClosePage();
 		WorldCommon.OpenWorld(worldpath, true);
 		GameLogic:UserAction("introduction");
+		GameLogic.GetFilters():apply_filters("OnWorldCreate",world_name_locale);
 		-- this is annoying, we will not show tutorial in this intrusive way. we will use external lesson mod to do this job in near future.
 		-- GameLogic.options:SetShowTutorial(true);
 	end

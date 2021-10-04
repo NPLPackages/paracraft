@@ -12,6 +12,9 @@ local item_ = ItemTimeSeriesNPC:new({});
 ]]
 NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/ActorNPC.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelTextureAtlas.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+local ModelTextureAtlas = commonlib.gettable("MyCompany.Aries.Game.Common.ModelTextureAtlas");
 local ActorNPC = commonlib.gettable("MyCompany.Aries.Game.Movie.ActorNPC");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -26,6 +29,7 @@ block_types.RegisterItemClass("ItemTimeSeriesNPC", ItemTimeSeriesNPC);
 -- @param template: icon
 -- @param radius: the half radius of the object. 
 function ItemTimeSeriesNPC:ctor()
+	self:SetOwnerDrawIcon(true);
 end
 
 -- create actor from item stack. 
@@ -42,5 +46,46 @@ function ItemTimeSeriesNPC:GetTooltipFromItemStack(itemStack)
 		return self:GetTooltip();
 	else
 		return format(L"%s:右键编辑", name);
+	end
+end
+
+-- get the first model if any 
+function ItemTimeSeriesNPC:GetModelFileName(itemStack)
+	local ts = itemStack:GetDataField("timeseries");
+	if(ts and ts["assetfile"] and ts["assetfile"].data) then
+		return ts["assetfile"].data[1];
+	end
+end
+
+-- get the first skin if any 
+function ItemTimeSeriesNPC:GetModelSkin(itemStack)
+	local ts = itemStack:GetDataField("timeseries");
+	if(ts and ts["skin"] and ts["skin"].data) then
+		return ts["skin"].data[1];
+	end
+end
+
+-- virtual: draw icon with given size at current position (0,0)
+-- @param width, height: size of the icon
+-- @param itemStack: this may be nil. or itemStack instance. 
+function ItemTimeSeriesNPC:DrawIcon(painter, width, height, itemStack)
+	local filename = self:GetModelFileName(itemStack);
+	if(filename and filename~="") then
+		local skin = self:GetModelSkin(itemStack)
+		filename = PlayerAssetFile:GetFilenameByName(filename)
+		if(filename) then
+			itemStack.renderedTexturePath = ModelTextureAtlas:CreateGetModel(filename, skin)
+		end
+		
+		if(itemStack.renderedTexturePath) then
+			--painter:SetPen("#ffffff30");
+			--painter:DrawRectTexture(0, 0, width, height, self:GetIcon());
+			painter:SetPen("#ffffff");
+			painter:DrawRectTexture(0, 0, width, height, itemStack.renderedTexturePath);
+		else
+			ItemTimeSeriesNPC._super.DrawIcon(self, painter, width, height, itemStack);
+		end
+	else
+		ItemTimeSeriesNPC._super.DrawIcon(self, painter, width, height, itemStack);
 	end
 end

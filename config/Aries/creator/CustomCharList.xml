@@ -694,7 +694,9 @@
 	</category>
 	
 	<category name="back" text="背部">
-	    <!--20210610新加-->
+         <!--20210929新加-->
+		<item id="86043" gsid="85003" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86043_red_flag_bag_32bits.png" name="红旗书包"/>
+	    <!--20210624新加-->
 		<item id="86042" gsid="85002" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86042_red_scarf_32bits.png" name="红领巾"/>
 	    <!--20210610新加-->
 		<item id="86041" gsid="85001" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86041_space_suit_bag_32bits.png" name="氧气瓶"/>

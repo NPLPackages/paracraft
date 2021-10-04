@@ -366,12 +366,14 @@ end
 -- @param skin: if nil, it will use the default skin. 
 -- if it only contains file path, then by default it will always be set at replaceable texture id 2.
 -- if the string is of format "id:filename;id:filename;...", it can be used to set multiple replaceable textures at custom index. 
+-- it can also be model and texture ids like "id1;id2;...", which is used in movie block actor. 
 function Entity:SetSkin(skin)
 	if(self.skin ~= skin) then
 		if(skin) then
 			local customSkin = skin;
 			if (self:HasCustomGeosets()) then
 				if(skin:match("^(%d+):[^;+]")) then
+					-- this never happens in a movie block actor, since movie block actor uses "id1;id2;..."
 					customSkin = CustomCharItems:ReplaceSkinTexture(self.skin, skin);
 				end
 			end
@@ -390,7 +392,7 @@ function Entity:SetSkin(skin)
 			end
 		end
 
-		if(self.username == commonlib.getfield("System.User.username")) then
+		if(self.username == System.User.username) then
 			PlayerAssetFile.Store.skin = self.skin;
 		end
 

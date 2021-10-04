@@ -181,15 +181,9 @@ end
                     <input type="button" style="position:relative;min-width:43px;margin-top:10px;background:;color:#cccccc" value='<%=L"预览"%>' />
                     <img name="CurrentSnapshot" zorder="1" style="width:60px;height:50px;"/>
                 </div>-->
-                <div style="float:left;margin-left:5px;">
-                    <div>
-                        <%=L"Ctrl+左键点击场景可保存模版"%>
-                    </div>
-                </div>
                 <div style="margin-left:1px;margin-top:0px;">
                     <input type="button" name="refresh" style="font-size:12px;color:#cccccc;background-color:#cccccc" value='<%=L"刷新"%>' class="linkbutton" onclick="OnClickRefreshAllTemplates"/>
                     <input type="button" name="opendir" style="margin-left:10px;font-size:12px;color:#cccccc;background-color:#cccccc" value='<%=L"目录"%>' tooltip='<%=L"打开模板文件目录"%>' class="linkbutton" onclick="OnClickOpenTemplateDir"/>
-                    <input type="button" name="fullwnd" style="position:relative;font-size:12px;color:#cccccc;background-color:#cccccc;align:right;" value='<%=L"管理"%>' tooltip='<%=L"打开模板管理窗口"%>' class="linkbutton" onclick="OnClickManageTemplateWnd"/>
                 </div>
             </div>
             <pe:treeview 
@@ -200,7 +194,7 @@ end
                 DataSource='<%=DS_GetBlockTemplates()%>' 
                 DefaultNodeHeight="20" 
                 OnClick="tvwOnClickNode()" 
-                style="margin-left:2px;margin-top:2px;margin-right:8px;width:218px;height:235px;"
+                style="margin-left:2px;margin-top:2px;margin-right:8px;width:218px;margin-bottom:10px"
             >
 	            <NodeTemplates>
                     <NodeTemplate DataType="official">

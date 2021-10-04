@@ -727,7 +727,7 @@ model id
     <item id="85097" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85097_Avatar_girl_leg_87.png"></texture></item>
     <item id="85098" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85098_Avatar_girl_leg_88.png"></texture></item>
     <item id="85099" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85099_Avatar_boy_leg_89.png"></texture></item>
-    <item id="85100" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85100_Avatar_boy_leg_90.png"></texture></item>
+    <item id="85100" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85100_Avatar_boy_leg_90.png"></texture></item>
     <item id="85101" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85101_Avatar_boy_leg_91.png"></texture></item>
     <item id="85102" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85102_Avatar_girl_leg_92.png"></texture></item>
     <item id="85103" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85103_Avatar_girl_leg_93.png"></texture></item>
@@ -781,6 +781,8 @@ model id
     <item id="86041" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86041_space_suit_bag.anim.x"></attachment></item>
     <!--20210624添加夏令营-->
     <item id="86042" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86042_red_scarf.anim.x"></attachment></item>
+    <!--20210929添加国庆-->
+    <item id="86043" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86043_red_flag_bag.anim.x"></attachment></item>
 
     <!--      87000 97999  手持  attachment id="1"    -->
     <item id="87001" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x"></attachment></item>

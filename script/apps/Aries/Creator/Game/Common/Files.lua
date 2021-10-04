@@ -471,7 +471,7 @@ function Files.GetRelativePath(filename)
 end	
 
 -- we will try to find a file in world directory or global directory at all cost and save the result to cache 
--- so that the next time the same file is requeried, we will return fast for both exist or non-exist ones. 
+-- so that the next time the same file is requried, we will return fast for both exist or non-exist ones. 
 -- see also Files.FindFile() it differs with it for non-exist files, this function will also cache non-exist files. 
 -- Files.FindFile does not cache non-exist files. 
 -- @return it will return the file path or false if not found

@@ -73,6 +73,8 @@ KeepWorkItemManager.loaded = false;
 KeepWorkItemManager.filter = nil;
 KeepWorkItemManager.is_init = false;
 KeepWorkItemManager.exid_preload_items = 11000; --preload item after login
+
+KeepWorkItemManager.page_size = 10000;
 function KeepWorkItemManager.TestMsg(gsid)
     gsid = gsid or 1000;
     _guihelper.MessageBox(gsid);
@@ -489,7 +491,7 @@ function KeepWorkItemManager.LoadGlobalStore(bForced, callback)
     end
     keepwork.globalstore.get({
         cache_policy = cache_policy,
-        ["x-per-page"] = 1000,
+        ["x-per-page"] = KeepWorkItemManager.page_size,
     },function(err, msg, data)
         if(err ~= 200)then
             return
@@ -511,7 +513,7 @@ function KeepWorkItemManager.LoadExtendedCost(bForced, callback)
     end
     keepwork.extendedcost.get({
         cache_policy = cache_policy,
-        ["x-per-page"] = 1000,
+        ["x-per-page"] = KeepWorkItemManager.page_size,
     },function(err, msg, data)
         if(err ~= 200)then
             return

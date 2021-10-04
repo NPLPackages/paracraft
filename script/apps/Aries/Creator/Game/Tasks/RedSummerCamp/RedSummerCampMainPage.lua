@@ -30,7 +30,8 @@ RedSummerCampMainPage.ItemData = {
 }
 
 local notice_desc = {
-	{desc = [[教师节快乐！你想送给老师一件什么礼物？]], name="teacher_day"},
+	{desc = [[教师节活动奖励新鲜出炉！！！]], name="teacher_day"},
+	{desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
 	{desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
 	{desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
 	{desc = [[重温红色记忆，重走《征程》之约]], name="zhengcheng"},
@@ -493,6 +494,9 @@ function RedSummerCampMainPage.OpenPage(name)
     elseif(name == "teacher_day")then
 		local ActTeacher = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacher.lua") 
 		ActTeacher.ShowView()
+    elseif(name == "nationak_day")then
+		local ActNationalDay = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Activity/ActNationalDay/ActNationalDay.lua") 
+		ActNationalDay.ShowPage()
     elseif(name == "my_works")then
         local Opus = NPL.load("(gl)Mod/WorldShare/cellar/Opus/Opus.lua")
         Opus:Show()
@@ -578,4 +582,24 @@ function RedSummerCampMainPage.OnClickRightBt(name)
 	elseif name == "rank" then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua").Show();
     end
+end
+
+function RedSummerCampMainPage.ClickSchoolName()
+	if RedSummerCampMainPage.UserData and not RedSummerCampMainPage.UserData.has_school then
+		GameLogic.GetFilters():apply_filters('cellar.my_school.after_selected_school', function ()
+			KeepWorkItemManager.LoadProfile(false, function()
+				local profile = KeepWorkItemManager.GetProfile()
+				-- 是否选择了学校
+				if profile and profile.schoolId and profile.schoolId > 0 then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+					local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+					QuestAction.AchieveTask("40003_1", 1, true)
+				end
+
+				commonlib.TimerManager.SetTimeout(function()
+					RedSummerCampMainPage.RefreshPage()
+				end, 500)
+			end)
+		end);
+	end
 end

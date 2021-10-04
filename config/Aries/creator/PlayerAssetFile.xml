@@ -620,6 +620,38 @@
   <asset filename="character/CC/07items/yiliaoxiang.x" displayname="医疗箱" name="medical_case"/>
   <asset filename="character/CC/07items/zhen.x" displayname="针" name="needle"/>
   <asset filename="character/CC/artwar/game/tiaogezi.x" displayname="跳房子" name="tiaogezi"/>
+<!-- 2021.09.28 补充垃圾桶及垃圾相关素材 -->
+  <!-- 垃圾桶分类 -->
+  <!-- <asset filename="character/CC/keepwork/lajitong/lajitong_chuyu.x" displayname="厨余垃圾桶" name="chuyu"/>
+  <asset filename="character/CC/keepwork/lajitong/lajitong_kehuishou.x" displayname="可回收垃圾桶" name="kehuishou"/>
+  <asset filename="character/CC/keepwork/lajitong/lajitong_qita.x" displayname="其他垃圾桶" name="qita"/>
+  <asset filename="character/CC/keepwork/lajitong/lajitong_youhai.x" displayname="有害垃圾桶" name="youhai"/>
+  -->
+
+  <!-- 垃圾分类 -->
+  <!-- <asset filename="character/CC/keepwork/laji/cy_caiyezi.x" displayname="菜叶子" name="caiyezi"/>
+  <asset filename="character/CC/keepwork/laji/cy_canzhiluoye.x" displayname="残枝落叶" name="canzhiluoye"/>
+  <asset filename="character/CC/keepwork/laji/cy_dagu.x" displayname="大骨" name="dagu"/>
+  <asset filename="character/CC/keepwork/laji/cy_guohe.x" displayname="果核" name="guohe"/>
+  <asset filename="character/CC/keepwork/laji/cy_xiangjiaopi.x" displayname="香蕉皮" name="xiangjiaopi"/>
+  <asset filename="character/CC/keepwork/laji/khs_bolipin.x" displayname="玻璃瓶" name="bolipin"/>
+  <asset filename="character/CC/keepwork/laji/khs_hezi.x" displayname="盒子" name="hezi"/>
+  <asset filename="character/CC/keepwork/laji/khs_jylg.x" displayname="卷状易拉罐" name="jylg"/>
+  <asset filename="character/CC/keepwork/laji/khs_luomu.x" displayname="螺母" name="luomu"/>
+  <asset filename="character/CC/keepwork/laji/khs_luosi.x" displayname="螺丝" name="luosi"/>
+  <asset filename="character/CC/keepwork/laji/khs_ylg.x" displayname="易拉罐" name="ylg"/>
+  <asset filename="character/CC/keepwork/laji/khs_yugu.x" displayname="鱼骨" name="yugu"/>
+  <asset filename="character/CC/keepwork/laji/khs_zhixiang.x" displayname="纸箱" name="zhixiang"/>
+  <asset filename="character/CC/keepwork/laji/qt_fanhe.x" displayname="饭盒" name="fanhe"/>
+  <asset filename="character/CC/keepwork/laji/qt_taoci.x" displayname="陶瓷" name="taoci"/>
+  <asset filename="character/CC/keepwork/laji/qt_yantou.x" displayname="烟头" name="yantou"/>
+  <asset filename="character/CC/keepwork/laji/qt_zhijin.x" displayname="纸巾" name="zhijin"/>
+  <asset filename="character/CC/keepwork/laji/yh_dianchi.x" displayname="电池" name="dianchi"/>
+  <asset filename="character/CC/keepwork/laji/yh_huazhuangpin.x" displayname="化妆品" name="huazhuangpin"/>
+  <asset filename="character/CC/keepwork/laji/yh_yaopin.x" displayname="药品" name="yaopin"/>
+  <asset filename="character/CC/keepwork/laji/yh_youqitong.x" displayname="油漆桶" name="youqitong"/>
+  -->
+
 <!-- 5·27更新 -->
   <asset filename="character/CC/artwar/game/chai.x" displayname="柴火" name="chai"/>
   <asset filename="character/CC/artwar/game/desk.x" displayname="复古木桌" name="desk"/>

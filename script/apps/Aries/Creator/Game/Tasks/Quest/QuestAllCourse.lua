@@ -661,7 +661,7 @@ function QuestAllCourse.RunCommand(index, is_pre)
 
 
     local is_vip_school_and_lesson = System.User.isVipSchool and select_teacher_data.name == "校园课程"
-    if System.User.isVip or QuestAllCourse.permissions_check or is_vip_school_and_lesson then
+    if System.User.isVip or QuestAllCourse.permissions_check or KeepWorkItemManager.IsOrgVip() then
         enter_world()
     else
         -- 需要vip才能进
@@ -686,6 +686,11 @@ function QuestAllCourse.RunCommand(index, is_pre)
                         return
                     end
                 end
+            end
+
+            if is_vip_school_and_lesson then
+                enter_world()
+                return
             end
 
             local function sure_callback()

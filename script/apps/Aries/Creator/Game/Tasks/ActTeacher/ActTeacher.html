@@ -9,15 +9,17 @@
         Page:CloseWindow();
     end
     function OnCreate()
-        GameLogic.GetFilters():apply_filters('show_create_page');
+        --GameLogic.GetFilters():apply_filters('show_create_page');
+        _guihelper.MessageBox(L"活动已结束，敬请期待下次的参与");
     end
 
     function OnSubmit()
-        GameLogic.RunCommand(format('/loadworld -s -force %d', ActTeacher.GetSubmitWorldId()))
+        _guihelper.MessageBox(L"活动已结束，敬请期待下次的参与");
     end
 
     function OnShowRank()
-        _guihelper.MessageBox(L"请在活动结束后，查看优秀作品");
+        local ActTeacherReward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacherReward.lua") 
+        ActTeacherReward.ShowView()
     end
 
     function OnShowDetail()

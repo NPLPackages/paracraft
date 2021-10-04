@@ -12,6 +12,8 @@ local item = ItemBlockModel:new({icon,});
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemToolBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelTextureAtlas.lua");
+local ModelTextureAtlas = commonlib.gettable("MyCompany.Aries.Game.Common.ModelTextureAtlas");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -230,16 +232,26 @@ end
 -- @param width, height: size of the icon
 -- @param itemStack: this may be nil. or itemStack instance. 
 function ItemBlockModel:DrawIcon(painter, width, height, itemStack)
-	ItemBlockModel._super.DrawIcon(self, painter, width, height, itemStack);
 	local filename = self:GetModelFileName(itemStack);
 	if(filename and filename~="") then
+		itemStack.renderedTexturePath = ModelTextureAtlas:CreateGetModel(filename)
+		
+		if(itemStack.renderedTexturePath) then
+			painter:SetPen("#ffffff");
+			painter:DrawRectTexture(0, 0, width, height, itemStack.renderedTexturePath);
+		else
+			ItemBlockModel._super.DrawIcon(self, painter, width, height, itemStack);
+		end
 		filename = filename:match("[^/]+$"):gsub("%..*$", "");
 		filename = filename:sub(1, 6);
+		
 		painter:SetPen("#33333380");
 		painter:DrawRect(0,0, width, 14);
 		painter:SetPen("#ffffff");
 		painter:SetFont("System;12")
 		painter:DrawText(1,0, filename);
+	else
+		ItemBlockModel._super.DrawIcon(self, painter, width, height, itemStack);
 	end
 end
 

@@ -71,8 +71,6 @@ function ActorAnimationsDialog.ShowPage(modelName, skin, options, OnClose, text)
 		end
 	end
 
-	echo(modelName);
-	echo(skin);
 	ActorAnimationsDialog.UpdateModel(modelName, skin, options);
 end
 
@@ -96,10 +94,16 @@ function ActorAnimationsDialog.UpdateModel(modelName, skin, options)
 			if(PlayerAssetFile:IsCustomModel(filepath)) then
 				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
 			elseif(PlayerAssetFile:HasCustomGeosets(filepath)) then
-				CustomGeosets = skin;
+				CustomGeosets = PlayerAssetFile:GetDefaultCustomGeosets();
 			elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 				-- TODO:  hard code worker skin here
 				ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
+			end
+
+			local skin = CustomCharItems:GetSkinByAsset(filepath);
+			if (skin) then
+				filepath = CustomCharItems.defaultModelFile;
+				CustomGeosets = skin;
 			end
 
 			ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures, CCSInfoStr=CCSInfoStr, CustomGeosets = CustomGeosets});

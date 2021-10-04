@@ -337,7 +337,7 @@ function QuestAction.DailyWorldTask()
 
     -- 在这里加ppt的世界访问
     if world_id then
-        RedSummerCampPPtPage.CompleteCourseTask(nil, world_id)
+        RedSummerCampPPtPage.OnVisitWrold(world_id)
     end
 
 	local key = world_id

@@ -683,6 +683,7 @@ function CustomCharItems:GetSkinByAsset(assetPath)
 	return CustomCharItems.ReplaceableAvatars[assetPath];
 end
 
+-- @param texture: it can be in format like "id:filename;id:filename;...", which will be replaced by ids in skin. 
 function CustomCharItems:ReplaceSkinTexture(skin, texture)
 	local currentSkin = skin;
 	if (not skin or skin == "") then
