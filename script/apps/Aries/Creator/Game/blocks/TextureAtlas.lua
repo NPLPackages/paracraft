@@ -320,6 +320,8 @@ function TexturePacker:Clear()
 		self:RemoveRegion(region);
 		region = self.regions:first();
 	end
+	local scene = self:GetScene();
+	scene:DestroyChildren();
 end
 
 function TexturePacker:AddRegion(region)
@@ -334,6 +336,10 @@ function TexturePacker:RemoveRegion(region)
 			self:FreeRectangle(region.rectangle);
 		end
 		self.regions:removeByValue(region);
+
+		-- also clear the scene object
+		local scene = self:GetScene();
+		scene:DestroyObject(region:GetName());
 	end
 end
 

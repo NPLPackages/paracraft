@@ -1195,11 +1195,9 @@ function CodeBlock:CreateGetActor()
 	end
 end
 
+-- this is same as self:FindNearbyActor()
 function CodeBlock:GetActor()
-	local env = self:GetCodeEnv();
-	if(env) then
-		return env.actor or self:FindNearbyActor();
-	end
+	return self:FindNearbyActor();
 end
 
 -- usually from help window. There can only be one temp code running. 

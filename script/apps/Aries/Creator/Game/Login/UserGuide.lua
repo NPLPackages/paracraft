@@ -21,7 +21,9 @@ local groupindex_hint = 4;
 local groupindex_hint_bling = 5;
 local groupindex_hint_auto = 6;
 
-function UserGuide.Start()
+--@param bMoveOnly: if true, we will only show for basic movement
+function UserGuide.Start(bMoveOnly)
+	UserGuide.bMoveOnly = bMoveOnly; 
 	UserGuide.Step1();
 end
 
@@ -103,7 +105,11 @@ function UserGuide.OnMouseUp(nCode, appName, msg)
 	local input = Map3DSystem.InputMsg;
 	if(input.mouse_button == "right") then
 		if(isMouseDown and isMouseMove) then
-			UserGuide.Step3();
+			if(not UserGuide.bMoveOnly) then
+				UserGuide.Step3();
+			else
+				UserGuide.StepEnd();
+			end
 		else
 			isMouseDown = false;
 		end
@@ -251,8 +257,11 @@ end
 
 function UserGuide:StepEnd(event)
 	GameLogic.events:RemoveEventListener("ShowHelpPage", UserGuide.Step10, UserGuide);
-	_guihelper.MessageBox(L"恭喜完成新手引导，点击确定之后在【帮助 F1】中探索更多帮助内容");
 	UserGuide.CloseWindow();
+
+	if(not UserGuide.bMoveOnly) then
+		_guihelper.MessageBox(L"恭喜完成新手引导，点击确定之后在【帮助 F1】中探索更多帮助内容");
+	end
 end
 
 function UserGuide.CloseWindow()

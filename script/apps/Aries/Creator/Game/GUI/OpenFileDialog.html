@@ -10,9 +10,6 @@
 <script refresh="false" type="text/npl" src="OpenFileDialog.lua"><![CDATA[
 OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 OpenFileDialog.OnInit()
-function OnClose()
-    Page:CloseWindow();
-end
 OpenFileDialog.lastSelectedFile = nil;
 function OnSelectFile(treenode)
     local filename = treenode.mcmlNode:GetPreValue("this").filename;
@@ -25,7 +22,7 @@ end
 function dummy()
 end
 ]]></script>
-<aries:window mode="thin" title='<%=OpenFileDialog.title or L"输入窗"%>' style="width:460px;" uiname_onclose="OpenFileDialog.OnClose" onclose="OnClose">
+<aries:window mode="thin" title='<%=OpenFileDialog.title or L"输入窗"%>' style="width:460px;" uiname_onclose="OpenFileDialog.OnClose" onclose="OpenFileDialog.OnClose">
 <div style="margin:10px;">
     <div class="mc_paper_panel" style="padding-top:3px;padding-bottom:3px">
         <pe:treeview ShowIcon="false" name="tvwExistingFiles" VerticalScrollBarStep="20" DataSource='<%=OpenFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">

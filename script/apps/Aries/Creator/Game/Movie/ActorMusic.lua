@@ -76,7 +76,7 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
 	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-	OpenFileDialog.ShowPage(title, function(result)
+	local onClose = function(result)
 		if(result) then
 			local cmd_text = result;
 			if(result ~= commonlib.Encoding.DefaultToUtf8(result)) then
@@ -109,7 +109,18 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 				end
 			end
 		end
-	end,old_value_str, L"声音文件", "audio")
+	end
+	OpenFileDialog.ShowPage(title, onClose, old_value_str, L"声音文件", "audio", nil, {text = L"录音", callback=function(filename) 
+		OpenFileDialog.OnClose()
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/SoundRecorder.lua");
+		local SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
+		SoundRecorder.ShowPage(function(filename)
+			if(filename) then
+				-- TODO: convert to relative to world directory
+				onClose(filename)
+			end
+		end);
+	end})
 end
 
 function Actor:CreateKeyFromUI(keyname, callbackFunc)

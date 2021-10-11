@@ -740,6 +740,10 @@ function CodeBlockWindow.OnChangeModel()
 				if(bIsAdded) then
 					-- do something?					
 				end
+				local movieEntity = self.entity and self.entity:FindNearByMovieEntity()	
+				if(movieEntity) then
+					movieEntity:MarkForUpdate();
+				end
 				if(codeBlock:IsLoaded()) then
 					CodeBlockWindow.OnClickCompileAndRun();
 				else

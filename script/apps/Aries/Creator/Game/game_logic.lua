@@ -2050,10 +2050,15 @@ function GameLogic.CheckCanLearn(type)
 	local week_day = os.date("*t",server_time).wday-1 == 0 and 7 or os.date("*t",server_time).wday-1
 	local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
 	if strType == "school_lesson" then --校本课
-        if week_day ~= 6 and week_day ~= 7 then
+        if week_day ~= 7 then
             local limit_time_stamp = today_weehours + 8 * 60 * 60 + 0 * 60
 			local limit_time_end_stamp = today_weehours + 16 * 60 * 60 + 20 * 60
             if server_time >= limit_time_stamp and server_time <= limit_time_end_stamp then
+				if not System.User.isVipSchool then
+					strTip = "该课程是vip专属课程，需要vip权限才能学习。"
+					return false, strTip
+				end
+
                 return true,""
             end
         end	

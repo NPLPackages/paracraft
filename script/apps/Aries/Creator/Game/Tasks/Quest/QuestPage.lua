@@ -131,6 +131,10 @@ function QuestPage.ShowView()
 	-- if QuestProvider.GetInstance == nil then
 	-- 	return
 	-- end
+	if GameLogic.QuestAction == nil then
+		GameLogic.QuestAction = QuestAction
+	end
+
 	QuestPage.CheckIsTaskCompelete()
 	QuestPage.HandleTaskData()
 	QuestPage.HandleGiftData()
@@ -738,6 +742,9 @@ function QuestPage.CheckIsTaskCompelete()
    if profile and profile.region and profile.region.hasChildren == 0 then
         QuestAction.SetValue("40004_1",1);
    end
+
+   --每日登陆
+   QuestAction.SetDailyTaskValue("40008_1",1)
 end
 
 function QuestPage.IsRoleModel(item_data)

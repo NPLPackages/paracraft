@@ -72,7 +72,10 @@ function BackgroundMusic:GetMusic(filename)
 		end
 		
 		audio_src = AudioEngine.CreateGet(filename);
-		audio_src.loop = true;
+		if(not filename:match("/recording/")) then
+			-- tricky: do not loop for recorded files
+			audio_src.loop = true;
+		end
 		audio_src.file = filename;
 		audio_src.isBackgroundMusic = true;
 	end

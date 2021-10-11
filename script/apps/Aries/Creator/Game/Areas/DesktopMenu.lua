@@ -88,6 +88,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"背包...",name = "window.userbag",onclick=nil},
 				-- {text = L"元件库...",name = "window.onlinestore", cmd="/open store"},
 				{text = L"视频录制...".."  F9",name = "window.videorecoder", cmd="/record"},
+				{text = L"音频录制...",name = "window.soundrecoder", cmd="/recordsound"},
 				--{text = L"视频分享...",name = "window.videosharing", cmd="/share"},
 				{Type = "Separator"},
 				{text = L"信息".."  F3",name = "window.info",onclick=nil},

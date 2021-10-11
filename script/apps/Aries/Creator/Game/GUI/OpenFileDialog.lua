@@ -159,7 +159,19 @@ end
 
 function OpenFileDialog.OnOK()
 	if(page) then
-		OpenFileDialog.result = commonlib.Encoding.Utf8ToDefault(page:GetValue("text"));
+		OpenFileDialog.OnCloseWithResult(commonlib.Encoding.Utf8ToDefault(page:GetValue("text")))
+	end
+end
+
+function OpenFileDialog.OnCloseWithResult(result)
+	if(page) then
+		OpenFileDialog.result = result
+		page:CloseWindow();
+	end
+end
+
+function OpenFileDialog.OnClose()
+	if(page) then
 		page:CloseWindow();
 	end
 end

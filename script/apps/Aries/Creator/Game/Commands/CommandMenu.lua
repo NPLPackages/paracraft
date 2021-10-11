@@ -232,7 +232,7 @@ Commands["menu"] = {
 		elseif(name == "help.newuserguide") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserGuide.lua");
 			local UserGuide = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserGuide")
-			UserGuide.Start()
+			UserGuide.Start(true)
 		elseif(name == "help.ask") then
 			GameLogic.RunCommand("/open "..L"https://keepwork.com/official/docs/FAQ/paracraft");
 		elseif(name == "help.lessons") then

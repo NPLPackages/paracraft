@@ -188,3 +188,28 @@ Commands["midi"] = {
 		end
 	end,
 };
+
+
+Commands["/recordsound"] = {
+	name="recordsound", 
+	quick_ref="/recordsound", 
+	desc=[[show sound recorder UI 
+/recordsound
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/SoundRecorder.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoRecorder.lua");
+		local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+		local SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
+		SoundRecorder.ShowPage(function(filename)
+			if(filename) then
+				local diskFilepath = Files.GetFilePath(filename)
+				if(diskFilepath) then
+					GameLogic.AddBBS("recordsound", L"录制文件成功保存到:"..filename, 10000, "0 255 0");
+					local folder = diskFilepath:gsub("[^\\/]*$", "")
+					GameLogic.RunCommand("/open -d "..folder);
+				end
+			end
+		end);
+	end,
+};
