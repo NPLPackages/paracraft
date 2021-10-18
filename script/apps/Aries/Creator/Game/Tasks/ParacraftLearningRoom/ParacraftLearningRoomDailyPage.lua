@@ -11,6 +11,7 @@ ParacraftLearningRoomDailyPage.DoCheckin();
 --]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
 
@@ -19,12 +20,14 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
 
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+
 local ParacraftLearningRoomDailyPage = NPL.export()
 ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 217;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 220;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -248,6 +251,11 @@ NPL自定义世界图块
 clone一群随机角色
 录音与ogg音频文件
 给电影方块添加声音
+clone电影方块中的多个角色
+如何使用PPT教学
+如何做1v1辅导
+编程教学中模仿的重要性
+100个游戏项目设计
 制作有待机动画的方块模型
 制作有行走动作的方块模型
 自主动画方块模型
@@ -265,7 +273,6 @@ clone一群随机角色
 新建世界模板展示
 2合1课程世界介绍（上）
 2合1课程世界介绍（下）
-3C教学法介绍
 摄影机图块 (上)
 摄影机图块 (下)
 ]]
@@ -501,7 +508,19 @@ function ParacraftLearningRoomDailyPage.SaveToLocal(callback)
 end
 function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
     if(not NplBrowserLoaderPage.IsLoaded())then
-        _guihelper.MessageBox(L"正在加载内置浏览器，请稍等！");
+		if(not ParacraftLearningRoomDailyPage.isLoading) then
+			ParacraftLearningRoomDailyPage.isLoading = true
+			NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+			local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+			NplBrowserLoaderPage.Check(function(bLoaded)
+				if(bLoaded) then
+					ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
+				end
+				ParacraftLearningRoomDailyPage.isLoading = false
+			end)
+		else
+			_guihelper.MessageBox(L"正在加载内置浏览器，请稍等！");
+		end
 		return
     end
 	index = tonumber(index)
@@ -513,6 +532,8 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	commonlib.echo(index);
 	commonlib.echo(bCheckVip);
 	commonlib.echo(ParacraftLearningRoomDailyPage.IsVip());
+	commonlib.echo("======================HasCheckedToday");
+	commonlib.echo(ParacraftLearningRoomDailyPage.HasCheckedToday());
 
 	if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip())then
 		if(ParacraftLearningRoomDailyPage.IsFuture(index))then
@@ -538,6 +559,32 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	local title = ParacraftLearningRoomDailyPage.GetTitle(index);
 	
 	GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { started = true, learningIndex = index });
+	if System.os.GetPlatform() ~= 'win32' then
+		-- 除了win32平台，使用默认浏览器打开视频教程
+		local cmd = string.format("/open %s", url);
+		GameLogic.RunCommand(cmd);
+		if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
+			local exid = ParacraftLearningRoomDailyPage.exid;
+			KeepWorkItemManager.DoExtendedCost(exid, function()
+
+				if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
+					ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp);
+				else
+					ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
+				end
+
+				local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
+				local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
+				GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
+
+				GameLogic.QuestAction.SetDailyTaskValue("40009_1",1)
+			end, function()
+				_guihelper.MessageBox(L"签到失败！");
+			end)
+		end
+		return
+    end
+
 	NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show(url, title, false, true, { scale_screen = "4:3:v", closeBtnTitle = L"退出" }, function(state)
 		if(state == "ONCLOSE")then
 			GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { ended = true, learningIndex = index });

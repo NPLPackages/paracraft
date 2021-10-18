@@ -123,3 +123,6 @@ HttpWrapper.Create("keepwork.user.roles_in_campus", "%MAIN%/core/v0/campusCenter
 -- 获取socketio地址
 -- http://yapi.kp-para.cn/project/165/interface/api/3992
 HttpWrapper.Create("keepwork.app.availableHost", "%MAIN%/push-manage/v0/app/availableHost","GET",true);
+
+--http://yapi.kp-para.cn/project/32/interface/api/1417
+HttpWrapper.Create("keepwork.permissions.check", "%MAIN%/core/v0/permissions/check", "GET", true)

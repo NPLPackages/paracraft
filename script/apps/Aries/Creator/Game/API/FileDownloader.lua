@@ -135,7 +135,7 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 	local label_id = src or "userworlddownload";
 	if(self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then
 		if(not self.isSilent) then
-			BroadcastHelper.PushLabel({id=label_id, label = format(L"%s: 正在下载中,请耐心等待", self.text), max_duration=20000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+			BroadcastHelper.PushLabel({id=label_id, label = format(L"%s: 正在下载中,请耐心等待", self.text or ""), max_duration=20000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 		end
 	end
 	LOG.std(nil, "info", "FileDownloader", "begin download file %s", src or "");
@@ -201,7 +201,7 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 				end
 			end
 			if(not self.isSilent and text and self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then
-				BroadcastHelper.PushLabel({id=label_id, label = format(L"文件%s: %s", self.text, text), max_duration=10000, color = isRedText and "255 0 0" or "0 255 0", scaling=1.1, bold=true, shadow=true,});
+				BroadcastHelper.PushLabel({id=label_id, label = format(L"文件%s: %s", self.text or "", text), max_duration=10000, color = isRedText and "255 0 0" or "0 255 0", scaling=1.1, bold=true, shadow=true,});
 			end	
 		end
 	);

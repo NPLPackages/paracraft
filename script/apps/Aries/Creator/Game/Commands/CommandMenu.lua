@@ -97,9 +97,11 @@ Commands["menu"] = {
 			local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
 			CreateNewWorld.ShowPage()
 		elseif(name == "file.loadworld") then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
-			local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
-			InternetLoadWorld.ShowPage(true);
+			-- NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
+			-- local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
+			-- InternetLoadWorld.ShowPage(true);
+
+			GameLogic.GetFilters():apply_filters("cellar.opus.show");
 		elseif(name == "file.export") then
 			GameLogic.RunCommand("export");
 		elseif(name == "file.worldrevision") then
@@ -225,7 +227,15 @@ Commands["menu"] = {
 							--ParacraftLearningRoomDailyPage.DoCheckin();
 						elseif(name == "help.creativespace") then
 							local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
-							RedSummerCampMainWorldPage.Show();
+							local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+							if RedSummerCampMainWorldPage.IsOpen() then
+								RedSummerCampPPtPage.ClosePPtAllPage()
+							else
+								RedSummerCampMainWorldPage.SetOpenFromCommandMenu(true)
+								RedSummerCampMainWorldPage.Show();
+								
+								RedSummerCampPPtPage.OpenLastPPtPage()
+							end
 						end
 					end
 				end)

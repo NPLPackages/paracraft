@@ -14,6 +14,9 @@ MovieClipController.SetFocusToItemStack(itemStack);
 NPL.load("(gl)script/ide/DateTime.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieUISound.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/GameRules/GameMode.lua");
+local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
+local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local MovieUISound = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieUISound");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -21,7 +24,6 @@ local MovieClipController = commonlib.inherit(commonlib.gettable("System.Core.To
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
-local curItemStack;
 local page;
 
 -- whether to lock the actors by default. 
@@ -32,6 +34,12 @@ MovieClipController:Property({"m_bForceEditorMode", nil, "IsForceEditorMode", "S
 MovieClipController:Signal("beforeActorFocusChanged");
 MovieClipController:Signal("afterActorFocusChanged");
 
+-- virtual function: for MovieClipEditors's player class
+function MovieClipController.ShowPlayEditorForMovieClip(movieClip)
+	MovieClipController:OnActiveMovieClipChange(movieClip)
+	return movieClip
+end
+
 function MovieClipController.OnInit()
 	MovieClipController:InitSingleton();
 	local self = MovieClipController;
@@ -39,17 +47,101 @@ function MovieClipController.OnInit()
 	self.last_time = nil;
 	self.mytimer = self.mytimer or commonlib.Timer:new({callbackFunc = self.OnTimer})
 	self.mytimer:Change(200, 200);
+	self:OnActiveMovieClipChange(MovieManager:GetActiveMovieClip());
 	Game.SelectionManager:Connect("selectedActorChanged", self, self.OnSelectedActorChange, "UniqueConnection");
-	MovieManager:Connect("activeMovieClipChanged", self, self.OnActiveMovieClipChange, "UniqueConnection");
+	MovieClipController.AutoSelectActorInEditor()
+end
+
+-- we will select the first actor in the movie block if there is a code block nearby 
+-- otherwise, we will select the default camera object in the movie block. 
+function MovieClipController.AutoSelectActorInEditor()
+	local selectedActorIndex;
+	local activeClip = MovieManager:GetActiveMovieClip()
+	local entity = activeClip and activeClip:GetEntity();
+	if(not entity) then
+		return
+	end
+	if(entity:GetSelectedActorIndex()) then
+		local itemStack = entity.inventory:GetItem(entity:GetSelectedActorIndex())		
+		if(itemStack) then
+			MovieClipController.SetFocusToItemStack(itemStack);
+			return
+		end
+	end
+	
+	local codeEntity = entity:GetNearByCodeEntity();
+	if(codeEntity) then
+		local firstActor = entity:GetFirstActorStack();
+		if(firstActor) then
+			MovieClipController.SetFocusToItemStack(firstActor);
+		end
+	else
+		local cameraItem = entity:GetCameraItemStack();
+		if(cameraItem) then
+			MovieClipController.SetFocusToItemStack(cameraItem);
+		end
+	end
+end
+
+-- @param state: "activated", "deactivated", "recording", "not_recording", "playmodeChange", "replay"
+function MovieClipController:OnChangeMovieClipState(state)
+	if(state == "activated" or state == "playmodeChange") then
+		if(GameMode:CanShowTimeLine() and (MovieManager:IsLastModeEditor() and not MovieManager:IsCapturing())) then
+			self:ShowAllGUI(true);
+		else
+			self:ShowAllGUI(false);
+		end
+	elseif(state == "deactivated") then
+		self:ShowTimeline(nil);
+		MovieClipController.ShowPage(false);
+	elseif(state == "recording") then
+		self:ShowTimeline("recording")
+	elseif(state == "not_recording") then
+		self:ShowTimeline("not_recording")
+	elseif(state == "replay") then
+		MovieClipController.SetFocusToItemStackCamera();
+	end
+end
+
+function MovieClipController:ShowTimeline(state)
+	MovieClipTimeLine:ShowTimeline(state)
+end
+
+-- show/hide timeline and controller GUI. 
+-- @param bForceEditorMode: true to force editor mode. 
+function MovieClipController:ShowAllGUI(bShow, bForceEditorMode)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
+	local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+	
+	if(bShow) then
+		if(bForceEditorMode) then
+			self:SetForceEditorMode(bForceEditorMode);
+		end
+		self:ShowTimeline("activated");
+		
+		local activeClip = self.activeClip;
+		if(activeClip) then
+			activeClip.entity:BeginEdit(); 
+			MovieClipController.ShowPage(true, function() 
+				activeClip.entity:EndEdit();
+			end);
+		end
+	else
+		self:ShowTimeline();
+		MovieClipController.ShowPage(false);
+		QuickSelectBar.ShowPage(false);
+	end
 end
 
 function MovieClipController:OnActiveMovieClipChange(clip)
 	if(self.activeClip~=clip) then
 		if(self.activeClip) then
 			self.activeClip:Disconnect("remotelyUpdated", self, self.OnMovieClipChange);
+			self.activeClip:Disconnect("stateChanged", self, self.OnChangeMovieClipState);
 		end
 		if(clip) then
 			clip:Connect("remotelyUpdated", self, self.OnMovieClipRemotelyUpdated, "UniqueConnection");
+			clip:Connect("stateChanged", self, self.OnChangeMovieClipState, "UniqueConnection");
 		end
 		self.activeClip = clip;
 	end
@@ -63,7 +155,6 @@ end
 
 function MovieClipController.OnClosePage()
 	local self = MovieClipController;
-	MovieManager:Disconnect("activeMovieClipChanged", self, self.OnActiveMovieClipChange);
 	-- focus back to current player. 
 	self.RestoreFocusToCurrentPlayer();
 	Game.SelectionManager:Disconnect("selectedActorChanged", self, self.OnSelectedActorChange);
@@ -83,11 +174,13 @@ function MovieClipController:OnSelectedActorChange(actor)
 end
 
 function MovieClipController.GetItemID()
-	return curItemStack.id;
+	local itemStack = MovieClipController.GetItemStack()
+	return itemStack and itemStack.id;
 end
 
 function MovieClipController.GetItemStack()
-	return curItemStack;
+	local movieClip = MovieClipController.GetMovieClip()
+	return movieClip and movieClip:GetCurrentItemStack();
 end
 
 function MovieClipController.DeleteSelectedActor()
@@ -216,8 +309,9 @@ end
 
 function MovieClipController.SetFocusToItemStack(itemStack)
 	local curItemChanged;
-	if(curItemStack~=itemStack) then
-		curItemStack = itemStack;
+	local movieClip = MovieClipController.GetMovieClip()
+	if(movieClip:GetCurrentItemStack() ~= itemStack) then
+		movieClip:SetCurrentItemStack(itemStack);
 		curItemChanged = true;
 		if(page) then
 			page:Refresh(0.1);
@@ -269,7 +363,8 @@ function MovieClipController.OnClose()
 end
 
 function MovieClipController.GetCode()
-	local content = curItemStack:GetData();
+	local itemStack = MovieClipController.GetItemStack()
+	local content = itemStack and itemStack:GetData();
 	if(type(content) == "table") then
 		return commonlib.Lua2XmlString(content);
 	else
@@ -278,7 +373,10 @@ function MovieClipController.GetCode()
 end
 
 function MovieClipController.SetCode(code)
-	curItemStack:SetData(code);
+	local itemStack = MovieClipController.GetItemStack()
+	if(itemStack) then
+		itemStack:SetData(code);
+	end
 end
 
 function MovieClipController.GetMarginBottom()

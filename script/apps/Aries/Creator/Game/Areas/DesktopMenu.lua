@@ -108,7 +108,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"教学视频",name = "help.videotutorials", onclick=nil},
 				{text = L"官方文档".." & "..L"教学视频",name = "help.learn", onclick=nil},
 				{text = L"推荐课程...",name = "help.dailycheck", onclick=nil},
-				{text = L"创意空间...",name = "help.creativespace", onclick=nil},
+				{text = L"创意空间...".."  F7",name = "help.creativespace", onclick=nil},
 				{Type = "Separator"},
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"帮助...".."  F1",name = "help.help", onclick=nil},

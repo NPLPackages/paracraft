@@ -160,7 +160,8 @@ function StartBuild()
     ]]  
     
     if(BuildQuest.IsTaskUnderway() and cur_task and cur_task.theme_id == theme_index) then
-        BuildQuest.EndEditing();
+        BuildQuest.CancelTask()
+        Page:Refresh(0.01)
         return;
     end
 

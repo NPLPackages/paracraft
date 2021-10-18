@@ -291,11 +291,14 @@ end
 
 
 function MainLogin:UpdateCoreBrowser()
-	local platform = System.os.GetPlatform();
-	if(platform=="win32")then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
-        local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
-        NplBrowserLoaderPage.CheckOnce()
+	-- since 2021.10, we no longer auto load chrome browser on startup. since we use NPL blockly by default. 
+	if(false) then
+		local platform = System.os.GetPlatform();
+		if(platform=="win32")then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+			local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+			NplBrowserLoaderPage.CheckOnce()
+		end
 	end
 	MainLogin:next_step({IsBrowserUpdaterStarted = true});
 end

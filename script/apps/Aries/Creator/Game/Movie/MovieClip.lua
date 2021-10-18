@@ -10,17 +10,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClip.lua");
 local MovieClip = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClip");
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/GameRules/GameMode.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
-local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
-local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
-local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
-local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
@@ -28,6 +19,8 @@ local MovieClip = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), 
 MovieClip:Property("Name", "MovieClip");
 
 MovieClip:Signal("timeChanged");
+-- @param state: "activated", "deactivated", "recording", "not_recording", "playmodeChange", "replay"
+MovieClip:Signal("stateChanged", function(state) end);
 
 local groupindex_hint = 3; 
 
@@ -68,11 +61,11 @@ function MovieClip:SetActorRecording(actor, bIsRecording)
 				self.recording_actor:SetRecording(false);
 			end
 			self.recording_actor = actor;
-			MovieClipTimeLine:ShowTimeline("recording");
+			self:stateChanged("recording");
 		end
 	elseif(not bIsRecording) then
 		self.recording_actor = nil;
-		MovieClipTimeLine:ShowTimeline("not_recording");
+		self:stateChanged("not_recording");
 	end
 end
 
@@ -104,42 +97,19 @@ end
 
 -- called when this movie clip is currently playing. 
 function MovieClip:OnActivated()
+	GameLogic.GetFilters():apply_filters("beforeActivateMovieClip", self);
 	local x, y, z = self:GetBlockOrigin();
 	if(x) then
 		ParaTerrain.SelectBlock(x,y,z, true, groupindex_hint);
 	end
 	self:GotoBeginFrame();
 	self:RefreshActors();
-	self:RefreshPlayModeUI();
+	self:stateChanged("activated")
 end
 
 -- show/hide timeline and controller according to whether we are in edit mode or recording. 
 function MovieClip:RefreshPlayModeUI()
-	if(GameMode:CanShowTimeLine() and (MovieManager:IsLastModeEditor() and not MovieManager:IsCapturing())) then
-		self:ShowGUI(true);
-	else
-		self:ShowGUI(false);
-	end
-end
-
--- show/hide timeline and controller GUI. 
--- @param bForceEditorMode: true to force editor mode. 
-function MovieClip:ShowGUI(bShow, bForceEditorMode)
-	if(bShow) then
-		if(bForceEditorMode) then
-			MovieClipController:SetForceEditorMode(bForceEditorMode);
-		end
-		MovieClipTimeLine:ShowTimeline("activated");
-		
-		self.entity:BeginEdit(); 
-		MovieClipController.ShowPage(true, function() 
-			self.entity:EndEdit();
-		end);
-	else
-		MovieClipTimeLine:ShowTimeline();
-		MovieClipController.ShowPage(false);
-		QuickSelectBar.ShowPage(false);
-	end
+	self:stateChanged("playmodeChange")
 end
 
 -- return the actor that is having the focus
@@ -151,9 +121,17 @@ function MovieClip:GetFocus()
 	end
 end
 
+function MovieClip:GetCurrentItemStack()
+	return self.curItemStack
+end
+
+function MovieClip:SetCurrentItemStack(itemStack)
+	self.curItemStack = itemStack;
+end
+
 -- get currently selected actor in the movie clip controller.
 function MovieClip:GetSelectedActor()
-	local itemStack = MovieClipController.GetItemStack()
+	local itemStack = self:GetCurrentItemStack();
 	if(itemStack) then
 		for i, actor in pairs(self.actors) do
 			if( actor:GetItemStack() == itemStack ) then
@@ -162,7 +140,6 @@ function MovieClip:GetSelectedActor()
 		end
 	end
 end
-
 
 -- called when this movie clip is no longer playing. 
 -- @param next_movieclip: the next movie clip to play. will hand over the camera focus to the next clip 
@@ -186,8 +163,7 @@ function MovieClip:OnDeactivated(next_movieclip)
 		end
 	end
 	self:RemoveAllActors();
-	MovieClipTimeLine:ShowTimeline(nil);
-	MovieClipController.ShowPage(false);
+	self:stateChanged("deactivated")
 end
 
 -- get actor from a given entity. 
@@ -266,6 +242,7 @@ end
 function MovieClip:RePlay()
 	self:Stop();
 	self:Resume();
+	self:stateChanged("replay");
 end
 
 -- whether is recording actor's action. 
@@ -430,6 +407,13 @@ function MovieClip:UpdateActors(deltaTime)
 	for i, actor in pairs(self.actors) do
 		local bIsSelected = (actor == actor_selected);
 		actor:FrameMove(deltaTime, bIsSelected);
+	end
+end
+
+function MovieClip:SetFocusToItemStackCamera()
+	local actor = self:GetCamera();
+	if(actor) then
+		actor:SetFocus()
 	end
 end
 

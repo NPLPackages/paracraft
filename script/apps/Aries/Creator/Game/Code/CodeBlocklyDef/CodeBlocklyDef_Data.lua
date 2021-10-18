@@ -1387,7 +1387,8 @@ assert(monsterCount == 1)
 	ToNPL = function(self)
 		return string.format('%s\n', self:getFieldAsString('codes'));
 	end,
-	examples = {{desc = L"", canRun = true, code = [[
+	examples = {{desc = L"NPL 文本代码", canRun = true, code = [[
+print ("hello world")
 ]]}},
 },
 {

@@ -29,6 +29,19 @@ RedSummerCampMainWorldPage.pageData = {
 local page
 function RedSummerCampMainWorldPage.OnInit()
 	page = document:GetPageCtrl();
+	page.OnClose = RedSummerCampMainWorldPage.OnClose
+end
+
+function RedSummerCampMainWorldPage.OnClose()
+	RedSummerCampMainWorldPage.OpenFromCommandMenu = nil
+end
+
+function RedSummerCampMainWorldPage.SetOpenFromCommandMenu(flag)
+	RedSummerCampMainWorldPage.OpenFromCommandMenu = flag
+end
+
+function RedSummerCampMainWorldPage.GetOpenFromCommandMenu()
+	return RedSummerCampMainWorldPage.OpenFromCommandMenu
 end
 
 function RedSummerCampMainWorldPage.Show()
@@ -98,4 +111,15 @@ end
 
 function RedSummerCampMainWorldPage.IsMainWorld()
 	return RedSummerCampMainWorldPage.name == "main_world"
+end
+
+function RedSummerCampMainWorldPage.ClosePage()
+    if page then
+        page:CloseWindow();
+        page = nil
+    end
+end
+
+function RedSummerCampMainWorldPage.IsOpen()
+	return page and page:IsVisible()
 end

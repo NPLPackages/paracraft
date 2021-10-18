@@ -13,6 +13,8 @@ local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieCl
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/KeyFrameCtrl.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieUISound.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/GameRules/GameMode.lua");
+local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local MovieUISound = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieUISound");
 local KeyFrameCtrl = commonlib.gettable("MyCompany.Aries.Game.Movie.KeyFrameCtrl");
@@ -90,25 +92,37 @@ local var_longname_to_text = {
 MovieClipTimeLine.timelineHeight = 12;
 MovieClipTimeLine.timeSliderHeight = 16;
 MovieClipTimeLine.height = MovieClipTimeLine.timelineHeight*2 + MovieClipTimeLine.timeSliderHeight;
+local self = MovieClipTimeLine;
 
 function MovieClipTimeLine.OnInit()
 	local self = MovieClipTimeLine;
 	self.inited = true;
 	Game.SelectionManager:Connect("selectedActorChanged", self, self.OnSelectedActorChange, "UniqueConnection");
 	Game.SelectionManager:Connect("varNameChanged", self, self.OnVariableNameChange, "UniqueConnection");
-	MovieManager:Connect("activeMovieClipChanged", self, self.OnActiveMovieClipChange, "UniqueConnection");
 	-- set initial values: 
 	self:OnSelectedActorChange(Game.SelectionManager:GetSelectedActor());
 	self:OnActiveMovieClipChange(MovieManager:GetActiveMovieClip());
 	self:OnMovieClipTimeChange();
+	GameLogic.GetFilters():add_filter("show", MovieClipTimeLine.ShowCommandFilter);
+end
+
+function MovieClipTimeLine.ShowCommandFilter(name, bShow)
+	if(name == "movie.controller") then
+		local self = MovieManager;
+		local movie_clip = self:GetActiveMovieClip();
+		if(movie_clip) then
+			MovieClipTimeLine:ShowAllGUI(bShow~=false, true);
+		end
+		return;
+	end
+	return name;
 end
 
 function MovieClipTimeLine.OnClosePage()
 	local self = MovieClipTimeLine;
 	Game.SelectionManager:Disconnect("selectedActorChanged", self, self.OnSelectedActorChange);
 	Game.SelectionManager:Disconnect("varNameChanged", self, self.OnVariableNameChange);
-	MovieManager:Disconnect("activeMovieClipChanged", self, self.OnActiveMovieClipChange);
-
+	
 	self.inited = false;
 	local viewport = ViewportManager:GetSceneViewport();
 	if(viewport:GetMarginBottomHandler() == self) then

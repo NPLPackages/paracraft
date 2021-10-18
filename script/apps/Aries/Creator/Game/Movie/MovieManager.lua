@@ -10,14 +10,12 @@ local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/Actor.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoRecorder.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieChannel.lua");
 local MovieChannel = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieChannel");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local VideoRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoRecorder");
-local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -35,7 +33,6 @@ MovieManager:Signal("activeMovieClipChanged", function(clip) end);
 function MovieManager:ctor()
 	self.active_clips = commonlib.UnorderedArraySet:new();
 	self.actor_names = commonlib.OrderedArraySet:new();
-	GameLogic.GetFilters():add_filter("show", MovieManager.ShowFilter);
 end
 
 -- called when enter block world. 
@@ -141,18 +138,6 @@ end
 
 function MovieManager:IsLastModeEditor()
 	return (self.lastmode == "editor");
-end
-
-function MovieManager.ShowFilter(name, bShow)
-	if(name == "movie.controller") then
-		local self = MovieManager;
-		local movie_clip = self:GetActiveMovieClip();
-		if(movie_clip) then
-			movie_clip:ShowGUI(bShow~=false, true);
-		end
-		return;
-	end
-	return name;
 end
 
 -- called when unload world

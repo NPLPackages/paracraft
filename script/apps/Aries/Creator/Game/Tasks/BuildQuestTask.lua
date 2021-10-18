@@ -324,9 +324,7 @@ function BuildQuest:StartEditing()
 	end
 end
 
--- @param bCommitChange: true to commit all changes made 
-function BuildQuest.EndEditing(bCommitChange)
-	BuildQuest.ClosePage()
+function BuildQuest.CancelTask()
 	GameLogic.HideTipText("<player>");
 	if(cur_instance) then
 		local self = cur_instance;
@@ -339,6 +337,12 @@ function BuildQuest.EndEditing(bCommitChange)
 			profile:GetEvents():DispatchEvent({type = "BuildProgressChanged" , status = "end",});
 		end
 	end
+end
+
+-- @param bCommitChange: true to commit all changes made 
+function BuildQuest.EndEditing(bCommitChange)
+	BuildQuest.ClosePage()
+	BuildQuest.CancelTask()
 end
 
 -- automatically select one block to bling 
@@ -725,11 +729,16 @@ function BuildQuest:FrameMove_SetOrigin()
 	end
 	self.is_valid = is_valid;
 
+	local tips
 	if(is_valid) then
 		self.bx, self.by, self.bz = bx, by, bz;
-		GameLogic.SetTipText(L"按【X】键确认建造位置, 【W,A,S,D】键可以移动", "<player>", nil, "F1");
+		tips = L"按【X】键确认建造位置, 【W,A,S,D】键可以移动"
 	else
-		GameLogic.SetTipText(L"当前位置有障碍物, 请走到一个空旷的位置!", "<player>", nil, "F1");
+		tips = L"当前位置有障碍物, 请走到一个空旷的位置!"
+	end
+	if(tips) then
+		GameLogic.RunCommand("/voice "..tips)
+		GameLogic.SetTipText(tips, "<player>", nil, "F1");
 	end
 end
 

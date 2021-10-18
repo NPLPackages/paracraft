@@ -659,40 +659,15 @@ function QuestAllCourse.RunCommand(index, is_pre)
         end)
     end
 
-
     local is_vip_school_and_lesson = System.User.isVipSchool and select_teacher_data.name == "校园课程"
     if System.User.isVip or QuestAllCourse.permissions_check or KeepWorkItemManager.IsOrgVip() then
+    -- if false then
         enter_world()
     else
         -- 需要vip才能进
         if data.isVip == 1 then
             -- local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
             -- VipToolNew.Show("AI_lesson")
-            
-            -- 入校课程的话 需要每天8:00-16:20才能做
-            if data.isForSchool == 1 then
-                -- 判断是不是周末
-                local server_time = QuestAction.GetServerTime()
-                local week_day = QuestAllCourse.GetWeekNum(server_time)
-                if week_day == 7 then
-                    _guihelper.MessageBox("现在不是上课时间哦，请在上课时间（周一至周六8:00-16:20）内再来上课吧。")
-                    return
-                else
-                    local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
-                    local limit_time_stamp = today_weehours + 8 * 60 * 60
-                    local limit_time_end_stamp = today_weehours + 16 * 60 * 60 + 20 * 60
-                    if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
-                        _guihelper.MessageBox("现在不是上课时间哦，请在上课时间（周一至周六8:00-16:20）内再来上课吧。")
-                        return
-                    end
-                end
-            end
-
-            if is_vip_school_and_lesson then
-                enter_world()
-                return
-            end
-
             local function sure_callback()
                 GameLogic.IsVip("AI_lesson", true, function(result)
                     if result then
@@ -701,29 +676,55 @@ function QuestAllCourse.RunCommand(index, is_pre)
             end
             local desc = "是否开通会员学习？"
             local desc2 = "该课程是vip专属课程，需要vip权限才能学习。"
-            QuestMessageBox.Show(desc, sure_callback, desc2)
+            
+            -- 入校课程的话 需要每天8:00-16:20才能做
+            if data.isForSchool == 1 then
+                if data.projectId then
+                    keepwork.world.detail({router_params = {id = data.projectId}}, function(err2, msg2, data2)
+                        if err2 ~= 200 then
+                            return
+                        end
+
+                        local timeRules = data2.timeRules
+                        if timeRules == nil or timeRules[1] == nil then
+                            -- 没有时间规则的话 给个默认
+                            timeRules = {
+                                {
+                                    endDay="2023-09-30",
+                                    endTime="16:20",
+                                    id=2,
+                                    startDay="2021-09-01",
+                                    startTime="08:00",
+                                    weeks={1,2,3,4,5} 
+                                },
+                            }
+                        end
+
+                        local result, reason = QuestAllCourse.CheckTimeRule(timeRules)
+                        if not result then
+                            _guihelper.MessageBox(reason)
+                            return
+                        end
+
+                        if is_vip_school_and_lesson then
+                            enter_world()
+                            return
+                        end
+                        QuestMessageBox.Show(desc, sure_callback, desc2)
+                    end);
+                end
+            else
+                QuestMessageBox.Show(desc, sure_callback, desc2)
+            end
         else
             local client_data = QuestAction.GetClientData()
 
             local has_enter = true -- 是否进去过
-            -- if client_data.course_world_id_list and client_data.course_world_id_list[tostring(data.projectId)] ~= nil then
-            --     has_enter = true
-            -- end
-            
-            -- if school_class_id and select_teacher_data.id == school_class_id then
-            --     has_enter = true
-            -- end
 
             if has_enter then
                 enter_world()
             else
                 local play_course_times = 0
-                -- if client_data.course_world_id_list ~= nil then
-                --     for k, v in pairs(client_data.course_world_id_list) do
-                --         play_course_times = play_course_times + 1
-                --     end
-                -- end
-                
                 local limit_course_times = 1
 
                 if play_course_times < limit_course_times then
@@ -744,6 +745,83 @@ function QuestAllCourse.RunCommand(index, is_pre)
 end
 
 ----------------------------------------------------------点击事件/end----------------------------------------------------------
+
+function QuestAllCourse.CheckTimeRule(timeRules)
+    local server_time = QuestAction.GetServerTime()
+    local week_day = QuestAllCourse.GetWeekNum(server_time)
+    local date_list = {"一","二","三","四","五","六","日"}
+    -- timeRules = timeRules[1]
+
+    local function check(timeRule)
+        local year,month,day = timeRule.startDay:match("^(%d+)%D(%d+)%D(%d+)") 
+        local start_date_timestamp = os.time({day=tonumber(day), month=tonumber(month), year=tonumber(year), hour=0, min=0, sec=0})
+
+        year,month,day = timeRule.endDay:match("^(%d+)%D(%d+)%D(%d+)")
+        local end_date_timestamp = os.time({day=tonumber(day), month=tonumber(month), year=tonumber(year), hour=23, min=59, sec=59})
+
+        if server_time < start_date_timestamp then
+            return false, string.format("未到上课时间，请在%s之后来学习吧。", timeRule.startDay)
+        end
+
+        if server_time > end_date_timestamp then
+            return false, "上课时间已过"
+        end
+        
+        
+        local weeks = timeRule.weeks
+        local in_week_day = false
+        
+        local date_str = ""
+        for i, v in ipairs(weeks) do
+            if v == week_day then
+                in_week_day = true
+            end
+
+            date_str = date_str .. "周" .. date_list[v] or ""
+            if i ~= #weeks then
+                date_str = date_str .. "，"
+            end
+        end
+
+        if not in_week_day then
+            return false, string.format("现在不是上课时间哦，请在上课时间（%s）内再来上课吧。", date_str)
+        end
+
+        local start_time_str = timeRule.startTime or "0:0"
+        local start_hour,start_min = start_time_str:match("^(%d+)%D(%d+)") 
+        start_hour = tonumber(start_hour)
+        start_min = tonumber(start_min)
+
+        local end_time_str = timeRule.endTime or "23:59"
+        local end_hour,end_min = end_time_str:match("^(%d+)%D(%d+)") 
+        end_hour = tonumber(end_hour)
+        end_min = tonumber(end_min)
+
+        local time_str = start_time_str .. "-" .. end_time_str
+
+        local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
+        local limit_time_stamp = today_weehours + start_hour * 60 * 60 + start_min * 60
+        local limit_time_end_stamp = today_weehours + end_hour * 60 * 60 + end_min * 60
+        if server_time < limit_time_stamp or server_time > limit_time_end_stamp then
+            -- _guihelper.MessageBox()
+            return false, string.format("现在不是上课时间哦，请在上课时间（%s）内再来上课吧。", time_str)
+        end
+
+        return true
+    end
+    
+    local failed_reason_list = {}
+    for _, timeRule in ipairs(timeRules) do
+        local result, reason = check(timeRule)
+        if result then
+            return true
+        end
+
+        failed_reason_list[#failed_reason_list + 1] = reason
+    end
+
+    return false, failed_reason_list[1]
+end
 
 function QuestAllCourse.SetSelectTeacherIndex()
     if QuestAllCourse.target_teacher_id then

@@ -63,8 +63,9 @@ function Entity:ctor()
 		self:OnInventoryChanged(slot_index);
 	end);
 
-	-- TODO: eventually, all win32 will also use NPL blockly, instead of google blockly. 
-	if((System.os.GetPlatform() ~= "win32" or System.os.Is64BitsSystem() or (GameLogic.options:IsOfflineMode())) and not System.options.isCodepku) then
+	-- all win32 will use NPL blockly, instead of google blockly. 
+	-- if((System.os.GetPlatform() ~= "win32" or System.os.Is64BitsSystem() or (GameLogic.options:IsOfflineMode())) and not System.options.isCodepku) then
+	if(not System.options.isCodepku) then
 		self:SetUseNplBlockly(true);
 	end
 end

@@ -1170,6 +1170,18 @@ function BaseContext:HandleGlobalKey(event)
 	elseif(dik_key == "DIK_F1") then
 		GameLogic.RunCommand("/menu help.help");
 		event:accept();
+	elseif(dik_key == "DIK_F7") then
+		local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
+		local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+		if RedSummerCampMainWorldPage.IsOpen() then
+			RedSummerCampPPtPage.ClosePPtAllPage()
+		else
+			RedSummerCampMainWorldPage.SetOpenFromCommandMenu(true)
+			RedSummerCampMainWorldPage.Show();
+			
+			RedSummerCampPPtPage.OpenLastPPtPage()
+		end
+		event:accept();
 	end
 
 	if (ctrl_pressed and event.alt_pressed) then

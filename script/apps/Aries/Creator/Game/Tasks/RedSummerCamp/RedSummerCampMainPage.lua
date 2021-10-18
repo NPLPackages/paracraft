@@ -30,7 +30,7 @@ RedSummerCampMainPage.ItemData = {
 }
 
 local notice_desc = {
-	{desc = [[教师节活动奖励新鲜出炉！！！]], name="teacher_day"},
+	-- {desc = [[教师节活动奖励新鲜出炉！！！]], name="teacher_day"},
 	{desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
 	{desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
 	{desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
@@ -94,12 +94,7 @@ function RedSummerCampMainPage.Show()
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);	
 
-	if RedSummerCampPPtPage.GetIsReturnOpenPage() then
-		local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
-		RedSummerCampCourseScheduling.ShowView()
-
-		RedSummerCampPPtPage.Show(course_name, pptIndex)
-	end
+	RedSummerCampPPtPage.OpenLastPPtPage()
 
 
 	page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())

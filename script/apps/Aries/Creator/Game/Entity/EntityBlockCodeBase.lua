@@ -140,7 +140,7 @@ end
 
 function Entity:LoadBlocklyFromXMLNode(node)
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
-	self.isUseNplBlockly = (node.attr.isUseNplBlockly == "true" or node.attr.isUseNplBlockly == true); 
+	local isUseNplBlockly = (node.attr.isUseNplBlockly == "true" or node.attr.isUseNplBlockly == true); 
     self.isUseCustomBlock = (node.attr.isUseCustomBlock == "true" or node.attr.isUseCustomBlock == true);
 
 	for i=1, #node do
@@ -182,6 +182,11 @@ function Entity:LoadBlocklyFromXMLNode(node)
 		end
 	end
 	
+	-- npl blockly should remain default value unless self.blockly_xmlcode has code 
+	if(isUseNplBlockly or (self.blockly_xmlcode or "") ~= "") then
+		self.isUseNplBlockly = isUseNplBlockly;	
+	end
+
 	if(not self.isBlocklyEditMode and not self.nplcode) then
 		self.nplcode = self:GetCommand();
 	end

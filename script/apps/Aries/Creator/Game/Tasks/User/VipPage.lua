@@ -112,17 +112,17 @@ function VipPage.LoadPruducts(callback)
   products={
     {
       code="six_month_vip",
-      description="鑾峰緱6涓湀鐨勪細鍛樻湇鍔°€?,
+      description="",
       id=5,
-      name="浼氬憳(6涓湀)",
+      name="",
       picUrl="",
       price=49800 
     },
     {
       code="twelve_month_vip",
-      description="鑾峰緱1骞寸殑浼氬憳鏈嶅姟銆?,
+      description="",
       id=6,
-      name="浼氬憳(1骞?",
+      name="",
       picUrl="",
       price=88000 
     } 

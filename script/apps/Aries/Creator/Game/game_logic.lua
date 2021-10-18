@@ -665,6 +665,10 @@ function GameLogic.LoadGame()
 	
 	options:OnLoadWorld();
 	
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipEditors.lua");
+	local MovieClipEditors = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipEditors");
+	MovieClipEditors.SetDefaultMovieClipPlayer()
+
 	CameraController.OnInit();
 
 	GameLogic.CheckCreateFileWatcher();

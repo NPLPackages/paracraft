@@ -121,7 +121,7 @@ function CreateReward.ShowGiftItems()
     local startX = 210 
     local startY = 310
     local icons = {"wuping_douzi_36X33_32bits.png;0 0 36 32","dianzan_32X32_32bits.png;0 0 32 32","pifu_64X64_32bits.png;0 0 64 64"}
-    local tooltips = {"知识豆","作品点赞数","皮肤碎片"}
+    local tooltips = {"知识豆","作品推荐数","皮肤碎片"}
     for i = 1,3 do
         local giftImg = ParaUI.CreateUIObject("container", "giftbg"..i, "_lt", startX + (i-1)*90, startY, 60, 60);
         giftImg:GetAttributeObject():SetField("ClickThrough", true);

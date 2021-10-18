@@ -19,8 +19,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Neuron/NeuronManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemStack.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClip.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
-local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipEditors.lua");
+local MovieClipEditors = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipEditors");
 local MovieClip = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClip");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
@@ -348,29 +348,8 @@ function Entity:GetFirstActorStack()
 	return firstActor;
 end
 
--- we will select the first actor in the movie block if there is a code block nearby 
--- otherwise, we will select the default camera object in the movie block. 
-function Entity:AutoSelectActorInEditor()
-	if(self.selectedActorIndex) then
-		local itemStack = self.inventory:GetItem(self.selectedActorIndex)		
-		if(itemStack) then
-			MovieClipController.SetFocusToItemStack(itemStack);
-			return
-		end
-	end
-	
-	local codeEntity = self:GetNearByCodeEntity();
-	if(codeEntity) then
-		local firstActor = self:GetFirstActorStack();
-		if(firstActor) then
-			MovieClipController.SetFocusToItemStack(firstActor);
-		end
-	else
-		local cameraItem = self:GetCameraItemStack();
-		if(cameraItem) then
-			MovieClipController.SetFocusToItemStack(cameraItem);
-		end
-	end
+function Entity:GetSelectedActorIndex()
+	return self.selectedActorIndex;
 end
 
 -- called when the user clicks on the block
@@ -386,6 +365,11 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	return true;
 end
 
+-- @param editor_name: nil for default, it can be "SimpleRolePlayingEditor"
+function Entity:SetDefaultEditor(editor_name)
+	self.defaultEditor = editor_name;
+end
+
 -- virtual function: right click to edit. 
 function Entity:OpenEditor(editor_name, entity)
 	local movieClip = self:GetMovieClip();
@@ -393,8 +377,16 @@ function Entity:OpenEditor(editor_name, entity)
 		movieClip:Stop();
 	end
 	self.is_playing_mode = false;
+
+	if(self.defaultEditor == "SimpleRolePlayingEditor") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/RolePlayMode/RolePlayMovieController.lua");
+		local RolePlayMovieController = commonlib.gettable("MyCompany.Aries.Game.Movie.RolePlayMode.RolePlayMovieController");
+		MovieClipEditors.SetDefaultMovieClipPlayer(RolePlayMovieController)
+	else
+		-- Open with default movie clip timeline editor
+		MovieClipEditors.SetDefaultMovieClipPlayer()
+	end
 	MovieManager:SetActiveMovieClip(movieClip);
-	self:AutoSelectActorInEditor();
 	return true;
 end
 
@@ -682,7 +674,6 @@ function Entity:ExecuteCommand(entityPlayer, bIgnoreNeuronActivation, bIgnoreOut
 		if(self:HasCamera()) then
 			MovieManager:SetActiveMovieClip(movieClip);
 			movieClip:RePlay();
-			MovieClipController.SetFocusToItemStackCamera();
 		else
 			movieClip:RefreshActors();
 			movieClip:RePlay();
