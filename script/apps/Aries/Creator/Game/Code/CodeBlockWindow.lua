@@ -281,8 +281,16 @@ function CodeBlockWindow:OnCodeChange()
 	end
 	if(page) then
 		page:Refresh(0.01);
+		commonlib.TimerManager.SetTimeout(CodeBlockWindow.UpdateNPLBlocklyUIFromCode, 200, "CodeBlockWindow_OnCodeChangeTimer")
 	end
 end
+
+function CodeBlockWindow.UpdateNPLBlocklyUIFromCode()
+	CodeBlockWindow.isUpdatingNPLBlocklyUIFromCode = true;
+	CodeBlockWindow.ShowNplBlocklyEditorPage();
+	CodeBlockWindow.isUpdatingNPLBlocklyUIFromCode = false;
+end
+
 
 function CodeBlockWindow.SetFocusToTextControl()
 	commonlib.TimerManager.SetTimeout(function()  
@@ -509,9 +517,11 @@ function CodeBlockWindow.UpdateCodeToEntity()
 	if(page and entity) then
 		local code = page:GetUIValue("code");
 		if(not entity:IsBlocklyEditMode()) then
-			entity:BeginEdit()
-			entity:SetNPLCode(code);
-			entity:EndEdit()
+			if(entity:GetNPLCode() ~= code) then
+				entity:BeginEdit()
+				entity:SetNPLCode(code);
+				entity:EndEdit()
+			end
 
 			local ctl = CodeBlockWindow.GetTextControl();
 			if(ctl) then
@@ -1366,14 +1376,22 @@ function CodeBlockWindow.IsMicrobitEntity()
 end
 function CodeBlockWindow.UpdateNplBlocklyCode()
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
-	if (not NplBlocklyEditorPage or not codeEntity) then return end
+	if (not NplBlocklyEditorPage or not codeEntity or CodeBlockWindow.isUpdatingNPLBlocklyUIFromCode) then return end
 	if (not CodeBlockWindow.IsSupportNplBlockly()) then return end
 
 	local G = NplBlocklyEditorPage:GetG();
 	local code = type(G.GetCode) == "function" and G.GetCode() or "";
 	local xml = type(G.GetXml) == "function" and G.GetXml() or "";
+
+	local hasCodeChanged = codeEntity:GetNPLBlocklyNPLCode() ~= code;
+	if(hasCodeChanged) then
+		codeEntity:BeginEdit();
+	end
 	codeEntity:SetNPLBlocklyXMLCode(xml);
 	codeEntity:SetNPLBlocklyNPLCode(code);
+	if(hasCodeChanged) then
+		codeEntity:EndEdit();
+	end
 end
 
 function CodeBlockWindow.ShowNplBlocklyEditorPage()

@@ -312,10 +312,8 @@ function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid)
         tag = tag,
         keyword = keyword,
         platform = 1,
-        headers = {
-            ["x-per-page"] = 1000,
-            ["x-page"] = 1,
-        }
+		["x-per-page"] = 800,
+		["x-page"] = 1,
 	},function(err, msg, data)
 		KeepWorkMallPage.grid_data_sources = data.rows
 		KeepWorkMallPage.HandleDataSources()

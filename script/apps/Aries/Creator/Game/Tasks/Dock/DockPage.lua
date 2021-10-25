@@ -30,6 +30,7 @@ local InviteFriend = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/InviteFr
 local EmailManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/EmailManager.lua");
 local DockPopupControl = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPopupControl.lua")
 local RankPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua")
+local RacePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Race/RacePage.lua")
 
 local DockPage = NPL.export();
 local UserData = nil
@@ -78,6 +79,7 @@ DockPage.top_line_2 = {
     { label = L"作业", id = "homework", enabled2 = false, bg="Texture/Aries/Creator/keepwork/dock/btn3_zuoye_32bits.png#0 0 100 80", },
     { label = L"成长日记", id = "checkin", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_riji_32bits.png#0 0 100 80", },
     { label = L"玩学课堂", id = "codewar", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_ketang_32bits.png#0 0 100 80", },
+    { label = L"大赛", id = "race", enabled2 = true, bg="Texture/Aries/Creator/keepwork/dock/btn3_dasai_32bits.png#0 0 100 80", },
 }
 
 DockPage.show_friend_red_tip = false
@@ -347,6 +349,9 @@ function DockPage.OnClickTop(id)
     elseif (id == 'rank') then    
         RankPage.Show();
         table.insert(DockPage.showPages,{id,RankPage.GetPageCtrl()})
+    elseif id == "race" then
+        RacePage.Show()
+        table.insert(DockPage.showPages,{id,RacePage.GetPageCtrl()})
     elseif (id == 'dragonboatfestival') then
         local ActDragonBoatFestival = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActDragonBoatFestival/ActDragonBoatFestival.lua");
         ActDragonBoatFestival:Init();

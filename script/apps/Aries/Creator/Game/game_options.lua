@@ -1038,9 +1038,15 @@ function options:IsStereoControllerEnabled()
 	return StereoVisionController:IsEnabled();
 end
 
+-- @note: we can only set user UI scaling when there is no design resolution specified. 
 -- @param value: if 0, the original unscaled scaling is used. If nil, it will load from setting file. 
 -- value is usually [1,2].  where 1 means original size
 function options:SetUIScaling(value)
+	local designWidth, designHeight = Screen:GetDesignUIResolution()
+	if(designWidth) then
+		return 
+	end
+
 	local scaling = 1;
 	local key = "Paracraft_System_SetUIScaling";
 	if(value == nil) then
@@ -1050,13 +1056,12 @@ function options:SetUIScaling(value)
 	end
 	if(value and value~=0) then
 		scaling = value
-		local frame_size = ParaEngine.GetAttributeObject():GetField("WindowResolution", {960,560});
-		local frame_height = frame_size[2];
+		local frame_width, frame_height = Screen:GetWindowSolution()
 		if(frame_height < self.min_ui_height*scaling) then
 			scaling = frame_height / self.min_ui_height;
 		end
 	end
-	Screen:SetUIScale(scaling, scaling)
+	Screen:SetUserUIScaling(scaling)
 end
 
 function options:GetUIScaling()

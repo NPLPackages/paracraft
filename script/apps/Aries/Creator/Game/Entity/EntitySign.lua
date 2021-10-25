@@ -31,7 +31,6 @@ Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"
 
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
-Entity:Signal("remotelyUpdated")
 Entity:Signal("inventoryChanged", function(slotIndex) end)
 
 -- class name

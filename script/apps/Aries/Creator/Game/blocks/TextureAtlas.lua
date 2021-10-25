@@ -31,6 +31,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Color = commonlib.gettable("System.Core.Color");
@@ -461,7 +462,16 @@ function TexturePacker:RebuildScene(bClearAll)
 					end
 				end
 			elseif(region:GetModelFilename()) then
-				local model_filename = Files.FindFile(region:GetModelFilename())
+				local model_filename;
+				local skin = CustomCharItems:GetSkinByAsset(region:GetModelFilename());
+				if (skin) then
+					model_filename = CustomCharItems.defaultModelFile;
+					skin = region:GetModelSkin() or skin;
+				else
+					skin = region:GetModelSkin()
+				end
+
+				model_filename = model_filename or Files.FindFile(region:GetModelFilename())
 				if(model_filename) then
 					local model_offset_y = 0;
 					local obj_name = region:GetName();
@@ -488,8 +498,7 @@ function TexturePacker:RebuildScene(bClearAll)
 
 						local isCustomModel = PlayerAssetFile:IsCustomModel(model_filename);
 						local hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(model_filename);
-						local skin = region:GetModelSkin();
-
+						
 						if(isCustomModel) then
 							PlayerAssetFile:RefreshCustomModel(obj, skin)
 						elseif(hasCustomGeosets) then

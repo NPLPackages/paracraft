@@ -106,7 +106,7 @@ function EscFramePage.ShowPage(bShow)
 					bShow = bShow,
 					click_through = false, 
 					zorder = 10,
-					app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+					-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 					directPosition = true,
 						align = "_ct",
 						x = -390/2,

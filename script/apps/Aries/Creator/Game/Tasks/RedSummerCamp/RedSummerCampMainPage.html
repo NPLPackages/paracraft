@@ -36,7 +36,7 @@ function ClosePage()
         MyCompany.Aries.Game.MainLogin:next_step({ShowLoginModePage = true})
     end
 
-    RedSummerCampPPtPage.PPtCacheData = nil
+    RedSummerCampPPtPage.PPtCacheData = {}
 end
 function OnOpen(name)
     RedSummerCampMainPage.OpenPage(name)    
@@ -304,8 +304,8 @@ end
                         </pe:if>
                     </pe:if>
                 </div>
-                <div style="float: left;margin-top: 10px;">
-                    <div onclick="ClickSchoolName" tooltip='<%=GetUserData("username")%>' name="user_name" style="position: relative;margin-left: 5px;margin-top: 0px;base-font-size:16px; font-size: 16px;color: #ffffff;">
+                <div style="float: left;margin-top: 8px;">
+                    <div onclick="ClickSchoolName" tooltip='<%="点击切换学校"%>' name="user_name" style="position: relative;width: 310px; margin-left: 5px;margin-top: 0px;base-font-size:15px; font-size: 15px;color: #ffffff;">
                         <%=GetUserData("limit_school_name")%>
                     </div>
 
@@ -370,11 +370,11 @@ end
         <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;background: ;">
             <!--背景水印-->
             <div>
-                <div style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
-                <div style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
-                <div style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
-                <div style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
-                <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div zorder="-3" style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div zorder="-3" style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div zorder="-3" style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div zorder="-3" style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div zorder="-3" style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
             </div>
             <div style="float: left;margin-top: 52px; width: 1280px;height: 520px;">
                 <div style="float: left;width: 380px;">

@@ -13,6 +13,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockCodeBase"));
 
@@ -21,6 +22,7 @@ Entity.class_name = "EntityBlockCodeBase";
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 
 Entity:Property("NplBlocklyToolboxXmlText");
+Entity:Signal("remotelyUpdated")
 
 function Entity:ctor()
 end
@@ -210,5 +212,32 @@ function Entity:IsCodeEmpty()
 	local cmd = self:GetCommand()
 	if(not cmd or cmd == "") then
 		return true;
+	end
+end
+
+-- virtual: this should be called when inventory itemstack or its values are changed
+-- this function can be called many times per frame, but only one merged inventoryChanged signal is fired.
+function Entity:OnInventoryChanged(slot_index)
+end
+
+-- Overriden to provide the network packet for this entity.
+function Entity:GetDescriptionPacket()
+	local x,y,z = self:GetBlockPos();
+	return Packets.PacketUpdateEntityBlock:new():Init(x,y,z, self:SaveToXMLNode());
+end
+
+-- update from packet. 
+function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
+	if(packet_UpdateEntityBlock:isa(Packets.PacketUpdateEntityBlock)) then
+		local node = packet_UpdateEntityBlock.data1;
+		if(node) then
+			self.blockly_nplcode = nil;
+			self.nplcode = nil;
+			self.npl_blockly_nplcode = nil;
+			self.blockly_nplcode = nil;
+			self:LoadFromXMLNode(node)
+			self:OnInventoryChanged();
+			self:remotelyUpdated();
+		end
 	end
 end

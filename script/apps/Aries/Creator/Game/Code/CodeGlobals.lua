@@ -417,24 +417,63 @@ function CodeGlobals:GetCodeBlockByName(name)
 end
 
 function CodeGlobals:AddActor(actor)
-	self.actors[actor:GetName() or ""] = actor;
-	actor:Connect("nameChanged", self, self.OnActorNameChange);
-	actor:Connect("beforeRemoved", self, self.RemoveActor);
+	local name = actor:GetName() or ""
+	if(name ~= "") then
+		local actors = self.actors[name];
+		if(not actors) then
+			actors = commonlib.UnorderedArraySet:new();
+			self.actors[name] = actors;
+		end
+		actors:add(actor)
+	end
+	actor:Connect("nameChanged", self, self.OnActorNameChange, "UniqueConnection");
+	actor:Connect("beforeRemoved", self, self.RemoveActor, "UniqueConnection");
 end
 
 function CodeGlobals:RemoveActor(actor)
-	if(self.actors[actor:GetName() or ""] == actor) then
-		self.actors[actor:GetName() or ""] = nil;
+	local name = actor:GetName() or "";
+	if(name ~= "") then
+		local actors = self.actors[name];
+		if(actors) then
+			actors:removeByValue(actor);
+			if(actors:empty()) then
+				self.actors[name] = nil;
+			end
+		end
 	end
 end
 
 function CodeGlobals:OnActorNameChange(actor, oldName, newName)
-	if(oldName and self.actors[oldName] == actor) then
-		self.actors[oldName] = nil;
+	local name = oldName or "";
+	if(name ~= "") then
+		local actors = self.actors[name];
+		if(actors) then
+			actors:removeByValue(actor);
+			if(actors:empty()) then
+				self.actors[name] = nil;
+			end
+		end
 	end
-	if(newName) then
-		self.actors[newName] = actor;
+	name = newName or "";
+	if(name ~= "") then
+		local actors = self.actors[name];
+		if(not actors) then
+			actors = commonlib.UnorderedArraySet:new();
+			self.actors[name] = actors;
+		end
+		actors:add(actor)
 	end
+end
+
+-- return the last added actor by name
+function CodeGlobals:GetActorByName(name)
+	local actors = self.actors[name];
+	return actors and actors:last();
+end
+
+-- return array of all actors by the same name
+function CodeGlobals:GetActorsByName(name)
+	return self.actors[name];
 end
 
 function CodeGlobals:GetPlayerActor()
@@ -448,11 +487,6 @@ function CodeGlobals:GetPlayerActor()
 		self.playerActor:BecomeAgent(EntityManager.GetPlayer())
 	end
 	return self.playerActor;
-end
-
--- return the last added actor by name
-function CodeGlobals:GetActorByName(name)
-	return self.actors[name];
 end
 
 -- @param name: actor name or "@p" for current player

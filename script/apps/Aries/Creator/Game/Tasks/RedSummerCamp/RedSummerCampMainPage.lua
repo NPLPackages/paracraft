@@ -31,7 +31,7 @@ RedSummerCampMainPage.ItemData = {
 
 local notice_desc = {
 	-- {desc = [[教师节活动奖励新鲜出炉！！！]], name="teacher_day"},
-	{desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
+	-- {desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
 	{desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
 	{desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
 	{desc = [[重温红色记忆，重走《征程》之约]], name="zhengcheng"},
@@ -299,6 +299,15 @@ end
 
 function RedSummerCampMainPage.StartNoticeAnim()
 	-- RedSummerCampMainPage.ClearTween()
+	if RedSummerCampMainPage.tween_y_1 then
+		RedSummerCampMainPage.tween_y_1:Stop()
+		RedSummerCampMainPage.tween_y_2:Stop()
+	end
+	if RedSummerCampMainPage.Timer then
+		RedSummerCampMainPage.Timer:Change()
+		RedSummerCampMainPage.Timer = nil
+	end
+	
 	if not page or not page:IsVisible() then
 		if page and not page:IsVisible() then
 			page:CloseWindow()
@@ -406,7 +415,8 @@ function RedSummerCampMainPage.InitUserData()
 	UserData.has_school = profile.school ~= nil and profile.school.name ~= nil
 	if UserData.has_school then
 		UserData.school_name = profile.school and profile.school.name or ""
-		UserData.limit_school_name = RedSummerCampMainPage.GetLimitLabel(UserData.school_name,18)
+		-- UserData.limit_school_name = RedSummerCampMainPage.GetLimitLabel(UserData.school_name,18)
+		UserData.limit_school_name = UserData.school_name
 	else
 		UserData.limit_school_name = "尚未关联学校"
 	end
@@ -484,8 +494,10 @@ function RedSummerCampMainPage.OpenPage(name)
         local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
         RedSummerCampRecCoursePage.Show();
     elseif(name == "shentongbei")then
-        local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
-        Page.ShowShenTongBeiPage();
+        -- local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+        -- Page.ShowShenTongBeiPage();
+		local RacePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Race/RacePage.lua");
+        RacePage.Show();
     elseif(name == "teacher_day")then
 		local ActTeacher = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacher.lua") 
 		ActTeacher.ShowView()
@@ -580,21 +592,22 @@ function RedSummerCampMainPage.OnClickRightBt(name)
 end
 
 function RedSummerCampMainPage.ClickSchoolName()
-	if RedSummerCampMainPage.UserData and not RedSummerCampMainPage.UserData.has_school then
-		GameLogic.GetFilters():apply_filters('cellar.my_school.after_selected_school', function ()
-			KeepWorkItemManager.LoadProfile(false, function()
-				local profile = KeepWorkItemManager.GetProfile()
-				-- 是否选择了学校
-				if profile and profile.schoolId and profile.schoolId > 0 then
-					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
-					local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
-					QuestAction.AchieveTask("40003_1", 1, true)
-				end
+	-- if RedSummerCampMainPage.UserData and not RedSummerCampMainPage.UserData.has_school then
 
-				commonlib.TimerManager.SetTimeout(function()
-					RedSummerCampMainPage.RefreshPage()
-				end, 500)
-			end)
-		end);
-	end
+	-- end
+	GameLogic.GetFilters():apply_filters('cellar.my_school.after_selected_school', function ()
+		KeepWorkItemManager.LoadProfile(false, function()
+			local profile = KeepWorkItemManager.GetProfile()
+			-- 是否选择了学校
+			if profile and profile.schoolId and profile.schoolId > 0 then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+				local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+				QuestAction.AchieveTask("40003_1", 1, true)
+			end
+
+			commonlib.TimerManager.SetTimeout(function()
+				RedSummerCampMainPage.RefreshPage()
+			end, 500)
+		end)
+	end);
 end

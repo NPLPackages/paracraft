@@ -10,6 +10,7 @@ RedSummerCampMainWorldPage.Show();
 --]]
 
 local RedSummerCampMainWorldPage = NPL.export();
+RedSummerCampMainWorldPage.has_bind = false
 RedSummerCampMainWorldPage.GridData = {}
 RedSummerCampMainWorldPage.pageData = {
     main_world = {	
@@ -45,10 +46,17 @@ function RedSummerCampMainWorldPage.GetOpenFromCommandMenu()
 end
 
 function RedSummerCampMainWorldPage.Show()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
+	local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+	EscFramePage.ShowPage(false);
+
+	local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
+	DesktopMenuPage.ActivateMenu(false);
+
 	local name = "main_world"
 	RedSummerCampMainWorldPage.name = name
 	RedSummerCampMainWorldPage.InitData(name)
-	local enable_esc_key = System.options.isDevMode
+	local enable_esc_key = false
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.html",
 			name = "RedSummerCampMainWorldPage.Show", 
@@ -67,6 +75,8 @@ function RedSummerCampMainWorldPage.Show()
 				height = 0,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
+
+	RedSummerCampMainWorldPage.BindEvent()
 end
 
 function RedSummerCampMainWorldPage.InitData(name)
@@ -122,4 +132,18 @@ end
 
 function RedSummerCampMainWorldPage.IsOpen()
 	return page and page:IsVisible()
+end
+
+function RedSummerCampMainWorldPage.BindEvent()
+	if not RedSummerCampMainWorldPage.has_bind then
+		GameLogic.GetFilters():add_filter("KeyPressEvent",function(callbackVal, event)
+			if event.keyname == "DIK_ESCAPE" then
+				if RedSummerCampMainWorldPage.IsOpen() then
+					event:accept()
+				end
+			end
+		end)
+
+		RedSummerCampMainWorldPage.has_bind = true
+	end
 end

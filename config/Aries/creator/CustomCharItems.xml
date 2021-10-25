@@ -617,6 +617,31 @@ model id
     <!--20210817新增-->
     <item id="84083" model="actor;"><geoset category="8" id="6"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84083_white_longcoat.png"></texture></item>
 
+    <!--20211021新增-->
+    <item id="84084" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84084_antiepidemic.png"></texture></item>
+    <item id="84085" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84085_chef_male.png"></texture></item>
+    <item id="84086" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84086_ground_male.png"></texture></item>
+    <item id="84087" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84087_cleaner.png"></texture></item>
+    <item id="84088" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84088_police1.png"></texture></item>
+    <item id="84089" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84089_police2.png"></texture></item>
+    <item id="84090" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84090_police3.png"></texture></item>
+    <item id="84091" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84091_navy.png"></texture></item>
+    <item id="84092" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84092_army.png"></texture></item>
+    <item id="84093" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84093_air_force.png"></texture></item>
+    <item id="84094" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84094_bankman.png"></texture></item>
+    <item id="84095" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84095_host.png"></texture></item>
+    <item id="84096" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84096_firefighter.png"></texture></item>
+    <item id="84097" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84097_feeder.png"></texture></item>
+    <item id="84098" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84098_cafer.png"></texture></item>
+    <item id="84099" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84099_archaeologist.png"></texture></item>
+    <item id="84100" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84100_fastfoodman.png"></texture></item>
+    <item id="84101" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84101_thief.png"></texture></item>
+    <item id="84102" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84102_nurse.png"></texture></item>
+    <item id="84103" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84103_bankwoman.png"></texture></item>
+    <item id="84104" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84104_coffeewoman.png"></texture></item>
+    <item id="84105" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84105_fastfoodwoman.png"></texture></item>
+    <item id="84106" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84106_cheffy.png"></texture></item>
+
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
     <item id="85002" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_.png"></texture></item>
@@ -733,6 +758,31 @@ model id
     <item id="85103" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85103_Avatar_girl_leg_93.png"></texture></item>
     <item id="85104" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85104_Avatar_girl_leg_94.png"></texture></item>
     <item id="85105" model="actor;"><geoset category="9" id="2"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85105_Avatar_girl_leg_95.png"></texture></item>
+
+    <!--20211021新增-->
+    <item id="85106" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85106_antiepidemic.png"></texture></item>
+    <item id="85107" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85107_cleaner.png"></texture></item>
+    <item id="85108" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85108_police.png"></texture></item>
+    <item id="85109" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85109_police3.png"></texture></item>
+    <item id="85110" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85110_navy.png"></texture></item>
+    <item id="85111" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85111_staff.png"></texture></item>
+    <item id="85112" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85112_staff2.png"></texture></item>
+    <item id="85113" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85113_firefighter.png"></texture></item>
+    <item id="85114" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85114_feeder.png"></texture></item>
+    <item id="85115" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85115_archaeologist.png"></texture></item>
+    <item id="85116" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85116_staff3.png"></texture></item>
+    <item id="85117" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85117_army.png"></texture></item>
+    <item id="85118" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85118_staffskirt.png"></texture></item>
+    <item id="85119" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85119_staffskirt2.png"></texture></item>
+    <item id="85120" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85120_navywoman.png"></texture></item>
+    <item id="85121" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85121_policewoman.png"></texture></item>
+    <item id="85122" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85122_air_force_woman.png"></texture></item>
+    <item id="85123" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85123_armywoman.png"></texture></item>
+    <item id="85124" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85124_staffskirt3.png"></texture></item>
+    <item id="85125" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85125_fastfoodwoman.png"></texture></item>
+
+   
+
 
     <!--      86000 86999  背部  attachment id="15"    -->
     <!--第一批数据-->

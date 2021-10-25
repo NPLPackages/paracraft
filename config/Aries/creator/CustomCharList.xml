@@ -477,6 +477,31 @@
 
 
 	<category name="shirt" text="衣服">
+	    <!--20211021新加-->
+		<item id="84084" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84084_antiepidemic_32bits.png" name="防疫服" avatarMode="false"/>
+		<item id="84085" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84085_chef_male_32bits.png" name="厨师（男）" avatarMode="false"/>
+		<item id="84086" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84086_ground_male_32bits.png" name="地勤（男）" avatarMode="false"/>
+		<item id="84087" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84087_cleaner_32bits.png" name="环卫工人" avatarMode="false"/>
+        <item id="84088" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84088_police1_32bits.png" name="警察1" avatarMode="false"/>
+        <item id="84089" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84089_police2_32bits.png" name="警察2" avatarMode="false"/>
+        <item id="84090" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84090_police3_32bits.png" name="交警" avatarMode="false"/>
+        <item id="84091" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84091_navy_32bits.png" name="海军" avatarMode="false"/>
+        <item id="84092" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84092_army_32bits.png" name="陆军" avatarMode="false"/>
+		<item id="84093" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84093_air_force_32bits.png" name="空军" avatarMode="false"/>
+		<item id="84094" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84094_bankman_32bits.png" name="银行员工" avatarMode="false"/>
+		<item id="84095" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84095_host_32bits.png" name="男主持" avatarMode="false"/>
+		<item id="84096" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84096_firefighter_32bits.png" name="消防员" avatarMode="false"/>
+		<item id="84097" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84097_feeder_32bits.png" name="饲养员" avatarMode="false"/>
+		<item id="84098" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84098_cafer_32bits.png" name="咖啡员工（男）" avatarMode="false"/>
+		<item id="84099" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84099_archaeologist_32bits.png" name="考古学家" avatarMode="false"/>
+		<item id="84100" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84100_fastfoodman_32bits.png" name="快餐员工（男）" avatarMode="false"/>
+		<item id="84101" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84101_thief_32bits.png" name="小偷" avatarMode="false"/>
+		<item id="84102" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84102_nurse_32bits.png" name="护士" avatarMode="false"/>
+		<item id="84103" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84103_bankwoman_32bits.png" name="银行（女）" avatarMode="false"/>
+		<item id="84104" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84104_coffeewoman_32bits.png" name="咖啡员工（女）" avatarMode="false"/>
+		<item id="84105" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84105_fastfoodwoman_32bits.png" name="快餐员工（女）" avatarMode="false"/>
+		<item id="84106" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84106_cheffy_32bits.png" name="女厨师" avatarMode="false"/>
+
 
 	    <!--20210817新加-->
 		<item id="84083" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84083_white_longcoat_32bits.png" name="白大褂"/>
@@ -580,6 +605,29 @@
 	</category>
 
 	<category name="pants" text="裤子">
+        <!--20211021新增-->
+        <item id="85106" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85106_antiepidemic_32bits.png" name="防疫服" avatarMode="false"/>
+		<item id="85107" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85107_cleaner_32bits.png" name="环卫工人" avatarMode="false"/>  
+		<item id="85108" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85108_police_32bits.png" name="警察" avatarMode="false"/>
+		<item id="85109" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85109_police3_32bits.png" name="交警" avatarMode="false"/>
+		<item id="85110" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85110_navy_32bits.png" name="海军" avatarMode="false"/>
+		<item id="85111" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85111_staff_32bits.png" name="职员裤子" avatarMode="false"/>
+		<item id="85112" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85112_staff2_32bits.png" name="职员裤子2" avatarMode="false"/>
+		<item id="85113" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85113_firefighter_32bits.png" name="消防员" avatarMode="false"/>
+		<item id="85114" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85114_feeder_32bits.png" name="饲养员" avatarMode="false"/>
+		<item id="85115" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85115_archaeologist_32bits.png" name="考古学家" avatarMode="false"/>
+		<item id="85116" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85116_staff3_32bits.png" name="职员裤子3" avatarMode="false"/>
+		<item id="85117" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85117_army_32bits.png" name="陆军" avatarMode="false"/>
+		<item id="85118" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85118_staffskirt_32bits.png" name="职员裙子" avatarMode="false"/>
+		<item id="85119" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85119_staffskirt2_32bits.png" name="职员裙子2" avatarMode="false"/>
+		<item id="85120" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85120_navywoman_32bits.png" name="海军（女）" avatarMode="false"/>
+		<item id="85121" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85121_policewoman_32bits.png" name="警察（女）" avatarMode="false"/>
+		<item id="85122" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85122_air_force_woman_32bits.png" name="空军(女)" avatarMode="false"/>
+		<item id="85123" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85123_armywoman_32bits.png" name="陆军（女）" avatarMode="false"/>
+		<item id="85124" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85124_staffskirt3_32bits.png" name="职员裙子3" avatarMode="false"/>
+		<item id="85125" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85125_fastfoodwoman_32bits.png" name="快餐职员（女）" avatarMode="false"/>
+
+
         <!--20210805新增-->
         <item id="85093" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85093_32bits.png" name="唐服（蓝）"/>
 		<item id="85094" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85094_32bits.png" name="运动裤（橙）"/>

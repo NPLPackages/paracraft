@@ -377,7 +377,6 @@ function Entity:OpenEditor(editor_name, entity)
 		movieClip:Stop();
 	end
 	self.is_playing_mode = false;
-
 	if(self.defaultEditor == "SimpleRolePlayingEditor") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/RolePlayMode/RolePlayMovieController.lua");
 		local RolePlayMovieController = commonlib.gettable("MyCompany.Aries.Game.Movie.RolePlayMode.RolePlayMovieController");
@@ -419,6 +418,9 @@ function Entity:LoadFromXMLNode(node)
 			if(attr.extend_data) then
 				self.extend_data = NPL.LoadTableFromString(attr.extend_data);
 			end
+			if attr.defaultEditor ~= nil then
+				self.defaultEditor = attr.defaultEditor
+			end
 		end
 	end
 
@@ -429,8 +431,10 @@ function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	if node then
 		local attr = node.attr
+		if self.defaultEditor ~= nil and attr then
+			attr.defaultEditor = self.defaultEditor
+		end
 		if(self.extend_data and attr) then
-			
 			attr.extend_data = commonlib.serialize_compact(self.extend_data, bSort);
 		end
 	end

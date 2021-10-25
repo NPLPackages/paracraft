@@ -34,217 +34,246 @@
 </style>
         <script refresh="false" type="text/npl" src="VipPage.lua">
             <![CDATA[
-            
-            local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
-            VipPage.OnInit()
-            function ClosePage()
-                Page:CloseWindow();
-            end
-            function OnOpenVipCode()
-                local VipCodeExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchange.lua")
-                VipCodeExchange.ShowView();
-            end
-            function IsSelected(type)
-                return VipPage.selected_product == type
-            end
-            -- "six_month_vip" or "twelve_month_vip"
-            function OnSelected(type)
-                VipPage.OnSelected(type);
-            end
-            function IsSelectedPay(type)
-                --return VipPage.selected_pay == type
-                return false;
-            end
-            -- "weixin" or "zhifubao"
-            function OnSelectedPay(type)
-                VipPage.OnSelectedPay(type);
-            end
-           
-            function GetQR()
-                if(VipPage.selected_order)then
-                    --local filepath = VipPage.CreateOrGetImgPath(VipPage.selected_order);
-                    local QR = VipPage.selected_order.data;
-                    local filepath = VipPage.CreateOrGetQRImgFile(VipPage.selected_product, VipPage.key, QR)
-                    return filepath;
-                end
-            end
-            function GetOrderID()
-                if(VipPage.selected_order)then
-                    return VipPage.selected_order.id
-                end
-            end
-            function GetOrderState()
-                if(VipPage.selected_order)then
-                   return VipPage.order_state_map[VipPage.selected_order.id];
-                end
-            end
-            function OnClickAndroid()
-                local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
-                VipToolNew.OnClickbuy()
-            end
-            function GetPlatform()
-                return System.os.GetPlatform();
-            end
-            function OpenParentsPage()
-                local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
-                RedSummerCampParentsPage.Show();
-            end
-            function IsDevMode()
-                if(System and System.options)then
-                    return System.options.isDevEnv;
-                end
-            end
-            function HasDesc()
-                if(VipPage.desc)then
-                    return true;
-                end
-            end
-            function GetDesc()
-                if(VipPage.desc)then
-                    return string.format("(%s)",VipPage.desc);
-                end
-            end
+                local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+                VipPage.OnInit()
 
-            function GetDesc2()
-                return VipPage.GetDesc2();
-            end
+                local clickConcealPayButtonTimes = 1
 
-            function GetVipStateDesc()
-                return VipPage.GetVipStateDesc()
-            end
-            function CanShowVip()
-                local platform = System.os.GetPlatform();
-                if(platform == "ios" or platform == "mac" )then
+                function ClosePage()
+                    Page:CloseWindow();
+                end
+                function OnOpenVipCode()
+                    local VipCodeExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchange.lua")
+                    VipCodeExchange.ShowView();
+                end
+                function IsSelected(type)
+                    return VipPage.selected_product == type
+                end
+                -- "six_month_vip" or "twelve_month_vip"
+                function OnSelected(type)
+                    VipPage.OnSelected(type);
+                end
+                function IsSelectedPay(type)
+                    --return VipPage.selected_pay == type
                     return false;
                 end
-                return true;
-            end
+                -- "weixin" or "zhifubao"
+                function OnSelectedPay(type)
+                    VipPage.OnSelectedPay(type);
+                end
+                function GetQR()
+                    if(VipPage.selected_order)then
+                        --local filepath = VipPage.CreateOrGetImgPath(VipPage.selected_order);
+                        local QR = VipPage.selected_order.data;
+                        local filepath = VipPage.CreateOrGetQRImgFile(VipPage.selected_product, VipPage.key, QR)
+                        return filepath;
+                    end
+                end
+                function GetOrderID()
+                    if(VipPage.selected_order)then
+                        return VipPage.selected_order.id
+                    end
+                end
+                function GetOrderState()
+                    if(VipPage.selected_order)then
+                    return VipPage.order_state_map[VipPage.selected_order.id];
+                    end
+                end
+                function OnClickAndroid()
+                    local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+                    VipToolNew.OnClickbuy()
+                end
+                function GetPlatform()
+                    return System.os.GetPlatform();
+                end
+                function OpenParentsPage()
+                    local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
+                    RedSummerCampParentsPage.Show();
+                end
+                function IsDevMode()
+                    if(System and System.options)then
+                        return System.options.isDevEnv;
+                    end
+                end
+                function HasDesc()
+                    if(VipPage.desc)then
+                        return true;
+                    end
+                end
+                function GetDesc()
+                    if(VipPage.desc)then
+                        return string.format("(%s)",VipPage.desc);
+                    end
+                end
+                function GetDesc2()
+                    return VipPage.GetDesc2();
+                end
+                function GetVipStateDesc()
+                    return VipPage.GetVipStateDesc()
+                end
+                function CanShowVip()
+                    local platform = System.os.GetPlatform();
+                    if(platform == "ios" or platform == "mac" )then
+                        return false;
+                    end
+                    return true;
+                end
+                function ConcealPay()
+                    if (System.os.GetPlatform() ~= "ios" and
+                        System.os.GetPlatform() ~= "mac") then
+                        return
+                    end
+
+                    if (clickConcealPayButtonTimes >= 3) then
+                        clickConcealPayButtonTimes = 1
+                        OnOpenVipCode()
+                    else
+                        if (clickConcealPayButtonTimes >= 2 and clickConcealPayButtonTimes < 3) then
+                            GameLogic.AddBBS(nil, format(L"再按%d次打开激活页面", 3 - clickConcealPayButtonTimes), 1000, "128 128 255")
+                        end
+                        clickConcealPayButtonTimes = clickConcealPayButtonTimes + 1
+                    end
+                end
             ]]>
         </script>
-        <kp:window class="default" mode="lite" width="690" height="530" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_vip_32bits.png" onclose="ClosePage">
-                <div style="margin-left:2px;margin-top:39px;width:686px;height:489px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/pane_bg_32bits.png#0 0 128 479: 25 70 70 70)" >
-                    <!--背景水印-->
-                    <div>
-                        <pe:container zorder="-1" style="position:relative;margin-left:150px;margin-top:0px;width:390px;height:195px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
-                        <pe:container zorder="-1" style="position:relative;margin-left:365px;margin-top:212px;width:334px;height:167px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
-                        <pe:container zorder="-1" style="position:relative;margin-left:0px;margin-top:285px;width:300px;height:149px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
-                    </div>
-                    <pe:if condition='<%= not CanShowVip() %>'>
-                        <div style="position:relative;color:#000000;padding:50px;">
-                            <div>苹果系统暂时不支持开通会员。</div>
-                            <div>请下载Windows版本体验会员功能或关注“帕拉卡”微信小程序了解更多。</div>
-                        </div>
-                    </pe:if>
-                    <pe:if condition='<%= CanShowVip() %>'>
-                        <div>
-                            <pe:container alignment="_rt" style="margin-right:20px;margin-top:30px;background:url();">
-                                <input type="button" value="" onclick="OnOpenVipCode" style="width:71px;height:16px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/active_code_btn_32bits.png#0 0 71 16)" />
-                            </pe:container>
-                            <pe:if condition="<%=not HasDesc()%>" >
-                                <div style="position:relative;margin-left:16px;margin-top:15px;color:#000000;" class="text_size_18">
-                                    <%=GetVipStateDesc()%>
-                                </div>
-                            </pe:if>
-                           
-                            <pe:if condition="<%=HasDesc()%>" >
-                                <div style="position:relative;margin-left:16px;margin-top:15px;color:#000000;" class="text_size_18">成为VIP会员可以使用该功能</div>
-                                <div style="position:relative;margin-left:267px;margin-top:15px;color:#86513c;" class="text_size_18">
-                                    <%=GetDesc()%>
-                                </div>
-                            </pe:if>
-                            
-                            <div style="position:relative;margin-left:16px;margin-top:43px;font-size:14px;color:#000000;">
-                                <%= GetDesc2() %>
-                            </div>
-                            <!--twelve_month_vip-->
-                            <pe:if condition='<%= IsSelected("twelve_month_vip")%>'>
-                                <div style="position:relative;margin-left:89px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_1_32bits.png#0 0 235 32: 10 10 10 10)">
-                                    <div style="width:235px;margin-left:0px;margin-top:10px;color:#845c53;text-align:center;" class="text_size_26">1年</div>
-                                    <div style="width:235px;margin-left:0px;margin-top:0px;color:#845c53;text-align:center;" class="text_size_36">880元</div>
-                                    <div style="width:235px;margin-top:0px;color:#826d57;text-align:center;">73元/月</div>
-                                </div>
-                                <div style="position:relative;margin-left:358px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_2_32bits.png#0 0 235 32: 10 10 10 10)">
-                                    <div style="width:235px;margin-left:0px;margin-top:10px;color:#3d3d3d;text-align:center;" class="text_size_26">6个月</div>
-                                    <div style="width:235px;margin-left:0px;margin-top:0px;color:#b7795e;text-align:center;" class="text_size_36">498元</div>
-                                    <div style="width:235px;margin-top:0px;color:#826d57;text-align:center;">83元/月</div>
-                                </div>
-                                <!--价格切换按钮-->
-                                <input zorder="10" name="six_month_vip" onclick="OnSelected" type="button" value="" style="position:relative;margin-left:358px;margin-top:80px;width:235px;height:130px;background:url();" />
-                            </pe:if>
-                            <!--six_month_vip-->
-                            <pe:if condition='<%= IsSelected("six_month_vip")%>'>
-                                <div style="position:relative;margin-left:89px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_2_32bits.png#0 0 235 32: 10 10 10 10)">
-                                    <div style="width:235px;margin-left:0px;margin-top:10px;color:#845c53;text-align:center;" class="text_size_26">1年</div>
-                                    <div style="width:235px;margin-left:0px;margin-top:0px;color:#845c53;text-align:center;" class="text_size_36">880元</div>
-                                    <div style="width:235px;margin-top:0px;color:#826d57;text-align:center;">73元/月</div>
-                                </div>
-                                <div style="position:relative;margin-left:358px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_1_32bits.png#0 0 235 32: 10 10 10 10)">
-                                    <div style="width:235px;margin-left:0px;margin-top:10px;color:#3d3d3d;text-align:center;" class="text_size_26">6个月</div>
-                                    <div style="width:235px;margin-left:0px;margin-top:0px;color:#b7795e;text-align:center;" class="text_size_36">498元</div>
-                                    <div style="width:235px;margin-top:0px;color:#826d57;text-align:center;">83元/月</div>
-                                </div>
-                                <!--价格切换按钮-->
-                                <input zorder="10" name="twelve_month_vip" onclick="OnSelected" type="button" value="" style="position:relative;margin-left:89px;margin-top:80px;width:235px;height:130px;background:url();" />
-                            </pe:if>
-
-                            <div style="position:relative;margin-left:16px;margin-top:221px;width:651px;height:34px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/bg_32bits.png#0 0 64 34: 10 10 10 10)">
-                                <div style="float:left;margin-left:10px;margin-top:7px;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/check_32bits.png#0 0 20 20)" />
-                                <div style="float:left;margin-left:10px;margin-top:7px;color:#765b56;font-weight:bold;">
-                                    送《征程》编程手册+《3D动画编程入门》图书+定制文具
-                                </div>
-                            </div>
-                            <div style="position:relative;margin-left:16px;margin-top:267px;width:651px;height:164px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/bg_whtieline_32bits.png: 10 10 10 10)">
-                                <div style="position:relative;margin-left:0px;margin-top:0px;width:186px;height:164px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/pay_bg_32bits.png: 10 10 10 10)" />
-                                <div style="position:relative;margin-left:202px;margin-top:16px;width:132px;height:132px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/qr_code_bg_32bits.png#0 0 64 64: 10 10 10 10)" />
-                                <!--二维码-->
-                                <img src='<%=GetQR()%>' style="position:relative;margin-left:204px;margin-top:18px;width:128px;height:128px;" />
-                            </div>
-                            <div style="position:relative;margin-left:24px;margin-top:283px;color:#000000;" class="text_size_18">扫码支付：</div>
-                            <div style="position:relative;margin-left:361px;margin-top:336px;color:#a9a9a9;">支持使用支付宝，微信支付</div>
-                            <pe:if condition='<%= IsSelectedPay("weixin")%>'>
-                                <input type="button" value="微信" style="position:relative;margin-left:24px;margin-top:283px;font-weight:bold;width:154px;height:40px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/weixin_btn_2_32bits.png#0 0 154 40)" />
-                                <input type="button" value="支付宝" name="zhifubao" onclick="OnSelectedPay" style="position:relative;margin-left:24px;margin-top:335px;font-weight:bold;width:154px;height:40px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/ali_btn_gray_32bits.png#0 0 154 40)" />
-                                <div style="position:relative;margin-left:361px;margin-top:336px;color:#a9a9a9;">请用微信扫码支付</div>
-                            </pe:if>
-                            <pe:if condition='<%= IsSelectedPay("zhifubao")%>'>
-                                <input type="button" value="微信" name="weixin" onclick="OnSelectedPay" style="position:relative;margin-left:24px;margin-top:283px;font-weight:bold;width:154px;height:40px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/weixin_btn_gray_32bits.png#0 0 154 40)" />
-                                <input type="button" value="支付宝" style="position:relative;margin-left:24px;margin-top:335px;font-weight:bold;width:154px;height:40px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/ali_btn_2_32bits.png#0 0 154 40)" />
-                                <div style="position:relative;margin-left:361px;margin-top:336px;color:#a9a9a9;">请用支付宝扫码支付</div>
-                            </pe:if>
-
-                            <!--twelve_month_vip-->
-                            <pe:if condition='<%= IsSelected("twelve_month_vip")%>'>
-                                <div style="position:relative;margin-left:361px;margin-top:304px;">
-                                    <div style="float:left;margin-top:-15px;color:#845c53;" class="text_size_32">880元</div>
-                                    <div style="float:left;margin-left:30px;margin-top:0px;color:#d28f75;">已优惠320元</div>
-                                </div>
-                            </pe:if>
-                            <!--six_month_vip-->
-                            <pe:if condition='<%= IsSelected("six_month_vip")%>'>
-                                <div style="position:relative;margin-left:361px;margin-top:304px;">
-                                    <div style="float:left;margin-top:-15px;color:#845c53;" class="text_size_32">498元</div>
-                                    <div style="float:left;margin-left:30px;margin-top:0px;color:#d28f75;">已优惠102元</div>
-                                </div>
-                            </pe:if>
-                            <pe:if condition='<%= GetPlatform() == "android" %>'>
-                                <div style="position:relative;margin-left:490px;margin-top:336px;color:#a9a9a9;">或</div>
-                                <input type="button" value="点击支付" onclick="OnClickAndroid" style="position:relative;margin-left:365px;margin-top:365px;width:127px;height:40px;color:#bc9380;font-weight:bold;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/pay_btn_32bits.png#0 0 32 20: 8 8 8 8)" />
-                            </pe:if>
-                        </div>
-                    </pe:if>
-                    
-                    <div style="position:relative;margin-left:16px;margin-top:445px;">
-                        <div style="float:left;color:#000000;" class="text_size_18">
-                            成为VIP会员，可享受帕拉卡的所有尊贵服务。
-                        </div>
-                        <div style="float:left;margin-left:0px;margin-top:2px;">
-                            <input type="button" value="了解更多..." onclick="OpenParentsPage()" style="color:#86513c;font-size:16px;font-weight:bold;background:url();" />
-                        </div>
-                    </div>
-
+        <kp:window class="default"
+                   mode="lite"
+                   width="690"
+                   height="530"
+                   icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_vip_32bits.png"
+                   onclose="ClosePage">
+            <div style="margin-left: 2px;
+                        margin-top: 39px;
+                        width: 686px;
+                        height: 489px;
+                        position: relative;
+                        background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/pane_bg_32bits.png#0 0 128 479: 25 70 70 70)" >
+                <!--背景水印-->
+                <div>
+                    <pe:container zorder="-1" style="position:relative;margin-left:150px;margin-top:0px;width:390px;height:195px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <pe:container zorder="-1" style="position:relative;margin-left:365px;margin-top:212px;width:334px;height:167px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                    <pe:container zorder="-1" style="position:relative;margin-left:0px;margin-top:285px;width:300px;height:149px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
                 </div>
+                <pe:if condition='<%= not CanShowVip() %>'>
+                    <div style="position:relative;color:#000000;padding:50px;">
+                        <div>苹果系统暂时不支持开通会员。</div>
+                        <div>请下载Windows版本体验会员功能或关注“帕拉卡”微信小程序了解更多。</div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%= CanShowVip() %>'>
+                    <div>
+                        <pe:container alignment="_rt" style="margin-right:20px;margin-top:30px;background:url();">
+                            <input type="button" value="" onclick="OnOpenVipCode" style="width:71px;height:16px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/active_code_btn_32bits.png#0 0 71 16)" />
+                        </pe:container>
+                        <pe:if condition="<%=not HasDesc()%>" >
+                            <div style="position:relative;margin-left:16px;margin-top:15px;color:#000000;" class="text_size_18">
+                                <%=GetVipStateDesc()%>
+                            </div>
+                        </pe:if>
+                        
+                        <pe:if condition="<%=HasDesc()%>" >
+                            <div style="position:relative;margin-left:16px;margin-top:15px;color:#000000;" class="text_size_18">成为VIP会员可以使用该功能</div>
+                            <div style="position:relative;margin-left:267px;margin-top:15px;color:#86513c;" class="text_size_18">
+                                <%=GetDesc()%>
+                            </div>
+                        </pe:if>
+                        
+                        <div style="position:relative;margin-left:16px;margin-top:43px;font-size:14px;color:#000000;">
+                            <%= GetDesc2() %>
+                        </div>
+                        <!--twelve_month_vip-->
+                        <pe:if condition='<%= IsSelected("twelve_month_vip")%>'>
+                            <div style="position:relative;margin-left:89px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_1_32bits.png#0 0 235 32: 10 10 10 10)">
+                                <div style="width:235px;margin-left:0px;margin-top:10px;color:#845c53;text-align:center;" class="text_size_26">1年</div>
+                                <div style="width:235px;margin-left:0px;margin-top:0px;color:#845c53;text-align:center;" class="text_size_36">880元</div>
+                                <div style="width:235px;margin-top:0px;color:#826d57;text-align:center;">73元/月</div>
+                            </div>
+                            <div style="position:relative;margin-left:358px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_2_32bits.png#0 0 235 32: 10 10 10 10)">
+                                <div style="width:235px;margin-left:0px;margin-top:10px;color:#3d3d3d;text-align:center;" class="text_size_26">6个月</div>
+                                <div style="width:235px;margin-left:0px;margin-top:0px;color:#b7795e;text-align:center;" class="text_size_36">498元</div>
+                                <div style="width:235px;margin-top:0px;color:#826d57;text-align:center;">83元/月</div>
+                            </div>
+                            <!--价格切换按钮-->
+                            <input zorder="10" name="six_month_vip" onclick="OnSelected" type="button" value="" style="position:relative;margin-left:358px;margin-top:80px;width:235px;height:130px;background:url();" />
+                        </pe:if>
+                        <!--six_month_vip-->
+                        <pe:if condition='<%= IsSelected("six_month_vip")%>'>
+                            <div style="position:relative;margin-left:89px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_2_32bits.png#0 0 235 32: 10 10 10 10)">
+                                <div style="width:235px;margin-left:0px;margin-top:10px;color:#845c53;text-align:center;" class="text_size_26">1年</div>
+                                <div style="width:235px;margin-left:0px;margin-top:0px;color:#845c53;text-align:center;" class="text_size_36">880元</div>
+                                <div style="width:235px;margin-top:0px;color:#826d57;text-align:center;">73元/月</div>
+                            </div>
+                            <div style="position:relative;margin-left:358px;margin-top:80px;width:235px;height:130px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/price_bg_1_32bits.png#0 0 235 32: 10 10 10 10)">
+                                <div style="width:235px;margin-left:0px;margin-top:10px;color:#3d3d3d;text-align:center;" class="text_size_26">6个月</div>
+                                <div style="width:235px;margin-left:0px;margin-top:0px;color:#b7795e;text-align:center;" class="text_size_36">498元</div>
+                                <div style="width:235px;margin-top:0px;color:#826d57;text-align:center;">83元/月</div>
+                            </div>
+                            <!--价格切换按钮-->
+                            <input zorder="10" name="twelve_month_vip" onclick="OnSelected" type="button" value="" style="position:relative;margin-left:89px;margin-top:80px;width:235px;height:130px;background:url();" />
+                        </pe:if>
 
-            </kp:window>
+                        <div style="position:relative;margin-left:16px;margin-top:221px;width:651px;height:34px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/bg_32bits.png#0 0 64 34: 10 10 10 10)">
+                            <div style="float:left;margin-left:10px;margin-top:7px;width:20px;height:20px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/check_32bits.png#0 0 20 20)" />
+                            <div style="float:left;margin-left:10px;margin-top:7px;color:#765b56;font-weight:bold;">
+                                送《征程》编程手册+《3D动画编程入门》图书+定制文具
+                            </div>
+                        </div>
+                        <div style="position:relative;margin-left:16px;margin-top:267px;width:651px;height:164px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/bg_whtieline_32bits.png: 10 10 10 10)">
+                            <div style="position:relative;margin-left:0px;margin-top:0px;width:186px;height:164px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/pay_bg_32bits.png: 10 10 10 10)" />
+                            <div style="position:relative;margin-left:202px;margin-top:16px;width:132px;height:132px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/qr_code_bg_32bits.png#0 0 64 64: 10 10 10 10)" />
+                            <!--二维码-->
+                            <img src='<%=GetQR()%>' style="position:relative;margin-left:204px;margin-top:18px;width:128px;height:128px;" />
+                        </div>
+                        <div style="position:relative;margin-left:24px;margin-top:283px;color:#000000;" class="text_size_18">扫码支付：</div>
+                        <div style="position:relative;margin-left:361px;margin-top:336px;color:#a9a9a9;">支持使用支付宝，微信支付</div>
+                        <pe:if condition='<%= IsSelectedPay("weixin")%>'>
+                            <input type="button" value="微信" style="position:relative;margin-left:24px;margin-top:283px;font-weight:bold;width:154px;height:40px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/weixin_btn_2_32bits.png#0 0 154 40)" />
+                            <input type="button" value="支付宝" name="zhifubao" onclick="OnSelectedPay" style="position:relative;margin-left:24px;margin-top:335px;font-weight:bold;width:154px;height:40px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/ali_btn_gray_32bits.png#0 0 154 40)" />
+                            <div style="position:relative;margin-left:361px;margin-top:336px;color:#a9a9a9;">请用微信扫码支付</div>
+                        </pe:if>
+                        <pe:if condition='<%= IsSelectedPay("zhifubao")%>'>
+                            <input type="button" value="微信" name="weixin" onclick="OnSelectedPay" style="position:relative;margin-left:24px;margin-top:283px;font-weight:bold;width:154px;height:40px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/weixin_btn_gray_32bits.png#0 0 154 40)" />
+                            <input type="button" value="支付宝" style="position:relative;margin-left:24px;margin-top:335px;font-weight:bold;width:154px;height:40px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/ali_btn_2_32bits.png#0 0 154 40)" />
+                            <div style="position:relative;margin-left:361px;margin-top:336px;color:#a9a9a9;">请用支付宝扫码支付</div>
+                        </pe:if>
+
+                        <!--twelve_month_vip-->
+                        <pe:if condition='<%= IsSelected("twelve_month_vip")%>'>
+                            <div style="position:relative;margin-left:361px;margin-top:304px;">
+                                <div style="float:left;margin-top:-15px;color:#845c53;" class="text_size_32">880元</div>
+                                <div style="float:left;margin-left:30px;margin-top:0px;color:#d28f75;">已优惠320元</div>
+                            </div>
+                        </pe:if>
+                        <!--six_month_vip-->
+                        <pe:if condition='<%= IsSelected("six_month_vip")%>'>
+                            <div style="position:relative;margin-left:361px;margin-top:304px;">
+                                <div style="float:left;margin-top:-15px;color:#845c53;" class="text_size_32">498元</div>
+                                <div style="float:left;margin-left:30px;margin-top:0px;color:#d28f75;">已优惠102元</div>
+                            </div>
+                        </pe:if>
+                        <pe:if condition='<%= GetPlatform() == "android" %>'>
+                            <div style="position:relative;margin-left:490px;margin-top:336px;color:#a9a9a9;">或</div>
+                            <input type="button" value="点击支付" onclick="OnClickAndroid" style="position:relative;margin-left:365px;margin-top:365px;width:127px;height:40px;color:#bc9380;font-weight:bold;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/pay_btn_32bits.png#0 0 32 20: 8 8 8 8)" />
+                        </pe:if>
+                    </div>
+                </pe:if>
+                <div style="position:relative;margin-left:16px;margin-top:445px;">
+                    <div style="float:left;color:#000000;" class="text_size_18">
+                        成为VIP会员，可享受帕拉卡的所有尊贵服务。
+                    </div>
+                    <div style="float:left;margin-left:0px;margin-top:2px;">
+                        <input type="button" value="了解更多..." onclick="OpenParentsPage()" style="color:#86513c;font-size:16px;font-weight:bold;background:url();" />
+                    </div>
+                </div>
+            </div>
+            <pe:if condition="<%= System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' %>">
+                <div onclick="ConcealPay"
+                    style="position: relative;
+                            width: 650px;
+                            height: 480px;">
+                </div>
+            </pe:if>
+        </kp:window>
 </pe:mcml>
 </body>
 </html>

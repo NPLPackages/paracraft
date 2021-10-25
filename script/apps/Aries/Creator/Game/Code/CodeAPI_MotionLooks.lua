@@ -367,6 +367,22 @@ function env_imp:turnTo(degree, pitch, roll)
 	env_imp.checkyield(self);
 end
 
+function env_imp:rotate(x, y, z)
+	local entity = env_imp.GetEntity(self);
+	if (not entity) then return end
+	entity:SetRoll(x * math.pi / 180 + entity:GetRoll());
+	entity:SetFacing(y * math.pi / 180 + entity:GetFacing());
+	entity:SetPitch(z * math.pi / 180 + entity:GetPitch());
+end
+
+function env_imp:rotateTo(x, y, z)
+	local entity = env_imp.GetEntity(self);
+	if (not entity) then return end
+	entity:SetRoll(x * math.pi / 180);
+	entity:SetFacing(y * math.pi / 180);
+	entity:SetPitch(z * math.pi / 180);
+end
+
 function env_imp:scale(scaleDeltaPercentage)
 	local entity = env_imp.GetEntity(self);
 	if(entity) then

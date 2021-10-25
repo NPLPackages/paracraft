@@ -54,10 +54,25 @@ function env_imp:GetEntity()
 	end		
 end
 
-function env_imp:GetActor()
-	return self.actor;
+function env_imp:getActorEntityValue(name, key)
+	local actor_entity = nil;
+	if(not name or name == "myself") then
+		actor_entity = self.actor:GetEntity();
+	elseif(name == "player") then
+		actor_entity = EntityManager.GetPlayer();
+	elseif(type(name) == "string") then
+		local actor = GameLogic.GetCodeGlobal():GetActorByName(name);
+		actor_entity = actor and actor:GetEntity();
+	end
+	if (not actor_entity) then return nil end
+	if (key == "x" or key == "y" or key == "z") then
+		local bx, by, bz = actor_entity:GetBlockPos();
+		if (key == "x") then return bx end
+		if (key == "y") then return by end 
+		if (key == "z") then return bz end 
+	end
+	return nil;
 end
-
 
 function env_imp:getActorValue(name)
 	if(self.actor) then
@@ -102,12 +117,34 @@ function env_imp:include(filename)
 	end
 end
 
+-- private: This function is faster than getActor(), only used internally. 
+function env_imp:GetActor()
+	return self.actor;
+end
+
 -- get actor by name
--- @param name: nil or "myself" means current actor, or any actor name
+-- @param name: nil or "myself" means current actor, or any actor name, if"@p" it means current player
 function env_imp:getActor(name)
-	if(name == "myself" or not name) then
+	if(not name or name == "myself") then
 		return self.actor;
+	elseif(name == "@p") then
+		return GameLogic.GetCodeGlobal():GetPlayerActor();
 	else
 		return GameLogic.GetCodeGlobal():GetActorByName(name);
 	end
+end
+
+function env_imp:string_length(str)
+	return ParaMisc.GetUnicodeCharNum(str);
+end
+
+function env_imp:string_char(str, index)
+	local len = ParaMisc.GetUnicodeCharNum(str);
+	if (index < 1 or index > len) then return "" end
+	return ParaMisc.UniSubString(str, index, index); 
+end
+
+function env_imp:string_contain(str, substr)
+	local pos = string.find(str, substr, 1, true);
+	return pos and true or false;
 end

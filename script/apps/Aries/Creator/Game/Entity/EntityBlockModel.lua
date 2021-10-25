@@ -16,6 +16,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
@@ -115,6 +117,15 @@ end
 
 -- this is helper function that derived class can use to create an inner mesh or character object. 
 function Entity:CreateInnerObject(filename, scale)
+	filename = filename or self:GetModelFile()
+
+	local skin = CustomCharItems:GetSkinByAsset(filename)
+	if(skin) then
+		-- tricky: for custom character
+		self.isBiped = true;
+		filename = CustomCharItems.defaultModelFile;
+	end
+
 	filename = Files.GetFilePath(self:GetModelDiskFilePath(filename)) or self.default_file;
 	local x, y, z = self:GetPosition();
 
@@ -125,8 +136,19 @@ function Entity:CreateInnerObject(filename, scale)
 		end
 	end
 
-	local model = ParaScene.CreateObject("BMaxObject", self:GetBlockEntityName(), x+self.offsetPos[1],y+self.offsetPos[2],z+self.offsetPos[3]);
-	model:SetField("assetfile", filename);
+	local model
+	if(not self.isBiped) then
+		model = ParaScene.CreateObject("BMaxObject", self:GetBlockEntityName(), x+self.offsetPos[1],y+self.offsetPos[2],z+self.offsetPos[3]);
+		model:SetField("assetfile", filename);
+	else
+		local asset = ParaAsset.LoadParaX("", filename);
+		model = ParaScene.CreateCharacter(self:GetBlockEntityName(), asset, "", true, 0.5, self.facing or 0, 1);
+		model:SetPosition(x+self.offsetPos[1],y+self.offsetPos[2],z+self.offsetPos[3])
+		model:SetPersistent(false);
+	end
+	if(skin) then
+		PlayerAssetFile:RefreshCustomGeosets(model, skin);
+	end
 	if(self.scaling) then
 		model:SetScaling(self.scaling);
 	end
@@ -148,6 +170,19 @@ function Entity:CreateInnerObject(filename, scale)
 	ParaScene.Attach(model);
 	return model;
 end
+
+-- make sure object is biped instead of default "BMaxObject" to allow custom char skins
+-- return obj
+function Entity:UpgradeInnerObjectToBiped(filename)
+	if(not self.isBiped) then
+		self:DestroyInnerObject();
+		self.isBiped = true;
+		self:CreateInnerObject(filename, scale)
+		return model;
+	end
+	return self:GetInnerObject();
+end
+
 
 function Entity:getYaw()
 	return self:GetFacing();
@@ -184,7 +219,18 @@ end
 function Entity:Refresh()
 	local obj = self:GetInnerObject();
 	if(obj) then
-		obj:SetField("assetfile", self:GetModelDiskFilePath() or self.default_file);
+		local filename = self:GetModelFile()
+		local skin = CustomCharItems:GetSkinByAsset(filename)
+		if(skin) then
+			filename = CustomCharItems.defaultModelFile;
+			obj = self:UpgradeInnerObjectToBiped()
+			if(obj) then
+				obj:SetField("assetfile", filename);
+				PlayerAssetFile:RefreshCustomGeosets(obj, skin);
+			end
+		else
+			obj:SetField("assetfile", self:GetModelDiskFilePath() or self.default_file);	
+		end
 	end
 end
 

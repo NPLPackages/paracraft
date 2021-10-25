@@ -37,7 +37,7 @@ function ParaWorldNPC.CreateDefaultNPC(x, y, z)
 	ParaWorldNPC.npcList[3] = {npcName = "动画导师", npcType = "animation", npcModel = "character/CC/02human/paperman/Male_teacher.x", x = x-5, y = y, z = z+5, show = true};
 	ParaWorldNPC.npcList[4] = {npcName = "CAD", npcType = "CAD", npcModel = "character/CC/02human/paperman/Female_teachers.x", x = x+5, y = y, z = z-5, show = true};
 	ParaWorldNPC.npcList[5] = {npcName = "玩学课堂", npcType = "code_war", npcModel = "character/CC/codewar/sunbinjunshixingtai_movie.x", x = x-5, y = y, z = z-5, show = true};
-	ParaWorldNPC.npcList[6] = {npcName = "实战导师", npcType = "code_learn", npcModel = "character/CC/02human/paperman/nuannuan.x", x = x, y = y, z = z-10, show = true};
+	-- ParaWorldNPC.npcList[6] = {npcName = "实战导师", npcType = "code_learn", npcModel = "character/CC/02human/paperman/nuannuan.x", x = x, y = y, z = z-10, show = true};
 	for i = 1, #ParaWorldNPC.npcList do
 		entityList[i] = ParaWorldNPC.CreateNPCImp(ParaWorldNPC.npcList[i]);
 	end

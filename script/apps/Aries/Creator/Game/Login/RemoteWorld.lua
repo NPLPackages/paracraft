@@ -1,7 +1,8 @@
 --[[
 Title: RemoteWorld
-Author(s): LiXizhi
-Date: 2014/1/17
+Author(s): LiXizhi, big
+CreateDate: 2014.01.17
+ModifyDate: 2021.10.22
 Desc: represent a single downloadable remote world
 Use Lib:
 -------------------------------------------------------
@@ -22,10 +23,8 @@ local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
 
 local RemoteWorld = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Creator.Game.Login.RemoteWorld"));
 
-
 function RemoteWorld:ctor()
 end
-
 
 function RemoteWorld:Init(remotefile, server, text, revision, icon, author, size, tag)
 	if(not server) then
@@ -80,6 +79,19 @@ end
 function RemoteWorld:SetProjectId(pid)
 	self.projectId = tonumber(pid);
 	return self;
+end
+
+function RemoteWorld:SetRevision(revision)
+	self.revision = tonumber(revision);
+	return self;
+end
+
+function RemoteWorld:SetSpecifyFilename(filename)
+	if (not filename or type(filename) ~= 'string') then
+		return;
+	end
+
+	self.specifyFilename = filename
 end
 
 local world_icons = {
@@ -147,22 +159,31 @@ end
 
 -- compute local file name
 function RemoteWorld:ComputeLocalFileName()
-	if(self.remotefile) then
+	if (self.remotefile) then
 		local filename;
-		if(self.remotefile:match("paraengine.com/")) then
-			filename = self.remotefile:match("([^/]+)%.zip$");
+
+		if (self.specifyFilename) then
+			filename = self.specifyFilename;
 		else
-			filename = self.remotefile:match("^(.*)%.zip") or self.remotefile;
-			if(filename) then
-				filename = filename:gsub("[%W%s]+", "_");
+			if (self.remotefile:match("paraengine.com/")) then
+				filename = self.remotefile:match("([^/]+)%.zip$");
+			else
+				filename = self.remotefile:match("^(.*)%.zip") or self.remotefile;
+
+				if (filename) then
+					filename = filename:gsub("[%W%s]+", "_");
+				end
 			end
 		end
-		local folder = ParaIO.GetWritablePath().."worlds/DesignHouse/userworlds/";
-		if(self.projectId) then
-			folder = folder..format("%d_%s_r%s.zip", self.projectId, filename, self.revision);
+
+		local folder = ParaIO.GetWritablePath() .. "worlds/DesignHouse/userworlds/";
+
+		if (self.projectId) then
+			folder = folder .. format("%d_%s_r%s.zip", self.projectId, filename, self.revision);
 		else
-			folder = folder..format("%s_r%s.zip", filename, self.revision);
+			folder = folder .. format("%s_r%s.zip", filename, self.revision);
 		end
+
 		return folder;
 	end
 end
@@ -203,7 +224,6 @@ end
 function RemoteWorld:CreateWorldWithSeed(seed)
 	-- TODO:
 end
-
 
 -- @param world: a table containing infor about the remote world. 
 -- @param callbackFunc: function (bSucceed) end

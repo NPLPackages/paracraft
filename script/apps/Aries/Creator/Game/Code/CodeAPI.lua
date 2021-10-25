@@ -37,11 +37,17 @@ local s_env_methods = {
 	"alert",
 	"setActorValue",
 	"getActorValue",
+	"getActorEntityValue",
 	"showVariable",
 	"include",
 	"getActor",
 	"cmd",
 	"getPlayTimer",
+
+	-- operator
+	"string_length",
+	"string_char",
+	"string_contain",
 
 	-- Motion
 	"move",
@@ -51,6 +57,8 @@ local s_env_methods = {
 	"walkForward",
 	"turn",
 	"turnTo",
+	"rotate",
+	"rotateTo",
 	"bounce",
 	"velocity",
 	"getX",

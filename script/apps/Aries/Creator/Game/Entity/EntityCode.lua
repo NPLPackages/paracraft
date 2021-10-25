@@ -39,7 +39,6 @@ Entity:Property({"hasDiskFileMirror", false, "HasDiskFileMirror", "SetHasDiskFil
 Entity:Property({"isOpenSource", false, "IsOpenSource", "SetOpenSource"})
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
-Entity:Signal("remotelyUpdated")
 Entity:Signal("inventoryChanged", function(slotIndex) end)
 Entity:Signal("beforeRunThisBlock")
 Entity:Signal("afterRunThisBlock")
@@ -693,20 +692,6 @@ function Entity:GetDescriptionPacket()
 	-- we need to update tick just in case the isPowered is not set in scheduleUpdate
 	self:updateTick(x,y,z);
 	return Packets.PacketUpdateEntityBlock:new():Init(x,y,z, self:SaveToXMLNode());
-end
-
--- update from packet. 
-function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
-	if(packet_UpdateEntityBlock:isa(Packets.PacketUpdateEntityBlock)) then
-		local node = packet_UpdateEntityBlock.data1;
-		if(node) then
-			self.blockly_nplcode = nil;
-			self.nplcode = nil;
-			self:LoadFromXMLNode(node)
-			self:OnInventoryChanged();
-			self:remotelyUpdated();
-		end
-	end
 end
 
 function Entity:EndEdit()
