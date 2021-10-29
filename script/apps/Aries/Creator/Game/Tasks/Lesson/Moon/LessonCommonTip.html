@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local LessonCommonTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/Moon/LessonCommonTip.lua");
+    LessonCommonTip.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetDesc()
+        return LessonCommonTip.GetDesc()
+    end
+
+    function IsNoEnough()
+        return not LessonCommonTip.nType == 0
+    end
+
+    function OnClick()
+        LessonCommonTip.OnClick()
+    end
+]]></script>
+<div style=" width: 466px; height: 343px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/BJK_32bits.png#0 0 64 128:20 60 20 50);">
+    <div style="width: 460x; height: 30px;">
+        <input type="button" onclick="ClosePage" style="height: 22px; width: 22px; margin-left: 426px; margin-top: 14px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+    </div>
+    <div style="position: relative; margin-top: 28px; margin-left: 12px; width: 442px; height: 270px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/BJK2_32bits.png#0 0 32 32:14 14 14 14); ">
+        <div style="text-align: center; margin-left: 50px; margin-top: 70px; width: 341px; font-size:14px; base-font-size:14px;color: #000000;">
+           <%=GetDesc()%>
+        </div>
+        <pe:if condition='<%=IsNoEnough()%>'>
+            <input type="button" value="去学习" onclick="OnClick" style="margin-left: 150px; margin-top: 90px; width: 144px; height: 46px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/btn_qiehuan1_32X32_32bits.png#0 0 32 32:14 14 14 14); " />
+        </pe:if>
+        <pe:if condition='<%=not IsNoEnough()%>'>
+            <input type="button" value="确认" onclick="OnClick" style="margin-left: 150px; margin-top: 90px; width: 144px; height: 46px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/btn_qiehuan1_32X32_32bits.png#0 0 32 32:14 14 14 14); " />
+        </pe:if>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

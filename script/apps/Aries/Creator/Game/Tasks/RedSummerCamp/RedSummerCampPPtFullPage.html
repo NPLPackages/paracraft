@@ -1,0 +1,108 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtFullPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="RedSummerCampPPtFullPage.lua">
+<![CDATA[
+local RedSummerCampPPtFullPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtFullPage.lua");
+local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+RedSummerCampPPtFullPage.OnInit()
+function ClosePage()
+    local pageCtrl = document:GetPageCtrl();
+    pageCtrl:CloseWindow(true)
+    RedSummerCampPPtFullPage.IsInFullPage = false
+end
+
+function LessonsPPtData(index)
+    if(index == nil) then
+        return #RedSummerCampPPtFullPage.LessonsPPtData;
+    else
+        return RedSummerCampPPtFullPage.LessonsPPtData[index];
+    end
+end
+
+function GetPPtTitle()
+    return RedSummerCampPPtPage.GetPPtTitle()
+end
+
+function GetPPtStr()
+    return RedSummerCampPPtFullPage.GetPPtStr()
+end
+]]>
+</script>
+<style type="text/mcss">
+    {
+        left = {
+            width = 583,
+            height = 532,
+            float = "left",
+            ["margin-left"] = 0,
+            ["margin-top"] = 20,
+        },
+
+        right = {
+            width = 432,
+            height = 532,
+            float = "left",
+            ["margin-left"] = 0,
+            ["margin-top"] = -30,
+        },        
+
+        mainwork = {
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj_title2_64X64_32bits.png#0 0 341 64:305 48 16 13",
+            width = 552,
+            ["min-height"] = 225,
+            float = "left",
+            ["margin-left"] = 0,
+            ["margin-top"] = 0,
+            ["padding-top"] = 75,
+            ["padding-left"] = 65,
+            padding = 35,
+            ["text-align"] = "center",
+            ["base-font-size"] = 28,
+            ["font-size"] = 28,
+        },  
+
+        F1 = {
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/9_32bits.png#0 0 32 32:8 8 8 8",
+            width = 354,
+            height = 111,
+            color = "#212122",
+            padding = 10,
+            ["margin-left"] = 37,
+            ["margin-top"] = 36,
+            ["text-align"] = "center",
+            ["base-font-size"] = 30,
+            ["font-size"] = 30,
+        },  
+        share = {
+            width = 312,
+            float = "left",
+            ["margin-left"] = 65,
+            ["margin-top"] = 15,
+        },  
+    }
+</style>
+
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj3_32bits.png#0 0 5 512:1 10 2 10);">
+    <pe:container alignment="_rt" style="background:url();">
+        <input type="button" value='' onclick="ClosePage" style="width: 112px;height: 52px; margin-right:20px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B2_112X52_32bits.png#0 0 112 52);" />
+    </pe:container>
+    <pe:container alignment="_ct" style="margin-left:-532px;margin-top:-326px;width:1024px;height:612px;background:url();">
+        <div style="position: relative;margin-left: 0px;base-font-siez:28px;font-size: 28px;">
+            <div style="margin-top: 40px;margin-left: 0px; base-font-size:40px; font-size:40px;font-weight:bold;color: #212122; "><%=GetPPtTitle()%></div>
+            <%=GetPPtStr()%>
+        </div>
+    </pe:container>
+    
+</pe:container>
+
+</pe:mcml>
+</body>
+</html>
+

@@ -244,7 +244,7 @@ function NplCad.GetCustomToolbarMCML()
 	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
         <input type="button" value="%s" style="float:left;margin-left:5px;margin-top:7px;width:50px;height:25px;color:#ffffff;font-size:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnShowCodeLib"/>
         <div onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickShowExport" style="float:left;margin-left:5px;margin-top:7px;"
-                tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="200" show_width="230">
+                tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="360" show_width="230">
             <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
         </div>
     
@@ -332,6 +332,15 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
 					end
 				end
 			end, _guihelper.MessageBoxButtons.YesNo);
+    elseif(type == "fbxa" or type == "fbx" or type == "obj")then
+		if(type == "fbxa")then
+			filename = filename .. ".fbx";
+		else
+			filename = filename .. "." .. type;
+		end
+        local swapYZ = false;
+		SceneHelper.exportSceneToFile(filename, scene, false, type, swapYZ, 0)
+        NplCad.ShowMessageBox(filename)
     end
 end
 function NplCad.ShowMessageBox(filename)

@@ -652,6 +652,8 @@
   <asset filename="character/CC/keepwork/laji/yh_youqitong.x" displayname="油漆桶" name="youqitong"/>
   -->
 
+<!-- 2021.10.25 更新鸟巢相关素材 -->
+  <!-- <asset filename="character/CC/artwar/game/niaochao-wai.x" displayname="鸟巢" name="niaochao"/>-->
 <!-- 5·27更新 -->
   <asset filename="character/CC/artwar/game/chai.x" displayname="柴火" name="chai"/>
   <asset filename="character/CC/artwar/game/desk.x" displayname="复古木桌" name="desk"/>

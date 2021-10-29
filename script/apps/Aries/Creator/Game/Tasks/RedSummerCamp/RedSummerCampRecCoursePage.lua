@@ -27,7 +27,7 @@ RedSummerCampRecCoursePage.courses_2 = {
 RedSummerCampRecCoursePage.courses_3 = {
  { id = 19405, label = L"孙子兵法",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/sunzibingfa_32bits.png;0 0 195 100",  },
  { id = 70351, label = L"夏令营每日一课",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/list_32bits.png;0 0 195 100",  },
- { id = 71346, label = L"盖世英雄",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/hero_32bits.png;0 0 195 100",  },
+ { id = 0, name="codewar", label = L"玩学课堂",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/wanxue_32bits.png;0 0 195 100",  },
 }
 function RedSummerCampRecCoursePage.Show()
 	ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp();

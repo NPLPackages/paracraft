@@ -70,6 +70,12 @@ function goto_world(item)
     if(not item or not item.id)then
         return
     end
+    if item.name == "codewar" then
+        local Course = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Course/Course.lua");
+        Course.Show();
+        return
+    end
+
     local id = item.id;
     if(id == "all")then
         local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")

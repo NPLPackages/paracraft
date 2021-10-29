@@ -68,6 +68,21 @@ RedSummerCampCommonPage.pageData = {
 		]]
 	},
 
+	leyuan = {	
+		title="乐园设计师",
+		lb_bt_desc = "<<< 家长指南",
+		rb_bt_desc = "进入",
+		img = "Texture/Aries/Creator/keepwork/RedSummerCamp/common/bg_leyuan_602X374_32bits.png#0 0 602 374",
+		begain_time = "",
+		end_time = "",
+		content=[[
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;“乐园设计师”是帕拉卡为同学们准备的全新内容，在这个乐园中，同学们可以在这里体验过山车、摩天轮等等和现实游乐园一样的乐园游戏。
+			并且同学们也在这个乐园中担当设计者的身份，可以参与到自己的项目建设中来：
+			在前期，可以通过完成有趣的小任务，提升自己的创作技巧；之后，通过将这些技巧结合想法，设计出自己想要的乐园；最后，邀请你的小伙伴一起来你的乐园游玩。
+			你的小伙伴们已经开始行动了，你也快来创造属于你自己的乐园吧！！
+		]]
+	},
+
     main_world = {	
 		title="创意空间",
 		lb_bt_desc = "<<< 家长指南",
@@ -135,6 +150,9 @@ function RedSummerCampCommonPage.ClickLBBt()
 	elseif RedSummerCampCommonPage.name == "zhengcheng" then
         local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
         RedSummerCampParentsPage.Show();
+	elseif RedSummerCampCommonPage.name == "leyuan" then
+        local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
+        RedSummerCampParentsPage.Show();
 	end
 end
 
@@ -159,6 +177,8 @@ function RedSummerCampCommonPage.ClickRBBt()
 		GameLogic.RunCommand(format('/loadworld -s -force %d', world_id))
 	elseif RedSummerCampCommonPage.name == "zhengcheng" then
 		GameLogic.RunCommand(format('/loadworld -s -force %d', 73139))
+	elseif RedSummerCampCommonPage.name == "leyuan" then
+		GameLogic.RunCommand(format('/loadworld -s -force %d', 79969))
 	end
 end
 

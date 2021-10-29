@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ActTeacherReward = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActTeacher/ActTeacherReward.lua");
+    ActTeacherReward.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+]]></script>
+<div style="width: 640px; height: 520px; background: url(Texture/Aries/Creator/keepwork/vip/tipbj_32bits.png#0 0 32 32:14 14 14 14);">
+    <div style="width: 640; height: 30px;">
+        <input type="button" style="margin-left: 610px; margin-top: 6x; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    </div>
+    <div style="text-align: center; font-size: 16px;base-font-size: 16px;  color: #ffffff; margin-left: 14px; margin-top: -10px;">
+        各位同学好，教师节作品评选已经结束，以下是获奖同学名单<br/>
+    </div>
+    <div style="margin-top: 20px; margin-left: 35px; width: 570px; height: 345px; background: url(Texture/Aries/Creator/keepwork/ActTeacher/tu3_570X345_32bits.png#0 0 570 345);"></div>
+    <div style="text-align: center; font-size: 14px;base-font-size: 14px;  color: #ffffff; margin-left: 14px; margin-top: 10px;">
+        获奖的同学请在邮箱查收奖励，（知识豆可以兑换想要的服装啦）。<br/>
+        排名靠前的同学可能收到管理员的邀请制做模型获得更多奖励！<br/>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -126,3 +126,6 @@ HttpWrapper.Create("keepwork.app.availableHost", "%MAIN%/push-manage/v0/app/avai
 
 --http://yapi.kp-para.cn/project/32/interface/api/1417
 HttpWrapper.Create("keepwork.permissions.check", "%MAIN%/core/v0/permissions/check", "GET", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/4487
+HttpWrapper.Create("keepwork.user.pwd", "%MAIN%/core/v0/users/pwd", "PUT", true)

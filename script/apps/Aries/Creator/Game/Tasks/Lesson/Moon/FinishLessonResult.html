@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="FinishLessonResult.lua" ><![CDATA[
+    local FinishLessonResult = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/Moon/FinishLessonResult.lua");
+    FinishLessonResult.OnInit()
+    function ClosePage()
+        FinishLessonResult.ClosePage();       
+    end
+
+
+]]></script>
+<div style=" width: 466px; height: 343px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/BJK_32bits.png#0 0 64 128:20 60 20 50);">
+    <div style="width: 460x; height: 30px;">
+        <input type="button" onclick="ClosePage" style="height: 22px; width: 22px; margin-left: 426px; margin-top: 14px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+        <div style="margin-top: -46px; margin-left: 64px; width: 333px; height: 75px;  background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/gongxi_333X75_32bits.png#0 0 333 75);"></div>
+    </div>
+    <div style="position: relative; margin-top: 28px; margin-left: 12px; width: 442px; height: 270px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/BJK2_32bits.png#0 0 32 32:14 14 14 14); ">
+        <div style="text-align: left; margin-left: 26px; margin-top: 160px; font-size:14px; base-font-size:14px;color: #000000;">
+            1.令牌是进入岳阳楼内爬塔答题的凭证，每天学习任意一章课程<br/>
+            即可获得一块,令牌仅获得当天内有效。<br/>
+            2.钥匙碎片用于合成开启返回原来世界大门的钥匙，八章必修课<br/>
+            每上完一章可获得一块，集齐八块即可合成钥匙。<br/>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

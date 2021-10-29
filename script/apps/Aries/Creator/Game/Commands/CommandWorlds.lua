@@ -125,8 +125,8 @@ Commands["loadworld"] = {
 @param -e: always use existing world if it exist without checking if it is up to date.  
 @param -s: slient load.
 @param -d: download the world without loading it. Upon finish, it will /sendevent download_offline_world_finish project_id
-@param -force: always download(again) online world without checking if it is different to local. 
-@param -auto: it will check local world revision with remote world, and download ONLY-if remote world is newer. 
+@param -forcedownload: always download(again) online world without checking if it is different to local. 
+@param -auto|-force: it will check local world revision with remote world, and download ONLY-if remote world is newer. 
 @param -inplace: if the entered world is equal to the current world, the subsequent /sendevent command will be executed directly. otherwise, the command will be executed after entering the world. For security reasons, only event that begins with "global" can be sent
 @param -personal: login required. always sync online world to local folder, then enter.
 @param -fork [pid] [newWorldName]: fork a project id and save to a new local world.

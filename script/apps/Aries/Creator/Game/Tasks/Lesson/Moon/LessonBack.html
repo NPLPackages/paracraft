@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local LessonBack = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/Moon/LessonBack.lua");
+    LessonBack.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetDesc()
+        return LessonBack.GetDesc()
+    end
+
+    function IsEnough()
+        return LessonBack.IsEnough()
+    end
+
+    function OnClick()
+        LessonBack.OnClick()
+    end
+
+    function GetItemNumStr()
+        return LessonBack.GetItemNum().."块碎片"
+    end
+]]></script>
+<div style=" width: 560px; height: 420px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/BJK_32bits.png#0 0 64 128:20 60 20 50);">
+    <div style="width: 560x; height: 30px;">
+        <input type="button" onclick="ClosePage" style="height: 22px; width: 22px; margin-left: 516px; margin-top: 20px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+    </div>
+    <div style="position: relative; margin-top: 28px; margin-left: 12px; width: 536px; height: 344px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/BJK2_32bits.png#0 0 32 32:14 14 14 14); ">
+        <div style="margin-top: 20px; margin-left: 20px; width: 190px; height: 190px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/wupingdi_60X60_32bits.png#0 0 40 40:14 14 14 14);">
+            <div style="margin-left: 320px; margin-top: 60px;">
+                <div style="font-size: 16px; base-font-size: 16px; color: #000000; margin-left: 20px;">已获得</div>
+                <div style="font-size: 24px; base-font-size: 24px; font-weight: bold; color: #000000;"><%=GetItemNumStr()%></div>
+            </div>
+        </div>
+        
+        <div style="margin-top: -44px; margin-left: 160px;">
+            <pe:if condition='<%=IsEnough()%>'>
+                <input type="button" value="返回原来世界" onclick="OnClick" style="color: #111616; margin-left: 150px; width: 144px; height: 46px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/btn_qiehuan1_32X32_32bits.png#0 0 32 32:14 14 14 14); " />
+            </pe:if>
+            <pe:if condition='<%=not IsEnough()%>'>
+                <input type="button" value="返回原来世界" onclick="OnClick" style="color: #ffffff; margin-left: 150px; width: 144px; height: 46px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/btn_qiehuan3_32X32_32bits.png#0 0 32 32:14 14 14 14); " />
+            </pe:if>
+        </div>
+
+        <div style="text-align: center; margin-left: 50px; margin-top: 60px; width: 441px; font-size:14px; base-font-size:14px;color: #000000;">
+           钥匙碎片用于合成开启返回原来世界大门的钥匙，八章必修课必须课每上完一章可获得一块，集齐八块即可开启返回原来世界的大门
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

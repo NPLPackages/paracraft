@@ -34,3 +34,11 @@ HttpWrapper.Create("keepwork.tatfook.lucky_info", "%MAIN%/core/v0/activities/nat
 
 -- 获取灯谜活动信息
 HttpWrapper.Create("keepwork.tatfook.lucky_lantern_info", "%MAIN%/core/v0/activities/lamp", "GET", true)
+
+-- http://yapi.kp-para.cn/project/32/interface/api/4482
+-- ppt学习进度
+HttpWrapper.Create("keepwork.tatfook.study_learn_records", "%MAIN%/core/v0/studyLearnRecords", "POST", true)
+
+-- http://yapi.kp-para.cn/project/116/interface/api/1212
+-- 敏感词汇检查
+HttpWrapper.Create("keepwork.tatfook.sensitive_words_check", "%MAIN%/sensi/sensitiveWords/check", "GET", false)

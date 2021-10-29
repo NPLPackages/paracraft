@@ -523,11 +523,13 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 		end
 		return
     end
+
 	index = tonumber(index)
 	
 	if(index <= 16)then
 		bCheckVip = false;
 	end
+	
 	commonlib.echo("==========ParacraftLearningRoomDailyPage.OnOpenWeb");
 	commonlib.echo(index);
 	commonlib.echo(bCheckVip);
@@ -535,93 +537,107 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	commonlib.echo("======================HasCheckedToday");
 	commonlib.echo(ParacraftLearningRoomDailyPage.HasCheckedToday());
 
-	if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip())then
-		if(ParacraftLearningRoomDailyPage.IsFuture(index))then
-			ParacraftLearningRoomDailyPage.OnVIP("DailyNote");
-			--[[
-            _guihelper.MessageBox(L"非VIP用户仅可观看已签到视频，是否开通VIP观看此视频？", function(res)
-                if(res == _guihelper.DialogResult.OK) then
-                    ParacraftLearningRoomDailyPage.OnVIP("daily_note");
-                else
-                    ParacraftLearningRoomDailyPage.ShowPage();
-	            end
-            end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right,nil,nil,nil,nil,{ ok = L"立即开通", cancel = L"暂不开通", title = L"开通VIP", });
-			]]
-			return
-		end
-	end
-    if(index < 1)then
-        index = 1;
-    end
-	LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnOpenWeb", index);
-	local url = string.format("https://keepwork.com/official/tips/s1/1_%d",index);
-	local start_time = os.time()
-	local title = ParacraftLearningRoomDailyPage.GetTitle(index);
-	
-	GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { started = true, learningIndex = index });
-	if System.os.GetPlatform() ~= 'win32' then
-		-- 除了win32平台，使用默认浏览器打开视频教程
-		local cmd = string.format("/open %s", url);
-		GameLogic.RunCommand(cmd);
-		if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
-			local exid = ParacraftLearningRoomDailyPage.exid;
-			KeepWorkItemManager.DoExtendedCost(exid, function()
-
-				if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
-					ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp);
-				else
-					ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
-				end
-
-				local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
-				local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
-				GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
-
-				GameLogic.QuestAction.SetDailyTaskValue("40009_1",1)
-			end, function()
-				_guihelper.MessageBox(L"签到失败！");
-			end)
-		end
-		return
-    end
-
-	NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show(url, title, false, true, { scale_screen = "4:3:v", closeBtnTitle = L"退出" }, function(state)
-		if(state == "ONCLOSE")then
-			GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { ended = true, learningIndex = index });
-            NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();
-			
-			-- 如果不是今天的签到课，就直接返回
-			if(not ParacraftLearningRoomDailyPage.IsNextDay(index))then
+	local studyFunc = function (is_association_vip)
+		if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip()) and not System.User.isVipSchool and not is_association_vip then
+			if(ParacraftLearningRoomDailyPage.IsFuture(index))then
+				ParacraftLearningRoomDailyPage.OnVIP("DailyNote");
+				--[[
+				_guihelper.MessageBox(L"非VIP用户仅可观看已签到视频，是否开通VIP观看此视频？", function(res)
+					if(res == _guihelper.DialogResult.OK) then
+						ParacraftLearningRoomDailyPage.OnVIP("daily_note");
+					else
+						ParacraftLearningRoomDailyPage.ShowPage();
+					end
+				end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right,nil,nil,nil,nil,{ ok = L"立即开通", cancel = L"暂不开通", title = L"开通VIP", });
+				]]
 				return
 			end
-			local end_time = os.time()
-			if not ParacraftLearningRoomDailyPage.HasCheckedToday() and end_time - start_time >= 20 then
+		end
+		if(index < 1)then
+			index = 1;
+		end
+		LOG.std(nil, "debug", "ParacraftLearningRoomDailyPage.OnOpenWeb", index);
+		local url = string.format("https://keepwork.com/official/tips/s1/1_%d",index);
+		local start_time = os.time()
+		local title = ParacraftLearningRoomDailyPage.GetTitle(index);
+
+		GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { started = true, learningIndex = index });
+		if System.os.GetPlatform() ~= 'win32' then
+			-- 除了win32平台，使用默认浏览器打开视频教程
+			local cmd = string.format("/open %s", url);
+			GameLogic.RunCommand(cmd);
+			if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
 				local exid = ParacraftLearningRoomDailyPage.exid;
 				KeepWorkItemManager.DoExtendedCost(exid, function()
-
+	
 					if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
 						ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp);
 					else
 						ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
 					end
-
+	
 					local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
 					local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
 					GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
-
+	
 					GameLogic.QuestAction.SetDailyTaskValue("40009_1",1)
 				end, function()
 					_guihelper.MessageBox(L"签到失败！");
 				end)
-			else
-				if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
-					ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp();
+			end
+			return
+		end
+	
+		NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show(url, title, false, true, { scale_screen = "4:3:v", closeBtnTitle = L"退出" }, function(state)
+			if(state == "ONCLOSE")then
+				GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { ended = true, learningIndex = index });
+				NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();
+				
+				-- 如果不是今天的签到课，就直接返回
+				if(not ParacraftLearningRoomDailyPage.IsNextDay(index))then
+					return
+				end
+				local end_time = os.time()
+				if not ParacraftLearningRoomDailyPage.HasCheckedToday() and end_time - start_time >= 20 then
+					local exid = ParacraftLearningRoomDailyPage.exid;
+					KeepWorkItemManager.DoExtendedCost(exid, function()
+	
+						if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
+							ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp);
+						else
+							ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
+						end
+	
+						local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
+						local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
+						GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
+	
+						GameLogic.QuestAction.SetDailyTaskValue("40009_1",1)
+					end, function()
+						_guihelper.MessageBox(L"签到失败！");
+					end)
 				else
-					ParacraftLearningRoomDailyPage.ShowPage();
+					if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
+						ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp();
+					else
+						ParacraftLearningRoomDailyPage.ShowPage();
+					end
 				end
 			end
-		end
-	end);
+		end);
+	end
+	if bCheckVip then
+		keepwork.permissions.check({
+			featureName = "LP_CommunityCourses",
+		},function(err, msg, data)
+			if err == 200 then
+				studyFunc(data.data)
+			end
+		end) 
+	else
+		studyFunc()
+	end
+
 end
 
 function ParacraftLearningRoomDailyPage.OnLearningLand()

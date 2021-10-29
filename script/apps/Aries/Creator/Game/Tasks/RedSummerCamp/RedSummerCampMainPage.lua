@@ -23,7 +23,7 @@ RedSummerCampMainPage.UserData = {}
 RedSummerCampMainPage.ItemData = {
 	{name="创意大赛", is_show_vip=false, is_show_recommend=true, node_name = "shentongbei", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_1_220x220_32bits.png#0 0 220 220"},
 	{name="推荐课程", is_show_vip=false, is_show_recommend=false, node_name = "course_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_2_220x220_32bits.png#0 0 220 220"},
-	{name="《征程》", is_show_vip=true, is_show_recommend=false, node_name = "zhengcheng", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_3_220x220_32bits.png#0 0 220 220"},
+	{name="乐园设计师", is_show_vip=false, is_show_recommend=false, node_name = "leyuan", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/8_219X202_32bits.png#0 0 220 220"},
 	{name="推荐列表", is_show_vip=false, is_show_recommend=false, node_name = "explore", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"},
 	{name="虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
 	{name="家长指南", is_show_vip=false, is_show_recommend=false, node_name = "parent_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_6_220x220_32bits.png#0 0 220 220"},
@@ -72,7 +72,7 @@ function RedSummerCampMainPage.Show()
 	RedSummerCampMainPage.InitUserData()
 	notice_text_index = 1
 
-	local enable_esc_key = System.options.isDevMode
+	local enable_esc_key = false
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainPage.html",
 			name = "RedSummerCampMainPage.Show", 
@@ -522,6 +522,9 @@ function RedSummerCampMainPage.OpenPage(name)
     elseif(name == "main_world")then
 		local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
 		RedSummerCampMainWorldPage.Show();
+	elseif(name == "leyuan")then
+		local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
+        RedSummerCampCommonPage.Show("leyuan");
     elseif(name == "explore")then
 		GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
     end

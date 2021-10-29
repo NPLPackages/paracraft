@@ -691,6 +691,10 @@ function Macros:PrepareInitialBuildState()
 	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 	CodeBlockWindow:SetBigCodeWindowSize(false);
 
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
+	local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
+	MovieClipController:ShowAllGUI(false);
+	
     NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
     local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
     OpenAssetFileDialog.OnChangeCategory(2);

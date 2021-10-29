@@ -642,6 +642,9 @@ model id
     <item id="84105" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84105_fastfoodwoman.png"></texture></item>
     <item id="84106" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84106_cheffy.png"></texture></item>
 
+    <!--20211028新增-->
+    <item id="84085" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84085_famale_teacher.png"></texture></item>
+
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
     <item id="85002" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_.png"></texture></item>

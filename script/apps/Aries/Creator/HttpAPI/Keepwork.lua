@@ -281,3 +281,31 @@ function Keepwork:CheckSkin(skin)
     LOG.std(nil, 'info', 'Keepwork:CheckSkin:Return:Skin', skin);
     return skin;
 end
+
+
+function Keepwork:GetUserName()
+    return self:GetUserInfo().username;
+end
+
+function Keepwork:GetNickName()
+    return self:GetUserInfo().nickname;
+end
+
+local Grades = {"一年级", "二年级", "三年级", "四年级", "五年级", "六年级", "七年级", "八年级", "九年级", "高一", "高二", "高三", "往届学生", "教师"};
+function Keepwork:GetGradeClassName()
+    local class = self:GetUserInfo().class;
+    if (not class or not class.grade) then return "" end 
+    local gradeNo = tonumber(class.grade);
+    gradeNo = math.max(gradeNo, 1);
+    gradeNo = math.min(#Grades, gradeNo);
+    return Grades[gradeNo] .. (class.classNo and (class.classNo .. "班" or ""));
+end
+
+function Keepwork:GetCurrentWorldID()
+    return GameLogic.options:GetProjectId();
+end
+
+function Keepwork:GetCurrentWorldName()
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+    return WorldCommon.GetWorldTag("name");
+end

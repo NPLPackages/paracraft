@@ -1,0 +1,52 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/SoundRecorder.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="SoundRecorder.lua"><![CDATA[
+SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
+SoundRecorder.OnInit();
+
+]]></script>
+<aries:window mode="thin" style="width:400px;" title='<%=L"录制声音"%>' onclose="SoundRecorder.OnClose">
+<div style="padding:5px;margin-right:10px;">
+    <pe:if condition="<%= SoundRecorder.status == nil %>">
+        <div style="margin:10px;padding:10px;height:64px;" class="mc_paper_panel">
+           <pe:label style="text-align:center;" value='<%=L"点击下方按钮开始录制"%>'></pe:label>
+        </div>
+        <div style="margin:10px;margin-left:160px;margin-bottom:20px">
+            <input name="record" type="button" value="" style="background:url(Texture/player/rec.png);width:64px;height:64px;" onclick="SoundRecorder.OnRecord"/>
+            <div for="record" style="text-align:center;width:64px;color:#ff3333"><%=L"录制"%></div>
+        </div>
+    </pe:if>
+    <pe:if condition="<%=SoundRecorder.status == 'recording' %>">
+        <div style="margin:10px;padding:10px;height:64px;" class="mc_paper_panel">
+            <pe:label name="text" style="text-align:center;" value='<%=L"录制中"%>'></pe:label>
+        </div>
+        <div style="margin:10px;margin-left:160px;margin-bottom:20px">
+            <input type="button" name="stop" value="" style="background:url(Texture/player/stop.png);width:64px;height:64px;" onclick="SoundRecorder.OnStopRecord"/>
+            <div for="stop" style="text-align:center;width:128px;margin-left:-32px;color:#6bbade"><%=L"停止录制"%></div>
+        </div>
+    </pe:if>
+    <pe:if condition="<%=SoundRecorder.status == 'recorded' %>">
+        <div style="margin:10px;padding:10px;height:64px;" class="mc_paper_panel">
+            <pe:label name="finalText" style="text-align:center;" value='<%=string.format(L"录制完毕, 长度%.2f秒", SoundRecorder.recordedDuration/1000)%>'></pe:label>
+        </div>
+        <div style="margin:10px;margin-left:160px;margin-bottom:0px">
+            <input type="button" name="play" value=""  style="background:url(Texture/player/play.png);width:64px;height:64px;" onclick="SoundRecorder.OnPlay" />
+            <div for="play" style="text-align:center;width:64px;color:#6bbade"><%=L"播放"%></div>
+        </div>
+        <div style="margin:10px;margin-bottom:20px">
+            <input type="button" name="ReRecord" style="position:relative;margin-left:0px;min-width:80px;height:32px" class="mc_light_grey_button_with_fillet" onclick="SoundRecorder.OnReRecord" value='<%=L"重新录制"%>' />
+            <input type="button" name="Save" align="right" style="margin-right:0px;min-width:80px;height:32px;" class="mc_yellow_button_with_fillet" onclick="SoundRecorder.OnSave" value='<%=L"保存"%>' />
+        </div>
+    </pe:if>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

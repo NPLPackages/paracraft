@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
+    local page = document:GetPageCtrl();
+    local index = tonumber(page:GetRequestParam("index"));
+    local dataHistroy = RedSummerCampCourseScheduling.GetHistroyByIndex(index)
+    local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+    Page.OnCreate = function()
+        local root = ParaUI.GetUIObject("course_tip_root");
+        local course_tip_bt = ParaUI.GetUIObject("course_tip_bt");
+
+        course_tip_bt.x = root.width/2 - course_tip_bt.width/2
+    end
+
+    function GetContent()
+        if dataHistroy then
+            return RedSummerCampPPtPage.GetContent(dataHistroy);
+        end
+        return ""
+    end
+
+    function OnClickReLearn()
+        if not RedSummerCampCourseScheduling.CheckCanLearn(dataHistroy.key) then
+            local strTip = "你暂时没有该课程访问权限，请联系客服"
+            _guihelper.MessageBox(strTip)
+            return
+        end
+        if dataHistroy then
+            RedSummerCampPPtPage.Show(dataHistroy.key, dataHistroy.pptIndex);
+            RedSummerCampCourseScheduling.RefreshPage()
+        end
+    end
+]]></script>
+<pe:container uiname="course_tip_root" style="min-height: 50px;max-width: 400px; font-size: 14px; base-font-size: 14px;color: #ffffff;padding: 10px; background: url(Texture/Aries/Creator/keepwork/Window/tooltip/tipbj_32bits.png#0 0 32 32:12 12 14 14);">
+    <div>
+        <%=GetContent()%>
+    </div>
+    
+    <input uiname="course_tip_bt" zorder="10" type="button" value="复习" onclick="OnClickReLearn" style="font-size: 14px; base-font-size: 14px; font-weight: bold; margin-top: 10px; width:100px;height:32px;background: url(Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+</pe:container>
+</pe:mcml>
+</body>
+</html>

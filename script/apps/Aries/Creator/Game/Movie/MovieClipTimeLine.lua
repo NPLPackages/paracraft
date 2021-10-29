@@ -103,19 +103,6 @@ function MovieClipTimeLine.OnInit()
 	self:OnSelectedActorChange(Game.SelectionManager:GetSelectedActor());
 	self:OnActiveMovieClipChange(MovieManager:GetActiveMovieClip());
 	self:OnMovieClipTimeChange();
-	GameLogic.GetFilters():add_filter("show", MovieClipTimeLine.ShowCommandFilter);
-end
-
-function MovieClipTimeLine.ShowCommandFilter(name, bShow)
-	if(name == "movie.controller") then
-		local self = MovieManager;
-		local movie_clip = self:GetActiveMovieClip();
-		if(movie_clip) then
-			MovieClipTimeLine:ShowAllGUI(bShow~=false, true);
-		end
-		return;
-	end
-	return name;
 end
 
 function MovieClipTimeLine.OnClosePage()

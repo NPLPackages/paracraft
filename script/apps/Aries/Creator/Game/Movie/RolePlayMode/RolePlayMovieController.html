@@ -1,0 +1,33 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/RolePlayMode/RolePlayMovieController.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="RolePlayMovieController.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+RolePlayMovieController = commonlib.gettable("MyCompany.Aries.Game.Movie.RolePlayMode.RolePlayMovieController");
+RolePlayMovieController.OnInit();
+
+
+]]></script>
+<pe:container style="background-color:#ff0000;height:64px;position:relative" width="100%" ClickThrough="true">
+    <div align="right" style="width:32px;position:relative;">
+        <input type="button" value="X" uiname="RolePlayMovieController.Close" name="btnClose" style="width: 32px; height: 32px; " onclick="RolePlayMovieController.OnClose()"/>
+    </div>
+    TODO: actor items
+</pe:container>
+<pe:container alignment="_mb" ClickThrough="true" style="width:0px;height:64px;background-color:#0000ff;position:relative">
+    <div style="width:512px">
+        <input type="button" onclick="RolePlayMovieController.OnGotoBeginFrame" uiname="RolePlayMovieController.to_begin" name="to_begin" tooltip='<%=L"到开始"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/back_off.png);" />
+        <input type="button" onclick="RolePlayMovieController.OnPlay" uiname="RolePlayMovieController.play" name="play" tooltip='<%=L"播放/暂停(P)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " />
+        <input type="button" onclick="RolePlayMovieController.OnRecord" uiname="RolePlayMovieController.record" name="record" tooltip='<%=L"开始录制MPEG(R)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/rec_off.png); " />
+        <input type="button" onclick="RolePlayMovieController.OnGotoEndFrame" uiname="RolePlayMovieController.to_end" name="to_end" tooltip='<%=L"到结束"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/go_off.png); " />
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

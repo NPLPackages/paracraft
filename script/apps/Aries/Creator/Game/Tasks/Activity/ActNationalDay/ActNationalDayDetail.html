@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ActNationalDayDetail = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Activity/ActNationalDay/ActNationalDayDetail.lua");
+    ActNationalDayDetail.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+]]></script>
+<div style="width: 460px; height: 320px; background: url(Texture/Aries/Creator/keepwork/vip/tipbj_32bits.png#0 0 32 32:14 14 14 14);">
+    <div style="width: 460; height: 30px;">
+        <input type="button" style="margin-left: 430px; margin-top: 6x; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        <div style="text-align: center; font-size: 18px;base-font-size: 18px; font-weight: bold; color: #ffffff;">活动规则</div>
+    </div>
+    <div style="text-align: left; font-size: 16px;base-font-size: 16px;  color: #ffffff; margin-left: 14px; margin-top: 40px;">
+        活动时间：2021年10月1日-2021年10月15日<br/>
+    </div>
+    <div style="text-align: left; font-size: 14px;base-font-size: 14px;  color: #ffffff; margin-left: 14px; margin-top: 10px;">
+        活动内容：<br/>
+        从国庆开始10月1日-10月7日，每日会解锁一个任务，<br/>
+        完成任务可获得对应的奖励，每日活动任务会根据日期解锁不同任务。<br/>
+
+
+        打卡要求：<br/>
+        用户需要登录并完成每日的活动任务记为打卡成功，打卡奖励与<br/>
+        打卡天数有关，与打卡日期无关。<br/>
+        完成顺序没有要求，可在第二天再完成第一天的任务并领取奖励。<br/>
+        每日解锁一个任务，直到第七天解锁第七个任务。<br/>
+        活动结束后不可再进行打卡或领取奖励。<br/>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

@@ -175,7 +175,7 @@ end
 -- @param callbackFunc: function is called when window size is adjusted. 
 function VideoRecorder.AdjustWindowResolution(callbackFunc)
 	local att = ParaEngine.GetAttributeObject();
-	local cur_resolution = att:GetField("WindowResolution", {400, 300}); 
+	local cur_resolution = att:GetField("ScreenResolution", {400, 300}); 
 	local preferred_resolution = VideoRecorderSettings.GetResolution();
 	
 	-- reserve space in resolution for render borders which indicates whether the screen is being recorded or not

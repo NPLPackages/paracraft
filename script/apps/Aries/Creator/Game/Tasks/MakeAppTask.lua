@@ -714,7 +714,7 @@ function MakeApp:MakeStartupExe()
 		file:WriteString("@echo off\n");
 		file:WriteString("cd bin\n");
 		local worldPath = Files.ResolveFilePath(GameLogic.GetWorldDirectory()).relativeToRootPath or GameLogic.GetWorldDirectory()
-		file:WriteString("start ParaEngineClient.exe noclientupdate=\"true\" world=\"%~dp0data/\"");
+		file:WriteString("start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" world=\"%~dp0data/\"");
 		file:close();
 		return true;
 	end

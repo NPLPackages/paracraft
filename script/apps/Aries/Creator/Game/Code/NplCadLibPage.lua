@@ -158,6 +158,9 @@ function NplCadLibPage:OnSelected(index)
             end
             _guihelper.MessageBox(L"你是否要使用代码库的源码？", function(res)
 	            if(res and res == _guihelper.DialogResult.Yes) then
+                    -- CAD 不使用NPL图块编辑器
+                    if(codeEntity and type(codeEntity.SetUseNplBlockly) == "function") then codeEntity:SetUseNplBlockly(false) end
+                    
                     CodeBlockWindow.UpdateBlocklyCode(codes_block, codes_lua);
                     -- force open nplbrowser to reload new code
                     CodeBlockWindow.OpenBlocklyEditor(true);

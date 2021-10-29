@@ -1,0 +1,247 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="RedSummerCampPPtPage.lua">
+<![CDATA[
+local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+local Lan = NPL.load("Mod/GeneralGameServerMod/Command/Lan/Lan.lua");
+RedSummerCampPPtPage.OnInit()
+function ClosePage()
+    local pageCtrl = document:GetPageCtrl();
+    pageCtrl:CloseWindow(true)
+end
+
+function ClosePPtAllPage()
+    RedSummerCampPPtPage.ClosePPtAllPage()
+end
+
+function LessonsPPtData(index)
+    if(index == nil) then
+        return #RedSummerCampPPtPage.LessonsPPtData;
+    else
+        return RedSummerCampPPtPage.LessonsPPtData[index];
+    end
+end
+RedSummerCampPPtPage.NotesData = {{}}
+function NotesData(index)
+    if(index == nil) then
+        return #RedSummerCampPPtPage.NotesData;
+    else
+        return RedSummerCampPPtPage.NotesData[index];
+    end
+end
+
+function SelectLesson(index)
+    RedSummerCampPPtPage.SelectLesson(index)
+end
+
+function IsSelect(index)
+    return RedSummerCampPPtPage.SelectLessonIndex == index
+    --return true
+end
+
+function GetPPtTitle()
+    return RedSummerCampPPtPage.GetPPtTitle()
+end
+
+function GetPPtStr()
+    return RedSummerCampPPtPage.GetPPtStr()
+end
+
+function OpenFullPage()
+    return RedSummerCampPPtPage.OpenFullPage()
+end
+
+function IsShowCloseAllPageBt()
+    return RedSummerCampPPtPage.IsShowCloseAllPageBt()
+end
+
+function OpenLocalServer()
+    Lan:SetEnableSnapshot(true);
+    Lan:StartServer();
+end
+]]>
+</script>
+<style type="text/mcss">
+    {
+        left = {
+            width = 373,
+            height = 390,
+            float = "left",
+            ["margin-left"] = 30,
+            ["margin-top"] = 20,
+        },
+
+        right = {
+            width = 294,
+            height = 390,
+            float = "left",
+            ["margin-left"] = 0,
+            ["margin-top"] = -30,
+        },        
+
+        mainwork = {
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj2_64X64_32bits.png#0 0 256 64:223 46 16 16",
+            width = 365,
+            ["min-height"] = 150,
+            float = "left",
+            ["margin-left"] = 0,
+            ["margin-top"] = 0,
+            ["padding-top"] = 50,
+            padding = 35,
+            ["text-align"] = "center",
+            ["base-font-size"] = 22,
+            ["font-size"] = 22,
+        },  
+
+        F1 = {
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/9_32bits.png#0 0 32 32:8 8 8 8",
+            width = 236,
+            height = 74,
+            color = "#212122",
+            padding = 7,
+            ["margin-left"] = 25,
+            ["margin-top"] = 24,
+            ["text-align"] = "center",
+            ["base-font-size"] = 20,
+            ["font-size"] = 20,
+        },  
+        share = {
+            width = 312,
+            float = "left",
+            ["margin-left"] = 35,
+            ["margin-top"] = 10,
+        },  
+    }
+</style>
+
+<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+    <!--Vip-->
+    <div>
+        <div style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+        <div style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+        <div style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+        <div style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+        <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+    </div>
+    <pe:container alignment="_rt" style="background:url();">
+        <pe:if condition='<%=IsShowCloseAllPageBt()%>'>
+            <input name="student_num" type="button" value='学生(0)' onclick="OpenLocalServer" 
+                style="font-size: 20px; width: 112px;height: 50px; 
+                    margin-right:16px;margin-top:25px;
+                    background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#205 112 86 46);" />
+            <input type="button" value='' onclick="OpenFullPage" style="width: 112px;height: 52px; margin-right:76px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B1_112X52_32bits.png#0 0 112 52);" />
+            <input type="button" value='' onclick="ClosePPtAllPage" style="margin-right:15px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn3_64X70_32bits.png#0 0 64 70);" />
+        </pe:if>
+
+        <pe:if condition='<%=not IsShowCloseAllPageBt()%>'>
+            <input type="button" value='' onclick="OpenFullPage" style="width: 112px;height: 52px; margin-right:155px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B1_112X52_32bits.png#0 0 112 52);" />
+        </pe:if>
+        <!-- <input type="button" value='' onclick="OpenVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" /> -->
+    </pe:container>
+        
+    <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+        <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+    </pe:container>
+    
+    <pe:container alignment="_ct" style="margin-left:-532px;margin-top:-326px;width:1024px;height:612px;background:url();">
+        <!--背景水印-->
+        <div name="win_left" style="float: left; margin-left: 0px;margin-top: 0px; width:192px;height:606px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/7_32bits.png#0 0 32 32:8 8 8 8);">
+            <div type ="box" style="width:210px;height:604px;margin-left:-5px;margin-top: 5px;float: left;">
+                <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" 
+                    DataSource='<%=LessonsPPtData %>'>
+                    <Columns>
+                        <div style="width: 176px; height: 36px;">
+                            <div onclick="SelectLesson" name='<%=Eval("index")%>' style="position: relative;width: 176px;height: 36px;"></div>
+                            <pe:if condition='<%=IsSelect(Eval("index")) %>'>
+                                <div style="position: relative;padding-left: 3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 18px; height: 27px; background: Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/10_13X27_32bits.png#0 0 13 27;">
+                                    <div style="float: left;text-align: right;width: 18px; margin-left: -6px; margin-top: 4px; base-font-size:12px;font-size: 12px;color: #ffffff;"><%=Eval("index")%></div>
+                                </div>
+                            </pe:if>
+
+                            <pe:if condition='<%=not IsSelect(Eval("index")) %>'>
+                                <div style="position: relative;padding-left: 3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 18px; height: 27px; background:">
+                                    <div style="float: left;text-align: right;width: 18px; margin-left: -6px; margin-top: 4px; base-font-size:12px;font-size: 12px;color: #ffffff;"><%=Eval("index")%></div>
+                                </div>
+                            </pe:if>
+
+                            
+                            <div style="float: left;margin-left: 22px; margin-top: 4px; width: 28px; height: 24px; background: Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/12_32X27_32bits.png#0 0 32 27;">
+                                <pe:if condition='<%=IsSelect(Eval("index")) %>'>
+                                    <div style="position: relative;margin-left: 0px; margin-top: 0px; width: 28px; height: 24px; background: Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/11_32X27_32bits.png#0 0 32 27;">
+                                    </div>
+                                </pe:if>
+                            </div>
+                            <div style="float: left;margin-left: 6px; margin-top: 7px; base-font-size:12px;font-size: 12px;color: #ffffff;"><%=Eval("title")%></div>
+                        </div>
+                    </Columns>
+                    <EmptyDataTemplate>
+                    </EmptyDataTemplate>
+                </pe:gridview>
+            </div>
+        </div>
+
+        <div name="win_right" style="float: left;width: 804px;height: 610px;margin-left: 5px;">
+            <div style="position: relative;margin-left: 30px;base-font-size:16px;font-size: 16px;">
+                <div style="margin-top: 40px;margin-left: 30px; base-font-size:26px; font-size:26px;font-weight:bold;color: #212122; "><%=GetPPtTitle()%></div>
+                <!-- <div class="left">
+                    <step value="1">
+                        作品探索 迷宫游戏<br/>
+                        <action type="explore" projectid="536"/>
+                        <action type="dailyVideo" id="75" />
+                        这里还可以有任意的HTML文字或图片， 图片最好用完整的HTTP路径
+                    </step>
+                </div>
+
+                <div class="right">
+                    <div class="mainwork">
+                        <step value="2">
+                            <action type="button" value="任务1 代码闯关" projectid="536"/>
+                            升国旗
+                        </step> 
+                        <step value="2">
+                            <action type="loadworld" value="任务2 创造你的作品"/>
+                            <div class="F1"> 
+                                F1: 气球升起<br/>
+                                一直旋转的物品
+                            </div> 
+                        </step>
+                    </div>
+                    <step value="3" class="share">
+                        <action type="saveAndShare"/>
+                    </step>
+                </div>
+
+                <pe:gridview style="margin-left:0px;width:825px;height: 114px; " name="notes_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" DataSource='<%=NotesData %>'><Columns>
+                        在学生自由创作的过程中， 老师大屏幕可以放这页PPT。<br/>
+                        第一课的作品探索环节比较特殊，包含了产品介绍，因此比后面的课会长一些。 所以如果课时小于90分钟， 建议老师取消任务1的环节。 <br/>
+                        写给老师的话：<br/>
+                        第一课由于学生首次接触，可能会遇到软件更新，注册等问题，老师可能会比较辛苦。后面随着学生熟悉软件， 基本可以立即进入到自主学习状态，老师会越来越轻松。<br/>
+                        写给老师的话：<br/>
+                        第一课由于学生首次接触，可能会遇到软件更新，注册等问题，老师可能会比较辛苦。后面随着学生熟悉软件， 基本可以立即进入到自主学习状态，老师会越来越轻松。<br/>
+                        写给老师的话：<br/>
+                        第一课由于学生首次接触，可能会遇到软件更新，注册等问题，老师可能会比较辛苦。后面随着学生熟悉软件， 基本可以立即进入到自主学习状态，老师会越来越轻松。<br/>
+                </Columns></pe:gridview> -->
+                <%=GetPPtStr()%>
+            </div>
+
+            <div style="position: relative;">
+                <div style="width: 826px;height: 492px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj1_64X64_32bits.png#0 0 64 64:20 15 20 28);"></div>
+                <div style="width: 826px;height: 172px;margin-top: -44; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj3_64X64_32bits.png#0 0 64 64:20 15 20 28);"></div>
+            </div>
+        </div>
+        
+    </pe:container>
+    
+</pe:container>
+
+</pe:mcml>
+</body>
+</html>
+

@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local LessonActivityRank = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/Moon/LessonActivityRank.lua");
+    LessonActivityRank.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+ 
+    function Button_DS_Items(index)
+        if index == nil then
+            return #LessonActivityRank.RankData
+        else
+            return LessonActivityRank.RankData[index]
+        end
+    end
+
+    function IsShowEmpty()
+        return LessonActivityRank.IsEmpty
+    end
+
+    function IsSelectScoreRank()
+        return LessonActivityRank.cur_select == "exp"
+    end
+
+    function GetRecudedNumberDesc(score)
+        return LessonActivityRank.GetRecudedNumberDesc(score)
+    end
+
+    function IsUseDefaul(portrait)
+        if portrait then
+            return false
+        end
+
+        return true
+    end
+
+    function GetMyData(key)
+        local myRank = LessonActivityRank.self_rank[LessonActivityRank.cur_select]
+        if myRank then
+            return myRank[key] or 0
+        end
+        return 0
+    end
+
+    function OnClickRank(name)
+        LessonActivityRank.OnClickRank(name)
+    end
+
+]]></script>
+<kp:window name="iframe" width="958" height="585"  icon_width="232" icon_height = "62" onclose="ClosePage">
+    <div style="color:#ffffff;" class="kp_window_container">
+        <!-- left -->
+        <div style="width: 130px;height: 544px; float: left;" >
+            <pe:if condition='<%=IsSelectScoreRank()%>'>
+                <input onclick="OnClickRank" type="button" name="exp" value="积分排行榜" style="margin-left: 10px; margin-top: 20px; width: 110px; height: 34px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/btn_qiehuan2_32X32_32bits.png#0 0 32 32:14 14 14 14);"/>
+                <input onclick="OnClickRank" type="button" name="duration" value="时间排行榜" style="margin-left: 10px; margin-top: 10px; width: 110px; height: 34px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/btn_qiehuan1_32X32_32bits.png#0 0 32 32:14 14 14 14);"/>
+            </pe:if>
+
+            <pe:if condition='<%=not IsSelectScoreRank()%>'>
+                <input onclick="OnClickRank" type="button" name="exp" value="积分排行榜" style="margin-left: 10px; margin-top: 20px; width: 110px; height: 34px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/btn_qiehuan1_32X32_32bits.png#0 0 32 32:14 14 14 14);"/>
+                <input onclick="OnClickRank" type="button" name="duration" value="时间排行榜" style="margin-left: 10px; margin-top: 10px; width: 110px; height: 34px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/btn_qiehuan2_32X32_32bits.png#0 0 32 32:14 14 14 14);"/>
+            </pe:if>
+        </div>
+        <!-- right -->
+        <div style="width: 795px;height: 544px; background:; float: left;" >
+            <pe:if condition='<%=IsShowEmpty() %>'>
+                <div style="position:relative;text-align:center;color: #000000;margin-top: 240px;base-font-size:24px;font-size: 24px;">正在获取排行榜数据...</div>
+            </pe:if>
+            <div style="margin-left: 8px;margin-top: 10px;width: 795px;height: 28px;background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/di1_64X62_32bits.png#0 0 64 28:13 13 13 13);">
+                <div style="float: left; margin-left: 33px;margin-top: 7px;width: 32px;height: 15px;background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/zi11_32X15_32bits.png#0 0 32 15);"></div>
+                <div style="float: left; margin-left: 129px;margin-top: 7px;width: 32px;height: 15px;background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/zi12_32X15_32bits.png#0 0 32 15);"></div>
+                <div style="float: left; margin-left: 130px;margin-top: 7px;width: 64px;height: 16px;background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/zi6_63X15_32bits.png#0 0 64 16);"></div>
+                <div style="float: left; margin-left: 201px;margin-top: 7px;width: 31px;height: 15px;background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/zi7_63X15_32bits.png#0 0 31 15);"></div>
+            </div>
+            <div type ="box" style="width:830px;height:352px;margin-left: 0px;margin-top: 0px;float: left;">
+                <pe:gridview style="width:830px;height:352px;float:left" name="item_gridview" CellPadding="6" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "35" 
+                    DataSource='<%=Button_DS_Items%>'>
+                    <Columns>
+                            <div style="margin-left: 0px;margin-top: 0px;width: 795px;height: 54px;background:">   
+                                <div zorder="-2" style="position:relative;margin-left: 0px;margin-top: 0px;width: 795px;height: 54px;background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/tiao2_32X32_32bits.png#0 0 32 32:13 13 13 13);"></div>                             
+                                <div style="position:relative;margin-left: 0px;margin-top: 0px;width: 795px;height: 54px;">
+                                    <div style="width: 53px;height: 54px;float: left;">
+                                        <div style="position: relative; width: 60px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 21px;"><%=Eval("rank")%></div>
+                                        <pe:if condition='<%=Eval("rank") == 1 %>'>
+                                            <div zorder="1" style="position: relative; margin-top: 9px;margin-left: 30px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/macro/lessonmoon/1_42X37_32bits.png#0 0 42 37);"></div>
+                                        </pe:if>
+                                        <pe:if condition='<%=Eval("rank") == 2 %>'>
+                                            <div zorder="1" style="position: relative; margin-top: 9px;margin-left: 30px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/macro/lessonmoon/2_42X37_32bits.png#0 0 42 37);"></div>
+                                        </pe:if>
+                                        <pe:if condition='<%=Eval("rank") == 3 %>'>
+                                            <div zorder="1" style="position: relative; margin-top: 9px;margin-left: 30px;width:42px;height:37px;background:url(Texture/Aries/Creator/keepwork/macro/lessonmoon/3_42X37_32bits.png#0 0 42 37);"></div>
+                                        </pe:if>
+                                    </div>
+                                    <div style="margin-left:142px;margin-top:9px;float: left;width: 38px;height: 38px;">
+                                        <pe:if condition='<%=not IsUseDefaul(Eval("portrait"))%>'>
+                                            <img zorder="-1" src='<%=Eval("portrait")%>' style="position: relative;" width="38" height="38" onclick="ClickHead" param1='<%= Eval("index") %>'/>
+                                        </pe:if>
+                                        <pe:if condition='<%=IsUseDefaul(Eval("portrait"))%>'>
+                                            <img zorder="-1" src="Texture/Aries/Creator/keepwork/UserInfo/renwu_32bits.png" style="position: relative;margin-left: 4px;margin-top: 2px;" width="38" height="38" onclick="ClickHead" param1='<%= Eval("index") %>'/>
+                                        </pe:if>
+                                        <div style="position: relative;margin-left: 0px;margin-top: 0px;width: 38px;height: 38px;background: url(Texture/Aries/Creator/keepwork/rank/touxiangk2_32X32_32bits.png#0 0 32 32);"></div> 
+                                    </div>
+                                    <div style="margin-left: 232px;margin-top: -54px;width: 580px;height: 54px;float: left;">
+                                        <div onclick="ClickHead" param1='<%= Eval("index") %>' tooltip='<%=Eval("tool_name")%>' style="float: left;width: 240px;height: 24px; text-align: center; color: #0d329b;base-font-size:20px;font-size: 20px;margin-top: 12px;margin-left: 38px;"><%=Eval("name")%></div>
+                                        <pe:if condition='<%=IsSelectScoreRank()%>'>
+                                            <div tooltip='<%=Eval("exp")%>' style="float: left;width: 70px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 97px;"><%=GetRecudedNumberDesc(Eval("exp"))%></div>
+                                        </pe:if>
+                                        <pe:if condition='<%=not IsSelectScoreRank()%>'>
+                                            <div tooltip='<%=Eval("duration")%>' style="float: left;width: 70px;height: 24px; text-align: center; color: #000000;base-font-size:18px;font-size: 18px;font-weight:bold;margin-top: 14px;margin-left: 97px;"><%=GetRecudedNumberDesc(Eval("duration"))%></div>
+                                        </pe:if>
+                                    </div>
+                                </div> 
+                            </div>         
+                    </Columns>
+                    <EmptyDataTemplate>
+                    </EmptyDataTemplate>
+                </pe:gridview>
+            </div>
+            <!-- myrank -->
+            <div style="margin-left: 6px;margin-top: 50px;width: 750px;height: 78px;background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/tiao1_32X32_32bits.png#0 0 32 32:13 13 13 13);">
+                <div zorder="1" style="position:relative;margin-top: 5px;margin-left: 5px;width:116px;height:26px;background:url(Texture/Aries/Creator/keepwork/macro/lessonmoon/biaoqian_116X26_32bits.png#0 0 116 26);"></div>
+                <div style="position:relative;width: 750px;height: 54px;margin-top: 15px;">
+                    <div style=" margin-left: 0px; margin-top: -13px; width: 750px; height: 74px; background: url(Texture/Aries/Creator/keepwork/macro/lessonmoon/biaoqian2_750X74_32bits.png#0 0 750 74);">
+                        <div style="font-size: 20px; base-font-size: 20px; font-weight: bold; margin-top: 20px;margin-left: 100px; width: 320px; height: 50; color: #000000; ">
+                            <div style="margin-left: 10px;margin-top: 10px;">积分</div>
+                            <div style="position:relative;width: 90px;height: 24px; text-align: center; margin-top: -29px;margin-left: 47px;"><%=GetMyData("exp")%></div>
+                            <div style="margin-left: 150px;margin-top: -30px;">排名</div>
+                            <pe:if condition='<%=GetMyData("rank") == 0%>'>
+                                <div style="position:relative;width: 90px;height: 24px; text-align: center; margin-top: -29px;margin-left: 197px;">未上榜</div>
+                            </pe:if>
+                            <pe:if condition='<%=GetMyData("rank") ~= 0%>'>
+                                <div style="position:relative;width: 60px;height: 24px; text-align: center; margin-top: 20px;margin-left: 27px;"><%=GetMyData("rank")%></div>
+                            </pe:if>
+                        </div>
+                        <div style="font-size: 20px; base-font-size: 20px; font-weight: bold;margin-top: -50px; margin-left: 430px; width: 320px; height: 50; color: #ffffff;">
+                            <div style="margin-left: 10px;margin-top: 10px;">时间</div>
+                            <div style="position:relative;width: 90px;height: 24px; text-align: center; margin-top: -29px;margin-left: 47px;"><%=GetMyData("duration")%></div>
+                            <div style="margin-left: 150px;margin-top: -30px;">排名</div>
+                            <pe:if condition='<%=GetMyData("rank") == 0%>'>
+                                <div style="position:relative;width: 90px;height: 24px; text-align: center; margin-top: -29px;margin-left: 197px;">未上榜</div>
+                            </pe:if>
+                            <pe:if condition='<%=GetMyData("rank") ~= 0%>'>
+                                <div style="position:relative;width: 60px;height: 24px; text-align: center; margin-top: 20px;margin-left: 27px;"><%=GetMyData("rank")%></div>
+                            </pe:if>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+        </div> 
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>

@@ -139,6 +139,12 @@ end
 
 -- block_types.register_basics
 function block_types.init()
+	-- simply ensure, all game mode are loaded, just incase they registered new block types.
+	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+	if(GameLogic.InitMod) then
+		GameLogic.InitMod();
+	end
+
 	-- register all types.
 	block_types.register_basics();
 end

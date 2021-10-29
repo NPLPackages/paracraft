@@ -50,7 +50,20 @@ function MovieClipController.OnInit()
 	self:OnActiveMovieClipChange(MovieManager:GetActiveMovieClip());
 	Game.SelectionManager:Connect("selectedActorChanged", self, self.OnSelectedActorChange, "UniqueConnection");
 	MovieClipController.AutoSelectActorInEditor()
+	GameLogic.GetFilters():add_filter("show", MovieClipController.ShowCommandFilter);
 end
+
+function MovieClipController.ShowCommandFilter(name, bShow)
+	if(name == "movie.controller") then
+		local movie_clip = MovieManager:GetActiveMovieClip();
+		if(movie_clip) then
+			MovieClipController:ShowAllGUI(bShow~=false, true);
+		end
+		return;
+	end
+	return name;
+end
+
 
 -- we will select the first actor in the movie block if there is a code block nearby 
 -- otherwise, we will select the default camera object in the movie block. 
@@ -110,9 +123,6 @@ end
 -- show/hide timeline and controller GUI. 
 -- @param bForceEditorMode: true to force editor mode. 
 function MovieClipController:ShowAllGUI(bShow, bForceEditorMode)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
-	local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
-	
 	if(bShow) then
 		if(bForceEditorMode) then
 			self:SetForceEditorMode(bForceEditorMode);
@@ -127,9 +137,9 @@ function MovieClipController:ShowAllGUI(bShow, bForceEditorMode)
 			end);
 		end
 	else
-		self:ShowTimeline();
-		MovieClipController.ShowPage(false);
-		QuickSelectBar.ShowPage(false);
+		if(MovieClipController.IsVisible()) then
+			MovieManager:SetActiveMovieClip(nil);
+		end
 	end
 end
 
@@ -159,9 +169,9 @@ function MovieClipController.OnClosePage()
 	self.RestoreFocusToCurrentPlayer();
 	Game.SelectionManager:Disconnect("selectedActorChanged", self, self.OnSelectedActorChange);
 	
-    if(self.activeClip and self.activeClip:GetEntity()) then
-        self.activeClip:GetEntity():MarkForUpdate();
-    end
+	if(self.activeClip and self.activeClip:GetEntity()) then
+		self.activeClip:GetEntity():MarkForUpdate();
+	end
 
 	MovieClipController:OnActiveMovieClipChange(nil);
 end

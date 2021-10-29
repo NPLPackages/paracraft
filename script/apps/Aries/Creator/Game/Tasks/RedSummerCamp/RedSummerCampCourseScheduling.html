@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua");
+    RedSummerCampCourseScheduling.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+    function GetDateStr()
+        return RedSummerCampCourseScheduling.GetDateStr()
+    end
+
+    function OnClickNextMonth()
+        RedSummerCampCourseScheduling.OnClickNextMonth()
+    end
+
+    function OnClickPreMonth()
+        RedSummerCampCourseScheduling.OnClickPreMonth()
+    end
+
+    function IsHaveHistroy()
+        return RedSummerCampCourseScheduling.IsHaveHistroy()
+    end
+
+    function GetItemData()
+        return RedSummerCampCourseScheduling.lessonCnf
+    end
+
+    function GetItemIcon(index)
+        local index = tonumber(index)
+        return string.format("width: 94px;height: 94px; background: url(%s);",RedSummerCampCourseScheduling.lessonCnf[index].icon)
+    end
+
+    function OnClickLesson(name)
+        RedSummerCampCourseScheduling.OnClickLesson(name)
+    end
+
+    function GetHistroyData()
+        return RedSummerCampCourseScheduling.curLearnHistroy
+    end
+
+    function GetHistroyIcon(index)
+        local index = tonumber(index)
+        return string.format("width: 94px;height: 94px; background: url(%s);",RedSummerCampCourseScheduling.curLearnHistroy[index].icon)
+    end
+
+    function CheckCanLearn(key)
+        return RedSummerCampCourseScheduling.CheckCanLearn(key)
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc"> </pe:container>
+<pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+    <!--Close-->
+    <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+        <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+    </pe:container>
+    
+    <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">
+        <!--背景水印-->
+        <div style="margin-top: -20px;">
+            <div zorder="-1" style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            <div zorder="-1" style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            <div zorder="-1" style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            <div zorder="-1" style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            <div zorder="-1" style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+        </div>
+        <!-- LOGO -->
+        <div style="margin-top: 20px; margin-left: 40px; width: 137px; height: 45px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/LOGO_137X45_32bits.png#0 0 137 45);"></div>
+        <!-- LEFT -->
+        <pe:container uiname="left_container" style="margin-left: 30px;margin-top: 14px; width: 630px; height: 502px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj_128X256_32bits.png#0 0 128 256:30 100 30 40);">
+            <div  style="margin-left: 40px; margin-top: 20px; font-size: 26px; base-font-size: 26px; font-weight: bold; color: #ffffff;"><%=GetDateStr()%></div>
+            <div style="margin-left: 480px; margin-top: -20px;">
+                <input type="button" onclick="OnClickNextMonth" style="width: 28px; height: 18px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/1_28X18_32bits.png#0 0 28 18);"/>
+                <input type="button" onclick="OnClickPreMonth" style="margin-left: 40px; width: 28px; height: 18px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/2_28X18_32bits.png#0 0 28 18);"/>
+            </div>
+        </pe:container>
+        <!-- RIGHT -->
+        <div style="float:left;margin-left:680px;margin-top:-500px;width:570px;height:482px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 53 72 135 : 30 60 30 60);">
+            <pe:if condition="<%=IsHaveHistroy()%>">
+                
+                <div style=" margin-top: 90px;">
+                    <pe:repeat DataSource="<%=GetHistroyData()%>">
+                        <pe:repeatitem>
+                            <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetHistroyIcon(Eval("index"))%>'></div>
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
+                            </div>
+                        </pe:repeatitem>
+                    </pe:repeat>        
+                </div>
+                <div style= "margin-top: 20px;">
+                    <pe:repeat DataSource="<%=GetItemData()%>">
+                        <pe:repeatitem>
+                            <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
+                                <div style="margin-left: 100px; margin-top: -38px; font-size: 14px; base-font-size: 14px; color: #ffffff;"><%=Eval("num")%></div>
+                                <pe:if condition='<%=not CheckCanLearn(Eval("key"))%>'>
+                                    <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">
+                                    </div>
+                                </pe:if>
+                            </div>
+                        </pe:repeatitem>
+                    </pe:repeat>        
+                </div>
+                <div zorder = "-1" style="margin-top: -200px; margin-left: 12px; position: relative; width: 546px; height: 270px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/8_32bits.png#0 0 32 32:14 14 14 14); "></div>
+                <div style="position: relative; margin-top: -382px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
+                <div style="position: relative;margin-top: -332px; margin-left: 30px; font-size: 20px; base-font-size: 20px; color: #ffffff; font-weight: bold;" >最近使用</div>
+            </pe:if>
+
+            <pe:if condition="<%=not IsHaveHistroy()%>">
+                <div style= "margin-top: 60px;">
+                    <pe:repeat DataSource="<%=GetItemData()%>">
+                        <pe:repeatitem>
+                            <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
+                                <div style="margin-left: 100px; margin-top: -38px; font-size: 14px; base-font-size: 14px; color: #ffffff;"><%=Eval("num")%></div>
+                                <pe:if condition='<%=not CheckCanLearn(Eval("key"))%>'>
+                                    <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">
+                                    </div>
+                                </pe:if>
+                            </div>
+                            
+                        </pe:repeatitem>
+                    </pe:repeat>        
+                </div>
+                <div style="position: relative; margin-top: -236px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
+            </pe:if>
+            
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
