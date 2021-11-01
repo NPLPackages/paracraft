@@ -22,7 +22,8 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
-
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local profile = KeepWorkItemManager.GetProfile()
 local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.Actor"), commonlib.gettable("MyCompany.Aries.Game.Movie.ActorGUIText"));
 
 -- default text values. 
@@ -354,8 +355,11 @@ function Actor:FrameMovePlaying(deltaTime)
 		if(self:GetTextOrder() ~= self:GetCurrentTextOrder()) then
 			return;
 		end
-
 		
+		local text = values.text
+		if profile and profile.nickname ~= nil then
+			values.text = text:gsub("%%name%%",profile.nickname)
+		end
 
 		local fromTime, toTime = var:getTimeRange(1, curTime);
 		
