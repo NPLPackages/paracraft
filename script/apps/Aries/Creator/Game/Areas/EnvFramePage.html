@@ -81,15 +81,25 @@ end
 function ChangeWeather(name,mcmlNode)
     NPL.load("(gl)script/apps/Aries/Creator/Env/SkyPage.lua");
 	local SkyPage = commonlib.gettable("MyCompany.Aries.Creator.SkyPage");
+    local cmdStr = ""
     if(string.match(name,"sun")) then
-        SkyPage.OnChangeSkybox(2);
+        SkyPage.OnChangeSkybox(2); 
+        cmdStr = "/sky model/skybox/skybox15/skybox15.x"
     elseif(string.match(name,"cloudy")) then
-        SkyPage.OnChangeSkybox(1);
+        SkyPage.OnChangeSkybox(1); 
+        cmdStr = "/sky sim"
     elseif(string.match(name,"rain")) then
         GameLogic.RunCommand("/rain");
+        cmdStr = "/rain"
     elseif(string.match(name,"snow")) then
         GameLogic.RunCommand("/snow");
+        cmdStr = "/snow"
     end
+
+    if EnvFramePage.changecb then
+        EnvFramePage.changecb("cmd",cmdStr)
+    end
+    --GameLogic.GetFilters():apply_filters('weatherChange',"cmd",cmdStr)
 end
 
 function SetLightColor(name,mcmlNode)    

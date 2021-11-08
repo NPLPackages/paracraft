@@ -416,7 +416,7 @@ end
 -- @param text: macro command text or just macro function name
 -- @param ...: additional input parameters to macro function name
 function Macros:AddMacro(text, ...)
-	if (self:IsPause()) then 
+	if (self:IsPaused()) then 
 		return 
 	end 
 	local args = {...}
@@ -431,8 +431,8 @@ function Macros:AddMacro(text, ...)
 				break
 			end
 		end
-		for i = 1, argCount do  -->获取参数总数
-			local param = args[i]; -->读取参数
+		for i = 1, argCount do 
+			local param = args[i];
 			if(params) then
 				param = param == nil and "nil" or commonlib.serialize_compact(param)
 				params = params..",".. param;
@@ -446,9 +446,9 @@ function Macros:AddMacro(text, ...)
 			text = text.."()";
 		end
 	end
-	if (self:IsPause()) then self:Restore() end 
+	if (self:IsPaused()) then self:Resume() end 
 	local idleTime = commonlib.TimerManager.GetCurrentTime() - idleStartTime - self:GetPauseTime();
-	self:SetPauseTime(0); -- 清除暂停时间
+	self:SetPauseTime(0); 
 
 	if(idleTime > 100) then
 		idleStartTime = commonlib.TimerManager.GetCurrentTime();
@@ -496,24 +496,27 @@ function Macros:AddMacro(text, ...)
 	end
 end
 
--- 引入宏录制暂停机制, 避免播放时等待时间过长, 暂停后最好引入一层透明遮罩, 避免误操作
-function Macros:IsPause()
-	return pause.isPause;
+-- whether we paused recording or playing
+function Macros:IsPaused()
+	return pause.IsPaused;
 end
 
 function Macros:Pause()
-	pause.isPause = true;
+	pause.IsPaused = true;
 	pause.startPauseTime = commonlib.TimerManager.GetCurrentTime();
 	pause.endPauseTime = nil;
 	pause.pauseTime = 0;
-	-- 引入遮罩 UI
+	-- TODO: shall we add a black UI overlay?
 end
 
-function Macros:Restore()
-	if (not pause.isPause) then return end
-	pause.isPause = false;
+function Macros:Resume()
+	if (not pause.IsPaused) then return end
+	pause.IsPaused = false;
 	pause.endPauseTime = commonlib.TimerManager.GetCurrentTime();
 	pause.pauseTime = pause.endPauseTime - pause.startPauseTime;
+	if(self.isPlaying) then
+		self:ResumePlayMacros()
+	end
 end
 
 function Macros:GetPauseTime()
@@ -739,6 +742,8 @@ function Macros:BeginPlay()
 	self:ResetLastCameraParams()
 
 	self.isPlaying = true;
+	pause.IsPaused = false;
+
 	Macros.SetNextKeyPressWithMouseMove(nil, nil)
 	MacroPlayer.ShowPage();
 	self:LockInput()
@@ -749,14 +754,19 @@ function Macros:BeginPlay()
 	GameLogic.GetFilters():apply_filters("Macro_BeginPlay");
 end
 
+
+
 function Macros.OnShowExitDialog(p1)
 	if(p1 == false) then
 		return
 	end
 	if(Macros:IsPlaying()) then
+		Macros:Pause()
 		_guihelper.MessageBox(L"是否退出示教系统?", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				Macros:Stop();
+			else
+				Macros:Resume()
 			end
 		end, _guihelper.MessageBoxButtons.YesNo);
 		return false;
@@ -808,6 +818,12 @@ function Macros:FindNextMacro(name, fromIndex)
 	end
 end
 
+function Macros:ResumePlayMacros()
+	if(self.macros and self.curLine and self.isPlaying and self.needResumePlay) then
+		self:PlayMacros(self.macros, self.curLine + 1)
+	end
+end
+
 -- @param fromLine: optional
 function Macros:PlayMacros(macros, fromLine, speed)
 	fromLine = fromLine or 1
@@ -818,8 +834,8 @@ function Macros:PlayMacros(macros, fromLine, speed)
 		end
 	end
 	self.macros = macros;
-
-	function play()
+	self.needResumePlay = false;
+	local function play()
 		while(true) do
 			local m = macros[fromLine];
 			if(m) then
@@ -831,7 +847,11 @@ function Macros:PlayMacros(macros, fromLine, speed)
 				m:Run(function()
 					if(isAsync) then
 						if(self.isPlaying) then
-							self:PlayMacros(macros, fromLine+1)
+							if(not self:IsPaused()) then
+								self:PlayMacros(macros, fromLine+1)
+							else
+								self.needResumePlay = true;
+							end
 						end
 					else
 						isAsync = false;
@@ -858,7 +878,10 @@ function Macros:PlayMacros(macros, fromLine, speed)
 	if (fromLine == 1) then
 		self.firstTextPrepared = false;
 		self.elapsedPrepareTime = 0;
-		self.checkText = self.checkText or commonlib.Timer:new({callbackFunc = function(timer)
+		if(self.checkText) then
+			self.checkText:Change();
+		end
+		self.checkText = commonlib.Timer:new({callbackFunc = function(timer)
 			self.elapsedPrepareTime = self.elapsedPrepareTime + 1;
 			if (not has_playtext or self.elapsedPrepareTime >= self.maxPrepareTime or self.firstTextPrepared) then
 				self.checkText:Change();

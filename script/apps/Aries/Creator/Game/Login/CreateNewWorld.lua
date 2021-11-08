@@ -85,25 +85,43 @@ end
 -- show page
 -- is_close:is only close page when click retturn button
 function CreateNewWorld.ShowPage(is_only_close)
-	CreateNewWorld.is_only_close = is_only_close
-	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
-	if(isCustomShow == "show") then
-		System.App.Commands.Call("File.MCMLWindowFrame", {
-			url = "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html", 
-			name = "CreateMCNewWorld", 
-			isShowTitleBar = false,
-			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			zorder = 0,
-			allowDrag = false,
-			directPosition = true,
-				align = "_ct",
-				x = -700/2,
-				y = -450/2,
-				width = 700,
-				height = 450,
-			cancelShowAnimation = true,
-		});
+	local function Handle()
+		CreateNewWorld.is_only_close = is_only_close
+		local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
+		if(isCustomShow == "show") then
+			System.App.Commands.Call("File.MCMLWindowFrame", {
+				url = "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html", 
+				name = "CreateMCNewWorld", 
+				isShowTitleBar = false,
+				DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+				style = CommonCtrl.WindowFrame.ContainerStyle,
+				zorder = 0,
+				allowDrag = false,
+				directPosition = true,
+					align = "_ct",
+					x = -700/2,
+					y = -450/2,
+					width = 700,
+					height = 450,
+				cancelShowAnimation = true,
+			});
+		end
+	end
+
+	if (System.options.loginmode == "online") then
+		GameLogic.GetFilters():apply_filters(
+            "service.keepwork_service_world.limit_free_user",
+            false,
+            function(result)
+                if result then
+                    Handle();
+                else
+                    _guihelper.MessageBox(L"操作被禁止了，免费用户最多只能拥有3个本地世界，请删除不要的本地世界，或者联系老师或家长成为会员。")
+                end
+            end
+        );
+	else
+		Handle();
 	end
 end
 

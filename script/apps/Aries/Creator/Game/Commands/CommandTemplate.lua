@@ -30,7 +30,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 Commands["loadtemplate"] = {
 	name="loadtemplate", 
-	quick_ref="/loadtemplate [-r] [-nohistory] [-abspos] [-tp] [-a seconds] [x y z] [templatename]", 
+	quick_ref="/loadtemplate [-r] [-history] [-abspos] [-tp] [-a seconds] [x y z] [templatename]", 
 	desc=[[load template to the given position
 @param -a seconds: animate building progress. the followed number is the number of seconds (duration) of the animation. 
 @param -r: remove blocks
@@ -43,7 +43,7 @@ default name is "default"
 /loadtemplate ~0 ~2 ~ test
 /loadtemplate -a 3 test
 /loadtemplate -r test
-/loadtemplate -nohistory test
+/loadtemplate -history test    allow ctrl+z to undo
 /loadtemplate ~/test   in writable global temp directory
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
@@ -54,8 +54,9 @@ default name is "default"
 		local option;
 		local load_anim_duration;
 		local operation = BlockTemplate.Operations.Load;
-		local UseAbsolutePos, TeleportPlayer, nohistory;
+		local UseAbsolutePos, TeleportPlayer;
 		local opaque;
+		local nohistory = fromEntity ~= EntityManager.GetPlayer();
 
 		while(cmd_text) do
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
@@ -69,8 +70,8 @@ default name is "default"
 					operation = BlockTemplate.Operations.Remove;
 				elseif (option == "abspos") then
 					UseAbsolutePos = true;
-				elseif (option == "nohistory") then
-					nohistory = true;
+				elseif (option == "history") then
+					nohistory = nil;
 				elseif (option == "tp") then
 					TeleportPlayer = true;
 				elseif (option == "opaque") then

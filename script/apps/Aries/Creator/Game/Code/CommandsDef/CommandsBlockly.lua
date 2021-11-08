@@ -14,10 +14,10 @@ commonlib.setfield("MyCompany.Aries.Game.Code.CommandsBlockly", CommandsBlockly)
 local all_cmds = {}
 local cmdsMap = {};
 local default_categories = {
-{name = "CommandBlocks", text = L"方块", colour="#0078d7", },
-{name = "CommandGlobal", text = L"全局" , colour="#7abb55", },
 {name = "CommandRules", text = L"规则", colour="#764bcc", },
+{name = "CommandBlocks", text = L"方块", colour="#0078d7", },
 {name = "CommandControl", text = L"控制", colour="#459197", },
+{name = "CommandGlobal", text = L"全局" , colour="#7abb55", },
 };
 
 local is_installed = false;

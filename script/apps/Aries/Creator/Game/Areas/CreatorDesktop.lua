@@ -168,7 +168,7 @@ CreatorDesktop.tabview_ds = {
 
 CreatorDesktop.new_page = nil;
 CreatorDesktop.IsExpanded = false;
-
+CreatorDesktop.IsMovie = false
 function CreatorDesktop.GetTab()
 	return CreatorDesktop.tabview_ds[CreatorDesktop.tabview_index];
 end
@@ -243,7 +243,7 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 			IsExpanded = true;
 		end
 	end
-	if(IsExpanded) then
+	if(IsExpanded and not CreatorDesktop.IsMovie) then
 		GameLogic.events:AddEventListener("game_mode_change", CreatorDesktop.OnGameModeChangedNew, CreatorDesktop, "CreatorDesktop");
 	end
 
@@ -257,30 +257,36 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 	end
 	CreatorDesktop.IsExpanded = IsExpanded;
 
-	if(CreatorDesktop.IsExpanded) then
+	if(CreatorDesktop.IsExpanded and not CreatorDesktop.IsMovie) then
 		GameLogic:desktopLayoutRequested("CreatorDesktop");
 	end
-
-	CreatorDesktop.tabview_ds = {
-		{text=L"建造", name="building", url="script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html?version=1", enabled=true}, -- script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html
-		{text=L"环境", name="env", url="script/apps/Aries/Creator/Game/Areas/EnvFramePage.html?version=1", enabled=true}, -- script/apps/Aries/Creator/Game/Areas/EnvFramePage.html
-	}
-
-	-- 处理工具箱(只在二合一世界处理)
-	local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
-	local world2in1_tool_data = World2In1.GetToolItems()
-	if world2in1_tool_data and #world2in1_tool_data > 0 then
-		table.insert(CreatorDesktop.tabview_ds, {text=L"世界", name="world", url="script/apps/Aries/Creator/Game/Areas/World2In1FramePage.html?version=1", enabled=true})
-	elseif CreatorDesktop.tabview_index == 3 then
+	if CreatorDesktop.IsMovie then
+		CreatorDesktop.tabview_ds = {
+			{text=L"环境", name="env", url="script/apps/Aries/Creator/Game/Areas/EnvFramePage.html?version=1", enabled=true}, -- script/apps/Aries/Creator/Game/Areas/EnvFramePage.html
+		}
 		CreatorDesktop.tabview_index = 1;
+	else
+		CreatorDesktop.tabview_ds = {
+			{text=L"建造", name="building", url="script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html?version=1", enabled=true}, -- script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html
+			{text=L"环境", name="env", url="script/apps/Aries/Creator/Game/Areas/EnvFramePage.html?version=1", enabled=true}, -- script/apps/Aries/Creator/Game/Areas/EnvFramePage.html
+		}
+	
+		-- 处理工具箱(只在二合一世界处理)
+		local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+		local world2in1_tool_data = World2In1.GetToolItems()
+		if world2in1_tool_data and #world2in1_tool_data > 0 then
+			table.insert(CreatorDesktop.tabview_ds, {text=L"世界", name="world", url="script/apps/Aries/Creator/Game/Areas/World2In1FramePage.html?version=1", enabled=true})
+		elseif CreatorDesktop.tabview_index == 3 then
+			CreatorDesktop.tabview_index = 1;
+		end
 	end
-
-	CreatorDesktop.new_page_params = CreatorDesktop.new_page_params  or {
+	--CreatorDesktop.new_page_params or
+	CreatorDesktop.new_page_params =  {
 			url = "script/apps/Aries/Creator/Game/Areas/NewDesktopPage.html", 
 			--url = url,
 			name = "CreatorDesktop.ShowNewPage", 
 			isShowTitleBar = false,
-			DestroyOnClose = false,
+			DestroyOnClose = true,
 			bToggleShowHide=true, 
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = false,
@@ -290,8 +296,8 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 			refresh = true,
 			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
-				align = "_ctr",
-				x = 0,
+				align = CreatorDesktop.IsMovie and "_rt" or "_ctr",
+				x = CreatorDesktop.IsMovie and -240 or 0,
 				y = 0,
 				width = 240,
 				height = 480,
@@ -307,10 +313,18 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 	local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
 	if(CreatorDesktop.new_page_params._page) then
 		CreatorDesktop.new_page_params._page.OnClose = function()
+			print(commonlib.debugstack())
 			DesktopMenuPage.ActivateMenu(false);
+			if CreatorDesktop.IsMovie then
+				CreatorDesktop.IsMovie = false
+				CreatorDesktop.IsExpanded = false
+				CreatorDesktop.new_page_params.align = "_ctr"
+				CreatorDesktop.new_page_params.x = 0
+			end
+			
 		end;
 	end
-	DesktopMenuPage.ActivateMenu(IsExpanded);
+	DesktopMenuPage.ActivateMenu(IsExpanded and not CreatorDesktop.IsMovie);
 
 	GameLogic.events:DispatchEvent({type = "ShowCreatorDesktop" , bShow = IsExpanded});	
 end
@@ -321,4 +335,8 @@ function CreatorDesktop:OnLayoutRequested(requesterName)
 			CreatorDesktop.ShowNewPage(false);
 		end
 	end
+end
+
+function CreatorDesktop.SetIsMovie(isMovie)
+	CreatorDesktop.IsMovie = isMovie
 end

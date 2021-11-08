@@ -22,6 +22,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/ActorBlocks.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/ActorMovieSequence.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/ActorMusic.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");
+local EnvFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnvFramePage");
+local CreatorDesktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.CreatorDesktop");
 local ActorMusic = commonlib.gettable("MyCompany.Aries.Game.Movie.ActorMusic");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local ActorBlocks = commonlib.gettable("MyCompany.Aries.Game.Movie.ActorBlocks");
@@ -83,6 +86,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 
 	timeseries:CreateVariableIfNotExist("cmd", "Discrete");
 	timeseries:CreateVariableIfNotExist("tip", "Discrete");
+	timeseries:CreateVariableIfNotExist("weather", "LinearTable");
 	-- time of day
 	timeseries:CreateVariableIfNotExist("time", "Linear"); 
 	return self;
@@ -93,7 +97,7 @@ function Actor:GetDisplayName()
 	return L"全局";
 end
 
-local selectable_var_list = {"text", "time", "blocks", "cmd", "movieblock", "music"};
+local selectable_var_list = {"text", "time","weather","blocks", "cmd", "movieblock", "music"};
 
 -- @return nil or a table of variable list. 
 function Actor:GetEditableVariableList()
@@ -132,6 +136,23 @@ function Actor:PlayTip(curTime)
 	-- local tip = self:GetValue("tip", curTime);
 end
 
+function Actor:PlayWeather(curTime)
+	local weather = self:GetValue("weather", curTime, true);
+	if weather then
+		if weather.time then
+			ParaScene.SetTimeOfDaySTD(weather.time);
+			GameLogic.GetSim():OnTickDayLight();
+		end
+		local cmd = weather.cmd
+		if cmd then
+			if(self.weather_cmd~=cmd) then
+				self.weather_cmd = cmd;
+				CommandManager:RunText(cmd, self:GetMovieClipEntity());
+			end
+		end
+	end
+end
+
 -- day time. 
 function Actor:PlayTime(curTime)
 	local time = self:GetValue("time", curTime, true);
@@ -159,7 +180,9 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 	local h,m,s = commonlib.timehelp.SecondsToHMS(curTime/1000);
 	local strTime = string.format("%.2d:%.2d", m,math.floor(s));
 	local old_value = self:GetValue(keyname, curTime);
-
+	if keyname ~= "weather" and CreatorDesktop.IsVisible() then
+		CreatorDesktop.ShowNewPage(false);
+	end
 	if(keyname == "text") then
 		self.actor_text:CreateKeyFromUI(keyname, callbackFunc);
 	elseif(keyname == "movieblock") then
@@ -186,6 +209,28 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		self.actor_blocks:AddKeyFrameOfSelectedBlocks();
 		if(callbackFunc) then
 			callbackFunc(true);
+		end
+	elseif(keyname == "weather") then
+		CreatorDesktop.SetIsMovie(true)
+		CreatorDesktop.ShowNewPage();
+		local TestActor = self		
+		EnvFramePage.changecb = function(key ,value)
+			local curTime = TestActor:GetTime();
+			local preData = TestActor:GetValue(keyname, curTime) 
+			local weather =  preData and commonlib.copy(preData) or {}
+			if key and value then
+				if key == "time" then
+					weather[key] = tonumber(value)
+				end
+				if key == "cmd" then
+					weather[key] = tostring(value) or ""
+				end
+				TestActor:AddKeyFrameByName(keyname, nil, weather);
+				TestActor:FrameMovePlaying(0);
+				if(callbackFunc) then
+					callbackFunc(true);
+				end
+			end
 		end
 	elseif(keyname == "cmd") then
 		local title = format(L"起始时间%s, 请输入命令行(/)", strTime);
@@ -252,4 +297,5 @@ function Actor:FrameMovePlaying(deltaTime, bIsSelected)
 	self:PlayCmd(curTime);
 	self:PlayTip(curTime);
 	self:PlayTime(curTime);
+	self:PlayWeather(curTime)
 end

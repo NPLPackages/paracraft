@@ -201,7 +201,7 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 					end
 
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, bSelect=self.bSelect, nohistory = self.nohistory})
+					local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, bSelect=self.bSelect, nohistory = self.nohistory, isSilent = true})
 					task:Run();
 					
 					if( self.TeleportPlayer and root_node.attr.player_pos) then

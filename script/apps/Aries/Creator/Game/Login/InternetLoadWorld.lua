@@ -436,9 +436,9 @@ function InternetLoadWorld.GotoUrl(url)
 			local relativePath = urlObj:GetRelativePath() or ""
 			local room_key = relativePath:match("^@(.+)")
 			if(room_key and room_key~="") then
-				CommandManager:RunCommand(string.format("/connect -tunnel %s %s %s", room_key, urlObj:GetHost(), urlObj:GetPort()));	
+				CommandManager:RunCommand(string.format("/connect -tunnel %s %s %s", room_key, urlObj:GetHost(), urlObj:GetPort() or 8099));	
 			else
-				CommandManager:RunCommand(string.format("/connect %s %s", urlObj:GetHost(), urlObj:GetPort()));	
+				CommandManager:RunCommand(string.format("/connect %s %s", urlObj:GetHost(), urlObj:GetPort() or 8099));	
 			end
 			return true;
 		elseif(not url or url == "") then

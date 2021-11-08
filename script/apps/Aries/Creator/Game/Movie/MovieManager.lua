@@ -96,7 +96,7 @@ function MovieManager:BeginCapture()
 				movie_clip:Resume();
 			else
 				self.is_video_recording = false;
-				movie_clip:RefreshPlayModeUI();
+				self:SetActiveMovieClip(nil);
 			end
 		end);
 	end

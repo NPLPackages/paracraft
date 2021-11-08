@@ -60,26 +60,32 @@ function block:Init()
 end
 
 function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, camx,camy,camz, lookat_x,lookat_y,lookat_z)
-	if(side and side <4) then
-		return op_side_to_data[side];
-	elseif(side == 5) then
-		local dir = Direction.GetDirection2DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
-		if(dir == 0 or dir==1) then
-			if(BlockEngine:isBlockNormalCube(blockX, blockY, blockZ-1)) then
-				return 4
+	if(side) then
+		local dir = Direction.GetDirection3DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+		if(dir == 4 or dir == 5) then
+			-- horizontal
+			local direction = Direction.GetDirection2DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+			return 5 + direction;
+		elseif(side < 4) then
+			return op_side_to_data[side];
+		elseif(side == 5) then
+			local dir = Direction.GetDirection2DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+			if(dir == 0 or dir==1) then
+				if(BlockEngine:isBlockNormalCube(blockX, blockY, blockZ-1)) then
+					return 4
+				else
+					return 3;
+				end
 			else
-				return 3;
-			end
-		else
-			if(BlockEngine:isBlockNormalCube(blockX-1, blockY, blockZ)) then
-				return 2
-			else
-				return 1;
+				if(BlockEngine:isBlockNormalCube(blockX-1, blockY, blockZ)) then
+					return 2
+				else
+					return 1;
+				end
 			end
 		end
-	else
-		return 1;
 	end
+	return 1;
 end
 
 -- if neighbor block is indirectly powered, toggle to open state. 
@@ -98,17 +104,15 @@ function block:canProvidePower()
     return self.needPower;
 end
 
+function block:isHorizontal(x, y, z)
+	local data = BlockEngine:GetBlockData(x,y,z)
+	return  (data or 0) > 4;
+end
+
 function block:isProvidingWeakPower(x, y, z, direction)
 	if(self.needPower and self.isOpen and not self.ignore_open_door_power) then
-		if(direction == 5 and self:IsAssociatedBlockID(BlockEngine:GetBlockId(x,y+1,z))) then
+		if(direction == 5 and self:IsAssociatedBlockID(BlockEngine:GetBlockId(x,y+1,z)) and not self:isHorizontal(x, y, z)) then
 			return 15;
-		--elseif(direction == 4) then
-			--self.ignore_open_door_power = true;
-			--local neighbor_has_power = isBlockEngine:isBlockIndirectlyGettingPowered(x,y,z);
-			--self.ignore_open_door_power = false;
-			--if(neighbor_has_power and self:IsAssociatedBlockID(BlockEngine:GetBlockId(x,y-1,z))) then
-				--return 15;
-			--end
 		end
 	end
 	return 0;
@@ -189,7 +193,7 @@ end
 function block:RotateBlockData(blockData, angle, axis)
 	axis = axis or "y"
 	-- rotation around axis
-	if(axis == "y") then
+	if(axis == "y" and (blockData or 1) <= 4) then
 		local side = data_to_side[blockData or 1] or 0;
 		if(side < 4) then
 			local facing = Direction.directionTo3DFacing[side];

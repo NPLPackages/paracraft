@@ -40,6 +40,7 @@ MovieClipTimeLine.keyframes_parent_name = "keyframe_timeline_parent";
 MovieClipTimeLine.subframes_parent_name = "subframe_timeline_parent";
 
 local var_name_to_text = {
+	weather=L"天气",
 	text = L"文字",
 	bones = L"骨骼",
 	time = L"时间",
@@ -402,7 +403,6 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 						if(node.originalActor and node.originalIndex and node.originalActor~=node.actor) then
 							node.originalActor:SetCurrentEditVariableIndex(node.originalIndex);
 						end
-
 						node.actor:SetCurrentEditVariableIndex(tonumber(node.Name));
 
 						GameLogic.GetFilters():apply_filters("user_event_stat", "actor", "edit:"..tostring(node.actor:GetEditableVariable().name), 1, nil);

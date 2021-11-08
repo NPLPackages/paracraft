@@ -383,7 +383,6 @@ function GetCmdStr()
     else
         words = L"没有相应的命令存在";
     end
-    
     return words;
 end
 
@@ -392,159 +391,216 @@ function GetShortCutKeyStr()
     return str or L"空";
 end
 
+function IsShowTypeLightFram(type_index,item_index)
+    return HelpPage.IsShowTypeLightFram(type_index,item_index)
+end
+
+function IsShowGridLightFram(grid_index)
+    return HelpPage.IsShowGridLightFram(grid_index)
+end
+
 ]]></script>
-<aries:window mode="thin" title='<%=L("帮助").." (F1)"%>' style="width:680px;height:450px;" uiname_onclose="ParacraftHelpPage.ClosePage" onclose="ClosePage">
-    <div style="float:left;margin-left:2px;margin-top:5px;width:131px;">
-        <pe:treeview name="tvwHelp" DataSource='<%=GetTypeDS()%>' OnClick="ChangeType" ItemToggleSize="0" style="height:400px;background:" VerticalScrollBarOffsetX="6">
-	        <NodeTemplates>
-		        <NodeTemplate DataType="type">
-                    <pe:treenode uiname='<%="ParacraftHelpPage.Type_"..XPath("this|category") %>'  RenderTemplate="type_template" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
-                </NodeTemplate>
-                <NodeTemplate DataType="type_template">
-                    <div style="margin-left:0px;margin-top:5px;height:23px;width:123px;" class="mc_button_grey">
-                        <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == false %>'>
-                            <div style="float:left;margin-left:7px;margin-top:5px;width:6px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#476 74 6 11);"/>
-                        </pe:if>
-                        <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == true %>'>
-                            <div style="float:left;margin-left:4px;margin-top:8px;width:11px;height:6px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#417 81 11 6);"/>
-                        </pe:if>
-                        <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Type_"..XPath("this|category") %>'  name='<%=XPath("this|index") %>' style="margin-left:5px;width:100px;height:23px;font-weight:bold;color:#ffffff;text-offset-y:-2;text-align:left;background:" />    
-                    </div>
-                </NodeTemplate>
-                <NodeTemplate DataType="item">
-                    <div style="height:32px;margin-left:2px;" MouseOverBG="">
-                        <pe:if condition='<%= ItemBeSelected(XPath("this|type_index"),XPath("this|item_index")) %>'>
-                            <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Item_"..XPath("this|name") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_blue"/>    
-                        </pe:if>
-                        <pe:if condition='<%= not ItemBeSelected(XPath("this|type_index"),XPath("this|item_index")) %>'>
-                            <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Item_"..XPath("this|name") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem" param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' style="margin-top:5px;width:110px;height:23px;font-weight:bold;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_grey"/>    
-                        </pe:if>
-                    </div>
-                </NodeTemplate>
-	        </NodeTemplates>
-        </pe:treeview>
-    </div>
-    <div style="float:left;margin-left:10px;margin-top:1px;width:1px;height:421px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 1)"/>
-    <div style="float:left;width:180px;padding-top:6px;">
-        <pe:gridview name="gvwMCTask" style="height:416px;" VerticalScrollBarStep="32" DefaultNodeHeight="32" DataSource="<%=GetGridview_DS%>" ItemsPerLine="1" AllowPaging="false" RememberScrollPos="true">
-            <Columns>
-                <div style="height:32px;">
-                    <pe:if condition='<%= IsCommandCategory() %>'>
-                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
-                            <input type="button" value='<%=Eval("name") %>' enabled="false" style="margin-left:10px;margin-top:1px;width:140px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_blue"/>    
-                        </pe:if>
-                        <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
-                            <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:10px;margin-top:1px;width:140px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_grey"/>    
-                        </pe:if>
-                    </pe:if>
-                    <pe:if condition='<%= not IsCommandCategory() %>'>
-                        <pe:if condition='<%= IsTutorialCategory() %>'>
-                            <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == true %>'>
-                                <input type="button" value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' enabled="false" style="margin-left:5px;margin-top:1px;width:150px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_blue"/>    
+<pe:container  alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc">
+    <pe:container  alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+        <!--Close-->
+        <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+            <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+            <div style="margin-left: 94px; margin-top: -51px; width: 294px; height: 64px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/shentongbei_32bits.png#15 790 294 64);">
+                <div style="margin-top: 22px; margin-left: 116px; width: 38px; height: 20px; background: url(Texture/Aries/Creator/keepwork/Help/F1/zi_38X20_32bits.png#0 0 38 20);"></div>
+            </div>
+        </pe:container>
+        <!-- 下拉列表 -->
+        <div style="float:left;margin-left:15px;margin-top:35px;width:157px;">
+            <pe:treeview name="tvwHelp" DataSource='<%=GetTypeDS()%>' OnClick="ChangeType" ItemToggleSize="0" style="height:605px;background:" VerticalScrollBarOffsetX="-26">
+                <NodeTemplates>
+                    <NodeTemplate DataType="type">
+                        <pe:treenode uiname='<%="ParacraftHelpPage.Type_"..XPath("this|category") %>'  RenderTemplate="type_template" MouseOverBG="" expanded='<%=XPath("this|expanded")%>' can_select="true"></pe:treenode>
+                    </NodeTemplate>
+                    <NodeTemplate DataType="type_template">
+                        <div style="margin-left:0px;margin-top:0px;height:74px;width:160px;background-color:#1a2d9b00;" >
+                            <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == false %>'>
+                                <div style="position:absolute;margin-left:0px;margin-top:0px;height:64px;width:160px;background: url(Texture/Aries/Creator/keepwork/Help/F1/kuaijie_160X64_32bits.png#0 0 160 64);"></div>
+                                <div zorder = "1" style="position:absolute;margin-left:120px;margin-top:25px;width:14px;height:14px;background:url(Texture/Aries/Creator/keepwork/Help/F1/1_14X14_32bits.png#0 0 14 14);"/>
+                                <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Type_"..XPath("this|category") %>'  name='<%=XPath("this|index") %>'
+                                 style="font-size:20px;margin-left:15px;width:120px;height:58px;font-weight:bold;color:#ffffff;text-offset-y:0;text-offset-x:8;text-align:left;background:url(); " />    
                             </pe:if>
-                            <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == false %>'>
-                                <pe:if condition='<%= TaskIsFinished(Eval("task_index")) == true %>'>
-                                    <input type="button" uiname='<%="ParacraftHelpPage.Tutorial_"..Eval("task_index") %>' value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:1px;width:150px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_green"/>    
-                                </pe:if>
-                                <pe:if condition='<%= TaskIsFinished(Eval("task_index")) == false %>'>
-                                    <input type="button" uiname='<%="ParacraftHelpPage.Tutorial_"..Eval("task_index") %>' value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:5px;margin-top:1px;width:150px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_grey"/>    
-                                </pe:if>  
+                            <pe:if condition='<%= TypeBeExpand(XPath("this|expanded")) == true %>'>
+                                <div zorder = "-2" style="position:relative;margin-left:2px;margin-top:10px;width:157px;height:68px;background:url(Texture/Aries/Creator/keepwork/Help/F1/di_8X8_32bits.png#0 0 8 8:2 2 2 2);"></div>
+                                <div style="position:absolute;margin-left:0px;margin-top:0px;height:64px;width:160px;background: url(Texture/Aries/Creator/keepwork/Help/F1/xinshou_160X64_32bits.png#0 0 160 64);"></div>
+                                <div zorder = "1" style="position:absolute;margin-left:120px;margin-top:25px;width:14px;height:14px;background:url(Texture/Aries/Creator/keepwork/Help/F1/2_14X14_32bits.png#0 0 14 14);"/>
+                                <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Type_"..XPath("this|category") %>'  name='<%=XPath("this|index") %>'
+                                 style="font-size:20px;margin-left:15px;width:120px;height:58px;font-weight:bold;color:#000000;text-offset-y:0;text-offset-x:8;text-align:left;background:url(); " />    
                             </pe:if>
-                        </pe:if>
-                        <pe:if condition='<%= IsBlockWikiCategory() %>'>
-                                
-                            <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == true %>'>
-                                <div style="margin-left:5px;width:137px;height:32px;" class="mc_button_blue">
-                                    <pe:mc_block block_id='<%=Eval("block_id")%>' style="float:left;margin-left:4px;margin-top:4px;width:24px;height:24px;" isclickable="false"/>    
-                                    <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;background:"/>    
-                                </div>
-                                    
+                        </div>
+                    </NodeTemplate>
+                    <NodeTemplate DataType="item">
+                        <div style="height:52px;margin-left:-17px;" MouseOverBG="">
+                            <pe:if condition='<%= IsShowTypeLightFram(XPath("this|type_index"),XPath("this|item_index")) %>'>
+                                <div zorder="1" style="position: relative;margin-top:-7px;margin-left:-1px;width:164px;height:60px;background: url(Texture/Aries/Creator/keepwork/Help/F1/di3_64X64_32bits.png#0 0 64 64:16 16 16 16);"></div>
                             </pe:if>
-                            <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == false %>'>
-                                <div style="margin-left:5px;width:137px;height:32px;background:"  onclick="ChangeTask" param1='<%= Eval("task_index") %>'>
-                                    <pe:mc_block block_id='<%=Eval("block_id")%>' style="float:left;margin-left:4px;margin-top:4px;width:24px;height:24px;" isclickable="false"/>    
-                                    <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;background:"/>
-                                </div>
-                                    
+                            
+                            <div zorder="-2" style="position:relative;margin-left:2px;width:157px;height:56px;background:url(Texture/Aries/Creator/keepwork/Help/F1/di_8X8_32bits.png#0 0 8 8:2 2 2 2);"></div>
+                            <pe:if condition='<%= ItemBeSelected(XPath("this|type_index"),XPath("this|item_index")) %>'>
+                                <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Item_"..XPath("this|name") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem"
+                                 param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>' 
+                                style="margin-top:-4px;margin-left:2px;width:164px;height:52px;font-size:20px;font-weight:bold;color:#FFC300;text-align:left;text-offset-x:20;background: url(Texture/Aries/Creator/keepwork/Help/F1/di2_164X52_32bits.png#0 0 164 52);"/>    
                             </pe:if>
-                        </pe:if>
-                        <pe:if condition='<%= IsShortCutKeyCategory() %>'>
+                            <pe:if condition='<%= not ItemBeSelected(XPath("this|type_index"),XPath("this|item_index")) %>'>
+                                <input type="button" value='<%=XPath("this|text") %>' uiname='<%="ParacraftHelpPage.Item_"..XPath("this|name") %>' name='<%=XPath("this|text") %>' onclick="ChangeItem"
+                                 param1='<%= XPath("this|type_index") %>' param2='<%= XPath("this|item_index") %>'
+                                 style="margin-top:-4px;margin-left:2px;width:164px;height:54px;font-size:20px;font-weight:bold;color:#808080;text-align:left;text-offset-x:20;background: url()"/>    
+                            </pe:if>
+                        </div>
+                    </NodeTemplate>
+                </NodeTemplates>
+            </pe:treeview>
+        </div>
+        <!-- 分隔线 -->
+        <div style="float:left;margin-left:30px;margin-top:35px;width:2px;height:614px;background-color: #a3a3a3;"/>
+
+        <div style="float:left;width:284px;padding-top:35px;">
+            <pe:gridview name="gvwMCTask" style="height:588px;" VerticalScrollBarStep="32" DefaultNodeHeight="32" DataSource="<%=GetGridview_DS%>" ItemsPerLine="1" AllowPaging="false" RememberScrollPos="true" VerticalScrollBarOffsetX="10">
+                <Columns>
+                    <div style="height:70px;">
+                        <pe:if condition='<%= IsCommandCategory() %>'>
+                            <pe:if condition='<%= IsShowGridLightFram(Eval("index")) %>'>
+                                <div zorder="1" style="position: relative;margin-left: 6px;margin-top: -2px; width:262px;height:65px;background: url(Texture/Aries/Creator/keepwork/Help/F1/di3_64X64_32bits.png#0 0 64 64:16 16 16 16);"></div>
+                            </pe:if>
+                            
                             <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
-                                <input type="button" uiname='<%="ParacraftHelpPage.Shortcut_"..Eval("index") %>' value='<%=Eval("name") %>' enabled="false" style="margin-left:20px;margin-top:1px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_blue"/>    
+                                <div zorder="-2" style="position:relative;margin-left:10px;margin-top:1px;width:254px;height:58px;background:url(Texture/Aries/Creator/keepwork/Help/F1/bt1_64X58_32bits.png#0 0 64 58:12 12 12 12);"></div>
+                                <input type="button" value='<%=Eval("name") %>'  style="margin-left:40px;margin-top:1px;width:254px;height:58px;color:#212122;text-align:left;font-size:20px;text-offset-x:5;background: url();" />    
                             </pe:if>
                             <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
-                                <input type="button" uiname='<%="ParacraftHelpPage.Shortcut_"..Eval("index") %>' value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:20px;margin-top:1px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;" class="mc_button_grey"/>    
+                                <div zorder="-2" style="position:relative;margin-left:10px;margin-top:1px;width:254px;height:56px;background:url(Texture/Aries/Creator/keepwork/Help/F1/bt2_64X58_32bits.png#0 0 64 56:12 12 12 12);"></div>
+                                <input type="button" value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' style="margin-left:40px;margin-top:1px;width:252px;height:58px;color:#212122;text-align:left;font-size:20px;text-offset-x:5;background: url();"/>    
                             </pe:if>
                         </pe:if>
+                        <pe:if condition='<%= not IsCommandCategory() %>'>
+                            <pe:if condition='<%= IsTutorialCategory() %>'>
+                                <pe:if condition='<%= IsShowGridLightFram(Eval("task_index")) %>'>
+                                    <div zorder="1" style="position: relative;margin-left: 6px;margin-top: -2px; width:262px;height:65px;background: url(Texture/Aries/Creator/keepwork/Help/F1/di3_64X64_32bits.png#0 0 64 64:16 16 16 16);"></div>
+                                </pe:if>
+
+                                <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == true %>'>
+                                    <div zorder="-2" style="position:relative;margin-left:10px;margin-top:1px;width:254px;height:58px;background:url(Texture/Aries/Creator/keepwork/Help/F1/bt1_64X58_32bits.png#0 0 64 58:12 12 12 12);"></div>
+                                    <input type="button" value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' style="margin-left:40px;margin-top:1px;width:252px;height:58px;color:#212122;text-align:left;font-size:20px;text-offset-x:5;background: url();" />    
+                                </pe:if>
+                                <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == false %>'>
+                                    <div zorder="-2" style="position:relative;margin-left:10px;margin-top:1px;width:254px;height:56px;background:url(Texture/Aries/Creator/keepwork/Help/F1/bt2_64X58_32bits.png#0 0 64 56:12 12 12 12);"></div>
+                                    <pe:if condition='<%= TaskIsFinished(Eval("task_index")) == true %>'>
+                                        <input type="button" uiname='<%="ParacraftHelpPage.Tutorial_"..Eval("task_index") %>' value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' onclick="ChangeTask" param1='<%=Eval("index") %>' 
+                                        style="margin-left:40px;margin-top:1px;width:252px;height:58px;color:#212122;text-align:left;font-size:20px;text-offset-x:5;background: url();"/>    
+                                    </pe:if>
+                                    <pe:if condition='<%= TaskIsFinished(Eval("task_index")) == false %>'>
+                                        <input type="button" uiname='<%="ParacraftHelpPage.Tutorial_"..Eval("task_index") %>' value='<%=format("%d %s", Eval("task_index"), Eval("name")) %>' onclick="ChangeTask" param1='<%=Eval("index") %>' 
+                                        style="margin-left:40px;margin-top:1px;width:252px;height:58px;color:#212122;text-align:left;font-size:20px;text-offset-x:5;background: url();"/>    
+                                    </pe:if>  
+                                </pe:if>
+                            </pe:if>
+                            <!-- 方块百科 -->
+                            <pe:if condition='<%= IsBlockWikiCategory() %>'>
+                                <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == true %>'>
+                                    <div style="margin-left:5px;width:137px;height:32px;" class="mc_button_blue">
+                                        <pe:mc_block block_id='<%=Eval("block_id")%>' style="float:left;margin-left:4px;margin-top:4px;width:24px;height:24px;" isclickable="false"/>    
+                                        <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;background:"/>    
+                                    </div>
+                                        
+                                </pe:if>
+                                <pe:if condition='<%= TaskIsSelected(Eval("task_index")) == false %>'>
+                                    <div style="margin-left:5px;width:137px;height:32px;background:"  onclick="ChangeTask" param1='<%= Eval("task_index") %>'>
+                                        <pe:mc_block block_id='<%=Eval("block_id")%>' style="float:left;margin-left:4px;margin-top:4px;width:24px;height:24px;" isclickable="false"/>    
+                                        <input type="button" value='<%=Eval("name") %>' enabled="false" style="float:left;margin-left:5px;margin-top:4px;width:120px;height:23px;color:#ffffff;text-align:left;text-offset-x:5;background:"/>
+                                    </div>
+                                        
+                                </pe:if>
+                            </pe:if>
+                            <pe:if condition='<%= IsShortCutKeyCategory() %>'>
+                                <pe:if condition='<%= IsShowGridLightFram(Eval("index")) %>'>
+                                    <div zorder="1" style="position: relative;margin-left: 6px;margin-top: -2px; width:262px;height:65px;background: url(Texture/Aries/Creator/keepwork/Help/F1/di3_64X64_32bits.png#0 0 64 64:16 16 16 16);"></div>
+                                </pe:if>
+                                <pe:if condition='<%= TaskIsSelected(Eval("index")) == true %>'>
+                                    <div zorder="-2" style="position:relative;margin-left:10px;margin-top:1px;width:254px;height:58px;background:url(Texture/Aries/Creator/keepwork/Help/F1/bt1_64X58_32bits.png#0 0 64 58:12 12 12 12);"></div>
+                                    <input type="button" uiname='<%="ParacraftHelpPage.Shortcut_"..Eval("index") %>' value='<%=Eval("name") %>' enabled="false" 
+                                    style="margin-left:40px;margin-top:1px;width:252px;height:58px;color:#212122;text-align:left;font-size:20px;text-offset-x:5;background: url();"/>    
+                                </pe:if>
+                                <pe:if condition='<%= TaskIsSelected(Eval("index")) == false %>'>
+                                    <div zorder="-2" style="position:relative;margin-left:10px;margin-top:1px;width:254px;height:56px;background:url(Texture/Aries/Creator/keepwork/Help/F1/bt2_64X58_32bits.png#0 0 64 56:12 12 12 12);"></div>
+                                    <input type="button" uiname='<%="ParacraftHelpPage.Shortcut_"..Eval("index") %>' value='<%=Eval("name") %>' onclick="ChangeTask" param1='<%=Eval("index") %>' 
+                                    style="margin-left:40px;margin-top:1px;width:252px;height:58px;color:#212122;text-align:left;font-size:20px;text-offset-x:5;background: url();"/>    
+                                </pe:if>
+                            </pe:if>
+                        </pe:if>
+                    </div>
+                </Columns>
+                <EmptyDataTemplate>
+                    <div style="color:#808080;margin-left:20px;font-weight:bold;font-size:20px;">
+                        <b><%=L"空"%></b>
+                    </div>
+                </EmptyDataTemplate>
+                <FetchingDataTemplate>
+                    <b><%=L"请稍等 ... "%></b>
+                </FetchingDataTemplate>       
+            </pe:gridview>
+        </div>
+        <!-- 右边部分 -->
+        <div zorder = "-2" style="float:left;margin-left:12px;margin-top:35px;width:745px;height:588px;background:url(Texture/Aries/Creator/keepwork/Help/F1/ziyuangk2_60X60_32bits.png#0 0 60 60:12 12 12 12);">
+            <!-- 快捷操作 -->
+            <pe:if condition='<%= IsShortCutKeyCategory() %>'>
+                <pe:treeview name="shortcutkeyStr" VerticalScrollBarStep="21" style="margin-top:12px;margin-bottom:12px;height:560px;background:;" VerticalScrollBarOffsetX="10">
+                    <div style="margin-left:10px;width:320px;color:#ffffff;font-size:20px;text-align:left;">
+                        <%=GetShortCutKeyStr() %>
+                    </div>
+                </pe:treeview>
+            </pe:if>
+            <!-- 命令帮助 -->
+            <pe:if condition='<%= IsCommandCategory()%>'>
+                <textarea ReadOnly="false" rows="44" UseSystemControl="true" fontsize="12" style="textcolor:#ffffff;margin-top:30px;margin-left:10px;margin-right:10px;margin-bottom:30px;width:740px;height:544px;" value="<%= GetCmdStr()%>"></textarea>
+            </pe:if>
+            <!-- 新手教程/方块百科-->
+            <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
+                <div style="margin-left:30px;margin-top:30px;margin-right:30px;min-width:330px;height:250px;color:#ffffff;font-size:20px;text-align:left;">
+                    <%=GetTaskDesc() %>
+                </div>
+                <div style="margin-left:10px;margin-top:50px;width:725px;height:248px;background:url(Texture/Aries/Creator/keepwork/Help/F1/ziyuangk_60X60_32bits.png#0 0 60 60:12 12 12 12);">
+                    <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
+                        <div style="margin-left:20px;margin-top:5px;font-size:20px;color:#212122;">
+                            <%=L"所需资源"%>
+                        </div> 
+                        <div style="margin-left:16px;margin-top:-8px;">
+                            <pe:gridview name="gvwMCBlock" DefaultNodeHeight="60" DataSource="<%=GetBlock_DS%>" pagesize="10" ItemsPerLine="8" style="margin-top:5px;" AllowPaging="true">
+                                <Columns>
+                                    <div style="height:80px;width:80px;">
+                                        <div style="margin-top:10px;margin-left:9px;height:60px;width:60px;background:url(Texture/Aries/Creator/keepwork/Help/F1/wupingk2_60X60_32bits.png#0 0 60 60:12 12 12 12)">
+                                            <pe:mc_block block_id ='<%=Eval("block_id") %>'  style="margin-left:9px;margin-top:9px;width:42px;height:42px;"/>
+                                        </div>
+                                    </div>    
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <b><%=L"该主题当前没有任务"%></b>
+                                </EmptyDataTemplate>
+                                <FetchingDataTemplate>
+                                    <b><%=L"请稍等 ..."%></b>
+                                </FetchingDataTemplate>
+                                <PagerSettings Position="Bottom" height="1"/>
+                                <PagerTemplate AutoHidePager="true">
+                                    <form>
+                                        <input type="button" name="pre" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"上一页"%>' style="margin-left:-18px;margin-top:-90px;width:16px;height:16px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#294 486 16 16)"/>
+                                        <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"下一页"%>' style="margin-left:262px;margin-top:-90px;width:16px;height:16px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#294 470 16 16)"/>
+                                    </form>
+                                </PagerTemplate>          
+                            </pe:gridview> 
+                        </div> 
                     </pe:if>
                 </div>
-            </Columns>
-            <EmptyDataTemplate>
-                <div style="color:#ffffff;margin-left:20px;">
-                    <b><%=L"空"%></b>
+                <div style="">
+                    <input type="button" uiname="ParacraftHelpPage.StartBuild" value='<%= GetQuestTriggerText() %>' 
+                    style="position:relative;margin-left:265px;margin-top:-96px;min-width:238px;height:80px;text-offset-y:-2;font-weight:bold;font-size:30px;background:url(Texture/Aries/Creator/keepwork/Help/F1/kashichuanjian_238X80_32bits.png#0 0 238 80:)" onclick="StartBuild" />
                 </div>
-            </EmptyDataTemplate>
-            <FetchingDataTemplate>
-                <b><%=L"请稍等 ... "%></b>
-			</FetchingDataTemplate>       
-        </pe:gridview>
-    </div>
-    <div style="float:left;margin-left:-10px;margin-top:1px;width:1px;height:421px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 1)"/>
-    <div style="float:left;margin-left:0px;margin-top:0px;">
-        <pe:if condition='<%= IsShortCutKeyCategory() %>'>
-            <pe:treeview name="shortcutkeyStr" VerticalScrollBarStep="21" style="margin-top:12px;margin-bottom:12px;height:400px;background:;" VerticalScrollBarOffsetX="10">
-                <div style="margin-left:-5px;width:320px;color:#ffffff;text-align:left;">
-                    <%=GetShortCutKeyStr() %>
-                </div>
-            </pe:treeview>
-        </pe:if>
-        <pe:if condition='<%= IsCommandCategory()%>'>
-            <textarea ReadOnly="false" rows="13" UseSystemControl="true" style="textcolor:#ffffff;margin-top:12px;margin-left:5px;margin-right:5px;margin-bottom:12px;height:400px;" value="<%= GetCmdStr()%>"></textarea>
-        </pe:if>
-        <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
-            <div style="margin-left:10px;margin-top:10px;margin-right:10px;min-width:330px;height:250px;color:#ffffff;text-align:left;">
-                <%=GetTaskDesc() %>
-            </div>
-            <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
-                <div style="float:left;margin-left:0px;margin-top:-1px;width:352px;height:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#344 66 1 8)"/>
             </pe:if>
-            <div style="margin-left:25px;margin-top:5px;height:110px;">
-                <pe:if condition='<%= IsTutorialCategory() or IsBlockWikiCategory() %>'>
-                    <div style="margin-left:25px;margin-top:2px;color:#ffffff;">
-                        <%=L"所需资源"%>
-                    </div> 
-                    <div style="margin-left:16px;margin-top:-8px;">
-                        <pe:gridview name="gvwMCBlock" DefaultNodeHeight="44" DataSource="<%=GetBlock_DS%>" pagesize="10" ItemsPerLine="5" style="margin-top:5px;" AllowPaging="true">
-                            <Columns>
-                                <div style="height:44px;width:52px;">
-                                    <div style="margin-top:10px;margin-left:9px;height:34px;width:34px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
-                                        <pe:mc_block block_id ='<%=Eval("block_id") %>'  style="margin-left:1px;margin-top:1px;width:32px;height:32px;"/>
-                                    </div>
-                                </div>    
-                            </Columns>
-                            <EmptyDataTemplate>
-	                            <b><%=L"该主题当前没有任务"%></b>
-                            </EmptyDataTemplate>
-                            <FetchingDataTemplate>
-                                <b><%=L"请稍等 ..."%></b>
-			                </FetchingDataTemplate>
-                            <PagerSettings Position="Bottom" height="1"/>
-                            <PagerTemplate AutoHidePager="true">
-				                <form>
-					                <input type="button" name="pre" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"上一页"%>' style="margin-left:-18px;margin-top:-90px;width:16px;height:16px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#294 486 16 16)"/>
-	                                <input type="button" name="next" invisibleondisabled="false" zorder=2 animstyle="23" tooltip='<%=L"下一页"%>' style="margin-left:262px;margin-top:-90px;width:16px;height:16px;background:url(Texture/Aries/Creator/Desktop/Inventory_32bits.png#294 470 16 16)"/>
-	                            </form>
-			                </PagerTemplate>          
-                        </pe:gridview> 
-                    </div> 
-                </pe:if>
-            </div>
-            <div style="">
-                <input type="button" uiname="ParacraftHelpPage.StartBuild" value='<%= GetQuestTriggerText() %>' style="margin-left:125px;margin-top:4px;min-width:100px;height:29px;font-weight:bold;font-size:14px;" class="mc_button_orange" onclick="StartBuild" />
-            </div>
-        </pe:if>
-    </div>
-</aries:window>
+        </div>
+    </pe:container>
+</pe:container>
 </pe:mcml> 
 </body>
 </html>

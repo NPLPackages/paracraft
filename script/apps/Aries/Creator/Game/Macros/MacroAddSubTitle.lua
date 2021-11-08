@@ -48,7 +48,7 @@ function MacroAddSubTitle.ShowPage()
 	}
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	params._page.OnClose = function()
-		Macros:Restore();
+		Macros:Resume();
 		page = nil;
 	end;
 

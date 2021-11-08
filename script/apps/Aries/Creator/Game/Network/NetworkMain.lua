@@ -39,6 +39,7 @@ function NetworkMain:StartServer(host, port)
 		self.server_manager:Shutdown();
 	end
 	self.server_manager = ServerManager.GetSingleton():Init(host, port);
+	
 	return true;
 end
 
@@ -142,14 +143,15 @@ end
 
 function NetworkMain:CheckLoadClient()
 	if(self:IsServerStarted()) then
-		_guihelper.MessageBox(L"你不能同时为客户端和服务器");
-		return;
+		-- _guihelper.MessageBox(L"你不能同时为客户端和服务器");
+		-- return;
+		self:Stop();
 	end
 	self:InitCommon();
 
 	-- prepare address
 	-- this is a pure client, so do not listen on any port. Just start the network interface. 
-	NPL.StartNetServer("127.0.0.1", "0");
+	-- NPL.StartNetServer("127.0.0.1", "0");
 	return true;
 end
 

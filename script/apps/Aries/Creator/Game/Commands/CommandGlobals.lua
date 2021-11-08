@@ -778,3 +778,14 @@ e.g.
 	end,
 };
 
+Commands["pptjson"] = {
+	name="pptjson", 
+	quick_ref="/pptjson", 
+	desc=[[Generate PPT JSON file
+/pptjson
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+		RedSummerCampPPtPage.SaveToPPtJson()
+	end,
+};

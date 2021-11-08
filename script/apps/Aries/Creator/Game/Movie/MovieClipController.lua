@@ -138,7 +138,12 @@ function MovieClipController:ShowAllGUI(bShow, bForceEditorMode)
 		end
 	else
 		if(MovieClipController.IsVisible()) then
-			MovieManager:SetActiveMovieClip(nil);
+			if(MovieManager:IsCapturing()) then
+				self:ShowTimeline(nil);
+				MovieClipController.ShowPage(false);
+			else
+				MovieManager:SetActiveMovieClip(nil);
+			end
 		end
 	end
 end

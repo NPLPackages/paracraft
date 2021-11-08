@@ -44,7 +44,7 @@ function ItemDoor:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_reg
 			local block_data = BlockEngine:GetBlockData(x,y,z);
 			local block_template = BlockEngine:GetBlock(x,y,z);
 			window_block_id = door_to_window_map[window_block_id or 0];
-			if(window_block_id) then
+			if(window_block_id and (block_data or 1) <= 4) then
 				BlockEngine:SetBlock(x,y+1,z, window_block_id, block_data, 3);
 			end
 		end

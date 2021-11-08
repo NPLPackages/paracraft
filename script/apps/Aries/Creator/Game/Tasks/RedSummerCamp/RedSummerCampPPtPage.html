@@ -87,13 +87,14 @@ end
         },        
 
         mainwork = {
-            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj2_64X64_32bits.png#0 0 256 64:223 46 16 16",
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj2_64X64_32bits.png#0 0 256 64:223 46 16 10",
             width = 365,
             ["min-height"] = 150,
             float = "left",
             ["margin-left"] = 0,
             ["margin-top"] = 0,
             ["padding-top"] = 50,
+            ["padding-bottom"] = 10,
             padding = 35,
             ["text-align"] = "center",
             ["base-font-size"] = 22,
@@ -103,11 +104,11 @@ end
         F1 = {
             background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/9_32bits.png#0 0 32 32:8 8 8 8",
             width = 236,
-            height = 74,
+            ["min-height"] = 35,
             color = "#212122",
             padding = 7,
             ["margin-left"] = 25,
-            ["margin-top"] = 24,
+            ["margin-top"] = 15,
             ["text-align"] = "center",
             ["base-font-size"] = 20,
             ["font-size"] = 20,
@@ -133,10 +134,29 @@ end
     <pe:container alignment="_rt" style="background:url();">
         <pe:if condition='<%=IsShowCloseAllPageBt()%>'>
             <input name="student_num" type="button" value='学生(0)' onclick="OpenLocalServer" 
-                style="font-size: 20px; width: 112px;height: 50px; 
+                icon="Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/xuesheng_32X32_32bits.png#0 0 32 32"
+                icon_width=32
+                icon_height=32
+                icon_off_y=5
+                icon_off_x=-30
+                style="font-size: 20px; width: 135px;height: 50px; 
                     margin-right:16px;margin-top:25px;
-                    background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#205 112 86 46);" />
-            <input type="button" value='' onclick="OpenFullPage" style="width: 112px;height: 52px; margin-right:76px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B1_112X52_32bits.png#0 0 112 52);" />
+                    text-offset-x: 15;
+                    text-offset-y: -3;
+                    background: url(Texture/Aries/Creator/keepwork/Window/button/btn_hui109X45_32bits.png#0 0 109 45:15 15 15 15);" />
+            
+            <input type="button" value='全屏' onclick="OpenFullPage" 
+                icon="Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/quanping_32X32_32bits.png#0 0 32 32"
+                icon_width=32
+                icon_height=32
+                icon_off_y=5
+                icon_off_x=-17
+                style="width: 112px;height: 50px; margin-right:76px;margin-top:25px;
+                    font-size: 20px;
+                    text-offset-x: 12;
+                    text-offset-y: -3;
+                    background: url(Texture/Aries/Creator/keepwork/Window/button/btn_hui109X45_32bits.png#0 0 109 45:15 15 15 15);" />
+            <!-- <input type="button" value='' onclick="OpenLocalServer" style="width: 112px;height: 52px; margin-right:76px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B1_112X52_32bits.png#0 0 112 52);" /> -->
             <input type="button" value='' onclick="ClosePPtAllPage" style="margin-right:15px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn3_64X70_32bits.png#0 0 64 70);" />
         </pe:if>
 

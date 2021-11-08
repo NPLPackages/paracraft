@@ -519,7 +519,6 @@ Example:
 		username, cmd_text = CmdParser.ParseString(cmd_text);
 		password, cmd_text = CmdParser.ParseString(cmd_text);
 		
-
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Network/NetworkMain.lua");
 		local NetworkMain = commonlib.gettable("MyCompany.Aries.Game.Network.NetworkMain");
 		if(room_key) then

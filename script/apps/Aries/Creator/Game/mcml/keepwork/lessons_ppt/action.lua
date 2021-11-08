@@ -23,6 +23,7 @@ end
 function action.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, style, parentLayout, css)
 	if mcmlNode:GetAttribute("type") == "dailyVideo" then
 		style.float = "left"
+		style.height = 100
 	end
 
 	return mcmlNode:DrawDisplayBlock(rootName, bindingContext, _parent, left, top, width, height, parentLayout, style, action.render_callback);
@@ -143,20 +144,34 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 		local padding = 13
 		local fontName = "System;18;norm";
 		local root_width = _guihelper.GetTextWidth(text_value, fontName) + padding * 2
+		if root_width > 274 then
+			root_width = 274
+			root_height = 67
+		end
 		
 		local _this = ParaUI.CreateUIObject("button", "action_button_type", "_lt", left + 50, top + root_y - 7, root_width, root_height);
 		_this.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/b1_32X46_32bits.png;0 0 32 46:8 8 8 8";
 		_this.tooltip = string.format("点击打开世界：%s", projectid)
 		_parent:AddChild(_this);
-		_guihelper.SetFontColor(_this, "#853a0d");
-		_this.font = fontName
-		_this.text = text_value;
-		_this:GetAttributeObject():SetField("TextOffsetY", -1)
+		-- _guihelper.SetFontColor(_this, "#853a0d");
+		-- _this.font = fontName
 		_this:SetScript("onclick", function()
 			if projectid then
 				GameLogic.RunCommand(string.format("/loadworld -s -auto %s", projectid))
 			end
 		end);
+
+		local button_text = ParaUI.CreateUIObject("text", "action_button_text", "_lt", _this.x, _this.y + 10, root_width, root_height);
+		button_text.text = text_value
+		button_text.font = fontName
+		_guihelper.SetFontColor(button_text, "#853a0d");
+		_guihelper.SetUIFontFormat(button_text, 17);
+
+		_parent:AddChild(button_text);
+		
+		-- _this.text = text_value;
+		-- _this:GetAttributeObject():SetField("TextOffsetY", -1)
+
 		_parent = _this;
 
 		if root_width >= 258 then
@@ -377,18 +392,32 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 		local padding = 24
 		local fontName = "System;26;norm";
 		local root_width = _guihelper.GetTextWidth(text_value, fontName) + padding * 2
+
+		if root_width > 384 then
+			root_width = 384
+			root_height = 96
+		end
 		
 		local _this = ParaUI.CreateUIObject("button", "action_button_type", "_lt", left + 80, top + root_y - 13, root_width, root_height);
 		_this.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/b1_32X46_32bits.png;0 0 32 46:8 8 8 8";
 		_parent:AddChild(_this);
 		_guihelper.SetFontColor(_this, "#853a0d");
-		_this.font = fontName
-		_this.text = text_value;
+		-- _this.font = fontName
+		-- _this.text = text_value;
 		_this:SetScript("onclick", function()
 			if projectid then
 				GameLogic.RunCommand(string.format("/loadworld -s -auto %s", projectid))
 			end
 		end);
+
+		local button_text = ParaUI.CreateUIObject("text", "action_button_text", "_lt", _this.x, _this.y + 16, root_width, root_height);
+		button_text.text = text_value
+		button_text.font = fontName
+		_guihelper.SetFontColor(button_text, "#853a0d");
+		_guihelper.SetUIFontFormat(button_text, 17);
+
+		_parent:AddChild(button_text);
+		
 		_parent = _this;
 
 		if root_width >= 387 then

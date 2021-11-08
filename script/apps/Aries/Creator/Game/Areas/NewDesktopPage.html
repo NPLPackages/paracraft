@@ -23,6 +23,8 @@ end
 
 function ToggleCurPage()
     CreatorDesktop.ShowNewPage()
+    local EnvFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnvFramePage");
+    EnvFramePage.changecb = nil
 end
 
 function OnDummy()

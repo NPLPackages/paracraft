@@ -140,6 +140,10 @@ function EnvFramePage.OnTimeSliderChanged(value)
 		local time=(value/1000-0.5)*2;
 		time = tostring(time);
 		CommandManager:RunCommand("time", time);
+		-- GameLogic.GetFilters():apply_filters('weatherChange',"time", time)
+		if EnvFramePage.changecb then
+			EnvFramePage.changecb("time", time)
+		end
 	end	
 end
 

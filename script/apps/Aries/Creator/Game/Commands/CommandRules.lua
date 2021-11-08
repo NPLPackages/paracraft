@@ -24,8 +24,11 @@ Commands["addrule"] = {
 	name="addrule", 
 	quick_ref="/addrule class_name rule", 
 	desc=[[add a given game rule. 
-@param class_name: "Player", "Block"
+@param class_name: "Player", "Block", "show", "reset|clear"
 @param rule: rule name value pairs
+
+show all rules: /addrule show
+clear all rules: /addrule reset
 Some examples rules: 
 /addrule Block CanPlace Lever Glowstone
 /addrule Block CanDestroy Glowstone true
@@ -39,11 +42,17 @@ Some examples rules:
 /addrule Player AllowRunning false
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local name, value = cmd_text:match("(%w+)%s+(.*)$");
-		if(name and value) then
+		local name, value = cmd_text:match("(%w+)%s?(.*)$");
+		if(name) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GameRules/GameRules.lua");
 			local GameRules = commonlib.gettable("MyCompany.Aries.Game.GameRules");
-			GameRules:AddRule(name, value);
+			if(name == "show") then
+				GameRules:ShowAllRules();
+			elseif(name == "reset" or name=="clear") then
+				GameRules:Reset();
+			else
+				GameRules:AddRule(name, value);	
+			end
 		end
 	end,
 };

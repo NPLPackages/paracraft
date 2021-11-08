@@ -38,7 +38,21 @@ Commands["save"] = {
 			return 
 		end
 		local function callback()
-			GameLogic.QuickSave();
+			if (System.options.loginmode == "online") then
+				GameLogic.GetFilters():apply_filters(
+					"service.keepwork_service_world.limit_free_user",
+					false,
+					function(result)
+						if result then
+							GameLogic.QuickSave();
+						else
+							_guihelper.MessageBox(L"操作被禁止了，免费用户最多只能拥有3个本地世界，请删除不要的本地世界，或者联系老师或家长成为会员。")
+						end
+					end
+				);
+			else
+				GameLogic.QuickSave();
+			end
 		end
 
 		if GameLogic.GetFilters():apply_filters("SaveWorld", false, callback) then

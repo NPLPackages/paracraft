@@ -50,22 +50,36 @@ function HelpPage.ShowPage(category_name, subfolder_name)
 		isShowTitleBar = false,
 		DestroyOnClose = true,
 		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = true,
+		allowDrag = false,
 		bShow = bShow,
 		zorder = 1,
 		directPosition = true,
-			align = "_ct",
-			x = -680/2,
-			y = -450/2,
-			width = 680,
-			height = 450,
+		align = "_fi",
+			x = 0,
+			y = 0,
+			width = 0,
+			height = 0,
+		DesignResolutionWidth = 1280,
+		DesignResolutionHeight = 720,
 	});
 
-	HelpPage.SelectCategory(category_name, subfolder_name);
+	local target_name
+	if category_name == nil and subfolder_name == nil and HelpPage.OpenIndexStrList then
+		target_name = HelpPage.OpenIndexStrList[1]
+
+		category_name, subfolder_name = HelpPage.GetCategoryAndSubName(target_name);
+		HelpPage.OpenIndexStrList = nil
+	end
+
+	HelpPage.SelectCategory(category_name, subfolder_name, target_name);
 
 	if GameLogic.events then
 		GameLogic.events:DispatchEvent({type = "ShowHelpPage"});
 	end
+end
+
+function HelpPage.IsOpen()
+	return page and page:IsVisible()
 end
 
 function HelpPage.ClosePage()
@@ -76,7 +90,7 @@ end
 
 -- @param index_or_name: category index number or string
 -- @param subcategory_name: nil or sub category name
-function HelpPage.SelectCategory(index_or_name, subcategory_name)
+function HelpPage.SelectCategory(index_or_name, subcategory_name, grid_item_name)
 	if(not index_or_name) then
 		return
 	end
@@ -109,12 +123,24 @@ function HelpPage.SelectCategory(index_or_name, subcategory_name)
 			item.attr.expanded = (i == index)
 		end
 		
+		
 
 		if(subcategory_name) then
 			for index, subitem in ipairs(ds[index]) do
 				if(subitem and subitem.attr and subitem.attr.name == subcategory_name) then
 					HelpPage.select_task_index = index;
 					HelpPage.select_item_index = index;
+				end
+			end
+
+			
+			if grid_item_name then
+				local grid_ds = BuildQuestProvider.GetTasks_DS(HelpPage.select_item_index,ds[index].attr.category)
+				for i, grid_item in ipairs(grid_ds) do
+					if grid_item.name == grid_item_name then
+						HelpPage.select_task_index = i
+						break
+					end
 				end
 			end
 		end
@@ -171,7 +197,7 @@ local function GetShortCutKeyDS()
 				local content = "";
 				for itemnode in commonlib.XPath.eachNode(node, "/Item") do
 					if(itemnode.attr and itemnode.attr.value and itemnode.attr.desc) then
-						local text = string.format("<font style=';color:#FF0000;'>%s:</font>%s",L(itemnode.attr.value),L(itemnode.attr.desc));
+						local text = string.format("<font style=';color:#ffc300;'>%s:</font>%s",L(itemnode.attr.value),L(itemnode.attr.desc));
 						content = content..text.."<br/>";
 					end
 				end
@@ -343,4 +369,79 @@ end
 function HelpPage.GetAnimStr()
 	local str = anim_ds[HelpPage.select_task_index]["content"];
 	return str;
+end
+
+-- 根据文本找索引
+function HelpPage.SetSearchIndexStrList(str_list)
+	-- str_list = { "新手小屋", "让角色向前行走" }
+	HelpPage.SearchStrList = str_list
+	HelpPage.OpenIndexStrList = str_list
+end
+
+-- 暂时只处理新手教程
+function HelpPage.IsShowTypeLightFram(type_index,item_index)
+	-- HelpPage.SearchStrList = { "新手小屋", "让角色向前行走" }
+	if not HelpPage.SearchStrList or #HelpPage.SearchStrList == 0 then
+		return false
+	end
+	local data_source = HelpPage.GetHelpDS()
+	if not data_source[type_index] or data_source[type_index].attr.category ~= "tutorial" then
+		return false
+	end
+	
+	local ds = BuildQuestProvider.GetTasks_DS(item_index,"tutorial")
+	for i, v in ipairs(ds) do
+		for k2, v2 in pairs(HelpPage.SearchStrList) do
+			if v.name == v2 then
+				return true
+			end
+		end
+	end
+end
+
+function HelpPage.IsShowGridLightFram(grid_index)
+	-- HelpPage.SearchStrList = { "新手小屋", "让角色向前行走" }
+	if not HelpPage.SearchStrList or #HelpPage.SearchStrList == 0 then
+		return false
+	end
+	local data_source = HelpPage.GetHelpDS()
+	local type_index = HelpPage.select_type_index
+	if not type_index or not data_source[type_index] or data_source[type_index].attr.category ~= "tutorial" then
+		return false
+	end
+	
+	local item_index = HelpPage.select_item_index
+	if not item_index then
+		return false
+	end
+
+	local grid_ds = BuildQuestProvider.GetTasks_DS(item_index,"tutorial")
+	local grid_item_data = grid_ds[grid_index]
+	if not grid_item_data then
+		return false
+	end
+
+	local name = grid_item_data.name
+	for k2, v2 in pairs(HelpPage.SearchStrList) do
+		if name == v2 then
+			return true
+		end
+	end
+end
+
+function HelpPage.GetCategoryAndSubName(target_name)
+	local data_source = HelpPage.GetHelpDS()
+	-- 暂时只处理新手教程
+	for i, v in ipairs(data_source) do
+		if v.attr.category == "tutorial" then
+			for i2, v2 in ipairs(v) do
+				local grid_ds = BuildQuestProvider.GetTasks_DS(i2,"tutorial")
+				for k, grid_item in pairs(grid_ds) do
+					if grid_item.name == target_name then
+						return i, v2.attr.name
+					end
+				end
+			end
+		end
+	end
 end

@@ -129,3 +129,7 @@ HttpWrapper.Create("keepwork.permissions.check", "%MAIN%/core/v0/permissions/che
 
 --http://yapi.kp-para.cn/project/32/interface/api/4487
 HttpWrapper.Create("keepwork.user.pwd", "%MAIN%/core/v0/users/pwd", "PUT", true)
+
+-- 获取用户角色
+-- http://yapi.kp-para.cn/project/32/interface/api/4207
+HttpWrapper.Create("keepwork.user.roles", "%MAIN%/core/v0/roles","GET",true);

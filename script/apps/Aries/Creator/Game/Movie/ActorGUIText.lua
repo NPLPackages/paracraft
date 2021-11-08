@@ -12,6 +12,8 @@ local actor = commonlib.gettable("MyCompany.Aries.Game.Movie.ActorGUIText");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/Actor.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
@@ -20,10 +22,6 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
-local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
-local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
-local profile = KeepWorkItemManager.GetProfile()
 local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.Actor"), commonlib.gettable("MyCompany.Aries.Game.Movie.ActorGUIText"));
 
 -- default text values. 
@@ -341,26 +339,28 @@ local function GetAlphaFromAnimTime(anim, curTime, fromTime, toTime)
 	return alpha or 1;
 end
 
+-- # is replaced with \n. 
+-- %name% is replaced with user's name
+function Actor:ReplaceVariablesInText(text)
+	if(text) then
+		text = text:gsub("#", "\n");
+		text = text:gsub("%%name%%", System.User.NickName or System.User.username or "")
+	end
+	return text;
+end
+
 function Actor:FrameMovePlaying(deltaTime)
 	local curTime = self:GetTime();
 	if(not curTime or self:Islocked()) then
 		return
 	end
-
 	local text, fontsize, fontcolor, textpos, bgalpha, textalpha, bgcolor;
-	
 	local values = self:GetValue("text", curTime);
 	local var = self:GetVariable("text");
 	if(var and values) then
 		if(self:GetTextOrder() ~= self:GetCurrentTextOrder()) then
 			return;
 		end
-		
-		local text = values.text
-		if profile and profile.nickname ~= nil then
-			values.text = text:gsub("%%name%%",profile.nickname)
-		end
-
 		local fromTime, toTime = var:getTimeRange(1, curTime);
 		
 		local firstTime = var:GetFirstTime();
@@ -372,13 +372,8 @@ function Actor:FrameMovePlaying(deltaTime)
 		if(firstTime <= curTime) then
 			bgalpha = GetAlphaFromAnimTime(values.bganim, curTime, fromTime, toTime);
 			textalpha = GetAlphaFromAnimTime(values.textanim, curTime, fromTime, toTime);
-
-			text, fontsize, fontcolor, textpos, bgcolor = values.text, values.fontsize, values.fontcolor, values.textpos, values.bgcolor;
-
-			-- # is replaced with \n. 
-			if(text) then
-				text = text:gsub("#", "\n");
-			end
+			
+			text, fontsize, fontcolor, textpos, bgcolor = self:ReplaceVariablesInText(values.text), values.fontsize, values.fontcolor, values.textpos, values.bgcolor;
 		end
 		self:UpdateTextUI(text, fontsize, fontcolor, textpos, values.textbg, bgalpha, textalpha, bgcolor, values.voicenarrator);
 	end

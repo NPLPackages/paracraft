@@ -7,7 +7,8 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
 -- @param side: this is OPPOSITE of the touching side
-local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, data=nil, side = nil, side_region=[nil, "upper", "lower"], block_id = 1, entityPlayer, itemStack})
+-- @param isSilent: true to disable player animation
+local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, data=nil, side = nil, side_region=[nil, "upper", "lower"], block_id = 1, entityPlayer, itemStack, isSilent})
 task:Run();
 
 -- create several blocks
@@ -96,9 +97,11 @@ function CreateBlock:Run()
 				self.entity_data = entity_data;
 
 				local tx, ty, tz = BlockEngine:real(self.blockX,self.blockY,self.blockZ);
-				GameLogic.PlayAnimation({facingTarget = {x=tx, y=ty, z=tz},});
-				GameLogic.events:DispatchEvent({type = "CreateBlockTask" , block_id = self.block_id, block_data = block_data, x = self.blockX, y = self.blockY, z = self.blockZ,
-					last_block_id = self.last_block_id, last_block_data = self.last_block_data});
+				if(not self.isSilent) then
+					GameLogic.PlayAnimation({facingTarget = {x=tx, y=ty, z=tz},});
+					GameLogic.events:DispatchEvent({type = "CreateBlockTask" , block_id = self.block_id, block_data = block_data, x = self.blockX, y = self.blockY, z = self.blockZ,
+						last_block_id = self.last_block_id, last_block_data = self.last_block_data});
+				end
 			end
 			if(not self.nohistory) then
 				if(GameLogic.GameMode:CanAddToHistory()) then
@@ -142,7 +145,7 @@ function CreateBlock:Run()
 		UndoManager.PushCommand(self);
 	end
 
-	if(self.blockX) then
+	if(self.blockX and not self.isSilent) then
 		local tx, ty, tz = BlockEngine:real(self.blockX,self.blockY,self.blockZ);
 		GameLogic.PlayAnimation({animationName = "Create",facingTarget = {x=tx, y=ty, z=tz},});
 	end

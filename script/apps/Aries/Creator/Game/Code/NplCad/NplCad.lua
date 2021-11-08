@@ -278,15 +278,14 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
         return
     end
     local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
-
+	local exportCoordinateType = 0;
     filename = string.match(filename, [[(.+).(.+)$]]);
     if(type == "stl")then
         filename = filename .. ".stl";
-        local swapYZ = true;
         local bBinary = true;
         local bEncodeBase64 = true
         local bIncludeColor = false;
-        SceneHelper.saveSceneToStl(filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor, liner, angular); -- binary
+        SceneHelper.saveSceneToStl(filename, scene, false, exportCoordinateType, bBinary, bEncodeBase64, bIncludeColor, liner, angular); -- binary
         NplCad.ShowMessageBox(filename)
     elseif(type == "iges")then
         filename = filename .. ".iges";
@@ -298,16 +297,15 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
         NplCad.ShowMessageBox(filename)
     elseif(type == "gltf")then
         filename = filename .. ".gltf";
-        SceneHelper.saveSceneToGltf(filename,scene,false, liner, angular);
+        SceneHelper.saveSceneToGltf(filename, scene, false, exportCoordinateType, liner, angular);
         NplCad.ShowMessageBox(filename)
     elseif(type == "bmax")then
         local input_filename = filename .. ".color.stl";
         local output_filename = filename .. ".bmax";
-        local swapYZ = false;
         local bBinary = false;
         local bEncodeBase64 = false
         local bIncludeColor = true;
-        SceneHelper.saveSceneToStl(input_filename,scene,false,swapYZ, bBinary, bEncodeBase64, bIncludeColor, liner, angular); -- text 
+        SceneHelper.saveSceneToStl(input_filename, scene, false, 2, bBinary, bEncodeBase64, bIncludeColor, liner, angular); -- text 
         NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/Tools/NplCadExportToBMaxPage.lua");
         local NplCadExportToBMaxPage = commonlib.gettable("MyCompany.Aries.Game.Code.NplCad.Tools.NplCadExportToBMaxPage");
         NplCadExportToBMaxPage.ShowPage(input_filename,output_filename,function(result)
@@ -338,8 +336,7 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
 		else
 			filename = filename .. "." .. type;
 		end
-        local swapYZ = false;
-		SceneHelper.exportSceneToFile(filename, scene, false, type, swapYZ, 0)
+		SceneHelper.exportSceneToFile(filename, scene, false, type, exportCoordinateType, 0)
         NplCad.ShowMessageBox(filename)
     end
 end

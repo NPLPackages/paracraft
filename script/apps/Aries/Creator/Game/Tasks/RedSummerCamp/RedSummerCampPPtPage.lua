@@ -14,6 +14,7 @@ local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/G
 local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
 local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
 local RedSummerCampPPtFullPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtFullPage.lua");
+local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
 local Lan
 -- 存储所有课程数据
 RedSummerCampPPtPage.LessonsPPtData = {}
@@ -28,6 +29,7 @@ local key_to_report_name = {
 	["ppt_L1"] = "org",		-- 机构课L1
 	["ppt_S1"] = "430",		-- 社团课S1
 	["ppt_X1"] = "campus",	-- 校园课X1
+	["ppt_Z1"] = "demo_lesson",	-- 校园课X1
 }
 function RedSummerCampPPtPage.OnInit()
 	page = document:GetPageCtrl();
@@ -36,6 +38,21 @@ function RedSummerCampPPtPage.OnInit()
 end
 
 function RedSummerCampPPtPage.OnCreate()
+	local f1_node = page:GetNode("div_f1")
+	if f1_node then
+		local f1_text = f1_node:GetInnerText()
+		--local f1_text = "F1:“新手小屋”、“让角色向前走”"
+		-- f1_text = string.gsub(f1_text, "、", "，")
+		-- f1_text = string.gsub(f1_text, "[F1:“”]+", "")
+		local str_list = commonlib.split_by_str(f1_text,"、")
+		for k, v in pairs(str_list) do
+			str_list[k] = string.gsub(str_list[k], "F1:", "")
+			str_list[k] = string.gsub(str_list[k], "”", "")
+			str_list[k] = string.gsub(str_list[k], "“", "")
+		end
+		HelpPage.SetSearchIndexStrList(str_list)
+	end
+
 	RedSummerCampPPtPage.StepNumKey = 0
 end
 
@@ -143,7 +160,7 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 	local ppt_data_list = {}
 	local ppt_data = {}
 	local is_div_str = false
-	local div_num = 0
+	local max_step = 0
 	local last_div_is_title = false
 	local is_start_notes = false
 	local is_start_knowledge_point = false
@@ -153,6 +170,10 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 	local function handle_div_str(ppt_data, strValue)
 		if last_div_is_title then
 			strValue = string.format([[<div style="margin-left: 50px;margin-top: 12px;color: #e17a15;font-weight: bold;">%s</div>]], strValue)
+		end
+
+		if string.find(strValue, 'class="F1"') then
+			strValue = string.gsub(strValue, 'class="F1"', 'class="F1" name="div_f1"')
 		end
 
 		if string.find(strValue, '<step value="1">') then
@@ -166,6 +187,14 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 
 		if string.find(strValue, "</step>") then
 			strValue = strValue .. '<div style="height:16px;"></div>'
+		end
+
+		if string.find(strValue, "<step") then
+			local step_value = tonumber(string.match(strValue, 'value="(%d)"'))
+			local cur_step_value = ppt_data.max_step or 0
+			if step_value and step_value > cur_step_value then
+				ppt_data.max_step = step_value
+			end
 		end
 
 		if string.find(strValue, "</notes") then
@@ -371,7 +400,7 @@ function RedSummerCampPPtPage.SetCourseClientData(key, value)
 	RedSummerCampCourseScheduling.SetDayHistroy(RedSummerCampPPtPage.CurCourseName, content, RedSummerCampPPtPage.SelectLessonIndex)
 
 	-- 上报ppt学习情况
-	local lesson_type = key_to_report_name[RedSummerCampPPtPage.CurCourseName]
+	local lesson_type = key_to_report_name[RedSummerCampPPtPage.CurCourseName] or RedSummerCampPPtPage.CurCourseName
 	local section = RedSummerCampPPtPage.SelectLessonIndex or 1
 
 	if lesson_type then
@@ -562,5 +591,48 @@ function RedSummerCampPPtPage.UpdateStudentNum()
 			-- student_num_value = test_num
 			page:SetValue("student_num", string.format("学生(%s)", student_num_value))
 		end
+	end
+end
+
+-- local test_num = 0
+function RedSummerCampPPtPage.SaveToPPtJson()
+	local json_data = {}
+	-- [{
+	-- 	"lessonType": "org",
+	-- 	"name": "小小建筑师",
+	-- 	"section": 1,
+	-- 	"totalStep":5
+	-- }]
+	for i, item in ipairs(RedSummerCampCourseScheduling.lessonCnf) do
+		local course_name = item.key or ""
+		RedSummerCampPPtPage.InitPPtConfig(course_name)
+		local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[course_name]
+		if ppt_data_list then
+			for i2, v2 in ipairs(ppt_data_list) do
+				local data = {
+					lessonType = key_to_report_name[course_name] or course_name,
+					name = v2.title,
+					section = i2,
+					totalStep = v2.max_step or 0,
+				}
+
+				json_data[#json_data + 1] = data
+			end
+		end
+	end
+
+
+	if #json_data > 0 then
+		local s = NPL.ToJson(json_data,true)
+		local file_path = string.format("temp/pptjson/ppt.json", disk_folder, voiceNarrator, filename)
+		ParaIO.CreateDirectory(file_path)
+		local file = ParaIO.open(file_path, "w");
+		if(file) then
+			file:write(s, #s);
+			file:close();
+		end
+
+		local absPath = string.gsub(ParaIO.GetCurDirectory(0) .. "temp/pptjson/", "/", "\\");
+		ParaGlobal.ShellExecute("open", "explorer.exe", absPath, "", 1)
 	end
 end

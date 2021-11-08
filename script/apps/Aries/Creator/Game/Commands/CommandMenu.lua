@@ -203,7 +203,11 @@ Commands["menu"] = {
 			end
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/HelpPage.lua");
 			local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
-			HelpPage.ShowPage(category, subfolder);
+			if	HelpPage.IsOpen() then
+				HelpPage.ClosePage()
+			else
+				HelpPage.ShowPage(category, subfolder);
+			end
 		elseif(name == "help.userintroduction") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UserIntroduction.lua");
 			local UserIntroduction = commonlib.gettable("MyCompany.Aries.Game.MainLogin.UserIntroduction")

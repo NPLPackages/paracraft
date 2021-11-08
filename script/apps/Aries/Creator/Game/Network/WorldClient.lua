@@ -118,8 +118,8 @@ function WorldClient:Login(params)
 	local username = params.username;
 	local password = params.password;
 	local thread = params.thread or "gl";
-	LOG.std(nil, "info", "WorldClient", "Start login %s %s as username:%s", ip, port, username);
-	
+
+	LOG.std(nil, "info", "WorldClient", "start login %s %s as username:%s", ip, port, username);
 	self.username = username;
 	self.password = password;
 

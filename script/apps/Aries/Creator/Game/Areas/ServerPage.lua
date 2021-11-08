@@ -203,6 +203,7 @@ function ServerPage.CreateServer(host,port)
 	ServerPage.SetServerUrl(nil)
 	if(netWorkMode == "Lan") then
 		NetworkMain:StartServer(host, port);
+
 	elseif(netWorkMode == "TunnelServer") then
 		local tunnelHost, tunnelPort = tunnelServerAddress:match("([^:%s]+)[:%s]?(%d*)");
 		if(tunnelHost~="" and tunnelHost) then
@@ -220,6 +221,11 @@ function ServerPage.CreateServer(host,port)
 	else
 		-- TODO: unknown mode
 	end
+
+	local windowTitle = ParaEngine.GetWindowText();
+	ServerPage.GetAllIPAddress();
+	windowTitle = windowTitle .. " 服务器地址: " .. (ServerPage.serverUrl or ServerPage.ips[1].text);
+	ParaEngine.SetWindowText(windowTitle);
 
 	page:Refresh(1);
 
@@ -294,7 +300,7 @@ function ServerPage.GetAllIPAddress()
 		self.ips = ips;
 		local function addIP_(ip)
 			if(ip and ip~="" and ip~="127.0.0.1"  and ip~="localhost") then
-				ips[#ips+1] = {text=format("%s:%s", ip, port)};	
+				ips[#ips+1] = {text= port == "8099" and ip or format("%s:%s", ip, port)};	
 			end
 		end
 		addIP_(NPL.GetExternalIP())

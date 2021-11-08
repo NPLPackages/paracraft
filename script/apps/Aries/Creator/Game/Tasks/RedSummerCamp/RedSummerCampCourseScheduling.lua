@@ -1,11 +1,13 @@
 --[[
-    luaide  模板位置位于 Template/FunTemplate/NewFileTemplate.lua 其中 Template 为配置路径 与luaide.luaTemplatesDir
-    luaide.luaTemplatesDir 配置 https://www.showdoc.cc/web/#/luaide?page_id=713062580213505
-    author:{pbb}
-    time:2021-09-17 10:44:02
-    use lib:
-    local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
-    RedSummerCampCourseScheduling.ShowView()
+Title: 
+Author(s): pbb
+Date: 2021/9/17
+Desc: 
+use the lib:
+------------------------------------------------------------
+local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
+RedSummerCampCourseScheduling.ShowView()
+-------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
@@ -38,14 +40,17 @@ RedSummerCampCourseScheduling.lessonCnf = {
         name="校园课X1",
         icon= "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i3_94X94_32bits.png#0 0 94 94",
         num = "16节",
+    },
+	{
+         key ="ppt_Z1",
+         name="试听课Z1",
+         icon= "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i4_94X94_32bits.png#0 0 94 94",
+		 num = "3节",
     }
-    -- ,{
-    --     key ="ppt_Z1",
-    --     name="自学课Z1",
-    --     icon= "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i4_94X94_32bits.png#0 0 94 94"
-    -- }
 }
-local auths = {ppt_L1 = false, ppt_S1 = false, ppt_X1 = false,}
+-- true to enable lessons for the current users
+local auths = {ppt_L1 = false, ppt_S1 = false, ppt_X1 = false, ppt_Z1 = true}
+
 local lessonKeys = {"LP_CommunityCourses","LP_SchoolCourses","LP_OrgCourses"}
 function RedSummerCampCourseScheduling.OnInit()
     page = document:GetPageCtrl();

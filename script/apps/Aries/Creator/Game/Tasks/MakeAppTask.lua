@@ -48,7 +48,7 @@ MakeApp.mode = {
 	UI = 1,
 }
 
-MakeApp.curAndroidVersion = '2.0.10';
+MakeApp.curAndroidVersion = '2.0.14';
 MakeApp.androidBuildRoot = 'temp/build_android_resource/';
 
 function MakeApp:ctor()
@@ -156,13 +156,13 @@ end
 
 function MakeApp:SignApkThread()
 	System.os.run(
-		'temp\\build_android_resource\\jre-windows\\bin\\jarsigner  -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ' ..
+		'temp\\build_android_resource\\jre-windows\\bin\\jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ' ..
 		self.androidBuildRoot .. 'personal-key.keystore -storepass paracraft ' ..
 		self.androidBuildRoot .. 'paracraft_ver' .. self.curAndroidVersion .. '_pack.apk paracraft');
 end
 
 function MakeApp:AndroidDownloadApk(callback)
-	local apkUrl = 'https://cdn.keepwork.com/paracraft/android/paracraft.apk?ver=' .. self.curAndroidVersion;
+	local apkUrl = 'https://cdn.keepwork.com/paracraft/android/paracraft_' .. self.curAndroidVersion .. '.apk';
 
 	local fileDownloader = FileDownloader:new();
 	fileDownloader.isSilent = true;
@@ -408,7 +408,7 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, loginEnable, callback)
 
 					if (writeFile:IsValid()) then
 						local content = 
-							'cmdline=mc="true" debug="main" bootstrapper="script/apps/Aries/main_loop.lua" ' .. 
+							'cmdline=mc="true" debug="main" IsAppVersion="true" bootstrapper="script/apps/Aries/main_loop.lua" ' .. 
 							'world="' .. 'worlds/DesignHouse/' .. currentEnterWorld.foldername .. '.zip"';
 
 						if (not beAutoUpdate) then
@@ -502,7 +502,7 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, loginEnable, callback)
 	
 			if (writeFile:IsValid()) then
 				local content = 
-					'cmdline=mc="true" debug="main" bootstrapper="script/apps/Aries/main_loop.lua" ' .. 
+					'cmdline=mc="true" debug="main" IsAppVersion="true" bootstrapper="script/apps/Aries/main_loop.lua" ' .. 
 					'world="' .. 'worlds/DesignHouse/' .. currentEnterWorld.foldername .. '"';
 
 				if (not beAutoUpdate) then
