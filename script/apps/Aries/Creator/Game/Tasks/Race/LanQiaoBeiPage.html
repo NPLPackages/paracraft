@@ -27,7 +27,7 @@
             end
 
             function GetBgStyle()
-                local view_width = LanQiaoBeiPage.index== 1 and 584 or 606
+                local view_width = LanQiaoBeiPage.index== 1 and 584 or 790
                 return string.format([[width: %spx;height:700px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/shentongbei_32bits.png#17 629 70 134:25 70 15 15);]], view_width)
             end
             
@@ -55,14 +55,14 @@
             <pe:if condition = '<%=CheckIsOpenSignUpPage()== false%>'>
                 <div style="color:#ffffff;font-size: 24px; position: relative;padding-top:14px;padding-left:15px;padding-right:22px;height: 180px; overflow-y: auto;font-weight: bold;">第十三届蓝桥杯青少年创意编程组大赛</div>
                 <div style="width: 60px; height: 60px;">
-                    <input type="button" style="margin-left: 562px; margin-top: 20px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+                    <input type="button" style="margin-left: 752px; margin-top: 20px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
                 </div>
                 <div style="float:left;">
-                    <pe:gridview style="margin-left:16px;margin-top:16px;margin-bottom:20px;width:600px;height:1024px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="20" VerticalScrollBarOffsetX="16"  AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "1024" 
+                    <pe:gridview style="margin-left:16px;margin-top:16px;margin-bottom:20px;width:790px;height:1024px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="20" VerticalScrollBarOffsetX="6"  AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "1024" 
                         DataSource="<%=GetItemData()%>">
                         <Columns>
-                            <div style="width:583px;height:5245px;">
-                                <div style="background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/tu8_564X5114_32bits.png#0 0 563 5245);margin-left:0px; margin-top:0px;width: 563px; height: 5245px;"></div>
+                            <div style="width:790px;height:7632px;">
+                                <div style="background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/tu8_564X5114_32bits.png#0 0 750 7632);margin-left:0px; margin-top:0px;width: 750px; height: 7632px;"></div>
                             </div>  
                         </Columns>
                         <EmptyDataTemplate>

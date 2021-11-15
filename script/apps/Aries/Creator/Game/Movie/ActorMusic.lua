@@ -74,8 +74,8 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 	end
 	local title = format(L"起始时间%s, 请输入文件名与播放位置:<br/>xxx.mp3 [开始时间(单位秒)]", strTime);
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAudioFileDialog.lua");
+	local OpenAudioFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAudioFileDialog");
 	local onClose = function(result)
 		if(result) then
 			local cmd_text = result;
@@ -110,8 +110,8 @@ function Actor:EditKeyFrame(keyname, time, default_value, callbackFunc)
 			end
 		end
 	end
-	OpenFileDialog.ShowPage(title, onClose, old_value_str, L"声音文件", "audio", nil, {text = L"录音", callback=function(filename) 
-		OpenFileDialog.OnClose()
+	OpenAudioFileDialog.ShowPage(title, onClose, old_value_str, L"声音文件", nil, {text = L"录音", callback=function(filename) 
+		OpenAudioFileDialog.OnClose()
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/SoundRecorder.lua");
 		local SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
 		SoundRecorder.ShowPage(function(filename)

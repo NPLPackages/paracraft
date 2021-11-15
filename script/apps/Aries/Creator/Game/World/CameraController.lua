@@ -485,6 +485,12 @@ function CameraController.OnMousePick(result, max_picking_dist)
 	if(not CameraController.IsLockPlayerHead() and result) then
 		local player = EntityManager.GetFocus();
 		if(player) then
+			if(ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LEFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RIGHT)) then
+				-- do not turn when left or right key is pressed
+				player:FaceTarget(nil);
+				return
+			end
+
 			local attr = ParaCamera.GetAttributeObject();
 			local cam_dist = attr:GetField("CameraObjectDistance", 10);
 			if(cam_dist < disable_facing_mouse_dist) then

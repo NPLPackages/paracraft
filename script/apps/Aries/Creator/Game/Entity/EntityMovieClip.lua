@@ -679,7 +679,7 @@ function Entity:ExecuteCommand(entityPlayer, bIgnoreNeuronActivation, bIgnoreOut
 			MovieManager:SetActiveMovieClip(movieClip);
 			movieClip:RePlay();
 		else
-			movieClip:RefreshActors();
+			movieClip:RefreshActors(true);
 			movieClip:RePlay();
 			MovieManager:AddMovieClip(movieClip);
 		end

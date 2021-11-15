@@ -32,14 +32,23 @@ local currentModelFile;
 local currentSkin;
 
 CustomSkinPage.category_ds = {
-	{tex1 = "zi_toushi1_28X14_32bits", tex2 = "zi_toushi2_28X14_32bits", name = "hair", index = 2},
-	{tex1 = "zi_yanjing2_28X14_32bits", tex2 = "zi_yanjing1_28X14_32bits", name = "eye", index = 3},
-	{tex1 = "zi_zuiba1_28X14_32bits", tex2 = "zi_zuiba2_28X14_32bits", name = "mouth", index = 4},
-	{tex1 = "zi_yifu1_28X14_32bits", tex2 = "zi_yifu2_28X14_32bits", name = "shirt", index = 5},
-	{tex1 = "zi_kuzi1_28X14_32bits", tex2 = "zi_kuzi2_28X14_32bits", name = "pants", index = 6},
-	{tex1 = "zi_shouchi1_28X14_32bits", tex2 = "zi_shouchi2_28X14_32bits", name = "right_hand_equipment", index = 8},
-	{tex1 = "zi_beibu1_28X14_32bits", tex2 = "zi_beibu2_28X14_32bits", name = "back", index = 7},
-	{tex1 = "zi_zuoqi1_28X14_32bits", tex2 = "zi_zuoqi2_28X14_32bits", name = "pet", index = 1},
+	-- {tex1 = "zi_toushi1_28X14_32bits", tex2 = "zi_toushi2_28X14_32bits", name = "hair", ui_index = 2},
+	-- {tex1 = "zi_yanjing2_28X14_32bits", tex2 = "zi_yanjing1_28X14_32bits", name = "eye", ui_index = 3},
+	-- {tex1 = "zi_zuiba1_28X14_32bits", tex2 = "zi_zuiba2_28X14_32bits", name = "mouth", ui_index = 4},
+	-- {tex1 = "zi_yifu1_28X14_32bits", tex2 = "zi_yifu2_28X14_32bits", name = "shirt", ui_index = 5},
+	-- {tex1 = "zi_kuzi1_28X14_32bits", tex2 = "zi_kuzi2_28X14_32bits", name = "pants", ui_index = 6},
+	-- {tex1 = "zi_shouchi1_28X14_32bits", tex2 = "zi_shouchi2_28X14_32bits", name = "right_hand_equipment", ui_index = 8},
+	-- {tex1 = "zi_beibu1_28X14_32bits", tex2 = "zi_beibu2_28X14_32bits", name = "back", ui_index = 7},
+	-- {tex1 = "zi_zuoqi1_28X14_32bits", tex2 = "zi_zuoqi2_28X14_32bits", name = "pet", ui_index = 1},
+
+	{tex1 = "zi_toushi1_28X14_32bits", tex2 = "zi_toushi2_28X14_32bits", name = "hair", ui_index = 7},
+	{tex1 = "zi_yanjing2_28X14_32bits", tex2 = "zi_yanjing1_28X14_32bits", name = "eye", ui_index = 1},
+	{tex1 = "zi_zuiba1_28X14_32bits", tex2 = "zi_zuiba2_28X14_32bits", name = "mouth", ui_index = 2},
+	{tex1 = "zi_yifu1_28X14_32bits", tex2 = "zi_yifu2_28X14_32bits", name = "shirt", ui_index = 3},
+	{tex1 = "zi_kuzi1_28X14_32bits", tex2 = "zi_kuzi2_28X14_32bits", name = "pants", ui_index = 4},
+	{tex1 = "zi_shouchi1_28X14_32bits", tex2 = "zi_shouchi2_28X14_32bits", name = "right_hand_equipment", ui_index = 6},
+	{tex1 = "zi_beibu1_28X14_32bits", tex2 = "zi_beibu2_28X14_32bits", name = "back", ui_index = 5},
+	{tex1 = "zi_zuoqi1_28X14_32bits", tex2 = "zi_zuoqi2_28X14_32bits", name = "pet", ui_index = 8},
 };
 CustomSkinPage.category_index = 1;
 CustomSkinPage.model_index = 1;
@@ -123,7 +132,7 @@ end
 function CustomSkinPage.GetIconIndexFromName(name)
 	for i = 1, #CustomSkinPage.category_ds do
 		if (CustomSkinPage.category_ds[i].name == name) then
-			return CustomSkinPage.category_ds[i].index;
+			return CustomSkinPage.category_ds[i].ui_index;
 		end
 	end
 	return -1;
@@ -188,15 +197,16 @@ end
 
 function CustomSkinPage.UpdateCustomGeosets(index)
 	local item = CustomSkinPage.Current_Item_DS[index];
-	if (CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].id == item.id) then
+	local ui_index = CustomSkinPage.category_ds[CustomSkinPage.category_index].ui_index;
+	if (CustomSkinPage.Current_Icon_DS[ui_index].id == item.id) then
 		return;
 	end
 
 	currentSkin = CustomCharItems:AddItemToSkin(currentSkin, item);
 
-	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].id = item.id;
-	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].name= item.name;
-	CustomSkinPage.Current_Icon_DS[CustomSkinPage.category_index].icon = item.icon;
+	CustomSkinPage.Current_Icon_DS[ui_index].id = item.id;
+	CustomSkinPage.Current_Icon_DS[ui_index].name= item.name;
+	CustomSkinPage.Current_Icon_DS[ui_index].icon = item.icon;
 	CustomSkinPage.Refresh();
 end
 

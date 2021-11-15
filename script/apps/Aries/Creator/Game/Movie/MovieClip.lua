@@ -378,7 +378,8 @@ function MovieClip:AddActor(actor)
 end
 
 -- create and refresh all actors with the movie clip entity
-function MovieClip:RefreshActors()
+-- @param bSkipPicking: if true, all actors will skip picking such as in play mode without camera. 
+function MovieClip:RefreshActors(bSkipPicking)
 	if(self.isActorCreated) then
 		-- remove all actors first and then recreate all. 
 	end
@@ -395,6 +396,12 @@ function MovieClip:RefreshActors()
 
 	for i, actor in pairs(self.actors) do
 		actor:OnCreate();
+		if(bSkipPicking) then
+			local entity = actor:GetEntity()
+			if(entity) then
+				entity:SetSkipPicking(true);
+			end
+		end
 	end
 
 	self:UpdateActors();

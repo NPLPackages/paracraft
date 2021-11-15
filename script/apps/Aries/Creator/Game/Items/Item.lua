@@ -686,7 +686,8 @@ end
 -- static function: from color to data
 -- @param bitCount: 8 or 16, default to current item setting
 function Item:ColorToData(color, bitCount)
-	if(bitCount~=16 and self:IsColorData8Bits()) then
+	bitCount = bitCount or (self:IsColorData8Bits() and 8 or 16)
+	if(bitCount~=16) then
 		return lshift((0xFF - Color.convert32_8(bor(color, 0xff000000))), 8);
 	else
 		return Color.convert32_16(color);
@@ -696,7 +697,8 @@ end
 -- @param bitCount: 8 or 16, default to current item setting
 -- @return without alpha, 0xff0000
 function Item:DataToColor(data, bitCount)
-	if(bitCount~=16 and self:IsColorData8Bits()) then
+	bitCount = bitCount or (self:IsColorData8Bits() and 8 or 16)
+	if(bitCount~=16) then
 		data = 0xFF - rshift(data, 8);
 		return band(Color.convert8_32(data), 0x00ffffff);
 	else

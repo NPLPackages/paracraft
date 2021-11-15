@@ -28,6 +28,18 @@ end
 
 function RedSummerCampPPtFullPage.OnCreate()
 	RedSummerCampPPtFullPage.StepNumKey = 0
+
+	if RedSummerCampPPtFullPage.is_expore_mode then
+		local rt_container = page:FindControl("rt_container")
+		if rt_container then
+			rt_container.visible=false
+		end
+
+		local export_mode_container = page:FindControl("export_mode_container")
+		if export_mode_container then
+			export_mode_container.visible=true
+		end
+	end
 end
 
 function RedSummerCampPPtFullPage.OnClose()
@@ -42,12 +54,12 @@ function RedSummerCampPPtFullPage.ClosePage()
 	end
 end
 
-function RedSummerCampPPtFullPage.Show(div_str)
+function RedSummerCampPPtFullPage.Show(div_str, zorder, is_expore_mode)
 	div_str = div_str or ""
 	RedSummerCampPPtPage.SetIsFullPage(true)
 	RedSummerCampPPtFullPage.IsInFullPage = true
 	RedSummerCampPPtFullPage.InitData(div_str)
-	
+	RedSummerCampPPtFullPage.is_expore_mode = is_expore_mode
 	
 	local enable_esc_key = System.options.isDevMode
 	local params = {
@@ -61,6 +73,7 @@ function RedSummerCampPPtFullPage.Show(div_str)
 			cancelShowAnimation = true,
 			DesignResolutionWidth = 1280,
 			DesignResolutionHeight = 720,
+			zorder=zorder or 0,
 			--app_key = 0, 
 			directPosition = true,
 				align = "_fi",
@@ -80,9 +93,6 @@ function RedSummerCampPPtFullPage.RefreshPage()
 end
 
 function RedSummerCampPPtFullPage.InitData(div_str)
-	-- local text = string.gsub(div_str, 'style="margin-left: 50px', 'style="margin-left: 80px')
-	-- print("ffffffffffffffff", string.find(div_str, 'style="margin-left: 50px'))
-	-- print("ddddddddd", text)
 	RedSummerCampPPtFullPage.StepNumKey = 0
 	RedSummerCampPPtFullPage.ShowDivStr = div_str
 end
@@ -95,12 +105,15 @@ end
 function RedSummerCampPPtFullPage.GetStepNumKey()
 	return RedSummerCampPPtFullPage.StepNumKey
 end
-function RedSummerCampPPtFullPage.RefreshPage()
-	if page then
-		page:Refresh(0)
-	end
-end
 
 function RedSummerCampPPtFullPage.GetPPtStr()
 	return RedSummerCampPPtFullPage.ShowDivStr
+end
+
+function RedSummerCampPPtFullPage.GetPPtTitle()
+	if RedSummerCampPPtFullPage.title then
+		return RedSummerCampPPtFullPage.title
+	end
+
+	return RedSummerCampPPtPage.GetPPtTitle()
 end

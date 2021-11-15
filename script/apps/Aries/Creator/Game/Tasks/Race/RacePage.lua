@@ -24,7 +24,7 @@ RacePage.ItemData = {
 			endTime="23:59:59"
 		},
 		race="“神通杯” 第一届全国学校联盟中小学计算机编程大赛",
-		content="大赛包含小学组图形化编程和中学组Python编程两个项目，比赛形式为理论知识（理论答题）+技能成果（作品创作）两项。大赛作品创作环节设有三大竞赛主题，分别为“编程与学科学习”、“人工智能创作”、“编程与未来生活”，同学们可创作3D动画或编程作品。例如将课本上的任意只是创作成动画，用动画或编程展示人类的未来生活等等。&#10备赛推荐课程：《盖世英雄》《长征》《孙子兵法》《征程》等系列主题课程。",
+		content="大赛包含小学组图形化编程和中学组Python编程两个项目，比赛形式为理论知识（理论答题）+技能成果（作品创作）两项。大赛作品创作环节设有三大竞赛主题，分别为“编程与学科学习”、“人工智能创作”、“编程与未来生活”，同学们可创作3D动画或编程作品。例如将课本上的任意知识创作成动画，用动画或编程展示人类的未来生活等等。&#10备赛推荐课程：《盖世英雄》《长征》《孙子兵法》《征程》等系列主题课程。",
 		ListData = {
 			{name = "赛事章程",node_name = "constitution",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/constitution_32bits.png#0 0 99 98);"></div>]]},
 			{name = "课程安排",node_name = "arrange",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/course_32bits.png#0 0 99 98);"></div>]]},
@@ -37,7 +37,7 @@ RacePage.ItemData = {
 	},
 	{
 		time = "2021年9月10日-2022年5月",
-		signUpBtnInfo = {tooltip = "报名截止时间：2021年11月10日",endDay = "2021-11-10",endTime ="23:59:59"},
+		signUpBtnInfo = {tooltip = "报名截止时间：2022年3月",endDay = "2022-2-28",endTime ="23:59:59"},
 		timeRule = {
 			startDay="2021-09-10",
 			startTime="00:00:00",

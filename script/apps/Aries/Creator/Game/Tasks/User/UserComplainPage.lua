@@ -13,7 +13,6 @@ UserComplainPage.ShowPage(UserComplainPage.Types.PROJECT,input_msg);
 local input_msg = UserComplainPage.MakeChatMsg(1,"test","aaaaaaaaaaaaa");
 UserComplainPage.ShowPage(UserComplainPage.Types.CHAT,input_msg);
 --]]
-
 local UserComplainPage = NPL.export()
 local page
 UserComplainPage.radio_ds = {

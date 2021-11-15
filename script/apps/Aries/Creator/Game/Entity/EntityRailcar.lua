@@ -717,8 +717,8 @@ function Entity:UpdateOnTrack(deltaTime, bx, by, bz, maxSpeed, slopeDecayFactor,
             local motionScale = self.motionX * self.motionX + self.motionZ * self.motionZ;
             if (motionScale < 0.01) then
 				local facing = self.riddenByEntity:GetFacing();
-				local dirXEntity = -math.sin(facing);
-				local dirZEntity = math.cos(facing);
+				local dirZEntity = -math.sin(facing);
+				local dirXEntity = math.cos(facing);
                 self.motionX = self.motionX + dirXEntity * 0.1;
                 self.motionZ = self.motionZ + dirZEntity * 0.1;
                 bDecelerate = false;

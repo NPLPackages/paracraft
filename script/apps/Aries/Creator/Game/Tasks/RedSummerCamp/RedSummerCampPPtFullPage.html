@@ -27,7 +27,7 @@ function LessonsPPtData(index)
 end
 
 function GetPPtTitle()
-    return RedSummerCampPPtPage.GetPPtTitle()
+    return RedSummerCampPPtFullPage.GetPPtTitle()
 end
 
 function GetPPtStr()
@@ -91,7 +91,9 @@ end
 </style>
 
 <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj3_32bits.png#0 0 5 512:1 10 2 10);">
-    <pe:container alignment="_rt" style="background:url();">
+    <pe:container zorder="1" visible="false" name="export_mode_container" onclick="" alignment="_fi" width="100%" height="100%" style="background:">
+    </pe:container>
+    <pe:container name="rt_container" alignment="_rt" style="background:url();">
         <input type="button" value='' onclick="ClosePage" style="width: 112px;height: 52px; margin-right:20px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B2_112X52_32bits.png#0 0 112 52);" />
     </pe:container>
     <pe:container alignment="_ct" style="margin-left:-532px;margin-top:-326px;width:1024px;height:612px;background:url();">

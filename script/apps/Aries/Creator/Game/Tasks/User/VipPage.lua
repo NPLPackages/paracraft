@@ -41,8 +41,10 @@ VipPage.order_state_map = {};
 VipPage.timer = nil;
 VipPage.desc = nil; -- vip功能描述
 VipPage.default_cache_policy = "access plus 1 month";
+VipPage.showRealNameGift = false
 function VipPage.OnInit()
     page = document:GetPageCtrl();
+	page.OnCreate = VipPage.OnCreate
 end
 function VipPage.GetPageCtrl()
     return page;
@@ -92,7 +94,7 @@ function VipPage.ShowPage__(key, desc)
 			directPosition = true,
 				align = "_ct",
 				x = -690/2,
-				y = -530/2,
+				y = -530/2 + 15,
 				width = 690,
 				height = 530,
 		};
@@ -481,4 +483,29 @@ function VipPage.GetDesc2()
 	end
 
 	return notOrganizationVipDesc;
+end
+
+
+function VipPage.OnCreate()
+	VipPage.SetActive("mouse_enter_tip",false)
+	VipPage.SetActive("phone_captcha_error",false)
+	VipPage.SetActive("phone_number_error",false)
+end
+
+function VipPage.SetActive(uiname,visible)
+	local pNode = ParaUI.GetUIObject(uiname)
+    if pNode then
+        pNode.visible = visible
+    end
+end
+
+function VipPage.OnMouseEnter(tipUiName)
+	VipPage.SetActive(tipUiName,true)
+end
+
+function VipPage.OnMouseLeave(tipUiName)
+    local pNode = ParaUI.GetUIObject(tipUiName)
+    if pNode then
+        pNode.visible = false
+    end
 end

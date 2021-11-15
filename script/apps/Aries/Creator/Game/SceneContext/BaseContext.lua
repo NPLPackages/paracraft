@@ -954,7 +954,7 @@ function BaseContext:handlePlayerKeyEvent(event)
 				GameLogic.ToggleDesktop("bag");
 				event:accept();
 			end
-		elseif(dik_key == "DIK_W") then
+		elseif(dik_key == "DIK_W" or dik_key == "DIK_UP") then
 			GameLogic.WalkForward();
 			
 		elseif(dik_key == "DIK_E") then

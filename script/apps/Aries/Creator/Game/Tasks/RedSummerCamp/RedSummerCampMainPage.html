@@ -204,6 +204,10 @@ end
 function ClickSchoolName()
     RedSummerCampMainPage.ClickSchoolName()
 end
+
+function need_show_login()
+    return need_certificate() or not GameLogic.GetFilters():apply_filters('is_signed_in')
+end
 ]]>
 </script>
 <style type="text/mcss">
@@ -296,7 +300,7 @@ end
                         </div>
                     </pe:if>
 
-                    <pe:if condition='<%= not need_certificate()%>'>
+                    <pe:if condition='<%= need_show_login()  %>'>
                         <pe:if condition='<%=System.options.loginmode == "offline" %>'>
                             <div style="margin-left: 5px;margin-top: 1px; float: left;">
                                 <div onclick="on_click_login" style="position: relative;width: 46px;height: 23px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn1_46X23_32bits.png#0 0 46 23)"></div>

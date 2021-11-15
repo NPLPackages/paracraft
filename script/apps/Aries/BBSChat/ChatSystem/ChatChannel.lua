@@ -59,12 +59,11 @@ local Chat = commonlib.gettable("MyCompany.Aries.Chat");
 local Friends = MyCompany.Aries.Friends;
 local FamilyChatWnd = commonlib.gettable("MyCompany.Aries.Chat.FamilyChatWnd");
 local ChatWnd = commonlib.gettable("MyCompany.Aries.Chat.ChatWnd");
-
+local KpChatChannel;
 local ProfileManager = commonlib.gettable("Map3DSystem.App.profiles.ProfileManager");
 local SmileyPage = commonlib.gettable("MyCompany.Aries.ChatSystem.SmileyPage");
 local Combat = commonlib.gettable("MyCompany.Aries.Combat");
 local Player = commonlib.gettable("MyCompany.Aries.Player");
-local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 
 ChatChannel.channels = {
 --{name=""},
@@ -443,9 +442,10 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inpu
 			_guihelper.MessageBox(L"很抱歉，现在不能聊天！");
 			return
 		end
-		
 	end
+	KpChatChannel = KpChatChannel or NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
     --if(generatorName == "paraworld" and KpChatChannel.IsBlockedChannel(ChannelIndex))then
+	
     if(KpChatChannel.IsInWorld() and KpChatChannel.IsBlockedChannel(ChannelIndex))then
         if(inputType ~= ChatChannel.InputTypes.FromQuickWord)then
 			_guihelper.MessageBox(L"这个频道只能发快捷语言！");

@@ -74,6 +74,7 @@ Entity.smoothFrames = 0;
 Entity.motionX = 0;
 Entity.motionY = 0;
 Entity.motionZ = 0;
+Entity.isBiped = true;
 
 function Entity:ctor()
 end

@@ -64,7 +64,7 @@ function DefaultFilters.cmd_open_url(url)
 		local isReturned;
 		local bStarted, site_url = NPLWebServer.CheckServerStarted(function(bStarted, site_url)
 			if(bStarted and isReturned) then
-				GameLogic.CommandManager:RunCommand("/open "..url);
+				GameLogic.RunCommand("/open "..url);
 			end
 		end)
 		isReturned = true;

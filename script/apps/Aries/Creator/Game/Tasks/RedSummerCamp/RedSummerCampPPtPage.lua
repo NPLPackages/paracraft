@@ -60,9 +60,9 @@ function RedSummerCampPPtPage.OnClose()
 
 	if not RedSummerCampPPtPage.IsSaveIndex then
 		RedSummerCampPPtPage.IsOpenPage = false
-		page = nil
 	end
 
+	page = nil
 	RedSummerCampPPtPage.IsSaveIndex = nil
 	RedSummerCampMainWorldPage.SetOpenFromCommandMenu(false)
 
@@ -212,6 +212,12 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 		end
 		
 		if is_start_notes then
+			if nil == ppt_data.notes_content then
+				ppt_data.notes_content = ""
+			end
+			ppt_data.notes_content = ppt_data.notes_content .. strValue .. "\r\n"
+			ppt_data.notes_content = string.gsub(ppt_data.notes_content, "</b>", "")
+			ppt_data.notes_content = string.gsub(ppt_data.notes_content, "<b>", "")
 			strValue = strValue .. "<br/>"
 
 			if is_start_knowledge_point then
@@ -491,6 +497,13 @@ function RedSummerCampPPtPage.OnWorldLoaded()
 
 		RedSummerCampPPtPage.SetIsReturnOpenPage(true)
 	end
+
+	commonlib.TimerManager.SetTimeout(function()  
+		local world_id = GameLogic.options:GetProjectId()
+		if world_id then
+			RedSummerCampPPtPage.OnVisitWrold(world_id)
+		end
+	end, 1500);
 end
 
 function RedSummerCampPPtPage.SetIsFullPage(flag)
@@ -503,6 +516,26 @@ end
 
 function RedSummerCampPPtPage.OpenFullPage()
 	RedSummerCampPPtFullPage.Show(RedSummerCampPPtPage.GetPPtStr());
+end
+
+function RedSummerCampPPtPage.ExportPPt()
+	local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
+	if DefaultFilters.Install == nil then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
+		local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
+		DefaultFilters:Install();
+	end
+
+	local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[RedSummerCampPPtPage.CurCourseName]
+	RedSummerCampPPtFullPage.Show(ppt_data_list[1].div_str, 9999, true);
+	
+	RedSummerCampPPtPage.export_ppt_data_list = ppt_data_list
+	RedSummerCampPPtPage.export_ppt_data_index = 1
+	commonlib.TimerManager.SetTimeout(function()  
+		RedSummerCampPPtPage.FlushExportFullPage()
+	end, 300);
+
+	-- GameLogic.RunCommand("/open npl://console");
 end
 
 function RedSummerCampPPtPage.OpenLastPPtPage()
@@ -634,5 +667,70 @@ function RedSummerCampPPtPage.SaveToPPtJson()
 
 		local absPath = string.gsub(ParaIO.GetCurDirectory(0) .. "temp/pptjson/", "/", "\\");
 		ParaGlobal.ShellExecute("open", "explorer.exe", absPath, "", 1)
+	end
+end
+
+function RedSummerCampPPtPage.GetExportData()
+	local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[RedSummerCampPPtPage.CurCourseName]
+	local course_data = nil
+	for key, v in pairs(RedSummerCampCourseScheduling.lessonCnf) do
+		if v.key == RedSummerCampPPtPage.CurCourseName then
+			course_data = v
+			break
+		end
+	end
+	return ppt_data_list or {}, course_data.name or "course"
+end
+
+function RedSummerCampPPtPage.FlushExportFullPage(index, ppt_data_list)
+	local ppt_data_list = RedSummerCampPPtPage.export_ppt_data_list
+	local index = RedSummerCampPPtPage.export_ppt_data_index
+	if not index or not ppt_data_list then
+		return
+	end
+
+	if index > #ppt_data_list then
+	-- if true then
+		RedSummerCampPPtFullPage.ClosePage()
+		RedSummerCampPPtFullPage.IsInFullPage = false
+		GameLogic.RunCommand("/open npl://console?isppt=true");
+		return
+	end
+
+	local data = ppt_data_list[index]
+	RedSummerCampPPtFullPage.title = data.title
+	RedSummerCampPPtFullPage.InitData(data.div_str)
+	RedSummerCampPPtFullPage.RefreshPage()
+	local filepath = string.format("script/apps/WebServer/admin/pptimg/%s.jpg", "ppt" .. index)
+
+	index = index + 1
+	RedSummerCampPPtPage.export_ppt_data_index = index
+	
+	commonlib.TimerManager.SetTimeout(function()  
+		ParaMovie.TakeScreenShot_Async(filepath,true,  1280, 720, string.format("NPL.load('(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua').FlushExportFullPage();%d",4))
+	end, 100);
+end
+
+function RedSummerCampPPtPage.IsClose()
+	return page == nil
+end
+
+function RedSummerCampPPtPage.IsLockScreen()
+	if Lan then
+		return Lan:GetSnapshot():IsLockScreen()
+	end
+
+	return false
+end
+
+function RedSummerCampPPtPage.LockScreen()
+	if Lan then
+		if RedSummerCampPPtPage.IsLockScreen() then
+			Lan:GetSnapshot():UnlockScreen()
+		else
+			Lan:GetSnapshot():LockScreen()
+		end
+
+		RedSummerCampPPtPage.RefreshPage()
 	end
 end

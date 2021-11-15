@@ -134,7 +134,10 @@ function env_imp:getActor(name)
 	end
 end
 
-function env_imp:string_length(str)
+function env_imp:string_length(var, str)
+	if (type(var) == "table") then return #var end 
+	if (type(var) == "string") then return ParaMisc.GetUnicodeCharNum(var) end 
+
 	return ParaMisc.GetUnicodeCharNum(str);
 end
 

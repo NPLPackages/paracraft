@@ -19,7 +19,7 @@ function LanQiaoBeiPage.OnInit()
 end
 
 function LanQiaoBeiPage.Show()
-	local view_width = LanQiaoBeiPage.index== 1 and 584 or 606
+	local view_width = LanQiaoBeiPage.index== 1 and 584 or 790
     local view_height = 700
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/Race/LanQiaoBeiPage.html",

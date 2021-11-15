@@ -23,6 +23,9 @@ SwfLoadingBar.lighting_tickcount = 0;
 function SwfLoadingBar.ShowForLightCalculation(onFinishCallback)
 	SwfLoadingBar.onFinishCallback = onFinishCallback;
 	SwfLoadingBarPage.ShowPage({ top = -50, show_background = true, worldname = WorldCommon.GetWorldTag("name") });
+	GameLogic.GetFilters():apply_filters(
+		"apply:apps.aries.creator.game.login.swf_loading_bar.show_for_light_calculation"
+	)
 	SwfLoadingBar.ShowProgress(L"正在计算光照信息, 请耐心等待...", 10);
 	SwfLoadingBar.tracking_target = "LightCalculation";
 	SwfLoadingBar.lighting_tickcount = 0;
@@ -105,6 +108,9 @@ function SwfLoadingBar.ClosePage(delay_time)
 		mytimer:Change(delay_time);	
 	end
 	SwfLoadingBar.OnFinish();
+	GameLogic.GetFilters():apply_filters(
+		"apply:apps.aries.creator.game.login.swf_loading_bar.close_page"
+	)
 end
 
 function SwfLoadingBar.ClosePageImp()
