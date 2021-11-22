@@ -12,7 +12,6 @@ local pageCtrl = document:GetPageCtrl();
 local KeepWorkBeanNoEnough = MyCompany.Aries.Creator.Game.KeepWork.KeepWorkBeanNoEnough
 local KeepworkServiceSession = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Session.lua")
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
---local WorldList = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/WorldList")
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
 
 local item_data = pageCtrl:GetRequestParam("item_data");
@@ -36,7 +35,6 @@ function OnDailyCheck()
         if result == true then
             Mod.WorldShare.Utils.SetTimeOut(function()
                 if result then
-                    --WorldList:RefreshCurrentServerList()
                     local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
                     ParacraftLearningRoomDailyPage.DoCheckin();
                     pageCtrl:CloseWindow();
@@ -55,7 +53,6 @@ function OnLearningLand()
         if result == true then
             Mod.WorldShare.Utils.SetTimeOut(function()
                 if result then
-                    --WorldList:RefreshCurrentServerList()
                     local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
                     ParacraftLearningRoomDailyPage.OnLearningLand();
                 end

@@ -151,10 +151,19 @@ end
 
 -- called when world is just loaded
 function block_types:OnWorldLoaded()
+	local restoredCount = 0;
 	for id, block_template in pairs(all_types) do
 		if(block_template.OnWorldLoaded) then
 			block_template:OnWorldLoaded();
 		end
+		if(block_template.RestoreToUnmodified) then
+			if(block_template:RestoreToUnmodified()) then
+				restoredCount = restoredCount + 1;
+			end
+		end
+	end
+	if(restoredCount > 0) then
+		LOG.std(nil, "info", "block_types", "%d blocks are restored", restoredCount);
 	end
 end
 

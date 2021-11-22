@@ -516,7 +516,8 @@ model id
     <!--20210701夏令营活动头饰-->
     <item id="83178" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83178_feedman_hat.anim.x"></attachment></item>
     <item id="83179" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83179_feedwoman_hat.anim.x"></attachment></item>
-    
+    <!--20211118活动头饰-->
+    <item id="83180" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83180_olympic_hat.anim.x"></attachment></item>
 
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>
@@ -643,7 +644,10 @@ model id
     <item id="84106" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84106_cheffy.png"></texture></item>
 
     <!--20211028新增-->
-    <item id="84085" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84085_famale_teacher.png"></texture></item>
+    <item id="84107" model="actor;"><geoset category="8" id="3"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84107_famale_teacher.png"></texture></item>
+
+    <!--20211118新增-->
+    <item id="84108" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84108_olympic_cloth.png"></texture></item>
 
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
@@ -784,7 +788,8 @@ model id
     <item id="85124" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85124_staffskirt3.png"></texture></item>
     <item id="85125" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85125_fastfoodwoman.png"></texture></item>
 
-   
+    <!--20211118新增-->
+    <item id="85126" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85126_olympic_pant.png"></texture></item>
 
 
     <!--      86000 86999  背部  attachment id="15"    -->
@@ -836,6 +841,8 @@ model id
     <item id="86042" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86042_red_scarf.anim.x"></attachment></item>
     <!--20210929添加国庆-->
     <item id="86043" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86043_red_flag_bag.anim.x"></attachment></item>
+    <!--20211118新增-->
+    <item id="86044" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86044_olympic_back.anim.x"></attachment></item>
 
     <!--      87000 97999  手持  attachment id="1"    -->
     <item id="87001" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x"></attachment></item>

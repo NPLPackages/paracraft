@@ -24,6 +24,7 @@ RedSummerCampPPtPage.PPtCacheData = {}
 local page
 RedSummerCampPPtPage.DiskFolder = nil
 RedSummerCampPPtPage.SplitKey = "_pptindex_"
+RedSummerCampPPtPage.ProjectIdToPPtData = {}
 
 local key_to_report_name = {
 	["ppt_L1"] = "org",		-- 机构课L1
@@ -194,6 +195,23 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 			local cur_step_value = ppt_data.max_step or 0
 			if step_value and step_value > cur_step_value then
 				ppt_data.max_step = step_value
+			end
+		end
+
+		if string.find(strValue, "projectid") then
+			local project_id = tonumber(string.match(strValue, 'projectid="(%d+)"'))
+			if project_id then
+				if RedSummerCampPPtPage.ProjectIdToPPtData[project_id] == nil then
+					RedSummerCampPPtPage.ProjectIdToPPtData[project_id] = {}
+				end
+	
+				local export_data = {}
+				export_data.course_name = course_name
+				export_data.step_value = ppt_data.max_step
+				export_data.course_index = #ppt_data_list
+	
+				local export_project_data = RedSummerCampPPtPage.ProjectIdToPPtData[project_id]
+				export_project_data[#export_project_data + 1] = export_data
 			end
 		end
 
@@ -404,19 +422,6 @@ function RedSummerCampPPtPage.SetCourseClientData(key, value)
 	local knowledge_point_desc = RedSummerCampPPtPage.SelectPPtData.knowledge_point_desc or course_title
 	local content = string.format("%s <br/> 知识点：<br/>%s", ppt_title, knowledge_point_desc)
 	RedSummerCampCourseScheduling.SetDayHistroy(RedSummerCampPPtPage.CurCourseName, content, RedSummerCampPPtPage.SelectLessonIndex)
-
-	-- 上报ppt学习情况
-	local lesson_type = key_to_report_name[RedSummerCampPPtPage.CurCourseName] or RedSummerCampPPtPage.CurCourseName
-	local section = RedSummerCampPPtPage.SelectLessonIndex or 1
-
-	if lesson_type then
-		keepwork.tatfook.study_learn_records({
-			lessonType = lesson_type,
-			section = section,
-			progress = tonumber(key) or 1,
-		}, function(err, msg, data)
-		end)
-	end
 end
 
 function RedSummerCampPPtPage.SetStepValueToProjectId(step_value, projectid)
@@ -461,6 +466,33 @@ function RedSummerCampPPtPage.OnVisitWrold(projectid)
 			RedSummerCampPPtPage.SetCourseClientData(step_value, 1)
 		end
 	end
+
+	if projectid then
+		-- 上报ppt学习情况
+		for key, v in pairs(RedSummerCampCourseScheduling.lessonCnf) do
+			if RedSummerCampPPtPage.PPtCacheData == nil or RedSummerCampPPtPage.PPtCacheData[v.key] == nil then
+				RedSummerCampPPtPage.InitPPtConfig(v.key)
+			end
+		end
+
+		-- export_data.course_name = course_name
+		-- export_data.step_value = ppt_data.max_step
+		-- export_data.course_index = #ppt_data_list + 1
+		projectid = tonumber(projectid)
+		local export_data_list = RedSummerCampPPtPage.ProjectIdToPPtData[projectid]
+		if export_data_list and #export_data_list > 0 then
+			for key, v in pairs(export_data_list) do
+				local lesson_type = key_to_report_name[v.course_name] or v.course_name
+				local section = v.course_index or 1
+				keepwork.tatfook.study_learn_records({
+					lessonType = lesson_type,
+					section = section,
+					progress = tonumber(v.step_value) or 1,
+				}, function(err, msg, data)
+				end)
+			end
+		end
+	end
 end
 
 function RedSummerCampPPtPage.OnSaveWrold()
@@ -497,13 +529,6 @@ function RedSummerCampPPtPage.OnWorldLoaded()
 
 		RedSummerCampPPtPage.SetIsReturnOpenPage(true)
 	end
-
-	commonlib.TimerManager.SetTimeout(function()  
-		local world_id = GameLogic.options:GetProjectId()
-		if world_id then
-			RedSummerCampPPtPage.OnVisitWrold(world_id)
-		end
-	end, 1500);
 end
 
 function RedSummerCampPPtPage.SetIsFullPage(flag)

@@ -165,11 +165,6 @@ end
 
 function Entity:EndEdit()
 	Entity._super.EndEdit(self);
-	if(self:IsBlocklyEditMode() and self:GetCommand() ~= self.blockly_nplcode) then
-		-- trickly: just in case we modified command directly, we will fallback to npl code instead. 
-		self:SetNPLCode(self:GetCommand())
-		self:SetBlocklyEditMode(false);
-	end
 	self:MarkForUpdate();
 end
 

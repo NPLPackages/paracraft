@@ -7,16 +7,20 @@ EmailManager.readed_ids_list = {}
 EmailManager.del_ids_list = {}
 EmailManager.reward_ids_list = {}
 EmailManager.cur_email_content = {}
-function EmailManager.Init(fromDock)
-    EmailManager.GetEmailList(fromDock)
+function EmailManager.Init(fromDock, init_cb)
+    EmailManager.GetEmailList(fromDock, init_cb)
 end
 
-function EmailManager.GetEmailList(formDock)
+function EmailManager.GetEmailList(formDock, init_cb)
     keepwork.email.email({},function(err, msg, data)
         if err == 200 then
             EmailManager.email_list = data.data
             if not formDock then
                 EmailManager.UpdateEmailList(true)                           
+            end
+
+            if init_cb then
+                init_cb()
             end
         end
     end)

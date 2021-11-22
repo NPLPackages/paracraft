@@ -150,7 +150,7 @@ function open()
 end
 
 function get_project_id(opus_content)
-    if (tonumber(opus_content or '') or 99999) < 99999 then
+    if (tonumber(opus_content or '') or 9999999) < 9999999 then
         return opus_content
     end
 
@@ -206,7 +206,12 @@ function ClickSchoolName()
 end
 
 function need_show_login()
-    return need_certificate() or not GameLogic.GetFilters():apply_filters('is_signed_in')
+    return  not GameLogic.GetFilters():apply_filters('is_signed_in')
+end
+
+function IsOffline()
+    local offline = not GameLogic.GetFilters():apply_filters('is_signed_in') --System.options.loginmode == "offline"
+    return offline
 end
 ]]>
 </script>
@@ -288,12 +293,12 @@ end
                     <pe:if condition='<%= need_certificate()%>'>
                         <div style="margin-left: 5px;margin-top: 1px; float: left;">
                             
-                            <pe:if condition='<%=System.options.loginmode ~= "offline" %>'>
+                            <pe:if condition='<%=not IsOffline() %>'>
                                 <input type="button" value='' onclick="show_certificate" class="green_button" style="position: relative;" />
                                 <div class="green_button" style="position: relative;background: ;">实名认证</div>
                             </pe:if>
 
-                            <pe:if condition='<%=System.options.loginmode == "offline" %>'>
+                            <pe:if condition='<%=IsOffline()%>'>
                                 <div onclick="on_click_login" style="position: relative;width: 46px;height: 23px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn1_46X23_32bits.png#0 0 46 23)"></div>
                             </pe:if>
                             
@@ -428,6 +433,14 @@ end
                 <pe:repeat DataSource="<%=GetRightBtData()%>">
                     <pe:repeatitem>
                         <div onclick="OnClickRightBt" name='<%=Eval("node_name")%>' style='<%=GetBtIconStyle(Eval("img"))%>'></div>
+                        <!-- <kp:redtip value="true" name='<%=Eval("node_name") .. "_red_icon"%>' style="position:relative;margin-left: -5px; margin-top:-66px;"></kp:redtip> -->
+                        <pe:container onclick="OnClickNotice1" 
+                                        visible=false
+                                        uiname='<%=Eval("red_icon_name")%>' 
+                                        style="width: 10px;height: 10px; position:relative;margin-left: -5px; margin-top:-66px;
+                                                background: url(Texture/Aries/Creator/keepwork/LearningDailyCheck/red_tip_32bits.png#0 0 10 10);">
+                        </pe:container>
+                        <!-- <div name='<%=Eval("red_icon_name")%>' style="width: 10px;height: 10px; position:relative;margin-left: -5px; margin-top:-66px;background: url(Texture/Aries/Creator/keepwork/LearningDailyCheck/red_tip_32bits.png#0 0 10 10);"></div> -->
                     </pe:repeatitem>
                 </pe:repeat>
             </div>

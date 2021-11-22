@@ -17,6 +17,8 @@ local RedSummerCampMainPage = NPL.export();
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua");
+local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
+local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 local page
 local notice_time = 3000
 RedSummerCampMainPage.UserData = {}
@@ -33,18 +35,18 @@ local notice_desc = {
 	-- {desc = [[教师节活动奖励新鲜出炉！！！]], name="teacher_day"},
 	-- {desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
 	{desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
-	{desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
+	-- {desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
 	{desc = [[重温红色记忆，重走《征程》之约]], name="zhengcheng"},
 	{desc = [[为校争光，我的虚拟校园等你来建设]], name="ai_school"},
 }
 
 RedSummerCampMainPage.RightBtData = {
-	{node_name = "skin", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/2_63X57_32bits.png#0 0 64 74"},
-	{node_name = "certificate", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/1_63X57_32bits.png#0 0 64 74"},
-	{node_name = "friend", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/3_63X57_32bits.png#0 0 64 74"},
-	{node_name = "email", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/4_63X57_32bits.png#0 0 64 74"},
-	{node_name = "task", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/5_63X57_32bits.png#0 0 64 74"},
-	{node_name = "rank", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/6_51X53_32bits.png#0 0 64 74"},
+	{node_name = "skin", red_icon_name="skin_red_icon", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/2_63X57_32bits.png#0 0 64 74"},
+	{node_name = "certificate", red_icon_name="certificate_red_icon", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/1_63X57_32bits.png#0 0 64 74"},
+	{node_name = "friend", red_icon_name="friend_red_icon", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/3_63X57_32bits.png#0 0 64 74"},
+	{node_name = "email", red_icon_name="email_red_icon", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/4_63X57_32bits.png#0 0 64 74"},
+	{node_name = "task", red_icon_name="task_red_icon", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/5_63X57_32bits.png#0 0 64 74"},
+	{node_name = "rank", red_icon_name="rank_red_icon", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/6_51X53_32bits.png#0 0 64 74"},
 }
 local notice_text_index = 1
 
@@ -105,6 +107,9 @@ function RedSummerCampMainPage.Show()
 
 	if not RedSummerCampMainPage.BindFilter then
 		GameLogic.GetFilters():add_filter("became_vip", RedSummerCampMainPage.RefreshPage);
+		GameLogic.GetFilters():add_filter("update_msgcenter_unread_num", function(num)
+			RedSummerCampMainPage.ChangeRedTipState("email_red_icon", DockPage.HasMsgCenterUnReadMsg())
+		end);
 		GameLogic.GetFilters():add_filter("role_page_close", function()
 			commonlib.TimerManager.SetTimeout(function()  
 				RedSummerCampMainPage.RefreshPage()
@@ -133,6 +138,8 @@ function RedSummerCampMainPage.Show()
 		end)
 	end
 
+	RedSummerCampMainPage.HasClickFriend = false
+	RedSummerCampMainPage.HasClickQuest = false
 end
 
 function RedSummerCampMainPage.OnClose()
@@ -168,6 +175,11 @@ function RedSummerCampMainPage.OnCreate()
 		local obj = scene:GetObject(module_ctl.obj_name);
 		obj:SetScale(1)
 	end
+
+	RedSummerCampMainPage.HandleQuestRedTip()
+	RedSummerCampMainPage.HandleFriendsRedTip()
+	DockPage.HandMsgCenterMsgData()
+	RedSummerCampMainPage.UpdateRedTip()
 end
 
 function RedSummerCampMainPage.GetAutoNoticeText()
@@ -583,12 +595,15 @@ function RedSummerCampMainPage.OnClickRightBt(name)
 	elseif name == "friend" then
         local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
         FriendsPage.Show();
+		RedSummerCampMainPage.ChangeRedTipState("friend_red_icon", false)
 	elseif name == "email" then
         local Email = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/Email.lua");
         Email.Show();		
 	elseif name == "task" then
 		local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
 		QuestPage.Show();
+		RedSummerCampMainPage.HasClickQuest = true
+		RedSummerCampMainPage.ChangeRedTipState("task_red_icon", false)
 	elseif name == "rank" then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua").Show();
     end
@@ -613,4 +628,84 @@ function RedSummerCampMainPage.ClickSchoolName()
 			end, 500)
 		end)
 	end);
+end
+
+function RedSummerCampMainPage.HandleQuestRedTip()
+	local is_all_task_complete = true
+	local QuestProvider = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestProvider");
+	if QuestProvider:GetInstance().questItemContainer_map then
+		local quest_datas = QuestProvider:GetInstance():GetQuestItems() or {}
+		for i, v in ipairs(quest_datas) do
+			-- 有可以领取任务的时候
+
+			if not v.questItemContainer:IsFinished() then
+				is_all_task_complete = false
+				break
+			end
+		end
+	end
+	RedSummerCampMainPage.ChangeRedTipState("task_red_icon", not is_all_task_complete and not RedSummerCampMainPage.HasClickQuest)
+end
+
+function RedSummerCampMainPage.HandleFriendsRedTip()
+	if not RedSummerCampMainPage.IsVisible() then
+		if RedSummerCampMainPage.CheckRedTipTimer then
+			RedSummerCampMainPage.CheckRedTipTimer:Change()
+			RedSummerCampMainPage.CheckRedTipTimer = nil
+		end
+		return
+	end
+
+	if nil == RedSummerCampMainPage.CheckRedTipTimer then
+		RedSummerCampMainPage.CheckRedTipTimer = commonlib.Timer:new({callbackFunc = function(timer)
+			RedSummerCampMainPage.HandleFriendsRedTip()
+		end})
+
+		RedSummerCampMainPage.CheckRedTipTimer:Change(60000, 60000);
+	end
+
+	FriendManager:LoadAllUnReadMsgs(function ()
+		-- 处理未读消息
+		if FriendManager.unread_msgs and FriendManager.unread_msgs.data then
+			for k, v in pairs(FriendManager.unread_msgs.data) do
+				if v.unReadCnt and v.unReadCnt > 0 then
+					RedSummerCampMainPage.ChangeRedTipState("friend_red_icon", true)
+					break
+				end
+			end
+		end
+	end, true);
+end
+
+function RedSummerCampMainPage.UpdateRedTip()
+	if not RedSummerCampMainPage.IsVisible() then
+		if RedSummerCampMainPage.UpdateRedTipTimer then
+			RedSummerCampMainPage.UpdateRedTipTimer:Change()
+			RedSummerCampMainPage.UpdateRedTipTimer = nil
+		end
+		return
+	end
+
+	if nil == RedSummerCampMainPage.UpdateRedTipTimer then
+		RedSummerCampMainPage.UpdateRedTipTimer = commonlib.Timer:new({callbackFunc = function(timer)
+			RedSummerCampMainPage.UpdateRedTip()
+		end})
+
+		RedSummerCampMainPage.UpdateRedTipTimer:Change(0, 1000);
+	end
+
+	RedSummerCampMainPage.ChangeRedTipState("email_red_icon", DockPage.HasMsgCenterUnReadMsg())
+	RedSummerCampMainPage.HandleQuestRedTip()
+end
+
+function RedSummerCampMainPage.ChangeRedTipState(ui_name, state)
+	if not RedSummerCampMainPage.IsVisible() then
+		return
+	end
+
+	local friend_red_icon = ParaUI.GetUIObject(ui_name)
+	
+	if friend_red_icon:IsValid() then
+		friend_red_icon.visible = state
+	end
 end

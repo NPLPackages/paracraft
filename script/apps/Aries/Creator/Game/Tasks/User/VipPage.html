@@ -53,13 +53,13 @@
             ["font-size"] = 14,
         },
         theme1_myhome_green_bt = {
-            background = 'Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_32x35_32bits.png#0 0 32 35:12 12 16 16',
+            background = 'Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_28x28_32bits.png#0 0 28 28:12 12 12 12',
             textcolor = '#000000',
             ["font-size"] = 14,
         },
         
         theme1_myhome_blue_bt = {
-            background = 'Texture/Aries/Creator/keepwork/Certification/RealName/btn_huang_18x18_32bits.png#0 0 20 21:6 6 6 6',
+            background = 'Texture/Aries/Creator/keepwork/Certification/RealName/xiayibu_28x28_32bits.png#0 0 28 28:12 12 12 12',
             width = 221,
             height = 55,
             folat = "left",
@@ -256,7 +256,7 @@
 
                     local timer = commonlib.Timer:new({
                         callbackFunc = function(timer)
-                            Page:SetValue("getPhoneCaptcha", format("%s(%ds)", L"重新发送", times))
+                            Page:SetValue("getPhoneCaptcha", format("%s(%ds)", L"重发", times))
 
                             if times == 0 then
                                 isClickedGetPhoneCaptcha = false
@@ -337,9 +337,9 @@
                     GameLogic.GetFilters():apply_filters('check_signed_in', "请先登录", function(result)
                             if result == true then
                             commonlib.TimerManager.SetTimeout(function()
+                            KeepWorkItemManager.LoadProfile(true, function()  --刷新用户信息                  
+                                VipPage.RefreshPage()
                                 RedSummerCampMainPage.RefreshPage()
-                                KeepWorkItemManager.LoadProfile(true, function()  --刷新用户信息                  
-                                    VipPage.RefreshPage()
                                 end)
                                 
                                 end, 500)
@@ -466,13 +466,8 @@
                                                 <img style="width: 145px;height: 35px;margin-left: 18px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/shurukuang_32x32_32bits.png#0 0 32 32:8 8 8 8" />
                                                 <input type="text" style="position:absolute;width: 135px;height: 25px;font-size:18px;margin-left: -138x;margin-top: 4px;background:url();" class="" onfocusout="check_phone_number()" onfocusin="ClearCaptchaErrorTip"name="phonecaptcha"/>
                         
-                                                <div style="float: left; width: 114px;height: 35px;margin-left: 18px;background-color: #a74a1f00;">
-                                                    <input type="button" 
-                                                    icon="Texture/Aries/Creator/keepwork/Certification/RealName/huoquyanzhengma_89x18_32bits.png#0 0 89 18"
-                                                    icon_width=89
-                                                    icon_height=18
-                                                    icon_off_y=2
-                                                    style="position: relative;width: 114px;height: 35px;background: url(Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_32x35_32bits.png#0 0 26 27:8 8 12 12)" name="getPhoneCaptcha" class="" value="" onclick="get_phone_captcha()"/>
+                                                <div style="float: left; width: 118px;height: 39px;margin-left: 14px;background-color: #a74a1f00;">
+                                                    <input type="button" style="font-weight:bold;font-size:18px;position: relative;width: 118px;height: 39px;background: url(Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_28x28_32bits.png#0 0 28 28:12 12 12 12)" name="getPhoneCaptcha" class="" value="<%=L'获取验证码'%>" onclick="get_phone_captcha()"/>
                                                     <!-- <img style="position:relative;width: 89px;height: 18px;margin-left: 15px;margin-top: 10px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/huoquyanzhengma_89x18_32bits.png#0 0 89 18" /> -->
                                                     
                                                 </div>

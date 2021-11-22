@@ -7,18 +7,19 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ActorAnimationsDialog.lua");
 local ActorAnimationsDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.ActorAnimationsDialog");
-ActorAnimationsDialog.ShowPage("", function(result)
-	
-end)
+ActorAnimationsDialog.ShowPageForEntity(entity, function(animId)   end)
+ActorAnimationsDialog.ShowPage(modelName, skin, options, OnClose, text)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ActorAnimationsDialog.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/EntityAnimation.lua");
+local EntityAnimation = commonlib.gettable("MyCompany.Aries.Game.Effects.EntityAnimation");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
-local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
@@ -39,9 +40,76 @@ function ActorAnimationsDialog.GetModelAnimDs()
 	return ActorAnimationsDialog.anims_ds;
 end
 
+--@param OnClose: function(animId) end 
+function ActorAnimationsDialog.ShowPageForEntity(entity, OnClose, text)
+	if(not entity) then
+		return
+	end
+			
+	-- get {{value, text}} array of all animations in the asset file. 
+	local options = {alignment="_lt"};
+	local assetfile = entity:GetMainAssetPath();
+	local skin = entity:GetSkin();
+
+	if(assetfile) then
+		assetfile = PlayerAssetFile:GetFilenameByName(assetfile)
+		NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
+		local ParaXModelAttr = commonlib.gettable("System.Scene.Assets.ParaXModelAttr");
+		local attr = ParaXModelAttr:new():initFromAssetFile(assetfile);
+		local animations = attr:GetAnimations()
+		if(animations) then
+			for _, anim in ipairs(animations) do
+				if(anim.animID) then
+					options[#options+1] = {value = anim.animID, text = EntityAnimation.GetAnimTextByID(anim.animID, assetfile)}
+				end
+			end
+			table.sort(options, function(a, b)
+				return a.value < b.value;
+			end)
+		end
+		if(assetfile:match("%.bmax$")) then
+			-- we will add some more default values
+			local hasAnims = {};
+			for _, option in ipairs(options) do
+				hasAnims[option.value] = true;
+			end
+			local default_anim_placeholders = {0,4,5,13, 37,38,39,41,42,43,44,45,91,135,153, 154, 155, 156,}
+			for _, animId in ipairs(default_anim_placeholders) do
+				if(not hasAnims[animId]) then
+					options[#options+1] = {value = animId, text = EntityAnimation.GetAnimTextByID(animId, assetfile)};
+				end
+			end
+		end
+		text = text or L"请选择动画ID或名称";
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ActorAnimationsDialog.lua");
+		local ActorAnimationsDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.ActorAnimationsDialog");
+		ActorAnimationsDialog.ShowPage(assetfile, skin, options, function(result)
+			if(result and result ~= "") then
+				result = EntityAnimation.CreateGetAnimId(result);	
+				if( type(result) == "number") then
+					result = tonumber(result);
+					if(OnClose) then
+						OnClose(result)
+					end
+				end
+			end
+		end, text);
+	end
+end
+
+--@param options: array of animation text and id pairs. it can also contain options.alignment = "_lt", 
 function ActorAnimationsDialog.ShowPage(modelName, skin, options, OnClose, text)
 	ActorAnimationsDialog.result = nil;
 	ActorAnimationsDialog.text = text;
+
+	options = options or {};
+	local width, height = 480, 360;
+	local x, y;
+	if(options.alignment == "_lt") then
+		x, y = 20, 100;
+	else
+		x, y = - width / 2, - height / 2;
+	end
 
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/ActorAnimationsDialog.html", 
@@ -57,11 +125,11 @@ function ActorAnimationsDialog.ShowPage(modelName, skin, options, OnClose, text)
 			isTopLevel = true,
 			---app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
-				align = "_ct",
-				x = -480/2,
-				y = -360/2,
-				width = 480,
-				height = 360,
+				align = options.alignment or "_ct",
+				x = x,
+				y = y,
+				width = width,
+				height = height,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
@@ -94,18 +162,17 @@ function ActorAnimationsDialog.UpdateModel(modelName, skin, options)
 			if(PlayerAssetFile:IsCustomModel(filepath)) then
 				CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
 			elseif(PlayerAssetFile:HasCustomGeosets(filepath)) then
-				CustomGeosets = PlayerAssetFile:GetDefaultCustomGeosets();
+				CustomGeosets = skin or PlayerAssetFile:GetDefaultCustomGeosets();
 			elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
 				-- TODO:  hard code worker skin here
-				ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
+				ReplaceableTextures = {[2] = skin or PlayerSkins:GetSkinByID(12)};
 			end
-
-			local skin = CustomCharItems:GetSkinByAsset(filepath);
-			if (skin) then
+			local skin_ = CustomCharItems:GetSkinByAsset(filepath);
+			if (skin_) then
 				filepath = CustomCharItems.defaultModelFile;
-				CustomGeosets = skin;
+				CustomGeosets = CustomGeosets or skin_;
 			end
-
+			
 			ctl:ShowModel({AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0, ReplaceableTextures=ReplaceableTextures, CCSInfoStr=CCSInfoStr, CustomGeosets = CustomGeosets});
 
 			ActorAnimationsDialog.RefreshAnims(filepath, options);

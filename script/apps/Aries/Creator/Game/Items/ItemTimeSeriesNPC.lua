@@ -78,8 +78,11 @@ function ItemTimeSeriesNPC:DrawIcon(painter, width, height, itemStack)
 		end
 		
 		if(itemStack.renderedTexturePath) then
-			--painter:SetPen("#ffffff30");
-			--painter:DrawRectTexture(0, 0, width, height, self:GetIcon());
+			-- painter:SetPen("#ffffffcc");
+			-- painter:DrawRectTexture(0, height*0.7, width*0.3, height*0.3, self:GetIcon());
+			-- draw a small background block to indicate there is a valid item. 
+			painter:SetPen("#ffffff80");
+			painter:DrawRect(0, height*0.75, width*0.25, height*0.25);
 			painter:SetPen("#ffffff");
 			painter:DrawRectTexture(0, 0, width, height, itemStack.renderedTexturePath);
 		else

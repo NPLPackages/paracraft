@@ -264,8 +264,12 @@ function FindBlockTask.SetResults(entities)
 		local regions = {};
 		for i, entity in ipairs(entities) do
 			local item = entity:GetItemClass()
-			local name = entity:GetDisplayName();
-			if(item and name and name~="") then
+			local name = entity:GetDisplayName() or "";
+			if(name == "" and entity.isPowered) then
+				-- tricky: for unnamed, yet powered code block, we will list them
+				name = "(powered)"
+			end
+			if(item and name~="") then
 				name = name:gsub("\r?\n"," ")
 				local index = #resultDS+1
 				resultDS[index] = {name="block", attr={index=index,name=name, lowerText = string.lower(name), icon = item:GetIcon()}};

@@ -111,6 +111,10 @@ function QuestAction.GetGoToWorldId(target_id)
     end
 end
 
+function QuestAction.Clear()
+    QuestAction.clientData = nil
+end
+
 function QuestAction.GetVersionValue(target_id, key)
     key = key or "goto_world"
     local template = QuestAction.GetItemTemplate(target_id);
@@ -336,9 +340,12 @@ function QuestAction.DailyWorldTask()
 	local world_name = WorldCommon.GetWorldTag("name");
 
     -- 在这里加ppt的世界访问
-    if world_id then
-        RedSummerCampPPtPage.OnVisitWrold(world_id)
-    end
+    commonlib.TimerManager.SetTimeout(function()  
+        local world_id = GameLogic.options:GetProjectId()
+        if world_id then
+            RedSummerCampPPtPage.OnVisitWrold(world_id)
+        end
+    end, 1500);
 
 	local key = world_id
 	if key == nil then

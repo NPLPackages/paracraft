@@ -94,7 +94,7 @@ function step.create_full_page(rootName, mcmlNode, bindingContext, _parent, left
 	end
 	RedSummerCampPPtFullPage.SetStepNumKey(step_num)
 
-	if RedSummerCampPPtPage.GetStepIsComplete(step_num) then
+	if RedSummerCampPPtPage.GetStepIsComplete(step_num) and not RedSummerCampPPtFullPage.is_expore_mode then
 		local check_icon = ParaUI.CreateUIObject("container", "lessonppt_check_icon", "_lt", 25, 30, 39, 36);
 		check_icon.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/v_26X24_32bits.png;0 0 26 24";
 		_root:AddChild(check_icon);

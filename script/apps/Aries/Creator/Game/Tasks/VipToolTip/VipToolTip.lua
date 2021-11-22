@@ -15,7 +15,7 @@ local KeepworkService = NPL.load("(gl)Mod/WorldShare/service/KeepworkService.lua
 local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
 -- UI
 local LoginModal = NPL.load("(gl)Mod/WorldShare/cellar/LoginModal/LoginModal.lua")
-local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
+
 local VipToolTip = NPL.export()
 VipToolTip.onlyRecharge = false;
 local page
@@ -80,7 +80,7 @@ function VipToolTip:ShowPage()
 end
 
 function VipToolTip:RefreshVipInfo()
-    UserInfo:LoginWithToken(VipToolTip.callback);
+    GameLogic.GetFilters():apply_filters('login_with_token', VipToolTip.callback);
 end
 
 function VipToolTip:Close()

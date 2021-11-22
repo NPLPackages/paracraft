@@ -1355,7 +1355,7 @@ end
 
 function CodeBlockWindow.IsSupportNplBlockly()
 	local entity = CodeBlockWindow.GetCodeEntity();
-	return entity and type(entity.IsBlocklyEditMode) == "function" and type(entity.IsUseNplBlockly) == "function" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
+	return entity and type(entity.IsBlocklyEditMode) and type(entity.IsUseNplBlockly) == "function" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
 end
 		
 function CodeBlockWindow.OnTryOpenMicrobit()
@@ -1369,7 +1369,7 @@ function CodeBlockWindow.IsMicrobitEntity()
 	local entity = CodeBlockWindow.GetCodeEntity();
 	if(entity)then
 		local configFile = entity:GetLanguageConfigFile()
-		if(configFile == "microbit")then
+		if(configFile == "microbit") then
 			return true;
 		end
 	end
@@ -1378,6 +1378,7 @@ function CodeBlockWindow.UpdateNplBlocklyCode()
 	local codeEntity = CodeBlockWindow.GetCodeEntity();
 	if (not NplBlocklyEditorPage or not codeEntity or CodeBlockWindow.isUpdatingNPLBlocklyUIFromCode) then return end
 	if (not CodeBlockWindow.IsSupportNplBlockly()) then return end
+	if (not CodeBlockWindow.IsBlocklyEditMode()) then return print("---------------------------NOT IsBlocklyEditMode---------------------------") end 
 
 	local G = NplBlocklyEditorPage:GetG();
 	local code = type(G.GetCode) == "function" and G.GetCode() or "";

@@ -608,6 +608,15 @@ function Entity:GetLastAnimId()
 	return self.lastAnimId;
 end
 
+-- get current animation id. this may return 0 if not found. 
+function Entity:GetCurrentAnimId()
+	local player = self:GetInnerObject();
+	if(player) then
+		return player:GetField("AnimID", 0);
+	else
+		return 0;
+	end
+end
 
 -- enable headon display
 function Entity:ShowHeadOnDisplay(bShow)
@@ -1176,6 +1185,11 @@ function Entity:Say(text, duration, bAbove3D)
 			end
 		end
 	end
+end
+
+-- get the last self:Say() text. it may return nil. 
+function Entity:GetLastSayText()
+	return self.lastSayText;
 end
 
 -- attach to entity manager

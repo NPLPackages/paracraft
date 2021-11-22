@@ -68,7 +68,6 @@ function HelpPage.ShowPage(category_name, subfolder_name)
 		target_name = HelpPage.OpenIndexStrList[1]
 
 		category_name, subfolder_name = HelpPage.GetCategoryAndSubName(target_name);
-		HelpPage.OpenIndexStrList = nil
 	end
 
 	HelpPage.SelectCategory(category_name, subfolder_name, target_name);
@@ -76,6 +75,13 @@ function HelpPage.ShowPage(category_name, subfolder_name)
 	if GameLogic.events then
 		GameLogic.events:DispatchEvent({type = "ShowHelpPage"});
 	end
+
+	commonlib.TimerManager.SetTimeout(function()
+		if HelpPage.ScrollToindex then
+			page:CallMethod("gvwMCTask", "ScrollToRow", HelpPage.ScrollToindex);
+			HelpPage.ScrollToindex = nil
+		end
+	end, 200);
 end
 
 function HelpPage.IsOpen()
@@ -149,6 +155,10 @@ function HelpPage.SelectCategory(index_or_name, subcategory_name, grid_item_name
 
 		-- GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse:"..tostring(HelpPage.cur_category), 1, nil);
 
+		if HelpPage.OpenIndexStrList then
+			HelpPage.ScrollToindex = HelpPage.select_task_index
+			HelpPage.OpenIndexStrList = nil
+		end
 		if(page) then
 			page:Refresh(0.1);
 		end
@@ -177,6 +187,7 @@ function HelpPage.OnInit()
 	HelpPage.OnInitDS();
 	HelpPage.select_task_index = HelpPage.select_task_index or 1;
 	HelpPage.inited = true;
+
 end
 
 --local blockTypes = {

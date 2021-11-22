@@ -36,8 +36,9 @@ function OnClick()
         else
             _guihelper.MessageBox(L"领取会员成功！")
         end
-        local UserInfo = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/UserInfo.lua")
-        UserInfo:LoginWithToken();
+
+        GameLogic.GetFilters():apply_filters('login_with_token')
+
         KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadProfile");
         KeepWorkItemManager.GetFilter():apply_filters("KeepWorkItemManager_LoadItems");
         ClosePage();

@@ -225,7 +225,7 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerEntity)
 	end
 
 	local use_hair = false;
-	local charater = player:ToCharacter();
+	local character = player:ToCharacter();
 
 	-- echo:"geosets"
     -- echo:return "6#201#301#401#501#801#901#"
@@ -235,7 +235,7 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerEntity)
 			if (id > 0 and id < 100) then
 				use_hair = true;
 			end
-			charater:SetCharacterSlot(math.floor(id / 100), id % 100);
+			character:SetCharacterSlot(math.floor(id / 100), id % 100);
 		end
 	end
 
@@ -255,16 +255,16 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerEntity)
 		end
 	end
 
-	charater:RemoveAttachment(2, 2);
-	charater:RemoveAttachment(11, 11);
-	charater:RemoveAttachment(15, 15);
+	character:RemoveAttachment(2, 2);
+	character:RemoveAttachment(11, 11);
+	character:RemoveAttachment(15, 15);
 
 	local isAttachmentStringExist = attachments and string.len(attachments) > 0;
 	if (isAttachmentStringExist) then
 		for id, filename in attachments:gmatch("(%d+):([^;]+)") do
 			id = tonumber(id);
 			if (use_hair and id == 11) then
-				charater:RemoveAttachment(11, 11);
+				character:RemoveAttachment(11, 11);
 			else
 				local meshModel;
 				if (string.find(filename, "anim.x")) then
@@ -273,7 +273,7 @@ function PlayerAssetFile:RefreshCustomGeosets(player, skin, playerEntity)
 					meshModel = ParaAsset.LoadStaticMesh("", filename);
 				end
 				if (meshModel and (id ~= ATTACHMENT_ID_PET)) then
-					charater:AddAttachment(meshModel, id, id);
+					character:AddAttachment(meshModel, id, id);
 				end
 			end
 		end
@@ -296,7 +296,7 @@ function PlayerAssetFile.ShowPetOrNot(player, attachments, playerEntity, isAttac
 
 	local player = player or playerEntity:GetInnerObject();
 	local playerUserName = playerEntity.username;
-	local charater = player:ToCharacter();
+	local character = player:ToCharacter();
 	local ATTACHMENT_ID_PET = 20;
 	local isPetSkinIdExist = attachments and string.find(attachments, "20:");
 	local playerId = player.id or "";
@@ -327,7 +327,7 @@ function PlayerAssetFile.ShowPetOrNot(player, attachments, playerEntity, isAttac
 			newSkin);
 
 		local petModel = ParaAsset.LoadParaX("", modelUrl);
-		charater:ResetBaseModel(petModel);
+		character:ResetBaseModel(petModel);
 
 		local dummmyPlayerObj = dummmyPlayerEntity:GetInnerObject();
 		dummmyPlayerObj:ToCharacter():MountOn(player)
@@ -342,14 +342,14 @@ function PlayerAssetFile.ShowPetOrNot(player, attachments, playerEntity, isAttac
 		commonlib.TimerManager.SetTimeout(function()
 			playerEntity:SetHeadOnDisplay(nil);
 			dummmyPlayerEntity:SetHeadOnDisplay(playerEntity.headUI_Params);
-		end, 200);
+		end, 3000);
 	end
 	
 	-- force reset BaseModel
 	if(isPetSkinIdExist and playerEntity.petObj) then
 		local modelUrl = PlayerAssetFile:GetAttachmentModelUrlByID(ATTACHMENT_ID_PET, attachments)
 		local petModel = ParaAsset.LoadParaX("", modelUrl);
-		charater:ResetBaseModel(petModel);
+		character:ResetBaseModel(petModel);
 
 		-- refresh dummyPlayer skin
 		PlayerAssetFile:RefreshCustomGeosets(playerEntity.petObj, PlayerAssetFile.RemovePetIdFromSkinIds(skinIds));
@@ -401,7 +401,7 @@ function PlayerAssetFile:ShowWingAttachment(player, skin, show)
 	end
 
 	skin = CustomCharItems:ChangeSkinStringToItems(skin);
-	local charater = player:ToCharacter();
+	local character = player:ToCharacter();
 	local itemIds = commonlib.split(skin, ";");
 	if (itemIds and #itemIds > 0) then
 		for i = 1, #itemIds do
@@ -418,11 +418,11 @@ function PlayerAssetFile:ShowWingAttachment(player, skin, show)
 							meshModel = ParaAsset.LoadStaticMesh("", filename);
 						end
 						if (meshModel) then
-							charater:AddAttachment(meshModel, id, id);
+							character:AddAttachment(meshModel, id, id);
 						end
 					end
 				else
-					charater:RemoveAttachment(15, 15);
+					character:RemoveAttachment(15, 15);
 				end
 
 				break;

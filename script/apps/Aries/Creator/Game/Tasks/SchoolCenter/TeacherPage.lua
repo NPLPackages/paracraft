@@ -206,19 +206,19 @@ function TeacherPage.Open3dSchool()
                     local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
 
                     TeacherPage.ClosePage()
-                    local UserConsole = NPL.load("(gl)Mod/WorldShare/cellar/UserConsole/Main.lua")
+
                     if currentEnterWorld and currentEnterWorld.text then
                         _guihelper.MessageBox(
                             format(L"即将离开【%s】进入【%s】", currentEnterWorld.text, item.paraWorld.name),
                             function(res)
                                 if res and res == _guihelper.DialogResult.Yes then
-                                    UserConsole:HandleWorldId(item.paraWorld.projectId, true) 
+                                    GameLogic.RunCommand("/loadworld -auto " .. item.paraWorld.projectId)
                                 end
                             end,
                             _guihelper.MessageBoxButtons.YesNo
                         )
                     else
-                        UserConsole:HandleWorldId(item.paraWorld.projectId, true)
+                        GameLogic.RunCommand("/loadworld -auto " .. item.paraWorld.projectId)
                     end
     
                     return

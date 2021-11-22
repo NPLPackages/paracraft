@@ -26,7 +26,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["show"] = {
 	name="show", 
 	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|terrain|
-mod|physics|vision|quickselectbar|tips|map|camera|
+mod|physics|vision|quickselectbar|tips|map|camera|anim|
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
@@ -137,6 +137,15 @@ Other show filters:
 		elseif (name == "world2in1") then
 			local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
 			World2In1.ShowPage();
+		elseif (name == "anim") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/ActorAnimationsDialog.lua");
+			local ActorAnimationsDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.ActorAnimationsDialog");
+			local entity = EntityManager.GetPlayer();
+			ActorAnimationsDialog.ShowPageForEntity(entity, function(animId)   
+				if(animId and entity) then
+					entity:SetAnimation(animId)
+				end
+			end)
 		end
 	end,
 };

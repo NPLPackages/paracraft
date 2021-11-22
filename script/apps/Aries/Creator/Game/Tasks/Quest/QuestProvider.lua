@@ -72,6 +72,18 @@ function QuestProvider:GetInstance()
     end
     return QuestProvider.provider_instance;
 end
+
+function QuestProvider:Clear()
+    QuestProvider.templates_map = {};
+    QuestProvider.gsid_exid_map = {};
+    QuestProvider.questItemContainer_map = {};
+    QuestProvider.provider_instance = nil
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+    local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+    QuestAction.Clear()
+end
+
 function QuestProvider:OnInit()
 
     QuestProvider:GetInstance():AddEventListener(QuestProvider.Events.OnInit,function(__, event)

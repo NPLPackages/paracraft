@@ -389,26 +389,99 @@ function block:UpdateAttribute(name, value)
 	end	
 end
 
+-- update attributes. 
+-- @param keyValues: name value pairs in table {}
+function block:UpdateAttributes(keyValues)
+	local attrs = { IsUpdating = true, }
+	for name, value in pairs(keyValues) do
+		attrs[name] = value;
+	end
+
+	if(not self.blockWorld) then
+		ParaTerrain.RegisterBlockTemplate(self.id, attrs);
+	else
+		ParaBlockWorld.RegisterBlockTemplate(self.blockWorld, self.id, attrs);
+	end	
+end
+
 -- set speed reduction percentage of current block type. 
 -- @param value : [0,1]. by default water and web has 0.4, and 0.33 reduction. 
 function block:SetSpeedReduction(value)
+	self:BeginModify();
+	self.speedReduction = value;
 	self:UpdateAttribute("speedReduction", value)
 end
 
 -- make all blocks of this type visible or invisible. Please note, invisible block will maintain all of its functions. 
 -- one may like to hide blocks like movie blocks in game mode. 
 function block:SetVisible(bVisible)
+	self:BeginModify();
+	self.invisible = not bVisible;
 	self:UpdateAttribute("isVisible", bVisible == true)
+end
+
+-- call this function to modify
+function block:BeginModify()
+	if(not self.lastModified) then
+		local cloneObj = {
+			attFlag = self.attFlag,
+			light = self.light,
+			torchLightValue = self.torchLightValue or 0,
+			climbable = self.climbable,
+			blockcamera = self.blockcamera,
+			obstruction = self.obstruction,
+			nopicking = self.nopicking,
+			handleNeighborChange = self.handleNeighborChange,
+
+			invisible = self.invisible,
+			slipperiness = self.slipperiness,
+			speedReduction = self.speedReduction,
+			color8_data = self.color8_data,
+			color_data = self.color_data,
+			mapcolor = self.mapcolor,
+			blockHardness = self.blockHardness,
+		};
+		self.lastModified = cloneObj;
+	end
+end
+
+-- @return true if restored. 
+function block:RestoreToUnmodified()
+	if(self.lastModified) then
+		local cloneObj = self.lastModified;
+		self.lastModified = nil;
+		
+		for name, value in pairs(cloneObj) do
+			self[name] = value;
+		end
+		self:UpdateAttributes({
+			attFlag = cloneObj.attFlag,
+			torchLightValue = cloneObj.torchLightValue,
+			isVisible = not cloneObj.invisible,
+			speedReduction = cloneObj.speedReduction,
+		})
+		return true;
+	end
 end
 
 -- @param nValue: [0-15] a value of 0 means no light. 
 function block:SetLightValue(nValue)
-	self:UpdateAttribute("torchLightValue", tonumber(nValue) or 0);
+	self:BeginModify();
+	nValue = tonumber(nValue) or 0
+	self.light = nValue > 0;
+	self.torchLightValue = nValue;
+	self:UpdateAttributes({
+		torchLightValue = self.torchLightValue, 
+		attFlag = self:RecomputeAttribute(), 
+	});
 end
 
 -- @param nValue: [0-15] a value of 0 means no light. 
 function block:SetInvisibleLightValue(nValue)
-	local params = {IsUpdating = true, attFlag = self:RecomputeAttribute(), isVisible=false, torchLightValue =  tonumber(nValue) or 0};
+	self:BeginModify();
+	self.invisible = true;
+	self.torchLightValue = tonumber(nValue) or 0
+	local params = {IsUpdating = true, attFlag = self:RecomputeAttribute(), isVisible=false, torchLightValue = self.torchLightValue };
 	if(not self.blockWorld) then
 		ParaTerrain.RegisterBlockTemplate(self.id, params);
 	else
@@ -423,15 +496,11 @@ end
 
 function block:RecomputeAttribute()
 	self.attr = 0;
-	--if(self.solid and self.blockcamera==nil) then
-		--self.blockcamera = true;
-	--end
-
+	
 	if( self.onload==nil and ((self.models and self.customModel and not self.cubeMode) or self.entity_class)) then
 		self.onload = true;
 	end
 	
-	local name, value
 	for name, value in pairs(block_attribute_map) do
 		if(self[name]) then
 			self.attr = mathlib.bit.bor(self.attr, value);
@@ -476,6 +545,7 @@ end
 
 -- Sets how many hits it takes to break a block.
 function block:setHardness(value)
+	self:BeginModify();
     self.blockHardness = value;
     if (self.blockResistance < value * 5.0) then
         self.blockResistance = value * 5.0;
@@ -1697,16 +1767,19 @@ end
 
 -- whether the block is obstructed
 function block:SetObstruction(bEnabled)
+	self:BeginModify();
 	self.obstruction = bEnabled;
 	self:UpdateAttribute("attFlag", self:RecomputeAttribute());
 end
 
 function block:SetBlockCamera(bEnabled)
+	self:BeginModify();
 	self.blockcamera = bEnabled;
 	self:UpdateAttribute("attFlag", self:RecomputeAttribute());
 end
 
 function block:SetClimbable(climbable)
+	self:BeginModify();
 	self.climbable = climbable;
 	self:UpdateAttribute("attFlag", self:RecomputeAttribute());
 end

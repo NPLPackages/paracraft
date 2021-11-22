@@ -277,37 +277,37 @@ end
 function World2In1.PlayWorldMusic()
 	local filename = music_path.."bigworld_bgm.ogg"
 	-- GameLogic.RunCommand("/music "..(filename or ""));
-	World2In1.PlayMusic(filename,0.5)
+	World2In1.PlayMusic(filename,0.1)
 end
 
 function World2In1.PlayLessonMusic()
 	local filename = music_path.."offline_bgm.ogg"
 	-- GameLogic.RunCommand("/music "..(filename or ""));
-	World2In1.PlayMusic(filename,0.5)
+	World2In1.PlayMusic(filename,0.1)
 end
 
 function World2In1.PlayOperateMusic()
 	local filename = music_path.."guide_bgm.ogg"
 	-- GameLogic.RunCommand("/music "..(filename or ""));
-	World2In1.PlayMusic(filename,0.5)
+	World2In1.PlayMusic(filename,0.05)
 end
 
 function World2In1.PlayCreatorMusic()
 	local filename = music_path.."planet_bgm.ogg"
 	-- GameLogic.RunCommand("/music "..(filename or ""));
-	World2In1.PlayMusic(filename,0.5)
+	World2In1.PlayMusic(filename,0.1)
 end
 
 function World2In1.PlayOtherMusic()
 	local filename = music_path.."minigame_bgm.ogg"
 	-- GameLogic.RunCommand("/music "..(filename or ""));
-	World2In1.PlayMusic(filename,0.5)
+	World2In1.PlayMusic(filename,0.1)
 end
 
 function World2In1.PlayLogoMusic()
 	local filename = music_path.."login_bgm.ogg"
 	-- GameLogic.RunCommand("/music "..(filename or ""));
-	World2In1.PlayMusic(filename,0.5)
+	World2In1.PlayMusic(filename,0.1)
 end
 
 --local filename = "Audio/Haqi/keepwork/common/offline_bgm.ogg"

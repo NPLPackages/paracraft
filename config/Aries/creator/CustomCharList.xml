@@ -114,6 +114,9 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+        <!-- 20211118新增-->
+        <item id="83180"  price="100" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83180_olympic_hat_32bits.png" name="冬奥会" avatarMode="false"/>
+
 	    <!-- 2021705夏令营道具-->
         <item id="83179"  gsid="82021" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83179_feedwoman_hat_32bits.png" name="熊猫宝宝头（女）"/>
         <item id="83178"  gsid="82018" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83178_feedman_hat_32bits.png" name="熊猫宝宝头（男）"/>
@@ -477,8 +480,10 @@
 
 
 	<category name="shirt" text="衣服">
+	    <!--20211118新加-->
+		<item id="84108" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84108_olympic_cloth_32bits.png" name="冬奥会" avatarMode="false"/>
 	    <!--20211028新加-->
-		<item id="84085" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84085_famale_teacher_32bits.png" name="女老师"/>
+		<item id="84107" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84107_famale_teacher_32bits.png" name="女老师"/>
 	    <!--20211021新加-->
 		<item id="84084" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84084_antiepidemic_32bits.png" name="防疫服" avatarMode="false"/>
 		<item id="84085" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84085_chef_male_32bits.png" name="厨师（男）" avatarMode="false"/>
@@ -520,7 +525,7 @@
 		
 	    <!--20210720新加-->
 		<item id="84062" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84062_32bits.png" name="班主任"/>
-		<item id="84063" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84063_32bits.png" name="衣服53"/>
+		<item id="84063" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84063_32bits.png" name="条纹"/>
 		<item id="84064" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84064_32bits.png" name="衣服54"/>
 		<item id="84065" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84065_32bits.png" name="夏日校服（男）"/>
 		<item id="84066" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84066_32bits.png" name="夏日校服（女）"/>
@@ -607,6 +612,9 @@
 	</category>
 
 	<category name="pants" text="裤子">
+        <!--20211118新增-->
+        <item id="85126" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85126_olympic_pant_32bits.png" name="冬奥会" avatarMode="false"/>
+	    
         <!--20211021新增-->
         <item id="85106" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85106_antiepidemic_32bits.png" name="防疫服" avatarMode="false"/>
 		<item id="85107" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85107_cleaner_32bits.png" name="环卫工人" avatarMode="false"/>  
@@ -744,6 +752,9 @@
 	</category>
 	
 	<category name="back" text="背部">
+         <!--20211118新加-->
+		<item id="86044" gsid="85004" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86044_olympic_back_32bits.png" name="冬奥会" avatarMode="false"/>
+
          <!--20210929新加-->
 		<item id="86043" gsid="85003" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86043_red_flag_bag_32bits.png" name="红旗书包"/>
 	    <!--20210624新加-->

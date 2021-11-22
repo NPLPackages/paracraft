@@ -233,7 +233,7 @@ function DockPage.CloseLastShowPage(id)
     if(not id)then
         return
     end
-    print("DockPage.CloseLastShowPage",id)
+    
     for k,v in pairs(DockPage.showPages) do
         if v[1] then
             local page = nil
@@ -756,25 +756,23 @@ function DockPage.HasMsgCenterUnReadMsg()
     return DockPage.GetMsgCenterUnReadNum() > 0 or EmailManager.IsHaveNew()
 end
 
-function DockPage.HandMsgCenterMsgData()
-    if not DockPage.is_show then
-        return
-    end 
-    
-    EmailManager.Init(true) --获取邮件
-    keepwork.msgcenter.unReadCount({
-    },function(err, msg, data)
-        if err == 200 then
-            local all_count = 0
-            for k, v in pairs(data.data) do
-                all_count = all_count + v
+function DockPage.HandMsgCenterMsgData()    
+    EmailManager.Init(true, function()
+        keepwork.msgcenter.unReadCount({
+        },function(err, msg, data)
+            if err == 200 then
+                local all_count = 0
+                for k, v in pairs(data.data) do
+                    all_count = all_count + v
+                end
+                DockPage.SetMsgCenterUnReadNum(all_count)
+                GameLogic.GetFilters():apply_filters('update_msgcenter_unread_num', all_count)
+                if DockPage.is_show and DockPage.page then
+                    DockPage.RefreshPage()
+                end 
             end
-            DockPage.SetMsgCenterUnReadNum(all_count)
-            if DockPage.is_show and DockPage.page then
-                DockPage.RefreshPage()
-            end 
-        end
-    end)
+        end)
+    end) --获取邮件
 end
 
 function DockPage.SetMsgCenterUnReadNum(num)

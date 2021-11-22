@@ -361,15 +361,17 @@ Commands["tickrate"] = {
 
 Commands["anim"] = {
 	name="anim", 
-	quick_ref="/anim [@playername] anim_name_or_id[,anim_name_or_id ...]", 
+	quick_ref="/anim [@playername] [anim_name_or_id,anim_name_or_id ...]", 
 	desc=[[play animation
 @param playername: if not specified and containing entity is a biped, it is the containing entity like NPC; otherwise it is current player
+@param anim_name_or_id: if nil, we will show anim UI window
 if NPC run this command from its rule bag, the NPC will be animated. 
 /anim [@playername] anim_name_or_id[,anim_name_or_id ...]. currently only two anim can be chained. the first one can be looping anim, which will only play once. 
 /anim lie
 /anim @p sit
 /anim lie,0   : lie down first and then play idle 0
 /anim [filename].fbx    : play any fbx or x file in current world.
+/anim : empty to show animation UI
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local playerEntity, anims, hasInputName;
@@ -393,6 +395,8 @@ if NPC run this command from its rule bag, the NPC will be animated.
 			else
 				playerEntity:SetAnimation(anims);
 			end
+		else
+			GameLogic.RunCommand("/show anim")
 		end
 	end,
 };

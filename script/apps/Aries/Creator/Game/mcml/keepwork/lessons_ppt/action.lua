@@ -337,8 +337,10 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 		parentLayout:NewLine();
 	elseif action_type == "dailyVideo" then
 		local root_y = 45
+		local root_x = 0
 		local root_height = 150
-		local _this = ParaUI.CreateUIObject("container", "action_dailyVideo_type", "_lt", left, top + root_y, 150, root_height);
+		local root_width = 150
+		local _this = ParaUI.CreateUIObject("container", "action_dailyVideo_type", "_lt", root_x + left, top + root_y, root_width, root_height);
 		_this.background = "";
 		_parent:AddChild(_this);
 		_parent = _this;
@@ -373,7 +375,7 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 
 			
 		end
-		css.height = root_y + root_height
+		css.width = root_width
 	elseif action_type == "button" then
 		local text_value = mcmlNode:GetString("value");
 		local root_y = 15
