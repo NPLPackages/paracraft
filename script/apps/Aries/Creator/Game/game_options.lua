@@ -272,8 +272,8 @@ end
 
 function options:GetCameraObjectDistance()
 	local camera_dist = ParaCamera.GetAttributeObject():GetField("CameraObjectDistance", 8);
-    if(camera_dist > 20) then
-        camera_dist = 20;
+    if(camera_dist > 30) then
+        camera_dist = 30;
     elseif(camera_dist < 1) then
         camera_dist = 1
     end
@@ -281,7 +281,7 @@ function options:GetCameraObjectDistance()
 end
 
 function options:SetCameraObjectDistance(value)
-	if(type(value)=="number" and value <= 20 and value>=1) then
+	if(type(value)=="number" and value <= 30 and value>=1) then
 		ParaCamera.GetAttributeObject():SetField("CameraObjectDistance", value);
 	end
 end
@@ -495,22 +495,30 @@ function options:ShowMenuPage()
 	end
 end
 
+-- just in case some computer has both a touch screen and keyboard/mouse. we need to automatically and dyamically 
+-- toggle touch mode when user clicks a mouse button or touches the screen. 
+-- we can detect the changes via self:HasTouchDevice() method
+function options:CheckTouchMouse2in1PC()
+end
 
 -- @param bShow: if nil, it will automatically show if on mobile platform.
 function options:ShowTouchPad(bShow)
 	-- on windows touch device, if the user has clicked with touch device before it enters a 3d world, we will show the touch controller. 
+
+	local TouchMiniKeyboard = GameLogic.GetFilters():apply_filters("TouchMiniKeyboard");
+	if(not TouchMiniKeyboard) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+		TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+	end
+
 	local IsTouchDevice = self:HasTouchDevice()
-	if(System.options.IsTouchDevice or IsTouchDevice) then
-		local TouchMiniKeyboard = GameLogic.GetFilters():apply_filters("TouchMiniKeyboard");
-		if(not TouchMiniKeyboard) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
-			TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
-		end
-
+	if(bShow or (bShow==nil and (System.options.IsTouchDevice or IsTouchDevice))) then
 		TouchMiniKeyboard.CheckShow(true);
-
 		-- enable touch mode
 		self:SetEnableMouseLeftDrag(true);
+	else
+		TouchMiniKeyboard.CheckShow(false);
+		self:SetEnableMouseLeftDrag(false);
 	end
 end
 

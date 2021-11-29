@@ -345,6 +345,9 @@ function QuestAction.DailyWorldTask()
         if world_id then
             RedSummerCampPPtPage.OnVisitWrold(world_id)
         end
+
+        local MsgTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/MsgTip.lua");
+        MsgTip.Check()
     end, 1500);
 
 	local key = world_id

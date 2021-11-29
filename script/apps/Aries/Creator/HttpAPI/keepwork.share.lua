@@ -26,3 +26,13 @@ HttpWrapper.Create("keepwork.shareUrl.get", "%MAIN%/ts-storage/files/downloadUrl
 --http://yapi.kp-para.cn/project/32/interface/api/1872
 -- get
 HttpWrapper.Create("keepwork.shareFile.post", "%MAIN%/core/v0/shareFile", "POST", true)
+
+-- 分享模型功能
+-- get
+--http://yapi.kp-para.cn/project/151/interface/api/4512
+HttpWrapper.Create("keepwork.shareBlock.getToken", "%MAIN%/ts-storage/files/:id/tokenByPublicTemporary", "GET", true, nil,
+-- PreProcessor
+HttpWrapper.default_prepFunc,
+-- Post Processor
+HttpWrapper.default_postFunc
+)

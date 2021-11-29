@@ -45,12 +45,12 @@ TouchMiniRightKeyboard.hover_press_hold_time = 500;
 -- @param name: displayname
 -- @param vKey: virtual key scan code. 
 TouchMiniRightKeyboard.DefaultKeyLayout = {
-	{name="Space", main = true, colorid=1, vKey = DIK_SCANCODE.DIK_SPACE, pos_x = 0, pos_y = 83, img="Texture/Aries/Creator/keepwork/MiniKey/6_112X112_32bits.png;0 0 112 112", width=112, height=112,default_width=112, default_height=112},
+	{name="Space", main = true, colorid=1, vKey = DIK_SCANCODE.DIK_SPACE, default_pos_x = 0, default_pos_y = 83, img="Texture/Aries/Creator/keepwork/MiniKey/6_112X112_32bits.png;0 0 112 112", width=112, height=112,default_width=112, default_height=112},
 
-	{name="Esc", colorid=1, vKey = DIK_SCANCODE.DIK_ESCAPE, pos_x = 0, pos_y = 0, off_pos_x = -17, off_pos_y = 98, is_child = true, img="Texture/Aries/Creator/keepwork/MiniKey/7_86X86_32bits.png;0 0 86 86", width=86, height=86,default_width=86, default_height=86},
-	-- {name="Enter", colorid=1, vKey = DIK_SCANCODE.DIK_RETURN, pos_x = 0, pos_y = 0, off_pos_x = -86, off_pos_y = 38, is_child = true, img="Texture/Aries/Creator/keepwork/MiniKey/8_86X86_32bits.png;0 0 86 86", width=86, height=86,default_width=86, default_height=86},
-	{name="KeyBoard", colorid=1, pos_x = 0, pos_y = 0, off_pos_x = -76, off_pos_y = -55, is_child = true, img="Texture/Aries/Creator/keepwork/MiniKey/9_86X86_32bits.png;0 0 86 86", width=86, height=86,default_width=86, default_height=86},
-	{name="F", colorid=1, vKey = DIK_SCANCODE.DIK_F, flyUpDown = true, pos_x = 0, pos_y = 0, off_pos_x = 10, off_pos_y = -83, is_child = true, img="Texture/Aries/Creator/keepwork/MiniKey/10_86X86_32bits.png;0 0 86 86", width=86, height=86,default_width=86, default_height=86},
+	{name="Esc", colorid=1, vKey = DIK_SCANCODE.DIK_ESCAPE, default_pos_x = 0, default_pos_y = 0, default_off_pos_x = -17, default_off_pos_y = 98, is_child = true, img="Texture/Aries/Creator/keepwork/MiniKey/7_86X86_32bits.png;0 0 86 86", width=86, height=86,default_width=86, default_height=86},
+	-- {name="Enter", colorid=1, vKey = DIK_SCANCODE.DIK_RETURN, default_pos_x = 0, default_pos_y = 0, default_off_pos_x = -86, default_off_pos_y = 38, is_child = true, img="Texture/Aries/Creator/keepwork/MiniKey/8_86X86_32bits.png;0 0 86 86", width=86, height=86,default_width=86, default_height=86},
+	{name="KeyBoard", colorid=1, default_pos_x = 0, default_pos_y = 0, default_off_pos_x = -76, default_off_pos_y = -55, is_child = true, img="Texture/Aries/Creator/keepwork/MiniKey/9_86X86_32bits.png;0 0 86 86", width=86, height=86,default_width=86, default_height=86},
+	{name="F", colorid=1, vKey = DIK_SCANCODE.DIK_F, flyUpDown = true, default_pos_x = 0, default_pos_y = 0, default_off_pos_x = 10, default_off_pos_y = -83, is_child = true, img="Texture/Aries/Creator/keepwork/MiniKey/10_86X86_32bits.png;0 0 86 86", width=86, height=86,default_width=86, default_height=86},
 };
 
 TouchMiniRightKeyboard.ColorMaskList = {
@@ -126,7 +126,17 @@ end
 function TouchMiniRightKeyboard:Init(name, left, top, width)
 	self.name = name or self.name;
 	self:SetPosition(left, top, width);
+
+	Screen:Connect("sizeChanged", self, self.OnScreenSizeChange, "UniqueConnection")
 	return self;
+end
+
+function TouchMiniRightKeyboard:OnScreenSizeChange()
+	self:SetPosition();
+	if(self:isVisible()) then
+		self:Show(true)
+		self:SetTransparencyImp(0.2)
+	end
 end
 
 -- @bShow: if nil, it will toggle show and hide. 
@@ -136,6 +146,12 @@ function TouchMiniRightKeyboard:Show(bShow)
 		bShow = not _parent.visible;
 	end
 	_parent.visible = bShow;
+	self.bIsVisible = bShow;
+end
+
+
+function TouchMiniRightKeyboard:isVisible()
+	return self.bIsVisible
 end
 
 function TouchMiniRightKeyboard:Destroy()
@@ -159,32 +175,34 @@ end
 -- @param top: default to 2/5 height of the screen
 -- @param width: if width is not specified, use 1/3 height of the screen
 function TouchMiniRightKeyboard:SetPosition(left, top, width)
-	self.default_width = 225
-	width =  width or math.floor(Screen:GetHeight() / 4 * 1.25);
-	self.width = width;
-	self.height = self.width * 1.5
+	self.default_control_width = 225
+	self.default_height = 720
+
+	local ratio = math.min(1, Screen:GetHeight()/self.default_height);
+
+	width =  width or self.default_control_width;
+	self.width = math.floor(width * ratio);
+	self.height = math.floor(self.width * 1.7)
 
 	self.button_width = math.floor(self.width / 3);
 	self.button_height = self.button_width;
 
 	self.left = left or Screen:GetWidth() - width
-	self.top = top or math.floor(Screen:GetHeight()/2 + self.button_height * 0.2 - 15);
+	self.top = top or (Screen:GetHeight() - self.height)
 
 	-- 50% padding between keys
 	self.key_margin = math.floor(math.min(self.finger_size, self.button_width*0.11) * 0.5); 
-
-	local ratio = self.width/self.default_width
-	-- 
+	
 	local main_item = self.keylayout[1]
-	main_item.pos_x = main_item.pos_x * ratio
-	main_item.pos_y = main_item.pos_y * ratio
+	main_item.pos_x = main_item.default_pos_x * ratio
+	main_item.pos_y = main_item.default_pos_y * ratio
 	for index, item in ipairs(self.keylayout) do
-		item.width = item.default_width * ratio
-		item.height = item.default_height * ratio
+		item.width = math.floor(item.default_width * ratio)
+		item.height = math.floor(item.default_height * ratio)
 
-		if item.off_pos_x and item.off_pos_y then
-			item.off_pos_x = item.off_pos_x * ratio
-			item.off_pos_y = item.off_pos_y * ratio
+		if item.default_off_pos_x and item.default_off_pos_y then
+			item.off_pos_x = math.floor(item.default_off_pos_x * ratio)
+			item.off_pos_y = math.floor(item.default_off_pos_y * ratio)
 		end
 	end
 
@@ -211,8 +229,6 @@ function TouchMiniRightKeyboard:GetUIControl()
 		_parent:SetField("ClickThrough", true);
 
 		self.id = _parent.id;
-	else
-		_parent:Reposition(self.alignment,self.left,self.top,self.width,self.height);
 	end
 	return _parent;
 end
@@ -447,6 +463,7 @@ end
 function TouchMiniRightKeyboard:CreateWindow()
 	local _parent = self:GetUIControl();
 	_parent:RemoveAll();
+	_parent:Reposition(self.alignment,self.left,self.top,self.width,self.height);
 	_parent.visible = false;
 
 	local start_angle = 255
@@ -461,28 +478,19 @@ function TouchMiniRightKeyboard:CreateWindow()
 	local main_item_center_pos_y = main_pos_y + main_item.height/2
 	
 	for index, item in ipairs(self.keylayout) do
+		item.mask_object = nil;
+
 		local pos_x = item.pos_x or 0
 		local pos_y = item.pos_y or 0
-
-
-
-		-- if item.off_pos_x and item.off_pos_y then
-		-- 	pos_x = main_pos_x + item.off_pos_x
-		-- 	pos_y = main_pos_y + item.off_pos_y
-		-- 	item.pos_x = pos_x
-		-- 	item.pos_y = pos_y
-		-- end
-
 		if item.is_child then
-			-- math.sin(math.rad(30))
-			-- math.cos(0.5)
 			pos_x = main_item_center_pos_x + math.cos(math.rad(start_angle)) * radius - item.width/2
 			pos_y = main_item_center_pos_y - math.sin(math.rad(start_angle)) * radius - item.height/2
-			item.pos_x = pos_x
-			item.pos_y = pos_y
+
+			item.pos_x = pos_x;
+			item.pos_y = pos_y;	
 			start_angle = start_angle + angle_dis
 		end
-
+		
 
 		local keyBtn = ParaUI.CreateUIObject("container",item.name, "_lt", pos_x, pos_y, item.width, item.height);
 		keyBtn:SetScript("ontouch", function() self:OnTouch(msg) end);

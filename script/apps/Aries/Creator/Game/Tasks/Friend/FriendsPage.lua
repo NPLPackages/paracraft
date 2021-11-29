@@ -46,7 +46,8 @@ function FriendsPage.OnInit()
 	TypeToCb[TopBtListType.Followers] = FriendsPage.GetFollowersLlist
 end
 
-function FriendsPage.Show(index)
+function FriendsPage.Show(index, msg_content)
+	FriendsPage.msg_content = msg_content
 	FriendsPage.index = index or 1
 	KeepWorkItemManager.GetUserInfo(nil,function(err,msg,data)
         if(err ~= 200)then
@@ -63,6 +64,8 @@ function FriendsPage.Show(index)
 					FriendsPage.UnreadMsg[v.latestMsg.senderId] = data
 					FriendManager:AddLastChatMsg(v.latestMsg.senderId, data)
 				end
+
+				GameLogic.GetFilters():apply_filters("update_friend_unread_num", FriendsPage.GetAllUnReadMsgNum());
 			end
 
 
@@ -430,7 +433,20 @@ function FriendsPage.PrivateLetter(chat_user_data)
 
 	-- 要先判断是否好友
 	if chat_user_data.isFriend or FriendsPage.index == TopBtListType.RecentContact or FriendsPage.index == TopBtListType.Friend then
-		FriendChatPage.Show(UserData, chat_user_data);
+
+		if FriendsPage.msg_content then
+			-- FriendManager:Connect(chat_user_data.id,function()
+			-- 	local msg = FriendsPage.msg_content
+			-- 	FriendManager:SendMessage(chat_user_data.id, { words = msg.content, msg_type=msg.msg_type})
+				
+			-- 	FriendsPage.msg_content = nil
+			-- end)
+
+			FriendChatPage.Show(UserData, chat_user_data, FriendsPage.msg_content);
+			FriendsPage.msg_content = nil
+		else
+			FriendChatPage.Show(UserData, chat_user_data);
+		end
 	end
 end
 
@@ -584,6 +600,21 @@ function FriendsPage.GetUnReadMsgNum(userId)
 	return 0
 end
 
+function FriendsPage.GetAllUnReadMsgNum()
+	if not FriendsPage.UnreadMsg then
+		return 0
+	end
+
+	local all_num = 0
+	for key, v in pairs(FriendsPage.UnreadMsg) do
+		if v.unReadCnt then
+			all_num = all_num + v.unReadCnt
+		end
+	end
+
+	return all_num
+end
+
 function FriendsPage.AddUnReadMsg(userId, num, msg)
 	num = num or 1
 	msg = msg or ""
@@ -597,6 +628,7 @@ function FriendsPage.AddUnReadMsg(userId, num, msg)
 	
 	FriendsPage.UnreadMsg[userId].unReadCnt = FriendsPage.UnreadMsg[userId].unReadCnt + num
 	
+	GameLogic.GetFilters():apply_filters("update_friend_unread_num", FriendsPage.GetAllUnReadMsgNum());
 end
 
 function FriendsPage.OnMsg(payload, full_msg)
@@ -632,6 +664,7 @@ function FriendsPage.ClearUnReadMsg(userId)
 		FriendsPage.UnreadMsg[userId].unReadCnt = 0
 	end
 	
+	GameLogic.GetFilters():apply_filters("update_friend_unread_num", FriendsPage.GetAllUnReadMsgNum());
 	FriendsPage.OnRefresh()
 end
 

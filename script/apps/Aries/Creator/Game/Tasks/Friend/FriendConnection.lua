@@ -151,9 +151,11 @@ function FriendConnection:SendMessage(msg)
         return
     end
     local words = msg.words;
+    local msg_type = msg.msg_type or 1
     local ChannelIndex = ChatChannel.EnumChannels.KpFriend;
     local roomName = self:GetStaticRoomName();
     local msgdata = KpChatChannel.CreateMessage(ChannelIndex, self.userId, nil, words, roomName);
+    msgdata.msg_type = msg_type
     KpChatChannel.SendToServer(msgdata);
 end
 function FriendConnection:UpdateLastMsgTag(callback)

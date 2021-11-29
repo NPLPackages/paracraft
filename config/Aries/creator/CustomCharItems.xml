@@ -518,6 +518,12 @@ model id
     <item id="83179" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83179_feedwoman_hat.anim.x"></attachment></item>
     <!--20211118活动头饰-->
     <item id="83180" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83180_olympic_hat.anim.x"></attachment></item>
+    <!--20211123活动头饰-->
+    <item id="83181" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83181_olympic_africa.anim.x"></attachment></item>
+    <item id="83182" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83182_olympic_aisa.anim.x"></attachment></item>
+    <item id="83183" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83183_olympic_australia.anim.x"></attachment></item>
+    <item id="83184" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83184_olympic_europe.anim.x"></attachment></item>
+    <item id="83185" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83185_olympic_america.anim.x"></attachment></item>
 
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>

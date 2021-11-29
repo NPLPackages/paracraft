@@ -61,6 +61,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"跳到上一层".."  Tab",name = "edit.upstairs",onclick=nil},
 				{text = L"跳到下一层".."  Shift+Tab",name = "edit.downstairs",onclick=nil},
 				{text = L"录制宏命令...", name = "window.macro", cmd="/macro record -i", onclick=nil},
+				{text = L"分享模型...", name = "window.sharemod", onclick=nil},
 			},
 		},
 		{text = L"多人联网",order=4, name = "online",children = 
@@ -90,6 +91,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"元件库...",name = "window.onlinestore", cmd="/open store"},
 				{text = L"视频录制...".."  F9",name = "window.videorecoder", cmd="/record"},
 				{text = L"音频录制...",name = "window.soundrecoder", cmd="/recordsound"},
+				{text = L"好友...",name = "window.friend",onclick=nil},
 				--{text = L"视频分享...",name = "window.videosharing", cmd="/share"},
 				{Type = "Separator"},
 				{text = L"信息".."  F3",name = "window.info",onclick=nil},

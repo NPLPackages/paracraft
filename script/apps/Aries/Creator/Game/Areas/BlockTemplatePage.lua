@@ -241,7 +241,7 @@ function BlockTemplatePage.OnClickSave()
 end
 
 -- @params params: attributes like author, creation_date, name, relative_motion, hollow, exportReferencedFiles, etc. 
-function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc, bSaveSnapshot)
+function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc, bSaveSnapshot, isSilenceSave)
 	if( not GameLogic.IsOwner()) then
 		--_guihelper.MessageBox(format("只有世界的作者, 才能保存模板. 请尊重别人的创意,不要盗版!", tostring(WorldCommon.GetWorldTag("nid"))));
 		--return;
@@ -267,7 +267,10 @@ function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc
 	})
 
 	if(task:Run()) then
-		page:CloseWindow();
+		if page then
+			page:CloseWindow();
+		end
+		
 		callbackFunc();
 		if(bSaveSnapshot) then
 			ParaIO.CopyFile(BlockTemplatePage.DefaultSnapShot, filename:gsub("xml$", "jpg"), true);	
@@ -285,8 +288,10 @@ function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc
 				end
 			end, _guihelper.MessageBoxButtons.YesNo);
 		else
-			BroadcastHelper.PushLabel({id="BlockTemplatePage", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
-			_guihelper.MessageBox(L"保存成功！ 您可以从【建造】->【模板】中创建这个模板的实例了～");
+			if not isSilenceSave then
+				BroadcastHelper.PushLabel({id="BlockTemplatePage", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+				_guihelper.MessageBox(L"保存成功！ 您可以从【建造】->【模板】中创建这个模板的实例了～");
+			end
 		end
 	end
 end

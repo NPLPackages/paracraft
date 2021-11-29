@@ -41,12 +41,10 @@ end
 function ItemInvisibleBlock:SetVisible(bVisible)
 	local blockTemplate = block_types.get(self.id);
 	if(blockTemplate) then
-		blockTemplate.invisible = not bVisible;
-		
 		if(blockTemplate.light and not bVisible) then
 			blockTemplate:SetInvisibleLightValue(15)
 		else
-			blockTemplate:SetVisible(not blockTemplate.invisible);
+			blockTemplate:SetVisible(bVisible);
 		end
 	end
 end

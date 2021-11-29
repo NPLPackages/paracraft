@@ -147,7 +147,8 @@ function ItemWorld2In1:CreatShowTemplate()
 	end})
 	self.frame_timer:Change(200,200);
 
-	GameLogic.AddBBS("desktop", L"按【鼠标右键】键确认建造位置, 【W,A,S,D】键可以移动");
+	local create_desc = self.create_desc or L"按【鼠标右键】键确认建造位置, 【W,A,S,D】键可以移动"
+	GameLogic.AddBBS("desktop", create_desc);
 end
 
 function ItemWorld2In1:ClearShowTemplate()

@@ -170,6 +170,12 @@ Commands["menu"] = {
 		elseif(name == "window.schoolcenter") then
 			local SchoolCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/SchoolCenter.lua")
 			SchoolCenter.OpenPage()
+		elseif(name == "window.friend") then
+			local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
+			FriendsPage.Show();
+		elseif(name == "window.sharemod") then
+			local ShareBlocksPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareBlocksPage.lua");
+			ShareBlocksPage.ShowPage()
 		elseif(name == "window.changeskin") then
 			--[[
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/SkinPage.lua");

@@ -189,6 +189,7 @@ function CodeGlobals:ctor()
 		System = System, 
 		commonlib = commonlib, 
 		ParaIO = ParaIO,
+		ParaAsset = ParaAsset,
 		GameLogic = GameLogic,
         NplOce = NplOce,
 		_guihelper = _guihelper,

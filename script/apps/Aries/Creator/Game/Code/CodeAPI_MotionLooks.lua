@@ -578,7 +578,9 @@ function env_imp:play(timeFrom, timeTo, isLooping, onFinishedCallback,speed)
 							timer:Change(checkSentientInterval, checkSentientInterval);
 						else
 							frameMove_(timer)
-							timer.period = actor:GetTickIntervalByCameraDist(deltaTime)
+							if(GameLogic.options:IsAutoMovieFPS()) then
+								timer.period = actor:GetTickIntervalByCameraDist(deltaTime)
+							end
 							if(timer.dueTime == checkSentientInterval) then
 								timer:Change(deltaTime, timer.period);
 							end
@@ -676,7 +678,9 @@ function env_imp:playBone(boneName, timeFrom, timeTo, isLooping)
 							timer:Change(checkSentientInterval, checkSentientInterval);
 						else
 							frameMove_(timer)
-							timer.period = actor:GetTickIntervalByCameraDist(deltaTime)
+							if(GameLogic.options:IsAutoMovieFPS()) then
+								timer.period = actor:GetTickIntervalByCameraDist(deltaTime)
+							end
 							if(timer.dueTime == checkSentientInterval) then
 								timer:Change(deltaTime, timer.period);
 							end

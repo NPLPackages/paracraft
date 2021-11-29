@@ -426,7 +426,7 @@ function block:BeginModify()
 		local cloneObj = {
 			attFlag = self.attFlag,
 			light = self.light,
-			torchLightValue = self.torchLightValue or 0,
+			torchLightValue = self.torchLightValue or (self.light and 15 or 0),
 			climbable = self.climbable,
 			blockcamera = self.blockcamera,
 			obstruction = self.obstruction,

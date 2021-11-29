@@ -526,8 +526,8 @@ function block_types.LoadFromFile(filename)
 				if(attr.associated_blockid) then
 					attr.associated_blockid = tonumber(attr.associated_blockid) or attr.associated_blockid;
 				end
-				if(attr.torchLightValue) then
-					attr.torchLightValue = tonumber(attr.torchLightValue);
+				if(attr.torchLightValue or attr.light) then
+					attr.torchLightValue = tonumber(attr.torchLightValue) or 15;
 				end
 				if(attr.speedReduction) then
 					attr.speedReduction = tonumber(attr.speedReduction);

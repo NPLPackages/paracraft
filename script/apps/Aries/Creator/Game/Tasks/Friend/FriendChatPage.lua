@@ -14,6 +14,7 @@ local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 local Encoding = commonlib.gettable("commonlib.Encoding");
 
 local FriendChatPage = NPL.export();
+commonlib.setfield("MyCompany.Aries.Creator.Game.Tasks.Friend.FriendChatPage", FriendChatPage);
 
 local UserData = {}
 local ChatUserData = {}
@@ -47,8 +48,30 @@ function FriendChatPage.OnInit()
 	page.OnClose = FriendChatPage.CloseView
 end
 
-function FriendChatPage.Show(user_data, chat_user_data)
+function FriendChatPage.Show(user_data, chat_user_data, auto_msg)
 
+	if not FriendChatPage.has_bind then
+		GameLogic.GetFilters():add_filter("KeyPressEvent",function(callbackVal, event)
+			if event.keyname == "DIK_X" then
+				if FriendChatPage.TemplateItem then
+					FriendChatPage.TemplateItem:TryCreate()
+					FriendChatPage.TemplateItem:Destroy()
+					FriendChatPage.TemplateItem = nil
+					event:accept()
+				end
+				
+			elseif event.keyname == "DIK_ESCAPE" then
+				if FriendChatPage.TemplateItem then
+					FriendChatPage.TemplateItem:ClearShowTemplate()
+					FriendChatPage.TemplateItem:Destroy()
+					FriendChatPage.TemplateItem = nil
+					event:accept()
+				end
+			end
+		end)
+
+		FriendChatPage.has_bind = true
+	end	
 	UserData = user_data
 
 	local last_chat_msg = FriendManager:GetLastChatMsg() or {}
@@ -154,6 +177,10 @@ function FriendChatPage.Show(user_data, chat_user_data)
 
 				FriendChatPage.CreateChatContentView()
 				FriendChatPage.FreshFriendGridView()
+				if auto_msg then
+					FriendChatPage.SendMsg(auto_msg)
+					_guihelper.MessageBox("分享成功")
+				end
 			end
 
 			FriendManager:LoadAllUnReadMsgs(function ()
@@ -299,68 +326,93 @@ function FriendChatPage.DrawConversationNodeHandler2(_parent, treeNode)
 	local text_singleline = is_more_line and "true" or "false"
 	if treeNode.ifmyself then
 		-- is_more_line = true
-		local margin_left = is_more_line and 0 or (text_width - bg_width + 10)
-		local text_margin_left = is_more_line and 4 or 0
-		-- height_str = "height:64px"
-		local align_type = is_more_line and "left" or "right"
-
-		-- local str_list = {}
-		local html_str = ""
-		for index, v in ipairs(str_list) do
-			-- if index > 1 then
-			-- 	margin_top = 0
-			-- end
-			html_str = html_str .. string.format([[
-				<div style="margin-top:%s;margin-left:%s;width:%s;font-size:%s;color:#575757;text-align:%s;text-singleline:%s;">
-					%s
-				</div>	
-			]], margin_top, text_margin_left, text_width, content_font_size, align_type, is_more_line, v)
-		end
-		mcmlStr = string.format([[
-			<div style="margin-left:0px;margin-top:0px;padding-left:30px;padding-top:2px;width:500px;">
-				<div style="float: left;margin-left: 0px;">
-					<div style="margin-top:0px;width:400px;color:#000000;text-align:right">
+		-- 2是模型类型
+		if treeNode.msg_type and treeNode.msg_type == 2 then
+			mcmlStr = string.format([[
+                <div style="margin-left: 150px;width: 218px;height: 80px;background-color: #bdbdbd;color: #ffffff;font-size: 12px;">
+                    <div style="margin-left: 40px;margin-top: 10px;">
+                        你分享了模型<br/>
+                        模型将在服务器上保留七天
+                        <div onclick='FriendChatPage_DowloadFile' param1='%s' style="margin-left: 50px; margin-top: 7px;font-size: 14px;base-font-size:14px;color: #0c61cf;">
+                            打开
+                            <div style="margin-top: -3px;margin-left: 2px; width:24px;height: 2px;background-color: #0c61cf;"></div>
+                        </div>
+                    </div>
+                </div>
+			]], treeNode.Text)
+		else
+			local margin_left = is_more_line and 0 or (text_width - bg_width + 10)
+			local text_margin_left = is_more_line and 4 or 0
+			-- height_str = "height:64px"
+			local align_type = is_more_line and "left" or "right"
+	
+			-- local str_list = {}
+			local html_str = ""
+			for index, v in ipairs(str_list) do
+				html_str = html_str .. string.format([[
+					<div style="margin-top:%s;margin-left:%s;width:%s;font-size:%s;color:#575757;text-align:%s;text-singleline:%s;">
+						%s
+					</div>	
+				]], margin_top, text_margin_left, text_width, content_font_size, align_type, is_more_line, v)
+			end
+			mcmlStr = string.format([[
+				<div style="margin-left:0px;margin-top:0px;padding-left:30px;padding-top:2px;width:500px;">
+					<div style="float: left;margin-left: 0px;">
+						<div style="margin-top:0px;width:400px;color:#000000;text-align:right">
+							%s
+						</div>
+						<div name="item_bg" style="position:relative;margin-top:0px;margin-left:%s;width:%s;%s;background:url(Texture/Aries/Creator/keepwork/friends/duihua2_32X32_32bits.png#0 0 32 32:12 22 12 6)">
+						</div>
 						%s
 					</div>
-					<div name="item_bg" style="position:relative;margin-top:0px;margin-left:%s;width:%s;%s;background:url(Texture/Aries/Creator/keepwork/friends/duihua2_32X32_32bits.png#0 0 32 32:12 22 12 6)">
+					<div style="float: left;margin-left:8px;margin-top:6px;">
+						<img zorder="0" src='%s'width="46" height="46"/>
 					</div>
-					%s
 				</div>
-				<div style="float: left;margin-left:8px;margin-top:6px;">
-					<img zorder="0" src='%s'width="46" height="46"/>
-				</div>
-			</div>
-			]] , name, margin_left, bg_width, height_str, html_str, icon);
+				]] , name, margin_left, bg_width, height_str, html_str, icon);
+		end
 	else
 
-		local html_str = ""
-		for index, v in ipairs(str_list) do
-			-- if index > 1 then
-			-- 	margin_top = 0
-			-- end
-			html_str = html_str .. string.format([[
-				<div style="margin-top:%s;margin-left:12px;width:%s;font-size:%s;color:#575757;text-singleline:%s;">
-					%s
-				</div>	
-			]], margin_top, text_width, content_font_size, is_more_line, v)
+		if treeNode.msg_type and treeNode.msg_type == 2 then
+			mcmlStr = string.format([[
+                <div style="margin-left: 150px;width: 218px;height: 80px;background-color: #bdbdbd;color: #ffffff;font-size: 12px;">
+                    <div style="margin-left: 40px;margin-top: 10px;">
+                        分享了模型给你<br/>
+                        模型将在服务器上保留七天
+                        <div onclick='FriendChatPage_DowloadFile' param1='%s' style="margin-left: 50px; margin-top: 7px;font-size: 14px;base-font-size:14px;color: #0c61cf;">
+                            打开
+                            <div style="margin-top: -3px;margin-left: 2px; width:24px;height: 2px;background-color: #0c61cf;"></div>
+                        </div>
+                    </div>
+                </div>
+			]], treeNode.Text)
+		else
+			local html_str = ""
+			for index, v in ipairs(str_list) do
+				html_str = html_str .. string.format([[
+					<div style="margin-top:%s;margin-left:12px;width:%s;font-size:%s;color:#575757;text-singleline:%s;">
+						%s
+					</div>	
+				]], margin_top, text_width, content_font_size, is_more_line, v)
+			end
+	
+			mcmlStr = string.format([[
+				<div style="margin-left:0px;margin-top:0px;padding-left:5px;padding-top:2px;width:500px;">
+					<div style="float: left;margin-left:0px;margin-top:5px;">
+						<img zorder="0" src='%s'width="46" height="46"/>
+					</div>
+					<div style="float: left;margin-left: 8px;">
+						<div style="margin-top:0px;width:400px;margin-left: 2px;color:#000000">
+							%s
+						</div>
+						<div name="item_bg" style="margin-top:0px;width:%s;%s;background:url(Texture/Aries/Creator/keepwork/friends/duihua1_32X32_32bits.png#0 0 32 32:12 22 12 6)">
+							%s
+						</div>
+	
+					</div>
+				</div>
+				]], icon , name, bg_width, height_str, html_str);
 		end
-
-		mcmlStr = string.format([[
-			<div style="margin-left:0px;margin-top:0px;padding-left:5px;padding-top:2px;width:500px;">
-				<div style="float: left;margin-left:0px;margin-top:5px;">
-					<img zorder="0" src='%s'width="46" height="46"/>
-				</div>
-				<div style="float: left;margin-left: 8px;">
-					<div style="margin-top:0px;width:400px;margin-left: 2px;color:#000000">
-						%s
-					</div>
-					<div name="item_bg" style="margin-top:0px;width:%s;%s;background:url(Texture/Aries/Creator/keepwork/friends/duihua1_32X32_32bits.png#0 0 32 32:12 22 12 6)">
-						%s
-					</div>
-
-				</div>
-			</div>
-			]], icon , name, bg_width, height_str, html_str);
 	end
 
 
@@ -368,6 +420,7 @@ function FriendChatPage.DrawConversationNodeHandler2(_parent, treeNode)
 		local xmlRoot = ParaXML.LuaXML_ParseString(mcmlStr);
 		if(type(xmlRoot)=="table" and table.getn(xmlRoot)>0) then
 			local xmlRoot = Map3DSystem.mcml.buildclass(xmlRoot);
+			local control = xmlRoot:GetControl()
 							
 			local myLayout = Map3DSystem.mcml_controls.layout:new();
 			myLayout:reset(0, 0, nodeWidth-5, height);
@@ -505,16 +558,22 @@ function FriendChatPage.GetStringCharCount(str, content_font_size, text_width)
     return charCount, allcount, str_list
 end
 
-function FriendChatPage.SendMsg()
-	
-	local send_text = page:GetValue("sendText") or ""
-	page:SetValue("sendText", "")
+function FriendChatPage.SendMsg(msg)
+	local send_text = ""
+	local msg_type = msg and msg.msg_type
+	if msg then
+		send_text = msg.content
+	elseif page then
+		send_text = page:GetValue("sendText") or ""
+		page:SetValue("sendText", "")
+	end
+
 
 	if send_text == "" then
 		GameLogic.AddBBS("statusBar", L"请输入信息!", 5000, "0 255 0");
 		return
 	end
-	FriendManager:SendMessage(ChatUserData.id, { words = send_text })
+	FriendManager:SendMessage(ChatUserData.id, { words = send_text, msg_type=msg_type})
 
 	-- local send_text = node:GetValue()
 
@@ -564,7 +623,6 @@ function FriendChatPage.OnMsg(payload, full_msg)
 	if payload.id ~= UserData.id and FriendList[payload.id] == nil then
 		FriendChatPage.UpdataFriendList()
 	end
-
 	
 	if payload.id ~= UserData.id and payload.id ~= ChatUserData.id then
 		local list = FriendChatPage.GetRecentFromFriendsList()
@@ -580,6 +638,7 @@ function FriendChatPage.OnMsg(payload, full_msg)
 
 	local chat_data = {}
 	chat_data.Text = payload.content
+	chat_data.msg_type = payload.contentType
 	chat_data.nickname = ChatUserData.nickname or ChatUserData.username
 	chat_data.ifmyself = UserData.id == payload.id
 
@@ -596,7 +655,7 @@ function FriendChatPage.OnMsg(payload, full_msg)
 		roomId = connection.roomId,
 		msgKey = payload.msgKey,
 	},function(err, msg, data)
-		ChatContent[#ChatContent + 1] = {id = payload.id, content = payload.content, createdAt="", iat = chat_data.time}
+		ChatContent[#ChatContent + 1] = {id = payload.id, content = payload.content, createdAt="", iat = chat_data.time, msg_type=payload.contentType}
 	end)
 end
 
@@ -711,7 +770,7 @@ function FriendChatPage.CreateChatContentView()
 				local show_data = {}
 				show_data.Text = v.content
 				show_data.ifmyself = UserData.id == v.id
-				
+				show_data.msg_type = v.msg_type
 				if show_data.ifmyself == false then
 					show_data.nickname = ChatUserData.nickname or ChatUserData.username
 					show_data.portrait = ChatUserData.portrait or ""
@@ -740,15 +799,20 @@ function FriendChatPage.CreateChatContentView()
 				local chat_data = msg_list[index]
 				local show_data = {}
 				show_data.Text = chat_data.content
+
+				-- local name_array = commonlib.split(show_data.Text,"/")
+				-- if name_array and name_array[1] == "qiniu-public-temporary.keepwork.com" then
+				-- 	chat_data.contentType = 2
+				-- end
 				show_data.ifmyself = UserData.id == chat_data.senderId
-				
+				show_data.msg_type = chat_data.contentType
 				if show_data.ifmyself == false then
 					show_data.nickname = ChatUserData.nickname or ChatUserData.username
 					show_data.portrait = ChatUserData.portrait or ""
 				end
 				ctl.RootNode:AddChild(CommonCtrl.TreeNode:new(show_data));
 
-				ChatContent[#ChatContent + 1] = {id = chat_data.senderId, content = chat_data.content, createdAt=chat_data.createdAt, iat = ""}
+				ChatContent[#ChatContent + 1] = {id = chat_data.senderId, content = chat_data.content, createdAt=chat_data.createdAt, iat = "", msg_type = chat_data.contentType}
 			end
 		end
 	end
@@ -783,7 +847,6 @@ function FriendChatPage.CreateChatContentView()
 				roomId = connection.roomId,
 				msgKey = msgKey,
 			},function(err, msg, data)
-				print(err, msg)
 				clear_unread_callback()
 			end)
 		end
@@ -925,4 +988,60 @@ function FriendChatPage.FlushCurDataAndView(search_text)
 		FriendChatPage.Current_Item_DS = list
 		FriendChatPage.FreshFriendGridView()
 	end)
+end
+
+function FriendChatPage_DowloadFile(name,mcmlNode)
+	if FriendChatPage.TemplateItem then
+		return
+	end
+
+	local attr = mcmlNode:GetAttribute("param1")
+	echo(attr, true)
+	local name_array = commonlib.split(attr,"-")
+	local file_name = name_array[#name_array]  .. ".blocks.xml"
+	local file_path = string.format("%s/%s", "temp/ShareBlock/", file_name)
+	if ParaIO.DoesFileExist(file_path, true) then
+		FriendChatPage.UseTemplete(file_path)
+		return
+	end
+	System.os.GetUrl(attr, function(err, msg, data)
+		if err == 200 and data then
+			GameLogic.AddBBS("statusBar", L"下载成功", 5000, "0 255 0");
+
+			file_name = file_name
+			
+			ParaIO.CreateDirectory(file_path)
+			local file = ParaIO.open(file_path, "w");
+			if(file) then
+				file:write(data, #data);
+				file:close();
+			end
+
+			if GameLogic.GameMode:IsEditor() then
+				FriendChatPage.UseTemplete(file_path)
+			end
+		end
+	end);
+end
+
+function FriendChatPage.UseTemplete(file_path)
+	local item_class = commonlib.gettable("MyCompany.Aries.Game.Items.ItemWorld2In1");
+	local item_data = {}
+	item_data.id = 10086
+	item_data.block_id = item_data.id;
+	local item = item_class:new(item_data);
+	item.type = "templates"
+	item.is_template_type = true
+	item.target_file_path = file_path
+	item.create_desc = "按【X键】键确认建造位置, 按【Esc键】键取消, 【W,A,S,D】键可以移动"
+	item:OnSelect()
+	FriendChatPage.TemplateItem = item
+
+	if page then
+		page:CloseWindow();
+	end
+end
+
+function FriendChatPage.CreateBlockByTemplate()
+
 end

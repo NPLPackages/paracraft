@@ -707,9 +707,10 @@ function KpChatChannel.SendToServer(msgdata)
         payload = {
             ChannelIndex = msgdata.ChannelIndex,
             content = msgdata.words,
+            contentType = msgdata.msg_type or 1,
             worldId = msgdata.worldId,
             type = msgdata.type,
-
+            
             toid = msgdata.toid,
 
             id = user_info.id,

@@ -181,7 +181,17 @@ end
 function TouchMiniKeyboard:Init(name, left, top, width)
 	self.name = name or self.name;
 	self:SetPosition(left, top, width);
+
+	Screen:Connect("sizeChanged", self, self.OnScreenSizeChange, "UniqueConnection")
 	return self;
+end
+
+function TouchMiniKeyboard:OnScreenSizeChange()
+	self:SetPosition();
+	if(self:isVisible()) then
+		self:Show(true)
+		self:SetTransparencyImp(0.2)
+	end
 end
 
 -- @bShow: if nil, it will toggle show and hide. 
@@ -224,13 +234,8 @@ function TouchMiniKeyboard:SetPosition(left, top, width)
 	self.default_button_height = 88
 	self.default_key_margin = 5
 
-	-- width =  width or math.floor(Screen:GetHeight() / 4 * 1.4);
-	
-	local ratio = Screen:GetHeight()/self.default_height
+	local ratio = math.min(1.2, Screen:GetHeight()/self.default_height);
 
-	-- self.width = width;
-
-	
 	self.button_width = self.default_button_width * ratio;
 	self.width = self.button_width  *3
 	
@@ -264,8 +269,6 @@ function TouchMiniKeyboard:GetUIControl()
 		_parent:SetScript("onmousemove", function() self:OnMouseMove() end);
 
 		self.id = _parent.id;
-	else
-		_parent:Reposition(self.alignment,self.left,self.top,self.width,self.height);
 	end
 	return _parent;
 end
@@ -600,6 +603,7 @@ end
 function TouchMiniKeyboard:CreateWindow()
 	local _parent = self:GetUIControl();
 	_parent:RemoveAll();
+	_parent:Reposition(self.alignment,self.left,self.top,self.width,self.height);
 	_parent.visible = false;
 	
 	local btn_margin = self.key_margin;
@@ -608,6 +612,7 @@ function TouchMiniKeyboard:CreateWindow()
 		local left_col = 0;
 		for _, item in ipairs(cols) do
 			if (item.name) then
+				item.mask_object = nil;
 				-- get global screen position
 				item.left = left_col*self.button_width;
 				item.top = (row - 1)*self.button_height;

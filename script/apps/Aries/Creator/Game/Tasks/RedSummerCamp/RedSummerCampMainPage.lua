@@ -34,7 +34,7 @@ RedSummerCampMainPage.ItemData = {
 local notice_desc = {
 	-- {desc = [[教师节活动奖励新鲜出炉！！！]], name="teacher_day"},
 	-- {desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
-	{desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
+	-- {desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
 	-- {desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
 	{desc = [[重温红色记忆，重走《征程》之约]], name="zhengcheng"},
 	{desc = [[为校争光，我的虚拟校园等你来建设]], name="ai_school"},

@@ -114,6 +114,13 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+        <!-- 20211125冬令营道具-->
+        <item id="83181"  gsid="82022" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83181_omlypic_africa_32bits.png" name="冬奥会（非洲）" avatarMode="false"/>
+        <item id="83182"  gsid="82023" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83182_omlypic_aisa_32bits.png" name="冬奥会（亚洲）" avatarMode="false"/>
+		<item id="83183"  gsid="82024" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83183_omlypic_australia_32bits.png" name="冬奥会（澳洲）" avatarMode="false"/>
+		<item id="83184"  gsid="82025" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83184_omlypic_europe_32bits.png" name="冬奥会（欧洲）" avatarMode="false"/>
+		<item id="83185"  gsid="82026" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83185_omlypic_america_32bits.png" name="冬奥会（美洲）" avatarMode="false"/>
+
         <!-- 20211118新增-->
         <item id="83180"  price="100" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83180_olympic_hat_32bits.png" name="冬奥会" avatarMode="false"/>
 

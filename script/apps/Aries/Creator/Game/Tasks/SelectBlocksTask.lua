@@ -33,6 +33,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
+local ShareBlocksPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareBlocksPage.lua");
 
 local SelectBlocks = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks"));
 
@@ -369,7 +370,10 @@ function SelectBlocks:Run(bIsDataPrepared)
 	cur_selection = self.blocks;
 	SelectBlocks.finished = false;
 	SelectBlocks.RegisterHooks();
-	SelectBlocks.ShowPage();
+	if not ShareBlocksPage.IsOpen() then
+		SelectBlocks.ShowPage();
+	end
+	
 	self:SetPivotPoint();
 
 	if(#(self.blocks) > 0) then
@@ -393,13 +397,17 @@ function SelectBlocks.CancelSelection()
 	ParaTerrain.DeselectAllBlock();
 	SelectBlocks.UnregisterHooks();
 	SelectBlocks.ClosePage();
-
+	SelectBlocks.selected_count = 0
 	-- canceled the selection. 	
 	cur_selection = nil;
 
 	if(cur_instance) then
 		local self = cur_instance;
 		cur_instance = nil;
+	end
+
+	if ShareBlocksPage.IsOpen() then
+		ShareBlocksPage.CancelSelection()
 	end
 end
 
@@ -838,6 +846,10 @@ function SelectBlocks.UpdateBlockNumber(count)
 				page:SetUIValue("title", format(L"选中了%d块",count or 1));
 			end
 		end
+	end
+
+	if ShareBlocksPage.IsOpen() then
+		ShareBlocksPage.UpdateBlockNumber(count)
 	end
 end
 

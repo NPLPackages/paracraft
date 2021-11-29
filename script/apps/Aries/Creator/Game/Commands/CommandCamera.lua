@@ -102,7 +102,7 @@ Commands["fov"] = {
 
 Commands["cameradist"] = {
 	name="cameradist", 
-	quick_ref="/cameradist [1-20]", 
+	quick_ref="/cameradist [1-30]", 
 	desc=[[change the camera to player distance
 /cameradist 10   set eye distance to 10
 /cameradist   return current camera distance

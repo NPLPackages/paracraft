@@ -131,8 +131,13 @@
             end
 
             function GetTopImg()
-                local strBg = string.format("Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/tu%d_875X255_32bits.png#0 0 875 255",RacePage.index)
-                return strBg
+                local bgs = {} 
+                for i = 1, 5 do 
+                    if i ~= 1 then
+                        table.insert(bgs,string.format("Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/tu%d_875X255_32bits.png#0 0 875 255",i))
+                    end
+                end
+                return bgs[RacePage.index]
             end
             
             ]]>
