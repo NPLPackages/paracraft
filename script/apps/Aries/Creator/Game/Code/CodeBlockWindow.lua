@@ -1431,6 +1431,7 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 		windowName = "UICodeBlockWindow",
 		minRootScreenWidth = 0,
 		minRootScreenHeight = 0,
+		zorder = -2,
 	});
 end
 

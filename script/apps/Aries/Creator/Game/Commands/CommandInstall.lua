@@ -231,12 +231,22 @@ Commands["makepkg"] = {
 pkg is an encrpted zip file and can be used interchangably with zip file in paracraft. 
 e.g.
 /makepkg temp/test.zip
+/makepkg main_mobile_res     :internally used
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local src, dest;
 		src, cmd_text = CmdParser.ParseFilename(cmd_text);
 		dest, cmd_text = CmdParser.ParseOption(cmd_text);
-		if(src) then
+
+		if(src == "main_mobile_res") then
+			NPL.load("(gl)script/installer/BuildParaWorld.lua");
+			local error_count = commonlib.BuildParaWorld.MakeZipPackage({"main_mobile_res"}) or 0;
+			commonlib.BuildParaWorld.EncryptZipFiles({"main_mobile_res"});
+			_guihelper.MessageBox(format("error_count: %d. main_mobile_res.pkg已经生成并覆盖好了，请上传AB. ", error_count or 0), function()
+				local absPath = string.gsub(ParaIO.GetCurDirectory(0).."installer/", "/", "\\");
+				ParaGlobal.ShellExecute("open", "explorer.exe", absPath, "", 1);
+			end)
+		elseif(src) then
 			if(not dest) then
 				dest = src:gsub("zip$", "pkg")
 			end

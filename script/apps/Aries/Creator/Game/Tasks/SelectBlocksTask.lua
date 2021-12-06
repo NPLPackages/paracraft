@@ -906,6 +906,10 @@ function SelectBlocks.DoClick(name)
 		SelectBlocks.TransformSelection({dz=-1})
 	elseif(name == "btn_mirror")then
 		SelectBlocks.MirrorSelection()
+	elseif(name == "btn_share")then
+		local ShareBlocksPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareBlocksPage.lua");
+		ShareBlocksPage.ShareBlcok()
+		SelectBlocks.ClosePage();
 	end
 end
 

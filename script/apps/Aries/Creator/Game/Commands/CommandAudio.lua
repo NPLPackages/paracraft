@@ -81,6 +81,11 @@ Commands["voice"] = {
 	quick_ref="/voice [-voiceNarrator number] text", 
 	desc=[[play a given text in human voice
 You must have internet connection to use this.
+0: 女声,1: 男声,3: 逍遥,4: 丫丫,        
+5003: 逍遥2,5118: 小鹿,106: 博文,110: 小童,111: 小萌,103: 米朵,5: 小娇,
+10001: 小燕,10002: 许久,10003: 小萍,10004: 小婧,10005: 许小宝,10006: 万叔,
+10007: 一菲,10008: 小果,10010: 小梅粤语,10011: 千雪,10012: 楠楠,10013: 芳芳,
+10015: 七哥
 /voice 你好 Paracraft
 /voice -voiceNarrator 2  欢迎使用Paracraft
 ]], 

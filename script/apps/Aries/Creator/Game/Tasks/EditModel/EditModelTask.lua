@@ -158,7 +158,7 @@ function EditModelTask:ShowPage()
 	window:Show({
 		name="EditModelTask", 
 		url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
-		alignment="_ctb", left=0, top=-55, width = 256, height = 64, parent = parent
+		alignment="_ctb", left=0, top=-55, width = 300, height = 64, parent = parent
 	});
 end
 
@@ -168,7 +168,7 @@ function EditModelTask:PickModelAtMouse(result)
 	if(result.blockX) then
 		local x,y,z = result.blockX,result.blockY,result.blockZ;
 		local modelEntity = BlockEngine:GetBlockEntity(x,y,z) or result.entity;
-		if(modelEntity and modelEntity:isa(EntityManager.EntityBlockModel)) then
+		if(modelEntity and (modelEntity:isa(EntityManager.EntityBlockModel) or modelEntity:isa(EntityManager.EntityLiveModel))) then
 			return modelEntity;
 		end
 	end
@@ -299,6 +299,53 @@ function EditModelTask.OnChangeOnClickEvent(text)
 				text = nil
 			end
 			modelEntity:SetOnClickEvent(text)
+		end
+	end
+end
+
+function EditModelTask.OnClickTogglePhysics()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			local modelEntityNew = modelEntity:EnablePhysics(not modelEntity:HasRealPhysics())
+			if(modelEntityNew ~= modelEntity and type(modelEntityNew) == "table") then
+				self:SelectModel(modelEntityNew)
+			end
+			self:UpdateValueToPage()
+		end
+	end
+end
+
+function EditModelTask.GetMountPointCount()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity and modelEntity:GetMountPoints()) then
+			return modelEntity:GetMountPoints():GetCount()
+		end
+	end
+	return 0
+end
+
+function EditModelTask.OnMountPointCountChanged(text)
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		text = tonumber(text)
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			if(text == 0) then
+				if(modelEntity:GetMountPoints()) then
+					modelEntity:GetMountPoints():Clear()
+				end
+			elseif(text) then
+				local maxCount = 9;
+				if(text > 0 and text <= maxCount) then
+					modelEntity:CreateGetMountPoints():Resize(text)
+				elseif(page) then
+					page:SetUIValue("mountpointCount", maxCount);
+				end
+			end
 		end
 	end
 end

@@ -163,8 +163,8 @@ end
 function ItemColorBlock:PickItemFromPosition(x,y,z)
 	if(self:HasColorData()) then
 		self:PickPenColorAtPos(x,y,z);
-		return ItemColorBlock._super.PickItemFromPosition(self, x,y,z);
 	end
+	return ItemColorBlock._super.PickItemFromPosition(self, x,y,z);
 end
 
 function ItemColorBlock:PickPenColorAtPos(x,y,z)

@@ -12,7 +12,10 @@ function EmailManager.Init(fromDock, init_cb)
 end
 
 function EmailManager.GetEmailList(formDock, init_cb)
-    keepwork.email.email({},function(err, msg, data)
+    keepwork.email.email({
+		["x-per-page"] = 400,
+		["x-page"] = 1,
+    },function(err, msg, data)
         if err == 200 then
             EmailManager.email_list = data.data
             if not formDock then

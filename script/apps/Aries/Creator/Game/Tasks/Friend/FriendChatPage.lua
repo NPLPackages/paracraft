@@ -54,9 +54,20 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg)
 		GameLogic.GetFilters():add_filter("KeyPressEvent",function(callbackVal, event)
 			if event.keyname == "DIK_X" then
 				if FriendChatPage.TemplateItem then
-					FriendChatPage.TemplateItem:TryCreate()
-					FriendChatPage.TemplateItem:Destroy()
-					FriendChatPage.TemplateItem = nil
+					local create_cb = function()
+						if FriendChatPage.TemplateItem then
+							FriendChatPage.TemplateItem:TryCreate()
+							FriendChatPage.TemplateItem:Destroy()
+							FriendChatPage.TemplateItem = nil
+		
+							GameLogic.HideTipText("<player>")
+						end
+					end
+					if FriendChatPage.TemplateItem.need_sure then
+						_guihelper.MessageBox("当前放置区域有其他物体，请确认是否覆盖？", create_cb);
+					else
+						create_cb()
+					end
 					event:accept()
 				end
 				
@@ -65,6 +76,7 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg)
 					FriendChatPage.TemplateItem:ClearShowTemplate()
 					FriendChatPage.TemplateItem:Destroy()
 					FriendChatPage.TemplateItem = nil
+					GameLogic.HideTipText("<player>")
 					event:accept()
 				end
 			end
@@ -1031,6 +1043,7 @@ function FriendChatPage.UseTemplete(file_path)
 	item_data.block_id = item_data.id;
 	local item = item_class:new(item_data);
 	item.type = "templates"
+	item.use_teacher_tip = true
 	item.is_template_type = true
 	item.target_file_path = file_path
 	item.create_desc = "按【X键】键确认建造位置, 按【Esc键】键取消, 【W,A,S,D】键可以移动"
@@ -1040,6 +1053,8 @@ function FriendChatPage.UseTemplete(file_path)
 	if page then
 		page:CloseWindow();
 	end
+
+	FriendsPage.ClosePage()
 end
 
 function FriendChatPage.CreateBlockByTemplate()

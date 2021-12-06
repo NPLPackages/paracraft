@@ -38,6 +38,13 @@ local default_values = {
 }
 Actor.default_values = default_values;
 
+-- we will scale text if screen is big
+Actor.MaxScreenWidth = 1440;
+Actor.MaxScreenHeight = 960;
+Actor.MinScreenWidth = 1280;
+Actor.MinScreenHeight = 720;
+Actor.defaultTextScaling = 1.2
+
 -- in ms seconds. 
 local fadein_time = 1000;
 local fadeout_time = 1000;
@@ -187,6 +194,26 @@ function Actor:Islocked()
 	return Actor.isLocked;
 end
 
+function Actor.OnScreenSizeChange()
+	local _parent = ParaUI.GetUIObject("MovieGUIRoot");
+	local viewport = ViewportManager:GetSceneViewport();
+	local margin_right = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
+	local margin_bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2])
+	_parent.height = margin_bottom;
+	_parent.width = margin_right;
+
+	local width = Screen:GetWidth() - margin_right;
+	local height = Screen:GetHeight() - margin_bottom;
+
+	Actor.textScaling = width / math.max(math.min(width, Actor.MaxScreenWidth), Actor.MinScreenWidth);
+	local textCtrl = _parent:GetChild("text")
+	textCtrl.scalingx = Actor.textScaling * Actor.defaultTextScaling;
+	textCtrl.scalingy = Actor.textScaling * Actor.defaultTextScaling;
+	if(Actor.textpos ~= "center") then
+		textCtrl:Reposition("_mb", 0, 45 * (Actor.textScaling or 1), 0, 50 * (Actor.textScaling or 1));
+	end
+end
+
 -- return the text gui object or nil. 
 function Actor:GetTextObj(bCreateIfNotExist)
 	if(self.uiobject_id) then
@@ -198,23 +225,15 @@ function Actor:GetTextObj(bCreateIfNotExist)
 	if(bCreateIfNotExist) then
 		local _parent = ParaUI.GetUIObject("MovieGUIRoot");
 		if(not _parent:IsValid()) then
-			local viewport = ViewportManager:GetSceneViewport();
-			local margin_right = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
-			local margin_bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2])
-			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0,0,margin_right, margin_bottom);
+			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0, 0, 0, 0);
 			_parent.background = ""
 			_parent.enabled = false;
 			_parent.zorder = -3;
 			_parent:AttachToRoot();
 			
-			viewport:Connect("sizeChanged", nil, function()
-				local _parent = ParaUI.GetUIObject("MovieGUIRoot");
-				local margin_right = math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
-				local margin_bottom = math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2])
-				_parent.height = margin_bottom;
-				_parent.width = margin_right;
-			end)
-
+			local viewport = ViewportManager:GetSceneViewport();
+			viewport:Connect("sizeChanged", Actor, Actor.OnScreenSizeChange, "UniqueConnection");
+			
 			local _this = ParaUI.CreateUIObject("button", "text", "_mb", 0, 45, 0, 50);
 			_this.background = "";
 			_this.font = "System;20;bold";
@@ -222,11 +241,10 @@ function Actor:GetTextObj(bCreateIfNotExist)
 			-- no clipping and vertical centered
 			_guihelper.SetUIFontFormat(_this, 256+4+1);
 			_this.shadow = true;
-			_this.scalingx = 1.2;
-			_this.scalingy = 1.2;
 			_this.enabled = false;
 			_parent:AddChild(_this);
 			self.uiobject_id = _this.id;
+			Actor.OnScreenSizeChange()
 			return _this;
 		else
 			local _this = _parent:GetChild("text");
@@ -281,10 +299,11 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha,
 		obj.visible = false;
 	end
 	
+	Actor.textpos = textpos;
 	if(textpos == "center") then
 		obj:Reposition("_ct", -480, -100, 960, 200);
 	else
-		obj:Reposition("_mb", 0, 45, 0, 50);
+		obj:Reposition("_mb", 0, 45 * (Actor.textScaling or 1), 0, 50 * (Actor.textScaling or 1));
 	end
 
 	if(fontsize and fontsize~=default_values.fontsize) then

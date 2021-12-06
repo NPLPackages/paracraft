@@ -141,6 +141,7 @@ function MovieClipController:ShowAllGUI(bShow, bForceEditorMode)
 			if(MovieManager:IsCapturing()) then
 				self:ShowTimeline(nil);
 				MovieClipController.ShowPage(false);
+				QuickSelectBar.ShowPage(false);
 			else
 				MovieManager:SetActiveMovieClip(nil);
 			end

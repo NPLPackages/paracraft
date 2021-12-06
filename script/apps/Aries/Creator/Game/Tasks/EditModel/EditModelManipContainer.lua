@@ -45,6 +45,27 @@ function EditModelManipContainer:createChildren()
 	self.rotateManip:SetYawEnabled(true);
 	self.rotateManip:SetPitchEnabled(false);
 	self.rotateManip:SetRollEnabled(false);
+	self:AddMountPointsManip()
+end
+
+function EditModelManipContainer:AddMountPointsManip()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/MountPointsManip.lua");
+	local MountPointsManip = commonlib.gettable("MyCompany.Aries.Game.Manipulators.MountPointsManip");
+	self.mountPointsManip = MountPointsManip:new():init(self);
+	self.mountPointsManip:Connect("valueChanged",  self, self.valueChanged);
+	self.mountPointsManip:Connect("mountPointChanged",  self, self.OnSelectMountPoint, "UniqueConnection");
+end
+
+function EditModelManipContainer:OnSelectMountPoint(name)
+	local bGlobalTransVisible = (name == nil)
+	if(self.scaleManip) then
+		self.translateManip:SetVisible(bGlobalTransVisible)
+		self.translateManip.enabled = bGlobalTransVisible
+		self.rotateManip:SetVisible(bGlobalTransVisible)
+		self.rotateManip.enabled = bGlobalTransVisible
+		self.scaleManip:SetVisible(bGlobalTransVisible)
+		self.scaleManip.enabled = bGlobalTransVisible
+	end
 end
 
 function EditModelManipContainer:paintEvent(painter)
@@ -68,6 +89,14 @@ function EditModelManipContainer:connectToDependNode(node)
 	self.node = node;
 
 	if(plugPos) then
+		if(node.BeginModify and node.EndModify) then
+			self.mountPointsManip:Connect("modifyBegun",  node, node.BeginModify);
+			self.mountPointsManip:Connect("modifyEnded",  node, node.EndModify);
+		end
+		if(node.GetMountPoints) then
+			self.mountPointsManip:ShowForEntity(node);
+		end
+
 		-- one way binding 
 		local manipPosPlug = self:findPlug("position");
 		self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)

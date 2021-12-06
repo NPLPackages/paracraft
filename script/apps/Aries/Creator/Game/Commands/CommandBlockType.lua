@@ -30,7 +30,7 @@ Commands["block"] = {
 	desc=[[set a block template's attribute 
 @param block_id: block id or name
 @param attr_name: "speedReduction", "visible", "light", "lightvalue", 
-"obstruction", "blockcamera", "climbable", etc 
+"obstruction", "blockcamera", "climbable", "solid", "transparent", etc 
 e.g.
 /block MovieClip visible false     :hide all movie blocks
 /block 8 speedReduction 0.3
@@ -39,6 +39,7 @@ e.g.
 /block ColorBlock blockcamera false
 /block ColorBlock climbable true
 /block ColorBlock obstruction false
+/block 5 solid false     :let sunlight pass through
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local blockid, name, value;
@@ -74,6 +75,12 @@ e.g.
 					elseif(name == "climbable") then
 						value, cmd_text = CmdParser.ParseBool(cmd_text);
 						block_template:SetClimbable(value)
+					elseif(name == "solid") then
+						value, cmd_text = CmdParser.ParseBool(cmd_text);
+						block_template:SetSolid(value)
+					elseif(name == "transparent") then
+						value, cmd_text = CmdParser.ParseBool(cmd_text);
+						block_template:SetTransparent(value)
 					else
 						-- TODO: 
 					end

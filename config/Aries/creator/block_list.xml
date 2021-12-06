@@ -338,6 +338,7 @@ uid: unique id used in macro recording
     <block name="ColorFence" />
     <block name="ColorWall" />
     <block name="White_Carpet" />
+    <block name="LiveModel" />
     <block name="BlockModel" />
     <block name="PhysicsModel" />
     <block name="BlockLight" />

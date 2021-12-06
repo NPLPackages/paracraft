@@ -25,7 +25,8 @@ NplCad.categories = {
     {name = "Control", text = L"控制", colour = "#d83b01", },
     {name = "Math", text = L"运算", colour = "#569138", },
     {name = "Data", text = L"数据", colour = "#459197", },
-    {name = "Skeleton", text = L"骨骼", colour = "#3c3c3c", },
+    -- {name = "Skeleton", text = L"骨骼", colour = "#3c3c3c", },
+    {name = "Skeleton", text = L"骨骼", colour = "#9ab4cd", },
     {name = "Animation", text = L"动画", colour = "#717171", },
     
 };

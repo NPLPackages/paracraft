@@ -27,7 +27,7 @@ ParacraftLearningRoomDailyPage.is_red_summercamp = false;
 local page;
 ParacraftLearningRoomDailyPage.exid = 10001;
 ParacraftLearningRoomDailyPage.gsid = 30102;
-ParacraftLearningRoomDailyPage.max_cnt_preset = 220;
+ParacraftLearningRoomDailyPage.max_cnt_preset = 238;
 ParacraftLearningRoomDailyPage.max_cnt = 0;
 ParacraftLearningRoomDailyPage.copies = 0;
 ParacraftLearningRoomDailyPage.lessons = [[关于移动
@@ -263,6 +263,37 @@ clone电影方块中的多个角色
 开启代码方块高性能模式
 代码方块设置断点(上)
 代码方块设置断点(下)
+架设私服与多人合作
+允许客户端执行代码
+自动注册学生账号
+配置教师服务器
+隐藏会员按钮
+分享世界
+找回历史版本
+过山车与动力铁轨
+过山车与探测铁轨
+出生点的摄影机lookat命令
+添加世界规则addrule
+制作有待机动画的方块模型
+制作有行走动作的方块模型
+自主动画方块模型
+100个游戏项目设计
+制作交互示课件
+基于角色扮演的动画制作
+摄影机与蒙太奇动画
+多人联网共享数据
+多人联网排行榜
+手机版操作介绍（上）
+手机版操作介绍（下）
+给平板电脑加上键盘和鼠标
+发布手机App
+世界激活码 （上）
+世界激活码 （下）
+新建世界模板展示
+2合1课程世界介绍（上）
+2合1课程世界介绍（下）
+摄影机图块 (上)
+摄影机图块 (下)
 ]]
 ParacraftLearningRoomDailyPage.Current_Item_DS = {
 
@@ -576,8 +607,13 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 			return
 		end
 	
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
+		local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
+		BackgroundMusic:Silence()
+		
 		NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show(url, title, false, true, { scale_screen = "4:3:v", closeBtnTitle = L"退出" }, function(state)
 			if(state == "ONCLOSE")then
+				BackgroundMusic:Recover()
 				GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { ended = true, learningIndex = index });
 				NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();
 				

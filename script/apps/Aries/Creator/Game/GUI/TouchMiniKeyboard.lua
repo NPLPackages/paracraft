@@ -337,6 +337,7 @@ function TouchMiniKeyboard:OnTouch(touch)
 				else
 					self:ChangeMoveState(touch.x, touch.y)
 				end
+				self:RefreshRocker(touch.x, touch.y)
 				
 				return
 			end
@@ -384,6 +385,7 @@ function TouchMiniKeyboard:OnTouch(touch)
 		end
 		
 	elseif(touch.type == "WM_POINTERUP") then
+		self:HideRockerAndShowKey()
 		local keydownBtn = touch_session:GetField("keydownBtn");
 		if(keydownBtn and keydownBtn.img) then
 			if self.cur_move_state then
@@ -949,6 +951,10 @@ function TouchMiniKeyboard:SetTransparency(alpha, bAnimate)
 end
 
 function TouchMiniKeyboard:SetTransparencyImp(alpha)
+	if self.rocker and self.rocker.visible then
+		return
+	end
+
 	self.transparency = alpha;
 	local _parent = self:GetUIControl();
 	_guihelper.SetColorMask(_parent, format("255 255 255 %d",math.floor(alpha * 255)))
@@ -1216,3 +1222,207 @@ function TouchMiniKeyboard:ShowShiftDrawAnim()
 	end
 end
 
+function TouchMiniKeyboard:RefreshRocker(touch_x, touch_y)
+	local center_item = self:GetCneterItem()
+	local cenert_pos_x = center_item.pos_x + center_item.width/2
+	local cenert_pos_y = center_item.pos_y + center_item.height/2
+
+	local pos_x = touch_x - self.left;
+	local pos_y = touch_y - self.top;
+	-- 282	264
+	if nil == self.rocker then
+		local bg_size = 256
+		local bg_pos_x = (self.width - bg_size)/2
+		local bg_pos_y = (self.height - bg_size)/2
+		self.rocker = ParaUI.CreateUIObject("container","rocker_root", "lt",cenert_pos_x - bg_size/2, cenert_pos_y - bg_size/2, bg_size, bg_size);
+		self.rocker.background = "Texture/Aries/Creator/keepwork/MiniKey/diban_256x256_32bits.png;0 0 256 256";
+		local parent = self:GetUIControl();
+		parent:AddChild(self.rocker)
+
+		local point_size = 55
+		self.rocker_point = ParaUI.CreateUIObject("container","rocker_point", "lt",cenert_pos_x - point_size/2, cenert_pos_y - point_size/2, point_size, point_size);
+		self.rocker_point.background = "Texture/Aries/Creator/keepwork/MiniKey/yuanxin_55x55_32bits.png;0 0 55 55";
+		self.rocker:AddChild(self.rocker_point)
+
+		local arrow_width = 292
+		local arrow_height = 292
+		self.rocker_arrow = ParaUI.CreateUIObject("container","rocker_arrow", "lt",-18, -18, arrow_width, arrow_height);
+		self.rocker_arrow.background = "Texture/Aries/Creator/keepwork/MiniKey/jiantou_292x292_32bits.png;0 0 292 292";
+		self.rocker:AddChild(self.rocker_arrow)
+
+		-- local timer = commonlib.Timer:new({callbackFunc = function(timer)
+		-- 	self.rocker_arrow.rotation = self.rocker_arrow.rotation + 0.1
+		-- end})
+		-- timer:Change(0, 20);
+
+		self.rocker.visible = false
+	end
+
+	if not self.rocker.visible then
+		self:HideKeyAndShowRocker()
+	end
+
+	local rocker_point =  self.rocker_point
+	local radius = self.rocker.width/2
+
+	-- 计算目标点离摇杆中心的距离
+	local target_distance = (pos_x - cenert_pos_x) ^ 2 + (pos_y - cenert_pos_y) ^ 2
+
+	-- 计算夹角
+	local param_y = pos_y - cenert_pos_y
+	local param_x = pos_x - cenert_pos_x
+	local rad = math.atan2(-param_y,  param_x)
+	local rotation = rad * 180/math.pi 
+	-- 计算圆上的点
+	-- 得到圆盘中点到手指位置连成的直线与圆的交点
+	local circle_pos_x = cenert_pos_x + math.cos(rad) * radius 
+	local circle_pos_y = cenert_pos_y + math.sin(rad) * (-radius) 
+	
+	-- 计算摇杆在圆上的坐标
+	local point_pos_x = circle_pos_x - rocker_point.width/2
+	local point_pos_y = circle_pos_y - rocker_point.height/2
+	if target_distance <= radius ^ 2 then
+		point_pos_x = pos_x - rocker_point.width/2
+		point_pos_y = pos_y - rocker_point.height/2
+	end
+
+	rocker_point.x = point_pos_x
+	rocker_point.y = point_pos_y
+
+	-- 处理箭头的角度和位置
+	local arrow = self.rocker_arrow
+	-- local arrow_pos_x = circle_pos_x - arrow.width/2
+	-- local arrow_pos_y = circle_pos_y - arrow.height/2
+	
+	arrow.rotation = -rad
+	-- self.rocker.rotation = -rad
+	-- arrow.x = arrow_pos_x
+	-- arrow.y = arrow_pos_y
+
+	if target_distance > 300 ^ 2 then
+		self:ShowOpenButton(touch_x, touch_y)
+	elseif self.open_button and self.open_button.visible then
+		self.open_button.x = touch_x - self.open_button.width/2
+		self.open_button.y = touch_y - self.open_button.height/2
+
+		-- self:HideOpenBt()
+	end
+end
+
+function TouchMiniKeyboard:HideKeyAndShowRocker()	
+	-- self:SetTransparency(0, false)
+
+	if self.rocker then
+		self.rocker.visible = true
+	end	
+
+	for k, v in pairs(self.keylayout) do
+		for k2, key_item in pairs(v) do
+			_guihelper.SetColorMask(key_item.key_object, "255 255 255 0")
+			_guihelper.SetColorMask(key_item.mask_object, "255 255 255 0")
+			if key_item.child_button then
+				for k3, child_item in pairs(key_item.child_button) do
+					_guihelper.SetColorMask(child_item.key_object, "255 255 255 0")
+					_guihelper.SetColorMask(child_item.mask_object, "255 255 255 0")
+				end
+			end
+		end
+	end	
+end
+
+function TouchMiniKeyboard:HideRockerAndShowKey()
+	if self.rocker then
+		self.rocker.visible = false
+	end
+
+	-- self:SetTransparency(255, false)
+
+	for k, v in pairs(self.keylayout) do
+		for k2, key_item in pairs(v) do
+			_guihelper.SetColorMask(key_item.key_object, "255 255 255 255")
+			_guihelper.SetColorMask(key_item.mask_object, "255 255 255 255")
+			if key_item.child_button then
+				for k3, child_item in pairs(key_item.child_button) do
+					_guihelper.SetColorMask(child_item.key_object, "255 255 255 255")
+					_guihelper.SetColorMask(child_item.mask_object, "255 255 255 255")
+				end
+			end
+		end
+	end
+end
+
+function TouchMiniKeyboard:ShowOpenButton(touch_x, touch_y)
+	local bt_width = 98
+	local bt_height = 100
+	self.is_draw_show_bt = true
+	if self.open_button == nil then
+		self.open_button = ParaUI.CreateUIObject("container","mini_keyboard_open_bt", "lt",0,0,bt_width,bt_height);
+		self.open_button.background="Texture/Aries/Creator/keepwork/MiniKey/xuanfuqiu_98x100_32bits.png;0 0 98 100"
+		self.open_button:AttachToRoot();
+		self.open_button.zorder = self.zorder + 100;
+
+		local has_click = true
+		local has_drag = false
+		local click_pos_x
+		local click_pos_y
+		local bt_touch_event = function(touch)
+			if touch.type == "WM_POINTERDOWN" then
+				has_click = true
+				click_pos_x = touch.x
+				click_pos_y = touch.y
+			elseif (touch.type == "WM_POINTERUPDATE") then
+				if has_click or self.is_draw_show_bt then
+					self.open_button.x = touch.x - bt_width/2
+					self.open_button.y = touch.y - bt_height/2
+					has_drag = true
+				end
+			elseif touch.type == "WM_POINTERUP" then
+				if has_click and click_pos_x then
+					local move_distance = (click_pos_x - touch.x)^2 + (click_pos_y - touch.y)^2
+					if move_distance <= 86^2 then
+						self:HideOpenBt()
+					end
+				end
+				has_click = false
+				has_drag = false
+				is_show_bt = false
+				self.is_draw_show_bt = false
+			end
+		end
+		self.open_button:SetScript("ontouch", function()
+			bt_touch_event(msg)
+		end);
+		self.open_button:SetScript("onmousedown", function()
+			local touch = {type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0};
+			bt_touch_event(touch);
+		end);
+		self.open_button:SetScript("onmouseup", function()
+			local touch = {type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0};
+			bt_touch_event(touch);
+		end);
+		self.open_button:SetScript("onmousemove", function()
+			local touch = {type="WM_POINTERUPDATE", x=mouse_x, y=mouse_y, id=-1, time=0};
+			bt_touch_event(touch);
+		end);
+
+		self.open_button.visible = false		
+	end
+	if not self.open_button.visible then
+		self.open_button.visible = true
+		local _parent = ParaUI.GetUIObject(self.id or self.name);
+		_parent.visible = false
+		local touch = {type="WM_POINTERUP", x=touch_x, y=touch_y, id=-1, time=0};
+		self:OnTouch(touch);
+	end
+	
+	self.open_button.x = touch_x - bt_width/2
+	self.open_button.y = touch_y - bt_height/2
+end
+
+function TouchMiniKeyboard:HideOpenBt()
+	if self.open_button and self.open_button.visible then
+		self.open_button.visible = false
+		local _parent = ParaUI.GetUIObject(self.id or self.name);
+		_parent.visible = true
+	end
+end

@@ -1783,3 +1783,16 @@ function block:SetClimbable(climbable)
 	self.climbable = climbable;
 	self:UpdateAttribute("attFlag", self:RecomputeAttribute());
 end
+
+function block:SetSolid(bEnabled)
+	self:BeginModify();
+	self.solid = bEnabled;
+	self:UpdateAttribute("attFlag", self:RecomputeAttribute());
+end
+
+function block:SetTransparent(bEnabled)
+	self:BeginModify();
+	self.transparent = bEnabled;
+	self:UpdateAttribute("attFlag", self:RecomputeAttribute());
+end
+

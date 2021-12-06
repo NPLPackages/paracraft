@@ -167,6 +167,9 @@ function options:OneTimeInit()
 	self:SetMaintainMovieBlockAspectRatio();
 
 	-- error log hook
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ParacraftDebug.lua");
+	local ParacraftDebug = commonlib.gettable("MyCompany.Aries.Game.Common.ParacraftDebug");
+	ParacraftDebug:Connect("onMessage", self, self.OnNPLErrorMessage, "UniqueConnection");
 	--[[
 	if(System.options.mc and ParaWorldAnalytics) then
 		ParaWorldAnalytics.SetNPLErrorCallback(function(errorMessage, stackInfo)
@@ -174,6 +177,10 @@ function options:OneTimeInit()
 		end)
 	end
 	]]
+end
+
+function options:OnNPLErrorMessage(errorMessage, stackInfo)
+	GameLogic.OnCodeError(errorMessage, stackInfo)
 end
 
 -- transient options can be modified by game rule and reset when loading a new world.
@@ -311,7 +318,7 @@ function options:ApplyTexturePack()
 end
 
 function options:OnLoadWorld()
-	self.userType = GameLogic.GetFilters():apply_filters('get_user_type');
+	self.userType = GameLogic.GetFilters():apply_filters('get_user_type') or {};
 
 	self:OneTimeInit();
 	self:LoadDefaultTransientOptions();
@@ -331,6 +338,7 @@ function options:OnLoadWorld()
 
 	-- load saved user settings
 	ParaCamera.GetAttributeObject():SetField("TurnBipedWhenWalkBackward", true);	
+	-- self:SetIgnoreEyeBlockCollisionInSunlight(true);
 	local profile = UserProfile.GetUser();
 	self.LockedGameMode = nil;
 	self.NormalDensity = self.DefaultDensity;
@@ -1271,7 +1279,7 @@ end
 
 -- "teacher", "vip"
 function options:GetUserType()
-	return self.userType;
+	return self.userType or {};
 end
 
 -- one can also use GameLogic.IsVip()

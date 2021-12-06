@@ -51,11 +51,16 @@ function ItemWorld2In1:FrameMove()
 		local blocks = self.show_template_blocks
 		local x,y,z = ParaScene.GetPlayer():GetPosition();
 		local bx, by, bz = BlockEngine:block(x, y+0.1, z);
+		self.need_sure = false
 		for i=1, #(blocks) do
 			local block = blocks[i];
 			local target_x,target_y,target_z = bx + block[1], by + block[2], bz + block[3]
 			local dest_id = ParaTerrain.GetBlockTemplateByIdx(target_x,target_y,target_z); 
 			local color = dest_id ~= 0 and groupindex_wrong or groupindex_hint_auto
+			if dest_id ~= 0 then
+				self.need_sure = true
+			end
+			
 			ParaTerrain.SelectBlock(target_x,target_y,target_z, true, color);
 		end
 	end
@@ -115,6 +120,10 @@ function ItemWorld2In1:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 			self:ClearShowTemplate()
 		end
 	end
+
+	if self.use_teacher_tip then
+		GameLogic.HideTipText("<player>")
+	end
 end
 
 function ItemWorld2In1:OnSelect(itemStack)
@@ -148,7 +157,12 @@ function ItemWorld2In1:CreatShowTemplate()
 	self.frame_timer:Change(200,200);
 
 	local create_desc = self.create_desc or L"按【鼠标右键】键确认建造位置, 【W,A,S,D】键可以移动"
-	GameLogic.AddBBS("desktop", create_desc);
+	if self.use_teacher_tip then
+		GameLogic.SetTipText(create_desc, "<player>", nil, nil);
+	else
+		GameLogic.AddBBS("desktop", create_desc);
+	end
+	
 end
 
 function ItemWorld2In1:ClearShowTemplate()

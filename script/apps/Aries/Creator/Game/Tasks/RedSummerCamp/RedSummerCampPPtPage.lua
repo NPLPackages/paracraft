@@ -101,6 +101,8 @@ function RedSummerCampPPtPage.Show(course_name, pptIndex)
 			allowDrag = false,
 			enable_esc_key = enable_esc_key,
 			cancelShowAnimation = true,
+			DesignResolutionWidth = 1280,
+			DesignResolutionHeight = 720,
 			--app_key = 0, 
 			directPosition = true,
 				align = "_fi",

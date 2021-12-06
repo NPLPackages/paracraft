@@ -172,7 +172,8 @@ local assets = {
   "Texture/Aries/Creator/keepwork/map/btn_R_32X32_32bits.png",
   "Texture/Aries/Creator/keepwork/map/btn_spawnpoint_32bits.png",
   "Texture/Aries/Creator/keepwork/map/btn_worldmap_32bits.png",
-  "Texture/Aries/Creator/keepwork/map/maparrow_32bits.png"
+  "Texture/Aries/Creator/keepwork/map/maparrow_32bits.png",
+  "Texture/Aries/Common/ThemeTeen/circle_32bits.png"
 }
 
 DockAssetsPreloader.cur_time = 0;

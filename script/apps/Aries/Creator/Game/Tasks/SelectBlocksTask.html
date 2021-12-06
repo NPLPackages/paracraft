@@ -46,6 +46,9 @@ end
         <pe:if condition='<%=SelectBlocks.selected_count == 1 and GameLogic.options.has_real_terrain==true %>'>
             <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"地表"%>' tooltip='<%=L"将选中的块变成实数地表"%>' name="RealTerrainToBlocks" uiname="SelectBlocksTask.ConvertBlocksToRealTerrain" onclick="SelectBlocks.ConvertBlocksToRealTerrain" class="mc_light_grey_button_with_fillet"/>    
         </pe:if>
+        <pe:if condition='<%=SelectBlocks.selected_count > 1 %>'>
+            <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"分享"%>' tooltip='<%=L"点击后分享给好友"%>' uiname="SelectBlocksTask.btn_share" name="btn_share" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+        </pe:if>
     </div>
     <div style="margin-left:12px;margin-top:4px;height:60px;">
         <div style="width:95px;height:44px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#35 297 95 44)">

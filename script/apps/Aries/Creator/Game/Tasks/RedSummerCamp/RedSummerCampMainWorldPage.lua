@@ -35,6 +35,10 @@ end
 
 function RedSummerCampMainWorldPage.OnClose()
 	RedSummerCampMainWorldPage.OpenFromCommandMenu = nil
+	if RedSummerCampMainWorldPage.IsFPSView then
+		GameLogic.ToggleCamera(true)
+		RedSummerCampMainWorldPage.IsFPSView = nil
+	end
 end
 
 function RedSummerCampMainWorldPage.SetOpenFromCommandMenu(flag)
@@ -46,6 +50,12 @@ function RedSummerCampMainWorldPage.GetOpenFromCommandMenu()
 end
 
 function RedSummerCampMainWorldPage.Show()
+	if GameLogic.IsFPSView then
+		RedSummerCampMainWorldPage.IsFPSView = GameLogic.IsFPSView
+		GameLogic.ToggleCamera(false)
+	end
+	
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
 	local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
 	EscFramePage.ShowPage(false);

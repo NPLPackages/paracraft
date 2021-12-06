@@ -127,6 +127,7 @@ function BackgroundMusic:PlayBackgroundSound(audio_src, bToggleIfSame)
 			last_audio_src = audio_src;
 			-- TODO: shall we fade in and fade out?
 			audio_src:play2d(); -- then play with default. 
+			self:CheckIsSilence()
 			return true;
 		elseif(bToggleIfSame) then
 			self:Stop();
@@ -144,6 +145,7 @@ function BackgroundMusic:PlayOnChannel(name, audio_src)
 			channels[name] = audio_src;
 			audio_src.channel = name;
 			audio_src:play2d();
+			self:CheckIsSilence()
 			return true;
 		end
 	end
@@ -195,3 +197,36 @@ function BackgroundMusic:ToggleMusic(filename)
 	return self:Play(filename, true)
 end
 
+function BackgroundMusic:CheckIsSilence()
+	if self.is_silence then
+		self:Silence()
+	end
+end
+
+function BackgroundMusic:Silence()
+	if last_audio_src then
+		last_audio_src:Silence()
+	end
+
+	for key, v in pairs(channels) do
+		if v then
+			v:Silence()
+		end
+	end
+
+	self.is_silence = true
+end
+
+function BackgroundMusic:Recover()
+	if last_audio_src then
+		last_audio_src:Recover()
+	end
+
+	for key, v in pairs(channels) do
+		if v then
+			v:Recover()
+		end
+	end
+
+	self.is_silence = false
+end

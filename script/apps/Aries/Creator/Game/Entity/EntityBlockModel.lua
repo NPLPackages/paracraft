@@ -16,6 +16,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
 NPL.load("(gl)script/ide/math/vector.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelMountPoints.lua");
+local ModelMountPoints = commonlib.gettable("MyCompany.Aries.Game.Common.ModelMountPoints");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local vector3d = commonlib.gettable("mathlib.vector3d");
@@ -73,17 +75,15 @@ function Entity:HasRealPhysics()
 end
 
 -- this function may remove entity object and create a new one inplace
+-- @return the new entity with new physics settings
 function Entity:EnablePhysics(bEnabled)
 	if(bEnabled ~= self.useRealPhysics) then
 		local x, y, z = self:GetBlockPos()
 		local block_id, block_data, entity_data = Game.BlockEngine:GetBlockFull(x,y,z)
 		local item_id = bEnabled and 22 or 254;
-		if(bEnabled) then
-			entity_data.attr.item_id = item_id;
-		else
-		end
+		entity_data.attr.item_id = item_id;
 		BlockEngine:SetBlock(x,y,z, item_id, block_data, 3, entity_data)
-		return true;
+		return EntityManager.GetBlockEntity(x,y,z)
 	end
 end
 
@@ -240,6 +240,23 @@ function Entity:EndEdit()
 	self:MarkForUpdate();
 end
 
+function Entity:SetModelFile(filename)
+	self.filename = filename;
+end
+
+function Entity:GetModelFile()
+	return self.filename;
+end
+
+function Entity:SetSkin(skin)
+end
+
+function Entity:SetBlockInRightHand(blockid)
+end
+
+function Entity:SetSpeedScale(vale)
+end
+
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	local attr = node.attr;
@@ -262,24 +279,10 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.onclickEvent) then
 			self:SetOnClickEvent(attr.onclickEvent);
 		end
+		if(attr.hasMount) then
+			self:CreateGetMountPoints():LoadFromXMLNode(node)
+		end
 	end
-end
-
-function Entity:SetModelFile(filename)
-	self.filename = filename;
-end
-
-function Entity:GetModelFile()
-	return self.filename;
-end
-
-function Entity:SetSkin(skin)
-end
-
-function Entity:SetBlockInRightHand(blockid)
-end
-
-function Entity:SetSpeedScale(vale)
 end
 
 function Entity:SaveToXMLNode(node, bSort)
@@ -299,6 +302,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	if(self.onclickEvent) then
 		node.attr.onclickEvent = self.onclickEvent
+	end
+	if(self:GetMountPoints()) then
+		self:GetMountPoints():SaveToXMLNode(node, bSort)
 	end
 	return node;
 end
@@ -469,4 +475,17 @@ function Entity:FindFile(text, bExactMatch)
 	if( (bExactMatch and filename == text) or (not bExactMatch and filename and filename:find(text))) then
 		return true, filename
 	end
+end
+
+-- get mount points and create it if not exist
+function Entity:CreateGetMountPoints()
+	if(not self.mountpoints) then
+		self.mountpoints = ModelMountPoints:new():Init(self)
+	end
+	return self.mountpoints;
+end
+
+-- this function may return nil if no mount points are created. 
+function Entity:GetMountPoints()
+	return self.mountpoints;
 end

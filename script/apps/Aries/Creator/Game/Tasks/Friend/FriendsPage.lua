@@ -535,6 +535,12 @@ function FriendsPage.FlushCurDataAndView(search_text)
 	end
 end
 
+function FriendsPage.ClosePage()
+	if page then
+		page:CloseWindow()
+	end
+end
+
 function FriendsPage.CloseView()
 	IsOpen = false
 

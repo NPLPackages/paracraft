@@ -20,7 +20,7 @@ BlockBoneManipContainer:Property({"Name", "BlockBoneManipContainer", auto=true})
 BlockBoneManipContainer:Property({"PivotColor", "#40ff20"});
 BlockBoneManipContainer:Property({"editColor", "#ff4264"});
 BlockBoneManipContainer:Property({"RootPivotColor", "#ff0000"});
--- for skin hightlight block selection effect. 
+-- for skin HighLight block selection effect. 
 BlockBoneManipContainer:Property({"groupindex_hint", 3});
 BlockBoneManipContainer:Signal("boneChanged", function(boneEntity) end);
 
@@ -48,8 +48,8 @@ function BlockBoneManipContainer:connectToDependNode(node)
 	self.boneEntity = node;
 	-- update all connected bones's parent, color and skins
 	self.allBones = self.boneEntity:RefreshBones();
-	-- hightlight skins
-	self:HightLightSkinForBone(self.boneEntity, true)
+	-- HighLight skins
+	self:HighLightSkinForBone(self.boneEntity, true)
 	local manipPosPlug = self.translateManip:findPlug("position");
 	local x, y, z = node:GetCenterPosition();
 	if(x and y and z) then
@@ -84,7 +84,7 @@ function BlockBoneManipContainer:GetLowestBone(allBones)
 	return lowestBone, lastHeight;
 end
 
-function BlockBoneManipContainer:HightLightSkinForBone(boneEntity, bRefresh)
+function BlockBoneManipContainer:HighLightSkinForBone(boneEntity, bRefresh)
 	ParaTerrain.DeselectAllBlock(self.groupindex_hint);
 	if(boneEntity) then
 		-- skin blocks connecting to the ground (lowest bone) is ignored during block bone editing
