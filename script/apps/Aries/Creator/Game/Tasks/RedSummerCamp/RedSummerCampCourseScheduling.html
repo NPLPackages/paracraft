@@ -79,8 +79,10 @@
         <!-- RIGHT -->
         <div style="float:left;margin-left:680px;margin-top:-500px;width:570px;height:482px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 53 72 135 : 30 60 30 60);">
             <pe:if condition="<%=IsHaveHistroy()%>">
-                
-                <div style=" margin-top: 90px;">
+                <div zorder = "-1" style="position: relative; margin-top: 185px; margin-left: 12px; width: 546px; height: 290px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/8_32bits.png#0 0 32 32:14 14 14 14); "></div>
+                <div style="position: relative; margin-top: 16px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
+                <div style="position: relative;margin-top: 58px; margin-left: 30px; font-size: 20px; base-font-size: 20px; color: #ffffff; font-weight: bold;" >最近使用</div>
+                <div style=" margin-top: 75px;">
                     <pe:repeat DataSource="<%=GetHistroyData()%>">
                         <pe:repeatitem>
                             <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
@@ -90,7 +92,7 @@
                         </pe:repeatitem>
                     </pe:repeat>        
                 </div>
-                <div style= "margin-top: 20px;">
+                <div style= "margin-top: 5px;">
                     <pe:repeat DataSource="<%=GetItemData()%>">
                         <pe:repeatitem>
                             <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
@@ -105,9 +107,7 @@
                         </pe:repeatitem>
                     </pe:repeat>        
                 </div>
-                <div zorder = "-1" style="margin-top: -200px; margin-left: 12px; position: relative; width: 546px; height: 270px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/8_32bits.png#0 0 32 32:14 14 14 14); "></div>
-                <div style="position: relative; margin-top: -382px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
-                <div style="position: relative;margin-top: -332px; margin-left: 30px; font-size: 20px; base-font-size: 20px; color: #ffffff; font-weight: bold;" >最近使用</div>
+                
             </pe:if>
 
             <pe:if condition="<%=not IsHaveHistroy()%>">
@@ -127,7 +127,7 @@
                         </pe:repeatitem>
                     </pe:repeat>        
                 </div>
-                <div style="position: relative; margin-top: -236px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
+                <div style="position: relative; margin-top: -330px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
             </pe:if>
             
         </div>

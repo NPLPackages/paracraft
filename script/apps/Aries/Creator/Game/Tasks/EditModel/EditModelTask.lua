@@ -23,6 +23,7 @@ NPL.load("(gl)script/ide/math/vector.lua");
 NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
@@ -67,6 +68,7 @@ function EditModelTask:SetTransformMode(bEnable)
 				self:GetSceneContext():setMouseTracking(true);
 				self:GetSceneContext():setCaptureMouse(true);
 			else
+				self:SelectModel(nil);
 				self:UnloadSceneContext();
 			end
 			self:RefreshPage();
@@ -98,6 +100,7 @@ function EditModelTask:Run()
 end
 
 function EditModelTask:OnExit()
+	self:SelectModel(nil);
 	self:SetFinished();
 	self:UnloadSceneContext();
 	self:CloseWindow();
@@ -106,7 +109,16 @@ end
 
 function EditModelTask:SelectModel(entityModel)
 	if(self.entityModel~=entityModel) then
+		if(self.entityModel and self.entityModel.isLastSkipPicking==false) then
+			self.entityModel:SetSkipPicking(false);
+		end
 		self.entityModel = entityModel;
+		if(entityModel) then
+			entityModel.isLastSkipPicking = entityModel:IsSkipPicking();
+			if(not entityModel.isLastSkipPicking) then
+				entityModel:SetSkipPicking(true);
+			end
+		end
 		self:UpdateManipulators();
 	end
 end
@@ -122,7 +134,9 @@ function EditModelTask.OnResetModel()
 		if(entity) then
 			entity:setYaw(0);
 			entity:setScale(1);
-			entity:SetOffsetPos({0,0,0});
+			if(entity.SetOffsetPos) then
+				entity:SetOffsetPos({0,0,0});
+			end
 		end
 	end
 end
@@ -158,7 +172,7 @@ function EditModelTask:ShowPage()
 	window:Show({
 		name="EditModelTask", 
 		url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
-		alignment="_ctb", left=0, top=-55, width = 300, height = 64, parent = parent
+		alignment="_ctb", left=0, top=-55, width = 360, height = 64, parent = parent
 	});
 end
 
@@ -333,7 +347,7 @@ function EditModelTask.OnMountPointCountChanged(text)
 	if(self) then
 		text = tonumber(text)
 		local modelEntity = self:GetSelectedModel()
-		if(modelEntity) then
+		if(modelEntity and modelEntity:GetMountPointsCount() ~= text) then
 			if(text == 0) then
 				if(modelEntity:GetMountPoints()) then
 					modelEntity:GetMountPoints():Clear()
@@ -345,6 +359,66 @@ function EditModelTask.OnMountPointCountChanged(text)
 				elseif(page) then
 					page:SetUIValue("mountpointCount", maxCount);
 				end
+			end
+			self:UpdateManipulators();
+		end
+	end
+end
+
+function EditModelTask.OnClickDeleteModel()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			self:SetTransformMode(false);
+			modelEntity:SetDead();
+		end
+	end
+end
+
+
+function EditModelTask.OnChangeSkin()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local entity = self:GetSelectedModel()
+		if(entity) then
+			local assetFilename = entity:GetMainAssetPath();
+			local old_value = entity:GetSkin();
+
+			if(entity.IsCustomModel and entity:IsCustomModel()) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.lua");
+				local EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
+				EditCCSTask:ShowPage(entity, function(ccsString)
+					if(ccsString ~= old_value) then
+						GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+							if(isVip) then
+								entity:SetSkin(ccsString);
+							end
+						end)
+					end
+				end);
+			elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
+				local old_value = entity:GetSkin()
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
+				local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
+				CustomSkinPage.ShowPage(function(filename, skin)
+					if (filename and skin~=old_value) then
+						entity:SetSkin(skin);
+					end
+				end, old_value);
+			else
+				assetFilename = PlayerAssetFile:GetNameByFilename(assetFilename)
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
+				local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
+				EditSkinPage.ShowPage(function(result)
+					if(result and result~=old_value) then
+						GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+							if(isVip) then
+								entity:SetSkin(result);
+							end
+						end)
+					end
+				end, old_value, "", assetFilename)
 			end
 		end
 	end

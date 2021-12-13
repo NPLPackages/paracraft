@@ -440,22 +440,24 @@ function TexturePacker:RebuildScene(bClearAll)
 								facing = facing,
 								scaling = scaling,
 							});
-							obj:SetField("progress", 1);
-							obj:SetRotation(q);
+							if(obj) then
+								obj:SetField("progress", 1);
+								obj:SetRotation(q);
 
-							-- diffuse color
-							local colorDiffuse = region:GetDiffuseColor();
-							if(colorDiffuse) then
-								obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorDiffuse", colorDiffuse);
-								if(region:GetAmbientColor()) then
-									obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorAmbient", region:GetAmbientColor());
+								-- diffuse color
+								local colorDiffuse = region:GetDiffuseColor();
+								if(colorDiffuse) then
+									obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorDiffuse", colorDiffuse);
+									if(region:GetAmbientColor()) then
+										obj:GetAttributeObject():GetChild("meshobject"):SetDynamicField("colorAmbient", region:GetAmbientColor());
+									end
 								end
+								scene:AddChild(obj);
 							end
-							scene:AddChild(obj);
 						end
 					
 						local tex = block_template:GetTextureObj();
-						if(tex) then
+						if(tex and obj) then
 							tex:LoadAsset();
 							obj:SetReplaceableTexture(2, tex);
 						end
@@ -488,45 +490,49 @@ function TexturePacker:RebuildScene(bClearAll)
 							facing = 0,
 							scaling = localScale,
 						});
-						obj:SetField("progress", 1);
-						-- there is no SetRotation function in biped object, we will use raw, pitch, roll instead. 
-						--obj:SetRotation(q);
-						obj:SetFacing(facing+yaw);
-						obj:SetField("pitch", pitch);
-						obj:SetField("roll", roll);
-						scene:AddChild(obj);
+						if(obj) then
+							obj:SetField("progress", 1);
+							-- there is no SetRotation function in biped object, we will use raw, pitch, roll instead. 
+							--obj:SetRotation(q);
+							obj:SetFacing(facing+yaw);
+							obj:SetField("pitch", pitch);
+							obj:SetField("roll", roll);
+							scene:AddChild(obj);
 
-						local isCustomModel = PlayerAssetFile:IsCustomModel(model_filename);
-						local hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(model_filename);
+							local isCustomModel = PlayerAssetFile:IsCustomModel(model_filename);
+							local hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(model_filename);
 						
-						if(isCustomModel) then
-							PlayerAssetFile:RefreshCustomModel(obj, skin)
-						elseif(hasCustomGeosets) then
-							PlayerAssetFile:RefreshCustomGeosets(obj, skin);
-						elseif(skin and skin~="") then
-							if(skin:match("^(%d+):")) then
-								for id, filename in skin:gmatch("(%d+):([^;]+)") do
-									id = tonumber(id)
-									obj:SetReplaceableTexture(id, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(filename), 1));
-								end
-							elseif(skin:match("^%d+#")) then
-								-- ignore ccs skins
-							elseif(skin:match("^%d+;")) then
-								-- custom geosets
-							else
-								obj:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
-							end
-						else
-							if(PlayerSkins:CheckModelHasSkin(model_filename)) then
-								local skin = PlayerSkins:GetDefaultSkinForModel(model_filename)
-								if(skin) then
+							if(isCustomModel) then
+								PlayerAssetFile:RefreshCustomModel(obj, skin)
+							elseif(hasCustomGeosets) then
+								PlayerAssetFile:RefreshCustomGeosets(obj, skin);
+							elseif(skin and skin~="") then
+								if(skin:match("^(%d+):")) then
+									for id, filename in skin:gmatch("(%d+):([^;]+)") do
+										id = tonumber(id)
+										obj:SetReplaceableTexture(id, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(filename), 1));
+									end
+								elseif(skin:match("^%d+#")) then
+									-- ignore ccs skins
+								elseif(skin:match("^%d+;")) then
+									-- custom geosets
+								else
 									obj:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
+								end
+							else
+								if(PlayerSkins:CheckModelHasSkin(model_filename)) then
+									local skin = PlayerSkins:GetDefaultSkinForModel(model_filename)
+									if(skin) then
+										obj:SetReplaceableTexture(2, ParaAsset.LoadTexture("", PlayerSkins:GetFileNameByAlias(skin), 1));
+									end
 								end
 							end
 						end
 					else
 						-- when asset is loaded, auto-scaling maybe changed, we will set it anyway
-						obj:SetScale(localScale);
+						if(obj) then
+							obj:SetScale(localScale);
+						end
 					end
 				end
 			end

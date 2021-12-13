@@ -30,6 +30,12 @@ RedSummerCampCourseScheduling.lessonCnf = {
         num = "24节",
     },
     {
+        key="ppt_L2",
+        name="机构课L2",
+        icon= "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i1_94X94_32bits.png#0 0 94 94",
+        num = "24节",
+    },
+    {
         key ="ppt_S1",
         name="社团课S1",
         icon= "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i5_94X94_32bits.png#0 0 94 94",
@@ -49,7 +55,7 @@ RedSummerCampCourseScheduling.lessonCnf = {
     }
 }
 -- true to enable lessons for the current users
-local auths = {ppt_L1 = false, ppt_S1 = false, ppt_X1 = false, ppt_Z1 = true}
+local auths = {ppt_L1 = false, ppt_L2 = false, ppt_S1 = false, ppt_X1 = false, ppt_Z1 = true}
 
 local lessonKeys = {"LP_CommunityCourses","LP_SchoolCourses","LP_OrgCourses"}
 function RedSummerCampCourseScheduling.OnInit()
@@ -75,6 +81,7 @@ function RedSummerCampCourseScheduling.AuthLesson(callback)
                 end
                 if curKey == "LP_OrgCourses" then
                     auths.ppt_L1 = data.data or false
+                    auths.ppt_L2 = data.data or false
                 end
 
                 times = times + 1
@@ -471,6 +478,10 @@ function RedSummerCampCourseScheduling.OnClickLesson(name)
         -- GameLogic.AddBBS(nil,"该课程为会员和机构会员学习课程")
         local strTip = "你暂时没有该课程访问权限，请联系客服"
         _guihelper.MessageBox(strTip)
+        return
+    end
+    if name == "ppt_L2" then
+        _guihelper.MessageBox("暂未开放,敬请期待")
         return
     end
     curSelectLesson = name

@@ -8,22 +8,24 @@ EditModelTask.InitPage(Page);
 task = EditModelTask.GetInstance();
 ]]>
 </script>
-<div style='<%=format("padding:5px;background-color:%s;color:#ffffff;width:300px;height:64px", task:IsTransformMode() and "#8080ff80" or "#80808080") %>' >
+<div style='<%=format("padding:5px;background-color:%s;color:#ffffff;width:360px;height:64px", task:IsTransformMode() and "#8080ff80" or "#80808080") %>' >
     <input name="toggleBtn" uiname="EditModelTask.toggleBtn" value='<%=task:IsTransformMode() and L"模型编辑" or L"模型创造"%>' tooltip='<%=L"点击切换"%>' type="button" onclick="EditModelTask.OnClickToggleMode" />
     <pe:if condition='<%=task:IsTransformMode()%>'>
         <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
             <div style="float:left;margin-left:3px">
-                <span style="margin-left:5px;"><%=L"方向"%></span><input name="facing" type="text" style="margin-left:2px;width:30px;height:20px;color:#000000" value='<%=string.format("%d", task:GetFacingDegree())%>' onchange="EditModelTask.OnFacingDegreeChanged"/>
-                <span style="margin-left:5px;"><%=L"大小"%></span><input name="scale" type="text" style="margin-left:2px;width:30px;height:20px;color:#000000" value='<%=string.format("%.2f", task:GetSelectedModel():GetScaling())%>'  onchange="EditModelTask.OnScalingChanged"/>
+                <span style="margin-left:5px;"><%=L"方向"%></span><input name="facing" type="text" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%d", task:GetFacingDegree())%>' onchange="EditModelTask.OnFacingDegreeChanged"/>
+                <span style="margin-left:5px;"><%=L"大小"%></span><input name="scale" type="text" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%.2f", task:GetSelectedModel():GetScaling())%>'  onchange="EditModelTask.OnScalingChanged"/>
                 <input uiname="EditModelTask.resetBtn" name="resetBtn" value='<%=L"重置"%>' type="button" style="margin-left:5px;" onclick="EditModelTask.OnResetModel" />
                 <input uiname="EditModelTask.physicsBtn" name="physicsBtn" value='<%=task:GetSelectedModel():HasRealPhysics() and L"有物理" or L"无物理"%>' type="button" style="margin-left:5px;" onclick="EditModelTask.OnClickTogglePhysics" />
+                <input uiname="EditModelTask.deleteBtn" name="deleteBtn" value='<%=L"删除"%>' type="button" style="margin-left:5px;" onclick="EditModelTask.OnClickDeleteModel" />
             </div>
             <div>
                 <pe:label value="<%=task:GetSelectedModel():GetModelFile()%>"/>
             </div>
             <div>
-                <%=L"点击事件"%><input name="onclickEvent" uiname="EditModelTask.onclickEvent" type="text" style="margin-left:2px;width:150px;height:20px;color:#000000" value='<%=task:GetSelectedModel():GetOnClickEvent()%>' onchange="EditModelTask.OnChangeOnClickEvent"/>
-                <span style="margin-left:5px;"><%=L"插件点"%></span><input uiname="EditModelTask.mountpointCount" name="mountpointCount" type="text" style="margin-left:2px;width:20px;height:20px;color:#000000" value='<%=string.format("%d", task:GetMountPointCount())%>' onchange="EditModelTask.OnMountPointCountChanged"/>
+                <input uiname="EditModelTask.skinBtn" name="skinBtn" value='<%=L"皮肤..."%>' type="button" style="margin-right:0px;" onclick="EditModelTask.OnChangeSkin" />
+                <span style="margin-left:5px;" tooltip="/sendevent XXX {x,y,z,name}"><%=L"点击事件"%></span><input name="onclickEvent" uiname="EditModelTask.onclickEvent" type="text" style="margin-left:2px;width:150px;height:18px;color:#000000" value='<%=task:GetSelectedModel():GetOnClickEvent()%>' onchange="EditModelTask.OnChangeOnClickEvent"/>
+                <span style="margin-left:5px;"><%=L"插件点"%></span><input uiname="EditModelTask.mountpointCount" name="mountpointCount" type="text" style="margin-left:2px;width:20px;height:18px;color:#000000" value='<%=string.format("%d", task:GetMountPointCount())%>' onchange="EditModelTask.OnMountPointCountChanged"/>
             </div>
         </pe:if>
         <pe:if condition='<%=not task:GetSelectedModel()%>'>

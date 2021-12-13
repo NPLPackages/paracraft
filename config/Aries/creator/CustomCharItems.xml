@@ -525,6 +525,9 @@ model id
     <item id="83184" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83184_olympic_europe.anim.x"></attachment></item>
     <item id="83185" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83185_olympic_america.anim.x"></attachment></item>
 
+    <!--20211209活动头饰-->
+    <item id="83186" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83186_nurse.anim.x"></attachment></item>
+
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>
     <item id="84002" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_01.png"></texture></item>

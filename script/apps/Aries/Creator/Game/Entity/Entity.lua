@@ -16,6 +16,9 @@ virtual functions related to input/output logics:
 	LoadFromXMLNode(node)   serializer
 	SaveToXMLNode(node)		serializer
 	OnClick(x, y, z, mouse_button)   event
+	mousePressEvent(event)
+	mouseMoveEvent(event)
+	mouseReleaseEvent(event)
 
 use the lib:
 ------------------------------------------------------------
@@ -139,6 +142,27 @@ end
 function Entity:SetCameraRoll(roll)
 	self.camera_roll = roll;
 end
+
+-- default to false
+function Entity:isCaptureMouse()
+	return self.bIsCaptureMouse
+end
+
+function Entity:setCaptureMouse(enabled)
+	self.bIsCaptureMouse = enabled
+end
+-- virtual function:
+-- this function is called when mouse press event is fired when cursor in on the entity. 
+-- if self:isCaptureMouse() is true, all subsequent mouse move and mouse release are also invoked on the entity. 
+function Entity:mousePressEvent(event)
+end
+
+function Entity:mouseMoveEvent(event)
+end
+
+function Entity:mouseReleaseEvent(event)
+end
+
 
 -- all kinds of custom user or game event, that is handled mostly by rule bag items.
 -- Entity event is the only source of inputs to the containing rule bag items, which the user can customize using ItemCommand, ItemScript, etc. 
@@ -441,6 +465,14 @@ function Entity:SetSkipPicking(bSkipPicking)
 	end
 end
 
+function Entity:IsSkipPicking()
+	local obj = self:GetInnerObject();
+	if(obj) then
+		return obj:GetField("SkipPicking", false);
+	end
+	return false;
+end
+
 -- called before focus is lost
 function Entity:OnFocusOut()
 	self.has_focus = nil;
@@ -616,6 +648,10 @@ function Entity:GetCurrentAnimId()
 	else
 		return 0;
 	end
+end
+
+function Entity:CanHighlight()
+	return true;
 end
 
 -- enable headon display
@@ -1614,6 +1650,11 @@ end
 
 -- this function is called when this entity collide with another entity. 
 function Entity:CollideWithEntity(fromEntity)
+end
+
+-- virtual function: return true if the object has real physics with C++ physics engine. 
+function Entity:HasRealPhysics()
+	return false
 end
 
 function Entity:GetPhysicsRadius()

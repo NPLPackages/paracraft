@@ -71,6 +71,7 @@ end
 
 -- virtual function: when selected in right hand
 function ItemToolBase:OnSelect(itemStack)
+	ItemToolBase._super.OnSelect(self, itemStack)
 	self:DeleteTask();
 	self:SetCurrentItemStack(itemStack);
 	if(not GameLogic.GameMode:IsEditor() and not self.allowTaskInGameMode) then
@@ -90,6 +91,7 @@ function ItemToolBase:DeleteTask()
 end
 
 function ItemToolBase:OnDeSelect()
+	ItemToolBase._super.OnDeSelect(self)
 	self:DeleteTask();
 	self:SetCurrentItemStack(nil);
 end

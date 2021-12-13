@@ -354,10 +354,27 @@ function BaseContext:HighlightPickBlock(result)
 end
 
 function BaseContext:HighlightPickEntity(result)
-	if(not result.block_id and result.entity and result.obj) then
+	
+	local hasEntityPicking;
+	if(result.entity and result.entity.OnHighlightPickingEntity) then
+		if(result.entity:OnHighlightPickingEntity(result)) then
+			hasEntityPicking = true
+		end
+	end
+	if(not result.block_id and result.entity) then
 		click_data.last_select_entity = result.entity;
-		ParaSelection.AddObject(result.obj, 1);
-		self:ClearBlockPickDisplay();
+
+		if(not hasEntityPicking) then
+			if(result.entity:CanHighlight()) then
+				local obj = result.entity:GetInnerObject()
+				if(obj) then
+					ParaSelection.AddObject(obj, 1);
+				end
+			else
+				ParaSelection.ClearGroup(1);
+			end
+			self:ClearBlockPickDisplay();
+		end
 	elseif(click_data.last_select_entity) then
 		click_data.last_select_entity = nil;
 		ParaSelection.ClearGroup(1);
@@ -539,6 +556,7 @@ end
 
 -- virtual: 
 function BaseContext:mousePressEvent(event)
+	self.mouseCaptureEntity = nil;
 	if GameLogic.GetFilters():apply_filters("BaseContextMousePressEvent", false, event) then
 		return
 	end
@@ -552,6 +570,18 @@ function BaseContext:mousePressEvent(event)
 	if(self:handleHookedMouseEvent(event)) then
 		return;
 	end
+	local result = SelectionManager:GetPickingResult();
+	local mouseEntity = result.entity 
+	if(mouseEntity and mouseEntity.mousePressEvent) then
+		mouseEntity:mousePressEvent(event)
+		if(event:isAccepted()) then
+			if(mouseEntity:isCaptureMouse()) then
+				self.mouseCaptureEntity = mouseEntity;
+			end
+			return
+		end
+	end
+
 	self:BeginMouseClickCheck();
 	if(event.mouse_button == "left") then
 		click_data.left_holding_time = 0;
@@ -565,10 +595,20 @@ function BaseContext:mouseMoveEvent(event)
 	if(self:handleHookedMouseEvent(event)) then
 		return;
 	end
+	if(self.mouseCaptureEntity) then
+		self.mouseCaptureEntity:mouseMoveEvent(event)
+	else
+		local result = SelectionManager:GetPickingResult();
+		if(result.entity and result.entity.mouseMoveEvent) then
+			result.entity:mouseMoveEvent(event);
+		end
+	end
 end
 
 -- virtual: 
 function BaseContext:mouseReleaseEvent(event)
+	local mouseCaptureEntity = self.mouseCaptureEntity;
+	self.mouseCaptureEntity = nil;
 	self.is_click = self:EndMouseClickCheck(event); 
 
 	if event.mouse_button == "left" and (System.options.isDevMode or System.os.IsTouchMode()) then
@@ -578,12 +618,20 @@ function BaseContext:mouseReleaseEvent(event)
 		end
 	end
 
-
 	if GameLogic.GetFilters():apply_filters("BaseContextMouseReleaseEvent", false, event) then
 		return
 	end
 	if(self:handleHookedMouseEvent(event)) then
 		return;
+	end
+
+	if(mouseCaptureEntity) then
+		mouseCaptureEntity:mouseReleaseEvent(event)
+	else
+		local result = SelectionManager:GetPickingResult();
+		if(result.entity and result.entity.mouseReleaseEvent) then
+			result.entity:mouseReleaseEvent(event);
+		end
 	end
 
 	self.left_holding_time = click_data.left_holding_time;

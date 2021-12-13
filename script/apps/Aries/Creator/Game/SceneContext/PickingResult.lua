@@ -24,6 +24,7 @@ function PickingResult:Clear()
 	self.block_id = nil;
 	self.x, self.y, self.z = nil, nil, nil;
 	self.blockX, self.blockY, self.blockZ = nil, nil, nil;
+	self.blockRealX, self.blockRealY, self.blockRealZ = nil, nil, nil;
 	self.block_template = nil;
 end
 

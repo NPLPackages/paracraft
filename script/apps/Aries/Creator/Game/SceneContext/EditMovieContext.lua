@@ -523,7 +523,7 @@ end
 
 function EditMovieContext:HighlightPickEntity(result)
 	local bSelectNew;
-	if(not result.block_id and result.entity and result.obj) then
+	if(not result.block_id and (result.entity or result.obj)) then
 		local actor = self:GetActor();
 		if(actor and actor:GetEntity()== result.entity) then
 			result.entity = nil;
@@ -536,7 +536,11 @@ function EditMovieContext:HighlightPickEntity(result)
 	local click_data = self:GetClickData();
 	if(bSelectNew) then
 		click_data.last_select_entity = result.entity;
-		ParaSelection.AddObject(result.obj, 1);
+		local obj = result.obj
+		if(result.entity) then
+			obj = result.entity:GetInnerObject()
+		end
+		ParaSelection.AddObject(obj, 1);
 	elseif(click_data.last_select_entity) then
 		click_data.last_select_entity = nil;
 		ParaSelection.ClearGroup(1);
@@ -566,7 +570,7 @@ function EditMovieContext:mouseReleaseEvent(event)
 		local isClickProcessed;
 		
 		-- escape alt key for entity event, since alt key is for picking entity. 
-		if( not event.alt_pressed and result and result.obj and result.entity and (not result.block_id or result.block_id == 0)) then
+		if( not event.alt_pressed and result and result.entity and (not result.block_id or result.block_id == 0)) then
 			-- click to select actor if any
 			local movieClip = MovieManager:GetActiveMovieClip();
 			if(movieClip) then

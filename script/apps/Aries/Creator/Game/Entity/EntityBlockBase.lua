@@ -47,6 +47,10 @@ function Entity:init()
 	end
 end
 
+function Entity:SetDead()
+	BlockEngine:SetBlockToAir(self.bx, self.by, self.bz)
+end
+
 function Entity:IsBlockEntity()
 	return true;
 end

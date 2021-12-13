@@ -114,6 +114,9 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+        <!-- 20211209新增-->
+        <item id="83186"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83186_nurse_32bits.png" name="护士帽" avatarMode="false"/>
+
         <!-- 20211125冬令营道具-->
         <item id="83181"  gsid="82022" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83181_omlypic_africa_32bits.png" name="冬奥会（非洲）" avatarMode="false"/>
         <item id="83182"  gsid="82023" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83182_omlypic_aisa_32bits.png" name="冬奥会（亚洲）" avatarMode="false"/>

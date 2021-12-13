@@ -171,20 +171,18 @@ end
 function EditContext:handleLeftClickScene(event, result)
 	local click_data = self:GetClickData();
 	if( self.left_holding_time < 150) then
-		if(result and result.obj and (not result.block_id or result.block_id == 0)) then
+		if(result and (result.obj or result.entity) and (not result.block_id or result.block_id == 0)) then
 			-- for scene object selection, blocks has higher selection priority.  
 			if(event.alt_pressed and result.entity) then
 				-- alt + left button to pick entity to item stack. 
-				local item_class = result.entity:GetItemClass();
-				if(item_class) then
-					local itemStack = item_class:ConvertEntityToItem(result.entity);
-					if(itemStack) then
-						GameLogic.GetPlayerController():SetBlockInRightHand(itemStack);
-					end
-				end
+				GameLogic.GetPlayerController():PickItemByEntity(result.entity);
 			else
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
-				local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=result.obj})
+				local obj = result.obj;
+				if(result.entity) then
+					obj = result.entity:GetInnerObject();
+				end
+				local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=obj})
 				task:Run();
 			end
 		else
@@ -210,6 +208,8 @@ function EditContext:handleLeftClickScene(event, result)
 					-- alt + left click to get the block in hand without destroying it
 					if(result.block_id) then
 						GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ);
+					elseif(result.entity) then
+						GameLogic.GetPlayerController():PickItemByEntity(entity);
 					end
 				elseif(ctrl_pressed and result and result.blockX) then
 					-- Ctrl + left click to select block
@@ -272,7 +272,7 @@ function EditContext:mouseReleaseEvent(event)
 		local isClickProcessed;
 		
 		-- escape alt key for entity event, since alt key is for picking entity. 
-		if( not event.alt_pressed and result and result.obj and result.entity and (not result.block_id or result.block_id == 0)) then
+		if( not event.alt_pressed and result and result.entity and (not result.block_id or result.block_id == 0)) then
 			-- for entities. 
 			isClickProcessed = GameLogic.GetPlayerController():OnClickEntity(result.entity, result.blockX, result.blockY, result.blockZ, event.mouse_button);
 		end

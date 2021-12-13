@@ -505,6 +505,9 @@ function NetClientHandler:handleMobSpawn(packet_MobSpawn)
 	elseif(entity_type == 14) then
 		spawnedEntity = EntityManager.EntityCollectable:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["gold_coin"]});
 		LOG.std(nil, "debug", "client::handleMobSpawn", "Collectable: %d", packet_MobSpawn.item_id or -1);
+	elseif(entity_type == 15) then
+		spawnedEntity = EntityManager.EntityLiveModel:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names.LiveModel});
+		LOG.std(nil, "debug", "client::handleMobSpawn", "LiveModel: %d", packet_MobSpawn.item_id or -1);
 	elseif(entity_type == 10) then
 		spawnedEntity = EntityManager.EntityRailcar:Create({x=x,y=y,z=z, item_id = packet_MobSpawn.item_id or block_types.names["railcar"]});
 		LOG.std(nil, "debug", "client::handleMobSpawn", "railcar: %d", packet_MobSpawn.item_id or -1);

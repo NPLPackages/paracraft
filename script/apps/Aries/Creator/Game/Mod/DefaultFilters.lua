@@ -43,9 +43,8 @@ function DefaultFilters.worldFileChanged(msg)
 		end	
 		if(isAsset) then
 			if(GameLogic.GetFilters():apply_filters("shouldRefreshWorldFile", true, msg.fullname)) then
-				if(ParaAsset.Refresh(msg.fullname)) then
-					LOG.std(nil, "info", "worldFileChanged", "AssetMonitor: File %s is refreshed in dir %s\n", msg.fullname, msg.dirname);
-				end	
+				local bFoundAsset = ParaAsset.Refresh(msg.fullname);
+				LOG.std(nil, "info", "worldFileChanged", "AssetMonitor: File %s is refreshed in dir %s. found:%s \n", msg.fullname, msg.dirname, bFoundAsset and "true" or "false");
 			end
 		end
 	end

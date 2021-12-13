@@ -385,6 +385,21 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 		end
 	end
 
+	-- let us handle mount point interactions here. 
+	if(self:GetMountPoints()) then
+		local mp = self:GetMountPoints():GetMountPointByXY();
+		if(mp) then
+			local entityPlayer = entity;
+			if(entityPlayer) then
+				local x, y, z = self:GetMountPoints():GetMountPositionInWorldSpace(mp:GetIndex())
+				local facing = self:GetMountPoints():GetMountFacingInWorldSpace(mp:GetIndex())
+				entityPlayer:SetPosition(x,y,z);
+				entityPlayer:SetFacing(facing)
+			end
+		end
+		return true
+	end
+
 	-- this is run for both client and server. 
 	if(entity and entity == EntityManager.GetPlayer()) then
 		local obj = self:GetInnerObject();
@@ -488,4 +503,15 @@ end
 -- this function may return nil if no mount points are created. 
 function Entity:GetMountPoints()
 	return self.mountpoints;
+end
+
+
+-- this function may return nil if no mount points are created. 
+function Entity:HasMountPoints()
+	return self.mountpoints and self.mountpoints:GetCount() > 0;
+end
+
+-- this function may return nil if no mount points are created. 
+function Entity:GetMountPointsCount()
+	return self.mountpoints and self.mountpoints:GetCount();
 end

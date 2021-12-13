@@ -105,6 +105,15 @@ function PlayerController:PickBlockAt(x, y, z)
 	end
 end
 
+function PlayerController:PickItemByEntity(entity)
+	if(entity and entity.GetItemClass) then
+		local item = entity:GetItemClass()
+		if(item) then
+			local item_stack = item:ConvertEntityToItem(entity);
+			self:SetBlockInRightHand(item_stack);
+		end
+	end
+end
 
 -- local settings
 function PlayerController:LoadFromCurrentWorld()

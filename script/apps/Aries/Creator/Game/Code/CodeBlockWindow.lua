@@ -22,6 +22,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua
 NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeIntelliSense.lua");
+local FocusPolicy = commonlib.gettable("System.Core.Namespace.FocusPolicy");
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 local CodeIntelliSense = commonlib.gettable("MyCompany.Aries.Game.Code.CodeIntelliSense");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
@@ -299,7 +300,7 @@ function CodeBlockWindow.SetFocusToTextControl()
 			local window = ctrl:GetWindow()
 			if(window) then
 				if(not GameLogic.Macros:IsPlaying()) then
-					window:SetFocus_sys()
+					window:SetFocus_sys(FocusPolicy.StrongFocus)
 					window:handleActivateEvent(true);
 				else
 					window.isEmulatedFocus = true;
@@ -882,7 +883,7 @@ function CodeBlockWindow.InsertCodeAtCurrentLine(code, forceOnNewLine, bx, by, b
 					end
 					-- set focus to control. 
 					if(textAreaCtrl and textAreaCtrl.window) then
-						textAreaCtrl.window:SetFocus_sys();
+						textAreaCtrl.window:SetFocus_sys(FocusPolicy.StrongFocus);
 						textAreaCtrl.window:handleActivateEvent(true)
 					end
 					return true;

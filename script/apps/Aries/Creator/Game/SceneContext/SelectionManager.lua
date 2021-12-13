@@ -62,6 +62,26 @@ function SelectionManager:ClearPickingResult()
 	result:Clear();
 end
 
+-- @param callbackFunc: callback function
+-- @param callbackFuncSelf: one can also provide a class instance if callbackFunc is a member function of callbackFuncSelf
+function SelectionManager:SetEntityFilterFunction(callbackFunc, callbackFuncSelf)
+	self.entityFilterFuncSelf = callbackFuncSelf;
+	self.entityFilterFunc = callbackFunc;
+end
+
+-- @return true if entity can be picked
+function SelectionManager:FilterEntity(entity)
+	if(entity and self.entityFilterFunc) then
+		if(self.entityFilterFuncSelf) then
+			return self.entityFilterFunc(self.entityFilterFuncSelf, entity)
+		else
+			return self.entityFilterFunc(entity)
+		end
+	else
+		return true;
+	end
+end
+
 -- @param bPickBlocks, bPickPoint, bPickObjects: default to true
 -- return result;
 function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist)
@@ -71,12 +91,14 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 	eye_pos = ParaCamera.GetAttributeObject():GetField("Eye position", eye_pos);
 	
 	picking_dist = picking_dist or self:GetPickingDist();
+	
 	-- pick blocks
 	if(bPickBlocks~=false) then
 		result = ParaTerrain.MousePick(picking_dist, result, 0xffffffff);
 		if(result.blockX) then
 			result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 			if(result.block_id > 0) then
+				result.blockRealX, result.blockRealY, result.blockRealZ = result.x, result.y, result.z;
 				local block = block_types.get(result.block_id);
 				if(not block) then
 					-- remove blocks for non-exist blocks
@@ -107,22 +129,17 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 		end
 	end
 
-	-- pick any point (like terrain and phyical mesh)
+	-- pick any physical point (like terrain and phyical mesh)
 	if(bPickPoint~=false) then
 		local pt = ParaScene.MousePick(picking_dist, "point");
 		if(pt:IsValid())then
-		
 			local x, y, z = pt:GetPosition();
 			local blockX, blockY, blockZ = BlockEngine:block(x,y+0.1,z); -- tricky we will slightly add 0.1 to y value. 
-		
+			blockY = blockY - 1;
+			local block_id = nil;
 			local length = math.sqrt((eye_pos[1] - x)^2 + (eye_pos[2] - y)^2 + (eye_pos[3] - z)^2);
-		
+			local entity
 			if(not result.length or (result.length>=picking_dist) or (result.length > length)) then
-				result.length = length;
-				result.x, result.y, result.z = x, y, z;
-				result.blockX, result.blockY, result.blockZ = blockX, blockY-1, blockZ;
-				result.side = 5;
-				result.block_id = nil;
 				local entityName = pt:GetName();
 				if(entityName) then
 					local bx, by, bz = entityName:match("^(%d+),(%d+),(%d+)$");
@@ -130,28 +147,83 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 						bx = tonumber(bx);
 						by = tonumber(by);
 						bz = tonumber(bz);
-						local entity = BlockEngine:GetBlockEntity(bx, by, bz);
-						if(entity) then
-							result.entity = entity;
-							result.block_id = result.block_id or entity:GetBlockId();
-							result.blockY = blockY; -- restore blockY-1 in case terrain point is picked. 
+						local entityBlock = BlockEngine:GetBlockEntity(bx, by, bz);
+						if(entityBlock) then
+							entity = entityBlock;
+							block_id = entity:GetBlockId();
+							blockY = blockY + 1; -- restore blockY-1 in case terrain point is picked. 
 						end
 					end
+					if(entityName~="") then
+						local entity1 = EntityManager.GetEntity(entityName);
+						if(entity1) then
+							local x1, y1, z1 = entity1:GetPosition()
+							local lengthSq = ((x1 - x)^2 + (y1 - y)^2 + (z1 - z)^2);
+							-- tricky: if the entity and hit points are close to each other, it is likely that they are the same object. 
+							if(lengthSq < (10^2)) then
+								entity = entity1
+								blockY = blockY + 1; -- restore blockY-1 in case terrain point is picked. 
+							end
+						end
+					end
+				end
+				if(not entity or self:FilterEntity(entity)) then
+					result.entity = entity;
+					result.length = length;
+					result.x, result.y, result.z = x, y, z;
+					result.blockX, result.blockY, result.blockZ = blockX, blockY, blockZ;
+					result.side = 5;
+					result.block_id = block_id;
 				end
 			end
 		end
 	end
 
-	-- pick any scene object
+	-- pick any scene object with AABB bounding box
 	if(bPickObjects~=false) then
-		local obj_filter;
-		local obj = ParaScene.MousePick(result.length or picking_dist, "anyobject"); 
-		if(not obj:GetField("visible", false) or obj.name == "_bm_") then
-			-- ignore block custom model or invisible ones
-			obj = nil;
-		else
-			result.obj = obj;
-			local x, y, z = obj:GetPosition();
+		local lastEntity = result.entity;
+		local lastLength = result.length;
+		-- pick recursively and ignore physical objects along the eye ray
+		-- @return entity that is picked. It will also fill result.obj with its object. 
+		local function PickEntity_()
+			local obj = ParaScene.MousePick(lastLength or picking_dist, "anyobject"); 
+			if(not obj:GetField("visible", false) or obj.name == "_bm_") then
+				-- ignore block custom model or invisible ones
+			else
+				local entity = EntityManager.GetEntityByObjectID(obj:GetID());
+				result.obj = obj;
+				local finalEntity;
+				if(entity) then
+					local canPickEntity = true;
+					if(entity and not self:FilterEntity(entity)) then
+						canPickEntity = false;
+					elseif(entity and entity:HasRealPhysics()) then
+						if(entity.IsAlwaysLoadPhysics and entity:IsAlwaysLoadPhysics()) then
+							if(entity.CheckLoadPhysics and entity:CheckLoadPhysics()) then
+								-- we will rely on the physics engine for picking instead of AABB bounding box picking. 
+								canPickEntity = false;
+							end
+						end
+					end
+					if(not canPickEntity and entity) then
+						result.obj = nil;
+						-- we will skip the physical entity, and try pick entities behind it. 
+						local lastSkipPicking = entity:IsSkipPicking();
+						if(not lastSkipPicking) then
+							entity:SetSkipPicking(true)
+							finalEntity = PickEntity_()
+							entity:SetSkipPicking(false)
+						end
+					end
+				end
+				if(result.obj) then
+					return finalEntity or entity;
+				end
+			end
+		end
+		local entity = PickEntity_()
+		if(lastEntity ~= entity and entity and result.obj) then
+			local x, y, z = result.obj:GetPosition();
 			local length = math.sqrt((eye_pos[1] - x)^2 + (eye_pos[2] - y)^2 + (eye_pos[3] - z)^2);
 			--if(not result.length or result.length > length) then
 				result.length = length;
@@ -161,7 +233,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 				result.side = 5;
 				result.block_id = nil;
 			--end
-			result.entity = EntityManager.GetEntityByObjectID(obj:GetID());
+			result.entity = entity;
 		end
 	end
 	return result;

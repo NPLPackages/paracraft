@@ -22,7 +22,7 @@ function Quest2in1Lesson.UpdateLessonProgress(course_id,lessonId,progress,status
             return
         end
         callback()
-        GameLogic.AddBBS(nil,"更新课程进度数据异常~")
+        --GameLogic.AddBBS(nil,"更新课程进度数据异常~")
     end)
 end
 

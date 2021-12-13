@@ -498,12 +498,16 @@ end
 
 -- virtual function: when selected in right hand
 function Item:OnSelect(itemStack)
-	
+	self.isSelected = true;
 end
 
 -- virtual function: when deselected in right hand
 function Item:OnDeSelect()
-	
+	self.isSelected = false;
+end
+
+function Item:IsSelected()
+	return self.isSelected;
 end
 
 -- virtual function: called when loading world. 

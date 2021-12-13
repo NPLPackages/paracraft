@@ -2,7 +2,7 @@
 Title: Edit Model Manipulator
 Author(s): LiXizhi@yeah.net
 Date: 2016/8/30
-Desc: 
+Desc: Manipulator for EntityBlockModel and EntityLiveModel
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelManipContainer.lua");
@@ -99,12 +99,12 @@ function EditModelManipContainer:connectToDependNode(node)
 
 		-- one way binding 
 		local manipPosPlug = self:findPlug("position");
-		self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)
-			return plugPos:GetValue() + plugOffsetPos:GetValue();
-		end);
 
 		-- two-way binding for offset position conversion:
 		if(plugOffsetPos) then
+			self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)
+				return plugPos:GetValue() + plugOffsetPos:GetValue();
+			end);
 			local manipTranslatePlug = self.translateManip:findPlug("position");
 			self:addManipToPlugConversionCallback(plugOffsetPos, function(self, plug)
 				return manipTranslatePlug:GetValue() - plugPos:GetValue();
@@ -112,6 +112,22 @@ function EditModelManipContainer:connectToDependNode(node)
 			self:addPlugToManipConversionCallback(manipTranslatePlug, function(self, manipPlug)
 				local pos = plugOffsetPos:GetValue();
 				return pos + plugPos:GetValue();
+			end);
+		else
+			-- use global position if offset pos not found, such as for EntityLiveModel 
+			self.translateManip:SetRealTimeUpdate(false);
+			self.translateManip:SetUpdatePosition(false);
+			self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)
+				return plugPos:GetValue();
+			end);
+			local manipTranslatePlug = self.translateManip:findPlug("position");
+			self:addManipToPlugConversionCallback(plugPos, function(self, plug)
+				local offsetPos = manipTranslatePlug:GetValue();
+				local pos = plugPos:GetValue();
+				local x, y, z = pos[1]+offsetPos[1], pos[2]+offsetPos[2], pos[3]+offsetPos[3]
+				-- tricky: we SetRealTimeUpdate to false, and use offset from manipulator and then set manipulator's value back to 0
+				self.translateManip:SetField("position", {0, 0, 0});
+				return {x, y, z};
 			end);
 		end
 
