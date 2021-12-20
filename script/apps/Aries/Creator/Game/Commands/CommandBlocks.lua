@@ -15,11 +15,12 @@ NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
 NPL.load("(gl)script/apps/Aries/SlashCommand/SlashCommand.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemStack.lua");
+local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local Color = commonlib.gettable("System.Core.Color");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
-	
 local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
 local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
@@ -243,8 +244,8 @@ if user has selected some blocks, then replacement only take place in these sele
 e.g.
 /replacefile blocktemplates/from.bmax    blocktemplates/to.bmax
 /replacefile from.jpg    to.png
-/replacefile -regexp ����/(.*).jpg    cn/%1.jpg
-/replacefile -regexp ���� cn
+/replacefile -regexp 中文/(.*).jpg    cn/%1.jpg
+/replacefile -regexp 中文 cn
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local from, to, radius
@@ -734,3 +735,54 @@ Example:
 		end
 	end,
 };
+
+Commands["blockgraffiti"] = {
+	name="blockgraffiti", 
+	quick_ref="/blockgraffiti [block] [graffititye] [graffitiradius]", 
+	desc=[[monitor a given file
+@param block: block id or name
+@param graffititye: 0 simple    1 radius 
+@param graffitiradius  maxvalue is 100
+Example:
+/blockgraffiti  if not block will stop graffiti
+/blockgraffiti 62
+/blockgraffiti 62 1
+/blockgraffiti 62 1 10
+	]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
+		local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
+		local context = AllContext:GetContext("roleplay");
+		local block_id , graffititye , graffitiradius
+		block_id, cmd_text = CmdParser.ParseBlockId(cmd_text);
+		if(block_id) then
+			graffititye, cmd_text = CmdParser.ParseInt(cmd_text)
+			if graffititye then
+				graffitiradius = CmdParser.ParseInt(cmd_text)
+			end
+		end
+		if not block_id then
+			context.SetIsSelectOther()
+			GameLogic.ActivateDefaultContext()
+			GameLogic.GetPlayerController():ThrowBlockInHand();
+			return 
+		end
+		
+		context:activate()
+		if graffititye == 1 then
+			context.SetIsSelectPaint()  -- 油漆桶 范围替换
+			context.SetPaintRadius(graffitiradius)
+		else
+			context.SetIsSelectBrush()  -- 刷子 单个方块
+		end
+
+		local playerEntity = GameLogic.EntityManager.GetPlayer()
+		if(playerEntity and playerEntity.inventory and playerEntity.inventory) then
+			local item = ItemStack:new():Init(block_id or 62, 1, serverdata);
+			if(playerEntity.SetBlockInRightHand) then
+				playerEntity:SetBlockInRightHand(item);
+			end
+		end
+	end,
+};
+

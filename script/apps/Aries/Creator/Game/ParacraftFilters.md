@@ -102,6 +102,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "worldFileChanged", msg:
   - "GetWorldGeneratorClass", generator, name: get world generator by name filter. Use this to add custom world generators
   - "OnClickCreateWorld"
+  - "OnBeforeLoadWorld"
   - "OnWorldLoaded" when world is successfully loaded
   - "OnWorldUnloaded" when world is unloaded
   - "shouldRefreshWorldFile" true, fullname: whether to refresh the world file. 

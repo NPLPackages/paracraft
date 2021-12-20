@@ -654,6 +654,9 @@
 
 <!-- 2021.10.25 更新鸟巢相关素材 -->
   <!-- <asset filename="character/CC/artwar/game/niaochao-wai.x" displayname="鸟巢" name="niaochao"/>-->
+<!-- 2021.11.11 补充冬奥会相关素材 -->
+  <!-- <asset filename="character/CC/artwar/game/huoju.x" displayname="火炬" name="huoju"/>-->
+  <!-- <asset filename="character/CC/artwar/game/changxindeng.x" displayname="长信宫灯" name="changxindeng"/>-->
 <!-- 5·27更新 -->
   <asset filename="character/CC/artwar/game/chai.x" displayname="柴火" name="chai"/>
   <asset filename="character/CC/artwar/game/desk.x" displayname="复古木桌" name="desk"/>

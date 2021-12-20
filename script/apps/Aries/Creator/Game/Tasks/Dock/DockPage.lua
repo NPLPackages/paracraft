@@ -351,7 +351,6 @@ function DockPage.OnClickTop(id)
         table.insert(DockPage.showPages,{id,RankPage.GetPageCtrl()})
     elseif id == "race" then
         RacePage.Show()
-        table.insert(DockPage.showPages,{id,RacePage.GetPageCtrl()})
     elseif (id == 'dragonboatfestival') then
         local ActDragonBoatFestival = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ActDragonBoatFestival/ActDragonBoatFestival.lua");
         ActDragonBoatFestival:Init();

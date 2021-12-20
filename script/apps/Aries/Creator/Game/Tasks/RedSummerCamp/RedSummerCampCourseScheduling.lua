@@ -32,7 +32,7 @@ RedSummerCampCourseScheduling.lessonCnf = {
     {
         key="ppt_L2",
         name="机构课L2",
-        icon= "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i1_94X94_32bits.png#0 0 94 94",
+        icon= "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i6_94x94_32bits.png#0 0 94 94",
         num = "24节",
     },
     {
@@ -72,6 +72,8 @@ function RedSummerCampCourseScheduling.AuthLesson(callback)
             featureName = v
         },function(err, msg, data)
             if err == 200 then
+                echo(data)
+                echo(v)
                 local curKey = lessonKeys[i]
                 if curKey == "LP_CommunityCourses" then
                     auths.ppt_S1 = data.data or false
@@ -467,21 +469,16 @@ end
 
 function RedSummerCampCourseScheduling.CheckCanLearn(name)
     local isCanlearn = auths[name]
-    if name == "ppt_X1"  then
-        return isCanlearn or System.User.isVipSchool
-    end
+    -- if name == "ppt_X1"  then
+    --     return isCanlearn or System.User.isVipSchool
+    -- end
     return isCanlearn
 end
 
 function RedSummerCampCourseScheduling.OnClickLesson(name)
     if not RedSummerCampCourseScheduling.CheckCanLearn(name) then
-        -- GameLogic.AddBBS(nil,"该课程为会员和机构会员学习课程")
         local strTip = "你暂时没有该课程访问权限，请联系客服"
         _guihelper.MessageBox(strTip)
-        return
-    end
-    if name == "ppt_L2" then
-        _guihelper.MessageBox("暂未开放,敬请期待")
         return
     end
     curSelectLesson = name

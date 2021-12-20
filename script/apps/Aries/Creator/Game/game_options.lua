@@ -322,7 +322,10 @@ function options:OnLoadWorld()
 
 	self:OneTimeInit();
 	self:LoadDefaultTransientOptions();
+	
 	GameLogic.RunCommand("language");
+	-- restore to default player mode, just in case the user has changed it. 
+	GameLogic.RunCommand("/hide playertouch");
 	-- increased chunk limit
 	GameLogic.RunCommand("/memlimit -v -s 500");
 --	if(System.os.Is64BitsSystem()) then

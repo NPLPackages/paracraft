@@ -80,6 +80,7 @@ local var_name_to_text = {
 	Attenuation1 = L"衰减参数1",
 	Attenuation2 = L"衰减参数2",
 	is_fps = L"第一人称",
+	eye_dist = L"大小",
 }
 local var_longname_to_text = {
 	anim = L"动作 (1键)",
@@ -88,6 +89,18 @@ local var_longname_to_text = {
 	facing = L"转身 (3键)",
 	rot = L"三轴旋转 (3,3键)",
 	scaling = L"大小 (4键)",
+	weather=L"天气" .. L"(6键)",
+	text = L"文字" .. L"(1键)",
+	time = L"时间" .. L"(5键)",
+	blocks = L"方块" .. L"(7键)",
+	assetfile = L"模型" .. L"(7键)",
+	cmd = L"命令" .. L"(8键)",
+	skin = L"皮肤" .. L"(8键)",
+	speedscale = L"运动速度" .. L"(6键)",
+	head = L"头部运动" .. L"(5键)",
+	music = L"背景音乐" .. L"(9键)",
+	opacity = L"透明度" .. L"(9键)",
+	parent = L"父链接" .. L"(0键)",
 }
 
 MovieClipTimeLine.timelineHeight = 12;
@@ -421,7 +434,12 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 			local totalHeight = 0;
 			for index, var in ipairs(varList) do
 				if(var.index) then
-					node:AddChild(CommonCtrl.TreeNode:new({Text = self:GetVariableDisplayName(var.name, true), 
+					local display_text = self:GetVariableDisplayName(var.name, true)
+					if var.actor and var.actor.class_name == "ActorNPC" and display_text == var_longname_to_text.blocks then
+						display_text = self:GetVariableDisplayName(var.name, false)
+					end
+
+					node:AddChild(CommonCtrl.TreeNode:new({Text = display_text, 
 						uiname=ctl.name.."."..(var.name or ""),
 						actor=var.actor, originalActor = var.originalActor, originalIndex = var.originalIndex,
 						Name = var.index, Type = "Menuitem", onclick = nil, }));

@@ -25,8 +25,8 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|terrain|
-mod|physics|vision|quickselectbar|tips|map|camera|anim|
+	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|playertouch
+terrain|mod|physics|vision|quickselectbar|tips|map|camera|anim|
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
@@ -36,6 +36,7 @@ Other show filters:
 /show vision   : AI memory vision
 /show overlaybuffer    show overlay picking buffer on left top corner
 /show quickselectbar
+/show playertouch   : a simple touch controller for kids
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
@@ -146,6 +147,13 @@ Other show filters:
 					entity:SetAnimation(animId)
 				end
 			end)
+		elseif (name == "playertouch") then
+			local player_ctr = GameLogic.GetPlayerController()
+			player_ctr:SetEnableDragPlayerToMove(true)
+
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+			local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+			TouchMiniKeyboard.GetSingleton():SetRockerMod()
 		end
 	end,
 };
@@ -154,8 +162,8 @@ Other show filters:
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
-	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|mobile|terrain|
-vision|ui|keyboard|quickselectbar|tips|map|info|camera|
+	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|mobile|playertouch|
+terrain|vision|ui|keyboard|quickselectbar|tips|map|info|camera|
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo
 ]], 
 	desc=[[hide different type of things.e.g.
@@ -234,6 +242,13 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 		elseif (name == "world2in1") then
 			local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
 			World2In1.HidePage();
+		elseif (name == "playertouch") then
+			local player_ctr = GameLogic.GetPlayerController()
+			player_ctr:SetEnableDragPlayerToMove(false)
+
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+			local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+			TouchMiniKeyboard.GetSingleton():SetKeyboardMod()
 		end
 	end,
 };

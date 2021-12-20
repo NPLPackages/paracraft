@@ -314,11 +314,14 @@ end
 local normal_ = {};
 -- Sets the rotation of the entity
 function Entity:SetRotation(yaw, pitch)
+	if(not yaw or not pitch) then
+		return
+	end
     self.rotationYaw = yaw % 360;
     self.rotationPitch = pitch % 360;
 	local obj = self:GetInnerObject();
 	if(obj) then
-		local offset_facing =  self:GetOffsetFacing()
+		local offset_facing = self:GetOffsetFacing()
 		self.facing = -self.rotationYaw*math.pi/180 + offset_facing;
 		obj:SetFacing(self.facing);
 
@@ -345,17 +348,16 @@ function Entity:SetRotation(yaw, pitch)
 	end
 
 	local x, y, z = self:GetPosition();	
-	self.prevMoveAngel = self.moveAngel or 0
+	self.prevMoveAngle = self.moveAngle or 0
 
 	local distance_x = x - self.prevPosX
 	local distance_y = z - self.prevPosZ
 
-	self.moveAngel = math.atan2(distance_y,distance_x)
-	if self.rotationPitch ~= self.prevRotationPitch or self.prevRotationYaw ~= self.rotationYaw or self.moveAngel ~= self.prevMoveAngel then
+	self.moveAngle = math.atan2(distance_y, distance_x)
+	if self.rotationPitch ~= self.prevRotationPitch or self.prevRotationYaw ~= self.rotationYaw or self.moveAngle ~= self.prevMoveAngle then
 		if self.riddenByEntity and CameraController.IsLockRailCarFirstPersonView and CameraController.IsLockRailCarFirstPersonView() then
-			CameraController.UpdateCameraRotation(self.facing, self.rotationPitch, self.moveAngel, self.isMoving)
+			CameraController.UpdateCameraRotation(self.facing, self.rotationPitch, self.moveAngle, self.isMoving)
 		end
-		--CameraController.UpdateCameraRotation(self.facing, self.rotationPitch, self.moveAngel)
 	end
 end
 
@@ -1163,8 +1165,8 @@ function Entity:OnBlockMoveChange()
 	end
 end
 
-function Entity:GetMoveAngel()
-	return self.moveAngel
+function Entity:GetmoveAngle()
+	return self.moveAngle
 end
 
 function Entity:IsMoving()

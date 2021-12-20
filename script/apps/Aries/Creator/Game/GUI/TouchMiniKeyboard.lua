@@ -16,9 +16,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 TouchMiniKeyboard.CheckShow(true);
 
--- static singleton to show at default left bottom position
-TouchMiniKeyboard.CheckShow(true);
-TouchMiniKeyboard.GetSingleton():LoadKeyboardLayout({{{name="A", vKey = DIK_SCANCODE.DIK_A}, {name="C", vKey = DIK_SCANCODE.DIK_C}}, {{name="B", vKey = DIK_SCANCODE.DIK_B}}})
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+TouchMiniKeyboard.GetSingleton():SetRockerMod(true)
 ------------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
@@ -129,7 +129,10 @@ function TouchMiniKeyboard:ctor()
 		GameLogic.events:AddEventListener("game_mode_change", self.UpdateIconVisible, self, "TouchMiniKeyboard");
 	end, "UniqueConnection");
 
-	
+	GameLogic.GetFilters():add_filter("OnWorldUnloaded", function(...)
+		self:ChangeMouseLockStata("NoLock")
+		return ...
+	end)
 end
 
 -- @param keyLayout: if nil, it will load the default layout. 
@@ -169,8 +172,22 @@ end
 
 -- static method
 function TouchMiniKeyboard.CheckShow(bShow)
+	if bShow == TouchMiniKeyboard.bShow then
+		return
+	end
+
+	if bShow and TouchMiniKeyboard.GetSingleton().is_rocker_mode then
+		return
+	end
+
+	TouchMiniKeyboard.bShow = bShow
+
 	TouchMiniKeyboard.GetSingleton():Show(bShow);
 	TouchMiniRightKeyboard.GetSingleton():Show(bShow);
+
+	if not bShow then
+		TouchMiniKeyboard.GetSingleton():ChangeMouseLockStata("NoLock")
+	end
 end
 
 
@@ -215,15 +232,15 @@ function TouchMiniKeyboard:Destroy()
 end
 
 -- @param alpha: 0-1 
-function TouchMiniKeyboard:SetTransparency(alpha)
-	if(self.transparency ~= alpha) then
-		self.transparency = alpha;
-		local _parent = self:GetUIControl();
-		_guihelper.SetColorMask(_parent, format("255 255 255 %d",math.floor(alpha * 255)))
-		_parent:ApplyAnim();
-	end
-	return self;
-end
+-- function TouchMiniKeyboard:SetTransparency(alpha)
+-- 	if(self.transparency ~= alpha) then
+-- 		self.transparency = alpha;
+-- 		local _parent = self:GetUIControl();
+-- 		_guihelper.SetColorMask(_parent, format("255 255 255 %d",math.floor(alpha * 255)))
+-- 		_parent:ApplyAnim();
+-- 	end
+-- 	return self;
+-- end
 
 -- @param left: position where to show. default to one button width
 -- @param top: default to 2/5 height of the screen
@@ -307,9 +324,16 @@ function TouchMiniKeyboard:OnTouch(touch)
 	local touch_session = TouchSession.GetTouchSession(touch);
 
 	local btnItem = self:GetButtonItem(touch.x, touch.y);
+	
 	-- let us track it with an item. 
-
+	self.is_ext = false
 	if(touch.type == "WM_POINTERDOWN") then
+		if self.rocker and self.rocker.visible then
+			if btnItem and btnItem.name ~= "W" and btnItem.name ~= "A" and btnItem.name ~= "S" and btnItem.name ~= "D"  then
+				btnItem = nil
+			end
+		end
+
 		if(btnItem) then
 			touch_session:SetField("keydownBtn", btnItem);
 			self:SetKeyState(btnItem, true);
@@ -335,7 +359,11 @@ function TouchMiniKeyboard:OnTouch(touch)
 					local key_name_list = TouchMiniKeyboard.DirectionKey[self.cur_move_state]
 					self:SetKeyListState(key_name_list, true)
 				else
-					self:ChangeMoveState(touch.x, touch.y)
+					local x = touch.x - self.left;
+					local y = touch.y - self.top;
+					local center_item = self:GetCneterItem()
+					local center_pos = {center_item.pos_x + center_item.width/2, center_item.pos_y + center_item.height/2}
+					self:ChangeMoveState(x, y, center_pos)
 				end
 				self:RefreshRocker(touch.x, touch.y)
 				
@@ -549,7 +577,7 @@ function TouchMiniKeyboard:SetKeyState(btnItem, isDown)
 		Mouse:SetTouchButtonSwapped(isDown or self.rmb_lock_state == TouchMiniKeyboard.RMBLockStateList.LockRight);
 	end
 
-	if(isDown) then
+	if(isDown and not self.is_ext) then
 		self:SetTransparency(1);
 	else
 		self:SetTransparency(0.2, true);
@@ -560,6 +588,7 @@ end
 
 function TouchMiniKeyboard:SendRawKeyEvent(btnItem, isDown)
 	if(btnItem.vKey) then
+		
 		Keyboard:SendKeyEvent(isDown and "keyDownEvent" or "keyUpEvent", btnItem.vKey);
 	end
 end
@@ -865,10 +894,9 @@ function TouchMiniKeyboard:ClearAllKeyDown()
 	end
 end
 
-function TouchMiniKeyboard:ChangeMoveState(x, y)
-	x = x - self.left;
-	y = y - self.top;
-	local state = self:GetDirectionState(x, y)
+-- is_ext 是否外部调用
+function TouchMiniKeyboard:ChangeMoveState(x, y, center_pos, is_ext)
+	local state = self:GetDirectionState({x, y}, center_pos)
 	if state == self.cur_move_state or state == nil then
 		return
 	end
@@ -876,6 +904,7 @@ function TouchMiniKeyboard:ChangeMoveState(x, y)
 	self:StopMoveState()
 	
 	self.cur_move_state = state
+	self.is_ext = is_ext
 	local key_name_list = TouchMiniKeyboard.DirectionKey[self.cur_move_state]
 	self:SetKeyListState(key_name_list, true)
 end
@@ -901,10 +930,10 @@ function TouchMiniKeyboard:SetKeyListState(key_name_list, state)
 	end
 end
 
-function TouchMiniKeyboard:GetDirectionState(x, y)
-	local center_item = self:GetCneterItem()
-	local param_y = y - (center_item.pos_y + center_item.height/2)
-	local param_x = x - (center_item.pos_x + center_item.width/2)
+function TouchMiniKeyboard:GetDirectionState(mouse_pos, center_pos)
+	local param_x = mouse_pos[1] - center_pos[1]
+	local param_y = mouse_pos[2] - center_pos[2]
+
 	local rotation = math.atan2(-param_y,  param_x) * 180/math.pi  
 	if rotation < 22.5 and rotation >= -22.5 then
 		return "Right"
@@ -951,16 +980,25 @@ function TouchMiniKeyboard:SetTransparency(alpha, bAnimate)
 end
 
 function TouchMiniKeyboard:SetTransparencyImp(alpha)
-	if self.rocker and self.rocker.visible then
+	if self.rocker and self.rocker.visible and self.rocker_arrow and self.rocker_arrow.visible then
 		return
 	end
 
 	self.transparency = alpha;
-	local _parent = self:GetUIControl();
-	_guihelper.SetColorMask(_parent, format("255 255 255 %d",math.floor(alpha * 255)))
-	_parent:ApplyAnim();
 
-	TouchMiniRightKeyboard.GetSingleton():SetTransparencyImp(alpha)
+	if self.is_rocker_mode then
+		if self.rocker then
+			_guihelper.SetColorMask(self.rocker, format("255 255 255 %d",math.floor(alpha * 255)))
+			self.rocker:ApplyAnim();
+		end
+	else
+		local _parent = self:GetUIControl();
+		_guihelper.SetColorMask(_parent, format("255 255 255 %d",math.floor(alpha * 255)))
+		_parent:ApplyAnim();
+	
+		TouchMiniRightKeyboard.GetSingleton():SetTransparencyImp(alpha)
+	end
+
 end
 
 function TouchMiniKeyboard:ChangeCtrlPressState(is_press)
@@ -1226,29 +1264,36 @@ function TouchMiniKeyboard:RefreshRocker(touch_x, touch_y)
 	local center_item = self:GetCneterItem()
 	local cenert_pos_x = center_item.pos_x + center_item.width/2
 	local cenert_pos_y = center_item.pos_y + center_item.height/2
-
-	local pos_x = touch_x - self.left;
-	local pos_y = touch_y - self.top;
 	-- 282	264
 	if nil == self.rocker then
 		local bg_size = 256
 		local bg_pos_x = (self.width - bg_size)/2
 		local bg_pos_y = (self.height - bg_size)/2
 		self.rocker = ParaUI.CreateUIObject("container","rocker_root", "lt",cenert_pos_x - bg_size/2, cenert_pos_y - bg_size/2, bg_size, bg_size);
-		self.rocker.background = "Texture/Aries/Creator/keepwork/MiniKey/diban_256x256_32bits.png;0 0 256 256";
+		self.rocker.background = "";
 		local parent = self:GetUIControl();
 		parent:AddChild(self.rocker)
+		self.rocker:SetField("ClickThrough", true);
+
+		self.rocker_bg = ParaUI.CreateUIObject("container","rocker_bg", "lt",0, 0, bg_size, bg_size);
+		self.rocker_bg.background = "Texture/Aries/Creator/keepwork/MiniKey/diban_256x256_32bits.png;0 0 256 256";
+		self.rocker_bg.visible = false
+		self.rocker:AddChild(self.rocker_bg)
+		self.rocker_bg:SetField("ClickThrough", true);
 
 		local point_size = 55
-		self.rocker_point = ParaUI.CreateUIObject("container","rocker_point", "lt",cenert_pos_x - point_size/2, cenert_pos_y - point_size/2, point_size, point_size);
+		self.rocker_point = ParaUI.CreateUIObject("container","rocker_point", "lt",bg_size/2 - point_size/2, bg_size/2 - point_size/2, point_size, point_size);
 		self.rocker_point.background = "Texture/Aries/Creator/keepwork/MiniKey/yuanxin_55x55_32bits.png;0 0 55 55";
 		self.rocker:AddChild(self.rocker_point)
+		self.rocker_point:SetField("ClickThrough", true);
 
 		local arrow_width = 292
 		local arrow_height = 292
 		self.rocker_arrow = ParaUI.CreateUIObject("container","rocker_arrow", "lt",-18, -18, arrow_width, arrow_height);
 		self.rocker_arrow.background = "Texture/Aries/Creator/keepwork/MiniKey/jiantou_292x292_32bits.png;0 0 292 292";
+		self.rocker_arrow.visible = false
 		self.rocker:AddChild(self.rocker_arrow)
+		self.rocker_arrow:SetField("ClickThrough", true);
 
 		-- local timer = commonlib.Timer:new({callbackFunc = function(timer)
 		-- 	self.rocker_arrow.rotation = self.rocker_arrow.rotation + 0.1
@@ -1262,9 +1307,16 @@ function TouchMiniKeyboard:RefreshRocker(touch_x, touch_y)
 		self:HideKeyAndShowRocker()
 	end
 
+	if not touch_x then
+		self:InitRockerPointPos()
+		return
+	end
+
 	local rocker_point =  self.rocker_point
 	local radius = self.rocker.width/2
 
+	local pos_x = touch_x - self.left;
+	local pos_y = touch_y - self.top;
 	-- 计算目标点离摇杆中心的距离
 	local target_distance = (pos_x - cenert_pos_x) ^ 2 + (pos_y - cenert_pos_y) ^ 2
 
@@ -1291,6 +1343,13 @@ function TouchMiniKeyboard:RefreshRocker(touch_x, touch_y)
 
 	-- 处理箭头的角度和位置
 	local arrow = self.rocker_arrow
+	if not touch_x and arrow.visible then
+		arrow.visible = false
+	elseif not arrow.visible then
+		arrow.visible = true
+	end
+
+	self.rocker_bg.visible = arrow.visible
 	-- local arrow_pos_x = circle_pos_x - arrow.width/2
 	-- local arrow_pos_y = circle_pos_y - arrow.height/2
 	
@@ -1309,12 +1368,30 @@ function TouchMiniKeyboard:RefreshRocker(touch_x, touch_y)
 	end
 end
 
+function TouchMiniKeyboard:InitRockerPointPos()
+	if self.rocker_arrow then
+		self.rocker_arrow.visible = false
+		self.rocker_bg.visible = self.rocker_arrow.visible
+	end
+
+	if self.rocker and self.rocker_point then
+		local bg_size = self.rocker.width
+		local point_width = self.rocker_point.width
+		local point_height = self.rocker_point.height
+		self.rocker_point.x = bg_size/2 - point_width/2
+		self.rocker_point.y = bg_size/2 - point_height/2
+	end
+end
+
 function TouchMiniKeyboard:HideKeyAndShowRocker()	
 	-- self:SetTransparency(0, false)
 
 	if self.rocker then
 		self.rocker.visible = true
 	end	
+
+	-- local _parent = ParaUI.GetUIObject(self.id or self.name);
+	-- _parent:SetField("ClickThrough", true);
 
 	for k, v in pairs(self.keylayout) do
 		for k2, key_item in pairs(v) do
@@ -1331,9 +1408,17 @@ function TouchMiniKeyboard:HideKeyAndShowRocker()
 end
 
 function TouchMiniKeyboard:HideRockerAndShowKey()
+	if self.is_rocker_mode then
+		self:InitRockerPointPos()
+		return
+	end
+
 	if self.rocker then
 		self.rocker.visible = false
 	end
+
+	-- local _parent = ParaUI.GetUIObject(self.id or self.name);
+	-- _parent:SetField("ClickThrough", false);
 
 	-- self:SetTransparency(255, false)
 
@@ -1425,4 +1510,27 @@ function TouchMiniKeyboard:HideOpenBt()
 		local _parent = ParaUI.GetUIObject(self.id or self.name);
 		_parent.visible = true
 	end
+end
+
+function TouchMiniKeyboard:SetRockerMod()
+	self.is_rocker_mode = true
+	if not TouchMiniKeyboard.bShow then
+		return
+	end
+
+	self:RefreshRocker()
+	self:SetTransparency(1);
+	self:SetTransparency(0.2, true);
+	TouchMiniRightKeyboard.GetSingleton():Show(false)
+	self:ChangeMouseLockStata("NoLock")
+end
+
+function TouchMiniKeyboard:SetKeyboardMod()
+	self.is_rocker_mode = false
+	if not TouchMiniKeyboard.bShow then
+		return
+	end
+	
+	self:HideRockerAndShowKey()
+	TouchMiniRightKeyboard.GetSingleton():Show(true)
 end

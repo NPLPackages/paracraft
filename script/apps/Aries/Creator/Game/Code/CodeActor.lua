@@ -140,7 +140,7 @@ end
 
 function Actor:EnableActorPicking(bEnabled)
 	self.enableActorPicking = bEnabled;
-	if(self.entity) then
+	if(self.entity and not self.entity.disable_codeactor_picking_control) then
 		self.entity:SetSkipPicking(not bEnabled);
 	end
 end
@@ -567,8 +567,16 @@ function Actor:SetAssetFile(filename)
 	local entity = self:GetEntity();
 	if(entity) then	
 		filename = PlayerAssetFile:GetFilenameByName(filename)
-		entity:SetMainAssetPath(filename);
+		if(entity.SetModelFile) then
+			entity:SetModelFile(filename);
+		else
+			entity:SetMainAssetPath(filename);
+		end
 	end
+end
+
+function Actor:SetIgnoreSkinAnim(ignore)
+	Actor._super.SetIgnoreSkinAnim(self, ignore==true or ignore == "true")
 end
 
 function Actor:GetColor()
@@ -1036,6 +1044,7 @@ local internalValues = {
 	["selectionEffect"] = {setter = Actor.SetSelectionEffect, getter = Actor.GetSelectionEffect, isVariable = false}, 
 	["isAgent"] = {setter = function() end, getter = Actor.IsAgent, isVariable = false}, 
 	["isRelativePlay"] = {setter = Actor.SetRelativePlay, getter = Actor.IsRelativePlay, isVariable = false}, 
+	["isIgnoreSkinAnim"] = {setter = Actor.SetIgnoreSkinAnim, getter = Actor.IsIgnoreSkinAnim, isVariable = false}, 
 	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 
 	["playSpeed"] = {setter = Actor.SetPlaySpeed, getter = Actor.GetPlaySpeed, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 

@@ -43,7 +43,7 @@ local page;
 -- @param subfolder_name: can be nil or sub folder name, such as "MovieMaking", "newusertutorial", "programming", "circuit","smallstructure"
 function HelpPage.ShowPage(category_name, subfolder_name)
 	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "browse:"..tostring(category_name)..":"..tostring(subfolder_name), 1, nil);
-
+	-- HelpPage.SetSearchIndexStrList()
 	System.App.Commands.Call("File.MCMLWindowFrame", {
 		url = "script/apps/Aries/Creator/Game/Tasks/HelpPage.html", 
 		name = "HelpPage.ShowPage", 
@@ -69,7 +69,7 @@ function HelpPage.ShowPage(category_name, subfolder_name)
 
 		category_name, subfolder_name = HelpPage.GetCategoryAndSubName(target_name);
 	end
-
+	
 	HelpPage.SelectCategory(category_name, subfolder_name, target_name);
 
 	if GameLogic.events then
@@ -81,7 +81,7 @@ function HelpPage.ShowPage(category_name, subfolder_name)
 			page:CallMethod("gvwMCTask", "ScrollToRow", HelpPage.ScrollToindex);
 			HelpPage.ScrollToindex = nil
 		end
-	end, 200);
+	end, 500);
 end
 
 function HelpPage.IsOpen()
@@ -143,7 +143,8 @@ function HelpPage.SelectCategory(index_or_name, subcategory_name, grid_item_name
 			if grid_item_name then
 				local grid_ds = BuildQuestProvider.GetTasks_DS(HelpPage.select_item_index,ds[index].attr.category)
 				for i, grid_item in ipairs(grid_ds) do
-					if grid_item.name == grid_item_name then
+					local item_name = string.gsub(grid_item.name, " ", "")
+					if item_name == grid_item_name then
 						HelpPage.select_task_index = i
 						break
 					end
@@ -384,14 +385,14 @@ end
 
 -- 根据文本找索引
 function HelpPage.SetSearchIndexStrList(str_list)
-	-- str_list = { "新手小屋", "让角色向前行走" }
+	-- str_list = { "区域放置与删除" }
 	HelpPage.SearchStrList = str_list
 	HelpPage.OpenIndexStrList = str_list
 end
 
 -- 暂时只处理新手教程
 function HelpPage.IsShowTypeLightFram(type_index,item_index)
-	-- HelpPage.SearchStrList = { "新手小屋", "让角色向前行走" }
+	-- HelpPage.SearchStrList = { "区域放置与删除" }
 	if not HelpPage.SearchStrList or #HelpPage.SearchStrList == 0 then
 		return false
 	end
@@ -411,7 +412,7 @@ function HelpPage.IsShowTypeLightFram(type_index,item_index)
 end
 
 function HelpPage.IsShowGridLightFram(grid_index)
-	-- HelpPage.SearchStrList = { "新手小屋", "让角色向前行走" }
+	-- HelpPage.SearchStrList = { "区域放置与删除" }
 	if not HelpPage.SearchStrList or #HelpPage.SearchStrList == 0 then
 		return false
 	end
@@ -448,7 +449,8 @@ function HelpPage.GetCategoryAndSubName(target_name)
 			for i2, v2 in ipairs(v) do
 				local grid_ds = BuildQuestProvider.GetTasks_DS(i2,"tutorial")
 				for k, grid_item in pairs(grid_ds) do
-					if grid_item.name == target_name then
+					local item_name = string.gsub(grid_item.name, " ", "")
+					if item_name == target_name then
 						return i, v2.attr.name
 					end
 				end

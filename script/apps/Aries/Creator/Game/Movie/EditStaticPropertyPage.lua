@@ -74,6 +74,7 @@ function EditStaticPropertyPage.UpdateUIFromValue(values)
 		page:SetValue("name", values.name or "");
 		page:SetValue("isAgent", values.isAgent and tostring(values.isAgent) or "false");
 		page:SetValue("isServer", values.isServer == true);
+		page:SetValue("isIgnoreSkin", values.isIgnoreSkin == true);
 	end
 end
 
@@ -96,6 +97,8 @@ function EditStaticPropertyPage.OnOK()
 		end
 		local isServer = page:GetValue("isServer") or false;
 		v.isServer = isServer;
+		local isIgnoreSkin = page:GetValue("isIgnoreSkin") or false;
+		v.isIgnoreSkin = isIgnoreSkin;
 		EditStaticPropertyPage.last_values = v;
 		EditStaticPropertyPage.result = "OK";
 		page:CloseWindow();

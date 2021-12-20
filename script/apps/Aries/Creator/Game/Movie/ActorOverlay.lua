@@ -677,6 +677,9 @@ function Actor:CheckInstallCodeEnv(painter, isPickingPass)
 						local filepath, params = filename:match("^([^:;]+)(.*)$");
 						-- repeated calls are cached
 						filename = Files.FindFile(filepath);
+						if(not filename) then
+							return
+						end
 						if(params and params~="") then
 							filename = filename..params;
 						end

@@ -77,7 +77,8 @@ local Entity = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), com
 Entity:Property({"position", nil, "getPosition", "setPosition"});
 -- max number of collisions to process per frame. too many collisions will lead to HIGH CPU. 
 Entity:Property({"max_collision_count", 10})
-
+-- globally unique identifier
+Entity:Property({"guid", nil, "GetKey", "SetKey"});
 Entity:Signal("focusIn");
 Entity:Signal("focusOut");
 -- position changed
@@ -314,6 +315,19 @@ function Entity:SetWorld(world)
     self.worldObj = world;
 end
 
+-- set globally unique identifier. by default this is self.name, which may not be unique
+-- @param key: if nil, we will generate a new unique ID
+function Entity:SetKey(key)
+	if(key == nil) then
+		key = ParaGlobal.GenerateUniqueID();
+	end
+	self.guid = key;
+end
+
+-- get globally unique identifier, by default we will use self.name, if self:SetKey is not called. 
+function Entity:GetKey()
+	return self.guid or self.name;
+end
 
 local validateNumber = mathlib.validateNumber;
 
@@ -322,6 +336,7 @@ function Entity:LoadFromXMLNode(node)
 	if(node) then
 		local attr = node.attr;
 		if(attr) then
+			self.guid = attr.guid
 			if(attr.bx) then
 				self.bx = validateNumber(self.bx or tonumber(attr.bx));
 				self.by = validateNumber(self.by or tonumber(attr.by));
@@ -397,10 +412,14 @@ end
 function Entity:SaveToXMLNode(node, bSort)
 	node = node or {name='entity', attr={}};
 	local attr = node.attr;
+	
 	attr.class = self.class_name;
 	attr.item_id = self.item_id;
 	attr.bx, attr.by, attr.bz  = self.bx, self.by, self.bz;
 	attr.name = self.name;
+	if(self.guid ~= self.name) then
+		attr.guid = self.guid;
+	end
 	attr.facing = self.facing;
 	if(self.lifetime) then
 		attr.lifetime = self.lifetime;
@@ -1070,14 +1089,6 @@ end
 function Entity:SetOpacity(value)
 	self.opacity = value;
 end		
-
--- get the associated item class. 
-function Entity:GetItemClass()
-	if(self.item_id and self.item_id>0) then
-		return ItemClient.GetItem(self.item_id);
-	end
-end		
-
 -- whether it can be searched via Ctrl+F FindBlockTask
 function Entity:IsSearchable()
 end

@@ -145,7 +145,7 @@ function open()
     if pid then
         GameLogic.RunCommand("/loadworld " .. pid)
     else
-        InternetLoadWorld.GotoUrl(opus_content)
+        GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.go_to_url', opus_content)
     end
 end
 
@@ -394,7 +394,7 @@ end
                         <div zorder="-1" style="width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/6_334X421_32bits.png#0 0 334 421)"></div>
                         <div style="margin-left: 14px;margin-top: 378px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                             <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
-                                创意空间
+                                创意空间（课程）
                             </div>
                         </div>
                     </div>

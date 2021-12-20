@@ -25,7 +25,10 @@ function PickingResult:Clear()
 	self.x, self.y, self.z = nil, nil, nil;
 	self.blockX, self.blockY, self.blockZ = nil, nil, nil;
 	self.blockRealX, self.blockRealY, self.blockRealZ = nil, nil, nil;
+	self.physicalX, self.physicalY, self.physicalZ = nil, nil, nil;
+	self.blockLength = nil;
 	self.block_template = nil;
+	self.side = nil
 end
 
 -- get the block template or nil. 

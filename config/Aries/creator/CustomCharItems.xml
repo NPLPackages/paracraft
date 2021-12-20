@@ -524,9 +524,13 @@ model id
     <item id="83183" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83183_olympic_australia.anim.x"></attachment></item>
     <item id="83184" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83184_olympic_europe.anim.x"></attachment></item>
     <item id="83185" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83185_olympic_america.anim.x"></attachment></item>
-
     <!--20211209活动头饰-->
     <item id="83186" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83186_nurse.anim.x"></attachment></item>
+    <!--20211216活动头饰-->
+    <item id="83187" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83187_cleaner_male.anim.x"></attachment></item>
+    <item id="83188" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83188_architect_male.anim.x"></attachment></item>
+    <item id="83189" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83189_archaeologist_male.anim.x"></attachment></item>
+
 
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>
@@ -852,6 +856,9 @@ model id
     <item id="86043" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86043_red_flag_bag.anim.x"></attachment></item>
     <!--20211118新增-->
     <item id="86044" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86044_olympic_back.anim.x"></attachment></item>
+    <!--20211216新增-->
+    <item id="86045" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86045_cleaner_back.anim.x"></attachment></item>
+    <item id="86046" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86046_archaeologist_back.anim.x"></attachment></item>
 
     <!--      87000 97999  手持  attachment id="1"    -->
     <item id="87001" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x"></attachment></item>

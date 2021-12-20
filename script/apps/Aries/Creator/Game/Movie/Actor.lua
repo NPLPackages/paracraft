@@ -742,11 +742,13 @@ end
 
 function Actor:DestroyEntity()
 	local entity = self:GetEntity()
-	if(entity and not self:IsAgent()) then
+	if(entity) then
 		if(entity:HasFocus()) then
 			EntityManager.SetFocus(EntityManager.GetPlayer());
 		end
-		entity:Destroy();
+		if(not self:IsAgent()) then
+			entity:Destroy();
+		end
 		self.entity = nil;
 	end
 end

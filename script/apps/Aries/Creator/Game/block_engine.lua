@@ -1132,12 +1132,27 @@ function BlockEngine:DoesBlockHaveSolidTopSurface(x,y,z)
 	end
 end    
 
-
-
 -- dump the current state of the block engine
 function BlockEngine:Dump()
 	echo("----------------------dumping block engine -------------------");
 	echo({eye_block = self.eye_block, eye = self.eye, min_y = self.min_y, max_y = self.max_y});
 end
+
+-- real world ray picking solid blocks. 
+-- @return nil if hit nothing, or dist, bx, by, bz, block_id
+function BlockEngine:RayPicking(fromX, fromY, fromZ, dirX, dirY, dirZ, length)
+	length = length or 100;
+	local dist = 1;
+	while(dist <= length) do
+		local x, y, z = fromX + dist * dirX, fromY + dist * dirY, fromZ + dist * dirZ
+		local bx, by, bz = self:block(x, y, z);
+		local block = self:GetBlock(bx, by, bz);
+		if(block and block.solid) then
+			return dist, bx, by, bz, block.id
+		end
+		dist = dist + 1;
+	end
+end
+
 
 

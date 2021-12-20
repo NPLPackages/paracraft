@@ -83,8 +83,8 @@ function EditMovieTextPage.OnOK()
 		end
 		local fontSize = tonumber(page:GetValue("fontsize")) or 25;
 		fontSize = math.min(math.max(fontSize, 8), 100);
-		fontcolor = page:GetValue("fontcolor");
-		bgcolor = page:GetValue("bgcolor");
+		local fontcolor = page:GetValue("fontcolor");
+		local bgcolor = page:GetValue("bgcolor");
 
 		EditMovieTextPage.result = {
 			text = text,

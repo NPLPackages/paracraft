@@ -43,6 +43,7 @@ function CommandManager:Init(bRefresh)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandShapes.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandGlobals.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandWorlds.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandScreenRecorder.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandInstall.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandPlayer.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMovie.lua");

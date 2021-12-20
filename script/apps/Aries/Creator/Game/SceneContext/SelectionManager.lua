@@ -8,6 +8,7 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local result = SelectionManager:GetPickingResult()
+SelectionManager:IsMousePickingEntity(entity)
 ------------------------------------------------------------
 ]]
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -82,6 +83,23 @@ function SelectionManager:FilterEntity(entity)
 	end
 end
 
+-- return true if mouse is picking the given entity. Please note this will disregard SkipPicking attribute on the entity. 
+-- @param entity: if nil,  we will use main player
+function SelectionManager:IsMousePickingEntity(entity)
+	entity = entity or EntityManager.GetPlayer();
+	local bIsLastSkipPicking = entity:IsSkipPicking()
+	if(bIsLastSkipPicking) then
+		entity:SetSkipPicking(false)
+	end
+	local result = self:MousePickBlock()
+	if(bIsLastSkipPicking) then
+		entity:SetSkipPicking(true)
+	end
+	if(result.entity == entity) then
+		return true;
+	end
+end
+
 -- @param bPickBlocks, bPickPoint, bPickObjects: default to true
 -- return result;
 function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist)
@@ -99,6 +117,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 			result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 			if(result.block_id > 0) then
 				result.blockRealX, result.blockRealY, result.blockRealZ = result.x, result.y, result.z;
+				result.blockLength = result.length;
 				local block = block_types.get(result.block_id);
 				if(not block) then
 					-- remove blocks for non-exist blocks
@@ -126,6 +145,10 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 			end
 			local root_ = ParaUI.GetUIObject("root");
 			local mouse_pos = root_:GetAttributeObject():GetField("MousePosition", {0,0});
+		else
+			-- ParaTerrain.MousePick will modify the length and side for unknown reasons, since we will use these two parameters, we will reset them if no picking result is found. 
+			result.length = nil;
+			result.side = nil;
 		end
 	end
 
@@ -171,6 +194,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 					result.entity = entity;
 					result.length = length;
 					result.x, result.y, result.z = x, y, z;
+					result.physicalX, result.physicalY, result.physicalZ = result.x, result.y, result.z;
 					result.blockX, result.blockY, result.blockZ = blockX, blockY, blockZ;
 					result.side = 5;
 					result.block_id = block_id;

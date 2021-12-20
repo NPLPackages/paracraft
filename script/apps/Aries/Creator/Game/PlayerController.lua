@@ -27,6 +27,8 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
 local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockInEntityHand");
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 
 -- create class
 local PlayerController = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.PlayerController"));
@@ -35,6 +37,10 @@ local throwed_item_lifetime = 60;
 
 function PlayerController:ctor()
 	self.netClientHandler = nil;
+	GameLogic.GetFilters():add_filter("basecontext_after_handle_mouse_event", function(event)
+		self:OnMouseEvent(event)
+		return event
+	end);
 end
 
 function PlayerController:Init(netClientHandler)
@@ -507,5 +513,63 @@ function PlayerController:SetFlyUsingCameraDir(bEnable)
 		if(obj) then
 			obj:SetField("FlyUsingCameraDir", bEnable == true);
 		end
+	end
+end
+
+-- whether to enable mouse dragging on player to move around. 
+function PlayerController:SetEnableDragPlayerToMove(bEnable)
+	if bEnable ~= self.isDragPlayerToMoveEnabled then
+		-- left dragging is always enabled
+		if bEnable then
+			local att = ParaCamera.GetAttributeObject();
+			GameLogic.options:SetEnableMouseLeftDrag(true)
+		else
+			if( not (System.options.IsTouchDevice or GameLogic.options:HasTouchDevice()) ) then
+				GameLogic.options:SetEnableMouseLeftDrag(false)
+			end
+		end
+	end
+	self.isDragPlayerToMoveEnabled = bEnable
+end
+
+function PlayerController:OnMouseEvent(event)
+	if not self.isDragPlayerToMoveEnabled then
+		return
+	end
+
+	if event:isAccepted() then
+		if self.move_center_pos then
+			self.move_center_pos = nil
+			local TouchMiniKeyboardSingleton = TouchMiniKeyboard.GetSingleton()
+			TouchMiniKeyboardSingleton:StopMoveState()
+		end
+		return
+	end
+
+	if event:isClick() and event.isDoubleClick then
+		if(GameLogic.SelectionManager:IsMousePickingEntity()) then
+			GameLogic.DoJump()
+		end
+	end
+
+	local event_type = event:GetType()
+	local TouchMiniKeyboardSingleton = TouchMiniKeyboard.GetSingleton()
+	if event_type == "mousePressEvent" then
+		local is_right_mouse = event.RightButton and event:RightButton()
+		if GameLogic.SelectionManager:IsMousePickingEntity() and not is_right_mouse then
+			self.move_center_pos = {ParaUI.GetMousePosition()}
+			event:accept();
+		end
+		
+	elseif event_type == "mouseMoveEvent" then
+		if self.move_center_pos then
+			local x, y = ParaUI.GetMousePosition()
+			TouchMiniKeyboardSingleton:ChangeMoveState(x, y, self.move_center_pos, true)
+			event:accept();
+		end
+	else
+		self.move_center_pos = nil
+		TouchMiniKeyboardSingleton:StopMoveState()
+		event:accept();
 	end
 end

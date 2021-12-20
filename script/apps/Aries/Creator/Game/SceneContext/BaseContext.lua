@@ -262,6 +262,8 @@ function BaseContext:handleMouseEvent(event)
 			end
 		end
 	end
+
+	GameLogic.GetFilters():apply_filters("basecontext_after_handle_mouse_event", event)
 end
 
 -- this function is called repeatedly if MousePickTimer is enabled. 
@@ -570,6 +572,8 @@ function BaseContext:mousePressEvent(event)
 	if(self:handleHookedMouseEvent(event)) then
 		return;
 	end
+	-- on touch screen, mouse press is fired before the timer where CheckMousePick is called, so we need to do a real mouse pick here
+	self:CheckMousePick();
 	local result = SelectionManager:GetPickingResult();
 	local mouseEntity = result.entity 
 	if(mouseEntity and mouseEntity.mousePressEvent) then

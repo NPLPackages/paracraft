@@ -275,6 +275,7 @@ function TouchMiniRightKeyboard:OnTouch(touch)
 			elseif btnItem.name == "Space" then
 				GameLogic.DoJump()
 			elseif btnItem.name == "KeyBoard" then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchVirtualKeyboardIcon.lua");
 				local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon")
 				TouchVirtualKeyboardIcon = TouchVirtualKeyboardIcon.GetSingleton()
 				if TouchVirtualKeyboardIcon then

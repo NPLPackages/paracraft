@@ -114,6 +114,11 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+        <!-- 20211216新增-->
+        <item id="83187"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83187_cleaner_male_32bits.png" name="环卫工（男）" avatarMode="false"/>
+		<item id="83188"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83188_architect_male_32bits.png" name="建筑师（男）" avatarMode="false"/>
+		<item id="83189"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83189_archaeologist_male_32bits.png" name="考古（男）" avatarMode="false"/>
+
         <!-- 20211209新增-->
         <item id="83186"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83186_nurse_32bits.png" name="护士帽" avatarMode="false"/>
 
@@ -762,16 +767,17 @@
 	</category>
 	
 	<category name="back" text="背部">
+	    <!--20211118新加-->
+		<item id="86045" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86045_cleaner_back_32bits.png" name="环卫腰包" avatarMode="false"/>
+		<item id="86046" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86046_archaeologist_back_32bits.png" name="考古腰包" avatarMode="false"/>
          <!--20211118新加-->
 		<item id="86044" gsid="85004" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86044_olympic_back_32bits.png" name="冬奥会" avatarMode="false"/>
-
          <!--20210929新加-->
 		<item id="86043" gsid="85003" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86043_red_flag_bag_32bits.png" name="红旗书包"/>
 	    <!--20210624新加-->
 		<item id="86042" gsid="85002" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86042_red_scarf_32bits.png" name="红领巾"/>
 	    <!--20210610新加-->
 		<item id="86041" gsid="85001" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86041_space_suit_bag_32bits.png" name="氧气瓶"/>
-
 		<item id="86040" gsid="85000" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86040_shubao_32bits.png" name="小伙伴书包"/>
 		<item id="86008" price="250" type="2" icon="Texture/Aries/Item/1656_ShopSchoolUniformBoyBack.png" name="黑色书包"/>
 		<item id="86009" price="250" type="2" icon="Texture/Aries/Item/1657_ShopSchoolUniformGalBack.png" name="白色书包"/>

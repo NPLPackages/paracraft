@@ -31,6 +31,9 @@ function mcml_controls.register_all()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/pe_mc_slot.lua");
 	MyCompany.Aries.Game.mcml2.pe_mc_slot:RegisterAs("pe:mc_slot");
 
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/pe_mc_block.lua");
+	MyCompany.Aries.Game.mcml2.pe_mc_block:RegisterAs("pe:mc_block");
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/pe_player_dir.lua");
 	MyCompany.Aries.Game.mcml2.pe_player_dir:RegisterAs("pe:player_dir");
 end

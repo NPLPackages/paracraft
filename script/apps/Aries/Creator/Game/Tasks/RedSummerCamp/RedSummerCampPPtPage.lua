@@ -328,9 +328,9 @@ function RedSummerCampPPtPage.InitData()
 		RedSummerCampPPtPage.InitPPtConfig(RedSummerCampPPtPage.CurCourseName)
 	end
 	
-	local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[RedSummerCampPPtPage.CurCourseName]
+	local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[RedSummerCampPPtPage.CurCourseName] or {}
 	RedSummerCampPPtPage.LessonsPPtData = ppt_data_list
-	RedSummerCampPPtPage.SelectPPtData = RedSummerCampPPtPage.LessonsPPtData[RedSummerCampPPtPage.SelectLessonIndex]
+	RedSummerCampPPtPage.SelectPPtData = RedSummerCampPPtPage.LessonsPPtData[RedSummerCampPPtPage.SelectLessonIndex] or {}
 end
 
 function RedSummerCampPPtPage.SelectLesson(index)
@@ -484,14 +484,19 @@ function RedSummerCampPPtPage.OnVisitWrold(projectid)
 		local export_data_list = RedSummerCampPPtPage.ProjectIdToPPtData[projectid]
 		if export_data_list and #export_data_list > 0 then
 			for key, v in pairs(export_data_list) do
-				local lesson_type = key_to_report_name[v.course_name] or v.course_name
-				local section = v.course_index or 1
-				keepwork.tatfook.study_learn_records({
-					lessonType = lesson_type,
-					section = section,
-					progress = tonumber(v.step_value) or 1,
-				}, function(err, msg, data)
-				end)
+				if tonumber(v.step_value) ~= 1 then
+					local lesson_type = key_to_report_name[v.course_name] or v.course_name
+					local section = v.course_index or 1
+					keepwork.tatfook.study_learn_records({
+						lessonType = lesson_type,
+						section = section,
+						progress = tonumber(v.step_value) or 1,
+					}, function(err, msg, data)
+						--print("ooooooooooo", err)
+					end)
+
+					break
+				end
 			end
 		end
 	end

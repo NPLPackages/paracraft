@@ -29,6 +29,16 @@ function env_imp:playSound(channel_name, filename, from_time, volume, pitch)
 	env_imp.checkyield(self);
 end
 
+-- play a sound 
+-- @param channel_name: channelname or filename, where filename can be relative to current world or a predefined name
+function env_imp:playSoundAndWait(channel_name, filename, from_time, volume, pitch)
+	filename = filename or channel_name;
+	SoundManager:PlaySound(channel_name, filename, from_time or 0, volume, pitch);	
+	local sound = AudioEngine.CreateGet(channel_name);
+	local total_time = tonumber(sound:GetSource().TotalAudioTime);
+	env_imp.wait(self, total_time);
+end
+
 -- same as /sound [filename]
 function env_imp:stopSound(filename)
 	SoundManager:StopSound(filename)

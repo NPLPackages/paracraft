@@ -37,7 +37,16 @@ Entity:Property({"scale", 1, "getScale", "setScale"});
 Entity:Property({"minScale", 0.02});
 Entity:Property({"maxScale", 1000});
 Entity:Property({"yaw", 0, "getYaw", "setYaw"});
+
+Entity:Property({"useRealPhysics", nil, "HasRealPhysics", "EnablePhysics", auto=true});
+Entity:Property({"bIsAutoTurning", nil, "IsAutoTurningDuringDragging", "SetAutoTurningDuringDragging", auto=true});
+Entity:Property({"isStackable", nil, "IsStackable", "SetIsStackable", auto=true});
+Entity:Property({"stackHeight", 0.2, "GetStackHeight", "SetStackHeight", auto=true});
+Entity:Property({"canDrag", nil, "GetCanDrag", "SetCanDrag", auto=true});
+
 Entity:Property({"onclickEvent", nil, "GetOnClickEvent", "SetOnClickEvent", auto=true});
+Entity:Property({"onhoverEvent", nil, "GetOnHoverEvent", "SetOnHoverEvent", auto=true});
+
 Entity:Property({"offsetPos", {0,0,0}, "GetOffsetPos", "SetOffsetPos"});
 
 -- class name
@@ -276,8 +285,23 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.offsetZ) then
 			self.offsetPos[3] = tonumber(attr.offsetZ);
 		end
+		if(attr.isStackable) then
+			self.isStackable = (attr.isStackable == "true") or (attr.isStackable == true);
+		end
+		if(attr.stackHeight) then
+			self.stackHeight = tonumber(attr.stackHeight);
+		end
+		if(attr.bIsAutoTurning) then
+			self.bIsAutoTurning = (attr.bIsAutoTurning == "true") or (attr.bIsAutoTurning == true);
+		end
+		if(attr.canDrag) then
+			self.canDrag = (attr.canDrag == "true") or (attr.canDrag == true);
+		end
 		if(attr.onclickEvent) then
 			self:SetOnClickEvent(attr.onclickEvent);
+		end
+		if(attr.onhoverEvent) then
+			self:SetOnHoverEvent(attr.onhoverEvent);
 		end
 		if(attr.hasMount) then
 			self:CreateGetMountPoints():LoadFromXMLNode(node)
@@ -303,9 +327,18 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.onclickEvent) then
 		node.attr.onclickEvent = self.onclickEvent
 	end
+	if(self.onhoverEvent) then
+		node.attr.onclickEvent = self.onhoverEvent
+	end
+	node.attr.canDrag = self.canDrag;
+	node.attr.stackHeight = self.stackHeight;
+	node.attr.isStackable = self.isStackable;
+	node.attr.bIsAutoTurning = self.bIsAutoTurning;
+	
 	if(self:GetMountPoints()) then
 		self:GetMountPoints():SaveToXMLNode(node, bSort)
 	end
+
 	return node;
 end
 

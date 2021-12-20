@@ -139,6 +139,8 @@ function RacePage.Show()
 				y = 0,
 				width = 0,
 				height = 0,
+				DesignResolutionWidth = 1280,
+				DesignResolutionHeight = 720,
 		}
 	System.App.Commands.Call("File.MCMLWindowFrame", params)
 end

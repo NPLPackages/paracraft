@@ -59,6 +59,11 @@ function AllContext:Init()
 	context = NullContext:new():Register("null");
 	contexts["null"] = context;
 
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/RolePlayMode/RolePlayMovieContext.lua");
+	local RolePlayMovieContext = commonlib.gettable("MyCompany.Aries.Game.SceneContext.RolePlayMovieContext")
+	context = RolePlayMovieContext:new():Register("roleplay");
+	contexts["roleplay"] = context
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/RedirectContext.lua");
 
 	-- LOG.std(nil, "debug", "AllContext", "registering all context");

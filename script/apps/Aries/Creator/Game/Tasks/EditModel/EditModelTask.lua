@@ -14,8 +14,9 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
 local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
-local task = EditModelTask:new();
-task:Run();
+local entity = EntityManager.EntityLiveModel:Create({bx=bx,by=by,bz=bz,});
+entity:SetModelFile(filename)
+entity:Attach();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
@@ -123,6 +124,17 @@ function EditModelTask:SelectModel(entityModel)
 	end
 end
 
+function EditModelTask.GetItemID()
+	local self = EditModelTask.GetInstance();
+	if(self:GetSelectedModel()) then
+		return self:GetSelectedModel():GetItemId()
+	else
+		if(self.itemInHand) then
+			return self.itemInHand.id
+		end
+	end
+end
+
 function EditModelTask:GetSelectedModel()
 	return self.entityModel;
 end
@@ -206,6 +218,7 @@ function EditModelTask:handleRightClickScene(event, result)
 		if(ctrl_pressed) then
 			modelEntity:OpenEditor("entity", modelEntity);
 		else
+			self:SelectModel(modelEntity);
 			self:SetTransformMode(true);
 		end
 	else
@@ -419,6 +432,89 @@ function EditModelTask.OnChangeSkin()
 						end)
 					end
 				end, old_value, "", assetFilename)
+			end
+		end
+	end
+end
+
+function EditModelTask.OnClickProperty()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelProperty.lua");
+			local EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
+			EditModelProperty.ShowPage(function(values)
+				if(values) then
+					if(modelEntity:GetName()~=values.name and not modelEntity:isa(EntityManager.EntityBlockBase)) then
+						if(not EntityManager.GetEntity(values.name)) then
+							modelEntity:SetName(values.name)
+						else
+							_guihelper.MessageBox(L"%s名字已经存在了, 无法改名。请换个名字")
+						end
+					end
+					modelEntity:SetIsStackable(values.isStackable)
+					modelEntity:SetStackHeight(values.stackHeight)
+					modelEntity:SetCanDrag(values.canDrag)
+					modelEntity:SetAutoTurningDuringDragging(values.autoTurning)
+					
+					if(values.onClickEvent == "") then
+						values.onClickEvent = nil
+					end
+					modelEntity:SetOnClickEvent(values.onClickEvent)
+					if(values.onHoverEvent == "") then
+						values.onHoverEvent = nil
+					end
+					modelEntity:SetOnHoverEvent(values.onHoverEvent)
+					if(values.modelfile ~= modelEntity:GetModelFile()) then
+						modelEntity:SetModelFile(values.modelfile)
+					end
+
+					-- this one needs to be called last, since it may change entity.  
+					modelEntity:EnablePhysics(values.hasRealPhysics)
+				end
+			end, {
+				name=modelEntity:GetName(), 
+				itemId = modelEntity:GetItemId(),
+				hasRealPhysics = modelEntity:HasRealPhysics(),
+				isStackable = modelEntity.isStackable,
+				stackHeight = modelEntity.stackHeight,
+				autoTurning = modelEntity.bIsAutoTurning,
+				canDrag = modelEntity.canDrag,
+				onClickEvent = modelEntity:GetOnClickEvent(),
+				onHoverEvent = modelEntity:GetOnHoverEvent(),
+				modelfile = modelEntity:GetModelFile(),
+			})
+		end
+	end
+end
+
+function EditModelTask.OnChangeModelType()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		if(modelEntity) then
+			if(self.itemInHand) then
+				local oldX, oldY, oldZ = modelEntity:GetPosition();
+				if(self.itemInHand.id == block_types.names.BlockModel or self.itemInHand.id == block_types.names.PhysicsModel) then
+					-- TODO: convert from physical model to live model
+					
+				elseif(self.itemInHand.id == block_types.names.LiveModel) then
+					-- TODO: convert from live model to physical model
+
+				end
+			end
+		else
+			-- toggle between physical and non-physical block model. 
+			if(self.itemInHand) then
+				if(self.itemInHand.id == block_types.names.BlockModel) then
+					self.itemInHand.id = block_types.names.PhysicsModel;
+				elseif(self.itemInHand.id == block_types.names.PhysicsModel) then
+					self.itemInHand.id = block_types.names.LiveModel;
+				elseif(self.itemInHand.id == block_types.names.LiveModel) then
+					self.itemInHand.id = block_types.names.BlockModel;
+				end
+				self:RefreshPage()
 			end
 		end
 	end

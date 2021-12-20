@@ -176,6 +176,7 @@ function GameLogic:InitAPIPath()
 	GameLogic.block_types = block_types;
 	GameLogic.ItemClient = ItemClient;
     GameLogic.QuestAction = QuestAction;
+	GameLogic.SelectionManager = SelectionManager;
 
 	_G["GameLogic"] = GameLogic; 
 	_G["Game"] = commonlib.gettable("MyCompany.Aries.Game");
@@ -648,6 +649,8 @@ function GameLogic.LoadGame()
 	LOG.std(nil, "system", "GameLogic", "loading block world for %s", GameLogic.current_worlddir);
 	
 	ItemClient.OnInit();
+
+	GameLogic.GetFilters():apply_filters("OnBeforeLoadWorld");
 
 	LocalNPC:Init();
 	if(LocalNPC:LoadFromFile()) then

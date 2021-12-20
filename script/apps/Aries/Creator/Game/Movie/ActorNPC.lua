@@ -38,6 +38,7 @@ local Actor = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Movie.A
 Actor.class_name = "ActorNPC";
 Actor:Property({"entityClass", "EntityNPC"});
 Actor:Property({"offset_facing", nil, "GetOffsetFacing", "SetOffsetFacing", auto=true});
+Actor:Property({"ignoreSkinAnim", false, "IsIgnoreSkinAnim", "SetIgnoreSkinAnim", auto=true});
 -- asset file is changed
 Actor:Signal("assetfileChanged");
 
@@ -108,6 +109,7 @@ function Actor:GetStaticVariable()
 		var:AddVariable(self:GetVariable("name"));
 		var:AddVariable(self:GetVariable("isAgent"));
 		var:AddVariable(self:GetVariable("isServer"));
+		var:AddVariable(self:GetVariable("isIgnoreSkin"));
 		self:SetCustomVariable("static_variable", var);
 		return var;
 	end
@@ -224,6 +226,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	timeseries:CreateVariableIfNotExist("name", "Discrete");
 	timeseries:CreateVariableIfNotExist("isAgent", "Discrete"); -- true, nil|false, "relative", "searchNearPlayer"
 	timeseries:CreateVariableIfNotExist("isServer", "Discrete"); -- false, whether this entity is a server mode entity
+	timeseries:CreateVariableIfNotExist("isIgnoreSkin", "Discrete"); -- true, nil|false
 	
 	timeseries:CreateVariableIfNotExist("skin", "Discrete");
 	timeseries:CreateVariableIfNotExist("blockinhand", "Discrete");
@@ -247,7 +250,11 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	opacity = self:GetValue("opacity", 0);
 	name = newName or self:GetValue("name", 0);
 	local isAgent = self:GetValue("isAgent", 0);
+	local isIgnoreSkin = self:GetValue("isIgnoreSkin", 0);
 	local isServerEntity = self:GetValue("isServer", 0);
+	if(isIgnoreSkin) then
+		self:SetIgnoreSkinAnim(isIgnoreSkin)
+	end
 
 	if(isReuseActor == nil) then
 		isReuseActor = isAgent
@@ -332,7 +339,6 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 		self.entity:SetGroupId(nil);
 		self.entity:SetSentientField(0);
 		self.entity:SetServerEntity(isServerEntity == true);
-
 		self.entity:SetSkin(skin);
 			
 		self.entity:SetCanRandomMove(false);
@@ -608,50 +614,50 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 		local entity = self:GetEntity()
 		if(entity) then
 			assetFilename = entity:GetMainAssetPath();
-		end
 
-		if(entity.IsCustomModel and entity:IsCustomModel()) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.lua");
-			local EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
-			EditCCSTask:ShowPage(entity, function(ccsString)
-				if(ccsString ~= old_value) then
-					self:AddKeyFrameByName(keyname, nil, ccsString);
-					self:FrameMovePlaying(0);
-					if(callbackFunc) then
-						callbackFunc(true);
+			if(entity.IsCustomModel and entity:IsCustomModel()) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.lua");
+				local EditCCSTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditCCSTask");
+				EditCCSTask:ShowPage(entity, function(ccsString)
+					if(ccsString ~= old_value) then
+						self:AddKeyFrameByName(keyname, nil, ccsString);
+						self:FrameMovePlaying(0);
+						if(callbackFunc) then
+							callbackFunc(true);
+						end
+					end
+				end);
+			elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
+				if(not old_value or old_value == "") then
+					local entity = self:GetEntity()
+					if(entity) then
+						old_value = entity:GetSkin()
 					end
 				end
-			end);
-		elseif(entity.HasCustomGeosets and entity:HasCustomGeosets()) then
-			if(not old_value or old_value == "") then
-				local entity = self:GetEntity()
-				if(entity) then
-					old_value = entity:GetSkin()
-				end
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
+				local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
+				CustomSkinPage.ShowPage(function(filename, skin)
+					if (filename and skin~=old_value) then
+						self:AddKeyFrameByName(keyname, nil, skin);
+						self:FrameMovePlaying(0);
+						if(callbackFunc) then
+							callbackFunc(true);
+						end
+					end
+				end, old_value);
+			else
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
+				local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
+				EditSkinPage.ShowPage(function(result)
+					if(result) then
+						self:AddKeyFrameByName(keyname, nil, result);
+						self:FrameMovePlaying(0);
+						if(callbackFunc) then
+							callbackFunc(true);
+						end
+					end
+				end, old_value, title, assetFilename)
 			end
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/CustomSkinPage.lua");
-			local CustomSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.CustomSkinPage");
-			CustomSkinPage.ShowPage(function(filename, skin)
-				if (filename and skin~=old_value) then
-					self:AddKeyFrameByName(keyname, nil, skin);
-					self:FrameMovePlaying(0);
-					if(callbackFunc) then
-						callbackFunc(true);
-					end
-				end
-			end, old_value);
-		else
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
-			local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
-			EditSkinPage.ShowPage(function(result)
-				if(result) then
-					self:AddKeyFrameByName(keyname, nil, result);
-					self:FrameMovePlaying(0);
-					if(callbackFunc) then
-						callbackFunc(true);
-					end
-				end
-			end, old_value, title, assetFilename)
 		end
 
 	elseif(keyname == "scaling") then
@@ -902,7 +908,11 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 		end, old_value);
 	elseif(keyname == "static") then
-		old_value = {name = self:GetValue("name", 0) or "", isAgent = self:GetValue("isAgent", 0), isServer = self:GetValue("isServer", 0)==true}
+		old_value = {name = self:GetValue("name", 0) or "", 
+			isAgent = self:GetValue("isAgent", 0), 
+			isServer = self:GetValue("isServer", 0)==true,
+			isIgnoreSkin = self:GetValue("isIgnoreSkin", 0)==true,
+		}
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.lua");
 		local EditStaticPropertyPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditStaticPropertyPage");
 		EditStaticPropertyPage.ShowPage(function(values)
@@ -915,6 +925,10 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			end
 			if(values.isServer ~= old_value.isServer) then
 				self:AddKeyFrameByName("isServer", 0, values.isServer);
+			end
+			if(values.isIgnoreSkin ~= old_value.isIgnoreSkin) then
+				self:AddKeyFrameByName("isIgnoreSkin", 0, values.isIgnoreSkin);
+				self:SetIgnoreSkinAnim(values.isIgnoreSkin)
 			end
 			if(callbackFunc) then
 				callbackFunc(true);
@@ -1363,8 +1377,10 @@ function Actor:FrameMovePlaying(deltaTime)
 		if(entity:SetMainAssetPath(PlayerAssetFile:GetFilenameByName(assetfile))) then
 			self:assetfileChanged();
 		end
-		entity:SetSkin(skin);
-		entity:SetBlockInRightHand(blockinhand);
+		if(not self:IsIgnoreSkinAnim()) then
+			entity:SetSkin(skin);
+			entity:SetBlockInRightHand(blockinhand);
+		end
 
 		obj:SetField("Time", curTime); 
 		obj:SetField("IsControlledExternally", true);

@@ -138,6 +138,7 @@ local s_env_methods = {
 	-- Sound
 	"playNote",
 	"playSound",
+	"playSoundAndWait",
 	"stopSound",
 	"playMusic",
 	"playText",

@@ -407,20 +407,31 @@ function EditMovieContext:HandleGlobalKey(event)
 				return true;
 			end
 		end
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua");
+		local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
+		local cmd_actor = MovieClipTimeLine:GetCmdActor();
 		if(dik_key == "DIK_1") then
 			-- switch between bones and animations. 
 			-- select first variable (default one).
-			if(actor:GetCurrentEditVariableIndex() ~= 1) then
-				actor:SetCurrentEditVariableIndex(1);
+			local index = actor:FindEditVariableByName("text");
+			if(index and index~=actor:GetCurrentEditVariableIndex()) then
+				actor:SetCurrentEditVariableIndex(index);
 			else
-				-- bones tools
-				local index = actor:FindEditVariableByName("bones");
-				if(index and index~=actor:GetCurrentEditVariableIndex()) then
-					actor:SetCurrentEditVariableIndex(index);
+				if cmd_actor and actor.class_name == "ActorCamera" then
+					actor:SetCurrentEditVariableIndex(-1);
+					cmd_actor:SetCurrentEditVariableIndex(1);
 				else
-					actor:SetCurrentEditVariableIndex(1);
-				end	
-			end
+					-- bones tools
+					local index = actor:FindEditVariableByName("bones");
+					if(index and index~=actor:GetCurrentEditVariableIndex()) then
+						actor:SetCurrentEditVariableIndex(index);
+					else
+						actor:SetCurrentEditVariableIndex(1);
+					end	
+				end
+
+			end	
+
 			event:accept();
 		elseif(dik_key == "DIK_2") then
 			-- move tool
@@ -446,6 +457,70 @@ function EditMovieContext:HandleGlobalKey(event)
 				actor:SetCurrentEditVariableIndex(index);
 			end
 			event:accept();
+		elseif(dik_key == "DIK_5") then
+			local index = actor:FindEditVariableByName("head");
+			if(index) then
+				actor:SetCurrentEditVariableIndex(index);
+			elseif cmd_actor then
+				actor:SetCurrentEditVariableIndex(-1);
+				local cmd_index = cmd_actor:FindEditVariableByName("time") or -1
+				cmd_actor:SetCurrentEditVariableIndex(cmd_index);
+			end
+
+			event:accept();
+		elseif(dik_key == "DIK_6") then
+			-- speedscale
+			local index = actor:FindEditVariableByName("speedscale");
+			if(index) then
+				actor:SetCurrentEditVariableIndex(index);
+			elseif cmd_actor then
+				actor:SetCurrentEditVariableIndex(-1);
+				local cmd_index = cmd_actor:FindEditVariableByName("weather") or -1
+				cmd_actor:SetCurrentEditVariableIndex(cmd_index);
+			end
+			event:accept();
+		elseif(dik_key == "DIK_7") then
+			-- assetfile
+			local index = actor:FindEditVariableByName("assetfile");
+			if(index) then
+				actor:SetCurrentEditVariableIndex(index);
+			elseif cmd_actor then
+				actor:SetCurrentEditVariableIndex(-1);
+				local cmd_index = cmd_actor:FindEditVariableByName("blocks") or -1
+				cmd_actor:SetCurrentEditVariableIndex(cmd_index);
+			end
+			event:accept();
+		elseif(dik_key == "DIK_8") then
+			-- skin
+			local index = actor:FindEditVariableByName("skin");
+			if(index) then
+				actor:SetCurrentEditVariableIndex(index);
+			elseif cmd_actor then
+				actor:SetCurrentEditVariableIndex(-1);
+				local cmd_index = cmd_actor:FindEditVariableByName("cmd") or -1
+				cmd_actor:SetCurrentEditVariableIndex(cmd_index);
+			end
+			event:accept();			
+		elseif(dik_key == "DIK_9") then
+			-- opacity
+			local index = actor:FindEditVariableByName("opacity");
+			if(index) then
+				actor:SetCurrentEditVariableIndex(index);
+			elseif cmd_actor then
+				actor:SetCurrentEditVariableIndex(-1);
+				local cmd_index = cmd_actor:FindEditVariableByName("music") or -1
+				cmd_actor:SetCurrentEditVariableIndex(cmd_index);
+			end
+			event:accept();	
+		elseif(dik_key == "DIK_0") then
+			-- parent
+			local index = actor:FindEditVariableByName("parent");
+			if(index) then
+				actor:SetCurrentEditVariableIndex(index);
+			end
+			event:accept();	
+		elseif(dik_key == "DIK_ADD" or event.shift_pressed and dik_key ==  "DIK_EQUALS") then
+			MovieClipTimeLine.OnClickAddSubFrameKey()
 		end
 	end
 	if(dik_key == "DIK_K") then
