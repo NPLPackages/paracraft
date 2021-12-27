@@ -47,9 +47,11 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 		callback = nil;
 	end
 
-	local miniSceneName = mcmlNode:GetAttributeWithCode("miniscenegraphname") or "pe:player"..ParaGlobal.GenerateUniqueID();
+	local name = mcmlNode:GetAttributeWithCode("name") or mcmlNode:GetInstanceName(rootName);
 
-	local instName = mcmlNode:GetInstanceName(rootName);
+	local miniSceneName = mcmlNode:GetAttributeWithCode("miniscenegraphname") or "pe:player"..ParaGlobal.GenerateUniqueID();
+	local renderSize = mcmlNode:GetNumber("RenderTargetSize") or 256
+	local instName = name
 	NPL.load("(gl)script/ide/Canvas3D.lua");
 	local ctl = CommonCtrl.Canvas3D:new{
 		name = instName.."_mcplayer",
@@ -63,7 +65,7 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 		IsActiveRendering = IsActiveRendering,
 		miniscenegraphname = miniSceneName,
 		DefaultRotY = mcmlNode:GetNumber("DefaultRotY") or 0,
-		RenderTargetSize = mcmlNode:GetNumber("RenderTargetSize") or 256,
+		RenderTargetSize = renderSize,
 		IsInteractive = IsInteractive,
 		autoRotateSpeed = autoRotateSpeed,
 		DefaultCameraObjectDist = mcmlNode:GetNumber("DefaultCameraObjectDist") or 7,

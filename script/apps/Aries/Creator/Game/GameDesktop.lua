@@ -480,7 +480,7 @@ function Desktop.ForceExit(bRestart)
 
 		if (bRestart) then
 			Restart();
-		elseif (platform == "android") then
+		elseif (platform == "android" or platform == "ios") then
 			local ClassManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Admin/ClassManager/ClassManager.lua");
 			ClassManager.OnExitApp();
 			Game.Exit();

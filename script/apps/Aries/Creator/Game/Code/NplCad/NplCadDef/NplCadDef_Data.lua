@@ -566,6 +566,56 @@ end
 	examples = {{desc = "", canRun = true, code = [[
 ]]}},
 },
+
+
+{
+	type = "jsonToObj", 
+	message0 = L"转换Json字符串 %1 为Lua Table",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = "",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'jsonToObj("%s")',
+	func_description_js = 'jsonToObj("%s")',
+	ToNPL = function(self)
+		return string.format('jsonToObj("%s")', self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "objToJson", 
+	message0 = L"转换 %1 为Json字符串",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = "",
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	func_description = 'objToJson(%s)',
+	func_description_js = 'objToJson(%s)',
+	ToNPL = function(self)
+		return string.format('objToJson(%s)', self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+]]}},
+},
+
 };
 function NplCadDef_Data.GetCmds()
 	return cmds;

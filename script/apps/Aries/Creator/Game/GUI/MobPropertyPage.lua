@@ -203,7 +203,10 @@ function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile, skin)
 			entity:SetSkin(skin);
 		else
 			-- this ensure that at least one shirt is displayed if it contains geosets.
-			entity:SetCharacterSlot(CharGeosets["shirt"], 1);
+			if not entity.GetSkin or not entity:GetSkin() then
+				entity:SetCharacterSlot(CharGeosets["shirt"], 1);
+			end
+			
 			-- this ensure that at least one default skin is selected
 			if((not entity.GetSkin or not entity:GetSkin()) and entity.ToggleNextSkin) then
 				--entity:ToggleNextSkin();
@@ -279,7 +282,8 @@ function MobPropertyPage.OnOpenAssetFile()
 				MobPropertyPage.OnChangeAssetFile(skin);
 			else
 				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filepath));
-				MobPropertyPage.OnChangeAssetFile(filepath);
+				
+				MobPropertyPage.OnChangeAssetFile();
 			end
 		end
 	end, commonlib.Encoding.Utf8ToDefault(lastFilename), L"选择模型文件", "model");

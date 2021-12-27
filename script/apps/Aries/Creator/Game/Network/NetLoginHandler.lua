@@ -93,6 +93,10 @@ function NetLoginHandler:handleAuthUser(packet_AuthUser)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
 	local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
 	local info = ServerPage.GetServerInfo();
+	if(not info) then
+		self:SendPacketToPlayer(Packets.PacketAuthUser:new():Init(self.clientUsername, nil, "failed", info));
+		return
+	end
 	info.BasicAuthMethod = self:GetServerManager():GetBasicAuthMethod();
 
 	local errMsg = self:GetServerManager():IsUserAllowedToConnect(self.playerConnection:GetIPAddress(), self.clientUsername);

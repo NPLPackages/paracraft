@@ -24,6 +24,8 @@ BlockEngine:Disconnect();
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+NPL.load("(gl)script/ide/math/ShapeRay.lua");
+local ShapeRay = commonlib.gettable("mathlib.ShapeRay");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
 local npl_profiler = commonlib.gettable("commonlib.npl_profiler");
@@ -1138,17 +1140,34 @@ function BlockEngine:Dump()
 	echo({eye_block = self.eye_block, eye = self.eye, min_y = self.min_y, max_y = self.max_y});
 end
 
--- real world ray picking solid blocks. 
--- @return nil if hit nothing, or dist, bx, by, bz, block_id
+-- real world ray picking obstruction blocks. 
+-- @return nil if hit nothing, or dist, bx, by, bz, block_id 
+-- realX, realY, realZ are the hit point in real coordinates
 function BlockEngine:RayPicking(fromX, fromY, fromZ, dirX, dirY, dirZ, length)
 	length = length or 100;
 	local dist = 1;
+	local ray;
 	while(dist <= length) do
 		local x, y, z = fromX + dist * dirX, fromY + dist * dirY, fromZ + dist * dirZ
 		local bx, by, bz = self:block(x, y, z);
 		local block = self:GetBlock(bx, by, bz);
-		if(block and block.solid) then
-			return dist, bx, by, bz, block.id
+		if(block and block.obstruction) then
+			if(block.solid) then
+				return dist, bx, by, bz, block.id
+			else
+				local aabb = block:GetCollisionBoundingBoxFromPool(bx, by, bz)
+				if(aabb) then
+					ray = ray or ShapeRay:new():init({fromX, fromY, fromZ}, {dirX, dirY, dirZ})
+					local hit, dist2 = ray:intersectsAABB(aabb)
+					if(hit) then
+						 if(dist2 <= length) then
+							return dist2, bx, by, bz, block.id
+						else
+							break;
+						end
+					end
+				end
+			end
 		end
 		dist = dist + 1;
 	end

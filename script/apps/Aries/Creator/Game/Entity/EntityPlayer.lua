@@ -64,6 +64,9 @@ Entity.name="default"
 Entity.isServerEntity = true;
 -- player is always framemoved as fast as possible
 Entity.framemove_interval = 0.01;
+-- for simple HP based games
+Entity.maxHP = 100;
+Entity.hp = Entity.maxHP;
 
 
 -- one step dist in meters
@@ -147,8 +150,9 @@ end
 
 -- set block in right hand
 -- @param blockid_or_item_stack:  block_id or ItemStack object. 
-function Entity:SetBlockInRightHand(blockid_or_item_stack)
-	local res = self.inventory:SetBlockInRightHand(blockid_or_item_stack);
+-- @param bIsReplace: if true, we will replace instead of moving to other empty slot
+function Entity:SetBlockInRightHand(blockid_or_item_stack, bIsReplace)
+	local res = self.inventory:SetBlockInRightHand(blockid_or_item_stack, bIsReplace);
 	self:GetDataWatcher():SetField(self.dataBlockInHand, self:GetBlockInRightHand());
 	return res;
 end
@@ -249,9 +253,12 @@ function Entity:CreatePhysicsObject()
 end
 
 function Entity:OnRespawn()
+	self.hp = self.maxHP;
+	GameLogic.RunCommand(format("/runat @all /goto @%s home", self:GetName()))
 end
 
 function Entity:OnDead()
+	self:OnRespawn()
 end
 
 function Entity:CanTeleport()
@@ -261,6 +268,48 @@ end
 
 -- virtual function: when the entity is hit (attacked) by the missile
 function Entity:OnHit(attack_value, fromX, fromY, fromZ)
+	local obj = self:GetInnerObject();
+	if(not obj) then
+		return;
+	end
+	
+--	if(obj:HasAnimation(73)) then
+--		obj:PlayAnimation(73);
+--	end
+
+	local spritestyle = "CombatDigits";
+	local color = "da2d2d";
+	-- TODO: attack - defense, plus some bonus point
+	local damage = math.random(attack_value, attack_value+10);
+	self.hp = self.hp - damage;
+	
+	if(self.hp <= 0) then
+		self:OnDead();
+	end
+
+	local content = string.format("-%d", damage);
+	
+	local anim_type = "plain";
+	local mcml_str = string.format([[<aries:textsprite spritestyle="%s" color="#%s" text="%s" default_fontsize="12" fontsize="19"/>]], spritestyle, color, content);
+	local sCtrlName = headon_speech.Speek(obj.name, mcml_str, 2, true, true, true, -1);
+	if(sCtrlName) then
+		if(anim_type == "plain") then
+			UIAnimManager.PlayCustomAnimation(800, function(elapsedTime)
+				local parent = ParaUI.GetUIObject(sCtrlName);
+				if(parent:IsValid()) then
+					local t = elapsedTime / 1000
+					parent.translationx = math.floor( - 100 * t );
+					parent.translationy = math.floor( -60 * t + 50 * t * t);
+					
+					if(elapsedTime < 400) then
+					else
+						parent.colormask = format("255 255 255 %d", math.floor( (1 - (elapsedTime-400) / 400)*255) );
+					end
+					parent:ApplyAnim();
+				end
+			end);
+		end
+	end
 end
 
 -- @param x, y, z: if nil, player faces front. 

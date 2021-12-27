@@ -538,6 +538,56 @@ function CameraController.OnCameraFrameMove()
 	CameraController.UpdateViewBobbing();
 
 	CameraController.UpdateFlyMode();
+
+	CameraController.ApplyCameraRestrictions()
+end
+
+function CameraController.ClearCameraRestrictions()
+	CameraController.SetCameraRestrictions()
+end
+
+-- @param minYaw, maxYaw: in radians, if nil, means no restrictions
+-- @param minDist, maxDist: camera object distance
+-- @param minPitch, maxPitch: angles
+function CameraController.SetCameraRestrictions(minYaw, maxYaw, minDist, maxDist, minPitch, maxPitch)
+	local self = CameraController;
+	self.minYaw, self.maxYaw, self.minDist, self.maxDist, self.minPitch, self.maxPitch = minYaw, maxYaw, minDist, maxDist, minPitch, maxPitch
+end
+
+function CameraController.ApplyCameraRestrictions()
+	local self = CameraController;
+	--  and not GameLogic.GameMode:IsEditor()
+	if(not GameLogic.GameMode:IsMovieMode()) then
+		if(not ParaUI.IsMousePressed(0) and not ParaUI.IsMousePressed(1)) then
+			-- apply restrictions
+			local att = ParaCamera.GetAttributeObject();
+			local dist, pitch, yaw = att:GetField("CameraObjectDistance", 0), att:GetField("CameraLiftupAngle", 0), att:GetField("CameraRotY", 0);
+			local dist1, pitch1, yaw1 = dist, pitch, yaw
+			if(self.minYaw and self.maxYaw) then
+				if(self.minYaw > self.maxYaw) then
+					self.maxYaw = self.maxYaw + math.pi* 2;
+				end
+				if(yaw < self.minYaw or yaw > self.maxYaw) then
+					if(math.abs(mathlib.ToStandardAngle(yaw-self.minYaw)) < math.abs(mathlib.ToStandardAngle(yaw-self.maxYaw))) then
+						yaw1 = self.minYaw
+					else
+						yaw1 = self.maxYaw
+					end
+				else
+					yaw1 = math.min(math.max(self.minYaw, yaw), self.maxYaw)	
+				end
+			end
+			if(self.minDist and self.maxDist) then
+				dist1 = math.min(math.max(self.minDist, dist), self.maxDist)
+			end
+			if(self.minPitch and self.maxPitch) then
+				pitch1 = math.min(math.max(self.minPitch, pitch), self.maxPitch)
+			end
+			att:SetField("CameraObjectDistance", dist1)
+			att:SetField("CameraLiftupAngle", pitch1)
+			att:SetField("CameraRotY", yaw1);
+		end
+	end
 end
 
 function CameraController.UpdateFlyMode()

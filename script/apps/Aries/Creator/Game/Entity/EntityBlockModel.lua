@@ -43,9 +43,13 @@ Entity:Property({"bIsAutoTurning", nil, "IsAutoTurningDuringDragging", "SetAutoT
 Entity:Property({"isStackable", nil, "IsStackable", "SetIsStackable", auto=true});
 Entity:Property({"stackHeight", 0.2, "GetStackHeight", "SetStackHeight", auto=true});
 Entity:Property({"canDrag", nil, "GetCanDrag", "SetCanDrag", auto=true});
+Entity:Property({"idleAnim", 0, "GetIdleAnim", "SetIdleAnim", auto=true});
 
 Entity:Property({"onclickEvent", nil, "GetOnClickEvent", "SetOnClickEvent", auto=true});
 Entity:Property({"onhoverEvent", nil, "GetOnHoverEvent", "SetOnHoverEvent", auto=true});
+Entity:Property({"onmountEvent", nil, "GetOnMountEvent", "SetOnMountEvent", auto=true});
+Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
+Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
 
 Entity:Property({"offsetPos", {0,0,0}, "GetOffsetPos", "SetOffsetPos"});
 
@@ -154,6 +158,7 @@ function Entity:CreateInnerObject(filename, scale)
 		model = ParaScene.CreateCharacter(self:GetBlockEntityName(), asset, "", true, 0.5, self.facing or 0, 1);
 		model:SetPosition(x+self.offsetPos[1],y+self.offsetPos[2],z+self.offsetPos[3])
 		model:SetPersistent(false);
+		model:SetField("MovementStyle", 3); -- linear
 	end
 	if(skin) then
 		PlayerAssetFile:RefreshCustomGeosets(model, skin);
@@ -173,6 +178,9 @@ function Entity:CreateInnerObject(filename, scale)
 		if(self:IsForceLoadPhysics()) then
 			model:LoadPhysics(); 
 		end
+	end
+	if(self:GetIdleAnim() ~= 0) then
+		self:SetIdleAnim(self:GetIdleAnim())
 	end
 
 	self:SetInnerObject(model);
@@ -303,8 +311,20 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.onhoverEvent) then
 			self:SetOnHoverEvent(attr.onhoverEvent);
 		end
+		if(attr.onmountEvent) then
+			self:SetOnMountEvent(attr.onmountEvent);
+		end
+		if(attr.tag) then
+			self:SetTag(attr.tag);
+		end
+		if(attr.category) then
+			self.category = attr.category
+		end
 		if(attr.hasMount) then
 			self:CreateGetMountPoints():LoadFromXMLNode(node)
+		end
+		if(attr.idleAnim) then
+			self.idleAnim = tonumber(attr.idleAnim)
 		end
 	end
 end
@@ -328,7 +348,19 @@ function Entity:SaveToXMLNode(node, bSort)
 		node.attr.onclickEvent = self.onclickEvent
 	end
 	if(self.onhoverEvent) then
-		node.attr.onclickEvent = self.onhoverEvent
+		node.attr.onhoverEvent = self.onhoverEvent
+	end
+	if(self.onmountEvent) then
+		node.attr.onmountEvent = self.onmountEvent
+	end
+	if(self.tag) then
+		node.attr.tag = self.tag
+	end
+	if(self.category and self.category~="") then
+		node.attr.category = self.category
+	end
+	if(self.idleAnim ~= 0) then
+		node.attr.idleAnim = self.idleAnim;
 	end
 	node.attr.canDrag = self.canDrag;
 	node.attr.stackHeight = self.stackHeight;

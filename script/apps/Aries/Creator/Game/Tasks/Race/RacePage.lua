@@ -57,7 +57,7 @@ RacePage.ItemData = {
 	},
 	{
 		time = "2021年8月15日-2021年12月31日",
-		signUpBtnInfo = {tooltip = "提交截止时间：2021年12月20日",endDay = "2021-12-20",endTime ="23:59:59"},
+		signUpBtnInfo = {tooltip = "提交截止时间：2021年12月31日",endDay = "2021-12-31",endTime ="23:59:59"},
 		timeRule = {
 			startDay="2021-08-15",
 			startTime="00:00:00",

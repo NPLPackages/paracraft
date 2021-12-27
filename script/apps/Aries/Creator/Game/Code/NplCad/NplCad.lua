@@ -279,13 +279,13 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
         return
     end
     local SceneHelper = NPL.load("Mod/NplCad2/SceneHelper.lua");
-	local exportCoordinateType = 0;
     filename = string.match(filename, [[(.+).(.+)$]]);
     if(type == "stl")then
         filename = filename .. ".stl";
         local bBinary = true;
         local bEncodeBase64 = true
         local bIncludeColor = false;
+		local exportCoordinateType = 0;
         SceneHelper.saveSceneToStl(filename, scene, false, exportCoordinateType, bBinary, bEncodeBase64, bIncludeColor, liner, angular); -- binary
         NplCad.ShowMessageBox(filename)
     elseif(type == "iges")then
@@ -298,6 +298,7 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
         NplCad.ShowMessageBox(filename)
     elseif(type == "gltf")then
         filename = filename .. ".gltf";
+		local exportCoordinateType = 101;
         SceneHelper.saveSceneToGltf(filename, scene, false, exportCoordinateType, liner, angular);
         NplCad.ShowMessageBox(filename)
     elseif(type == "bmax")then
@@ -337,6 +338,7 @@ function NplCad.ExportToFile(scene,filename, liner, angular)
 		else
 			filename = filename .. "." .. type;
 		end
+		local exportCoordinateType = 101;
 		SceneHelper.exportSceneToFile(filename, scene, false, type, exportCoordinateType, 0)
         NplCad.ShowMessageBox(filename)
     end

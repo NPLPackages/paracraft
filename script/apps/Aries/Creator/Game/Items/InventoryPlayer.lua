@@ -81,7 +81,8 @@ end
 
 -- set block in right hand
 -- @param blockid_or_item_stack:  block_id or ItemStack object. 
-function InventoryPlayer:SetBlockInRightHand(blockid_or_item_stack)
+-- @param bIsReplace: if true, we will replace instead of moving to other empty slot
+function InventoryPlayer:SetBlockInRightHand(blockid_or_item_stack, bIsReplace)
 	local block_id, count, item_stack;
 	if(type(blockid_or_item_stack) == "table") then
 		block_id, count = blockid_or_item_stack.id, blockid_or_item_stack.count;
@@ -103,7 +104,7 @@ function InventoryPlayer:SetBlockInRightHand(blockid_or_item_stack)
 	if(not bIsSameItem) then
 		local lastIndex = self:GetHandToolIndex();
 		local last_item = self:SetItemByBagPos(lastIndex, block_id, count, item_stack);
-		if(last_item) then
+		if(last_item and not bIsReplace) then
 			-- we will only insert it to blocks after the current index, to prevent a full inventory to pick the block at the old position.
 			self:AddItemToInventory(last_item, lastIndex+1);
 		end

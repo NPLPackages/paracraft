@@ -1256,3 +1256,61 @@ end
 function QuestAction.GetAppCommandLine(key, default)
     return ParaEngine.GetAppCommandLineByParam(key, default)
 end
+
+local dongao_gsid = 40008
+
+--[[ 
+    param: lesson_type：
+        anim 动画课
+        code 编程课
+        build 建造课
+
+    param: lesson_index:课程索引 第几节课
+]]--
+function QuestAction.GetDongaoLessonState(lesson_type, lesson_index)
+    if QuestAction.DongAoClientData == nil then
+        QuestAction.DongAoClientData = KeepWorkItemManager.GetClientData(dongao_gsid)
+    end
+
+    local client_data = QuestAction.DongAoClientData
+    if client_data == nil then
+        return false
+    end
+
+    local key = lesson_type .. "_lesson_progress"
+    local lesson_state_data = client_data[key]
+    if not lesson_state_data then
+        return false
+    end
+
+    if not lesson_state_data[lesson_index] then
+        return false
+    end
+
+    return lesson_state_data[lesson_index].is_finish
+end
+
+function QuestAction.SetDongaoLessonState(lesson_type, lesson_index, is_finish)
+    if QuestAction.DongAoClientData == nil then
+        QuestAction.DongAoClientData = KeepWorkItemManager.GetClientData(dongao_gsid) or {}
+    end
+
+    local client_data = QuestAction.DongAoClientData
+
+    local key = lesson_type .. "_lesson_progress"
+    client_data[key] = client_data[key] or {}
+    local lesson_state_data = client_data[key]
+
+    if not lesson_state_data[lesson_index] then
+        lesson_state_data[lesson_index] = {}
+    end
+
+    if lesson_state_data[lesson_index].is_finish == is_finish then
+        return
+    end
+
+    lesson_state_data[lesson_index].is_finish = is_finish
+
+    KeepWorkItemManager.SetClientData(dongao_gsid, client_data, function()
+    end)
+end

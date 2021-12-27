@@ -59,34 +59,34 @@ end
 <aries:window style="width:420px;height:400px;color:#ffffff" title='<%=L"保存模板"%>' onclose="ClosePage" mode="thin">
     <div style="margin-top:10px;margin-left:18px;">
         <div style="float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#263 346 36 36:5 5 5 5);">
-            <img name="CurrentSnapshot" tooltip='<%=L"点击重新截图"%>' style="width:60px;height:60px;" onclick="OnClickTakeSnapshot" />
+            <img uiname="BlockTemplatePage.CurrentSnapshot" name="CurrentSnapshot" tooltip='<%=L"点击重新截图"%>' style="width:60px;height:60px;" onclick="OnClickTakeSnapshot" />
         </div>
         <div style="float:left;margin-left:10px;">
             <div>
                 <div style="float:left;">
                     <%=L"种类:"%>
                 </div>
-                <select name="template_type" AllowUserEdit="false" style="height:22px;" onclick="ChangeCategory" DataSource='<%=GetCategoryDS()%>'>
+                <select uiname="BlockTemplatePage.template_type" name="template_type" AllowUserEdit="false" style="height:22px;" onclick="ChangeCategory" DataSource='<%=GetCategoryDS()%>'>
                 </select>
             </div>    
             <div>
                 <div style="float:left">
-                    <input type="checkbox" id="checkboxRelativeMotion" name="checkboxRelativeMotion" style="margin-top:2px;"/>
-                    <div for="checkboxRelativeMotion" style="float:left" tooltip='<%=L"不选表示使用绝对位置"%>'><%=L"演员使用相对位置"%></div>
+                    <input uiname="BlockTemplatePage.checkboxRelativeMotion" type="checkbox" id="checkboxRelativeMotion" name="checkboxRelativeMotion" style="margin-top:2px;"/>
+                    <div uiname="BlockTemplatePage.checkboxRelativeMotion_label" for="checkboxRelativeMotion" style="float:left" tooltip='<%=L"不选表示使用绝对位置"%>'><%=L"演员使用相对位置"%></div>
                 </div>
                 <div style="float:left;margin-left:20px;">
-                    <input type="checkbox" id="checkboxRefFiles" name="checkboxRefFiles" style="margin-top:2px;"/>
-                    <div for="checkboxRefFiles" style="float:left" tooltip='<%=L"被引用的BMAX模型等也会打包到文件中"%>'><%=L"导出引用"%></div>
+                    <input uiname="BlockTemplatePage.checkboxRefFiles" type="checkbox" id="checkboxRefFiles" name="checkboxRefFiles" style="margin-top:2px;"/>
+                    <div uiname="BlockTemplatePage.checkboxRefFiles_label" for="checkboxRefFiles" style="float:left" tooltip='<%=L"被引用的BMAX模型等也会打包到文件中"%>'><%=L"导出引用"%></div>
                 </div>
             </div>
             <div>
                 <div style="float:left">
-                    <input type="checkbox" id="checkboxUsePivot" name="checkboxUsePivot" style="margin-top:2px;"/>
-                    <div for="checkboxUsePivot" style="float:left" tooltip='<%=L"默认原点在所有方块中央的下方"%>'><%=L"使用自定义原点"%></div>
+                    <input uiname="BlockTemplatePage.checkboxUsePivot" type="checkbox" id="checkboxUsePivot" name="checkboxUsePivot" style="margin-top:2px;"/>
+                    <div uiname="BlockTemplatePage.checkboxUsePivot_label" for="checkboxUsePivot" style="float:left" tooltip='<%=L"默认原点在所有方块中央的下方"%>'><%=L"使用自定义原点"%></div>
                 </div>
                 <div style="float:left;margin-left:20px;">
-                    <input type="checkbox" id="checkboxHollow" name="checkboxHollow" style="margin-top:2px;"/>
-                    <div for="checkboxHollow" style="float:left" ><%=L"空心模型"%></div>
+                    <input uiname="BlockTemplatePage.checkboxHollow" type="checkbox" id="checkboxHollow" name="checkboxHollow" style="margin-top:2px;"/>
+                    <div uiname="BlockTemplatePage.checkboxHollow_label" for="checkboxHollow" style="float:left" ><%=L"空心模型"%></div>
                 </div>
             </div>
         </div>
@@ -96,22 +96,22 @@ end
             <div style="float:left;">
                <%=L"模型名称:"%>
             </div>
-            <input type="text" name="name" class="mc_text" value="" style="float:left;height:22px;"/>
+            <input uiname="BlockTemplatePage.template_name" type="text" name="name" class="mc_text" value="" style="float:left;height:22px;"/>
         </div>
         <div style="margin-top:5px;">
             <div style="float:left;">
                 <%=L"目录:"%>
             </div>
-            <select name="template_dir" AllowUserEdit="false" style="height:22px;width:256px;" DataSource='<%=GetThemeDS()%>'>
+            <select name="template_dir" AllowUserEdit="false" style="height:22px;width:256px;" DataSource='<%=GetThemeDS()%>' uiname="BlockTemplatePage.template_dir">
             </select>
-            <input type="button" onclick="CreateNewTheme" tooltip='<%=L"点击创建模版目录"%>' style="margin-left:5px;margin-top:5px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)"/>
+            <input uiname="BlockTemplatePage.template_new" type="button" onclick="CreateNewTheme" tooltip='<%=L"点击创建模版目录"%>' style="margin-left:5px;margin-top:5px;width:10px;height:10px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#501 203 10 10)"/>
         </div>
         <div style="margin-top:5px;">
             <div style="float:left;">
                 <%=L"模型描述:"%>
             </div>
             <div style="margin-top:5px;margin-left:8px;" class="mc_paper_panel">
-                <textarea name="template_desc" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="20" rows="4" UseSystemControl="true" style="color:#cccccc;" >
+                <textarea uiname="BlockTemplatePage.template_desc" name="template_desc" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="20" rows="4" UseSystemControl="true" style="color:#cccccc;" >
                 </textarea>
             </div>
         </div>
@@ -139,8 +139,8 @@ end
         </div>
     </div>
     <div style="margin-top:7px;margin-bottom:12px;">
-        <input type="button" name="save" class="mc_light_grey_button_with_fillet" style="margin-left:200px;min-width:50px;" onclick="OnClickSave" value='<%=L"保存"%>'/>
-        <input type="button" name="cancel" class="mc_light_grey_button_with_fillet" value='<%=L"取消"%>' style="margin-left:30px;min-width:50px;"onclick="ClosePage"/>
+        <input type="button" name="save" class="mc_light_grey_button_with_fillet" style="margin-left:200px;min-width:50px;" onclick="OnClickSave" value='<%=L"保存"%>' uiname="BlockTemplatePage.ClickSave"/>
+        <input type="button" name="cancel" class="mc_light_grey_button_with_fillet" value='<%=L"取消"%>' style="margin-left:30px;min-width:50px;"onclick="ClosePage" uiname="BlockTemplatePage.ClickClosePage"/>
     </div>
 </aries:window>
 </pe:mcml>

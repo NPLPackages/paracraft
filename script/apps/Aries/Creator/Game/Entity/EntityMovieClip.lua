@@ -845,6 +845,29 @@ function Entity:RemapAnim(animMap, filename)
 	return bFound, count;
 end
 
+function Entity:GetAllActorData()
+	local slotCount = self.inventory:GetSlotCount()
+	local actor_datas = {}
+	for i=1,slotCount do
+		local itemStack = self.inventory:GetItem(i);
+		if itemStack and itemStack.serverdata and itemStack.serverdata.timeseries and itemStack.id == block_types.names.TimeSeriesNPC then
+			local timeseries = itemStack.serverdata.timeseries
+			local assetfile = timeseries.assetfile
+			local skin = timeseries.skin
+			local scaling = timeseries.scaling
+			local temp = {}
+			temp.assetfile = assetfile.data[1] or ""
+			if temp.assetfile == "customchar" then
+				temp.assetfile = "character/CC/02human/CustomGeoset/actor.x"
+			end
+			temp.skin = skin.data[1] or ""
+			temp.scaling = scaling and scaling.data[1] or 1
+			actor_datas[#actor_datas + 1] = temp
+		end
+	end
+	return actor_datas
+end
+
 function Entity:CompareSlot(entity)
 	if not entity then
 		return 

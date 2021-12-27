@@ -476,19 +476,16 @@ function WorldCommon.ReplaceWorldImp()
 	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
 	local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. WorldCommon.sourceWorldFolderName.. "/";
 
+	if (ParaIO.DoesFileExist(targetFolder)) then
+		ParaIO.DeleteFile(targetFolder);
+	end
+
 	WorldCommon.SaveWorldAsImp(targetFolder, function(result)
 		local sourceWorldName = WorldCommon.sourceWorldName
 		WorldCommon.sourceWorldName = nil
 
-		commonlib.TimerManager.SetTimeout(function()
-			GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
-			WorldCommon.OpenWorld(targetFolder, true);
-
-			commonlib.TimerManager.SetTimeout(function()
-				WorldCommon.SetWorldTag("name", sourceWorldName or '');
-				WorldCommon.SaveWorldTag()
-			end, 8000);
-		end, 5000);
+		GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
+		WorldCommon.OpenWorld(targetFolder, true);
 	end);
 end
 

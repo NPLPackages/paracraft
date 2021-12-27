@@ -442,6 +442,14 @@ function EditModelTask.OnClickProperty()
 	if(self) then
 		local modelEntity = self:GetSelectedModel()
 		if(modelEntity) then
+			local mountpoints
+			if(modelEntity:GetMountPoints()) then
+				mountpoints = {};
+				for i = 1, modelEntity:GetMountPoints():GetCount() do 
+					local mp = modelEntity:GetMountPoints():GetMountPoint(i)
+					mountpoints[#mountpoints + 1] = {index = i, name = mp:GetName()}
+				end
+			end
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelProperty.lua");
 			local EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
 			EditModelProperty.ShowPage(function(values)
@@ -455,6 +463,7 @@ function EditModelTask.OnClickProperty()
 					end
 					modelEntity:SetIsStackable(values.isStackable)
 					modelEntity:SetStackHeight(values.stackHeight)
+					modelEntity:SetIdleAnim(values.idleAnim or 0)
 					modelEntity:SetCanDrag(values.canDrag)
 					modelEntity:SetAutoTurningDuringDragging(values.autoTurning)
 					
@@ -462,14 +471,38 @@ function EditModelTask.OnClickProperty()
 						values.onClickEvent = nil
 					end
 					modelEntity:SetOnClickEvent(values.onClickEvent)
+					
 					if(values.onHoverEvent == "") then
 						values.onHoverEvent = nil
 					end
 					modelEntity:SetOnHoverEvent(values.onHoverEvent)
+					
+					if(values.onMountEvent == "") then
+						values.onMountEvent = nil
+					end
+					modelEntity:SetOnMountEvent(values.onMountEvent)
+
+					if(values.tag == "") then
+						values.tag = nil
+					end
+					modelEntity:SetTag(values.tag)
+
+					if(values.category == "") then
+						values.category = nil
+					end
+					modelEntity:SetCategory(values.category)
+
 					if(values.modelfile ~= modelEntity:GetModelFile()) then
 						modelEntity:SetModelFile(values.modelfile)
 					end
-
+					if(values.mountpoints and modelEntity:GetMountPoints()) then
+						for i, mp in ipairs(values.mountpoints) do
+							local mountpoint = modelEntity:GetMountPoints():GetMountPoint(i)
+							if(mountpoint) then
+								mountpoint.name = mp.name;
+							end
+						end
+					end
 					-- this one needs to be called last, since it may change entity.  
 					modelEntity:EnablePhysics(values.hasRealPhysics)
 				end
@@ -483,7 +516,12 @@ function EditModelTask.OnClickProperty()
 				canDrag = modelEntity.canDrag,
 				onClickEvent = modelEntity:GetOnClickEvent(),
 				onHoverEvent = modelEntity:GetOnHoverEvent(),
+				onMountEvent = modelEntity:GetOnMountEvent(),
+				tag = modelEntity:GetTag(),
+				category = modelEntity:GetCategory(),
 				modelfile = modelEntity:GetModelFile(),
+				idleAnim = modelEntity:GetIdleAnim(),
+				mountpoints = mountpoints, 
 			})
 		end
 	end
@@ -507,14 +545,15 @@ function EditModelTask.OnChangeModelType()
 		else
 			-- toggle between physical and non-physical block model. 
 			if(self.itemInHand) then
+				local itemStack = self.itemInHand:Copy();
 				if(self.itemInHand.id == block_types.names.BlockModel) then
-					self.itemInHand.id = block_types.names.PhysicsModel;
+					itemStack.id = block_types.names.PhysicsModel;
 				elseif(self.itemInHand.id == block_types.names.PhysicsModel) then
-					self.itemInHand.id = block_types.names.LiveModel;
+					itemStack.id = block_types.names.LiveModel;
 				elseif(self.itemInHand.id == block_types.names.LiveModel) then
-					self.itemInHand.id = block_types.names.BlockModel;
+					itemStack.id = block_types.names.BlockModel;
 				end
-				self:RefreshPage()
+				GameLogic.GetPlayerController():SetBlockInRightHand(itemStack, true)
 			end
 		end
 	end

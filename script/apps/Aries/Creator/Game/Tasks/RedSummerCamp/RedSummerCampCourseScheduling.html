@@ -28,6 +28,14 @@
         return RedSummerCampCourseScheduling.lessonCnf
     end
 
+    function GetLessonPPT(index)
+        if index == nil then
+            return #RedSummerCampCourseScheduling.lessonCnf
+        else
+            return RedSummerCampCourseScheduling.lessonCnf[index]
+        end
+    end
+
     function GetItemIcon(index)
         local index = tonumber(index)
         return string.format("width: 94px;height: 94px; background: url(%s);",RedSummerCampCourseScheduling.lessonCnf[index].icon)
@@ -92,7 +100,27 @@
                         </pe:repeatitem>
                     </pe:repeat>        
                 </div>
-                <div style= "margin-top: 5px;">
+                <div style= "margin-top: 5px; width: 560px; height: 320px;">
+                    <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false" pagesize="6" >
+                        <Columns>
+                            <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
+                                <div style="margin-left: 100px; margin-top: -38px; font-size: 14px; base-font-size: 14px; color: #ffffff;"><%=Eval("num")%></div>
+                                <pe:if condition='<%=not CheckCanLearn(Eval("key"))%>'>
+                                    <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">
+                                    </div>
+                                </pe:if>
+                            </div>
+                        </Columns>
+                    </pe:gridview>
+                </div>
+                
+            </pe:if>
+
+            <pe:if condition="<%=not IsHaveHistroy()%>">
+                <div style="position: relative; margin-top: 20px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
+                <div style= "margin-top: 60px;">
                     <pe:repeat DataSource="<%=GetItemData()%>">
                         <pe:repeatitem>
                             <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
@@ -109,27 +137,6 @@
                 </div>
                 
             </pe:if>
-
-            <pe:if condition="<%=not IsHaveHistroy()%>">
-                <div style= "margin-top: 60px;">
-                    <pe:repeat DataSource="<%=GetItemData()%>">
-                        <pe:repeatitem>
-                            <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
-                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
-                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
-                                <div style="margin-left: 100px; margin-top: -38px; font-size: 14px; base-font-size: 14px; color: #ffffff;"><%=Eval("num")%></div>
-                                <pe:if condition='<%=not CheckCanLearn(Eval("key"))%>'>
-                                    <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">
-                                    </div>
-                                </pe:if>
-                            </div>
-                            
-                        </pe:repeatitem>
-                    </pe:repeat>        
-                </div>
-                <div style="position: relative; margin-top: -330px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
-            </pe:if>
-            
         </div>
     </pe:container>
 </pe:container>

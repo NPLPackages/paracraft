@@ -511,7 +511,7 @@ end
 
 --- @param skin string: e.g. 80001;8291;2121;
 function CustomCharItems:RemovePetIdFromSkinIds(skin)
-	LOG.std(nil, 'info', 'CustomCharItems:RemovePetIdFromSkinIds', skin);
+	-- LOG.std(nil, 'info', 'CustomCharItems:RemovePetIdFromSkinIds', skin);
 	local newSkin = "";
 	local itemIds = commonlib.split(skin, ";");
 
@@ -521,7 +521,7 @@ function CustomCharItems:RemovePetIdFromSkinIds(skin)
 		end
 	end
 
-	LOG.std(nil, 'info', 'CustomCharItems:RemovePetIdFromSkinIds', newSkin);
+	-- LOG.std(nil, 'info', 'CustomCharItems:RemovePetIdFromSkinIds', newSkin);
 	return newSkin;
 end
 

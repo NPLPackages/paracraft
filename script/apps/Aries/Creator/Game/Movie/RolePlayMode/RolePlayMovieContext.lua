@@ -40,7 +40,7 @@ end
 -- virtual function: 
 -- try to select this context. 
 function RolePlayMovieContext:OnSelect()
-	BaseContext.OnSelect(self);
+	RolePlayMovieContext._super.OnSelect(self);
 	self:updateManipulators();
 end
 
@@ -236,52 +236,47 @@ end
 
 -- virtual: 
 function RolePlayMovieContext:mousePressEvent(event)
-	event:accept();
+	local result = self:CheckMousePick();
+	local click_data = self:GetClickData();
+	if(event.mouse_button == "left") then --这里是左键删除方块的逻辑
+		-- play touch step sound when left click on an object
+		if(result and result.block_id and result.block_id > 0) then
+			click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
+			local block = block_types.get(result.block_id);
+			if(block and result.blockX) then
+				-- block:OnMouseDown(result.blockX,result.blockY,result.blockZ, event.mouse_button);
+				event:accept();
+			end
+		end
+	end
 	if(event:isAccepted()) then
-		if(event.ctrl_pressed) then
-		else
-			self:EnableMouseDownTimer(true);
-		end
-		local click_data = self:GetClickData();
-		if(event.mouse_button == "left") then
-			click_data.left_holding_time = 0;
-		elseif(event.mouse_button == "right") then
-			click_data.right_holding_time = 0;
-		end
-		-- local result = self:CheckMousePick();
-		-- self:UpdateClickStrength(0, result);
-
-		-- if(event.mouse_button == "left") then --这里是左键删除方块的逻辑
-		-- 	-- play touch step sound when left click on an object
-		-- 	if(result and result.block_id and result.block_id > 0) then
-		-- 		click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
-		-- 		local block = block_types.get(result.block_id);
-		-- 		if(block and result.blockX) then
-		-- 			block:OnMouseDown(result.blockX,result.blockY,result.blockZ, event.mouse_button);
-		-- 		end
-		-- 	end
-		-- end
 		return
 	end
+	RolePlayMovieContext._super.mousePressEvent(self, event);
 end
 
 -- virtual: 
 function RolePlayMovieContext:mouseMoveEvent(event)
-	event:accept();
+	RolePlayMovieContext._super.mouseMoveEvent(self, event);
 	if(event:isAccepted()) then
-		-- print("RolePlayMovieContext:mouseMoveEvent=============")
 		return
 	end
 end
 
 function RolePlayMovieContext:mouseReleaseEvent(event)
-	event:accept();
+	local mouseCaptureEntity = self.mouseCaptureEntity;
+	self.mouseCaptureEntity = nil;
+	if mouseCaptureEntity then
+		mouseCaptureEntity:mouseReleaseEvent(event)
+	end
 	if(event:isAccepted()) then
-		-- print("RolePlayMovieContext:mouseReleaseEvent=============")
-		RolePlayMovieContext:HandleKeyRelease()
 		return
 	end
-	
+	RolePlayMovieContext:HandleKeyRelease(event)
+	if(event:isAccepted()) then
+		return
+	end
+	RolePlayMovieContext._super.mouseReleaseEvent(self, event);	
 end
 
 -- this function is called repeatedly if MousePickTimer is enabled. 
@@ -323,10 +318,9 @@ function RolePlayMovieContext:CheckMousePick()
 	end
 end
 
-function RolePlayMovieContext:HandleKeyRelease()
+function RolePlayMovieContext:HandleKeyRelease(event)
 	local result = self:CheckMousePick();
 	if not result then
-		print("not result==============")
 		return 
 	end
 	local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
@@ -339,14 +333,14 @@ function RolePlayMovieContext:HandleKeyRelease()
 		if(item) then
 			block_data = item:GetBlockData(itemStack);
 		else
-			LOG.std(nil, "debug", "BaseContext", "no block definition for %d", block_id or 0);
+			LOG.std(nil, "debug", "RolePlayMovieContext", "no block definition for %d", block_id or 0);
 			return;
 		end
 	end
 	local click_data = self:GetClickData()
-	-- print("HandleKeyRelease================1",click_data.left_holding_time)
 	if click_data.left_holding_time < 400 and result and result.blockX then
 		if RolePlayMovieContext.GetIsSelectPaint() then
+			event:accept();
 			if(block_id and block_id > 0) or result.block_id == block_types.names.water then
 				-- if ctrl key is pressed, we will replace block at the cursor with the current block in right hand. 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
@@ -354,9 +348,11 @@ function RolePlayMovieContext:HandleKeyRelease()
 				task:Run();
 				return 
 			end
-			GameLogic.AddBBS(nil,"请选择你要使用的方块")
+			-- GameLogic.AddBBS(nil,"请选择你要使用的方块")
+			
 		end
 		if RolePlayMovieContext.GetIsSelectBrush() then
+			event:accept()
 			if(block_id and block_id > 0) then
 				-- if alt key is pressed, we will replace block at the cursor with the current block in right hand. 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
@@ -364,7 +360,7 @@ function RolePlayMovieContext:HandleKeyRelease()
 				task:Run();
 				return 
 			end
-			GameLogic.AddBBS(nil,"请选择你要使用的方块")
+			-- GameLogic.AddBBS(nil,"请选择你要使用的方块")
 		end
 		if RolePlayMovieContext.GetIsSelectGlove() then
 			if block_id and block_id > 0  then
@@ -373,11 +369,11 @@ function RolePlayMovieContext:HandleKeyRelease()
 
 				return
 			end
-			GameLogic.AddBBS(nil,"请去世界里寻找你需要放置的物品，然后使用手套获取")
+			-- GameLogic.AddBBS(nil,"请去世界里寻找你需要放置的物品，然后使用手套获取")
 		end
 		
 		if self.GetIsSelectOther() then
-
+			return
 		end
 	end
 end

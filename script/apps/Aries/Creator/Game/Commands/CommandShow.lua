@@ -26,7 +26,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 Commands["show"] = {
 	name="show", 
 	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|playertouch
-terrain|mod|physics|vision|quickselectbar|tips|map|camera|anim|
+terrain|mod|physics|vision|quickselectbar|tips|map|camera|anim|paralife|
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
@@ -154,6 +154,11 @@ Other show filters:
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 			local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 			TouchMiniKeyboard.GetSingleton():SetRockerMod()
+		elseif (name == "paralife") then
+			local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
+        	ParalifeLiveModel.ShowView()
+
+			GameLogic.RunCommand("/show playertouch")
 		end
 	end,
 };
@@ -163,7 +168,7 @@ Other show filters:
 Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|mobile|playertouch|
-terrain|vision|ui|keyboard|quickselectbar|tips|map|info|camera|
+terrain|vision|ui|keyboard|quickselectbar|tips|map|info|camera|paralife|
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo
 ]], 
 	desc=[[hide different type of things.e.g.
@@ -249,6 +254,11 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 			local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 			TouchMiniKeyboard.GetSingleton():SetKeyboardMod()
+		elseif (name == "paralife") then
+			local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
+        	ParalifeLiveModel.ClosePage()
+
+			GameLogic.RunCommand("/hide playertouch")
 		end
 	end,
 };

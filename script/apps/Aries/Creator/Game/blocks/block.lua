@@ -1590,6 +1590,20 @@ function block:GetCollisionBoundingBoxFromPool(x,y,z)
 	return self.collisionAABB:clone_from_pool():Offset(BlockEngine:real_min(x,y,z));
 end
 
+-- @param x, y, z: real world coordinates
+-- @return true if it is inside. 
+function block:IsPointInsideCollisionBox(x, y, z)
+	if(self.solid) then
+		return true
+	elseif(self.obstruction) then
+		local bx, by, bz = BlockEngine:block(x, y, z)
+		local aabb = self:GetCollisionBoundingBoxFromPool(bx, by, bz)
+		if(aabb and aabb:ContainsPoint(x, y, z)) then
+			return true
+		end
+	end
+end
+
 -- Adds all intersecting collision boxes representing this block to a list.
 -- @param list: in|out array list to hold the output
 -- @param aabb: only add if collide with this aabb. 

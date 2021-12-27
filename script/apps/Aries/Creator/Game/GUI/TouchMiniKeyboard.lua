@@ -172,21 +172,24 @@ end
 
 -- static method
 function TouchMiniKeyboard.CheckShow(bShow)
+	local self = TouchMiniKeyboard.GetSingleton()
+	if self.open_button and self.show_open_bt then
+		self.open_button.visible = bShow
+		return
+	end
 	if bShow == TouchMiniKeyboard.bShow then
 		return
 	end
-
-	if bShow and TouchMiniKeyboard.GetSingleton().is_rocker_mode then
-		return
-	end
-
+	-- if bShow and self.is_rocker_mode then
+	-- 	return
+	-- end
 	TouchMiniKeyboard.bShow = bShow
 
-	TouchMiniKeyboard.GetSingleton():Show(bShow);
+	self:Show(bShow);
 	TouchMiniRightKeyboard.GetSingleton():Show(bShow);
 
 	if not bShow then
-		TouchMiniKeyboard.GetSingleton():ChangeMouseLockStata("NoLock")
+		self:ChangeMouseLockStata("NoLock")
 	end
 end
 
@@ -1498,6 +1501,7 @@ function TouchMiniKeyboard:ShowOpenButton(touch_x, touch_y)
 		_parent.visible = false
 		local touch = {type="WM_POINTERUP", x=touch_x, y=touch_y, id=-1, time=0};
 		self:OnTouch(touch);
+		self.show_open_bt = true
 	end
 	
 	self.open_button.x = touch_x - bt_width/2
@@ -1507,6 +1511,7 @@ end
 function TouchMiniKeyboard:HideOpenBt()
 	if self.open_button and self.open_button.visible then
 		self.open_button.visible = false
+		self.show_open_bt = false
 		local _parent = ParaUI.GetUIObject(self.id or self.name);
 		_parent.visible = true
 	end

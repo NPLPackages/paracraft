@@ -28,6 +28,7 @@ RedSummerCampPPtPage.ProjectIdToPPtData = {}
 
 local key_to_report_name = {
 	["ppt_L1"] = "org",		-- 机构课L1
+	["ppt_L2"] = "org_L2",	-- 机构课L2
 	["ppt_S1"] = "430",		-- 社团课S1
 	["ppt_X1"] = "campus",	-- 校园课X1
 	["ppt_Z1"] = "demo_lesson",	-- 校园课X1
@@ -484,13 +485,14 @@ function RedSummerCampPPtPage.OnVisitWrold(projectid)
 		local export_data_list = RedSummerCampPPtPage.ProjectIdToPPtData[projectid]
 		if export_data_list and #export_data_list > 0 then
 			for key, v in pairs(export_data_list) do
-				if tonumber(v.step_value) ~= 1 then
+				local step_value = tonumber(v.step_value)
+				if step_value and step_value ~= 1 then
 					local lesson_type = key_to_report_name[v.course_name] or v.course_name
 					local section = v.course_index or 1
 					keepwork.tatfook.study_learn_records({
 						lessonType = lesson_type,
 						section = section,
-						progress = tonumber(v.step_value) or 1,
+						progress = step_value,
 					}, function(err, msg, data)
 						--print("ooooooooooo", err)
 					end)

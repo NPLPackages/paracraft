@@ -282,7 +282,8 @@ end
 
 -- set block in right hand
 -- @param blockid_or_item_stack:  block_id or ItemStack object. 
-function PlayerController:SetBlockInRightHand(blockid_or_item_stack)
+-- @param bIsReplace: if true, we will replace instead of moving to other empty slot
+function PlayerController:SetBlockInRightHand(blockid_or_item_stack, bIsReplace)
 	LOG.std(nil, 'info', 'SetBlockInRightHand');
 	local player = EntityManager.GetPlayer();
 	if(player) then
@@ -290,7 +291,7 @@ function PlayerController:SetBlockInRightHand(blockid_or_item_stack)
 			BlockInEntityHand.RefreshRightHand(nil, blockid_or_item_stack, player.petObj)
 		end
 		
-		return player:SetBlockInRightHand(blockid_or_item_stack);		
+		return player:SetBlockInRightHand(blockid_or_item_stack, bIsReplace);		
 	end
 end
 

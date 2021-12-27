@@ -740,11 +740,11 @@ Commands["blockgraffiti"] = {
 	name="blockgraffiti", 
 	quick_ref="/blockgraffiti [block] [graffititye] [graffitiradius]", 
 	desc=[[monitor a given file
-@param block: block id or name
+@param block: block id  if not block will stop graffiti
 @param graffititye: 0 simple    1 radius 
 @param graffitiradius  maxvalue is 100
 Example:
-/blockgraffiti  if not block will stop graffiti
+/blockgraffiti  
 /blockgraffiti 62
 /blockgraffiti 62 1
 /blockgraffiti 62 1 10

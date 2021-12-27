@@ -346,3 +346,51 @@ Commands["panorama"] = {
 		--]]
 	end,
 };
+
+
+
+Commands["camera"] = {
+	name="camera", 
+	quick_ref="/camera [-norestrict|clear] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]]", 
+	desc=[[angle should be in range [-180, 180]
+/camera      : clear all camera settings
+/camera -norestrict
+/camera -restrictPitch 30 80
+/camera -restrictDist 15
+/camera -restrictFacing 45 135
+/camera -restrictFacing 90 -restrictDist 10 -restrictPitch 30 80
+
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
+		local minYaw, maxYaw, minDist, maxDist, minPitch, maxPitch
+		local option_name = "";
+		while (option_name and cmd_text) do
+			option_name, cmd_text = CmdParser.ParseOption(cmd_text);
+			if(option_name == "norestrict" or option_name == "clear") then
+				CameraController.ClearCameraRestrictions()
+			elseif(option_name == "restrictPitch") then
+				minPitch, cmd_text = CmdParser.ParseInt(cmd_text);
+				maxPitch, cmd_text = CmdParser.ParseInt(cmd_text);
+				maxPitch = maxPitch or minPitch
+				if(minPitch) then
+					minPitch = mathlib.ToStandardAngle(minPitch * math.pi / 180)
+					maxPitch = mathlib.ToStandardAngle(maxPitch * math.pi / 180)
+				end
+			elseif(option_name == "restrictYaw" or option_name == "restrictFacing") then
+				minYaw, cmd_text = CmdParser.ParseInt(cmd_text);
+				maxYaw, cmd_text = CmdParser.ParseInt(cmd_text);
+				maxYaw = maxYaw or minYaw
+				if(minYaw) then
+					minYaw = mathlib.ToStandardAngle(minYaw * math.pi / 180)
+					maxYaw = mathlib.ToStandardAngle(maxYaw * math.pi / 180)
+				end
+			elseif(option_name == "restrictDist") then
+				minDist, cmd_text = CmdParser.ParseInt(cmd_text);
+				maxDist, cmd_text = CmdParser.ParseInt(cmd_text);
+				maxDist = maxDist or minDist
+			end
+		end
+		CameraController.SetCameraRestrictions(minYaw, maxYaw, minDist, maxDist, minPitch, maxPitch)
+	end,
+};

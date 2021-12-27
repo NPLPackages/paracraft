@@ -75,6 +75,9 @@ function Entity:CreateInnerObject(...)
 	if(self:IsShowHeadOnDisplay() and System.ShowHeadOnDisplay) then
 		System.ShowHeadOnDisplay(true, obj, self:GetDisplayName(), GameLogic.options.NPCHeadOnTextColor);	
 	end
+	if(obj) then
+		obj:SetField("SkipPicking", false);
+	end
 	return obj;
 end
 

@@ -75,6 +75,7 @@ LessonBoxTip.NomalTip = {
     check="仔细观察一下我这边，在绿色的格子中，摆放合适的方块吧！",
     movietarget="在电影方块中，%s",
     notfinish="像我这样，完成全部的操作吧！",
+    no_change="这一步不需要改动地图，在熟悉完老师讲授的知识后，点击“开始检查”即可",
 }
 local checkIndex = 0
 local page = nil
@@ -304,7 +305,7 @@ function LessonBoxTip.StartCurStage()
         if stagePos[1] then
             GameLogic.GetPlayer():MountEntity(nil);
             GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
-            GameLogic.RunCommand("/camerayaw 1.57")
+            --GameLogic.RunCommand("/camerayaw 1.57")
         end
         LessonBoxTip.PlayLessonMusic("lesson_operate")
         LessonBoxTip.StartTip()
@@ -416,30 +417,37 @@ function LessonBoxTip.StartLearn()
         local regiondest = lessonConfig.regionOther
         --print("StartLearn=================1")
         --echo({regionsrc,regiondest})
-        LessonBoxCompare.CompareTwoAreas(regionsrc,regiondest,function(needbuild,pivotConfig)
-            echo(needbuild)
-            LessonBoxTip.AllNeedBuildBlock = needbuild.blocks
-            LessonBoxTip.CurNeedBuildBlock = needbuild.blocks
-            LessonBoxTip.CreatePos = pivotConfig.createpos
-            LessonBoxTip.SrcBlockOrigin = pivotConfig.srcPivot
+        local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
+        if taskCnf and taskCnf.starttemplate == taskCnf.finishtemplate then
+            LessonBoxTip.SetTaskTip("no_change")
+            LessonBoxTip.SetRoleName()
             LessonBoxTip.SetLessonTitle()
-            compare_type = needbuild.nAddType
-            if(#needbuild.blocks == 0 and needbuild.nAddType == 3)then
-                local movieBlocks = needbuild.movies
-                local codeBlocks = needbuild.codes
-                LessonBoxTip.CompareCode(codeBlocks)
-                LessonBoxTip.CompareMovie(movieBlocks)
-            else
-                -- LessonBoxTip.AutoEquipHandTools()
-                LessonBoxTip.RegisterHooks()
-                commonlib.TimerManager.SetTimeout(function()
-                    LessonBoxTip.SetTaskTip("check")
-                    LessonBoxTip.SetRoleName()
-                    LessonBoxTip.UpdateNextBtnStatus()
-                    LessonBoxTip.RenderBlockTip()
-                end,200)
-            end
-        end)
+        else
+            LessonBoxCompare.CompareTwoAreas(regionsrc,regiondest,function(needbuild,pivotConfig)
+                echo(needbuild)
+                LessonBoxTip.AllNeedBuildBlock = needbuild.blocks
+                LessonBoxTip.CurNeedBuildBlock = needbuild.blocks
+                LessonBoxTip.CreatePos = pivotConfig.createpos
+                LessonBoxTip.SrcBlockOrigin = pivotConfig.srcPivot
+                LessonBoxTip.SetLessonTitle()
+                compare_type = needbuild.nAddType
+                if(#needbuild.blocks == 0 and needbuild.nAddType == 3)then
+                    local movieBlocks = needbuild.movies
+                    local codeBlocks = needbuild.codes
+                    LessonBoxTip.CompareCode(codeBlocks)
+                    LessonBoxTip.CompareMovie(movieBlocks)
+                else
+                    -- LessonBoxTip.AutoEquipHandTools()
+                    LessonBoxTip.RegisterHooks()
+                    commonlib.TimerManager.SetTimeout(function()
+                        LessonBoxTip.SetTaskTip("check")
+                        LessonBoxTip.SetRoleName()
+                        LessonBoxTip.UpdateNextBtnStatus()
+                        LessonBoxTip.RenderBlockTip()
+                    end,200)
+                end
+            end)
+        end
     end
 end
 
@@ -663,7 +671,8 @@ end
 
 function LessonBoxTip.SetErrorTip(index)
     if page then
-        local strTip = LessonBoxTip.CheckBLockTips[index]
+        index = index or 1
+        local strTip = str or LessonBoxTip.CheckBLockTips[index]
         page:SetValue("role_tip", strTip);
         if strTip then
             LessonBoxTip.PlayRoleAni(index)
@@ -772,6 +781,20 @@ function LessonBoxTip.IsCompareAutoBlock()
 end
 
 function LessonBoxTip.StartCheck()
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
+    if taskCnf and taskCnf.starttemplate == taskCnf.finishtemplate then
+        LessonBoxTip.RemoveErrBlockTip()
+        LessonBoxTip.SetErrorTip(1)
+        isFinishStage = true
+        GameLogic.AddBBS(nil,"当前小节已完成，即将进入下一小节的学习")
+        commonlib.TimerManager.SetTimeout(function()
+            LessonBoxTip.ClearErrorBlockTip()
+            LessonBoxTip.RemoveErrBlockTip()
+            LessonBoxTip.ClearBlockTip()
+            LessonBoxTip.GotoNextStage()
+        end,4000)
+    end
+
     if check_timer then
         check_timer:Change()
     end   
@@ -995,7 +1018,7 @@ function LessonBoxTip.SetErrBlockTip()
         end
         local background = block_item:GetIcon(blockData):gsub("#", ";");
         local name = block_item:GetStatName()
-        --print("block=========",name,background,tooltip)	
+        --print("block=========",name,background,tooltip)
         local strErrTip = string.format("红色方框中的方块错了，正确的应该是【     】【%s】（编号：【%d】）。",name,blockId)
         SoundManager:PlayText(strErrTip,10006)
         local txtErrTip = ParaUI.GetUIObject("lessonbox_err_text")

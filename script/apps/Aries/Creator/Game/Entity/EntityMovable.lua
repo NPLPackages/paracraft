@@ -141,7 +141,7 @@ function Entity:init()
 				self:SetAnimation(self.anim);
 			end
 
-			self:RefreshClientModel(nil, obj);
+			self:RefreshClientModel(true, obj);
 
 			if(self:IsShowHeadOnDisplay()) then
 				System.ShowHeadOnDisplay(true, obj, self:GetDisplayName(), GameLogic.options.NPCHeadOnTextColor);	
@@ -408,7 +408,7 @@ function Entity:RefreshClientModel(bForceRefresh, playerObj)
 	if(playerObj) then
 		-- refresh skin and base model, preserving all custom bone info
 		local assetPath = self:GetMainAssetPath()
-		if(playerObj:GetField("assetfile", "") ~= assetPath) then
+		if(playerObj:GetField("assetfile", "") ~= assetPath or bForceRefresh) then
 			local skin = CustomCharItems:GetSkinByAsset(assetPath);
 			if (skin) then
 				self.mainAssetPath = CustomCharItems.defaultModelFile;
@@ -424,6 +424,7 @@ function Entity:RefreshClientModel(bForceRefresh, playerObj)
 		end
 		self.isCustomModel = PlayerAssetFile:IsCustomModel(assetPath);
 		self.hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(assetPath);
+		
 		self:RefreshSkin(playerObj);
 		self:RefreshRightHand(playerObj);
 	end
@@ -449,7 +450,6 @@ function Entity:RefreshSkin(player)
 	local player = player or self:GetInnerObject();
 	if(player) then
 		local skin = self:GetSkin();
-
 		if(self.isCustomModel) then
 			PlayerAssetFile:RefreshCustomModel(player, skin)
 			return 
