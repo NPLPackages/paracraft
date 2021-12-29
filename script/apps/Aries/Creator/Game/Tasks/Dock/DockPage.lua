@@ -50,6 +50,13 @@ DockPage.hide_ui_world_ids = {
 DockPage.is_show = true;
 
 DockPage.left_top_line_1 = {
+    { label = L"冬运会", id = "winter_camp", enabled = true, bg="Texture/Aries/Creator/keepwork/WinterGames/dongao_101x93_32bits.png#0 0 101 93", },  
+    { label = L"帕帕", id = "papa", enabled = true, bg="Texture/Aries/Creator/keepwork/WinterGames/papa_101x93_32bits.png#0 0 101 93", }, 
+    { label = L"拉拉", id = "lala", enabled = true, bg="Texture/Aries/Creator/keepwork/WinterGames/lala_101x93_32bits.png#0 0 101 93", },    
+    { label = L"卡卡", id = "kaka", enabled = true, bg="Texture/Aries/Creator/keepwork/WinterGames/kaka_101x93_32bits.png#0 0 101 93", }, 
+    { label = L"环保卫士", id = "huanbao", enabled = true, bg ="Texture/Aries/Creator/keepwork/WinterGames/huanbao_101x93_32bits.png#0 0 101 93"},   
+}
+DockPage.left_top_line_2 = {
     { label = L"夏令营主ui", id = "summer_camp_main", enabled = true, bg="Texture/Aries/Creator/keepwork/SummerCamp/btn3_summer_camp_32bits.png#0 0 100 80", },  
     { label = L"地图", id = "summer_camp_map", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/map_32bits.png#0 0 100 80", }, 
     { label = L"课程", id = "summer_camp_kecheng", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/kecheng_32bits.png#0 0 100 80", },    
@@ -59,9 +66,6 @@ DockPage.left_top_line_1 = {
     { label = L"长征路", id = "summer_camp_changzheng", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/changzheng_32bits.png#0 0 100 80", },
     { label = L"抗疫", id = "summer_camp_kangyi", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/kangyi_32bits.png#0 0 100 80", },
     { label = L"任务", id = "summer_camp_renwu", enabled = true, bg="Texture/Aries/Creator/keepwork/dock/SummerCamp/renwu_32bits.png#0 0 100 80", },
-}
-DockPage.left_top_line_2 = {
-    
 }
 
 DockPage.top_line_1 = {
@@ -143,7 +147,8 @@ function DockPage.RefreshPage()
         DockPage.InitTopIconData()
         DockPage.page:Refresh(0)
         DockPage.InitButton()
-		DockPage.CheckRedSummerCampUIVisible();
+		-- DockPage.CheckRedSummerCampUIVisible();
+        DockPage.CheckWinterCampUIVisible()
     end    
 end
 
@@ -478,31 +483,21 @@ function DockPage.FindUIControl(name)
 end
 
 function DockPage.OnClickLeftTop(id)
-    local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua") 
-	local SummerCampNoticeIntro = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampNoticeIntro.lua") 
-	local SummerCampTaskPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampTaskPage.lua") 
-	NPL.load("(gl)script/ide/timer.lua");
-
-	if (id == 'summer_camp_main') then
-        SummerCampMainPage.ShowView()
-	elseif (id == 'summer_camp_map') then
-		SummerCampMainPage.ClickMap()
-	elseif (id == 'summer_camp_kecheng') then
-        SummerCampMainPage.ShowView(2)
-	elseif (id == 'summer_camp_chengjiu') then
-        SummerCampMainPage.ShowView(4)
-	elseif (id == 'summer_camp_yunyou') then
-		SummerCampNoticeIntro.ShowView(1)
-	elseif (id == 'summer_camp_changzheng') then
-		SummerCampNoticeIntro.ShowView(2)
-	elseif (id == 'summer_camp_kangyi') then
-		GameLogic.GetCodeGlobal():BroadcastTextEvent("openUI", {name = "taskMain"}, function() end)
-	elseif (id == 'summer_camp_renwu') then
-        SummerCampMainPage.ShowView(3)
+    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+    if (id == 'winter_camp') then
+        Page.ShowWinterCampMainWindow("tiyujinsai")
+	elseif (id == 'papa') then
+		Page.ShowWinterCampMainWindow("quweibiancheng")
+	elseif (id == 'lala') then
+        Page.ShowWinterCampMainWindow("kuailejianzao")
+	elseif (id == 'kaka') then
+        Page.ShowWinterCampMainWindow("jingcaidonghua")
+	elseif (id == 'huanbao') then
+		Page.ShowWinterCampMainWindow("lajifenlei")
 	end
-	table.insert(DockPage.showPages,{id,SummerCampMainPage.GetPageCtrl()})
-    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.summer_camp_main");
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.winter_camp_main");
 end
+
 function DockPage.RenderButton_LeftTop_1(index)
     local node = DockPage.left_top_line_1[index];
 	local tip_str = "";
@@ -1010,6 +1005,10 @@ function DockPage.SetUIVisible_LeftTop(v)
 end
 function DockPage.SetUIVisible_CenterBottom(v)
 	DockPage.SetMcmlNodeVisible("center_bottom_container", v)
+    local bottom_back = DockPage.GetContainerObj("bottom_background")
+    if bottom_back and bottom_back:IsValid() then
+        bottom_back.visible = v
+    end
 end
 function DockPage.SetUIVisible_RightBottom(v)
 	DockPage.SetMcmlNodeVisible("right_bottom_container", v)
@@ -1046,3 +1045,29 @@ function DockPage.CheckRedSummerCampUIVisible()
 	DockPage.SetUIVisible_RightTop(visible)
 	DockPage.SetUIVisible_LeftTop(not visible)
 end
+
+function DockPage.CheckWinterCampUIVisible()
+    local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+	local hide_ui_world_ids = {
+        ONLINE = { 119551,114607,91056 },
+        RELEASE = {},
+    };
+    local worlds = hide_ui_world_ids[HttpWrapper.GetDevVersion()]
+	local visible = true;
+    if(worlds)then
+		local projectId = GameLogic.options:GetProjectId();
+        projectId = tonumber(projectId);
+        for k,id in ipairs(worlds) do
+            if(id == projectId)then
+                visible = false;
+            end
+        end
+    end
+	DockPage.SetUIVisible_RightTop(visible)
+	DockPage.SetUIVisible_LeftTop(not visible)
+    DockPage.SetUIVisible_CenterBottom(visible)
+    DockPage.SetUIVisible_RightBottom(visible)
+end
+

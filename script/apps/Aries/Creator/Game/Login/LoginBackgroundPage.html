@@ -1,48 +1,69 @@
-<!-- "script/apps/Aries/Creator/Game/Login/LoginBackgroundPage.html" -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head>
-<title>2014.1.14</title>
-</head>
-<body> 
-<pe:mcml>
-<script type="text/npl" refresh="false"><![CDATA[
-showbg = Page:GetRequestParam("showbg") or "true";
+<html>
+    <head>
+        <title>2014.1.14</title>
+    </head>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl" refresh="false">
+                <![CDATA[
+                    showbg = Page:GetRequestParam("showbg") or "true";
 
-NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
-local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+                    local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
 
-ClientVersion = string.format(L"Paracraft帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
-LatestVersion = LatestVersion or false;
+                    ClientVersion = string.format(L"Paracraft帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
+                    LatestVersion = LatestVersion or false;
 
--- NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
--- local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
--- local updater = ClientUpdater:new();
--- updater:Check(function(bNeedUpdate, latestVersion)
---     if(bNeedUpdate) then
---         LatestVersion = latestVersion;
---         if(Page:IsVisible()) then
---             Page:Refresh();
---         end
---     end
--- end);
-]]></script>
-<pe:if condition='<%=Eval("showbg") == "true"%>'>
-    <pe:container alignment="_fi" zorder="-1" width="100%" height="100%" style="position:relative;background:url(Texture/Aries/Creator/Paracraft/login_bg_32bits.png#0 0 1280 720)" ></pe:container>
-</pe:if>
-<pe:container alignment="_mb" width="0" height="85px" style="position:relative;background:">
-    <pe:container align="left" style="position:relative;color:#8f815f;font-size:12px;font-weight:bold;margin-left:20px;background:">
-        <pe:if condition="<%=Eval('LatestVersion')~=false%>">
-            <div style="position:relative;margin-top:0px;color:#ff0000;">
-                <div><%=L"发现新版本:"..Eval('LatestVersion')%></div>
-                <div><%=L"请到官网更新"%></div>
-            </div>
-        </pe:if>
-        <div style="margin-top:35px"><%=Eval("ClientVersion")%></div>
-        <div style="margin-top:0px;"><%=L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"%></div>
-    </pe:container>
-</pe:container>
-</pe:mcml>
-</body>
+                    function get_background()
+                        local filter_bg = GameLogic.GetFilters():apply_filters(
+                                            "apply:apps.aries.creator.game.login.login_background_page.get_background",
+                                            false
+                                          );
+
+                        if (filter_bg) then
+                            return filter_bg;
+                        else
+                            return "Texture/Aries/Creator/Paracraft/login_bg_32bits.png#0 0 1280 720";
+                        end
+                    end
+                ]]>
+            </script>
+            <pe:if condition="<%= Eval('showbg') == 'true' %>">
+                <pe:container
+                    alignment="_fi"
+                    zorder="-1"
+                    width="100%"
+                    height="100%"
+                    style="<%= format('position: relative;background:url(%s)', get_background()) %>">
+                </pe:container>
+            </pe:if>
+            <pe:container
+                alignment="_mb"
+                width="0"
+                height="85px"
+                style="position: relative;
+                       background:">
+                <pe:container
+                    align="left"
+                    style="position: relative;
+                           color: #8f815f;
+                           font-size: 12px;
+                           font-weight: bold;
+                           margin-left: 20px;
+                           background:">
+                    <pe:if condition="<%= Eval('LatestVersion') ~= false %>">
+                        <div style="position: relative;
+                                    margin-top: 0px;
+                                    color: #ff0000;">
+                            <div><%= L"发现新版本:" .. Eval("LatestVersion") %></div>
+                            <div><%= L"请到官网更新" %></div>
+                        </div>
+                    </pe:if>
+                    <div style="margin-top:35px"><%= Eval("ClientVersion") %></div>
+                    <div style="margin-top:0px;"><%= L"(c)Tatfook. powered by NPL and ParaEngine"%></div>
+                </pe:container>
+            </pe:container>
+        </pe:mcml>
+    </body>
 </html>
 

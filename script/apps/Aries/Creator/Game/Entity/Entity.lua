@@ -331,6 +331,30 @@ end
 
 local validateNumber = mathlib.validateNumber;
 
+-- update from XML node
+function Entity:UpdateFromXMLNode(node)
+	if(self.obj) then
+		local lastX, lastY, lastZ = self:GetPosition();
+		local lastFacing = self:GetFacing();
+		local lastScaling = self:GetScaling();
+		self:LoadFromXMLNode(node);
+		local newX, newY, newZ = self:GetPosition()
+		local newFacing = self:GetFacing();
+		local newScaling = self:GetScaling();
+		self.facing = newFacing;
+		self.x, self.y, self.z = lastX, lastY, lastZ
+		self.facing = lastFacing
+		self.scaling = lastScaling
+		self:SetPosition(newX, newY, newZ);
+		self:SetFacing(newFacing);
+		self:SetScaling(newScaling);
+	else
+		self:LoadFromXMLNode(node);
+		self:init()
+		self:Attach();
+	end
+end
+
 -- load from an xml node. 
 function Entity:LoadFromXMLNode(node)
 	if(node) then
@@ -353,6 +377,8 @@ function Entity:LoadFromXMLNode(node)
 			end
 			if(attr.facing) then
 				self.facing = tonumber(attr.facing) or self.facing;
+			else
+				self.facing = nil
 			end
 			if(attr.anim and attr.anim~="") then
 				self.anim = attr.anim;

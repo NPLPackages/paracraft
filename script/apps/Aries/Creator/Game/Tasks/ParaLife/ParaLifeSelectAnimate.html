@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ParaLifeSelectAnimate = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeSelectAnimate.lua");
+    ParaLifeSelectAnimate.OnInit()
+    function ClosePage()
+        ParaLifeSelectAnimate.ClosePage()
+    end
+
+    function Anim_Data(index)
+        if index == nil then
+            return #ParaLifeSelectAnimate.player_ani_config
+        else
+            return ParaLifeSelectAnimate.player_ani_config[index]
+        end
+    end
+
+    function GetAniText(name)
+        return ParaLifeSelectAnimate.GetAniText(name)
+    end
+
+    function ClickAnim(name)
+        print(name)
+        ParaLifeSelectAnimate.OnClickAnim(name)
+    end
+
+    function OnClickOk()
+        ParaLifeSelectAnimate.OnClickOk()
+    end
+]]></script>
+<div style="width: 1001px; height: 762px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/select_anim.png#0 0 1001 762);">
+    <input type="button" onclick="ClosePage" style="margin-left: 840px; margin-top: 48px; width: 94px; height:95px;background:url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/close.png#0 0 94 95)"/>
+
+    <div style="margin-left: -40px;margin-top: 40;">
+        <pe:mc_player  name="change_role_anim" miniscenegraphname="ParaLifeAnimate" style="width:512px;height:512px; margin-top: -50px;"  IsInteractive="false" NoFrameMove="true" RenderTargetSize="600" DefaultCameraObjectDist="5.12" />
+    </div>
+
+    <div style="position: relative; margin-left: 426px; margin-top: -460px; width: 400px; height: 470px; ">
+        <pe:gridview name="teacher_list" style="margin-left:0px;" CellPadding="0" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="50" DataSource='<%=Anim_Data%>'>
+            <Columns>
+                <input type="button" onclick = "ClickAnim" name='<%=Eval("ani_name")%>' value='<%=GetAniText(Eval("ani_name"))%>' style="width: 300px; height: 50px; background:;"/>
+            </Columns>
+        </pe:gridview>
+    </div>
+    <div onclick="OnClickOk" style="margin-left: 800px; margin-top: -60px; width: 154px; height: 154px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/sure_32bits.png#0 0 154 154);"></div>
+</div>
+</pe:mcml>
+</body>
+</html>

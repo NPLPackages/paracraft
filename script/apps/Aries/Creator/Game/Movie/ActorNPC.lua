@@ -16,6 +16,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/MultiAnimBlock.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CmdParser.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
 NPL.load("(gl)script/ide/math/Quaternion.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local Matrix4 = commonlib.gettable("mathlib.Matrix4");
 local Quaternion = commonlib.gettable("mathlib.Quaternion");
 local math3d = commonlib.gettable("mathlib.math3d");
@@ -564,6 +566,10 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				local filepath = PlayerAssetFile:GetValidAssetByString(result);
 				if(filepath or result=="0" or result=="") then
 					-- PlayerAssetFile:GetNameByFilename(filename)
+					local skin = CustomCharItems:GetSkinByAsset(result)
+					if skin then
+						self:AddKeyFrameByName("skin", nil, skin);
+					end
 					self:AddKeyFrameByName(keyname, nil, result);
 					self:FrameMovePlaying(0);
 					if(callbackFunc) then
@@ -975,6 +981,26 @@ function Actor:OnDestroyBlocks(blocks)
 	if(self:IsRecording())then
 		self.actor_block:AddKeyFrameOfBlocks(blocks);
 	end
+end
+
+function Actor:SetMovieAppearance(assetfile,skin)
+	local curTime = 0;
+	local entity = self.entity;
+	if(not entity or not curTime) then
+		return
+	end
+	if assetfile then
+		self:AddKeyFrameByName("assetfile", nil, assetfile);
+	end
+	if skin then
+		self:AddKeyFrameByName("skin", nil, skin);
+	end
+	local displayname = entity:GetDisplayName();
+	if(displayname and displayname~="") then
+		self:AddKey("name", 0, displayname);
+		self:GetItemStack():SetTooltip(displayname);
+	end
+	self:FrameMovePlaying(0);
 end
 
 function Actor:SaveStaticAppearance()

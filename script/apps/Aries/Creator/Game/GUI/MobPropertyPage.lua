@@ -81,7 +81,7 @@ function MobPropertyPage.GetCommand()
 	end
 end
 
-function MobPropertyPage.ShowPage(entity, triggerEntity, OnClose)
+function MobPropertyPage.ShowPage(entity, triggerEntity, OnClose,from)
 	if(not entity) then
 		return;
 	end
@@ -89,7 +89,7 @@ function MobPropertyPage.ShowPage(entity, triggerEntity, OnClose)
 	if(not entity.isa or not entity:isa(EntityMob)) then
 		return
 	end
-
+	MobPropertyPage.form = from
 	entity:BeginEdit();
 	cur_entity = entity;
 	local params = {
@@ -116,8 +116,11 @@ function MobPropertyPage.ShowPage(entity, triggerEntity, OnClose)
 	params._page.OnClose = function()
 		entity:EndEdit();
 		if(OnClose) then
-			OnClose();
+			OnClose(MobPropertyPage.assetfile,MobPropertyPage.skin);
 		end
+		MobPropertyPage.skin = nil
+		MobPropertyPage.assetfile = nil
+		MobPropertyPage.form = nil
 	end;
 end
 
@@ -184,6 +187,10 @@ function MobPropertyPage.OnChangeAssetFile(skin)
 end
 
 function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile, skin)
+	if MobPropertyPage.form and MobPropertyPage.form == "movie" then
+		MobPropertyPage.assetfile = page:GetValue("assetfile")
+		return
+	end
 	entity = entity or MobPropertyPage.GetEntity();
 	obj = obj or entity:GetInnerObject();
 	if(obj and obj:IsCharacter()) then
@@ -300,6 +307,7 @@ function MobPropertyPage.OnOpenCustomModel()
 			if(filepath) then
 				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
 				MobPropertyPage.OnChangeAssetFile(skin);
+				MobPropertyPage.skin = skin
 			end
 		end
 	end);

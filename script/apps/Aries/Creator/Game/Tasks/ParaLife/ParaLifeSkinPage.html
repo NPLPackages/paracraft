@@ -1,0 +1,266 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/ParaLifeSkinPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="ParaLifeSkinPage.lua">
+            <![CDATA[
+            ParaLifeSkinPage = commonlib.gettable("MyCompany.Aries.Game.ParaLife.ParaLifeSkinPage");
+            ParaLifeSkinPage.OnInit();
+            local page = document:GetPageCtrl();
+            local isEditable = false;
+
+            function DS_Items(index)
+                if(index == nil) then
+                    return #ParaLifeSkinPage.Current_Item_DS;
+                else
+                    return ParaLifeSkinPage.Current_Item_DS[index];
+                end
+            end
+
+            function DS_Models(index)
+                if(index == nil) then
+                    return #ParaLifeSkinPage.Current_Model_DS;
+                else
+                    return ParaLifeSkinPage.Current_Model_DS[index];
+                end
+            end
+            
+            function DS_Icons(index)
+                if(index == nil) then
+                    return #ParaLifeSkinPage.Current_Icon_DS;
+                else
+                    return ParaLifeSkinPage.Current_Icon_DS[index];
+                end
+           end
+
+            function GetCategoryStyle(tex)
+                return string.format("margin-left:12px;margin-top:8px;width:28px;height:14px;background:url(Texture/Aries/Creator/keepwork/Avatar/%s.png#0 0 28 14);", tex);
+            end
+
+            function GetBigIconStyle(tex)
+                return string.format("margin-left:32px;margin-top:16px;width:64px;height:64px;background:url(%s);", tex or "");
+            end
+
+            function GetSmallIconStyle1(tex)
+                return string.format("float:left;margin:5px;width:40px;height:40px;background:url(%s);", tex or "");
+            end
+
+            function GetSmallIconStyle2(tex)
+                return string.format("float:left;margin:5px;width:40px;height:40px;background:url(%s);", tex or "");
+            end
+
+            function GetModelName(index)
+                if (index > 0) then
+                    local model = ParaLifeSkinPage.Current_Model_DS[ParaLifeSkinPage.model_index];
+                    if (model) then
+                        return model.alias;
+                    else
+                        return L"新建套装";
+                    end
+                else
+                end
+            end
+
+            function IsOdd(index)
+                return (index % 2) ~= 0;
+            end
+
+            function IsEditable()
+                return isEditable;
+            end
+
+            function SetEditable()
+                isEditable = true;
+                ParaLifeSkinPage.Refresh();
+            end
+
+            --重命名搭配
+            function FinishEditing()
+                local name = page:GetValue("model_name");
+                if (name == nil or name == "") then
+                    return;
+                end
+                if (commonlib.utf8.len(name) > 10) then
+                    _guihelper.MessageBox(L"输入的名称太长，请控制在10个字以内");
+                    return;
+                end
+                isEditable = false;
+                ParaLifeSkinPage.RenameModel(name);
+            end
+
+            function CancelEditing()
+                isEditable = false;
+                ParaLifeSkinPage.Refresh();
+            end
+
+            function OnclickClothes()
+                ParaLifeSkinPage.ClickClothesBtn()
+            end
+
+            ]]>
+        </script>
+        <div style='width: 1190px; height: 580px; background: url();' >
+            <!-- title -->
+            <div style="position: relative; margin-top: -20px;">
+                <div style="width: 128px; height: 64px; background: url(Texture/Aries/Creator/keepwork/Window/title/biaoti_32bits.png);"></div>
+                <pe:if condition='<%=ParaLifeSkinPage.bSelectCollocation%>'>
+                    <input type="button" onclick="ParaLifeSkinPage.OnClose" uiname="ParaLifeSkinPage.OnClose" style="margin-top: -32px; margin-left: 1160px; width: 22px; height: 22px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+                </pe:if>
+                <pe:if condition='<%=not ParaLifeSkinPage.bSelectCollocation%>'>
+                    <input type="button" onclick="ParaLifeSkinPage.OnClose" uiname="ParaLifeSkinPage.OnClose" style="margin-top: -32px; margin-left: 930px; width: 22px; height: 22px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);"/>
+                </pe:if>
+            </div>
+            <div style="position:relative;margin-top:40px;">
+                <pe:if condition='<%=ParaLifeSkinPage.bSelectCollocation%>'>
+                    <div style="float:left;margin-left:12px;margin-top:12px;width:225px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/dikuang_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                        <div style="width: 225px; min-height: 100px; margin-top: 10px;">
+                            <input type="button" style="margin-top:0px; margin-left: 20px; min-width:84px;height:40px;font-size:16px; font-weight: bold; base-font-size:16px;" uiname="ParaLifeSkinPage.SaveModel" class="kp_gray_button" onclick="ParaLifeSkinPage.OnClickSave" value='<%=L"保存搭配"%>' />
+                            <input type="button" style="margin-top:0px; margin-left: 20px; min-width:84px;height:40px;font-size:16px; font-weight: bold; base-font-size:16px;" uiname="ParaLifeSkinPage.LoadModel" class="kp_gray_button" onclick="ParaLifeSkinPage.LoadModel" value='<%=L"加载搭配"%>' />
+                            <input type="button" style="margin-top:0px; margin-left: 20px; min-width:84px;height:40px;font-size:16px; font-weight: bold; base-font-size:16px;" uiname="ParaLifeSkinPage.EditModel" class="kp_gray_button" onclick="ParaLifeSkinPage.OnClickEdit" value='<%=L"改名"%>' />
+                            <input type="button" style="margin-top:0px; margin-left: 20px; min-width:84px;height:40px;font-size:16px; font-weight: bold; base-font-size:16px;" uiname="ParaLifeSkinPage.DeleteModel" class="kp_gray_button" onclick="ParaLifeSkinPage.DeleteModel" value='<%=L"删除"%>' />
+                        </div>
+                        <div style="width:225px;height:360px;">
+                            <pe:gridview style="margin-left:9px;margin-top:4px;" name="item_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="44"
+                                        DataSource='<%=DS_Models%>'>
+                                <Columns>
+                                    <div style="width:207px;height:44px;background:url(Texture/Aries/Creator/keepwork/Avatar/btn_tiao_128X44_32bits.png#0 0 128 44:60 0 60 0);">
+                                        <div style="float:left;margin-left:14px;margin-top:8px;width:26px;text-align:center;font-size:18px;base-font-size:18px;color:#ffffff;">
+                                            <%=Eval("index")%>
+                                        </div>
+                                        <div name='<%=Eval("index")%>' onclick="ParaLifeSkinPage.SelectModel" style="float:left;margin-left:2px;margin-top:8px;width:124px;text-align:center;font-size:18px;base-font-size:18px;color:#ffffff;">
+                                            <%=Eval("alias")%>
+                                        </div>
+                                        <!-- <div name='<%=Eval("index")%>' onclick="ParaLifeSkinPage.DeleteModel" style="float:left;margin-left:2px;margin-top:5px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/Avatar/btn_shanchu_36X36_32bits.png#0 0 36 36);"></div> -->
+                                    </div>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                </EmptyDataTemplate>
+                            </pe:gridview>
+                        </div>
+                        <div style="margin-top:0px;width:225px;height:42px;">
+                            <input type="button" style="margin-top:0px;min-width:213px;height:44px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/add_clothes.png#0 0 213 44);" onclick="ParaLifeSkinPage.CreateNewActor" />
+                        </div>
+                    </div>
+                </pe:if>
+                <div style="float:left;margin-left:10px;margin-top:12px;width:334px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/renwukuangbj_334X512_32bits.png#0 0 334 512);">
+                    <pe:if condition='<%=ParaLifeSkinPage.bSelectCollocation%>'>
+                        <input type="button" onclick="OnclickClothes" style="margin-left: 8px; width: 52px; height:30px; background:url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/btn_clothes2_32bits.png#0 0 52 30)"/>        
+                    </pe:if>
+                    <pe:if condition='<%=not ParaLifeSkinPage.bSelectCollocation%>'>
+                        <input type="button" onclick="OnclickClothes" style="margin-left: 8px; width: 52px; height:30px; background:url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/btn_clothes1_32bits.png#0 0 52 30)"/>  
+                    </pe:if>
+                    <div style="margin-top:20px;width:334px;height:300px;">
+                        <div style="width:334px;height:50px;margin-top:10px;">
+                            <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                                <div style="margin-left:6px;margin-top:16px;width:37px;height:18px;background:url(Texture/Aries/Creator/keepwork/Avatar/10yanjing_37X18_32bits.png#0 0 37 18);"></div>
+                            </div>
+                            <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                                <div style="margin-left:9px;margin-top:17px;width:32px;height:15px;background:url(Texture/Aries/Creator/keepwork/Avatar/9zuiba_32X15_32bits.png#0 0 32 15);"></div>
+                            </div>
+                        </div>
+                        <div style="width:334px;height:50px;margin-top:10px;">
+                            <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                                <div style="margin-left:9px;margin-top:12px;width:32px;height:26px;background:url(Texture/Aries/Creator/keepwork/Avatar/3yifu_32X26_32bits.png#0 0 32 26);"></div>
+                            </div>
+                            <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                                <div style="margin-left:9px;margin-top:11px;width:31px;height:27px;background:url(Texture/Aries/Creator/keepwork/Avatar/2kuzi_31X27_32bits.png#0 0 31 27);"></div>
+                            </div>
+                        </div>
+                        <div style="width:334px;height:50px;margin-top:10px;">
+                            <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                                <div style="margin-left:12px;margin-top:10px;width:30px;height:30px;background:url(Texture/Aries/Creator/keepwork/Avatar/4beibu_30X30_32bits.png#0 0 30 30);"></div>
+                            </div>
+                            <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                                <div style="margin-left:8px;margin-top:7px;width:33px;height:35px;background:url(Texture/Aries/Creator/keepwork/Avatar/8shouchi_33X35_32bits.png#0 0 33 35);"></div>
+                            </div>
+                        </div>
+                        <div style="width:334px;height:50px;margin-top:10px;">
+                            <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                                <div style="margin-left:7px;margin-top:13px;width:36px;height:24px;background:url(Texture/Aries/Creator/keepwork/Avatar/6toushi_36X24_32bits.png#0 0 36 24);"></div>
+                            </div>
+                            <!-- <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                                <div style="margin-left:8px;margin-top:7px;width:36px;height:35px;background:url(Texture/Aries/Creator/keepwork/Avatar/11zuoqi_36X35_32bits.png#0 0 36 35);"></div>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div style="margin-top:-300px;width:334px;height:300px;">
+                        <pe:gridview style="margin-left:10px;margin-top:10px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight="60"
+                                     DataSource='<%=DS_Icons%>'>
+                            <Columns>
+                                <pe:if condition='<%=Eval("icon") ~= ""%>'>
+                                    <pe:if condition='<%=IsOdd(Eval("index"))%>'>
+                                        <div name='<%= Eval("index")%>' onclick="ParaLifeSkinPage.RemoveSkin" style="float:left;margin-left:0px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
+                                            <div zorder="1" name='<%= Eval("index")%>' onclick="ParaLifeSkinPage.RemoveSkin" style='<%=GetSmallIconStyle1(Eval("icon"))%>'>
+                                            </div>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition='<%=not IsOdd(Eval("index"))%>'>
+                                        <div name='<%= Eval("index")%>' onclick="ParaLifeSkinPage.RemoveSkin" style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
+                                            <div zorder="1" name='<%= Eval("index")%>' onclick="ParaLifeSkinPage.RemoveSkin" style='<%=GetSmallIconStyle2(Eval("icon"))%>'>
+                                            </div>
+                                        </div>
+                                    </pe:if>
+                                </pe:if>
+                                <pe:if condition='<%=Eval("icon") == ""%>'>
+                                    <div style="float:left;margin-left:0px;width:50px;height:50px;">
+                                    </div>
+                                </pe:if>
+                            </Columns>
+                            <EmptyDataTemplate>
+                            </EmptyDataTemplate>
+                        </pe:gridview>
+                    </div>
+                    <div style="margin-left:40px;margin-top:-300px;width:256px;height:256px;">
+                        <div>
+                            <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarCharacter" style="width:256px;height:256px;" IsInteractive="false" NoFrameMove="true" DefaultCameraObjectDist="4" LookAtHeight="0.9" DefaultLiftupAngle="0.1"/>
+                        </div>
+                    </div>
+                    <input type="button" style="margin-left: 10px; margin-top:92px;min-width:144px;height:48px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="ParaLifeSkinPage.OnClickOK()" value='<%=L"使用"%>' />
+                    <input type="button" style="margin-left: 170px; margin-top:-48px;min-width:144px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="ParaLifeSkinPage.OnClose()" value='<%=L"取消"%>' />
+                </div>
+                <div style="float:left;margin-left:4px;margin-top:12px;width:590px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/dikuang_32X32_32bits.png#0 0 32 32:8 8 8 8);">
+                    <div style="width:580px;height:36px;margin-left:2px;margin-top:10px;">
+                        <pe:repeat DataSource="<%=ParaLifeSkinPage.category_ds%>">
+                            <pe:repeatitem style="float:left;width:52px;">
+                                <pe:if condition='<%=ParaLifeSkinPage.category_index == Eval("index") %>'>
+                                    <div style="float:left;margin-left:6px;margin-top:0px;width:52px;height:30px;background:url(Texture/Aries/Creator/keepwork/Avatar/zik1_52X30_32bits.png#0 0 52 30);">
+                                        <div style='<%=GetCategoryStyle(Eval("tex2"))%>'></div>
+                                    </div>
+                                </pe:if>
+                                <pe:if condition='<%=ParaLifeSkinPage.category_index ~= Eval("index") %>'>
+                                    <div name='<%=Eval("index")%>' onclick="ParaLifeSkinPage.OnChangeCategory" style="float:left;margin-left:6px;margin-top:0px;width:52px;height:30px;background:url(Texture/Aries/Creator/keepwork/Avatar/zik2_52X30_32bits.png#0 0 52 30);">
+                                        <div zorder="1" name='<%=Eval("index")%>' onclick="ParaLifeSkinPage.OnChangeCategory" style='<%=GetCategoryStyle(Eval("tex1"))%>'></div>
+                                    </div>
+                                </pe:if>
+                            </pe:repeatitem>
+                        </pe:repeat>
+                    </div>
+                    <div style="width:620px;height:466px;">
+                        <pe:gridview style="margin-left:1px;" name="item_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="18" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight="140" RememberScrollPos="true" RememberLastPage="true"
+                                     DataSource='<%=DS_Items%>'>
+                            <Columns>
+                                <div style="float:left;width:146px;height:140px;background:url(Texture/Aries/Creator/keepwork/ggs/user/renwuqiehuan/wupingbj_146X140_32bits.png#0 0 146 140);">
+                                    <div name='<%= Eval("index")%>' onclick="ParaLifeSkinPage.UpdateCustomGeosets" style="margin-left:9px;margin-top:8px;width:128px;height:96px;">
+                                        <div style='<%=GetBigIconStyle(Eval("icon"))%>'></div>
+                                    </div>
+                                    <div style="margin-top:2px;width:146px;text-align:center;">
+                                        <%=Eval("name")%>
+                                    </div>
+                                </div>
+                            </Columns>
+                            <EmptyDataTemplate>
+                            </EmptyDataTemplate>
+                        </pe:gridview>
+                    </div>
+                </div>
+            </div>
+            <div name = "skin_page" zorder = "-1" style="position: relative; width: 960px; height: 580px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44);"></div>
+        </div>
+    </pe:mcml>
+</body>
+</html>

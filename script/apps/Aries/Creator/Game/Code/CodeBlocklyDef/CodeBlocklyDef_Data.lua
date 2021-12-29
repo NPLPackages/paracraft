@@ -234,7 +234,7 @@ say(key, 1)
 		if input == '' then
 			input = 'pass'
 		end
-		return string.format('def registerCloneEvent_func(msg):\n    %s\nregisterCloneEvent("%s", registerCloneEvent_func)\n', input, self:getFieldAsString('param'));
+		return string.format('def registerCloneEvent_func(%s):\n    %s\nregisterCloneEvent(registerCloneEvent_func)\n', self:getFieldAsString('param'), input);
 	end,
 	ToNPL = function(self)
 		return string.format('registerCloneEvent(function(%s)\n    %s\nend)\n', self:getFieldAsString('param'), self:getFieldAsString('input'));

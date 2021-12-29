@@ -212,12 +212,20 @@ function Entity:setYaw(yaw)
 	end
 end
 
+function Entity:SetScaling(v)
+	self:setScale(v)
+end
+
+function Entity:GetScaling()
+	return self:getScale()
+end
+
 function Entity:getScale()
 	return self.scaling or 1;
 end
 
 function Entity:setScale(scale)
-	if(self.scaling ~= scale) then
+	if(self:getScale() ~= scale) then
 		scale = math.min(math.max(self.minScale, scale), self.maxScale);
 		self.scaling = scale;
 		local obj = self:GetInnerObject();
@@ -281,9 +289,8 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.filename) then
 			self:SetModelFile(attr.filename);
 		end
-		if(attr.scale) then
-			self:setScale(tonumber(attr.scale));
-		end
+		self:setScale(tonumber(attr.scale or 1));
+		
 		if(attr.offsetX) then
 			self.offsetPos[1] = tonumber(attr.offsetX);
 		end

@@ -1,0 +1,34 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/WorldShare/InstanllGuide.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="InstanllGuide.lua"><![CDATA[
+local InstanllGuide = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldShare/InstanllGuide.lua");
+InstanllGuide.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    InstanllGuide.CloseView()
+end
+
+]]></script>
+<div style="width: 516px;height: 357px; background: url(Texture/Aries/Creator/keepwork/Mall/tipbj_32bits.png#0 0 32 32:8 8 8 8);">
+    <input type="button" style="position: relative; margin-left:484px;margin-top: 10px; width:19px;height:20px;background: url(Texture/Aries/Creator/keepwork/Mall/tipX_19X20_32bits.png#0 0 19 20)" onclick="ClosePage()"/>
+    <div style="margin-top: 20px;margin-left: 30px; font-size: 14px;color: #ffffff;">
+        <div>回家后不知道如何安装帕拉卡？按照下面的步骤操作即可：</div>
+        <div>1.使用家里的电脑登录paracraft.cn点击下载;</div>
+        <div>2.根据自己家里电脑系统选择Windows版或Mac版下载安装即可。</div>
+        <div style="width: 436px;height: 174px;margin-top: 20px;
+            background: url(Texture/Aries/Creator/keepwork/worldshare/tu_436X174_32bits.png#0 0 436 174);"></div>
+        <div style="float: left; margin-top: 20px;">3.如果出现安全软件提醒，点击允许即可。</div>
+        <input type="button" value="知道了" onclick="ClosePage" width="113" height="41" class="kp_yellow_button" style="float: left;margin-top: 20px;margin-left: 60px; text-offset-y:-2;">
+    </div>
+</div>    
+</pe:mcml>
+</body>
+</html>
+

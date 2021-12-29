@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
+    ParalifeLiveModel.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function getButtonType()
+        return ParalifeLiveModel.main_ui_mode
+    end
+
+    function switchButton(name)
+        ParalifeLiveModel.SwitchOperateButton(name)
+    end
+
+    function SwitchView()
+        ParalifeLiveModel.SwitchView()
+    end
+
+    function OnClickGlove()
+        ParalifeLiveModel.OnClickGlove()
+    end
+    function OnClickBrush()
+        ParalifeLiveModel.OnClickBrush()
+    end
+    function OnClickPaint()
+        ParalifeLiveModel.OnClickPaint()
+    end
+    function OnClickFurniture()
+        ParalifeLiveModel.OnClickFurniture()
+    end
+    function OnClickCamera()
+        ParalifeLiveModel.OnClickCamera()
+    end
+
+    function ShowRolePage()
+        ParalifeLiveModel.ShowRolePage()
+    end
+
+    function OnClickTopBtn(name)
+        ParalifeLiveModel.OnClickTopBtn(name)
+    end
+
+    function GetIconName(index)
+        return string.format("main_user_player"..index)
+    end
+
+    function GetParentIconName(index)
+        return string.format("main_user_player_parent"..index)
+    end
+
+    function GetSceneName(index)
+        return string.format("parascenerole"..index) --ClickThrough="true"
+    end
+
+    function CheckShow(index)
+        local index = tonumber(index)
+        return index <= ParalifeLiveModel.GetShowNum()
+    end
+]]></script>
+<pe:container  uiname="paralife_back" alignment="_fi" width="100%" height="100%" style="background:;">
+    <pe:if condition='<%=ParalifeLiveModel.main_ui_mode == "switchmain"%>'>
+        <pe:container alignment="_rb"  style="margin-bottom: 0px; background:;"> <!--切换UI-->
+            <input type="button" name="switchrole" style="width:119px;height:201px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/role_32bits.png#0 0 119 201);" onclick="switchButton()"/>
+        </pe:container>
+    </pe:if>
+    <pe:if condition='<%=ParalifeLiveModel.main_ui_mode == "switchrole"%>'>
+        <pe:container alignment="_lb" ClickThrough="true" width="100%" height="300" style="background:url(Texture/Aries/Creator/keepwork/Paralife/main/bottom_32bits.png#0 0 2439 433);">
+            <pe:container ClickThrough="true" uiname="paralife_role" width="100%" height="300" style="background:url();">
+                <pe:repeat DataSource="<%=ParalifeLiveModel.role_data%>">
+                    <pe:repeatitem style="float:left;width:200px;">
+                        <pe:if condition='<%=CheckShow(Eval("index"))%>'>
+                            <pe:container  uiname = '<%=GetParentIconName(Eval("index"))%>' style="float: left; width: 200px; height: 300px; background:;">
+                                <pe:mc_player name='<%=GetIconName(Eval("index"))%>' miniscenegraphname='<%=GetSceneName(Eval("index"))%>' IsInteractive = "false" style="margin-left: -30px; margin-top: -60px; width:300px;height:300px;" NoFrameMove="true" RenderTargetSize="512" DefaultCameraObjectDist="5.2" />
+                            </pe:container>
+                        </pe:if>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </pe:container>
+        </pe:container>
+        
+    </pe:if>
+    <pe:if condition='<%=ParalifeLiveModel.main_ui_mode ~= "switchmain"%>'>
+        <pe:container ClickThrough="true" alignment="_rb" style="margin-bottom: 60px;    background:;">
+            <input align="right" type="button" name="switchmain" style="width:120px;height:120px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/close_32bits.png#0 0 128 128);" onclick="switchButton()"/>
+        </pe:container>
+    </pe:if>
+    
+</pe:container>
+</pe:mcml>
+</body>
+</html>

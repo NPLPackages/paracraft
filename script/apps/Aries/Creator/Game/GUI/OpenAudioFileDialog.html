@@ -1,0 +1,97 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/OpenAudioFileDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="OpenAudioFileDialog.lua"><![CDATA[
+OpenAudioFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAudioFileDialog");
+OpenAudioFileDialog.OnInit()
+OpenAudioFileDialog.lastSelectedFile = nil;
+function OnSelectFile(treenode)
+    local filename = treenode.mcmlNode:GetPreValue("this").filename;
+    if(filename) then
+        OpenAudioFileDialog.lastSelectedFile = filename
+        Page:SetValue("text", commonlib.Encoding.DefaultToUtf8(OpenAudioFileDialog.lastSelectedFile));
+    end
+end
+
+function dummy()
+end
+
+function OnChangeCategory(name)
+    OpenAudioFileDialog.OnChangeCategory(tonumber(name))    
+end
+
+function GetTreeNodeText(item_data)
+    return OpenAudioFileDialog.GetTreeNodeText(item_data)
+end
+]]></script>
+<aries:window mode="thin" title='<%=OpenAudioFileDialog.title or L"输入窗"%>' style="width:460px;" uiname_onclose="OpenAudioFileDialog.OnClose" onclose="OpenAudioFileDialog.OnClose">
+<div style="margin:10px;">
+    <pe:if condition='<%=OpenAudioFileDialog.category_index == 1%>' >
+        <input type="button" value='本地' name="1" onclick="OnChangeCategory" 
+            style="font-weight:bold;margin-right:8px;margin-top:9px;float: left;
+                    color:#ffffff;font-size:14px;width:45px; height:26px;
+                    background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:8 8 8 8);" />
+    </pe:if>
+    <pe:if condition='<%=OpenAudioFileDialog.category_index ~= 1%>' >
+        <input type="button" value='本地' name="1" onclick="OnChangeCategory" 
+            style="font-weight:bold;margin-right:7px;margin-top:12px;float: left;
+                color:#ffffff;font-size:14px;width:43px; height:22px;
+                background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8);" />
+    </pe:if>
+
+    <pe:if condition='<%=OpenAudioFileDialog.category_index == 2%>' >
+        <input type="button" value='官方' name="2" onclick="OnChangeCategory" 
+            style="font-weight:bold;margin-right:8px;margin-top:9px;float: left;
+                    color:#ffffff;font-size:14px;width:45px; height:26px;
+                    background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:8 8 8 8);" />
+    </pe:if>
+    <pe:if condition='<%=OpenAudioFileDialog.category_index ~= 2%>' >
+        <input type="button" value='官方' name="2" onclick="OnChangeCategory" 
+            style="font-weight:bold;margin-right:7px;margin-top:12px;float: left;
+                color:#ffffff;font-size:14px;width:43px; height:22px;
+                background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8);" />
+    </pe:if>   
+    <div class="mc_paper_panel" style="padding-top:3px;padding-bottom:3px">
+        <pe:treeview ShowIcon="false" name="tvwExistingFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAudioFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">
+            <NodeTemplates>
+                <NodeTemplate DataType="file">
+                    <pe:treenode style="height:20px;" uiname='<%="OpenAudioFileDialog.file_"..commonlib.Encoding.DefaultToUtf8(XPath("this|filename"))%>' OnClick="OnSelectFile" can_select="true" text='<%=GetTreeNodeText(XPath("this"))%>'></pe:treenode>
+                </NodeTemplate>
+            </NodeTemplates>
+            <DataNodePlaceholder xpath="*" />
+        </pe:treeview>
+    </div>
+    <div style="color:#ffffff;margin:5px;">
+        <%=OpenAudioFileDialog.GetText()%>
+    </div>
+    <div>
+        <input type="text" SkipAutoBadWordFilter="true" uiname="OpenAudioFileDialog.text" onchange="dummy" name="text" enable_ime="false" style="height:24px;width:320px"/>
+        <input type="button" class="mc_light_grey_button_with_fillet" uiname="OpenAudioFileDialog.openfile"  name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenAudioFileDialog.OnOpenAudioFileDialog"/>
+    </div>
+    <div style="margin-top:5px;">
+        <input type="button" uiname="OpenAudioFileDialog.OK" name="OK" DefaultButton="true" align="left" style="margin-left:323px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OpenAudioFileDialog.OnOK" value='<%=L"确定"%>' />
+    </div>
+</div>
+<%
+    function SetFocus()
+        local t = Page:FindControl("text")
+        if(t) then
+            t:Focus();
+        end	
+    end
+    SetFocus()
+    local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+	    SetFocus()
+    end})
+    mytimer:Change(200);
+%>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

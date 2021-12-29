@@ -87,16 +87,16 @@
     end
 
     function CanShowCampVip()
-        return DockPage.CanShowCampVip();
+        return DockPage.CanShowCampVip()
     end
 ]]></script>
     <!--左上角UI-->
     <pe:container ClickThrough="true" name="left_top_container" alignment="_lt" style="position:relative;margin-left:10px;margin-top:10px;height:270px;background:;">
-        <div style="width:820px;height:90px;">
-            <pe:gridview name="gridview_1" style="position:relative;width:820px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="8" DefaultNodeHeight="75" pagesize="8"
+        <div style="width:820px;height:93px;">
+            <pe:gridview name="gridview_1" style="position:relative;width:820px;height:93px;" AllowPaging="false" CellPadding="0" ItemsPerLine="8" DefaultNodeHeight="75" pagesize="8"
                          DataSource='<%=ds_left_top_line_1%>'>
                 <Columns>
-                    <div style="width:100px;height:80px;">
+                    <div style="width:101px;height:93px;">
                         <pe:if condition='<%= (Eval("enabled") == true) %>'>
                             <%= RenderButton_LeftTop_1(Eval("index"))%>
                         </pe:if>
@@ -106,7 +106,7 @@
             </pe:gridview>
 
         </div>
-        <div style="margin-top:-10px;width:600px;height:90px;">
+        <!-- <div style="margin-top:-10px;width:600px;height:90px;">
             <pe:gridview name="gridview_2" style="width:600px;height:90px;" AllowPaging="false" CellPadding="0" ItemsPerLine="6" DefaultNodeHeight="75" pagesize="6"
                          DataSource='<%=ds_left_top_line_2%>'>
                 <Columns>
@@ -118,7 +118,7 @@
                 </Columns>
                 <PagerSettings Position="Top" height="0" PreviousPageText="" NextPageText="" />
             </pe:gridview>
-        </div>
+        </div> -->
     </pe:container>
     <!--右上角UI-->
     <pe:container ClickThrough="true" name="right_top_container"  alignment="_rt" style="position:relative;margin-top:10px;margin-right:205px;height:270px;background:;">
@@ -243,8 +243,8 @@
         </pe:container>
     </pe:if> 
     
-    <pe:container zorder= "-1" ClickThrough="true" height="100" alignment="_mb" style="position:relative; background:url(Texture/Aries/Creator/keepwork/dock/jianbian-xia_32bits.png#0 0 32 99:8 25 8 25);"></pe:container>
-    <pe:container ClickThrough="true" zorder="-1"  alignment="_mt" style="position:relative;margin-top:0px;margin-right:205px;height:270px;background:url(Texture/Aries/Creator/keepwork/dock/jianbian-shang_32bits.png#0 0 32 128:8 32 8 32);"></pe:container>
+    <pe:container name="bottom_background" zorder= "-1" ClickThrough="true" height="100" alignment="_mb" style="position:relative; background:url(Texture/Aries/Creator/keepwork/dock/jianbian-xia_32bits.png#0 0 32 99:8 25 8 25);"></pe:container>
+    <pe:container name="top_background" ClickThrough="true" zorder="-1"  alignment="_mt" style="position:relative;margin-top:0px;margin-right:205px;height:270px;background:url(Texture/Aries/Creator/keepwork/dock/jianbian-shang_32bits.png#0 0 32 128:8 32 8 32);"></pe:container>
 </pe:mcml> 
 </body>
 </html>

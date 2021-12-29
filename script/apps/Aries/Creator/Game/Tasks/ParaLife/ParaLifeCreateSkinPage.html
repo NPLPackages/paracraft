@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ParaLifeCreateSkinPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeCreateSkinPage.lua");
+    ParaLifeCreateSkinPage.OnInit()
+    function ClosePage()
+        --Page:CloseWindow();
+        ParaLifeCreateSkinPage.ClosePage()
+    end
+
+    function FinishEditing()
+        ParaLifeCreateSkinPage.FinishEditing()
+    end
+
+    function CancelEditing() 
+        ParaLifeCreateSkinPage.CancelEditing()
+    end
+]]></script>
+<div style=" width: 300px; height: 200px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
+    <div style="width: 300x; height: 60px;">
+        <input type="button" style="margin-left: 260px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+    </div>
+    <div style="margin-top:16px;width:300px;height:30px;">
+        <input type="text" name="model_name" EmptyText='<%=L"请输入搭配的名称"%>' style="width:160px;height:26px;margin-left:60px;background:url(Texture/Aquarius/Login/TextBox_32bits.png: 8 8 5 5)" />
+    </div>
+    <div style="margin-top:36px;width:300px;height:30px;">
+        <input type="button" style="width:40px;height:26px;margin-left:80px;color:#ffffff;" value='<%=L"确定" %>' class="mc_blue_button_with_fillet" onclick="FinishEditing()" />
+        <input type="button" style="width:40px;height:26px;margin-left:30px;color:#ffffff;" value='<%=L"取消" %>' class="mc_blue_button_with_fillet" onclick="CancelEditing()" />
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

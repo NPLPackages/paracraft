@@ -1,0 +1,179 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelProperty.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="EditModelProperty.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
+EditModelProperty.OnInit();
+
+function GetHasRealPhysicsDS()
+    return {
+        {value="true", text=L"有"},
+        {value="false", text=L"无"},
+        {value="nil", text=L"自动", selected=true},
+    };
+end
+function GetAutoTurningDS()
+    return {
+        {value="true", text=L"是"},
+        {value="false", text=L"否"},
+        {value="nil", text=L"自动", selected=true},
+    };
+end
+function GetCanDragDS()
+    return {
+        {value="true", text=L"是"},
+        {value="false", text=L"否"},
+        {value="nil", text=L"自动", selected=true},
+    };
+end
+function GetIsStackableDS()
+    return {
+        {value="true", text=L"是"},
+        {value="false", text=L"否"},
+        {value="nil", text=L"自动", selected=true},
+    };
+end
+function GetStackHeightDS()
+    return {
+        {value="nil", text=L"自动", selected=true},
+        {value="0.05"},
+        {value="0.1"},
+        {value="0.2"},
+        {value="0.3"},
+        {value="0.4"},
+        {value="0.5"},
+        {value="0.6"},
+        {value="0.8"},
+        {value="1"},
+    };
+end
+function GetIdleAnimDS()
+    return {
+        {value="0", text=L"默认".."(0)", selected=true},
+        {value="4", text=L"走路".."(4)"},
+        {value="5", text=L"跑步".."(5)"},
+    };
+end
+function GetMountPointDS()
+    return EditModelProperty.mountpoints or {}
+end
+
+function GetCategoryDS()
+    return {
+        {value="", text=L"默认", selected=true},
+        {value="disabled", text=L"禁用",},
+        {value="character", text=L"人物",},
+        {value="bigobject", text=L"大物品",},
+        {value="smallobject", text=L"小物品",},
+    };
+end
+]]></script>
+<aries:window mode="thin" style="width:640px;" title="模型属性" uiname_onclose="EditModelProperty.OnClose" onclose="EditModelProperty.OnClose">
+<div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
+    <div style="">
+        <div style="float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
+            <pe:mc_block block_id='<%=EditModelProperty.GetItemID()%>' style="width:32px;height:32px;"/>
+        </div>
+        <div style="float:left;margin-left:10px;margin-top:5px;">
+            <div style="float:left;" tooltip='<%=L"必须全局唯一"%>'><%=L"名字:"%></div>
+            <input type="text" uiname="EditModelProperty.name" name="name" style="width:200px;height:24px;"/>
+        </div>
+        <div style="float:left;margin-left:10px;margin-top:5px;">
+            <div style="float:left;" ><%=L"模型:"%></div>
+            <input type="text" uiname="EditModelProperty.modelfile" name="modelfile" style="width:200px;height:24px;"/>
+            <!--<input type="button" value="..." uiname="EditModelProperty.openmodelfile" name="openmodelfile" style="" class="mc_light_grey_button_with_fillet" onclick="EditModelProperty.OnOpenModelFile" />-->
+        </div>
+    </div>
+        
+    <div style="margin-top: 5px;">
+        <div style="float:left;">
+            <%=L"真实物理:"%>
+            <select uiname="EditModelProperty.hasRealPhysics" name="hasRealPhysics" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetHasRealPhysicsDS()%>'>
+            </select>
+        </div>
+        <div style="float:left;margin-left:20px;">
+            <%=L"自动转向:"%>
+            <select uiname="EditModelProperty.autoTurning" name="autoTurning" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetAutoTurningDS()%>'>
+            </select>
+        </div>
+        <div style="float: left; margin-left: 20px;">
+            <%=L"是否可拖动:"%>
+            <select uiname="EditModelProperty.canDrag" name="canDrag" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetCanDragDS()%>'>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top: 5px;">
+        <div style="float: left;">
+            <%=L"是否可堆叠:"%>
+            <select uiname="EditModelProperty.isStackable" name="isStackable" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetIsStackableDS()%>'>
+            </select>
+        </div>
+        <div style="float: left; margin-left: 20px;">
+            <%=L"堆叠高度:"%>
+            <select uiname="EditModelProperty.stackHeight" name="stackHeight" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetStackHeightDS()%>'>
+            </select>
+        </div>
+        <div style="float: left; margin-left: 20px;">
+            <%=L"待机动画:"%>
+            <select uiname="EditModelProperty.idleAnim" name="idleAnim" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetIdleAnimDS()%>'>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top: 5px;">
+        <div style="float: left;">
+            <div style="float:left"><%=L"类别:"%></div>
+            <select uiname="EditModelProperty.category" name="category" AllowUserEdit="true" style="min-width:70px;height:24px;" DataSource='<%=GetCategoryDS()%>'></select>
+        </div>
+        <div style="float: left; margin-left: 20px;">
+            <div style="float:left"><%=L"自定义标签:"%></div>
+            <input type="text" uiname="EditModelProperty.tag" name="tag" style="width:200px;height:24px;"/>
+        </div>
+    </div>
+    <div style="margin-top: 5px;">
+        <div style="float:left;min-width:90px;">
+            <div><%=L"插件点名称:"%></div>
+            <div style="color:#808080">sit,lie,eat</div>
+        </div>
+        <div style="float:left;width:510px;height:50px;">
+            <pe:repeat name="mountpoints" DataSource="<%=GetMountPointDS()%>">
+                <pe:repeatitem style="float:left;width:80px;height:25px;">
+                    <input type="text" tooltip='<%=format(L"插件点%d", Eval("index"))%>' uiname='<%=format(L"EditModelProperty.mountpoint%d", Eval("index"))%>' name='<%=format(L"mountpointName%d", Eval("index"))%>' value="<%=Eval('name')%>" style="margin-left:5px;width:70px;height:24px;" onchange="EditModelProperty.OnTextChange"/>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+    </div>
+    <div style="margin-top: 5px;">
+        <div>
+            <div style="float: left;">
+                <div style="float:left" tooltip="/sendevent XXX {x,y,z,name}"><%=L"点击事件:"%></div>
+                <input type="text" uiname="EditModelProperty.onClickEvent" name="onClickEvent" style="width:200px;height:24px;"/>
+            </div>
+            <div style="float: left; margin-left: 20px;">
+                <div style="float:left" tooltip="/sendevent XXX {x,y,z,name}"><%=L"悬停事件:"%></div>
+                <input type="text" uiname="EditModelProperty.onHoverEvent" name="onHoverEvent" style="width:200px;height:24px;"/>
+            </div>
+        </div>
+        <div>
+            <div style="float: left;">
+                <div style="float:left" tooltip="/sendevent XXX {x,y,z,name, mountname, mountindex}"><%=L"插件点事件:"%></div>
+                <input type="text" uiname="EditModelProperty.onMountEvent" name="onMountEvent" style="width:200px;height:24px;"/>
+            </div>
+            
+        </div>
+    </div>
+    <div style="margin-top:10px;">
+        <input type="button" uiname="EditModelProperty.Reset" name="Reset" align="right" style="margin-right:120px;min-width:70px;position:relative;" class="mc_light_grey_button_with_fillet" onclick="EditModelProperty.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>' />
+        <input type="button" uiname="EditModelProperty.OK" name="OK" DefaultButton="true" align="right" style="margin-right:20px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditModelProperty.OnOK" value='<%=L"确定"%>' />
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

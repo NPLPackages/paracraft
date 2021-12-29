@@ -118,12 +118,31 @@ function RedSummerCampCourseScheduling.AuthLesson(callback)
 end
 
 function RedSummerCampCourseScheduling.ShowView()
-    RedSummerCampCourseScheduling.InitPageData()
-    RedSummerCampCourseScheduling.ShowPage()
-    RedSummerCampCourseScheduling.AuthLesson(function()
+    if GameLogic.GetFilters():apply_filters('is_signed_in') then
         RedSummerCampCourseScheduling.InitPageData()
-        RedSummerCampCourseScheduling.RefreshPage()
+        RedSummerCampCourseScheduling.ShowPage()
+        RedSummerCampCourseScheduling.AuthLesson(function()
+            RedSummerCampCourseScheduling.InitPageData()
+            RedSummerCampCourseScheduling.RefreshPage()
+        end)
+        return
+    end
+
+    GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
+        if result == true then
+            commonlib.TimerManager.SetTimeout(function()
+                if result then
+                    RedSummerCampCourseScheduling.InitPageData()
+                    RedSummerCampCourseScheduling.ShowPage()
+                    RedSummerCampCourseScheduling.AuthLesson(function()
+                        RedSummerCampCourseScheduling.InitPageData()
+                        RedSummerCampCourseScheduling.RefreshPage()
+                    end)
+                end
+            end, 500)
+        end
     end)
+    
 end
 
 function RedSummerCampCourseScheduling.ShowPage()

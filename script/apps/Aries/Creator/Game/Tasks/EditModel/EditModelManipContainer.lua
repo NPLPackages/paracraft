@@ -29,6 +29,8 @@ EditModelManipContainer:Property({"PositionPlugName", "position", auto=true});
 EditModelManipContainer:Property({"ScalePlugName", "scale", auto=true});
 EditModelManipContainer:Property({"YawPlugName", "yaw", auto=true});
 EditModelManipContainer:Property({"OffsetPosPlugName", "offsetPos", auto=true});
+EditModelManipContainer:Property({"AngleGridStep", math.pi / 12, "GetAngleGridStep", "SetAngleGridStep", auto=true});
+EditModelManipContainer:Property({"SupportUndo", true, "IsSupportUndo", "SetSupportUndo", auto=true});
 
 function EditModelManipContainer:ctor()
 	self:AddValue("position", {0,0,0});
@@ -45,6 +47,7 @@ function EditModelManipContainer:createChildren()
 	self.rotateManip:SetYawEnabled(true);
 	self.rotateManip:SetPitchEnabled(false);
 	self.rotateManip:SetRollEnabled(false);
+	self.rotateManip:SetGridStep(self:GetAngleGridStep());
 	self:AddMountPointsManip()
 end
 
@@ -127,6 +130,7 @@ function EditModelManipContainer:connectToDependNode(node)
 				local x, y, z = pos[1]+offsetPos[1], pos[2]+offsetPos[2], pos[3]+offsetPos[3]
 				-- tricky: we SetRealTimeUpdate to false, and use offset from manipulator and then set manipulator's value back to 0
 				self.translateManip:SetField("position", {0, 0, 0});
+				commonlib.TimerManager.SetTimeout(function() self:SnapshotToHistory() end, 1000)
 				return {x, y, z};
 			end);
 		end
@@ -135,6 +139,7 @@ function EditModelManipContainer:connectToDependNode(node)
 		if(plugScale) then
 			local manipScalePlug = self.scaleManip:findPlug("scaling");
 			self:addManipToPlugConversionCallback(plugScale, function(self, plug)
+				commonlib.TimerManager.SetTimeout(function() self:SnapshotToHistory() end, 1000)
 				return manipScalePlug:GetValue()[1] or 1;
 			end);
 			self:addPlugToManipConversionCallback(manipScalePlug, function(self, manipPlug)
@@ -148,8 +153,11 @@ function EditModelManipContainer:connectToDependNode(node)
 
 		-- two-way binding for yaw conversion:
 		if(plugYaw) then
+			self.rotateManip:SetGridStep(self:GetAngleGridStep());
+
 			local manipYawPlug = self.rotateManip:findPlug("yaw");
 			self:addManipToPlugConversionCallback(plugYaw, function(self, plug)
+				commonlib.TimerManager.SetTimeout(function() self:SnapshotToHistory() end, 1000)
 				return manipYawPlug:GetValue() or 0;
 			end);
 			self:addPlugToManipConversionCallback(manipYawPlug, function(self, manipPlug)
@@ -166,4 +174,64 @@ function EditModelManipContainer:connectToDependNode(node)
 	-- should be called only once after all conversion callbacks to setup real connections
 	self:finishAddingManips();
 	EditModelManipContainer._super.connectToDependNode(self, node);
+
+	self:SnapshotToHistory()
+end
+
+function EditModelManipContainer:SnapshotToHistory()
+	if(self:IsSupportUndo()) then
+		self.history = self.history or {}
+		-- TODO: remove duplicated calls
+		local lastItem = self:GetHistoryItem()
+		local newItem = self.node:SaveToXMLNode();
+		if(not lastItem or not commonlib.compare(newItem, lastItem)) then
+			self.history[#(self.history) + 1] = newItem;
+		end
+	end
+end
+
+function EditModelManipContainer:GetHistoryItem()
+	return self.history and self.history[#(self.history)];
+end
+
+function EditModelManipContainer:Undo()
+	local xmlNode = self:GetHistoryItem()
+	if(xmlNode and self.node) then
+		local lastItem = xmlNode
+		local newItem = self.node:SaveToXMLNode();
+		if(commonlib.compare(newItem, lastItem)) then
+			if(#(self.history) > 1) then
+				self.history[#(self.history)] = nil;
+				xmlNode = self:GetHistoryItem()
+			else
+				return true;
+			end
+		end
+		-- always preserve last one and pop others. 
+		if(#(self.history) > 1) then
+			self.history[#(self.history)] = nil;
+		end
+		self.node:UpdateFromXMLNode(xmlNode)
+	end
+	return true
+end
+
+function EditModelManipContainer:Redo()
+	return true
+end
+
+-- virtual: actually means key stroke. 
+function EditModelManipContainer:keyPressEvent(key_event)
+	if(self:IsSupportUndo()) then
+		local keyseq = key_event:GetKeySequence();
+		if(keyseq == "Undo") then
+			if(self:Undo()) then
+				key_event:accept()
+			end
+		elseif(keyseq == "Redo") then
+			if(self:Redo()) then
+				key_event:accept()
+			end
+		end
+	end
 end

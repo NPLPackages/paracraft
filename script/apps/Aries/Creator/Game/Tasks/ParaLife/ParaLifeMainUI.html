@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    ParaLifeMainUI = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeMainUI.lua");
+    ParaLifeMainUI.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function getButtonType()
+        return ParaLifeMainUI.main_ui_mode
+    end
+
+    function switchButton(name)
+        ParaLifeMainUI.SwitchOperateButton(name)
+    end
+
+    function SwitchView()
+        ParaLifeMainUI.SwitchView()
+    end
+
+    function OnClickGlove()
+        ParaLifeMainUI.OnClickGlove()
+    end
+    function OnClickBrush()
+        ParaLifeMainUI.OnClickBrush()
+    end
+    function OnClickPaint()
+        ParaLifeMainUI.OnClickPaint()
+    end
+    function OnClickFurniture()
+        ParaLifeMainUI.OnClickFurniture()
+    end
+    function OnClickCamera()
+        ParaLifeMainUI.OnClickCamera()
+    end
+
+    function ShowRolePage()
+        ParaLifeMainUI.ShowRolePage()
+    end
+
+    function OnClickTopBtn(name)
+        ParaLifeMainUI.OnClickTopBtn(name)
+    end
+
+    function GetIconName(index)
+        return string.format("main_user_player"..index)
+    end
+
+    function GetParentIconName(index)
+        return string.format("main_user_player_parent"..index)
+    end
+
+    function GetSceneName(index)
+        return string.format("parascenerole"..index) --ClickThrough="true"
+    end
+
+    function CheckShow(index)
+        local index = tonumber(index)
+        return index <= ParaLifeMainUI.GetShowNum()
+    end
+]]></script>
+<pe:container  uiname="paralife_back" alignment="_fi" width="100%" height="100%" style="background:;">
+    <pe:if condition='<%=ParaLifeMainUI.view_mode == "main"%>'>
+        <pe:container alignment="_lt" style="position: relative;margin-top: 4px; margin-left: 4px; width: 400px; height: 128px; background:;">
+            <input type="button" name="exit" style="width: 120x; height: 120x; background: url(Texture/Aries/Creator/keepwork/Paralife/main/exit_32bits.png#0 0 128 128);" onclick="OnClickTopBtn"/>
+            <input type="button" name= "gift" style="width: 120x; height: 120x; background: url(Texture/Aries/Creator/keepwork/Paralife/main/gift_32bits.png#0 0 128 128);" onclick="OnClickTopBtn"/>
+            <input type="button" name= "wifi" style="width: 120x; height: 120x; background: url(Texture/Aries/Creator/keepwork/Paralife/main/wifi_32bits.png#0 0 128 128);" onclick="OnClickTopBtn"/>
+        </pe:container>
+        <pe:container alignment="_rt" style="margin-top: 4px; width: 240px; height: 128px; background:;">
+            <input type="button" name="skin" style="width: 120x; height: 120x; background: url(Texture/Aries/Creator/keepwork/Paralife/main/changeskin_32bits.png#0 0 128 128);" onclick="OnClickTopBtn"/>
+            <input type="button" name= "camera" uiname="ui_camera" style="width: 120x; height: 120x; background: url(Texture/Aries/Creator/keepwork/Paralife/main/camera_32bits.png#0 0 128 128);"/>
+        </pe:container>
+    </pe:if>
+    <pe:if condition='<%=ParaLifeMainUI.view_mode == "movie"%>'>
+
+    </pe:if>
+    
+    
+    <pe:if condition='<%=ParaLifeMainUI.main_ui_mode == "switchmain"%>'>
+        <pe:container alignment="_ctb" style="margin-bottom: 10px;width: 1180px; height: 96px; background:;" > <!--操作-->
+            <pe:container uiname="ParaLifeMainUI.social"  style="margin-left: 20px;margin-top: -20px; width: 900px; height: 90px; background:;" >
+                <pe:container uiname="ParaLifeMainUI.actor_ani1" style="position: relative;  width: 120px; height: 120px; background: url(Texture/Aries/Creator/keepwork/Paralife/animation/bow_32bits.png#0 0 128 128);"></pe:container>
+                <pe:container uiname="ParaLifeMainUI.actor_ani2" style="position: relative;  margin-left: 120px; width: 120px; height: 120px; background: url(Texture/Aries/Creator/keepwork/Paralife/animation/bow_32bits.png#0 0 128 128);"></pe:container>
+                <pe:container uiname="ParaLifeMainUI.actor_ani3" style="position: relative;  margin-left: 240px; width: 120px; height: 120px; background: url(Texture/Aries/Creator/keepwork/Paralife/animation/bow_32bits.png#0 0 128 128);"></pe:container>
+                <pe:container uiname="ParaLifeMainUI.actor_ani4" style="position: relative;  margin-left: 360px; width: 120px; height: 120px; background: url(Texture/Aries/Creator/keepwork/Paralife/animation/bow_32bits.png#0 0 128 128);"></pe:container>
+                <pe:container uiname="ParaLifeMainUI.actor_ani5" style="position: relative;  margin-left: 480px; width: 120px; height: 120px; background: url(Texture/Aries/Creator/keepwork/Paralife/animation/bow_32bits.png#0 0 128 128);"></pe:container>
+                <pe:container uiname="ParaLifeMainUI.actor_ani6" style="position: relative;  margin-left: 600px; width: 120px; height: 120px; background: url(Texture/Aries/Creator/keepwork/Paralife/animation/bow_32bits.png#0 0 128 128);"></pe:container>
+                <pe:container uiname="ParaLifeMainUI.actor_ani7" style="position: relative;  margin-left: 720px; width: 120px; height: 120px; background: url(Texture/Aries/Creator/keepwork/Paralife/animation/bow_32bits.png#0 0 128 128);"></pe:container>
+            </pe:container>
+        </pe:container>
+        <pe:container alignment="_rb"  style="margin-bottom: 0px; background:;"> <!--切换UI-->
+            <input type="button" name="switchmap" style="width:119px;height:201px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/map_32bits.png#0 0 119 201);" onclick="switchButton()"/>
+            <input type="button" name="switchfurniture" style="width:119px;height:201px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/furniture_32bits.png#0 0 119 201);" onclick="switchButton()"/>
+            <input type="button" name="switchrole" style="width:119px;height:201px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/role_32bits.png#0 0 119 201);" onclick="switchButton()"/>
+        </pe:container>
+    </pe:if>
+    <!-- SelfPaint="true" -->
+    <pe:if condition='<%=ParaLifeMainUI.main_ui_mode == "switchrole"%>'>
+        <pe:container alignment="_lb" ClickThrough="true" width="100%" height="300" style="background:url(Texture/Aries/Creator/keepwork/Paralife/main/bottom_32bits.png#0 0 2439 433);">
+            <pe:container ClickThrough="true" uiname="paralife_role" width="100%" height="300" style="background:url();">
+                <pe:repeat DataSource="<%=ParaLifeMainUI.role_data%>">
+                    <pe:repeatitem style="float:left;width:200px;">
+                        <pe:if condition='<%=CheckShow(Eval("index"))%>'>
+                            <pe:container  uiname = '<%=GetParentIconName(Eval("index"))%>' style="float: left; width: 200px; height: 300px; background:;">
+                                <pe:mc_player name='<%=GetIconName(Eval("index"))%>' miniscenegraphname='<%=GetSceneName(Eval("index"))%>' IsInteractive = "false" style="margin-left: -30px; margin-top: -60px; width:300px;height:300px;" NoFrameMove="true" RenderTargetSize="512" DefaultCameraObjectDist="5.2" />
+                            </pe:container>
+                        </pe:if>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </pe:container>
+        </pe:container>
+        
+    </pe:if>
+    <pe:if condition='<%=ParaLifeMainUI.main_ui_mode == "switchfurniture"%>'>
+        <pe:container alignment="_ctb" ClickThrough="true"  name = "paralife_furniture" style=" width: 1280px; height: 256px; background: url();">
+        </pe:container>
+    </pe:if>
+    <pe:if condition='<%=ParaLifeMainUI.main_ui_mode ~= "switchmain"%>'>
+        <pe:container ClickThrough="true" alignment="_rb" style="margin-bottom: 60px;    background:;">
+            <input align="right" type="button" name="switchmain" style="width:120px;height:120px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/close_32bits.png#0 0 128 128);" onclick="switchButton()"/>
+        </pe:container>
+    </pe:if>
+    
+</pe:container>
+</pe:mcml>
+</body>
+</html>

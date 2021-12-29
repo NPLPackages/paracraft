@@ -1,0 +1,53 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ShareBlocksPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ShareBlocksPage.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+ShareBlocksPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareBlocksPage.lua");
+SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks")
+
+ShareBlocksPage.OnInit()
+local page = document:GetPageCtrl();
+function OnClose()
+    ShareBlocksPage.Close()
+end
+
+function IsMCVersion()
+    return System.options.mc;
+end
+
+]]></script>
+<aries:window style="width:140px;height: 250px;" title='<%=L"分享模型"%>' mode="thin" onclose="OnClose">
+    <div style="height: 250px;color: #ffffff;">
+        <div style="margin-top:12px;height:55px;">
+            <div style="margin-left:43px;padding:3px;padding-left:6px;padding-right:6px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
+                <div style="position:relative;margin-left:36px;">
+                    <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(3) %>' style="float:left;width:24px;height:24px;" />
+                </div>
+                <div style="position:relative;margin-left:20px;">
+                    <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(2) %>' style="float:left;width:28px;height:28px;" />
+                </div>
+                <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(1) %>' style="float:left;width:32px;height:32px;" />
+            </div>
+            <input type="button" name="title" value='<%=format(L"选中了%d块", ShareBlocksPage.GetSelectCount() or 1) %>' style="margin-left: 5px; background:;font-size:12px;width:120px;color:#cccccc"/>
+        </div>
+
+        <div style="margin-top: 10px; color:#ffffff">
+            <input type="button" name="add" value='+' onclick="ShareBlocksPage.ChangeRange" class="mc_light_grey_button_with_fillet" style="float: left; margin-left: 25px;font-size:12px;width:30px;color:#ffffff;"/>
+            <input type="button" name="reduce" value='-' onclick="ShareBlocksPage.ChangeRange" class="mc_light_grey_button_with_fillet" style="float: left; margin-left: 15px;font-size:12px;width:30px;color:#ffffff;"/>
+        </div>
+
+        <div style="margin-left: 10px;margin-top: 20px;">或<br/>ctrl+左键精确选择</div>
+        <input type="button" name="reduce" value='分享' onclick="ShareBlocksPage.ShareBlcok" class="mc_light_grey_button_with_fillet" style="margin-top: 20px; margin-left: 35px;font-size:12px;width:60px;color:#ffffff;"/>
+    </div>
+</aries:window>
+
+</pe:mcml> 
+</body>
+</html>

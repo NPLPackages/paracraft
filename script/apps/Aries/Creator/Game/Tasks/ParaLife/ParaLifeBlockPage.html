@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    ParaLifeBlockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeBlockPage.lua");
+    ParaLifeBlockPage.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetItemDs(index)
+        if(index == nil) then
+            print(#ParaLifeBlockPage.blockIds)
+            return #ParaLifeBlockPage.blockIds;
+        else
+            return ParaLifeBlockPage.blockIds[index];
+        end
+    end
+
+    function OnDummy()
+
+    end
+
+    function GetIconIcon(id)
+        return string.format("width: 32px; height: 32px;background:url(%s);",ParaLifeBlockPage.GetBackground(id)) 
+    end
+
+    function GetName(id)
+        return string.format("block_%d",id)
+    end
+
+    function OnClickBlock(name)
+        print(name)
+        local block_id = tonumber(string.sub(name,7,-1))
+        ParaLifeBlockPage.SelectBlock(block_id)
+        ClosePage()
+    end
+]]></script>
+<pe:container style="width:230px;height:480px;background:;" onclick="OnDummy">
+    <div style="float:left;margin-left:0px;width:230px;height:480px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#267 89 31 34:8 8 8 8);">
+        <div style="position:relative;margin-left:13px;margin-top:13px;width:230px">
+            <input type="button" value='方块' style="font-weight:bold;margin-right:12px;margin-top:1px;color:#ffffff;font-size:14px;min-width:45px;height:26px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:8 8 8 8)" />
+        </div>
+        <input type="button" class="mc_close_button" style="position:relative;margin-top:12px;margin-right:20px" align="right" onclick="ClosePage" />
+        <div style="position:relative;margin-left:1px;margin-top:41px;width:230px;height:1px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#352 66 8 1:1 1 1 1)"/>
+        <div style="position:relative;margin-left:6px;margin-top:45px;width:230px;height:440px;">
+            <pe:gridview name="MyItems" DataSource="<%=GetItemDs%>" CellPadding="4" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true">
+                <Columns>
+                    <div style="margin-left:4px;font-weight:bold;" class="mc_item">
+                        <div onclick="OnClickBlock" name='<%=GetName(Eval("id"))%>' tooltip='<%=ParaLifeBlockPage.GetBlockName(Eval("id"))%>' style='<%=GetIconIcon(Eval("id"))%>'></div>
+                    </div>
+			    </Columns>
+            </pe:gridview>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

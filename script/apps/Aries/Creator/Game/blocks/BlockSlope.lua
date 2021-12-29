@@ -26,6 +26,33 @@ local block = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.block")
 block_types.RegisterBlockClass("BlockSlope", block);
 
 function block:ctor()
+	local models = {
+		{id_data=0, assetfile="L", facing=0, },
+		{id_data=7, assetfile="L", facing=1.57, },
+		{id_data=1, assetfile="L", facing=3.14, },
+		{id_data=6, assetfile="L", facing=4.71, },
+
+		{id_data=9, assetfile="T", facing=0, },
+		{id_data=12, assetfile="T", facing=4.71, },
+		{id_data=8, assetfile="T", facing=3.14, },
+		{id_data=13, assetfile="T", facing=1.57, },
+
+		{id_data=4, assetfile="/", facing=0, },
+		{id_data=3, assetfile="/", facing=4.71, },
+		{id_data=5, assetfile="/", facing=3.14, },
+		{id_data=2, assetfile="/", facing=1.57, },
+
+		{id_data=14, assetfile="7", facing=0, },
+		{id_data=11, assetfile="7", facing=4.71, },
+		{id_data=15, assetfile="7", facing=3.14, },
+		{id_data=10, assetfile="7", facing=1.57, },
+	}
+	models.id_model_map = {};
+	for i, model in ipairs(models) do
+		models.id_model_map[model.id_data] = model
+	end
+	-- only used by block rotation
+	self.models2 = models;
 end
 
 function block:Init()
@@ -304,6 +331,139 @@ end
 -- @param axis: "x|y|z", if nil, it should default to "y" axis
 -- @return the mirrored block data. 
 function block:MirrorBlockData(blockData, axis)
-	-- TODO: 
+	function block:MirrorBlockData(blockData, axis)
+	local highColorData = band(blockData, 0xff00)
+	blockData = band(blockData, 0xff);
+	if(axis == "x") then
+		if(blockData == 1) then
+			blockData = 0;
+		elseif(blockData == 0) then
+			blockData = 1;
+		elseif(blockData == 9) then
+			blockData = 12;
+		elseif(blockData == 12) then
+			blockData = 9;
+		elseif(blockData == 13) then
+			blockData = 8;
+		elseif(blockData == 8) then
+			blockData = 13;
+		elseif(blockData == 2) then
+			blockData = 3;
+		elseif(blockData == 3) then
+			blockData = 2;
+		elseif(blockData == 14) then
+			blockData = 11;
+		elseif(blockData == 11) then
+			blockData = 14;
+		elseif(blockData == 15) then
+			blockData = 10
+		elseif(blockData == 10) then
+			blockData = 15;
+		end
+	elseif(axis == "z") then
+		if(blockData == 7) then
+			blockData = 6;
+		elseif(blockData == 6) then
+			blockData = 7;
+		elseif(blockData == 9) then
+			blockData = 13;
+		elseif(blockData == 13) then
+			blockData = 9;
+		elseif(blockData == 12) then
+			blockData = 8;
+		elseif(blockData == 8) then
+			blockData = 12;
+		elseif(blockData == 11) then
+			blockData = 15;
+		elseif(blockData == 15) then
+			blockData = 11;
+		elseif(blockData == 14) then
+			blockData = 10;
+		elseif(blockData == 10) then
+			blockData = 14;
+		elseif(blockData == 4) then
+			blockData = 5;
+		elseif(blockData == 5) then
+			blockData = 4;
+		end
+	else -- "y"
+		if(blockData == 7) then
+			blockData = 4;
+		elseif(blockData == 4) then
+			blockData = 7;
+		elseif(blockData == 12) then
+			blockData = 11;
+		elseif(blockData == 11) then
+			blockData = 12;
+		elseif(blockData == 0) then
+			blockData = 3;
+		elseif(blockData == 3) then
+			blockData = 0;
+		elseif(blockData == 15) then
+			blockData = 8;
+		elseif(blockData == 8) then
+			blockData = 15;
+		elseif(blockData == 6) then
+			blockData = 5;
+		elseif(blockData == 5) then
+			blockData = 6;
+		elseif(blockData == 13) then
+			blockData = 10;
+		elseif(blockData == 10) then
+			blockData = 13;
+		elseif(blockData == 2) then
+			blockData = 1;
+		elseif(blockData == 1) then
+			blockData = 2;
+		elseif(blockData == 14) then
+			blockData = 9;
+		elseif(blockData == 9) then
+			blockData = 14;
+		end
+	end
+	return blockData + highColorData;
+end
+end
+
+function block:GetModelByBlockData2(blockData)
+	if(self.models2 and blockData and self.models2.id_model_map) then
+		return self.models2.id_model_map[blockData];
+	end
+end
+
+-- helper function: can be used by RotateBlockData() to automatically calculate rotated block facing. 
+-- please note, it will cache last search result to accelerate subsequent calls.
+function block:RotateBlockDataUsingModelFacing(blockData, angle, axis)
+	if(not axis or axis == "y") then
+		local lastModel = self:GetModelByBlockData2(blockData)
+		if(lastModel) then
+			local lastFacing = lastModel.facing;
+			if(lastFacing) then
+				facing = lastFacing + angle;
+				if(facing < 0) then
+					facing = facing + 6.28;
+				end
+				facing = (math.floor(facing/1.57+0.5) % 4) * 1.57;
+
+				if(not lastModel.facings) then
+					lastModel.facings = {};
+					for _, model in ipairs(self.models2) do
+						if(model.assetfile == lastModel.assetfile and model.facing and model.transform==lastModel.transform) then
+							lastModel.facings[model.facing] = model.id_data;
+						end
+					end
+					if(not lastModel.facings[3.14] and lastModel.facings[0]) then
+						lastModel.facings[3.14] = lastModel.facings[0];
+					end
+					if(not lastModel.facings[4.71] and lastModel.facings[1.57]) then
+						lastModel.facings[4.71] = lastModel.facings[1.57];
+					end
+				end
+				blockData = lastModel.facings[facing] or blockData;
+			end
+		end
+	else
+		-- TODO: other axis
+	end
 	return blockData;
 end

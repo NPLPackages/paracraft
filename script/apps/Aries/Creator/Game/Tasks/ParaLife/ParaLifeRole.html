@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    ParaLifeRole = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeRole.lua");
+    ParaLifeRole.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetIconName(index)
+        return string.format("main_user_player"..index)
+    end
+
+    function GetParentIconName(index)
+        print("===========",index)
+        return string.format("main_user_player_parent"..index)
+    end
+
+    function GetSceneName(index)
+        return string.format("parascenerole"..index)
+    end
+    --Texture/Aries/Creator/keepwork/macro/btn_1_32X32_32bits.png#0 0 32 32:14 14 14 14
+]]></script>
+<pe:container ClickThrough="true"  name = "paralife_role" style=" width: 1280px; height: 256px; background: url();">
+    <pe:repeat DataSource="<%=ParaLifeRole.role_configs%>">
+        <pe:repeatitem style="float:left;width:140px;">
+            <div ClickThrough="true" style="float: left; width: 140px; height: 200px;">
+                <pe:mc_player name='<%=GetIconName(Eval("index"))%>' miniscenegraphname='<%=GetSceneName(Eval("index"))%>' IsInteractive = "false" style="margin-left: -30px; width:200px;height:200px;" NoFrameMove="true" RenderTargetSize="256" DefaultCameraObjectDist="5.2" />
+            </div>
+        </pe:repeatitem>
+    </pe:repeat>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

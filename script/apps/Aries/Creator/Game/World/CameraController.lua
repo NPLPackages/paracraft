@@ -691,7 +691,7 @@ function CameraController.LockRailCarFirstPersonView()
 		att:SetField("IsShiftMoveSwitched", true);
 		local facing = entity.ridingEntity:GetFacing()
 		local rotation_pitch = entity.ridingEntity:GetRotationPitch()
-		local move_angle = entity.ridingEntity:GetMoveAngel()
+		local move_angle = entity.ridingEntity:GetmoveAngle()
 		local is_moving = entity.ridingEntity:IsMoving()
 		CameraController.UpdateCameraRotation(facing, rotation_pitch, move_angle, is_moving)
 	end

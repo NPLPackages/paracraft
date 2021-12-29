@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ParaLifeSelectRole = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeSelectRole.lua");
+    ParaLifeSelectRole.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetIconStyle(index)
+        local back = ""
+        if CheckIsSel(index) then
+            back = string.format("margin-top:-200px; margin-left:30px; width:152px;height:152px;background:url(%s);",ParaLifeSelectRole.GetSkinPicture(index))
+        else
+            back = string.format("margin-top:60px; margin-left:30px; width:152px;height:152px;background:url(%s);",ParaLifeSelectRole.GetSkinPicture(index))
+        end
+        return back
+    end
+
+    function DS_Items(index)
+        if index == nil then
+            return #ParaLifeSelectRole.roleDt
+        else
+            return ParaLifeSelectRole.roleDt[index]
+        end
+    end
+
+    function CheckIsSel(index)
+        if ParaLifeSelectRole.select_index == tonumber(index) and ParaLifeSelectRole.select_index > 0 then
+            return true
+        end
+        return false
+    end
+
+    function CheckIsSelAdd()
+        return ParaLifeSelectRole.CheckIsSelAdd()
+    end
+
+    function CheckIsAdd(index)
+        local bIsAddItem =  ParaLifeSelectRole.IsAddItems(index)
+        return bIsAddItem
+    end
+
+    function CheckHasSkin()
+        return ParaLifeSelectRole.CheckHasSkin()
+    end
+
+    function CheckIsSetSkin(index)
+        return ParaLifeSelectRole.CheckIsSetSkin(index)
+    end
+
+    function OnClickOperate(name)
+        ParaLifeSelectRole.OnClickOperate(name)
+    end
+
+    function OnClickItem(name)
+        ParaLifeSelectRole.OnClickItem(name)
+    end
+
+]]></script>
+<div style="width: 1151px; height: 842px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/select_role_32bits.png#0 0 1151 842);">
+    <input type="button" onclick="ClosePage" style="margin-left: 1000px; margin-top: 48px; width: 94px; height:95px;background:url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/close.png#0 0 94 95)"/>
+    <div style="margin-left: 45px; margin-top: 20px; width: 1000px; height: 600px;">
+        <pe:gridview style="margin-left:10px;width:940px;height:550px;" name="grid_role" ScrollToEnd="true"  RememberScrollPos="true" RememberLastPage="true" CellPadding="14" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight="256"
+            DataSource='<%=DS_Items%>'>
+            <Columns>
+                <div onclick="OnClickItem" name='<%=Eval("index")%>' style="width:206px;height:256px;background:url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/actor_bg.png#0 0 206 256);">
+                    <pe:if condition='<%=CheckIsSel(Eval("index"))%>'>
+                        <div zorder="2" style="width: 206px; height: 256px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/actor_selBox_32bits.png#0 0 206 256);"></div>
+                    </pe:if>
+                    <pe:if condition='<%=CheckIsSetSkin(Eval("index"))%>'>
+                        <div zorder="3" style='<%=GetIconStyle(Eval("index"))%>'></div>
+                    </pe:if>
+                    <pe:if condition='<%=CheckIsAdd(Eval("index"))%>'>
+                        <pe:if condition='<%=CheckIsSel(Eval("index"))%>'>
+                            <input type="button" onclick="OnClickItem" name='<%=Eval("index")%>' style="margin-top: -200px; margin-left: 40px; width: 128px; height: 128px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/add_32bits.png);"/>
+                        </pe:if>
+                        <pe:if condition='<%=not CheckIsSel(Eval("index"))%>'>
+                            <input type="button" onclick="OnClickItem" name='<%=Eval("index")%>' style="margin-top: 50px; margin-left: 40px; width: 128px; height: 128px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/add_32bits.png);"/>
+                        </pe:if>
+                    </pe:if>
+                </div>
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+    <div style="margin-top: -46px;margin-left: 140px; width: 800px; height: 100px;">
+        <pe:if condition='<%=not CheckIsSelAdd()%>'>
+            <pe:if condition='<%=CheckHasSkin()%>'>
+                <input type="button"  value="选择" name="select" style="margin-left: 50px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+                <input type="button"  value="换装" name="change" style="margin-left: 75px;margin-top: 0px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+                <input type="button"  value="删除" name="delete" style="margin-left: 550px; margin-top: -58px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+            </pe:if>
+            <pe:if condition='<%=not CheckHasSkin()%>'>
+                <input type="button"  value="换装" name="change" style="margin-left: 150px;margin-top: 0px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+                <input type="button"  value="删除" name="delete" style="margin-left: 450px; margin-top: -58px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+            </pe:if>
+        </pe:if>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>

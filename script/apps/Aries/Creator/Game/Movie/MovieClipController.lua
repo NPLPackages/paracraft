@@ -553,9 +553,9 @@ function MovieClipController.OnClickAddNPC()
 					entity:SetDisplayName(movieClip:NewActorName());
 					NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/MobPropertyPage.lua");
 					local MobPropertyPage = commonlib.gettable("MyCompany.Aries.Game.GUI.MobPropertyPage");
-					MobPropertyPage.ShowPage(entity, nil, function()
-						actor:SaveStaticAppearance();
-					end);
+					MobPropertyPage.ShowPage(entity, nil, function(assetfile,skin)
+						actor:SetMovieAppearance(assetfile,skin)
+					end,"movie");
 				end
 			end
 		end
