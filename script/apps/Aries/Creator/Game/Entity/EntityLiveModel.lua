@@ -47,6 +47,7 @@ Entity:Property({"yaw", 0, "getYaw", "setYaw"});
 Entity:Property({"useRealPhysics", false, "HasRealPhysics", "EnablePhysics", auto=true});
 -- used by ItemLiveModel:GetNearbyPhysicalModelDropPoints
 Entity:Property({"gridSize", BlockEngine.blocksize*0.25, "GetGridSize", "SetGridSize", auto=true});
+Entity:Property({"dropRadius", 0.2, "GetDropRadius", "SetDropRadius", auto=true});
 Entity:Property({"isAlwaysLoadPhysics", true, "IsAlwaysLoadPhysics", "SetAlwaysLoadPhysics"});
 Entity:Property({"bIsAutoTurning", nil, "IsAutoTurningDuringDragging", "SetAutoTurningDuringDragging"});
 Entity:Property({"isStackable", nil, "IsStackable", "SetIsStackable"});

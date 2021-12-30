@@ -270,6 +270,18 @@ function PlayerController:GetBlockInRightHand()
 	end
 end
 
+-- get item stack 
+function PlayerController:GetItemStackInRightHand()
+	local player = EntityManager.GetPlayer();
+	if(player) then
+		local res = player:SetHandToolIndex(nIndex, true);
+		local itemStack = player:GetItemInRightHand();
+		if(itemStack) then
+			return itemStack;
+		end
+	end
+end
+
 -- if there is nothing in the hand ItemEmpty is returned. 
 function PlayerController:GetItemInRightHand()
 	local item;

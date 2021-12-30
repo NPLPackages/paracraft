@@ -49,9 +49,12 @@ end
 -- Called whenever this item is equipped and the right mouse button is pressed.
 -- @return the new item stack to put in the position.
 function ItemTimeSeries:OnItemRightClick(itemStack, entityPlayer)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
-	local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
-	MovieClipController.OnRightClickItemStack(itemStack)
+	local curItem = GameLogic.GetPlayerController():GetItemStackInRightHand();
+	if(curItem ~= itemStack) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
+		local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
+		MovieClipController.OnRightClickItemStack(itemStack)
+	end
     return itemStack, true;
 end
 

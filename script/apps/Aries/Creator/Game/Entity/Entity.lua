@@ -759,8 +759,17 @@ function Entity:GetPortaitObjectParams(bForceRefresh)
 		local obj = self:GetInnerObject();
 		local params;
 		if(obj) then
+			local skin;
+			if(self.GetSkin)then
+				skin = self:GetSkin();
+			end
+			-- this params has a default value of CustomGeosets
 			params = ObjEditor.GetObjectParams(obj);
 
+			-- replace skin
+			if(skin)then
+				params.CustomGeosets = skin;
+			end
 			if(not params.ReplaceableTextures and params.IsCharacter) then
 				local filename = obj:GetReplaceableTexture(2):GetFileName();
 				if(filename ~= "") then

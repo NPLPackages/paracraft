@@ -185,6 +185,7 @@ function KeyFrameCtrl:OnClickKeyFrame(uiobj)
 				elseif(ctrl_pressed) then
 					self.single_copy = true;
 				end
+				self.begin_click_obj = uiobj
 				self:OnBeginShiftFrame(time, uiobj.x);
 			else
 				-- right click to goto that frame. 
@@ -282,6 +283,7 @@ function KeyFrameCtrl:OnEndShiftFrame(bIsOK)
 			self:handleEvent("ShiftKeyFrame", self.shift_begin_time, offset_time)
 		end
 	end
+	self:ShowMoveTime()
 	self.single_shift = nil;
 	self.single_copy = nil;
 end
@@ -536,6 +538,8 @@ function KeyFrameCtrl:Update(_parent, width, height)
 					(not single_mode and self.shift_begin_time <= time) or (single_mode and self.shift_begin_time==time) ) then
 					ui_obj.x = x + self.shift_ui_x_offset;
 					_guihelper.SetUIColor(ui_obj, self.key_button_color_shifting);
+					local new_time = self:GetKeyTimeByUIPos(self.shift_ui_x_offset+self.shift_begin_ui_x)
+					self:ShowMoveTime(_parent,new_time,self.begin_click_obj)
 				else
 					ui_obj.x = x;
 					_guihelper.SetUIColor(ui_obj, self.key_button_color);
@@ -556,6 +560,44 @@ function KeyFrameCtrl:Update(_parent, width, height)
 			nUIIndex = nUIIndex + 1;
 		else
 			bFinished = true;
+		end
+	end
+end
+
+function KeyFrameCtrl:ShowMoveTime(parent,time,obj)
+	if parent and parent:IsValid() then
+		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+		local Screen = commonlib.gettable("System.Windows.Screen");
+		local posY = Screen:GetHeight() - 60
+		local textBg = ParaUI.GetUIObject("move_time_bg")
+		local posX = obj and obj.x or 0
+		local strStart ="" --L"平移右侧所有帧"
+		-- if self.single_shift then
+		-- 	strStart = L"平移当前帧"
+		-- end
+		-- if self.single_copy then
+		-- 	strStart = L"平移当前拷贝帧"
+		-- end
+		if not textBg:IsValid() then
+			textBg = ParaUI.CreateUIObject("container", "move_time_bg", "_lt", posX + 40, posY, 60, 20);
+			textBg:GetAttributeObject():SetField("ClickThrough", true)
+			textBg.background = self.key_button_background;
+			_guihelper.SetUIColor(textBg, "#0000ffc8");
+			textBg:AttachToRoot()
+
+			local txtTime = ParaUI.CreateUIObject("text", "time_text", "_lt", 0, 0, 60, 20);
+			txtTime.text= strStart..time
+			_guihelper.SetFontColor(txtTime, "#ffffff")
+			textBg:AddChild(txtTime)
+			return
+		end
+		ParaUI.GetUIObject("time_text").text = strStart..time
+		textBg.x = posX + 40
+	else
+		local textBg = ParaUI.GetUIObject("move_time_bg")
+		if textBg:IsValid() then
+			textBg.visible = false
+			ParaUI.Destroy("move_time_bg")
 		end
 	end
 end

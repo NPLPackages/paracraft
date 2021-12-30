@@ -147,6 +147,20 @@ function Actor:PlayWeather(curTime)
 		if cmd then
 			if(self.weather_cmd~=cmd) then
 				self.weather_cmd = cmd;
+				if string.find(self.weather_cmd,"rain") then
+					if not GameLogic.GetSkyEntity():IsRaining() then
+						CommandManager:RunText(cmd, self:GetMovieClipEntity())
+					end
+					return
+				end
+				if string.find(self.weather_cmd,"snow") then
+					if not GameLogic.GetSkyEntity():IsSnowing() then
+						CommandManager:RunText(cmd, self:GetMovieClipEntity())
+					end
+					return
+				end
+				GameLogic.GetSkyEntity():SetSnow(0)
+				GameLogic.GetSkyEntity():SetRain(0)
 				CommandManager:RunText(cmd, self:GetMovieClipEntity());
 			end
 		end

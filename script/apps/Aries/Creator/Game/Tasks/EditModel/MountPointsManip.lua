@@ -456,7 +456,7 @@ function MountPointsManip:UpdateModel()
 		if(scaling ~= 1) then
 			self.matScale = self.matScale or Matrix4:new():identity();
 			self.matScale:setScale(scaling, scaling, scaling);
-			self.localTransform = self.localTransform * self.matScale;
+			self.localTransform:multiply(self.matScale);
 		end
 		-- TODO: bmax's local transform does not contain scaling, we will compute local transform manually
 		-- self.localTransform = self.entity:GetInnerObject():GetField("LocalTransform", self.localTransform);

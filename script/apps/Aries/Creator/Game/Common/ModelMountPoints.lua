@@ -33,11 +33,19 @@ local ModelMountPoints = commonlib.inherit(commonlib.gettable("System.Core.ToolB
 function ModelMountPoints:ctor()
 	self.points = commonlib.Array:new();
 	self.localTransform = Matrix4:new():identity();
+	self.isTransformDirty = true
 end
 
 function ModelMountPoints:Init(parentEntity)
 	self.parentEntity = parentEntity;
+	-- parentEntity:Connect("valueChanged", self, self.SetTransformDirty)
+	-- parentEntity:Connect("facingChanged", self, self.SetTransformDirty)
+	-- parentEntity:Connect("scalingChanged", self, self.SetTransformDirty)
 	return self;
+end
+
+function ModelMountPoints:SetTransformDirty()
+	self.isTransformDirty = true
 end
 
 function ModelMountPoints:GetEntity()
@@ -61,6 +69,7 @@ function ModelMountPoints:AddMountPoint(point)
 	if(autoPos) then
 		point.y = 0.4 * self:GetCount()
 	end
+	self:SetTransformDirty()
 end
 
 function ModelMountPoints:GetMountPoint(index)
@@ -86,6 +95,7 @@ function ModelMountPoints:Resize(num)
 	else
 		self.points:resize(num);
 	end
+	self:SetTransformDirty()
 end
 
 function ModelMountPoints:Clear()
@@ -119,6 +129,7 @@ function ModelMountPoints:LoadFromXMLNode(node)
 			end
 		end
 	end
+	self:SetTransformDirty()
 end
 
 function ModelMountPoints:SaveToXMLNode(node, bSort)
@@ -156,12 +167,10 @@ function ModelMountPoints:GetEntityLocalTransform(localTransform)
 		end
 		local scaling = entity:GetScaling()
 		if(scaling ~= 1) then
-			localTransform[1] = localTransform[1] * scaling;
-			localTransform[6] = localTransform[6] * scaling;
-			localTransform[11] = localTransform[11] * scaling;
+			self.matScale = self.matScale or Matrix4:new():identity();
+			self.matScale:setScale(scaling, scaling, scaling);
+			localTransform:multiply(self.matScale);
 		end
-		-- TODO: bmax's local transform does not contain scaling, we will compute local transform manually
-		-- localTransform = entity:GetInnerObject():GetField("LocalTransform", localTransform);
 	end
 	return localTransform;
 end
@@ -180,8 +189,8 @@ function ModelMountPoints:CalculateWorldMatrix(mWorld, bUseRenderOffset)
 	local x, y, z = entity:GetPosition();
 	mWorld:offsetTrans(x, y, z);
 	if(bUseRenderOffset) then
-		local orgin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
-		mWorld:offsetTrans(-orgin[1], -orgin[2], -orgin[3]);
+		local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+		mWorld:offsetTrans(-origin[1], -origin[2], -origin[3]);
 	end
 	return mWorld;
 end
@@ -212,16 +221,23 @@ function ModelMountPoints:GetMountPointsInScreenSpace()
 	return vecList;
 end
 
+-- transform in local model space to world space. 
+function ModelMountPoints:TransformLocalPointToWorldSpace(point)
+	if(point) then
+		local worldMat = self:CalculateWorldMatrix(nil, true);
+		math3d.Vector4MultiplyMatrix(point, point, worldMat);
+		local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+		return point[1]+origin[1], point[2]+origin[2], point[3]+origin[3]
+	end
+end
+
 -- @param index: mount point index
 -- @return x, y, z: world position
 function ModelMountPoints:GetMountPositionInWorldSpace(index)
 	local mp = self:GetMountPoint(index)
 	if(mp) then
 		local pivot = mp:GetPivot();
-		local worldMat = self:CalculateWorldMatrix(nil, true);
-		math3d.Vector4MultiplyMatrix(pivot, pivot, worldMat);
-		local orgin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
-		return pivot[1]+orgin[1], pivot[2]+orgin[2], pivot[3]+orgin[3]
+		return self:TransformLocalPointToWorldSpace(pivot);
 	end
 end
 
@@ -253,6 +269,33 @@ function ModelMountPoints:GetMountPointByXYZ(x, y, z, bIgnoreY, maxDiff)
 		end
 	end
 	return mountPoint;
+end
+
+-- check if a mount point is inside a mount point's aabb. the one that is closest to the mount point center is returned. 
+-- @param x, y, z: a world space point
+-- @param maxDiff: default to 0. we will expand the aabb by this value. usually 0.1
+-- return true, mountpoint:  the first return value is true, if the mount point is inside one of the mount point's aabb. 
+-- the second value is the mountpoint
+function ModelMountPoints:IsPointInMountPointAABB(x, y, z, maxDiff)
+	-- transform in local model space to camera space. 
+	local worldMat = self:CalculateWorldMatrix(nil, true);
+	
+	local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+	x, y, z = x - origin[1], y - origin[2], z - origin[3]
+	
+	for i= 1, self:GetCount() do
+		local mountpoint = self:GetMountPoint(i);
+		local cx, cy, cz = mountpoint:GetBottomCenter();
+		local dx, dy, dz = mountpoint:GetAABBSize()
+		local aabb = mathlib.ShapeAABB:new_from_pool(cx, cy+dy/2, cz, dx/2, dy/2, dz/2, true)
+		if((maxDiff or 0) ~= 0) then
+			aabb:Expand(maxDiff, maxDiff, maxDiff)
+		end
+		aabb:Rotate(worldMat);
+		if(aabb:ContainsPoint(x, y, z)) then
+			return true, mountpoint;
+		end
+	end
 end
 
 -- get mount point by screen position

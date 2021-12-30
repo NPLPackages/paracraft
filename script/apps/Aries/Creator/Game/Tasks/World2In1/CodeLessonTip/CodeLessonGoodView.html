@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+CodeLessonGoodView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/CodeLessonTip/CodeLessonGoodView.lua");
+CodeLessonGoodView.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+
+]]></script>
+<!-- Texture/Aries/Creator/keepwork/macro/lessonbox/ -->
+<pe:container ClickThrough="true" uiname="CodeLessonGoodRoot" alignment="_lt" width="1280" height="720" style="background:;">
+    <pe:container alignment="_ct" style="margin-left: -220.5px;margin-top: -138px; width: 441px;height: 276px;background: url(Texture/Aries/Creator/keepwork/macro/code/tanchuangdi_441x276_32bits.png#0 0 441 276);">
+        <div align="center" style="width: 135px; margin-top: 38px; base-font-size:32px;font-size: 32px;font-weight: bold;">
+            太棒了！
+        </div>
+    
+        <div align="center" style="margin-top: 22px;width: 280px;height: 65px;base-font-size:21px;font-size: 21px;">
+            <%=CodeLessonGoodView.GetContent()%>
+        </div>
+    
+        <div style="margin-top: 20px;">
+            <pe:if condition='<%=not CodeLessonGoodView.is_end_diff%>'>
+                <div onclick="CodeLessonGoodView.ClickNext" style="position: relative; margin-left: 72px; width: 87px;height: 37px;background: url(Texture/Aries/Creator/keepwork/macro/code/jixujiangjie_87x37_32bits.png#0 0 87 37);"></div>
+            </pe:if>
+            <div onclick="CodeLessonGoodView.ClickPass" style="position: relative; margin-left: 274px; width: 87px;height: 37px;background: url(Texture/Aries/Creator/keepwork/macro/code/kaishitongguan_87x37_32bits.png#0 0 87 37);"></div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

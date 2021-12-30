@@ -149,10 +149,10 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school40.x"] = "80001;82004;84032;81049;88002;85028";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/school3.x"] = "80001;82029;84003;81018;88002;85002";
 	
-	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_archaeologist.x"] = "80001;82064;84015;81018;88002;85011";
+	--CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_archaeologist.x"] = "80001;82064;84015;81018;88002;85011";
 	-- TODO skin ids wrong no skin
-	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_host.x"] = "80001;82126;84038;81049;88002;85028";
-	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_host.x"] = "80001;82011;84014;81005;88002;85011";
+	--CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_host.x"] = "80001;82126;84038;81049;88002;85028";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_host.x"] = "80001;82028;84095;81070;88017;85112";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_staff_bank.x"] = "80001;82011;84014;81005;88002;85011";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/paperman/principal.x"] = "80001;82011;84014;81005;88002;85011";
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/paperman/bay01.x"] = "80001;82011;84014;81005;88002;85011";
@@ -163,9 +163,9 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/blockman/cunming.x"] = "80001;82011;84014;81005;88002;85011";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunzhang.x"] = "80001;83158;84050;81018;88014;85067";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunming.x"] = "80001;82001;84046;81018;88014;85040";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84032;81018;88014;85027";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84107;81049;88017;85029";
 	-- TODO skin ids wrong 
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;82001;84062;81018;88014;85081";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;84062;81005;88014;85081;83190";
 	-- 系统默认男孩1的模型
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy01.x"] = "80001;82001;84020;81018;88002;85058";
 	-- TODO skin ids wrong
@@ -178,7 +178,7 @@ function CustomCharItems:Init()
 	-- TODO skin ids wrong
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy06.x"] = "80001;82001;84082;81018;88002;85101";
 	-- TODO skin ids wrong
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy07.x"] = "80001;82001;84016;81018;88002;85017";
+	--CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/boy07.x"] = "80001;82001;84016;81018;88002;85017";
 	-- 系统默认女孩1的模型
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/girl01.x"] = "80001;82004;84028;81018;88002;85029";
 	-- TODO skin ids wrong

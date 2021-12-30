@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+CodeResultView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/CodeLessonTip/CodeResultView.lua");
+CodeResultView.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+
+]]></script>
+<!-- Texture/Aries/Creator/keepwork/macro/lessonbox/ -->
+<pe:container uiname="CodeLessonGoodRoot" alignment="_lt" width="1280" height="720" style="background:;">
+    <pe:container alignment="_ct" style="margin-left: -220.5px;margin-top: -138px; width: 441px;height: 276px;background: url(Texture/Aries/Creator/keepwork/macro/code/tanchuangdi_441x276_32bits.png#0 0 441 276);">
+        <div align="center" style="margin-left: -5px; width: 135px; margin-top: 38px; base-font-size:32px;font-size: 32px;font-weight: bold;text-align: center;">
+            <%=CodeResultView.GetTitle()%>
+        </div>
+    
+        <div align="center" style="margin-top: 22px;width: 280px;height: 65px;base-font-size:21px;font-size: 21px;">
+            <%=CodeResultView.GetContent()%>
+        </div>
+    
+        <div style="margin-top: 20px;">
+            <pe:if condition='<%=CodeResultView.is_success and not CodeResultView.is_last_lesson%>'>
+                <div onclick="CodeResultView.ClickLeftBt" style="position: relative; margin-left: 72px; width: 92px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/jixuxiayike_92x36_32bits.png#0 0 92 36);"></div>
+            </pe:if>
+            <pe:if condition='<%=not CodeResultView.is_success%>'>
+                <div onclick="CodeResultView.ClickLeftBt" style="position: relative; margin-left: 72px; width: 92px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/chongxinkaishi_92x36_32bits.png#0 0 92 36);"></div>
+            </pe:if>
+
+            <div onclick="CodeResultView.ClickRightBt" style="position: relative; margin-left: 274px; width: 92px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/fanhuidatin_92x36_32bits.png#0 0 92 36);"></div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

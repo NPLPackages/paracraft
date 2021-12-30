@@ -706,9 +706,12 @@ end
 -- get nearby drop points, starting from the one that is closest to the eye position. 
 -- @param targetEntity: which physical model to drop upon. 
 -- @param x, y, z: this is usually a hit point on targetEntity's physical mesh. 
+-- @param objRadius: default to 0.  we have to ensure that the drop point is almost flat in the given radius for the drop to be valid. 
+--  this is usually the aabb radius of the dropping object in xz plane. 
+--  we will sort result, where the drop point that is big enough to contain the object is moved to the front.
 -- @param gridSize: default to targetEntity:GetGridSize() or 0.25.
 -- @return array of {x,y,z}, candidates for nearby drop points close to x, y, z 
-function ItemLiveModel:GetNearbyPhysicalModelDropPoints(targetEntity, x, y, z, gridSize)
+function ItemLiveModel:GetNearbyPhysicalModelDropPoints(targetEntity, x, y, z, objRadius, gridSize)
 	if(targetEntity and targetEntity:HasRealPhysics()) then
 		if(not gridSize and targetEntity.GetGridSize) then
 			gridSize = targetEntity:GetGridSize()
@@ -745,6 +748,33 @@ function ItemLiveModel:GetNearbyPhysicalModelDropPoints(targetEntity, x, y, z, g
 			addPoint_(x+1*gridSize, y, z+dz*gridSize)	
 			addPoint_(x-1*gridSize, y, z+dz*gridSize)
 		end
+		if(objRadius and objRadius > 0.1) then
+			-- sorting result, the drop point that is big enough to contain the object is moved to the front
+			for index, point in ipairs(points) do
+				local x, y, z = point[1], point[2], point[3];
+				local count = 6;
+				local isBigEnough = true;
+				-- try replacing with best height
+				if(not points[1].isBigEnough or math.abs(points[1][2]-y) > math.abs(points[index][2]-y)) then
+					for i = 1, count do
+						local angle = math.pi * 2 / count * i;
+						local x1 = x + math.cos(angle) * objRadius
+						local z1 = z + math.sin(angle) * objRadius
+						local maxFlatDiff = 0.2
+						local entity, x1, y1, z1 = self:RayPickPhysicalLiveModel(x1, y+0.1, z1, 0, -1, 0, maxFlatDiff+0.1)
+						if(entity ~= targetEntity or (y1 - y) >= maxFlatDiff) then
+							isBigEnough = false
+							break;
+						end
+					end
+					if(isBigEnough) then
+						points[index].isBigEnough = true;
+						-- try replacing with best height
+						points[1], points[index] = points[index], points[1]
+					end
+				end
+			end
+		end
 		return points;
 	end
 end
@@ -759,7 +789,13 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 		-- finding a right location to put down.
 		if(targetEntity) then
 			if(targetEntity:GetMountPoints() and targetEntity:GetMountPoints():GetCount() > 0) then
-				local mp, distance = targetEntity:GetMountPoints():GetMountPointByXY();
+				local bInside, mp, distance;
+				if(targetEntity:HasRealPhysics() and result.x) then
+					-- for physical model, we need to check if hit point is inside the AABB of mount points. 	
+					bInside, mp = targetEntity:GetMountPoints():IsPointInMountPointAABB(result.x, result.y, result.z, 0.1)
+				else
+					mp, distance = targetEntity:GetMountPoints():GetMountPointByXY();
+				end
 				if(mp) then
 					local x, y, z = targetEntity:GetMountPoints():GetMountPositionInWorldSpace(mp:GetIndex())
 					local totalStackHeight = self:GetStackHeightOnLocation(draggingEntity, x, y, z, true, targetEntity)
@@ -778,12 +814,15 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 				-- try nearby drop points. 
 				local x, y, z = result.x, result.y, result.z
 				local dropX, dropY, dropZ = x, y, z;
-				local points = self:GetNearbyPhysicalModelDropPoints(targetEntity, dropX, dropY, dropZ)
+				local radius = draggingEntity.GetDropRadius and draggingEntity:GetDropRadius();
+				local points = self:GetNearbyPhysicalModelDropPoints(targetEntity, dropX, dropY, dropZ, radius)
 				if(points) then
 					for _, point in ipairs(points) do
 						if(self:CanSeePoint(point[1], point[2], point[3])) then
 							dropX, dropY, dropZ = point[1], point[2], point[3];
 							hasFound = true	
+							-- TODO: stackheight
+
 							dragParams.dropLocation = {target = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, mountPointIndex = -1}
 							break;
 						end

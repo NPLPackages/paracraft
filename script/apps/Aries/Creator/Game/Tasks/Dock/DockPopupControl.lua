@@ -66,21 +66,19 @@ end
 
 function DockPopupControl.IsInSummerCampWorld()
     local id_list = {
-        ONLINE = 70351,
-        RELEASE = 20669,
+        ONLINE = {72966,70351,73104,72945,79969,128252},
+        RELEASE = {20669},
     }
     local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
     local httpwrapper_version = HttpWrapper.GetDevVersion();
     local world_id = id_list[httpwrapper_version]
 	local project_id = WorldCommon.GetWorldTag("kpProjectId");
-	if project_id == world_id 
-        or project_id == 72966 
-        or project_id == 73104
-        or project_id == 72945
-        or project_id == 79969 then
-		return true
-	end
-
+    local worldNum = #world_id
+    for i=1,worldNum do
+        if project_id == world_id[i] then
+            return true
+        end
+    end
 	return false
 end
 

@@ -7,6 +7,7 @@
 	-- ParaCamera.GetAttributeObject():SetField("BlockInput", true);
 	-- ParaCamera.GetAttributeObject():SetField("EnableMouseRightButton", false)
 ]]
+NPL.load("(gl)script/ide/Canvas3D.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TouchSession.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
@@ -16,6 +17,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemLiveModel.lua");
 NPL.load("Mod/GeneralGameServerMod/App/Client/AppGeneralGameClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local AppGeneralGameClient = commonlib.gettable("Mod.GeneralGameServerMod.App.Client.AppGeneralGameClient");
@@ -34,10 +37,10 @@ local ParalifeLiveModel = NPL.export()
 local page = nil
 local default_model = "character/CC/02human/CustomGeoset/actor.x"
 local default_skin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString)
-local default_role_data = {assetfile=default_model,skin=default_skin,scaling=1}
+local default_data = {assetfile=default_model,skin=default_skin,scaling=1}
 local creatEntity
 local role_timer
-ParalifeLiveModel.role_data = {
+local default_role_data = {
 	{
 		assetfile = "character/CC/02human/CustomGeoset/actor.x", 
         skin = "80001;83148;84100;81018;88002;85073;", 
@@ -188,8 +191,9 @@ ParalifeLiveModel.role_data = {
 		scaling = 1,
 	},
 }
-ParalifeLiveModel.show_role_data = {}
 ParalifeLiveModel.main_ui_mode = "switchmain" --decorate
+ParalifeLiveModel.role_data = {}
+ParalifeLiveModel.furniture_data = {}
 ParalifeLiveModel.cur_btn_anis = {}
 ParalifeLiveModel.movie_entity = nil
 function ParalifeLiveModel.OnInit()
@@ -198,7 +202,8 @@ function ParalifeLiveModel.OnInit()
 end
 
 function ParalifeLiveModel.ShowView(entity)
-	-- ParalifeLiveModel.InitRoleDataWithEntity(entity)
+	ParalifeLiveModel.InitRoleDataWithEntity(entity)
+	-- ParalifeLiveModel.role_data = default_role_data
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.html",
         name = "ParalifeLiveModel.ShowView", 
@@ -218,7 +223,6 @@ function ParalifeLiveModel.ShowView(entity)
             height = 0,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);
-	-- ParalifeLiveModel.GetSceneContext():activate();
     QuickSelectBar.ShowPage(false);
 	GameLogic.RunCommand("/clearbag")
 	GameLogic:Connect("WorldUnloaded", ParalifeLiveModel, ParalifeLiveModel.OnWorldUnload, "UniqueConnection");
@@ -242,7 +246,7 @@ function ParalifeLiveModel.CheckPickRole()
 			end
 			if targetEntity or result.entity then
 				local entity = result.entity or targetEntity
-				if entity.item_id and entity.item_id == 10074 and entity.hasCustomGeosets  then
+				if entity.item_id and entity.item_id == 10074 and entity:HasCustomGeosets()  then --只能拖入可换装任务模型
 					ParalifeLiveModel.AddRoleData(entity) 
 					entity:SetDead();
 				end
@@ -274,22 +278,40 @@ function ParalifeLiveModel.OnWorldUnload()
 end
 
 function ParalifeLiveModel.InitRoleDataWithEntity(entity)
-	if not entity or entity:GetType() ~= "EntityMovieClip" then
-		return
-	end
-	ParalifeLiveModel.role_data = {}
-	ParalifeLiveModel.movie_entity = entity
-	local data = ParalifeLiveModel.movie_entity:GetAllActorData()
-	local num = #data
-	if num > 0 then
-		ParalifeLiveModel.role_data = data
-	else
-		for i=1,7 do
-			ParalifeLiveModel.role_data[ParalifeLiveModel.role_data + 1] = commonlib.deepcopy(default_role_data);
+	ParalifeLiveModel.role_data = default_role_data
+	if entity and entity:GetType() == "EntityMovieClip" then
+		ParalifeLiveModel.movie_entity = entity
+		local data = ParalifeLiveModel.movie_entity:GetAllActorData()
+		local num = #data
+		if num > 0 then
+			ParalifeLiveModel.role_data = data
 		end
 	end
-	echo(ParalifeLiveModel.role_data)
+
+	-- local entities = GameLogic.EntityManager.FindEntities({category="all", })
+	-- local num = #entities
+	-- for i=1,num do
+	-- 	local entity = entities[i]
+	-- 	if entity and entity:isa(EntityManager.EntityLiveModel) and entity:HasCustomGeosets() then
+	-- 		ParalifeLiveModel.AddRoleData(entity)
+	-- 	end
+	-- end
+	-- echo(ParalifeLiveModel.role_data)
 end
+
+function ParalifeLiveModel.InitFurnitureData()
+	ParalifeLiveModel.furniture_data = {}
+	local entities = GameLogic.EntityManager.FindEntities({category="all", })
+	local num = #entities
+	for i=1,num do
+		local entity = entities[i]
+		if entity and entity:isa(EntityManager.EntityLiveModel) then
+			ParalifeLiveModel.AddFurnitureData(entity)
+		end
+	end
+end
+
+
 
 function ParalifeLiveModel.OnCreate()
 	if page then
@@ -299,10 +321,120 @@ function ParalifeLiveModel.OnCreate()
 		local paralife_back = ParaUI.GetUIObject("paralife_back")
 		if paralife_back then
 			paralife_back:GetAttributeObject():SetField("ClickThrough", true)
-		end             
+		end   
+		-- ParalifeLiveModel.CreateRoleView()
     end
 end
 
+-- function ParalifeLiveModel.TestAction()
+-- 	local parent_root  = page:GetParentUIObject()  
+	
+-- 	-- local ParaLifeMoveBy = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeMoveBy")
+-- 	local node = ParaUI.CreateUIObject("container", "test_action", "_lt", 640, 360, 100, 100)
+-- 	node.background = "Texture/Aries/Creator/keepwork/Paralife/animation/clap_32bits.png;0 0 128 128"
+-- 	parent_root:AddChild(node)
+-- 	local ParaLifeMoveBy = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/Action/ParaLifeMoveBy.lua");
+-- 	local moveDis = {x=-900,y=0}
+-- 	ParaLifeMoveBy.RunAction(node,moveDis,0.5)
+-- end
+
+function ParalifeLiveModel.CreateRoleView()
+	local move_view	 = ParaUI.GetUIObject("paralife_role")
+	local default_data_num = #ParalifeLiveModel.role_data
+	local show_num = ParalifeLiveModel.GetShowNum()
+	if  move_view and move_view:IsValid() then
+		for i=1,show_num do
+			local node = ParaUI.CreateUIObject("container", "role_node"..i, "_lt", (i-1) * 200, 0, 200, 300);
+			move_view:AddChild(node)
+			ParalifeLiveModel.CreateCanvaNode(node,i) --添加角色形象
+		end
+	end
+end
+
+
+----IsActiveRendering 没有这个参数的话当前帧不会渲染这个角色
+----IsInteractive 判断UI角色是否可以拖动旋转，是否可以监听mouseevent
+function ParalifeLiveModel.CreateCanvaNode(parent,index)
+	if parent and parent:IsValid() then
+		local data = ParalifeLiveModel.role_data[index]
+		local ctl = CommonCtrl.Canvas3D:new{
+			name = "livenode"..index,
+			alignment = "_lt",
+			left = -50,top = -60,
+			width = 300,height = 300,
+			background = "",
+			parent = parent,
+			IsActiveRendering = true, 
+			miniscenegraphname = "create_role"..index,
+			DefaultRotY = 0,
+			RenderTargetSize = 512,
+			IsInteractive = false,
+			autoRotateSpeed = 0,
+			DefaultCameraObjectDist =  6,
+			DefaultLiftupAngle =  0.25,
+			LookAtHeight =  1.57,
+			FrameMoveCallback = function()
+				
+			end,
+		};
+		local params = {
+			IsCharacter = true, 
+			AssetFile = data.assetfile,
+			x=0, 
+			y=0, 
+			z=0, 
+			facing=1.57,
+			Attribute = 128,
+			name = "test_player"..index,
+			CustomGeosets = data.skin
+		};
+		ctl:Show(true);
+		ctl:ShowModel(params)
+	end
+end
+
+--furniture data------------------------------------------------------------------------------------
+function ParalifeLiveModel.RemoveFurnitureData(index)
+	local num = #ParalifeLiveModel.furniture_data
+	for i=index,num do
+		ParalifeLiveModel.furniture_data[i] = ParalifeLiveModel.furniture_data[i + 1]
+	end
+	ParalifeLiveModel.furniture_data[num] = nil
+	ParalifeLiveModel.RereshPage()
+end
+
+function ParalifeLiveModel.AddFurnitureData(entity)
+	if not entity then
+		return 
+	end
+	local xmlnode = entity:SaveToXMLNode()
+	local curNum = #ParalifeLiveModel.furniture_data
+	local objScale = entity:GetInnerObject():GetScale()
+	local assetfile = entity.filename
+	local skin = entity.skin
+	local scaling = entity.scaling or objScale
+	local temp = {assetfile = entity.filename,skin = entity.skin,scaling = scaling or 1,xmlnode=xmlnode}
+	local index = ParalifeLiveModel.GetIndexWithMouse()
+	if curNum < ParalifeLiveModel.GetShowNum() then
+		ParalifeLiveModel.furniture_data[curNum + 1] = temp
+	else
+		table.insert( ParalifeLiveModel.furniture_data, index ,temp )
+	end
+	ParalifeLiveModel.RereshPage()
+end
+
+function ParalifeLiveModel.MoveFurnitureData(move_num,ismoveleft)
+	if move_num < 0 then
+		return 
+	end
+	local furniture_num = #ParalifeLiveModel.furniture_data
+	local type = ismoveleft and -1 or 1
+	commonlib.moveArrayItemWithNum(ParalifeLiveModel.furniture_data,move_num*type)
+	ParalifeLiveModel.RereshPage()
+end
+-- data=====end-------------------------------------------------------------------------------------------
+
+---roledata================================================================================================
 function ParalifeLiveModel.RemoveRoleData(index)
 	local num = #ParalifeLiveModel.role_data
 	for i=index,num do
@@ -337,25 +469,12 @@ function ParalifeLiveModel.MoveRoleData(move_num,ismoveleft)
 		return 
 	end
 	local role_num = #ParalifeLiveModel.role_data
-	local type = ismoveleft or false
-	local moveDatas = {}
-	if ismoveleft then
-		for i=1,move_num do
-			local temp = commonlib.deepcopy(ParalifeLiveModel.role_data[i])
-			table.remove(ParalifeLiveModel.role_data,i)
-			table.insert( ParalifeLiveModel.role_data, temp)
-		end
-	else
-		for i=1,move_num do
-			local removeindex = role_num - i + 1
-			local temp = commonlib.deepcopy(ParalifeLiveModel.role_data[removeindex])
-			table.remove(ParalifeLiveModel.role_data,removeindex)
-			table.insert( ParalifeLiveModel.role_data,1, temp)
-		end
-	end
+	local type = ismoveleft and -1 or 1
+	commonlib.quickMoveArrayItemWithNum(ParalifeLiveModel.role_data,move_num*type)
 	ParalifeLiveModel.RereshPage()
 end
 
+--roledata=======================================================================================================
 
 function ParalifeLiveModel.InitPlayerView()
 	for i,v in ipairs(ParalifeLiveModel.role_data) do
@@ -383,7 +502,12 @@ function ParalifeLiveModel.InitPlayerControl()
 		if creatEntity then
 			ItemLiveModel:DropDraggingEntity();
 			local index = creatEntity.remove_index
-			ParalifeLiveModel.RemoveRoleData(index)
+			if ParalifeLiveModel.main_ui_mode == "switchrole" then
+				ParalifeLiveModel.RemoveRoleData(index)
+			end
+			if ParalifeLiveModel.main_ui_mode == "switchfurniture" then
+				ParalifeLiveModel.RemoveFurnitureData(index)
+			end
 			paralife_back:GetAttributeObject():SetField("ClickThrough", true)
 			creatEntity = nil
 		end
@@ -409,19 +533,30 @@ function ParalifeLiveModel.InitPlayerUI()
 	local mouse_x, mouse_y = ParaUI.GetMousePosition();
 	local startmousex,startmousey
 	local disx,disy = 0,0
+	local showNum = ParalifeLiveModel.GetShowNum()
 	for i,v in ipairs(ParalifeLiveModel.role_data) do
 		local parentUser = ParaUI.GetUIObject("main_user_player_parent"..i)
 		local startParaX,startParaY
 		if parentUser then
-			if i > ParalifeLiveModel.GetShowNum() then
+			if i > showNum then
 				--parentUser.visible = false
 			else
 				parentUser:SetScript("onmouseup",function()
 					isTouchPlayer = false
 					touchIndex = -1
-					local move_num = math.floor(math.abs(disx) / 200) + 1
-					if move_num > 0 then
-						ParalifeLiveModel.MoveRoleData(move_num , disx < 0 and disx ~= 0 )
+					if math.abs( disx ) > 100 then
+						local moveDis = {x= (disx > 0 and screen_width or -screen_width),y=0}
+						ParalifeLiveModel.MoveAction(moveDis,0.4,function()
+							local move_num = showNum--math.floor(math.abs(disx) / 200) + 1
+							if move_num > 0 then
+								ParalifeLiveModel.MoveRoleData(move_num , disx < 0 and disx ~= 0 )
+							end
+						end)
+					else
+						for i=1,showNum do
+							local target = ParaUI.GetUIObject("main_user_player_parent"..i)
+							target.x = target.x - disx
+						end
 					end
 				end)
 				parentUser:SetScript("onmousedown",function()
@@ -439,7 +574,7 @@ function ParalifeLiveModel.InitPlayerUI()
 							parentUser.visible = false
 							paralife_back:GetAttributeObject():SetField("ClickThrough", false)
 						end
-						if ParalifeLiveModel.GetShowNum() < #ParalifeLiveModel.role_data then
+						if showNum < #ParalifeLiveModel.role_data then
 							paralife_role.x = startParaX + disx
 						end
 					end
@@ -448,6 +583,50 @@ function ParalifeLiveModel.InitPlayerUI()
 			
 		end
 	end
+end
+
+function ParalifeLiveModel.MoveAction(movedis,time,callback_func)
+	if not movedis then
+		return 
+	end
+    local showNum = ParalifeLiveModel.GetShowNum()
+	local moveX = movedis.x
+	local moveY = movedis.y
+	local time_interval = 30
+	local move_deltaX = moveX/(time * 1000) *time_interval
+	local move_deltaY = moveY/(time * 1000) *time_interval
+	local finishIndex = 0
+	local endPosX = {}
+	local endPosY = {}
+	for i=1,showNum do
+		local target = ParaUI.GetUIObject("main_user_player_parent"..i)
+		local end_posX = target.x + moveX
+		local end_posY = target.y + moveY
+		endPosX[i] = end_posX
+		endPosY[i] = end_posY
+	end
+	local timer =  commonlib.Timer:new({callbackFunc = function(timer)
+		for i=1,showNum do
+			local target = ParaUI.GetUIObject("main_user_player_parent"..i)
+			local bFinishAdd = (moveX > 0 and target.x > endPosX[i]) or (moveY > 0 and target.y > endPosY[i])
+			local bFinishReduce = (moveX < 0 and target.x < endPosX[i]) or (moveY < 0 and target.y < endPosY[i])
+			local bFinish = bFinishAdd or bFinishReduce
+			if not bFinish then
+				target.x = target.x + move_deltaX
+				target.y = target.y + move_deltaY
+			else
+				finishIndex = finishIndex + 1
+			end
+		end
+		if finishIndex >=  showNum then
+			timer:Change()
+			timer = nil	
+			if callback_func then
+				callback_func()
+			end	
+		end
+	end})
+	timer:Change(0, time_interval)	
 end
 
 function ParalifeLiveModel.CreateEntity(index,data) --创建livemodel
@@ -515,6 +694,7 @@ function ParalifeLiveModel.SwitchOperateButton(name)
 	if not name or ParalifeLiveModel.main_ui_mode == name  then
 		return
 	end
+	local viewport = ViewportManager:GetSceneViewport();
 	local isMobile = System.options.IsTouchDevice or GameLogic.options:HasTouchDevice()
 	if isMobile then
 		if name == "switchmain" then
@@ -524,13 +704,29 @@ function ParalifeLiveModel.SwitchOperateButton(name)
 			TouchMiniKeyboard.CheckShow(false)
 		end
 	end
-	
+	if name == "switchrole" or name=="switchfurniture" then
+		if viewport:GetMarginBottomHandler() ~= ParalifeLiveModel then
+			viewport:SetMarginBottom(math.floor(300 * (Screen:GetUIScaling()[2])));
+			viewport:SetMarginBottomHandler(ParalifeLiveModel);
+		end
+	elseif name== "switchmain" then
+		if viewport:GetMarginBottomHandler() == ParalifeLiveModel then
+			viewport:SetMarginBottom(0);
+			viewport:SetMarginBottomHandler(nil);
+		end
+	end
 	ParalifeLiveModel.main_ui_mode = name
 	ParalifeLiveModel.RereshPage()
 end
 
 function ParalifeLiveModel.OnExitWorld()
+	ParalifeLiveModel.role_data = default_role_data
 	ParalifeLiveModel.main_ui_mode = "switchmain"
 	GameLogic.RunCommand("/clearbag")
+	local viewport = ViewportManager:GetSceneViewport();
+	if viewport:GetMarginBottomHandler() == ParalifeLiveModel then
+		viewport:SetMarginBottom(0);
+		viewport:SetMarginBottomHandler(nil);
+	end
 	ParalifeLiveModel.ClosePage()
 end

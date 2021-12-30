@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+CodeDifficultView = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/CodeLessonTip/CodeDifficultView.lua");
+CodeDifficultView.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetTitleStyle()
+    local img = "Texture/Aries/Creator/keepwork/macro/code/nandianjiangjie_192x49_32bits.png#0 0 192 49"
+    if CodeDifficultView.is_detail_answer then
+        img = "Texture/Aries/Creator/keepwork/macro/code/wanzhengjieda_192x49_32bits.png#0 0 192 49"
+    end
+
+    local style = string.format("margin-left: -10px; width: 192px;height: 49px;margin-top: 34px; background: url(%s);", img)
+    return style
+end
+
+]]></script>
+<pe:container ClickThrough="true" uiname="CodeLessonDiffRoot" alignment="_lt" width="1280" height="720" style="background:;">
+    <pe:container alignment="_ct" style="margin-left: -220.5px;margin-top: -138px; width: 441px;height: 276px;background: url(Texture/Aries/Creator/keepwork/macro/code/tanchuangdi_441x276_32bits.png#0 0 441 276);">
+        <div align="center" style='<%=GetTitleStyle()%>'></div>
+
+        <div align="center" style="margin-top: 25px;width: 360px;height: 65px;base-font-size:21px;font-size: 21px;">
+            <%=CodeDifficultView.GetContent()%>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <div onclick="CodeDifficultView.ClickCancel" style="float: left; margin-left: 80px; width: 63px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/quxiao_63x36_32bits.png#0 0 63 36);"></div>
+            <div onclick="CodeDifficultView.ClickOk" style="float: left; margin-left: 145px; width: 63px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/quedin_63x36_32bits.png#0 0 63 36);"></div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

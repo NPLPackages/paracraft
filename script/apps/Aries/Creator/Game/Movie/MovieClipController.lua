@@ -326,14 +326,16 @@ end
 function MovieClipController.SetFocusToItemStack(itemStack)
 	local curItemChanged;
 	local movieClip = MovieClipController.GetMovieClip()
-	if(movieClip:GetCurrentItemStack() ~= itemStack) then
-		movieClip:SetCurrentItemStack(itemStack);
-		curItemChanged = true;
-		if(page) then
-			page:Refresh(0.1);
+	if(movieClip) then
+		if(movieClip:GetCurrentItemStack() ~= itemStack) then
+			movieClip:SetCurrentItemStack(itemStack);
+			curItemChanged = true;
+			if(page) then
+				page:Refresh(0.1);
+			end
 		end
+		MovieClipController.SetFocusToActor();
 	end
-	MovieClipController.SetFocusToActor();
 	return curItemChanged;
 end
 
