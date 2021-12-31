@@ -1085,9 +1085,9 @@ end
 
 function LessonBoxTip.CheckHasePlayMovie()
     local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
-	if(#MovieManager.active_clips > 0) then
-		return true
-	end
+	-- if(#MovieManager.active_clips > 0) then
+	-- 	return true
+	-- end
     return false
 end
 

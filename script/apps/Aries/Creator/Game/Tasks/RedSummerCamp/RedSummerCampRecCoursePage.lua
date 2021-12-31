@@ -19,9 +19,9 @@ RedSummerCampRecCoursePage.courses_1 = {
 }
 
 RedSummerCampRecCoursePage.courses_2 = {
- { id = 42670, label = L"卡卡之家",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/kaka_32bits.png;0 0 195 100",  },
- { id = 42701, label = L"拉拉之家",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/lala_32bits.png;0 0 195 100",  },
- { id = 42457, label = L"帕帕之家",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/papa_32bits.png;0 0 195 100",  },
+ { id = 42670, label = L"动画入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/kaka_32bits.png;0 0 195 100",  },
+ { id = 42701, label = L"建模入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/lala_32bits.png;0 0 195 100",  },
+ { id = 42457, label = L"编程入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/papa_32bits.png;0 0 195 100",  },
 }
 
 RedSummerCampRecCoursePage.courses_3 = {

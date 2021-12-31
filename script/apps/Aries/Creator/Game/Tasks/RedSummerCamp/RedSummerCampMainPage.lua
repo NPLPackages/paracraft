@@ -503,11 +503,13 @@ end
 
 function RedSummerCampMainPage.OpenPage(name)
     if(name == "course_page")then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.course_page");
         local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
         RedSummerCampRecCoursePage.Show();
     elseif(name == "shentongbei")then
         -- local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
         -- Page.ShowShenTongBeiPage();
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.match");
 		local RacePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Race/RacePage.lua");
         RacePage.Show();
     elseif(name == "teacher_day")then
@@ -523,21 +525,26 @@ function RedSummerCampMainPage.OpenPage(name)
         local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("zhengcheng");
     elseif(name == "ai_school")then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.ai_school");
         local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("ai_school");
     elseif(name == "parent_page")then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.parent_page");
         local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
         RedSummerCampParentsPage.Show();
     elseif(name == "summer_camp")then
         local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("summer_camp");
     elseif(name == "main_world")then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.main_world");
 		local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
 		RedSummerCampMainWorldPage.Show();
 	elseif(name == "leyuan")then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.leyuan");
 		local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("leyuan");
     elseif(name == "explore")then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.explore");
 		GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
     end
 end

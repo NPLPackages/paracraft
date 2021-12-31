@@ -552,13 +552,97 @@ function EditMovieContext:HandleGlobalKey(event)
 			end
 			event:accept();
 		end
+	elseif (dik_key == "DIK_LBRACKET") then
+		local new_value = self:GetNextTimeValue(dik_key,event)
+		local movieClip = MovieManager:GetActiveMovieClip();
+		if(movieClip) then
+			movieClip:SetTime(new_value);
+		end
+		event:accept();
+	elseif (dik_key == "DIK_RBRACKET") then
+		local new_value = self:GetNextTimeValue(dik_key,event)
+		local movieClip = MovieManager:GetActiveMovieClip();
+		if(movieClip) then
+			movieClip:SetTime(new_value);
+		end
+		event:accept();
 	end
-
 	if(not event:isAccepted()) then
 		return EditMovieContext._super.HandleGlobalKey(self, event);
 	end
 
 	return event:isAccepted();
+end
+
+function EditMovieContext:GetNextTimeValue(key,event)
+	local ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+	local shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
+	local alt_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU);
+	local movieClip = MovieManager:GetActiveMovieClip();
+	local curTime = movieClip:GetTime()
+	local startTime = movieClip:GetStartTime()
+	local endTime = movieClip:GetLength()
+	local newTime = 0
+	if key == "DIK_LBRACKET" then
+		if ctrl_pressed then
+			if shift_pressed then
+				local value = (math.floor(curTime/100) - 1)*100
+				newTime = value > startTime and value or startTime
+				return newTime
+			end
+			if alt_pressed then
+				local value = (math.floor(curTime/50) - 1)*50
+				newTime = value > startTime and value or startTime
+				return newTime
+			end
+			local value = (math.floor(curTime/1000) - 1)*1000
+			newTime = value > startTime and value or startTime
+			return newTime
+		end
+		if shift_pressed then
+			local value = curTime - 100
+			newTime =value > startTime and value or startTime
+			return newTime
+		end
+		-- if alt_pressed then
+		-- 	local value = curTime - 50
+		-- 	newTime =value > startTime and value or startTime
+		-- 	return newTime
+		-- end
+		local value = curTime - 1000
+		newTime =value > startTime and value or startTime
+		return newTime
+	end
+	if key == "DIK_RBRACKET" then
+		if ctrl_pressed then
+			if shift_pressed then
+				local value = (math.floor(curTime/100) + 1)*100
+				newTime = value < endTime and value or endTime
+				return newTime
+			end
+			if alt_pressed then
+				local value = (math.floor(curTime/50) + 1)*50
+				newTime = value < endTime and value or endTime
+				return newTime
+			end
+			local value = (math.floor(curTime/1000) + 1)*1000
+			newTime = value < endTime and value or endTime
+			return newTime
+		end
+		if shift_pressed then
+			local value = curTime + 100
+			newTime =value < endTime and value or endTime
+			return newTime
+		end
+		-- if alt_pressed then
+		-- 	local value = curTime + 50
+		-- 	newTime =value < endTime and value or endTime
+		-- 	return newTime
+		-- end
+		local value = curTime + 1000
+		newTime =value < endTime and value or endTime
+		return newTime
+	end
 end
 
 -- virtual: 

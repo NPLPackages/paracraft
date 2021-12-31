@@ -649,6 +649,20 @@ function ItemLiveModel:GetStackHeightOnLocation(draggingEntity, x, y, z, isMount
 				local _, y2, _ = right:GetPosition()
 				return y1 < y2;
 			end)
+			if(targetEntity) then
+				-- remove all entities below the targetTarget. 
+				local count = 0
+				for i, entity in ipairs(mountedEntities) do
+					if(entity==targetEntity) then
+						count = i;
+						break;
+					end
+				end
+				while(count > 0) do
+					count = count - 1;
+					commonlib.removeArrayItem(mountedEntities, 1)
+				end
+			end
 			for _, entity in ipairs(mountedEntities) do
 				if(entity ~= draggingEntity and entity~=targetEntity) then
 					local x1, y1, z1 = entity:GetPosition();
@@ -750,7 +764,8 @@ function ItemLiveModel:GetNearbyPhysicalModelDropPoints(targetEntity, x, y, z, o
 		end
 		if(objRadius and objRadius > 0.1) then
 			-- sorting result, the drop point that is big enough to contain the object is moved to the front
-			for index, point in ipairs(points) do
+			for index = 1, #points do
+				local point = points[index];
 				local x, y, z = point[1], point[2], point[3];
 				local count = 6;
 				local isBigEnough = true;
@@ -821,8 +836,8 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 						if(self:CanSeePoint(point[1], point[2], point[3])) then
 							dropX, dropY, dropZ = point[1], point[2], point[3];
 							hasFound = true	
-							-- TODO: stackheight
-
+							local totalStackHeight = self:GetStackHeightOnLocation(draggingEntity, x, y, z, false, targetEntity)
+							dropY = dropY + (totalStackHeight or 0);
 							dragParams.dropLocation = {target = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, mountPointIndex = -1}
 							break;
 						end
@@ -1045,23 +1060,7 @@ end
 
 function ItemLiveModel:MountEntityToTargetMountPoint(entity, mountTarget, mountPointIndex)
 	if(entity and mountTarget) then
-		entity:LinkTo(mountTarget)
-		
-		if(mountPointIndex and mountPointIndex>0) then
-			local mountpoint = mountTarget:CreateGetMountPoints():GetMountPoint(mountPointIndex)
-			if(mountpoint) then
-				mountTarget:OnMount(mountpoint.name, mountPointIndex, entity)
-				if(mountpoint.name == "lie") then
-					entity:SetAnimation(100); -- 100 lie facing up; 88 lie facing side ways
-				elseif(mountpoint.name == "sit") then
-					entity:SetAnimation(72); -- sit on ground
-				elseif(mountpoint.name == "eat") then
-				elseif(mountpoint.name == "create") then
-				elseif(mountpoint.name == "run") then
-					entity:SetAnimation(5);
-				end
-			end
-		end
+		entity:MountTo(mountTarget, mountPointIndex, true)
 	end
 end
 

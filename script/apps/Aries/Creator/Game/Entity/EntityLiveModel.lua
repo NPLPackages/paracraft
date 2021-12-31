@@ -117,6 +117,17 @@ function Entity:init()
 	return self;
 end
 
+-- virtual function: return cloned entity. 
+function Entity:CloneMe()
+	local xmlNode = self:SaveToXMLNode()
+	xmlNode.attr.name = nil;
+	xmlNode.attr.linkTo = nil;
+	local x, y, z = self:GetPosition()
+	local entity = self:Create({x=x, y=y, z=z, facing=self:GetFacing()}, xmlNode);
+	entity:Attach();
+	return entity
+end
+
 -- virtual: set as dead and will be destroyed
 function Entity:SetDead()
 	Entity._super.SetDead(self)
@@ -708,12 +719,64 @@ function Entity:HasAnyRule()
 	return (self.cmd or "")~="" or not self.inventory:IsEmpty();
 end
 
+-- similar to LinkTo function, except that it will take mount points into consideration. 
+-- mount current entity to another entity's mount point at mountPointIndex. 
+-- if no mountpoint is found, we will simply linkto the target entity
+-- @param mountPointIndex: default to 1, 
+-- @param bUseCurrentLocation: if true, we will use the current entity's facing and position, instead of the target mount point's settings. 
+function Entity:MountTo(mountTarget, mountPointIndex, bUseCurrentLocation)
+	mountPointIndex = mountPointIndex or 1
+	if(mountTarget) then
+		if(not bUseCurrentLocation and mountTarget:GetMountPoints()) then
+			local x, y, z = mountTarget:GetMountPoints():GetMountPositionInWorldSpace(mountPointIndex)
+			local facing = mountTarget:GetMountPoints():GetMountFacingInWorldSpace(mountPointIndex)
+			if(x and facing) then
+				self:SetPosition(x, y, z)
+				self:SetFacing(facing)
+			end
+		end
+		self:LinkTo(mountTarget)
+		
+		if(mountPointIndex and mountPointIndex>0 and mountTarget:GetMountPoints()) then
+			local mountpoint = mountTarget:GetMountPoints():GetMountPoint(mountPointIndex)
+			if(mountpoint) then
+				mountTarget:OnMount(mountpoint.name, mountPointIndex, self)
+				if(mountpoint.name == "lie") then
+					self:SetAnimation(100); -- 100 lie facing up; 88 lie facing side ways
+				elseif(mountpoint.name == "sit") then
+					self:SetAnimation(72); -- sit on ground
+				elseif(mountpoint.name == "eat") then
+				elseif(mountpoint.name == "create") then
+				elseif(mountpoint.name == "run") then
+					self:SetAnimation(5);
+				end
+			end
+		end
+	end
+end
+
+function Entity:GetMountedEntityAt(mountPointIndex)
+	mountPointIndex = mountPointIndex or 1;
+	if(self:GetMountPoints()) then
+		local x, y, z = self:GetMountPoints():GetMountPositionInWorldSpace(mountPointIndex)
+		if(x and self.childLinks) then
+			for child, _ in pairs(self.childLinks) do
+				local x1, y1, z1 = child:GetPosition()
+				if((math.abs(x-x1)+math.abs(z-z1)) < 0.05 and math.abs(y-y1) < 0.3) then
+					return child;
+				end
+			end
+		end
+	end
+end
+
+
 function Entity:OnMount(mountPointName, mountpointIndex, mountedEntity)
 	local event = Event:new():init("onmount");	
 	self:event(event);
-	if(self.onmountEvent) then
+	if(self.onmountEvent and mountedEntity) then
 		local x, y, z = self:GetBlockPos();
-		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, mountname=%q, mountindex = %d}", self.onmountEvent, x, y, z, self.name, mountPointName or "", mountpointIndex or 0))
+		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, mountname=%q, mountindex=%d, mountedEntityName=%q}", self.onmountEvent, x, y, z, self.name, mountPointName or "", mountpointIndex or 0, mountedEntity.name or ""))
 		return true;
 	end
 end
@@ -1095,3 +1158,4 @@ function Entity:SetIdleAnim(id)
 		self:SetAnimation(id)
 	end
 end
+

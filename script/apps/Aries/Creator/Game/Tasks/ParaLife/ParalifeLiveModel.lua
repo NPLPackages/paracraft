@@ -288,14 +288,14 @@ function ParalifeLiveModel.InitRoleDataWithEntity(entity)
 		end
 	end
 
-	-- local entities = GameLogic.EntityManager.FindEntities({category="all", })
-	-- local num = #entities
-	-- for i=1,num do
-	-- 	local entity = entities[i]
-	-- 	if entity and entity:isa(EntityManager.EntityLiveModel) and entity:HasCustomGeosets() then
-	-- 		ParalifeLiveModel.AddRoleData(entity)
-	-- 	end
-	-- end
+	local entities = GameLogic.EntityManager.FindEntities({category="all", })
+	local num = #entities
+	for i=1,num do
+		local entity = entities[i]
+		if entity and entity:isa(EntityManager.EntityLiveModel) and entity:HasCustomGeosets() then
+			ParalifeLiveModel.AddRoleData(entity)
+		end
+	end
 	-- echo(ParalifeLiveModel.role_data)
 end
 
@@ -326,18 +326,6 @@ function ParalifeLiveModel.OnCreate()
     end
 end
 
--- function ParalifeLiveModel.TestAction()
--- 	local parent_root  = page:GetParentUIObject()  
-	
--- 	-- local ParaLifeMoveBy = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeMoveBy")
--- 	local node = ParaUI.CreateUIObject("container", "test_action", "_lt", 640, 360, 100, 100)
--- 	node.background = "Texture/Aries/Creator/keepwork/Paralife/animation/clap_32bits.png;0 0 128 128"
--- 	parent_root:AddChild(node)
--- 	local ParaLifeMoveBy = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/Action/ParaLifeMoveBy.lua");
--- 	local moveDis = {x=-900,y=0}
--- 	ParaLifeMoveBy.RunAction(node,moveDis,0.5)
--- end
-
 function ParalifeLiveModel.CreateRoleView()
 	local move_view	 = ParaUI.GetUIObject("paralife_role")
 	local default_data_num = #ParalifeLiveModel.role_data
@@ -350,6 +338,7 @@ function ParalifeLiveModel.CreateRoleView()
 		end
 	end
 end
+
 
 
 ----IsActiveRendering 没有这个参数的话当前帧不会渲染这个角色

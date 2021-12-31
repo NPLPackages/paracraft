@@ -1192,6 +1192,10 @@ function Entity:GetWorldServer()
     return GameLogic.GetWorld();
 end
 
+-- virtual function: return cloned entity. 
+function Entity:CloneMe()
+end
+
 local isUseHeadonSay = true;
 local sHeadonSayTemplate = nil;
 

@@ -155,10 +155,9 @@ Other show filters:
 			local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 			TouchMiniKeyboard.GetSingleton():SetRockerMod()
 		elseif (name == "paralife") then
-			local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
-        	ParalifeLiveModel.ShowView()
-
-			GameLogic.RunCommand("/show playertouch")
+			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
+			ParaLife:Init()
+			ParaLife:Show();
 		end
 	end,
 };
@@ -255,10 +254,8 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 			local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 			TouchMiniKeyboard.GetSingleton():SetKeyboardMod()
 		elseif (name == "paralife") then
-			local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
-        	ParalifeLiveModel.ClosePage()
-
-			GameLogic.RunCommand("/hide playertouch")
+			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
+			ParaLife:Hide();
 		end
 	end,
 };

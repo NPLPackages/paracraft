@@ -51,7 +51,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua")
 NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLife.lua");
+local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
@@ -366,6 +367,8 @@ function GameLogic.Init(worldObj)
 
 	NeuronSimulator.Init();
 	
+	ParaLife:Init()
+
 	GameLogic.LoadGame();
 
 	GameLogic.is_started = true;
