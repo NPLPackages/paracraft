@@ -1510,7 +1510,7 @@ function Entity:SetRoll(roll)
 end
 
 -- rotation around Z axis
-function Entity:GetRoll(roll)
+function Entity:GetRoll()
 	local obj = self:GetInnerObject();
 	return obj and obj:GetField("roll", 0) or 0;
 end
@@ -3124,5 +3124,19 @@ function Entity:SetInsideTriggers(triggerObjects)
 			end
 		end
 		self.lastTriggerObjects = triggerObjects;
+	end
+end
+
+-- @param granularity: (0-1), 1 will generate 27 pieces, 0 will generate 0 pieces, default to 1. 
+function Entity:CreateBlockPieces(granularity, icon)
+	-- simply use block 1 for break sound
+	local block_id = 1;
+	local block_template = block_types.get(block_id);
+	if(block_template) then
+		local item = self:GetItemClass()
+		if(item and (item.icon or icon)) then
+			local bx, by, bz = self:GetBlockPos()
+			block_template:CreateBlockPieces(bx, by, bz, granularity, item.icon or icon);
+		end
 	end
 end

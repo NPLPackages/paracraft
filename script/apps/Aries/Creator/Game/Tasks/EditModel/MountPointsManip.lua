@@ -38,6 +38,8 @@ MountPointsManip:Property({"ShowMountPointName", false});
 MountPointsManip:Property({"RealTimeUpdate", true, "IsRealTimeUpdate", "SetRealTimeUpdate", auto=true});
 MountPointsManip:Property({"MountCount", 0, "GetMountCount"});
 MountPointsManip:Property({"UIScaling", 1, "GetUIScaling", "SetUIScaling"});
+-- default to nil, if not, the returned angle will always be snap to steps, such pi/2, pi/4, pi/6
+MountPointsManip:Property({"GridStep", math.pi/12, "GetGridStep", "SetGridStep", auto=true});
 -- each mount point has trans, scale, rotate three variables. when mountpoint is changed, varNameChanged is always changed. 
 MountPointsManip:Signal("mountPointChanged", function(mountpoint_name) end);
 
@@ -255,7 +257,13 @@ function MountPointsManip:OnChangeMountPointRotation()
 		local mountpoint = self.selectedMountPoint;
 		local yaw = self.curManip:GetField("yaw")
 		if(yaw) then
-			mountpoint:SetFacing(mountpoint:GetLastRotation() + yaw)
+			local angle = mountpoint:GetLastRotation() + yaw;
+			angle = mathlib.ToStandardAngle(angle);
+			if(self:GetGridStep()) then
+				local step = self:GetGridStep()
+				angle = math.floor( angle / step + 0.5) * step
+			end
+			mountpoint:SetFacing(angle)
 		end
 		self:SetModified();
 	end
@@ -507,10 +515,7 @@ function MountPointsManip:paintEvent(painter)
 		-- draw this mountpoint if any
 		painter:PushMatrix();
 		painter:TranslateMatrix(cx, cy, cz);
-		if(mountpoint:GetFacing() ~= 0) then
-			painter:RotateMatrix(mountpoint:GetFacing(), 0, 1, 0)
-		end
-
+		
 		if(self.selectedMountPoint == mountpoint) then
 			self:SetColorAndName(painter, self.editColor, pickName);
 		else
@@ -521,10 +526,15 @@ function MountPointsManip:paintEvent(painter)
 				self:SetColorAndName(painter, self.AABBColor, pickName);
 			end
 		end
-		-- draw this mountpoint
+		-- draw this mountpoint AABB
 		ShapesDrawer.DrawAABB(painter, - dx / 2, 0, - dz / 2, dx / 2, dy, dz / 2, false)
-		ShapesDrawer.DrawLine(painter, 0, 0, 0, dx + 0.1, 0, 0)
 		
+		-- draw mountpoint facing
+		if(mountpoint:GetFacing() ~= 0) then
+			painter:RotateMatrix(mountpoint:GetFacing(), 0, 1, 0)
+		end
+		ShapesDrawer.DrawLine(painter, 0, 0, 0, dx + 0.1, 0, 0)
+
 		if(not isDrawingPickable and 
 			(((self.ShowMountPointName) and (name == mountpoint.pickName or self.selectedMountPoint == mountpoint))
 				or (not self.selectedMountPoint and name == mountpoint.pickName))) then

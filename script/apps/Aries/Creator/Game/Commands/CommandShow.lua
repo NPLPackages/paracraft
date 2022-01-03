@@ -156,8 +156,7 @@ Other show filters:
 			TouchMiniKeyboard.GetSingleton():SetRockerMod()
 		elseif (name == "paralife") then
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
-			ParaLife:Init()
-			ParaLife:Show();
+			ParaLife:SetEnabled(true)
 		end
 	end,
 };
@@ -255,7 +254,7 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 			TouchMiniKeyboard.GetSingleton():SetKeyboardMod()
 		elseif (name == "paralife") then
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
-			ParaLife:Hide();
+			ParaLife:SetEnabled(false)
 		end
 	end,
 };

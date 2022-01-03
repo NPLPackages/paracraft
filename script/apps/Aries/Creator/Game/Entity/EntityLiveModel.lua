@@ -20,6 +20,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelMountPoints.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
+local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockInEntityHand");
 local AppGeneralGameClient = commonlib.gettable("Mod.GeneralGameServerMod.App.Client.AppGeneralGameClient");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
@@ -284,6 +286,23 @@ function Entity:FindSkinFiles(skin)
 	return allExists;
 end
 
+-- update from XML node
+function Entity:UpdateFromXMLNode(node)
+	if(self.obj) then
+		local lastPitch = self:GetPitch()
+		local lastRoll = self:GetRoll()
+		Entity._super.UpdateFromXMLNode(self, node)
+		local newPitch = self:GetPitch();
+		local newRoll = self:GetRoll();
+		self.pitch = lastPitch
+		self.roll = lastRoll
+		self:SetPitch(newPitch);
+		self:SetRoll(newRoll);
+	else
+		Entity._super.UpdateFromXMLNode(self, node)
+	end
+end
+
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	local attr = node.attr;
@@ -339,50 +358,76 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.lastAnim) then
 			self.lastAnimId = tonumber(attr.lastAnim)
 		end
+		if(attr.pitch) then
+			self.pitch = tonumber(attr.pitch) or self.pitch;
+		else
+			self.pitch = nil
+		end
+		if(attr.roll) then
+			self.roll = tonumber(attr.roll) or self.roll;
+		else
+			self.roll = nil
+		end
+		if(attr.bootHeight) then
+			self.bootHeight = tonumber(attr.bootHeight) or self.bootHeight;
+		else
+			self.bootHeight = nil
+		end
 	end
 end
 
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
-	node.attr.filename = self:GetModelFile();
+	local attr = node.attr;
+	attr.filename = self:GetModelFile();
 	if(self:getScale()~= 1) then
-		node.attr.scale = self:getScale();
+		attr.scale = self:getScale();
 	end
 	if(self.skin and self.skin~="") then
-		node.attr.skin = self.skin;
+		attr.skin = self.skin;
 	end
 	if(self.onclickEvent) then
-		node.attr.onclickEvent = self.onclickEvent
+		attr.onclickEvent = self.onclickEvent
 	end
 	if(self.onhoverEvent) then
-		node.attr.onhoverEvent = self.onhoverEvent
+		attr.onhoverEvent = self.onhoverEvent
 	end
 	if(self.onmountEvent) then
-		node.attr.onmountEvent = self.onmountEvent
+		attr.onmountEvent = self.onmountEvent
 	end
 	if(self.tag and self.tag~="") then
-		node.attr.tag = self.tag
+		attr.tag = self.tag
 	end
 	if(self.category and self.category~="") then
-		node.attr.category = self.category
+		attr.category = self.category
 	end
 	if(self.linkInfo and self.linkInfo.entity) then
-		node.attr.linkTo = self.linkInfo.entity:GetName();
+		attr.linkTo = self.linkInfo.entity:GetName();
 	end
 	if(self.idleAnim ~= 0) then
-		node.attr.idleAnim = self.idleAnim;
+		attr.idleAnim = self.idleAnim;
 	end
-	node.attr.x, node.attr.y, node.attr.z = self:GetPosition()
+	if(self.pitch and self.pitch ~= 0) then
+		attr.pitch = self.pitch;
+	end
+	if(self.roll and self.roll ~= 0) then
+		attr.roll = self.roll;
+	end
+	if(self.bootHeight and self.bootHeight ~= 0) then
+		attr.bootHeight = self.bootHeight;
+	end
+
+	attr.x, attr.y, attr.z = self:GetPosition()
 	if(self.useRealPhysics) then
-		node.attr.useRealPhysics = true;
+		attr.useRealPhysics = true;
 	end
-	node.attr.canDrag = self.canDrag;
-	node.attr.stackHeight = self.stackHeight;
-	node.attr.isStackable = self.isStackable;
-	node.attr.bIsAutoTurning = self.bIsAutoTurning;
+	attr.canDrag = self.canDrag;
+	attr.stackHeight = self.stackHeight;
+	attr.isStackable = self.isStackable;
+	attr.bIsAutoTurning = self.bIsAutoTurning;
 	local lastAnim = self:GetLastAnimId();
 	if((lastAnim or 0) ~= (self.idleAnim or 0)) then
-		node.attr.lastAnim = lastAnim
+		attr.lastAnim = lastAnim
 	end
 
 	if(self:GetMountPoints()) then
@@ -490,13 +535,20 @@ function Entity:CreateInnerObject()
 				self:LoadPhysics(); 
 			end
 		end
-	
 		self:SetInnerObject(obj);
 		ParaScene.Attach(obj);
 		if(self:GetIdleAnim() ~= 0 or (self.lastAnimId or 0) ~= 0) then
 			self:SetAnimation(self.lastAnimId or self:GetIdleAnim())
 		end
-
+		if(self.pitch and self.pitch ~= 0) then
+			obj:SetField("pitch", self.pitch);
+		end
+		if(self.roll and self.roll ~= 0) then
+			obj:SetField("roll", self.roll);
+		end
+		if(self:GetBootHeight() ~= 0) then
+			obj:SetField("BootHeight", self:GetBootHeight());
+		end
 		self:Refresh(nil, obj)
 
 		self:UpdateBlockContainer();
@@ -504,6 +556,51 @@ function Entity:CreateInnerObject()
 	return obj;
 end
 
+function Entity:SetBootHeight(bootHeight)
+	if((self.bootHeight or 0) ~= bootHeight) then
+		self.bootHeight = bootHeight
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("BootHeight", bootHeight or 0);
+		end
+	end
+end
+
+function Entity:GetBootHeight()
+	return self.bootHeight or 0
+end
+
+-- rotation around Z axis
+function Entity:SetRoll(roll)
+	if((self.roll or 0) ~= roll) then
+		self.roll = roll
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("roll", roll or 0);
+		end
+	end
+end
+
+-- rotation around Z axis
+function Entity:GetRoll()
+	return self.roll or 0;
+end
+
+-- rotation around X axis
+function Entity:SetPitch(pitch)
+	if((self.pitch or 0) ~= pitch) then
+		self.pitch = pitch;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("pitch", pitch or 0);
+		end
+	end
+end
+
+-- rotation around X axis
+function Entity:GetPitch()
+	return self.pitch or 0;
+end
 
 function Entity:getYaw()
 	return self:GetFacing();
@@ -781,13 +878,14 @@ function Entity:OnMount(mountPointName, mountpointIndex, mountedEntity)
 	end
 end
 
+-- called every 1500 milliseconds
 function Entity:OnHover(hoverEntity)
-	if(self.onhover) then
+	if(self.onhoverEvent and hoverEntity) then
 		local event = Event:new():init("onhover");	
 		self:event(event);
 
 		local x, y, z = self:GetBlockPos();
-		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, }", self.onmountEvent, x, y, z, self.name))
+		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, hoverEntityName=%q}", self.onhoverEvent, x, y, z, self.name, hoverEntity.name or ""))
 		return true;
 	end
 end
@@ -954,6 +1052,15 @@ function Entity:HasLinkChild(childEntity)
 				return true;
 			end
 		end
+	end
+end
+
+function Entity:HasLinkParent(parentEntity)
+	if(self == parentEntity) then
+		return true
+	else
+		local parent = self:GetLinkToTarget()
+		return parent and parent:HasLinkParent(parentEntity)
 	end
 end
 
@@ -1159,3 +1266,57 @@ function Entity:SetIdleAnim(id)
 	end
 end
 
+-- make this live model to look like a given block. 
+-- @param itemStackOrItemId: the item to hold in hand or nil. usually one that is in the inventory of entity. 
+-- it can also be item id, such as 62 for grass block
+function Entity:BecomeBlockItem(itemStackOrItemId)
+	BlockInEntityHand.TransformEntityToBlockItem(self, itemStackOrItemId)
+end
+
+-- make this live model to look like a given custom char icon. 
+-- @param itemId: custom character item id, such as 83127
+function Entity:BecomeCustomCharacterItem(itemId)
+	BlockInEntityHand.TransformEntityToCustomCharItem(self, itemId)
+end
+
+-- only call this function when the entity is a custom character.
+-- we will put on the item, and it will return item_id that has been replaced. 
+-- @param itemId: custom character item id, such as 83127
+-- @return replacedItemId: this can be nil or the same as the itemId. 
+function Entity:PutOnCustomCharItem(itemId)
+	local item = CustomCharItems:GetItemInCategoryById(itemId)
+	if(item and self:HasCustomGeosets()) then
+		local oldSkins = self:GetSkin();
+		local newSkins = CustomCharItems:AddItemToSkin(oldSkins, item);
+		if(newSkins and newSkins ~= oldSkins) then
+			local oldItems, newItems;
+			if(oldSkins) then
+				oldItems = commonlib.split(oldSkins, ";")
+			end
+			if(newSkins) then
+				newItems = commonlib.split(newSkins, ";")
+			end
+			local replacedItemId;
+			if(oldSkins) then
+				for _, id in pairs(oldSkins) do
+					local bHasItem;
+					for _, id2 in pairs(newSkins) do
+						if(id == id2) then
+							bHasItem = true
+							break;
+						end
+					end
+					if(not bHasItem) then
+						replacedItemId = id
+						break
+					end
+				end
+			else
+				replacedItemId = tostring(itemId);
+			end
+			self:SetSkin(newSkins)
+			return replacedItemId
+		end
+	end
+	return itemId;
+end

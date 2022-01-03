@@ -1,6 +1,6 @@
 --[[
 Title: Custom Char Models and Skins
-Author(s): chenjinxian
+Author(s): chenjinxian, LiXizhi
 Date: 2020/12/21
 Desc: 
 use the lib:
@@ -9,10 +9,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 CustomCharItems:Init();
 
-
-
 function CustomCharItems:AddItemToSkin(skin, item) 
-������Ϣ��geosets index-1  = ccs index
+-- geosets index-1  = ccs index
  geosets={ 2, [3]=1, [4]=1, [5]=1, [6]=1, [9]=1, [10]=1 },
  2#201#301#401#501#801#901
 -----------------------------------------------------------------
@@ -66,8 +64,6 @@ echo:"===================RefreshCustomGeosets output skin"
 echo:"1#201#301#401#501#802#904#@1:Texture/blocks/CustomGeoset/hair/1_Avatar_boy_hair_00.png;2:Texture/blocks/CustomGeoset/body/shirt_02_Avatar_boy_body_01.png;3:Texture/blocks/Paperman/eye/eye_boy_fps10_a001.png;4:Texture/blocks/Paperman/mouth/mouth_boy_fps10_a001.png;5:Texture/blocks/CustomGeoset/leg/Avatar_boy_leg_xiangyu00.png;6:Texture/blocks/CustomGeoset/main/Avatar_tsj.png;@"
 
 
-
-����skinλ�ã�
 PlayerAssetFile:RefreshCustomGeosets(player, skin)
 pe_mc_player.SetAssetFile(mcmlNode, pageInst, filename)
 -------------------------------------------------------
@@ -85,6 +81,9 @@ local items = {};
 --		[key: string]: { icon:string, id: int, isVip: boolean, name: string }[]
 -- }
 CustomCharItems.category_items = {};
+CustomCharItems.itemsGsidMap = {};
+CustomCharItems.itemsIdMap = {};
+CustomCharItems.itemsInCaregoryIdMap = {}
 
 -- pet id string list
 CustomCharItems.PetIds = {};
@@ -227,6 +226,9 @@ function CustomCharItems:Init()
 				end
 			end
 			items[#items+1] = item;
+			if(item.id) then
+				CustomCharItems.itemsIdMap[item.id] = item;
+			end
 		end
 
 		-- items DS
@@ -270,7 +272,12 @@ function CustomCharItems:Init()
 						data.wing = node.attr.wing;
 					end
 					groups[#groups+1] = item;
-
+					if(item.gsid) then
+						CustomCharItems.itemsGsidMap[item.gsid] = item;
+					end
+					if(item.id) then
+						CustomCharItems.itemsInCaregoryIdMap[item.id] = item;
+					end
 					-- record pet category item id
 					if name == "pet" then
 						CustomCharItems.PetIds[item.id] = 1;
@@ -349,20 +356,27 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 	end
 end
 
+-- @param id: item id 
+-- @param modelType: can be nil
 function CustomCharItems:GetItemById(id, modelType)
-	for _, item in ipairs(items) do
-		if (item.id == id) then
-			if (modelType) then
-				for _, model in ipairs(item.model) do
-					if (model == modelType) then
-						return item.data;
-					end
+	local item = CustomCharItems.itemsIdMap[id]
+	if(item) then
+		if (modelType) then
+			for _, model in ipairs(item.model) do
+				if (model == modelType) then
+					return item.data;
 				end
-			else
-				return item.data;
 			end
+		else
+			return item.data;
 		end
 	end
+end
+
+-- this is the item in cartegory list, with price and icon, etc. 
+-- @param id: item id 
+function CustomCharItems:GetItemInCategoryById(id)
+	return CustomCharItems.itemsInCaregoryIdMap[tostring(id)]
 end
 
 CustomCharItems.defaultSkinTable = {
@@ -700,12 +714,18 @@ function CustomCharItems:ReplaceSkinTexture(skin, texture)
 	return currentSkin;
 end
 
+-- get item in category list by global store id, which is the id on the server side. 
 function CustomCharItems:GetItemByGsid(gsid)
-	for k, v in pairs(CustomCharItems.category_items) do
-		for k2, item in pairs(v) do
-			if (item.gsid == gsid) then
-				return item;
+	local item = CustomCharItems.itemsGsidMap[gsid]
+	if(not item) then
+		for k, v in pairs(CustomCharItems.category_items) do
+			for k2, item in pairs(v) do
+				if (item.gsid == gsid) then
+					CustomCharItems.itemsGsidMap[gsid] = item;
+					return item;
+				end
 			end
 		end
 	end
+	return item;
 end

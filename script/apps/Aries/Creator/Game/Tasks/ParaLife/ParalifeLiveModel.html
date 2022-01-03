@@ -71,15 +71,6 @@
     <pe:if condition='<%=ParalifeLiveModel.main_ui_mode == "switchrole"%>'>
         <pe:container alignment="_lb" ClickThrough="true" width="100%" height="300" style="background:url(Texture/Aries/Creator/keepwork/Paralife/main/bottom_32bits.png#0 0 2439 433);">
             <pe:container ClickThrough="true" uiname="paralife_role" width="100%" height="300" style="background:url();">
-                <pe:repeat DataSource="<%=ParalifeLiveModel.role_data%>">
-                    <pe:repeatitem style="float:left;width:200px;">
-                        <pe:if condition='<%=CheckShow(Eval("index"))%>'>
-                            <pe:container  uiname = '<%=GetParentIconName(Eval("index"))%>' style="float: left; width: 200px; height: 300px; background:;">
-                                <pe:mc_player name='<%=GetIconName(Eval("index"))%>' miniscenegraphname='<%=GetSceneName(Eval("index"))%>' IsInteractive = "false" style="margin-left: -30px; margin-top: -60px; width:300px;height:300px;" NoFrameMove="true" RenderTargetSize="512" DefaultCameraObjectDist="5.2" />
-                            </pe:container>
-                        </pe:if>
-                    </pe:repeatitem>
-                </pe:repeat>
             </pe:container>
         </pe:container>
         

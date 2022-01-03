@@ -315,26 +315,77 @@ end
 
 function ParalifeLiveModel.OnCreate()
 	if page then
-        ParalifeLiveModel.InitPlayerUI() 
-		ParalifeLiveModel.InitPlayerView()
+        -- ParalifeLiveModel.InitPlayerUI() 
+		-- ParalifeLiveModel.InitPlayerView()
+		ParalifeLiveModel.CreateRoleView()
 		ParalifeLiveModel.InitPlayerControl()
 		local paralife_back = ParaUI.GetUIObject("paralife_back")
 		if paralife_back then
 			paralife_back:GetAttributeObject():SetField("ClickThrough", true)
 		end   
-		-- ParalifeLiveModel.CreateRoleView()
+		
     end
 end
 
 function ParalifeLiveModel.CreateRoleView()
-	local move_view	 = ParaUI.GetUIObject("paralife_role")
+	local touchIndex =-1
+	local isTouchPlayer = false
+	local paralife_back = ParaUI.GetUIObject("paralife_back")
+	local paralife_role = ParaUI.GetUIObject("paralife_role")
+	local screen_width,screen_height = Screen:GetWidth(),Screen:GetHeight()
+	local startx = screen_width/2 - 640
+	local starty = screen_height - 250
+	local mouse_x, mouse_y = ParaUI.GetMousePosition();
+	local startmousex,startmousey
+	local disx,disy = 0,0
+	local showNum = ParalifeLiveModel.GetShowNum()
 	local default_data_num = #ParalifeLiveModel.role_data
-	local show_num = ParalifeLiveModel.GetShowNum()
-	if  move_view and move_view:IsValid() then
-		for i=1,show_num do
-			local node = ParaUI.CreateUIObject("container", "role_node"..i, "_lt", (i-1) * 200, 0, 200, 300);
-			move_view:AddChild(node)
-			ParalifeLiveModel.CreateCanvaNode(node,i) --添加角色形象
+	if  paralife_role and paralife_role:IsValid() then
+		for i=1,showNum do
+			local parentUser = ParaUI.CreateUIObject("container", "main_user_player_parent"..i, "_lt", (i-1) * 200, 0, 200, 300);
+			parentUser.background = ""
+			paralife_role:AddChild(parentUser)
+			ParalifeLiveModel.CreateCanvaNode(parentUser,i) --添加角色形象
+
+			local startParaX,startParaY
+			parentUser:SetScript("onmouseup",function()
+				isTouchPlayer = false
+				touchIndex = -1
+				if math.abs( disx ) > 100 then
+					local moveDis = {x= (disx > 0 and screen_width or -screen_width),y=0}
+					ParalifeLiveModel.MoveAction(moveDis,0.4,function()
+						local move_num = showNum--math.floor(math.abs(disx) / 200) + 1
+						if move_num > 0 then
+							ParalifeLiveModel.MoveRoleData(move_num , disx < 0 and disx ~= 0 )
+						end
+					end)
+				else
+					for i=1,showNum do
+						local target = ParaUI.GetUIObject("main_user_player_parent"..i)
+						target.x = target.x - disx
+					end
+				end
+			end)
+			parentUser:SetScript("onmousedown",function()
+				isTouchPlayer = true
+				touchIndex = i
+				startmousex,startmousey = ParaUI.GetMousePosition();
+				startParaX = paralife_role.x
+			end)
+			parentUser:SetScript("onmousemove",function()
+				if isTouchPlayer and touchIndex == i then
+					mouse_x, mouse_y = ParaUI.GetMousePosition();
+					disx,disy = mouse_x - startmousex ,mouse_y - startmousey
+					if disy < 0 and mouse_y < starty  then
+						ParalifeLiveModel.CreateEntity(i,ParalifeLiveModel.role_data[i])
+						parentUser.visible = false
+						paralife_back:GetAttributeObject():SetField("ClickThrough", false)
+					end
+					if showNum < #ParalifeLiveModel.role_data then
+						paralife_role.x = startParaX + disx
+					end
+				end
+			end)
 		end
 	end
 end
@@ -464,27 +515,6 @@ function ParalifeLiveModel.MoveRoleData(move_num,ismoveleft)
 end
 
 --roledata=======================================================================================================
-
-function ParalifeLiveModel.InitPlayerView()
-	for i,v in ipairs(ParalifeLiveModel.role_data) do
-		local playUser = page:FindControl("main_user_player"..i)
-		if playUser then
-			local scene = ParaScene.GetMiniSceneGraph(playUser.resourceName);
-			if scene and scene:IsValid() then
-				local player = scene:GetObject(playUser.obj_name);
-				if player then
-					player:SetScale(1)
-					player:SetFacing(1.57);
-					player:SetField("HeadUpdownAngle", 0.3);
-					player:SetField("HeadTurningAngle", 0);
-					player:SetField("assetfile",v.assetfile)
-					ParalifeLiveModel.SetPlayerSkin(player,v.assetfile,v.skin)
-				end
-			end 
-		end
-	end
-end
-
 function ParalifeLiveModel.InitPlayerControl()
 	local paralife_back = ParaUI.GetUIObject("paralife_back")
 	paralife_back:SetScript("onmouseup",function()			
@@ -509,6 +539,27 @@ function ParalifeLiveModel.InitPlayerControl()
 
 		end
 	end)
+end
+
+--暂时废弃
+function ParalifeLiveModel.InitPlayerView()
+	for i,v in ipairs(ParalifeLiveModel.role_data) do
+		local playUser = page:FindControl("main_user_player"..i)
+		if playUser then
+			local scene = ParaScene.GetMiniSceneGraph(playUser.resourceName);
+			if scene and scene:IsValid() then
+				local player = scene:GetObject(playUser.obj_name);
+				if player then
+					player:SetScale(1)
+					player:SetFacing(1.57);
+					player:SetField("HeadUpdownAngle", 0.3);
+					player:SetField("HeadTurningAngle", 0);
+					player:SetField("assetfile",v.assetfile)
+					ParalifeLiveModel.SetPlayerSkin(player,v.assetfile,v.skin)
+				end
+			end 
+		end
+	end
 end
 
 function ParalifeLiveModel.InitPlayerUI()
@@ -573,6 +624,7 @@ function ParalifeLiveModel.InitPlayerUI()
 		end
 	end
 end
+---------------------------------end
 
 function ParalifeLiveModel.MoveAction(movedis,time,callback_func)
 	if not movedis then

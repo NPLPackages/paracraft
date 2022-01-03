@@ -53,7 +53,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "ShowClientUpdaterNotice": show client updater notice when stared updater.
   - "HideClientUpdaterNotice": hide client updater notice when finished updater.
   - "InitDesktop", bSkipDefaultDesktop: called to init the default desktop UI
-  - "ActivateDesktop", bIgnoreDefaultDesktop, mode: called when desktop mode is changed. This is the place to initialize your custom GUI. 
+  - "ActivateDesktop", bIgnoreDefaultDesktop, mode: called when desktop mode is changing. This is the place to initialize your custom GUI. 
+  - "DesktopModeChanged", mode: called when desktop mode is already changed. This is the place to initialize your custom GUI after default GUI is shown. 
   - "show", name, bIsShow: hook `/show name` command to display a custom gui via command
   - "cmd_open_url", url, options: hook `/open url` command to display a custom url via command
   - "InternetLoadWorld.ShowPage", bEnable, bShow: whether to show the default load world window. We can use this filter to replace the default load world window.

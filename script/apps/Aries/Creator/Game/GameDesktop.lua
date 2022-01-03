@@ -196,6 +196,7 @@ function Desktop.OnActivateDesktop(mode)
 		end
 		Desktop.mode = mode;
 	end
+	GameLogic.GetFilters():apply_filters("DesktopModeChanged", mode);
 end
 
 -- get Desktop.mode

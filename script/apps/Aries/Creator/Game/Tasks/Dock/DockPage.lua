@@ -1051,7 +1051,7 @@ function DockPage.CheckWinterCampUIVisible()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 	local hide_ui_world_ids = {
-        ONLINE = { 119551,114607,91056,128252 },
+        ONLINE = { 119551,114607,91056,128252,128291},
         RELEASE = {},
     };
     local worlds = hide_ui_world_ids[HttpWrapper.GetDevVersion()]

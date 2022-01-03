@@ -273,10 +273,10 @@ end
 
 -- check if a mount point is inside a mount point's aabb. the one that is closest to the mount point center is returned. 
 -- @param x, y, z: a world space point
--- @param maxDiff: default to 0. we will expand the aabb by this value. usually 0.1
+-- @param maxDiffX, maxDiffY, maxDiffZ: default to 0. we will expand the aabb by this value. usually 0.1 in y direction
 -- return true, mountpoint:  the first return value is true, if the mount point is inside one of the mount point's aabb. 
 -- the second value is the mountpoint
-function ModelMountPoints:IsPointInMountPointAABB(x, y, z, maxDiff)
+function ModelMountPoints:IsPointInMountPointAABB(x, y, z, maxDiffX, maxDiffY, maxDiffZ)
 	-- transform in local model space to camera space. 
 	local worldMat = self:CalculateWorldMatrix(nil, true);
 	
@@ -288,10 +288,9 @@ function ModelMountPoints:IsPointInMountPointAABB(x, y, z, maxDiff)
 		local cx, cy, cz = mountpoint:GetBottomCenter();
 		local dx, dy, dz = mountpoint:GetAABBSize()
 		local aabb = mathlib.ShapeAABB:new_from_pool(cx, cy+dy/2, cz, dx/2, dy/2, dz/2, true)
-		if((maxDiff or 0) ~= 0) then
-			aabb:Expand(maxDiff, maxDiff, maxDiff)
-		end
 		aabb:Rotate(worldMat);
+		aabb:Expand(maxDiffX or 0, maxDiffY or 0, maxDiffZ or 0)
+
 		if(aabb:ContainsPoint(x, y, z)) then
 			return true, mountpoint;
 		end

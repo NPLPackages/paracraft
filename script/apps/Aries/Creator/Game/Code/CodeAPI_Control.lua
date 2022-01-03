@@ -106,7 +106,9 @@ function env_imp:becomeAgent(entityName)
 		else
 			entity = EntityManager.GetEntity(entityName);
 		end
-		self.actor:BecomeAgent(entity);
+		if(entity) then
+			self.actor:BecomeAgent(entity);
+		end
 	else
 		local actor = self.codeblock:CloneMyself()
 		if(actor and self.co) then

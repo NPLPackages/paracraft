@@ -587,15 +587,24 @@ function EditMovieContext:GetNextTimeValue(key,event)
 		if ctrl_pressed then
 			if shift_pressed then
 				local value = (math.floor(curTime/100) - 1)*100
+				if curTime % 100 ~= 0 then
+					value = math.floor(curTime/100)*100
+				end
 				newTime = value > startTime and value or startTime
 				return newTime
 			end
 			if alt_pressed then
 				local value = (math.floor(curTime/50) - 1)*50
+				if curTime % 50 ~= 0 then
+					value = math.floor(curTime/50)*50
+				end
 				newTime = value > startTime and value or startTime
 				return newTime
 			end
 			local value = (math.floor(curTime/1000) - 1)*1000
+			if curTime % 1000 ~= 0 then
+				value = math.floor(curTime/1000)*1000
+			end
 			newTime = value > startTime and value or startTime
 			return newTime
 		end

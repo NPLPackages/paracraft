@@ -1099,14 +1099,16 @@ function Actor:SetActorValue(name, value, v2, v3)
 end
 
 function Actor:BecomeAgent(entity)
-	Actor._super.BecomeAgent(self, entity);
+	if(entity) then
+		Actor._super.BecomeAgent(self, entity);
 
-	if(self:IsActorPickingEnabled()) then
-		entity:Connect("clicked", self, self.OnClick, "UniqueConnection");
-		self:EnableActorPicking(true)
+		if(self:IsActorPickingEnabled()) then
+			entity:Connect("clicked", self, self.OnClick, "UniqueConnection");
+			self:EnableActorPicking(true)
+		end
+		entity:Connect("collided", self, self.OnCollideWithEntity, "UniqueConnection");
+		entity:Connect("valueChanged", self, self.OnEntityPositionChange, "UniqueConnection");
 	end
-	entity:Connect("collided", self, self.OnCollideWithEntity, "UniqueConnection");
-	entity:Connect("valueChanged", self, self.OnEntityPositionChange, "UniqueConnection");
 end
 
 -- in block coordinates

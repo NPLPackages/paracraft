@@ -56,12 +56,12 @@ RacePage.ItemData = {
 		name = "lan_qiao_bei"
 	},
 	{
-		time = "2021年8月15日-2021年12月31日",
-		signUpBtnInfo = {tooltip = "提交截止时间：2021年12月31日",endDay = "2021-12-31",endTime ="23:59:59"},
+		time = "2021年8月15日-2022年8月31日",
+		signUpBtnInfo = {tooltip = "提交截止时间：2022年8月31日",endDay = "2022-8-31",endTime ="23:59:59"},
 		timeRule = {
 			startDay="2021-08-15",
 			startTime="00:00:00",
-			endDay="2021-12-31",
+			endDay="2022-8-31",
 			endTime="23:59:59"
 		},
 		race="2021青少年“讲好中国故事”创意编程大赛",

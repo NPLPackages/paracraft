@@ -620,7 +620,7 @@ function ItemLiveModel:GetStackHeightOnLocation(draggingEntity, x, y, z, isMount
 		local mountedEntities = EntityManager.GetEntitiesByAABBOfType(EntityManager.EntityLiveModel, ShapeAABB:new_from_pool(x, y+0.5, z, 0.1, 0.55, 0.1, true))
 		if(mountedEntities) then
 			for _, entity in ipairs(mountedEntities) do
-				if(entity ~= draggingEntity and entity~=targetEntity) then
+				if(not entity:HasLinkParent(draggingEntity) and entity~=targetEntity) then
 					if(entity:GetLinkToTarget() == targetEntity) then
 						local x1, y1, z1 = entity:GetPosition();
 						if(math.abs(x1 - x) + math.abs(z1 - z) < 0.1) then
@@ -664,14 +664,14 @@ function ItemLiveModel:GetStackHeightOnLocation(draggingEntity, x, y, z, isMount
 				end
 			end
 			for _, entity in ipairs(mountedEntities) do
-				if(entity ~= draggingEntity and entity~=targetEntity) then
+				if(not entity:HasLinkParent(draggingEntity) and entity~=targetEntity) then
 					local x1, y1, z1 = entity:GetPosition();
-					if(math.abs(x1 - x) + math.abs(z1 - z) < 0.1) then
+					if((math.abs(x1 - x) + math.abs(z1 - z)) < 0.1) then
 						MountedEntityCount = MountedEntityCount + 1
 						if(entity:IsStackable() and entity:GetCanDrag()) then
 							local x1, y1, z1 = entity:GetPosition()
 							local distSq = ((x1 - x)^2) + ((z1 - z)^2);
-							if(distSq < 0.02 and y1 >= y and y1 <= (y + 1)) then
+							if(distSq < 0.02 and (y1-y) > -0.001 and y1 <= (y + 1)) then
 								-- vertically stacked
 								totalStackHeight = (totalStackHeight or 0) + entity:GetStackHeight();
 								isMountedEntitiesStackable = true
@@ -807,7 +807,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 				local bInside, mp, distance;
 				if(targetEntity:HasRealPhysics() and result.x) then
 					-- for physical model, we need to check if hit point is inside the AABB of mount points. 	
-					bInside, mp = targetEntity:GetMountPoints():IsPointInMountPointAABB(result.x, result.y, result.z, 0.1)
+					bInside, mp = targetEntity:GetMountPoints():IsPointInMountPointAABB(result.x, result.y, result.z, 0, 0.1, 0)
 				else
 					mp, distance = targetEntity:GetMountPoints():GetMountPointByXY();
 				end
@@ -959,12 +959,7 @@ function ItemLiveModel:SmoothMoveTo(draggingEntity, facing, newX, newY, newZ)
 			if(draggingEntity.motionSpeed) then
 				draggingEntity.motionSpeed = math.max(0, draggingEntity.motionSpeed - math.max(draggingEntity.motionSpeed*0.2, 0.1));
 				bReached = bReached and (draggingEntity.motionSpeed == 0);
-				local animId = 0
-				if(draggingEntity.motionSpeed > 0.1) then
-					animId = 5;
-				end
-				-- echo({"1111", animId, draggingEntity.motionSpeed})
-				draggingEntity:SetAnimation(animId);
+				self:UpdateEntityAnimationByMotionSpeed(draggingEntity, draggingEntity.motionSpeed)
 			end
 			if(bReached) then
 				draggingEntity:SetAnimation(draggingEntity:GetIdleAnim());
@@ -972,9 +967,20 @@ function ItemLiveModel:SmoothMoveTo(draggingEntity, facing, newX, newY, newZ)
 			end
 		end})
 		draggingEntity.smoothAnimTimer:Change(30, 30)
+		self:UpdateEntityAnimationByMotionSpeed(draggingEntity, draggingEntity.motionSpeed)
 	elseif(draggingEntity.smoothAnimTimer) then
 		draggingEntity:SetAnimation(draggingEntity:GetIdleAnim());
 		draggingEntity.smoothAnimTimer:Change()
+	end
+end
+
+function ItemLiveModel:UpdateEntityAnimationByMotionSpeed(entity, motionSpeed)
+	if(motionSpeed) then
+		local animId = 0
+		if(motionSpeed > 0.1) then
+			animId = 5;
+		end
+		entity:SetAnimation(animId);
 	end
 end
 
@@ -1004,6 +1010,58 @@ function ItemLiveModel:UpdateEntityDragAnim(draggingEntity, newX, newY, newZ, ol
 	self:SmoothMoveTo(draggingEntity, targetFacing, newX, newY, newZ)
 end
 
+local hoverInterval = 1500; -- ms
+local maxHoverMoveDistance = 10; -- pixels
+
+-- return isHover, hoverOnEntity: the first return value is true, if it is already a hover event. 
+-- the second parameter is the entity that is hovered on by the draggingEntity. 
+function ItemLiveModel:UpdateOnHoverMousePointAABB(event, bReset)
+	self.hoverTimer = self.hoverTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		if(not self.draggingEntity) then
+			timer:Change();
+		else
+			self:UpdateOnHoverMousePointAABB()
+		end
+	end})
+	self.hoverTimer:Change(200, 200);
+	if(bReset) then 
+		self.mousePointAABB = self.mousePointAABB or mathlib.ShapeAABB:new();
+		if(event) then
+			self.mousePointAABB:SetPointAABB(mathlib.vector3d:new({event.x, event.y, 0}))
+		end
+		self.hoverBeginTime = commonlib.TimerManager.GetCurrentTime();
+		self.lastHoverDraggingEntity = self.draggingEntity
+		if(self.draggingEntity and self.draggingEntity.dragParams and self.draggingEntity.dragParams.dropLocation) then
+			self.lastHoverOnEntity = self.draggingEntity.dragParams.dropLocation.target;
+		else
+			self.lastHoverOnEntity = nil;
+		end
+		
+	elseif(self.hoverBeginTime and self.mousePointAABB) then
+		local curHoverOnEntity;
+		if(self.draggingEntity and self.draggingEntity.dragParams and self.draggingEntity.dragParams.dropLocation) then
+			curHoverOnEntity = self.draggingEntity.dragParams.dropLocation.target;
+		end
+
+		local curTime = commonlib.TimerManager.GetCurrentTime();
+		if(event) then
+			self.mousePointAABB:Extend(event.x, event.y, 0)
+		end
+		local maxDiff = self.mousePointAABB:GetMaxExtent()
+		if(maxDiff > maxHoverMoveDistance or not curHoverOnEntity or (curHoverOnEntity~=self.lastHoverOnEntity or self.draggingEntity~=self.lastHoverDraggingEntity)) then
+			self:UpdateOnHoverMousePointAABB(event, true)
+		elseif( (curTime - self.hoverBeginTime) > hoverInterval and self.draggingEntity) then
+			self:UpdateOnHoverMousePointAABB(event, true)
+
+			local hoverOnEntity = self.lastHoverOnEntity;
+			if(type(hoverOnEntity) == "table" and hoverOnEntity.OnHover) then
+				hoverOnEntity:OnHover(self.draggingEntity)
+			end
+			return true, self.lastHoverOnEntity;
+		end
+	end
+end
+
 function ItemLiveModel:mouseMoveEvent(event)
 	if(self.mousePressEntity) then
 		event:accept();
@@ -1014,12 +1072,14 @@ function ItemLiveModel:mouseMoveEvent(event)
 			local topEntity = self:GetTopStackEntityFromEntity(self.mousePressEntity)
 			if(topEntity and topEntity:GetCanDrag()) then
 				self:StartDraggingEntity(topEntity)
+				self:UpdateOnHoverMousePointAABB(event, true)
 			end
 		end
 	end
 	local result, targetEntity = self:CheckMousePick()
 	if(self.draggingEntity) then
 		self:UpdateDraggingEntity(self.draggingEntity, result, targetEntity)
+		self:UpdateOnHoverMousePointAABB(event)
 	end
 end
 

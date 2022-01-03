@@ -200,6 +200,37 @@ function Entity:UpgradeInnerObjectToBiped(filename)
 	return self:GetInnerObject();
 end
 
+-- rotation around Z axis
+function Entity:SetRoll(roll)
+	if((self.roll or 0) ~= roll) then
+		self.roll = roll
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("roll", roll or 0);
+		end
+	end
+end
+
+-- rotation around Z axis
+function Entity:GetRoll()
+	return self.roll or 0;
+end
+
+-- rotation around X axis
+function Entity:SetPitch(pitch)
+	if((self.pitch or 0) ~= pitch) then
+		self.pitch = pitch;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("pitch", pitch or 0);
+		end
+	end
+end
+
+-- rotation around X axis
+function Entity:GetPitch()
+	return self.pitch or 0;
+end
 
 function Entity:getYaw()
 	return self:GetFacing();
@@ -333,6 +364,16 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.idleAnim) then
 			self.idleAnim = tonumber(attr.idleAnim)
 		end
+		if(attr.pitch) then
+			self.pitch = tonumber(attr.pitch) or self.pitch;
+		else
+			self.pitch = nil
+		end
+		if(attr.roll) then
+			self.roll = tonumber(attr.roll) or self.roll;
+		else
+			self.roll = nil
+		end
 	end
 end
 
@@ -368,6 +409,12 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	if(self.idleAnim ~= 0) then
 		node.attr.idleAnim = self.idleAnim;
+	end
+	if(self.pitch and self.pitch ~= 0) then
+		attr.pitch = self.pitch;
+	end
+	if(self.roll and self.roll ~= 0) then
+		attr.roll = self.roll;
 	end
 	node.attr.canDrag = self.canDrag;
 	node.attr.stackHeight = self.stackHeight;

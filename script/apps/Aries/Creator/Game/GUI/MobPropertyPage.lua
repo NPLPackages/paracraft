@@ -287,9 +287,8 @@ function MobPropertyPage.OnOpenAssetFile()
 				-- set default skin
 				local skin = CustomCharItems:ChangeSkinStringToItems(CustomCharItems.defaultSkinString)
 				MobPropertyPage.OnChangeAssetFile(skin);
-			else
-				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filepath));
-				
+			elseif(filepath) then
+				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
 				MobPropertyPage.OnChangeAssetFile();
 			end
 		end

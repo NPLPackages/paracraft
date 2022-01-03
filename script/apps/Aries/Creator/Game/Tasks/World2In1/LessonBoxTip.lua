@@ -325,6 +325,7 @@ function LessonBoxTip.ResetMyArea()
     commonlib.TimerManager.SetTimeout(function()
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posMy[1],posMy[2],posMy[3],startTemp))
         GameLogic.AddBBS("resetArea","区域已恢复到初始状态")
+        LessonBoxTip.RenderBlockTip()
     end,500)
 end
 
