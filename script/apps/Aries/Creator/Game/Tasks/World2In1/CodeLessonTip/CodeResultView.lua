@@ -29,7 +29,7 @@ function CodeResultView.OnClose()
 end
 
 -- cur_diff_index 当前看的是第几个难点 0 的话表示看完的是思路提示
-function CodeResultView.ShowView(is_success, content, left_bt_cb, right_bt_cb)
+function CodeResultView.ShowView(is_success, content, left_bt_cb, right_bt_cb, is_last_lesson)
     CodeResultView.is_success = is_success
     CodeResultView.content = content
     CodeResultView.left_bt_cb = left_bt_cb

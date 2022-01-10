@@ -162,7 +162,7 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/artwar/02human/blockman/cunming.x"] = "80001;82011;84014;81005;88002;85011";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunzhang.x"] = "80001;83158;84050;81018;88014;85067";
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/blockman/cunming.x"] = "80001;82001;84046;81018;88014;85040";
-	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84107;81049;88017;85029";
+	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Female_teachers.x"] = "80001;82126;84107;81049;88020;85029";
 	-- TODO skin ids wrong 
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/Male_teacher.x"] = "80001;84062;81005;88014;85081;83190";
 	-- 系统默认男孩1的模型

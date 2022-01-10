@@ -262,10 +262,11 @@ function LessonBoxTip.PrepareStageScene()
     -- print("runcommand showMask===============end")
     local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     local moivePos = taskCnf.moviePos
-    if moivePos[1] then
-        GameLogic.RunCommand("/sendevent hideNpc")
-        GameLogic.GetCodeGlobal():BroadcastTextEvent("playstagemovie", {config = taskCnf});
-    end
+    -- if moivePos[1] then
+
+    -- end
+    GameLogic.RunCommand("/sendevent hideNpc")
+    GameLogic.GetCodeGlobal():BroadcastTextEvent("playstagemovie", {config = taskCnf});
     GameLogic.RunCommand("/ggs user hidden");
 end
 
@@ -299,8 +300,8 @@ function LessonBoxTip.StartCurStage()
         -- print(string.format("/loadtemplate %d,%d,%d %s",posTeacher[1],posTeacher[2],posTeacher[3],endTemp))
         -- echo(lessonConfig,true)
         GameLogic.RunCommand("/clearbag")
-        GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posTeacher[1],posTeacher[2],posTeacher[3],endTemp))
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posMy[1],posMy[2],posMy[3],startTemp))
+        GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posTeacher[1],posTeacher[2],posTeacher[3],endTemp))
         local stagePos = lessonConfig.myStage
         if stagePos[1] then
             GameLogic.GetPlayer():MountEntity(nil);
@@ -310,7 +311,7 @@ function LessonBoxTip.StartCurStage()
         LessonBoxTip.PlayLessonMusic("lesson_operate")
         LessonBoxTip.StartTip()
         LessonBoxTip.StartLearn()
-    end,500)
+    end,700)
 end
 
 function LessonBoxTip.ResetMyArea()
@@ -345,6 +346,7 @@ end
 
 function LessonBoxTip.RegisterHooks()
 	GameLogic.events:AddEventListener("CreateBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip, "LessonBoxTip");
+    GameLogic.events:AddEventListener("CreateDiffIdBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip, "LessonBoxTip");
     GameLogic.events:AddEventListener("DestroyBlockTask", LessonBoxTip.OnDestroyBlockTask, LessonBoxTip, "LessonBoxTip");
     GameLogic.GetFilters():add_filter("lessonbox_change_region_blocks",function(blocks)
         -- echo(commonlib.debugstack(),true)
@@ -361,6 +363,7 @@ end
 
 function LessonBoxTip.UnregisterHooks()
 	GameLogic.events:RemoveEventListener("CreateBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip);
+    GameLogic.events:RemoveEventListener("CreateDiffIdBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip);
     GameLogic.events:RemoveEventListener("DestroyBlockTask", LessonBoxTip.OnDestroyBlockTask, LessonBoxTip);
     GameLogic.GetFilters():remove_filter("lessonbox_change_region_blocks", function() end);
     LessonBoxTip.EndTip()
@@ -425,7 +428,7 @@ function LessonBoxTip.StartLearn()
             LessonBoxTip.SetLessonTitle()
         else
             LessonBoxCompare.CompareTwoAreas(regionsrc,regiondest,function(needbuild,pivotConfig)
-                echo(needbuild)
+                --echo(needbuild)
                 LessonBoxTip.AllNeedBuildBlock = needbuild.blocks
                 LessonBoxTip.CurNeedBuildBlock = needbuild.blocks
                 LessonBoxTip.CreatePos = pivotConfig.createpos
@@ -436,7 +439,7 @@ function LessonBoxTip.StartLearn()
                     local movieBlocks = needbuild.movies
                     local codeBlocks = needbuild.codes
                     LessonBoxTip.CompareCode(codeBlocks)
-                    LessonBoxTip.CompareMovie(movieBlocks)
+                    --LessonBoxTip.CompareMovie(movieBlocks)
                 else
                     -- LessonBoxTip.AutoEquipHandTools()
                     LessonBoxTip.RegisterHooks()
@@ -781,6 +784,24 @@ function LessonBoxTip.IsCompareAutoBlock()
     return false
 end
 
+function LessonBoxTip.IsShowFollowBt()
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
+    if taskCnf and taskCnf.follow and taskCnf.follow[1] then
+        return true
+    end
+
+    return false
+end
+
+function LessonBoxTip.IsShowMoviceBt()
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
+    if taskCnf and taskCnf.moviePos and taskCnf.moviePos[1] then
+        return true
+    end
+
+    return false
+end
+
 function LessonBoxTip.StartCheck()
     local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     if taskCnf and taskCnf.starttemplate == taskCnf.finishtemplate then
@@ -856,19 +877,31 @@ function LessonBoxTip.StartCheck()
                     LessonBoxTip.RemoveErrBlockTip()
                     LessonBoxTip.SetErrorTip(LessonBoxTip.m_nCorrectCount)
                     isFinishStage = true
-                    GameLogic.AddBBS(nil,"当前小节已完成，即将进入下一小节的学习")
+                    local finish_desc = lessonConfig.is_lx and "当前练习已完成" or "当前小节已完成，即将进入下一小节的学习"
+                    GameLogic.AddBBS(nil,finish_desc)
                     commonlib.TimerManager.SetTimeout(function()
                         LessonBoxTip.ClearErrorBlockTip()
                         LessonBoxTip.RemoveErrBlockTip()
                         LessonBoxTip.ClearBlockTip()
-                        LessonBoxTip.GotoNextStage()
+                        if lessonConfig.is_lx then
+                            LessonBoxTip.OnRetunMacro(true)
+                        else
+                            LessonBoxTip.GotoNextStage()
+                        end
+                        
                     end,5000)
                     return
                 end
                 if LessonBoxTip.m_nCorrectCount <= -5 then
-                    _guihelper.MessageBox("开启教学模式，跟着帕帕卡卡拉拉一起手把手一步一步完成课程的学习吧！",function()
-                        LessonBoxTip.OnStartMacroLearn()
-                    end)
+                    if taskCnf.follow and taskCnf.follow[1] then
+                        _guihelper.MessageBox("开启教学模式，跟着帕帕卡卡拉拉一起手把手一步一步完成课程的学习吧！",function()
+                            LessonBoxTip.OnStartMacroLearn()
+                        end)
+                    end
+
+                    if lessonConfig.is_lx then
+                        LessonBoxTip.m_nCorrectCount = -5
+                    end
                 end
                 if LessonBoxTip.m_nCorrectCount < - 6 then LessonBoxTip.m_nCorrectCount = -6  end
                 if LessonBoxTip.m_nCorrectCount > 5 then LessonBoxTip.m_nCorrectCount = 5 end
@@ -996,6 +1029,7 @@ function LessonBoxTip.SetErrBlockTip()
         end
         local x,y,z = startPos[1]+block[1],startPos[2]+block[2],startPos[3]+block[3]
         local blockId,blockData = BlockEngine:GetBlockIdAndData(x,y,z)
+
         -- print("blockId========",blockId,type(blockId),x,y,z)
         local block_item = ItemClient.GetItem(blockId);
         if blockId == 0 or block_item == nil then
@@ -1020,6 +1054,11 @@ function LessonBoxTip.SetErrBlockTip()
         local background = block_item:GetIcon(blockData):gsub("#", ";");
         local name = block_item:GetStatName()
         --print("block=========",name,background,tooltip)
+        -- 电灯特殊处理
+        if blockId == 207 then
+            blockId = 199
+        end
+
         local strErrTip = string.format("红色方框中的方块错了，正确的应该是【     】【%s】（编号：【%d】）。",name,blockId)
         SoundManager:PlayText(strErrTip,10006)
         local txtErrTip = ParaUI.GetUIObject("lessonbox_err_text")
@@ -1061,13 +1100,13 @@ function LessonBoxTip.OnStartMacroLearn()
     commonlib.TimerManager.SetTimeout(function()
         local endTemp = taskCnf.finishtemplate
         local startTemp = taskCnf.starttemplate
-        GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posTeacher[1],posTeacher[2],posTeacher[3],endTemp))
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posMy[1],posMy[2],posMy[3],startTemp))
+        GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posTeacher[1],posTeacher[2],posTeacher[3],endTemp))
         LessonBoxTip.ClearBlockTip()
         LessonBoxTip.ClearErrorBlockTip()
         LessonBoxTip.ClosePage()
         LessonBoxTip.StopStageMovie()
-        GameLogic.GetCodeGlobal():BroadcastTextEvent("playFollowMacro", {macroPos = taskCnf.follow});
+        GameLogic.GetCodeGlobal():BroadcastTextEvent("playFollowMacro", {macroPos = taskCnf.follow, taskCnf.macro_center_pos});
     end,200)
 end
 
@@ -1081,7 +1120,7 @@ function LessonBoxTip.OnRetunMacro(isFinish)
     GameLogic.RunCommand("/sendevent hideNpc")
     GameLogic.RunCommand("/ggs user visible");
     LessonBoxTip.PlayLessonMusic("free_world")
-    GameLogic.GetCodeGlobal():BroadcastTextEvent("enterMacroMode", {isFinish = isFinish or false});
+    GameLogic.GetCodeGlobal():BroadcastTextEvent("enterMacroMode", {isFinish = isFinish or false, is_lx = lessonConfig.is_lx});
 end
 
 function LessonBoxTip.CheckHasePlayMovie()

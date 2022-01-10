@@ -49,6 +49,7 @@ Entity:Property({"onclickEvent", nil, "GetOnClickEvent", "SetOnClickEvent", auto
 Entity:Property({"onhoverEvent", nil, "GetOnHoverEvent", "SetOnHoverEvent", auto=true});
 Entity:Property({"onmountEvent", nil, "GetOnMountEvent", "SetOnMountEvent", auto=true});
 Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
+Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
 Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
 
 Entity:Property({"offsetPos", {0,0,0}, "GetOffsetPos", "SetOffsetPos"});
@@ -355,6 +356,9 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.tag) then
 			self:SetTag(attr.tag);
 		end
+		if(self.staticTag and self.staticTag~="") then
+			attr.staticTag = self.staticTag
+		end
 		if(attr.category) then
 			self.category = attr.category
 		end
@@ -379,36 +383,40 @@ end
 
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
-	node.attr.filename = self:GetModelFile();
+	local attr = node.attr;
+	attr.filename = self:GetModelFile();
 	if(self:getScale()~= 1) then
-		node.attr.scale = self:getScale();
+		attr.scale = self:getScale();
 	end
 	if(self.offsetPos[1]~=0) then
-		node.attr.offsetX = self.offsetPos[1];
+		attr.offsetX = self.offsetPos[1];
 	end
 	if(self.offsetPos[2]~=0) then
-		node.attr.offsetY = self.offsetPos[2];
+		attr.offsetY = self.offsetPos[2];
 	end
 	if(self.offsetPos[3]~=0) then
-		node.attr.offsetZ = self.offsetPos[3];
+		attr.offsetZ = self.offsetPos[3];
 	end
 	if(self.onclickEvent) then
-		node.attr.onclickEvent = self.onclickEvent
+		attr.onclickEvent = self.onclickEvent
 	end
 	if(self.onhoverEvent) then
-		node.attr.onhoverEvent = self.onhoverEvent
+		attr.onhoverEvent = self.onhoverEvent
 	end
 	if(self.onmountEvent) then
-		node.attr.onmountEvent = self.onmountEvent
+		attr.onmountEvent = self.onmountEvent
 	end
 	if(self.tag) then
-		node.attr.tag = self.tag
+		attr.tag = self.tag
+	end
+	if(attr.tag) then
+		self:SetTag(attr.tag);
 	end
 	if(self.category and self.category~="") then
-		node.attr.category = self.category
+		attr.category = self.category
 	end
 	if(self.idleAnim ~= 0) then
-		node.attr.idleAnim = self.idleAnim;
+		attr.idleAnim = self.idleAnim;
 	end
 	if(self.pitch and self.pitch ~= 0) then
 		attr.pitch = self.pitch;
@@ -416,10 +424,10 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.roll and self.roll ~= 0) then
 		attr.roll = self.roll;
 	end
-	node.attr.canDrag = self.canDrag;
-	node.attr.stackHeight = self.stackHeight;
-	node.attr.isStackable = self.isStackable;
-	node.attr.bIsAutoTurning = self.bIsAutoTurning;
+	attr.canDrag = self.canDrag;
+	attr.stackHeight = self.stackHeight;
+	attr.isStackable = self.isStackable;
+	attr.bIsAutoTurning = self.bIsAutoTurning;
 	
 	if(self:GetMountPoints()) then
 		self:GetMountPoints():SaveToXMLNode(node, bSort)

@@ -583,75 +583,34 @@ function EditMovieContext:GetNextTimeValue(key,event)
 	local startTime = movieClip:GetStartTime()
 	local endTime = movieClip:GetLength()
 	local newTime = 0
-	if key == "DIK_LBRACKET" then
-		if ctrl_pressed then
-			if shift_pressed then
-				local value = (math.floor(curTime/100) - 1)*100
-				if curTime % 100 ~= 0 then
-					value = math.floor(curTime/100)*100
-				end
-				newTime = value > startTime and value or startTime
-				return newTime
-			end
-			if alt_pressed then
-				local value = (math.floor(curTime/50) - 1)*50
-				if curTime % 50 ~= 0 then
-					value = math.floor(curTime/50)*50
-				end
-				newTime = value > startTime and value or startTime
-				return newTime
-			end
-			local value = (math.floor(curTime/1000) - 1)*1000
-			if curTime % 1000 ~= 0 then
-				value = math.floor(curTime/1000)*1000
-			end
-			newTime = value > startTime and value or startTime
-			return newTime
-		end
+	local flag = key == "DIK_LBRACKET" and -1 or 1
+    local function check_value(value)
+		return  flag < 0 and (value > startTime and value or startTime) or (value < endTime and value or endTime)   
+    end
+	if ctrl_pressed then
 		if shift_pressed then
-			local value = curTime - 100
-			newTime =value > startTime and value or startTime
+			local value = flag < 0 and (math.ceil(curTime/100) - 1)*100 or (math.floor(curTime/100) + 1)*100
+			newTime = check_value(value)
+			return newTime
+
+		end
+		if alt_pressed then
+			local value = flag < 0 and (math.ceil(curTime/50) - 1)*50 or (math.floor(curTime/50) + 1)*50
+			newTime = check_value(value)
 			return newTime
 		end
-		-- if alt_pressed then
-		-- 	local value = curTime - 50
-		-- 	newTime =value > startTime and value or startTime
-		-- 	return newTime
-		-- end
-		local value = curTime - 1000
-		newTime =value > startTime and value or startTime
+		local value = flag < 0 and (math.ceil(curTime/1000) - 1)*1000 or (math.floor(curTime/1000) + 1)*1000
+		newTime = check_value(value)
 		return newTime
 	end
-	if key == "DIK_RBRACKET" then
-		if ctrl_pressed then
-			if shift_pressed then
-				local value = (math.floor(curTime/100) + 1)*100
-				newTime = value < endTime and value or endTime
-				return newTime
-			end
-			if alt_pressed then
-				local value = (math.floor(curTime/50) + 1)*50
-				newTime = value < endTime and value or endTime
-				return newTime
-			end
-			local value = (math.floor(curTime/1000) + 1)*1000
-			newTime = value < endTime and value or endTime
-			return newTime
-		end
-		if shift_pressed then
-			local value = curTime + 100
-			newTime =value < endTime and value or endTime
-			return newTime
-		end
-		-- if alt_pressed then
-		-- 	local value = curTime + 50
-		-- 	newTime =value < endTime and value or endTime
-		-- 	return newTime
-		-- end
-		local value = curTime + 1000
-		newTime =value < endTime and value or endTime
+	if shift_pressed then
+		local value = curTime + 100 * flag
+		newTime = check_value(value)
 		return newTime
 	end
+	local value = curTime + 1000 * flag
+	newTime = check_value(value)
+	return newTime
 end
 
 -- virtual: 

@@ -25,6 +25,20 @@ function DragEntity:ctor()
 	
 end
 
+-- we have just created an entity
+function DragEntity:CreateEntity(entity)
+	self:StartDraggingEntity(entity);
+	self:DropDraggingEntity()
+	self:SetCreateMode()
+end
+
+-- we are about to delete an entity
+function DragEntity:DeleteEntity(entity)
+	self:StartDraggingEntity(entity);
+	self:DropDraggingEntity()
+	self:SetDeleteMode()
+end
+
 function DragEntity:StartDraggingEntity(dragEntity)
 	self.draggingEntity = dragEntity;
 	if(self.draggingEntity) then
@@ -48,31 +62,34 @@ end
 
 
 function DragEntity:Redo()
-	if(self.draggingEntity and self.toXmlNode) then
-		if(self:IsCreateMode()) then
+	if(self.draggingEntity) then
+		if(self.toXmlNode) then
 			-- recreate the entity and attach to scene
 			self.draggingEntity:UpdateFromXMLNode(self.toXmlNode)
 		else
-			self.draggingEntity:UpdateFromXMLNode(self.toXmlNode)
+			self.draggingEntity:Destroy();
 		end
 	end
 end
 
 function DragEntity:Undo()
-	if(self.draggingEntity and self.fromXmlNode) then
-		if(self:IsCreateMode()) then
-			self.draggingEntity:Destroy();
-		else
+	if(self.draggingEntity) then
+		if(self.fromXmlNode) then
 			self.draggingEntity:UpdateFromXMLNode(self.fromXmlNode)
+		else
+			self.draggingEntity:Destroy();
 		end
 	end
 end
 
 -- in create mode, when undo, we will delete the object. 
 function DragEntity:SetCreateMode()
+	self.fromXmlNode = nil;
 	self.mode = "create"
 end
 
-function DragEntity:IsCreateMode()
-	return self.mode == "create"
+-- in create mode, when undo, we will delete the object. 
+function DragEntity:SetDeleteMode()
+	self.mode = "delete"
+	self.toXmlNode = nil;
 end

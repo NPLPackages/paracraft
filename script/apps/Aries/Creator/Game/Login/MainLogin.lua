@@ -1,8 +1,9 @@
 --[[
 Title: MC Main Login Procedure
-Author(s):  LiXizhi
+Author(s): LiXizhi, big
 Company: ParaEngine
-Date: 2013.10.14
+CreateDate: 2013.10.14
+ModifyDate: 2022.1.5
 Desc: 
 use the lib:
 ------------------------------------------------------------
@@ -10,6 +11,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Login/MainLogin.lua");
 MyCompany.Aries.Game.MainLogin:start();
 ------------------------------------------------------------
 ]]
+
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 -- create class
@@ -28,14 +30,14 @@ MainLogin.state = {
 	IsPluginLoaded = nil,
 	HasSignedIn = nil,
 	HasInitedTexture = nil,
-	
+
 	IsPreloadedTextures = nil, -- added by leio
 	IsPreloadedSocketIOUrl = nil, -- added by leio
 
 	IsLoadMainWorldRequested = nil,
 	IsCreateNewWorldRequested = nil,
 	IsLoadTutorialWorldRequested = nil, -- NOT used
-	
+
 	-- the background 3d world path during login. This is set during Updater progress. We can display some news and movies in it. 
 	login_bg_worldpath = nil,
 };
@@ -73,7 +75,6 @@ function MainLogin:start(init_callback)
 
 		HasInitedTexture = self.HasInitedTexture,
 
-
 		PreloadTextures = self.PreloadTextures,
 		PreloadedSocketIOUrl = self.PreloadedSocketIOUrl,
 
@@ -82,8 +83,8 @@ function MainLogin:start(init_callback)
 		-- create new world
 		ShowCreateWorldPage = self.ShowCreateWorldPage,
 	}
+
 	self:next_step();
-	
 end
 
 -- invoke a handler 
@@ -148,7 +149,7 @@ function MainLogin:next_step(state_update)
 	elseif(not state.IsPreloadedSocketIOUrl) then
 		self:Invoke_handler("PreloadedSocketIOUrl");
 	else
-		-- already signed in 
+		-- already signed in
 		if(not state.IsLoadMainWorldRequested) then	
 			self:Invoke_handler("LoadMainWorld");
 		-- don't load the exsiting world ,can call   [[self:Invoke_handler("ShowCreateWorldPage")]]    enter the create new world page
@@ -288,7 +289,6 @@ function MainLogin:UpdateCoreClient()
 		end);
 	end
 end
-
 
 function MainLogin:UpdateCoreBrowser()
 	-- since 2021.10, we no longer auto load chrome browser on startup. since we use NPL blockly by default. 
@@ -442,20 +442,25 @@ function MainLogin:HasInitedTexture()
 	self:next_step({HasInitedTexture = true});
 end
 
-
 function MainLogin:CheckCommandLine()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
 	local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
 
-	local cmdline = ParaEngine.GetAppCommandLine()
-	if(not UrlProtocolHandler:GetParacraftProtocol(cmdline) and (not System.options.cmdline_world or System.options.cmdline_world=="")) then
+	local cmdline = ParaEngine.GetAppCommandLine();
+
+	if (not UrlProtocolHandler:GetParacraftProtocol(cmdline) and
+		(not System.options.cmdline_world or
+		 System.options.cmdline_world == "")) then
 		-- only install url protocol when the world is empty
 		UrlProtocolHandler:CheckInstallUrlProtocol();
 	end
+
 	UrlProtocolHandler:ParseCommand(cmdline);
-	if(System.options.servermode) then
+
+	if (System.options.servermode) then
 		-- TODO: for server only world
-		if(not System.options.cmdline_world or System.options.cmdline_world=="") then
+		if (not System.options.cmdline_world or
+			System.options.cmdline_world == "") then
 			System.options.cmdline_world = "worlds/DesignHouse/defaultserverworld";
 			LOG.std(nil, "warn", "serverworld", "no server world specified, we will use %s", System.options.cmdline_world);
 		end
@@ -463,20 +468,17 @@ function MainLogin:CheckCommandLine()
 
 	-- in case, a request comes when application is already running. 
 	commonlib.EventSystem.getInstance():AddEventListener("CommandLine", function(self, msg)
-		local curWorldpath = System.options.cmdline_world;
 		UrlProtocolHandler:ParseCommand(msg.msg);
-		if(System.options.cmdline_world) then
-			-- TODO: shall we ask the user to confirm before automatically download and login.
-			if (login_enable ~= "true") then
-				self:CheckLoadWorldFromCmdLine(true);
-			end
+
+		if (System.options.cmdline_world) then
+			self:CheckLoadWorldFromCmdLine(true);
 		end
+
 		return true;
 	end, self);
 
 	self:next_step({IsCommandLineChecked = true});	
 end
-
 
 function MainLogin:PreloadDailyCheckinAndTeachingWnd()
 	if(not System.options.cmdline_world or System.options.cmdline_world == "") then
@@ -531,10 +533,8 @@ function MainLogin:ShowLoginModePage()
 		self:CheckShowTouchVirtualKeyboard();
 	end);
 
-	local login_enable = ParaEngine.GetAppCommandLineByParam("login_enable","")
-
-	if(login_enable ~= "true" and System.options.cmdline_world and System.options.cmdline_world~="") then
-		System.options.loginmode = "local";
+	if (System.options.cmdline_world and
+		System.options.cmdline_world ~= "") then
 		self:next_step({IsLoginModeSelected = true});
 		return;
 	end
@@ -542,7 +542,6 @@ function MainLogin:ShowLoginModePage()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
-	
 	if (not System.options.isCodepku) then
 		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 		KeepWorkItemManager.StaticInit();
@@ -589,19 +588,30 @@ end
 
 -- return true if loaded
 function MainLogin:CheckLoadWorldFromCmdLine(bForceLoad)
-	local worldpath = System.options.cmdline_world;
-	if(worldpath and worldpath~="" and (not self.cmdWorldLoaded or bForceLoad)) then
+	local cmdline_world = System.options.cmdline_world;
+
+	if (cmdline_world and
+		cmdline_world ~= "" and
+		(not self.cmdWorldLoaded or bForceLoad)) then
 		self.cmdWorldLoaded = true;
-		local customPath = GameLogic.GetFilters():apply_filters("load_world_from_cmd_precheck", worldpath);
-		if customPath then
-			worldpath = customPath;
+
+		if (GameLogic.GetFilters():apply_filters(
+			"cellar.common.common_load_world.check_load_world_from_cmd_line",
+			cmdline_world)) then
+			return true;
 		end
-	
-		if(System.options.servermode) then
+
+		local customPath = GameLogic.GetFilters():apply_filters("load_world_from_cmd_precheck", cmdline_world);
+		if (customPath) then
+			cmdline_world = customPath;
+		end
+
+		if (System.options.servermode) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/main.lua");
-			local Game = commonlib.gettable("MyCompany.Aries.Game")
-			Game.Start(worldpath, nil, 0, nil, nil, function()
-				LOG.std(nil, "info", "MainLogin", "server mode load world: %s", worldpath);
+			local Game = commonlib.gettable("MyCompany.Aries.Game");
+
+			Game.Start(cmdline_world, nil, 0, nil, nil, function()
+				LOG.std(nil, "info", "MainLogin", "server mode load world: %s", cmdline_world);
 				local ip = ParaEngine.GetAppCommandLineByParam("ip", "0.0.0.0");
 				local port = ParaEngine.GetAppCommandLineByParam("port", "");
 				local autosaveInterval = ParaEngine.GetAppCommandLineByParam("autosave", "");
@@ -620,15 +630,15 @@ function MainLogin:CheckLoadWorldFromCmdLine(bForceLoad)
 					end
 				end
 			end);
-
-		elseif(worldpath:match("^https?://")) then
-			LOG.std(nil, "info", "MainLogin", "loading world: %s", worldpath);
-			GameLogic.RunCommand("loadworld", worldpath);
+		elseif(cmdline_world:match("^https?://")) then
+			LOG.std(nil, "info", "MainLogin", "loading world: %s", cmdline_world);
+			GameLogic.RunCommand("loadworld", cmdline_world);
 		else
 			NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 			local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-			WorldCommon.OpenWorld(worldpath, true);	
+			WorldCommon.OpenWorld(cmdline_world, true);	
 		end
+
 		return true;
 	end
 end
@@ -647,6 +657,7 @@ function MainLogin:PreloadedSocketIOUrl()
 		end);
 	end
 end
+
 function MainLogin:PreloadTextures()
 	if(System.options.servermode) then
 		self:next_step({IsPreloadedTextures = true});
@@ -659,11 +670,10 @@ function MainLogin:PreloadTextures()
 end
 
 function MainLogin:LoadMainWorld()
-	local login_enable = ParaEngine.GetAppCommandLineByParam("login_enable","");
-
-	if(login_enable ~= "true" and (self:CheckLoadWorldFromCmdLine() or System.options.servermode)) then
+	if (self:CheckLoadWorldFromCmdLine() or System.options.servermode) then
 		return;
 	end
+
 	if (not System.options.isCodepku) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
 		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
@@ -675,7 +685,7 @@ function MainLogin:LoadMainWorld()
 		if (GameLogic.GetFilters():apply_filters('is_signed_in')  and (tutorial == "true" or (tutorial ~= "false" and isFirstLogin))) then
 			return GameLogic.RunCommand(string.format("/loadworld %s", 24062)); 
 		end
-	
+
 		ParaWorldLoginAdapter:EnterWorld();
 	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");

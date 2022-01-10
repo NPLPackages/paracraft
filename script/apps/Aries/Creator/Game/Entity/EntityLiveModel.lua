@@ -7,6 +7,8 @@ This class is almost identical to EntityBlockModel.
 - If model filename contains "_char", we will use auto turning
 - If model filename contains "_drag", we will enable dragging even if it has real physics
 
+A general event "__entity_onclick", "__entity_onhover", "__entity_onmount", "__entity_onbegindrag", "__entity_onenddrag" will be fired if no custom event is specified. 
+
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityLiveModel.lua");
@@ -21,6 +23,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelMountPoints.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
+local BonesVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
 local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockInEntityHand");
 local AppGeneralGameClient = commonlib.gettable("Mod.GeneralGameServerMod.App.Client.AppGeneralGameClient");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
@@ -36,6 +40,7 @@ local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local Event = commonlib.gettable("System.Core.Event");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
@@ -62,11 +67,15 @@ Entity:Property({"idleAnim", 0, "GetIdleAnim", "SetIdleAnim", auto=true});
 Entity:Property({"onclickEvent", nil, "GetOnClickEvent", "SetOnClickEvent", auto=true});
 Entity:Property({"onhoverEvent", nil, "GetOnHoverEvent", "SetOnHoverEvent", auto=true});
 Entity:Property({"onmountEvent", nil, "GetOnMountEvent", "SetOnMountEvent", auto=true});
+Entity:Property({"onbeginDragEvent", nil, "GetOnBeginDragEvent", "SetOnBeginDragEvent", auto=true});
+Entity:Property({"onendDragEvent", nil, "GetOnEndDragEvent", "SetOnEndDragEvent", auto=true});
 Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
+Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
 Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
 
 Entity:Signal("beforeDestroyed")
 Entity:Signal("clicked", function(mouse_button) end)
+Entity:Signal("assetfileChanged");
 
 Entity.default_file = "character/common/headquest/headquest.x";
 -- persistent object by default. 
@@ -243,6 +252,7 @@ function Entity:SetMainAssetPath(name)
 	if(self:GetMainAssetPath() ~= name) then
 		self.mainAssetPath = name;
 		self.asset_rendertech = 0;
+		self:assetfileChanged();
 		return true;
 	end
 end
@@ -337,8 +347,17 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.onmountEvent) then
 			self:SetOnMountEvent(attr.onmountEvent);
 		end
+		if(attr.onbeginDragEvent) then
+			self.onbeginDragEvent = attr.onbeginDragEvent
+		end
+		if(attr.onendDragEvent) then
+			self.onendDragEvent = attr.onendDragEvent
+		end
 		if(attr.tag) then
 			self:SetTag(attr.tag);
+		end
+		if(attr.staticTag) then
+			self.staticTag = attr.staticTag;
 		end
 		if(attr.category) then
 			self.category = attr.category
@@ -376,6 +395,13 @@ function Entity:LoadFromXMLNode(node)
 	end
 end
 
+-- find a tag in static tag. 
+function Entity:HasStaticTag(tagName)
+	if(tagName and self.staticTag and self.staticTag:find(tagName, 1, true)) then
+		return true
+	end
+end
+
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	local attr = node.attr;
@@ -386,24 +412,33 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.skin and self.skin~="") then
 		attr.skin = self.skin;
 	end
-	if(self.onclickEvent) then
+	if(self.onclickEvent and self.onclickEvent~="") then
 		attr.onclickEvent = self.onclickEvent
 	end
-	if(self.onhoverEvent) then
+	if(self.onhoverEvent and self.onhoverEvent~="") then
 		attr.onhoverEvent = self.onhoverEvent
 	end
-	if(self.onmountEvent) then
+	if(self.onmountEvent and self.onmountEvent~="") then
 		attr.onmountEvent = self.onmountEvent
+	end
+	if(self.onbeginDragEvent and self.onbeginDragEvent~="") then
+		attr.onbeginDragEvent = self.onbeginDragEvent
+	end
+	if(self.onendDragEvent and self.onendDragEvent~="") then
+		attr.onendDragEvent = self.onendDragEvent
 	end
 	if(self.tag and self.tag~="") then
 		attr.tag = self.tag
 	end
+	if(self.staticTag and self.staticTag~="") then
+		attr.staticTag = self.staticTag
+	end
 	if(self.category and self.category~="") then
 		attr.category = self.category
 	end
-	if(self.linkInfo and self.linkInfo.entity) then
-		attr.linkTo = self.linkInfo.entity:GetName();
-	end
+
+	attr.linkTo = self:ConvertLinkInfoToString(self.linkInfo)
+	
 	if(self.idleAnim ~= 0) then
 		attr.idleAnim = self.idleAnim;
 	end
@@ -437,16 +472,24 @@ function Entity:SaveToXMLNode(node, bSort)
 	return node;
 end
 
+-- convert all link info into a string, such as "name1::L_Hand@{rot={1,0,0},pos={0,1,0}}"
+function Entity:ConvertLinkInfoToString(linkInfo)
+	if(linkInfo and linkInfo.entity) then
+		local str = linkInfo.entity:GetName();
+		if(linkInfo.boneName) then
+			str = format("%s::%s", str, linkInfo.boneName)
+			if(linkInfo.pos) then
+				str = format("%s@%s", str, commonlib.serialize_compact({rot=linkInfo.rot, pos = linkInfo.pos}))
+			end
+		end
+		return str;
+	end
+end
+
 -- right click to show item
 function Entity:OnClick(x, y, z, mouse_button)
 	Entity._super.OnClick(self, x, y, z, mouse_button);
 	return true;
-end
-
--- called every frame
-function Entity:FrameMove(deltaTime)
-	if(GameLogic.isRemote) then
-	end
 end
 
 -- we will use C++ polygon-level physics engine for real physics. 
@@ -871,21 +914,25 @@ end
 function Entity:OnMount(mountPointName, mountpointIndex, mountedEntity)
 	local event = Event:new():init("onmount");	
 	self:event(event);
-	if(self.onmountEvent and mountedEntity) then
+	-- send a general event or user defined one
+	local onmountEvent = self.onmountEvent or "__entity_onmount"
+	if(mountedEntity) then
 		local x, y, z = self:GetBlockPos();
-		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, mountname=%q, mountindex=%d, mountedEntityName=%q}", self.onmountEvent, x, y, z, self.name, mountPointName or "", mountpointIndex or 0, mountedEntity.name or ""))
+		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, mountname=%q, mountindex=%d, mountedEntityName=%q}", onmountEvent, x, y, z, self.name, mountPointName or "", mountpointIndex or 0, mountedEntity.name or ""))
 		return true;
 	end
 end
 
 -- called every 1500 milliseconds
 function Entity:OnHover(hoverEntity)
-	if(self.onhoverEvent and hoverEntity) then
-		local event = Event:new():init("onhover");	
-		self:event(event);
+	local event = Event:new():init("onhover");	
+	self:event(event);
 
+	-- send a general event or user defined one
+	local onhoverEvent = self.onhoverEvent or "__entity_onhover"
+	if(hoverEntity) then
 		local x, y, z = self:GetBlockPos();
-		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, hoverEntityName=%q}", self.onhoverEvent, x, y, z, self.name, hoverEntity.name or ""))
+		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, hoverEntityName=%q}", onhoverEvent, x, y, z, self.name, hoverEntity.name or ""))
 		return true;
 	end
 end
@@ -908,9 +955,11 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			-- signal
 			self:clicked(mouse_button);
 
-			if(self.onclickEvent) then
+			-- send a general event or user defined one
+			local onclickEvent = self.onclickEvent or "__entity_onclick"
+			if(onclickEvent) then
 				local x, y, z = self:GetBlockPos();
-				GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q}", self.onclickEvent, x, y, z, self.name))
+				GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q}", onclickEvent, x, y, z, self.name))
 				return true;
 			end
 		else
@@ -924,6 +973,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	end
 
 	-- let us handle mount point interactions here. 
+	--[[
 	if(self:GetMountPoints()) then
 		local mp = self:GetMountPoints():GetMountPointByXY();
 		if(mp) then
@@ -937,6 +987,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 		end
 		return true
 	end
+	]]
 
 	if(self:HasRealPhysics() or self:HasAnyRule()) then
 		return true;
@@ -964,7 +1015,10 @@ end
 -- LinkTo function is suitable for linking between two static objects, like an apple can be linked to a table. 
 -- if we already attachedTo an object, we will detach from it, before link to it. 
 -- @param targetEntity: string or entity object. which entity to link to. if nil, it will detach from existing entity. 
-function Entity:LinkTo(targetEntity)
+-- @param boneName: nil or a given bone name. If specified, we will use a timer to update. 
+-- @param pos: nil or 3d position offset
+-- @param rot: nil or 3d rotation 
+function Entity:LinkTo(targetEntity, boneName, pos, rot)
 	if(targetEntity) then
 		if(self:HasLinkChild(targetEntity)) then
 			-- recursive link is ignored. 
@@ -980,7 +1034,9 @@ function Entity:LinkTo(targetEntity)
 		self.linkInfo.facing = srcEntity:GetFacing() - targetEntity:GetFacing();
 		self.linkInfo.scaling = targetEntity:GetScaling()
 		self.linkInfo.quatRot = quatRot;
-		
+		self.linkInfo.boneName = boneName;
+		self.linkInfo.pos = pos;
+		self.linkInfo.rot = rot;
 
 		if(self.linkInfo.entity ~= targetEntity) then
 			self:UnLinkEntity(self.linkInfo.entity)
@@ -991,6 +1047,24 @@ function Entity:LinkTo(targetEntity)
 			targetEntity:Connect("beforeDestroyed", self, self.UnLink);
 			targetEntity.childLinks = targetEntity.childLinks or {};
 			targetEntity.childLinks[self] = true;
+		end
+		if(targetEntity and boneName) then
+			local animId = targetEntity:GetCurrentAnimId()
+			if(animId == 153 or animId == 154) then
+				-- tricky, in case we are playing random standing loop animation, we will set to 0 and wait 500ms to apply attach. 
+				targetEntity:SetAnimation(0);
+				local count = 0;
+				local linkToTimer = commonlib.Timer:new({callbackFunc = function(timer)
+					count = count + 1;
+					self:UpdateEntityLink();
+					if(count > 5) then
+						timer:Change()
+					end
+				end})
+				linkToTimer:Change(0, 100)
+			else
+				self:UpdateEntityLink();
+			end
 		end
 	else
 		self:UnLink();
@@ -1016,20 +1090,123 @@ function Entity:UnLink()
 	end
 end
 
+function Entity:GetBonesVariable()
+	if(not self.bones_variable) then
+		self.bones_variable = BonesVariable:new():initFromEntity(self);
+		self:Connect("assetfileChanged", self.bones_variable, self.bones_variable.OnAssetFileChanged)
+	end
+	return self.bones_variable;
+end
+
+-- get bone's world position and rotation. 
+-- @param boneName: like "R_Hand". can be nil.
+-- @param localPos: if not nil, this is the local offset
+-- @param localRot: if not nil, this is the local rotation {roll, pitch yaw}
+-- @param bUseParentRotation: use the parent rotation.
+-- @return x,y,z, roll, pitch yaw, scale: in world space.  
+-- return nil, if such information is not available, such as during async loading.
+function Entity:ComputeBoneWorldPosAndRot(boneName, localPos, localRot, bUseParentRotation)
+	local link_x, link_y, link_z = self:GetPosition()
+	local bFoundTarget;
+	self.parentPivot = self.parentPivot or mathlib.vector3d:new();
+		
+	local parentBoneRotMat;
+	if(boneName) then
+		local bones = self:GetBonesVariable();
+		local boneVar = bones:GetChild(boneName);
+		if(boneVar) then
+			bones:UpdateAnimInstance();
+			local pivot = boneVar:GetPivot(true);
+			self.parentPivot:set(pivot);
+			if(bUseParentRotation) then
+				parentBoneRotMat = boneVar:GetPivotRotation(true);
+			end
+			bFoundTarget = true;
+		end
+	else
+		self.parentPivot:set(0,0,0);
+		bFoundTarget = true;
+	end 
+	if(bFoundTarget) then
+		local parentObj = self:GetInnerObject();
+		local parentScale = parentObj:GetScale() or 1;
+		local dx,dy,dz = 0,0,0;
+		if(not bUseParentRotation and localPos) then
+			self.parentPivot:add((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
+		end
+
+		self.parentTrans = self.parentTrans or mathlib.Matrix4:new();
+		self.parentTrans = parentObj:GetField("LocalTransform", self.parentTrans);
+		self.parentPivot:multiplyInPlace(self.parentTrans);
+		self.parentQuat = self.parentQuat or Quaternion:new();
+		if(parentScale~=1) then
+			self.parentTrans:RemoveScaling();
+		end
+		self.parentQuat:FromRotationMatrix(self.parentTrans);
+		if(bUseParentRotation and parentBoneRotMat) then
+			self.parentPivotRot = self.parentPivotRot or Quaternion:new();
+			self.parentPivotRot:FromRotationMatrix(parentBoneRotMat);
+			self.parentQuat:multiplyInplace(self.parentPivotRot);
+
+			if(localRot) then
+				self.localRotQuat = self.localRotQuat or Quaternion:new();
+				self.localRotQuat:FromEulerAngles((localRot[3] or 0), (localRot[1] or 0), (localRot[2] or 0));
+				self.parentQuat:multiplyInplace(self.localRotQuat);
+			end
+		
+			if(localPos) then
+				self.localPos = self.localPos or mathlib.vector3d:new();
+				self.localPos:set((localPos[1] or 0), (localPos[2] or 0), (localPos[3] or 0));
+				self.localPos:rotateByQuatInplace(self.parentQuat);
+				dx, dy, dz = self.localPos[1], self.localPos[2], self.localPos[3];
+			end
+		end
+			
+		local p_roll, p_pitch, p_yaw = self.parentQuat:ToEulerAnglesSequence("zxy");
+			
+		if(not bUseParentRotation and localRot) then
+			-- just for backward compatibility, bUseParentRotation should be enabled in most cases
+			p_roll = (localRot[1] or 0) + p_roll;
+			p_pitch = (localRot[2] or 0) + p_pitch;
+			p_yaw = (localRot[3] or 0) + p_yaw;
+		end
+		local x, y, z = link_x + self.parentPivot[1] + dx, link_y + self.parentPivot[2] + dy, link_z + self.parentPivot[3] + dz
+		-- This fixed a bug where x or y or z could be NAN(0/0), because GetPivotRotation and GetPivot could return NAN
+		if(x == x and y==y and z==z) then
+			return x, y, z, p_roll, p_pitch, p_yaw, parentScale;
+		end
+	end
+end
+
 -- update this entity's position according to its link target
 function Entity:UpdateEntityLink()
 	local targetEntity = self:GetLinkToTarget()
 	if(targetEntity) then
-		local x, y, z = targetEntity:GetPosition();
-		self.linkInfo.quatRot:FromAngleAxis(targetEntity:GetFacing(), mathlib.vector3d.unit_y)
-		local rx, ry, rz = self.linkInfo.quatRot:RotateVector3(self.linkInfo.x, self.linkInfo.y, self.linkInfo.z)
-		local curScaling = targetEntity:GetScaling();
-		if(curScaling ~= self.linkInfo.scaling) then
-			local scaling = curScaling / self.linkInfo.scaling;
-			rx, ry, rz = rx * scaling, ry * scaling, rz * scaling;
+		if (self.linkInfo.boneName) then
+			local new_x, new_y, new_z, roll, pitch, yaw = targetEntity:ComputeBoneWorldPosAndRot(self.linkInfo.boneName, self.linkInfo.pos, self.linkInfo.rot); 
+			if(new_x) then
+				self:SetPosition(new_x, new_y, new_z);
+
+				-- we will simply ignore rotation. 
+				if(false) then
+					local obj = self:GetInnerObject();
+					obj:SetField("yaw", yaw or 0);
+					obj:SetField("roll", roll or 0);
+					obj:SetField("pitch", pitch or 0);	
+				end
+			end
+		else
+			local x, y, z = targetEntity:GetPosition();
+			self.linkInfo.quatRot:FromAngleAxis(targetEntity:GetFacing(), mathlib.vector3d.unit_y)
+			local rx, ry, rz = self.linkInfo.quatRot:RotateVector3(self.linkInfo.x, self.linkInfo.y, self.linkInfo.z)
+			local curScaling = targetEntity:GetScaling();
+			if(curScaling ~= self.linkInfo.scaling) then
+				local scaling = curScaling / self.linkInfo.scaling;
+				rx, ry, rz = rx * scaling, ry * scaling, rz * scaling;
+			end
+			self:SetPosition(x + rx, y + ry, z + rz)
+			self:SetFacing(targetEntity:GetFacing() + self.linkInfo.facing);
 		end
-		self:SetPosition(x + rx, y + ry, z + rz)
-		self:SetFacing(targetEntity:GetFacing() + self.linkInfo.facing);
 	end
 end
 
@@ -1050,6 +1227,16 @@ function Entity:HasLinkChild(childEntity)
 				return true;
 			elseif(child:HasLinkChild(childEntity)) then
 				return true;
+			end
+		end
+	end
+end
+
+function Entity:GetLinkChildAtBone(boneName)
+	if(boneName and self.childLinks) then
+		for child, _ in pairs(self.childLinks) do
+			if(child.linkInfo and child.linkInfo.boneName == boneName) then
+				return child;
 			end
 		end
 	end
@@ -1082,6 +1269,7 @@ end
 
 -- this function is only used during world loading, in case the entity name is not loaded yet, 
 -- we will wait some time and try again. 
+-- @param name: entityName[::boneName], such as "player1::L_Hand"
 function Entity:TryLinkToEntityByName(name)
 	if(not self:LinkToEntityByName(name)) then
 		local tryCount = 0;
@@ -1098,12 +1286,30 @@ function Entity:TryLinkToEntityByName(name)
 end
 
 -- use LinkTo() in most cases
+-- @param name: entityName[::boneName], such as "player1::L_Hand"
 -- @return true if target entity is found and linked. 
 function Entity:LinkToEntityByName(name)
 	local entity = EntityManager.GetEntity(name)
 	if(entity) then
 		self:LinkTo(entity)
 		return true;
+	else
+		local entityName, boneName, location = name:match("([^:]+)::([^:@]+)@?(.*)");
+		if(entityName and boneName) then
+			local entity = EntityManager.GetEntity(entityName)
+			if(entity) then
+				local rot, pos
+				if(location and location ~= "") then
+					location = NPL.LoadTableFromString(location)
+					if(location) then
+						rot = location.rot
+						pos = location.pos
+					end
+				end
+				self:LinkTo(entity, boneName, pos, rot)
+				return true;
+			end
+		end
 	end
 end
 
@@ -1115,6 +1321,7 @@ function Entity:BeginDrag()
 		self:EnablePhysics(false);
 	end
 	self:ForEachChildLinkEntity(Entity.BeginDrag)
+	self:OnBeginDrag()
 end
 
 -- when dragging ends, we will restore picking and physics. 
@@ -1125,6 +1332,27 @@ function Entity:EndDrag()
 		self.beforeDragHasPhysics = nil;
 	end
 	self:ForEachChildLinkEntity(Entity.EndDrag)
+	self:OnEndDrag()
+end
+
+function Entity:OnBeginDrag()
+	-- send a general event or user defined one
+	local onbeginDragEvent = self.onbeginDragEvent or "__entity_onbegindrag"
+	if(onbeginDragEvent) then
+		local x, y, z = self:GetBlockPos();
+		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q}", onbeginDragEvent, x, y, z, self.name))
+		return true;
+	end
+end
+
+function Entity:OnEndDrag()
+	-- send a general event or user defined one
+	local onendDragEvent = self.onendDragEvent or "__entity_onenddrag"
+	if(onendDragEvent) then
+		local x, y, z = self:GetBlockPos();
+		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q}", onendDragEvent, x, y, z, self.name))
+		return true;
+	end
 end
 
 -- if model filename contains "_char", we will use auto turning
@@ -1246,6 +1474,9 @@ function Entity:FrameMove(deltaTime)
 			self:OnMainAssetLoaded()
 		end
 	end
+	--if(self.linkInfo and self.linkInfo.boneName) then
+		--self:UpdateEntityLink()
+	--end
 end
 
 -- virtual function: this function is called by the basecontext to highlight picking entity. 
@@ -1284,7 +1515,7 @@ end
 -- @param itemId: custom character item id, such as 83127
 -- @return replacedItemId: this can be nil or the same as the itemId. 
 function Entity:PutOnCustomCharItem(itemId)
-	local item = CustomCharItems:GetItemInCategoryById(itemId)
+	local item = CustomCharItems:GetItemById(itemId)
 	if(item and self:HasCustomGeosets()) then
 		local oldSkins = self:GetSkin();
 		local newSkins = CustomCharItems:AddItemToSkin(oldSkins, item);
@@ -1298,9 +1529,9 @@ function Entity:PutOnCustomCharItem(itemId)
 			end
 			local replacedItemId;
 			if(oldSkins) then
-				for _, id in pairs(oldSkins) do
+				for _, id in pairs(oldItems) do
 					local bHasItem;
-					for _, id2 in pairs(newSkins) do
+					for _, id2 in pairs(newItems) do
 						if(id == id2) then
 							bHasItem = true
 							break;
@@ -1319,4 +1550,51 @@ function Entity:PutOnCustomCharItem(itemId)
 		end
 	end
 	return itemId;
+end
+
+-- let the entity fall down immediately to ground or physical mesh 
+function Entity:FallDown()
+	local item = self:GetItemClass()
+	local x, y, z = self:GetPosition()
+	local bx, by, bz = self:GetBlockPos()
+	local dropLocation = {target = nil, x=x, y=y, z=z, dropX = x, dropY = y, dropZ = z, bx = bx, by = by, bz = bz, side = 5}
+	item:CalculateFreeFallDropLocation(self, dropLocation);	
+	self:SetPosition(dropLocation.dropX, dropLocation.dropY, dropLocation.dropZ);
+end
+
+-- get the entity that this entity is stacked on, they usually have the same x,z location and 
+-- differs only by y and the diff matches the stackable height of thee below entity
+-- @return nil or an entity
+function Entity:GetStackedOnEntity()
+	local x, y, z = self:GetPosition();
+	local mountedEntities = EntityManager.GetEntitiesByAABBOfType(EntityManager.EntityLiveModel, ShapeAABB:new_from_pool(x, y-0.5, z, 0.1, 0.55, 0.1, true))
+	if(mountedEntities) then
+		table.sort(mountedEntities, function(left, right)
+			local _, y1, _ = left:GetPosition()
+			local _, y2, _ = right:GetPosition()
+			return y1 < y2;
+		end)
+		local myIndex;
+		for i, entity in ipairs(mountedEntities) do
+			if(entity==self) then
+				myIndex = i;
+				break;
+			end
+		end
+		local stackedEntity
+		if(myIndex and myIndex>1) then
+			for i = myIndex-1, 1, -1 do
+				local entity = mountedEntities[i]
+				local x1, y1, z1 = entity:GetPosition();
+				if(math.abs(x1 - x) + math.abs(z1 - z) < 0.1) then
+					stackedEntity = stackedEntity or entity;
+					if(entity:IsStackable() and math.abs(entity:GetStackHeight() + y - y1) < 0.02) then
+						stackedEntity = entity;
+						break;
+					end
+				end
+			end
+		end
+		return stackedEntity;
+	end
 end

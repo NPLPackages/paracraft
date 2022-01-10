@@ -1153,8 +1153,21 @@ end
 -- static public function: 
 -- copy current mouse cursor block to clipboard
 function SelectBlocks.CopyToClipboard(blocks)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
+	local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
+
 	local result = Game.SelectionManager:MousePickBlock();
-	if(result.blockX and result.side) then
+	local bFound;
+	if(result.entity) then
+		if(result.entity:isa(EntityManager.EntityLiveModel)) then
+			bFound = true;
+			local xmlNode = result.entity:SaveToXMLNode()
+			if(Clipboard.Save("EntityLiveModel", xmlNode)) then
+				GameLogic.AddBBS(nil, format(L"1个模型已存到裁剪版"), 4000, "0 255 0");
+			end
+		end
+	end
+	if(not bFound and result.blockX and result.side) then
 		if(not blocks) then
 			local bx, by, bz = result.blockX, result.blockY, result.blockZ;
 			local b = {0, 0, 0}
@@ -1165,14 +1178,13 @@ function SelectBlocks.CopyToClipboard(blocks)
 		end
 		
 		if(blocks) then
+			bFound = true;
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 			local task = BlockTemplate:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, 
 				blocks = blocks,
 				relative_motion=true, UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false, relative_to_player = (#blocks>1)})
 				
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
-			local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
 			local filedata = task:SaveTemplateToString();
 			if(filedata) then
 				if(Clipboard.Save("block_template", filedata)) then
@@ -1190,20 +1202,38 @@ function SelectBlocks.PasteFromClipboard()
 		local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
 		local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
-		local obj = Clipboard.LoadByType("block_template")
-		if(type(obj) == "string") then
-			local xmlRoot = ParaXML.LuaXML_ParseString(obj);
-			if(xmlRoot and xmlRoot[1]) then
-				local attr = xmlRoot[1].attr;
-				if(attr and attr.relative_to_player=="true") then
-					bx,by,bz = EntityManager.GetPlayer():GetBlockPos();
-				end
 
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
-				local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-				local task = BlockTemplate:new({blockX = bx,blockY = by, blockZ = bz, 
-					UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false})
-				if(task:LoadTemplateFromXmlNode(xmlRoot)) then
+		local obj_type, obj = Clipboard.Load()
+		if(obj_type == "block_template") then
+			if(type(obj) == "string") then
+				local xmlRoot = ParaXML.LuaXML_ParseString(obj);
+				if(xmlRoot and xmlRoot[1]) then
+					local attr = xmlRoot[1].attr;
+					if(attr and attr.relative_to_player=="true") then
+						bx,by,bz = EntityManager.GetPlayer():GetBlockPos();
+					end
+
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
+					local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
+					local task = BlockTemplate:new({blockX = bx,blockY = by, blockZ = bz, 
+						UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false})
+					if(task:LoadTemplateFromXmlNode(xmlRoot)) then
+					end
+				end
+			end
+		elseif(obj_type == "EntityLiveModel") then
+			if(type(obj) == "table" and obj.attr) then
+				local xmlNode = obj;
+				local attr = xmlNode.attr;
+				attr.x, attr.y, attr.z = nil, nil, nil;
+				attr.name = nil;
+				local entity = EntityManager.EntityLiveModel:Create({bx=bx,by=by,bz=bz}, xmlNode);
+				entity:Attach();
+
+				if(GameLogic.GameMode:IsEditor()) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
+					local dragTask = MyCompany.Aries.Game.Tasks.DragEntity:new({})
+					dragTask:CreateEntity(entity)
 				end
 			end
 		end

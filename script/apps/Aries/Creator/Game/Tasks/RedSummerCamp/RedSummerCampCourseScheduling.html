@@ -100,8 +100,8 @@
                         </pe:repeatitem>
                     </pe:repeat>        
                 </div>
-                <div style= "margin-top: 5px; width: 560px; height: 320px;">
-                    <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false" pagesize="6" >
+                <div style= "margin-top: 5px; width: 560px; height: 300px;">
+                    <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false" pagesize="10" >
                         <Columns>
                             <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
                                 <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
@@ -120,9 +120,9 @@
 
             <pe:if condition="<%=not IsHaveHistroy()%>">
                 <div style="position: relative; margin-top: 20px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
-                <div style= "margin-top: 60px;">
-                    <pe:repeat DataSource="<%=GetItemData()%>">
-                        <pe:repeatitem>
+                <div style= "margin-top: 60px;width: 560px; height: 400px;">
+                    <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false" pagesize="10" >
+                        <Columns>
                             <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
                                 <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
                                 <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
@@ -132,8 +132,8 @@
                                     </div>
                                 </pe:if>
                             </div>
-                        </pe:repeatitem>
-                    </pe:repeat>        
+                        </Columns>
+                    </pe:gridview>
                 </div>
             </pe:if>
         </div>

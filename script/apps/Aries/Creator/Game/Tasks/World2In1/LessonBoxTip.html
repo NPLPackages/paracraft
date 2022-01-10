@@ -45,6 +45,14 @@
     function RestartScene()
         LessonBoxTip.ResetMyArea()
     end
+
+    function IsShowFollowBt()
+        return LessonBoxTip.IsShowFollowBt()
+    end
+
+    function IsShowMoviceBt()
+        return LessonBoxTip.IsShowMoviceBt()
+    end
 ]]></script>
 <!-- Texture/Aries/Creator/keepwork/macro/lessonbox/ -->
 <div width="100%" style="height: 220px; margin-top: 4px; background:url();">
@@ -66,8 +74,12 @@
     </div>
     <div style="margin-left: 200px; margin-top: -46px; width: 300px; height: 120px;">
         <input type="button" uiname="lesson_check_button" onclick="StartCheck"  style="position: relative; margin-left: 426px; width: 128px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_sc_128X47_32bits.png#0 0 128 47);"/>
-        <input type="button" onclick="OnStartMacroLearn" style="position: relative; margin-left: 130px; width: 106px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_follow_106X47_32bits.png#0 0 106 47);"/>
-        <input type="button" onclick="ReplayMovie"  style="position: relative; margin-left: 20px; width: 106px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_replay_106X47_32bits.png#0 0 106 47);"/>
+        <pe:if condition='<%=IsShowFollowBt()%>'>
+            <input type="button" onclick="OnStartMacroLearn" style="position: relative; margin-left: 130px; width: 106px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_follow_106X47_32bits.png#0 0 106 47);"/>
+        </pe:if>
+        <pe:if condition='<%=IsShowMoviceBt()%>'>
+            <input type="button" onclick="ReplayMovie"  style="position: relative; margin-left: 20px; width: 106px; height: 47px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/btn_replay_106X47_32bits.png#0 0 106 47);"/>
+        </pe:if>
     </div>
     <div style="position: relative;margin-top: -290px;margin-left: 160px; width: 421px;height: 46px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/img_title_421X46_32bits.png#0 0 421 46);">
         <pe:label name="lesson_title" style="margin-top: 6px; margin-left: 20px;height:  60px; position: relative;color: #eca927;text-shadow:true;shadow-quality:8 font-size: 20px; base-font-size:20px;font-weight: bold;"></pe:label>

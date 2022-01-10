@@ -236,6 +236,7 @@ function ParalifeLiveModel.CheckPickRole()
 		local screen_width,screen_height = Screen:GetWidth(),Screen:GetHeight()
 		local startx = screen_width/2 - 640
 		local starty = screen_height - 300
+		local data_num = #ParalifeLiveModel.role_data
 		if mouse_y > starty and ParalifeLiveModel.main_ui_mode == "switchrole" then
 			local result, targetEntity = ItemLiveModel:CheckMousePick()
 			if not targetEntity and result.blockX then
@@ -338,7 +339,8 @@ function ParalifeLiveModel.CreateRoleView()
 	local mouse_x, mouse_y = ParaUI.GetMousePosition();
 	local startmousex,startmousey
 	local disx,disy = 0,0
-	local showNum = ParalifeLiveModel.GetShowNum()
+	local data_num = #ParalifeLiveModel.role_data
+	local showNum = data_num <= ParalifeLiveModel.GetShowNum() and data_num or ParalifeLiveModel.GetShowNum()
 	local default_data_num = #ParalifeLiveModel.role_data
 	if  paralife_role and paralife_role:IsValid() then
 		for i=1,showNum do
@@ -351,18 +353,20 @@ function ParalifeLiveModel.CreateRoleView()
 			parentUser:SetScript("onmouseup",function()
 				isTouchPlayer = false
 				touchIndex = -1
-				if math.abs( disx ) > 100 then
-					local moveDis = {x= (disx > 0 and screen_width or -screen_width),y=0}
-					ParalifeLiveModel.MoveAction(moveDis,0.4,function()
-						local move_num = showNum--math.floor(math.abs(disx) / 200) + 1
-						if move_num > 0 then
-							ParalifeLiveModel.MoveRoleData(move_num , disx < 0 and disx ~= 0 )
+				if data_num > showNum then
+					if math.abs( disx ) > 100 then
+						local moveDis = {x= (disx > 0 and screen_width or -screen_width),y=0}
+						ParalifeLiveModel.MoveAction(moveDis,0.4,function()
+							local move_num = showNum--math.floor(math.abs(disx) / 200) + 1
+							if move_num > 0 then
+								ParalifeLiveModel.MoveRoleData(move_num , disx < 0 and disx ~= 0 )
+							end
+						end)
+					else
+						for i=1,showNum do
+							local target = ParaUI.GetUIObject("main_user_player_parent"..i)
+							target.x = target.x - disx
 						end
-					end)
-				else
-					for i=1,showNum do
-						local target = ParaUI.GetUIObject("main_user_player_parent"..i)
-						target.x = target.x - disx
 					end
 				end
 			end)
@@ -381,7 +385,7 @@ function ParalifeLiveModel.CreateRoleView()
 						parentUser.visible = false
 						paralife_back:GetAttributeObject():SetField("ClickThrough", false)
 					end
-					if showNum < #ParalifeLiveModel.role_data then
+					if data_num > showNum then
 						paralife_role.x = startParaX + disx
 					end
 				end
@@ -390,7 +394,12 @@ function ParalifeLiveModel.CreateRoleView()
 	end
 end
 
-
+function ParalifeLiveModel.PlayCreateAnimation(parent,index)
+	local anitimer = commonlib.Timer:new({callbackFunc = function(timer)
+		
+	end})
+	anitimer:Change(0,30)
+end
 
 ----IsActiveRendering 没有这个参数的话当前帧不会渲染这个角色
 ----IsInteractive 判断UI角色是否可以拖动旋转，是否可以监听mouseevent
@@ -728,6 +737,11 @@ function ParalifeLiveModel.ClosePage()
 		page = nil
 		ParalifeLiveModel.main_ui_mode = "switchmain"
 		--GameLogic.ActivateDefaultContext()
+		local viewport = ViewportManager:GetSceneViewport();
+		if viewport:GetMarginBottomHandler() == ParalifeLiveModel then
+			viewport:SetMarginBottom(0);
+			viewport:SetMarginBottomHandler(nil);
+		end
     end
 end
 

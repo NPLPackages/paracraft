@@ -118,16 +118,16 @@ end
             <pe:treeview style="margin-top:6px;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#0 0 4 4:2 2 2 2);" VerticalScrollBarStep="30" VerticalScrollBarPageSize="200" >
                 <div style="color:#ffffff;">
                     <pe:if condition='<%=GetCategoryDSIndex() == 1 %>' >
-                        <div style="height:25px;margin-top:12px;">
+                        <div style="height:25px;margin-top:0px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"分辨率" %></div>
                             <div style="float:left;margin-left:14px;font-size:11px;">
                                 <select name = "ScreenResolution" AllowUserEdit="false" dropWidth="30.6" dropHeight="28.8" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 184px; height:28px">
-                                    <option value="3840 × 2160">3840X2160 (4K)</option>
-                                    <option value="2560 × 1440">2560X1440 (2K)</option>
-                                    <option value="1920 × 1080">1920X1080 (1080p)</option>
-                                    <option value="1280 × 720" selected="true">1280X720 (720p)</option>
-                                    <option value="1600 × 1200">1600X1200 (UXGA)</option>
-                                    <option value="1024 × 768">1024X768 (XGA)</option>
+                                    <option value="3840 x 2160">3840X2160 (4K)</option>
+                                    <option value="2560 x 1440">2560X1440 (2K)</option>
+                                    <option value="1920 x 1080">1920X1080 (1080p)</option>
+                                    <option value="1280 x 720" selected="true">1280X720 (720p)</option>
+                                    <option value="1600 x 1200">1600X1200 (UXGA)</option>
+                                    <option value="1024 x 768">1024X768 (XGA)</option>
                                 </select>
                             </div>
                         </div>
@@ -160,6 +160,14 @@ end
                             <div style="float:left;margin-top:-2px;margin-left:20px;">
                                 <input name='btn_Shadow' value='' type="button" onclick='SystemSettingsPage.OnClickEnableShadow' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
                             </div>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;"><%=L"光线设置" %></div>
+                            <div style="float:left;margin-left:3px;margin-top:0px;width:21px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#167 238 21 22)"/>
+                            <div style="float:left;margin-top:6px;width:138;height:7px;margin-left:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 264 138 7);">
+                                <pe:sliderbar uiname="SystemSettingsPage.mcTimeSlider" name="mcTimeSlider" min="0" max="1000" min_step="1" value="300" button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;139 238 18 18" button_width="18" button_height="18" style="float:left;margin-top:-7px;width:138px;height:18px;background:;" onchange="SystemSettingsPage.OnTimeSliderChanged" tooltip='<%=L"拖动滑块调整光线强调"%>'></pe:sliderbar>
+                            </div>
+                            <div style="float:left;margin-left:7px;margin-top:-2px;width:13px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#196 238 13 22)"/>
                         </div>
                         <div style="height:25px;margin-top:12px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;"><%=L"UI放缩" %></div>

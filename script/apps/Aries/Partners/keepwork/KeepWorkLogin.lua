@@ -14,7 +14,7 @@ NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
 NPL.load("(gl)script/apps/Aries/Login/MainLogin.lua");
 local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
 local MainLogin = commonlib.gettable("MyCompany.Aries.MainLogin");
-
+local KeepWorkRealname = NPL.load("(gl)script/apps/Aries/Partners/keepwork/KeepWorkRealname.lua");
 local KeepWorkLogin = commonlib.gettable("MyCompany.Aries.Partners.keepwork.KeepWorkLogin");
 KeepWorkLogin.client_id = "1000003";
 function KeepWorkLogin.OnInit()
@@ -23,6 +23,9 @@ end
 
 function KeepWorkLogin.LoadLocalData()
     local local_data = MyCompany.Aries.Player.LoadLocalData("KeepWork_Local_UserInfo_Data", {});
+	if local_data and local_data.username then
+		KeepWorkRealname.LoadGameTime()
+	end
     return local_data.username,local_data.password;
 end
 function KeepWorkLogin.SaveLocalData(username,password)
@@ -36,6 +39,7 @@ function KeepWorkLogin.SaveLocalData(username,password)
     end
     MyCompany.Aries.Player.SaveLocalData("KeepWork_Local_UserInfo_Data", local_data)
 end
+
 function KeepWorkLogin.ClosePage()
     if(KeepWorkLogin.page)then
         KeepWorkLogin.page:CloseWindow();
@@ -187,6 +191,17 @@ function KeepWorkLogin.OnClickLogin(btnName, forms)
         end
         if(data and data.data and data.data.token)then
 			_guihelper.MessageBox(nil);
+			--实名认证
+			local idcardAuth = data.data.userinfo.idcardAuth
+			if not idcardAuth or idcardAuth.status ~= 0 then
+				_guihelper.MessageBox("你的账号未实名，是否进行实名认证",function ()
+					KeepWorkLogin.RealNameAuth(data.data.token)
+				end)
+				return
+			end
+			--正常流程
+			KeepWorkRealname.SetUserAge(idcardAuth)
+			KeepWorkLogin.GetOrCreateSessionId()
             if(data.data.userinfo and data.data.userinfo.username)then
                 username = data.data.userinfo.username; -- use username in the callback info
             end
@@ -202,6 +217,55 @@ function KeepWorkLogin.OnClickLogin(btnName, forms)
         end
     end);
 end
+
+function KeepWorkLogin.LoginAction(type)
+	if not type then
+		return 
+	end
+	if type == 0 then
+		KeepWorkRealname.ExitGame()
+	else
+		KeepWorkRealname.StartGame()
+	end
+	local url = "https://keepwork.com/api/wiki/models/users/idcard/behavior/loginout";
+    System.os.GetUrl({
+        url = url,
+        json = true,
+        form = {
+            sessionId = KeepWorkLogin.GetOrCreateSessionId(),
+		    type = type,
+        },
+        headers = {
+            ["Authorization"] = " Bearer " .. System.User.keepworktoken or "",
+        },
+    }, function(err, msg, data)
+		LOG.std(nil, "debug", "keepwork LoginAction err", err);
+		LOG.std(nil, "debug", "keepwork LoginAction msg", msg);
+		LOG.std(nil, "debug", "keepwork LoginAction data", data);
+        if(err and err == 503)then
+            _guihelper.MessageBox("keepwork正在维护中，我们马上回来");
+            return 
+        end
+        
+        if(data and data.error)then
+            _guihelper.MessageBox(data.error.message);
+        end
+    end);
+end
+
+function KeepWorkLogin.GetOrCreateSessionId()
+	if not KeepWorkLogin.sessionId then
+		KeepWorkLogin.sessionId = os.time()
+		return KeepWorkLogin.sessionId
+	end
+	return KeepWorkLogin.sessionId
+end
+
+function KeepWorkLogin.RealNameAuth(token)
+	local url = "https://keepwork.com/haqi/rr/realname?uid="..token;
+	ParaGlobal.ShellExecute("open", url, "", "", 1)
+end
+
 function KeepWorkLogin.agreeOauth(username,client_id,token)
     local url = "https://keepwork.com/api/wiki/models/oauth_app/agreeOauth";
     System.os.GetUrl({

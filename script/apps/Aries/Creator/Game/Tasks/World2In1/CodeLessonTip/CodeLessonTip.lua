@@ -303,7 +303,7 @@ function CodeLessonTip.ShowResultView(is_success)
                 page:CloseWindow();
             end
 
-            GameLogic.GetCodeGlobal():BroadcastTextEvent("resetCodeLesson",{lesson_index = CodeLessonTip.lesson_index + 1});
+            GameLogic.GetCodeGlobal():BroadcastTextEvent("startCodeLesson",{lesson_index = CodeLessonTip.lesson_index + 1});
         else
             GameLogic.GetCodeGlobal():BroadcastTextEvent("lessonNormalStart");
         end
@@ -319,6 +319,7 @@ function CodeLessonTip.ShowResultView(is_success)
 
     if is_success then
         GameLogic.QuestAction.SetDongaoLessonState("code", CodeLessonTip.lesson_index, true)
+        GameLogic.GetCodeGlobal():BroadcastTextEvent("refreshCodeNpcSay");
     end
 end
 

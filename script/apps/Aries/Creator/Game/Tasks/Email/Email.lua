@@ -36,7 +36,9 @@ Email.InteractionType = {
 	collect = 4, 			--收藏
 	jion = 5, 				--加入项目
 	wechat_like = 6, 		--微信点赞
-	world_star = 7,
+	world_star = 7,			--点赞道具加赞
+	world_apply_agree = 8,	--加入世界同意
+	world_apply_refuse = 9, --加入世界拒绝
 }
 
 Email.ButtonData = {
@@ -57,7 +59,9 @@ local interaction_type_desc = {
 	[Email.InteractionType.collect] = "收藏了你的《%s》", 
 	[Email.InteractionType.jion] = "申请加入项目《%s》", 	
 	[Email.InteractionType.wechat_like] = "觉得你的《%s》很赞", 
-	[Email.InteractionType.world_star] = "你的作品《%s》获得%d个赞的创作奖励。"
+	[Email.InteractionType.world_star] = "你的作品《%s》获得%d个赞的创作奖励。",
+	[Email.InteractionType.world_apply_agree] = "已允许你加入项目。", 
+	[Email.InteractionType.world_apply_refuse] = "拒绝了你的加入申请。",
 }
 
 
@@ -268,15 +272,17 @@ function Email.HandleData(data, updata_cb)
 			msg_data.interaction_type = interaction_type
 
 			msg_data.msg_content2 = interaction_type_desc[interaction_type] or ""	
-			local bt_value = '回关'
-			local bt_bg = "Texture/Aries/Creator/keepwork/Email/btn_lan_32X32_32bits.png#0 0 32 32:8 8 8 8"
-
-			-- 如果是关注消息 要判断是否相互关注
+			-- 如果是关注消息 要判断是否相互关注 
 			if interaction_type == Email.InteractionType.fans then
 				search_id_list[#search_id_list + 1] = msg.userId
 			else
 				if interaction_type == Email.InteractionType.world_star then
 					msg_data.msg_content2 = msg.projectName and string.format(interaction_type_desc[interaction_type], msg.projectName,msg.starCnt) or ""
+				elseif interaction_type == Email.InteractionType.world_apply_agree or interaction_type == Email.InteractionType.world_apply_refuse  then
+					msg_data.msg_content1 = string.format("项目《%s》作者",msg.projectName)
+					local cur_name = msg.authorUsername or msg.authorNickname
+					msg_data.color_name = cur_name
+					msg_data.msg_content2 = interaction_type_desc[interaction_type] or ""
 				else
 					local strFormat = interaction_type_desc[interaction_type] or "未定义类型"
 					msg_data.msg_content2 = msg.projectName and string.format(strFormat, msg.projectName) or ""
@@ -375,10 +381,12 @@ function Email.GetDivBtnDesc(data)
 		style="float: left;margin-left: -10px; margin-top:32px;width:70px;height:28px;
 		background:url(Texture/Aries/Creator/keepwork/Email/btn_hui_32X32_32bits.png#0 0 32 32:8 8 8 8);" />]]
 	elseif data.interaction_type == Email.InteractionType.jion then
-		desc = 	[[<input type="button" value='允许' name = '<%=XPath("this") %>' onclick="OnClickAllowJoin" param1='<%=Eval("index") %>' 
-		style="float: left;margin-left: -10px; margin-top:32px;width:70px;height:28px;
-		background:url(Texture/Aries/Creator/keepwork/Email/btn_lv_32X32_32bits.png#0 0 32 32:8 8 8 8);" />]]
-
+		desc = 	[[<div style="width: 100px; height: 20px; margin-left: 720px; margin-top: -40;">
+		<input type="button" value='允许' name = '<%=XPath("this") %>' onclick="OnClickAllowJoin" param1='<%=Eval("index") %>' 
+		style="width:70px;height:28px;background:url(Texture/Aries/Creator/keepwork/Email/btn_lv_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+		<input type="button" value='拒绝' name = '<%=XPath("this") %>' onclick="OnClickRefuseJoin" param1='<%=Eval("index") %>' 
+		style=" margin-top:8px;width:70px;height:28px;background:url(Texture/Aries/Creator/keepwork/Email/btn_hui_32X32_32bits.png#0 0 32 32:8 8 8 8);" />
+		</div>]]
 		-- 要判断是否已允许
 		local pro_id = data.server_data.msg.projectId or 0
 		local msg_id = data.server_data.msg.id
@@ -447,6 +455,22 @@ function Email.OnClickAllowJoin(data)
 	keepwork.msgcenter.jion({
 		id = msg_id,
 		state = 1, --1同意 2拒绝
+	}, function(err, msg, data)
+		if err == 200 then
+			Email.HandleData(Email.server_data, function()
+				Email.FlushView(true)
+			end)
+		end
+	end)
+end
+
+function Email.OnClickRefuseJoin(data)
+	local msg = data.server_data.msg or {}
+	local msg_id = msg.id
+	HttpWrapper.Create("keepwork.msgcenter.jion", "%MAIN%/core/v0/applies/" .. msg_id , "PUT", true)
+	keepwork.msgcenter.jion({
+		id = msg_id,
+		state = 2, --1同意 2拒绝
 	}, function(err, msg, data)
 		if err == 200 then
 			Email.HandleData(Email.server_data, function()

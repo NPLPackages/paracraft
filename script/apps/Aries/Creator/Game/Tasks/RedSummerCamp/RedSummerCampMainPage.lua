@@ -716,3 +716,8 @@ function RedSummerCampMainPage.ChangeRedTipState(ui_name, state)
 		friend_red_icon.visible = state
 	end
 end
+
+function RedSummerCampMainPage.OpenOlypic()
+	local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+    RedSummerCampPPtPage.Show("winterOlympic");
+end

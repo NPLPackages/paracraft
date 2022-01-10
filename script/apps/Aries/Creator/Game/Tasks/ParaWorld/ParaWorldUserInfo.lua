@@ -13,6 +13,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldChunkGene
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.user.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local ParaWorldChunkGenerator = commonlib.gettable("MyCompany.Aries.Game.World.Generators.ParaWorldChunkGenerator");
 local ParaWorldCodeList = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldCodeList.lua");

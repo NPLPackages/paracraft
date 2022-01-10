@@ -531,6 +531,9 @@ model id
     <item id="83188" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83188_architect_male.anim.x"></attachment></item>
     <item id="83189" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83189_archaeologist_male.anim.x"></attachment></item>
 
+    <!--20211228活动头饰-->
+    <item id="83190" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83190_teacher_male.anim.x"></attachment></item>
+
 
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>
@@ -661,6 +664,9 @@ model id
 
     <!--20211118新增-->
     <item id="84108" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84108_olympic_cloth.png"></texture></item>
+
+    <!--20211228新增-->
+    <item id="84109" model="actor;"><geoset category="8" id="6"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84109_normal_people.png"></texture></item>
 
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
@@ -1067,11 +1073,8 @@ model id
     <item id="88007" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a002.png"></texture></item>
     <item id="88008" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a003.png"></texture></item>
     <item id="88009" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a004.png"></texture></item>
-    <item id="88010" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_c001.png"></texture></item>
-    <item id="88011" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a001.png"></texture></item>
     <item id="88012" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a002.png"></texture></item>
     <item id="88013" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_mask.png"></texture></item>
-    <item id="88014" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_01.png"></texture></item>
     <item id="88015" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_02.png"></texture></item>
     <item id="88016" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_03.png"></texture></item>
     <item id="88017" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_04.png"></texture></item>

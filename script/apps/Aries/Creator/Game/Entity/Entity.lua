@@ -1745,6 +1745,21 @@ function Entity:IsPlayer()
 end
 
 -- in real world coordinates
+-- return shapeAABB of the inner object, usually the rendering shape aabb. 
+function Entity:GetInnerObjectAABB()
+	self.aabbObj = self.aabbObj or ShapeAABB:new()
+	local x, y, z = self:GetPosition();
+	local obj = self:GetInnerObject()
+	if(obj) then
+		local height = obj:GetField("height", 0)
+		local width = obj:GetField("width", 0)
+		local depth = obj:GetField("depth", 0)
+		self.aabbObj:SetCenterExtentValues(x, y+height/2, z, width/2, height/2, depth/2);
+	end
+	return self.aabbObj;
+end
+
+-- in real world coordinates
 function Entity:GetCollisionAABB()
 	if(self.aabb) then
 		local x, y, z = self:GetPosition();

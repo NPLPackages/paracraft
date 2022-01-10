@@ -19,6 +19,13 @@ Commands["screenrecorder"] = {
 	desc=[[]],
     mode_deny = "",
     handler = function(cmd_name, cmd_text, cmd_params)
+        local platform = System.os.GetPlatform();
+
+        if (platform ~= "ios") then
+            _guihelper.MessageBox(L"此功能暂不支持该操作系统");
+            return;
+        end
+
         local mode
         mode, cmd_text = CmdParser.ParseWord(cmd_text);
 

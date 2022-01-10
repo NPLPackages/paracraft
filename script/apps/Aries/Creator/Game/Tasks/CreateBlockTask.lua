@@ -102,6 +102,9 @@ function CreateBlock:Run()
 					GameLogic.events:DispatchEvent({type = "CreateBlockTask" , block_id = self.block_id, block_data = block_data, x = self.blockX, y = self.blockY, z = self.blockZ,
 						last_block_id = self.last_block_id, last_block_data = self.last_block_data});
 				end
+			else
+				GameLogic.events:DispatchEvent({type = "CreateDiffIdBlockTask" , block_id = self.block_id, block_data = block_data, x = self.blockX, y = self.blockY, z = self.blockZ,
+				last_block_id = self.last_block_id, last_block_data = self.last_block_data});				
 			end
 			if(not self.nohistory) then
 				if(GameLogic.GameMode:CanAddToHistory()) then

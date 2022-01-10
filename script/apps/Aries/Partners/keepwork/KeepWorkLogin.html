@@ -129,10 +129,10 @@ function passwdTips()
     return s;    
 end
 function OnClickRegister()
-    --ParaGlobal.ShellExecute("open", "http://keepwork.com/wiki/join", "", "", 1);
-    NPL.load("(gl)script/apps/Aries/Partners/keepwork/KeepWorkRegPage.lua");
-    local KeepWorkRegPage = commonlib.gettable("MyCompany.Aries.keepwork.KeepWorkRegPage")
-    KeepWorkRegPage.ShowPage()
+    ParaGlobal.ShellExecute("open", "https://keepwork.com/haqi/rr/register", "", "", 1);
+    --NPL.load("(gl)script/apps/Aries/Partners/keepwork/KeepWorkRegPage.lua");
+    --local KeepWorkRegPage = commonlib.gettable("MyCompany.Aries.keepwork.KeepWorkRegPage")
+    --KeepWorkRegPage.ShowPage()
 end
 function OnClickChangePassword()
     KeepWorkLogin.OnClickChangePassword();
@@ -170,7 +170,7 @@ end
                 <input type="button" value="找回密码" tooltip="找回密码" onclick="OnClickForgetPassword" style="width:50px;height:20px;font-size:12px;padding-left:3px;padding-right:-5px;padding-bottom:-4px;color:#FFFFFF;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)"/>
             </div>
             <div style="margin-top:-3px">
-                <!--<input type="button" value="密码保护" tooltip="密码保护" onclick="MyCompany.Aries.UserLoginPage.OnClickProtectPassword" style="width:50px;height:20px;font-size:12px;padding-left:3px;padding-right:-5px;padding-bottom:-4px;color:#FFFFFF;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)"/>-->
+                <input type="button" value="密码保护" tooltip="密码保护" onclick="MyCompany.Aries.UserLoginPage.OnClickProtectPassword" style="width:50px;height:20px;font-size:12px;padding-left:3px;padding-right:-5px;padding-bottom:-4px;color:#FFFFFF;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)"/>
             </div>
         </div>
             <div style="margin-top:5px;font-weight:bold;font-size:14px"><%=accountTips()%></div>

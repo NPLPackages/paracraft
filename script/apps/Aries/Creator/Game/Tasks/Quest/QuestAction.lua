@@ -1271,23 +1271,22 @@ function QuestAction.GetDongaoLessonState(lesson_type, lesson_index)
     if QuestAction.DongAoClientData == nil then
         QuestAction.DongAoClientData = KeepWorkItemManager.GetClientData(dongao_gsid)
     end
-
     local client_data = QuestAction.DongAoClientData
     if client_data == nil then
         return false
     end
-
     local key = lesson_type .. "_lesson_progress"
     local lesson_state_data = client_data[key]
     if not lesson_state_data then
         return false
     end
 
-    if not lesson_state_data[lesson_index] then
+    local result = lesson_state_data[tonumber(lesson_index)] or lesson_state_data[tostring(lesson_index)]
+    if not result then
         return false
     end
 
-    return lesson_state_data[lesson_index].is_finish
+    return result.is_finish
 end
 
 function QuestAction.SetDongaoLessonState(lesson_type, lesson_index, is_finish)
@@ -1301,6 +1300,7 @@ function QuestAction.SetDongaoLessonState(lesson_type, lesson_index, is_finish)
     client_data[key] = client_data[key] or {}
     local lesson_state_data = client_data[key]
 
+    lesson_index = tonumber(lesson_index)
     if not lesson_state_data[lesson_index] then
         lesson_state_data[lesson_index] = {}
     end
@@ -1310,7 +1310,6 @@ function QuestAction.SetDongaoLessonState(lesson_type, lesson_index, is_finish)
     end
 
     lesson_state_data[lesson_index].is_finish = is_finish
-
     KeepWorkItemManager.SetClientData(dongao_gsid, client_data, function()
     end)
 end

@@ -11,7 +11,15 @@ local page = nil
 local close_timer
 function LessonFinish.OnInit()
     page = document:GetPageCtrl();
+    page.OnCreate = LessonFinish.OnCreate
 end
+
+function LessonFinish.OnCreate()
+    local desc_node = ParaUI.GetUIObject("lesson_finish_desc_node")
+    local desc_parent_node = ParaUI.GetUIObject("lesson_finish_desc_parent_node")
+    desc_node.x = desc_parent_node.width/2 - desc_node.width/2
+end
+
 local max_time = 6
 function LessonFinish.ShowView(strTitle)
     max_time = 6

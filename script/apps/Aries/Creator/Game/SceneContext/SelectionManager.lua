@@ -19,6 +19,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local Matrix4 = commonlib.gettable("mathlib.Matrix4");
 
 local SelectionManager = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.SelectionManager"));
 SelectionManager:Property("Name", "SelectionManager");
@@ -180,12 +181,17 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 					if(entityName~="") then
 						local entity1 = EntityManager.GetEntity(entityName);
 						if(entity1) then
-							local x1, y1, z1 = entity1:GetPosition()
-							local lengthSq = ((x1 - x)^2 + (y1 - y)^2 + (z1 - z)^2);
-							-- tricky: if the entity and hit points are close to each other, it is likely that they are the same object. 
-							if(lengthSq < (10^2)) then
-								entity = entity1
-								blockY = blockY + 1; -- restore blockY-1 in case terrain point is picked. 
+							if(true) then
+								entity = entity1;
+							else
+								-- no long verify distance since we may be dealing with big physical meshes
+								local x1, y1, z1 = entity1:GetPosition()
+								local lengthSq = ((x1 - x)^2 + (y1 - y)^2 + (z1 - z)^2);
+								-- tricky: if the entity and hit points are close to each other, it is likely that they are the same object. 
+								if(lengthSq < (10^2)) then
+									entity = entity1
+									blockY = blockY + 1; -- restore blockY-1 in case terrain point is picked. 
+								end
 							end
 						end
 					end
@@ -292,6 +298,26 @@ function SelectionManager:SetSelectedActor(actor)
 		end
 		self.actor = actor;
 		self:selectedActorChanged(actor);
+	end
+end
+
+-- get the intersection point between the mouse ray and a world space aabb. 
+-- @param aabb: world space aabb. usually from Entity:GetInnerObjectAABB()
+-- @return x, y, z: nil or a hit point
+function SelectionManager:GetMouseInteractionPointWithAABB(aabb)
+	local Cameras = commonlib.gettable("System.Scene.Cameras");
+	local mouseRay = Cameras:GetCurrent():GetMouseRay(nil, nil, Matrix4.IDENTITY);
+	
+	aabb = aabb:clone_from_pool();
+	local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+	aabb:Offset(-origin[1], -origin[2], -origin[3])
+	
+
+	local hit, dist, hitpoint = mouseRay:intersectsAABB(aabb)
+	if(hit) then
+		local x, y, z = mouseRay:GetOriginValues()
+		local dx, dy, dz = mouseRay:GetDirValues()
+		return origin[1]+x+dx*dist, origin[2]+y+dy*dist, origin[3]+z+dz*dist
 	end
 end
 

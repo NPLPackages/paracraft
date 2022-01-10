@@ -184,7 +184,6 @@ local function UpdateCheckBox(name, bChecked)
 	if(page) then
 		bChecked = bChecked == true or bChecked == "true";
 		--page:SetValue(name, GetCheckBoxText(bChecked))
-		print("UpdateCheckBox==========",name,bChecked)
 		if (useDefaultStyle or useDefaultStyle == nil) then
 			page:CallMethod(name, "SetUIBackground", bChecked and "Texture/Aries/Creator/keepwork/setting/qiehuan1_108X29_32bits.png;0 0 108 29" or "Texture/Aries/Creator/keepwork/setting/qiehuan2_108X29_32bits.png;0 0 108 29");
 		end
@@ -1291,6 +1290,14 @@ function SystemSettingsPage.OnChangeStereoEyeDist(value)
 	value = tonumber(value);
 	if(value) then
 		GameLogic.options:SetStereoEyeSeparationDist(value);
+	end
+end
+
+function SystemSettingsPage.OnTimeSliderChanged(value)
+	if (value) then
+		local time=(value/1000-0.5)*2;
+		time = tostring(time);
+		CommandManager:RunCommand("time", time);
 	end
 end
 

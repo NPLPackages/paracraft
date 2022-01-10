@@ -76,6 +76,7 @@
   <asset filename="character/CC/02human/actor/actor.x" name="actor" displayname="演员" />
   <asset filename="character/CC/02human/CustomGeoset/actor.x" name="customchar" displayname="可换装人物"/>
   <asset filename="character/CC/01char/char_male.x" name="default" displayname="通用人物"/>
+  <asset filename="character/CC/02human/paperman/xmr.x" name="pendaman" displayname="熊猫人"/>
   <asset filename="character/v3/Elf/Female/ElfFemale.xml" name="haqi" displayname="哈奇" />
   <asset filename="character/CC/02human/keepwork/avatar/pp.x" name="papa" displayname="帕帕" />
   <asset filename="character/CC/02human/keepwork/avatar/lala.x" name="lala" displayname="拉拉" />
@@ -495,6 +496,13 @@
   <asset filename="character/CC/codewar/shangdengma.x" displayname="上等马" name="shangdengma"/>
 </category>
 <category name="fantasy">
+  <!-- 2021.09.28 补充垃圾桶及垃圾相关素材 -->
+  <!-- 垃圾桶分类 -->
+  <asset filename="character/CC/keepwork/lajitong/lajitong_chuyu.x" displayname="厨余垃圾桶" name="chuyu"/>
+  <asset filename="character/CC/keepwork/lajitong/lajitong_kehuishou.x" displayname="可回收垃圾桶" name="kehuishou"/>
+  <asset filename="character/CC/keepwork/lajitong/lajitong_qita.x" displayname="其他垃圾桶" name="qita"/>
+  <asset filename="character/CC/keepwork/lajitong/lajitong_youhai.x" displayname="有害垃圾桶" name="youhai"/>
+  
   <asset filename="character/CC/03animals/treemonster/treemonster.x" name="TreeMonster" displayname="树妖" school="false"/>
   <asset filename="character/v3/GameNpc/BZL/BZL.x" displayname="冰紫龙" name="BZL" school="false"/>
 	<asset filename="character/v3/GameNpc/DINA/DINA.x" displayname="蒂娜" name="DINA" school="false"/>
@@ -620,13 +628,8 @@
   <asset filename="character/CC/07items/yiliaoxiang.x" displayname="医疗箱" name="medical_case"/>
   <asset filename="character/CC/07items/zhen.x" displayname="针" name="needle"/>
   <asset filename="character/CC/artwar/game/tiaogezi.x" displayname="跳房子" name="tiaogezi"/>
-<!-- 2021.09.28 补充垃圾桶及垃圾相关素材 -->
-  <!-- 垃圾桶分类 -->
-  <!-- <asset filename="character/CC/keepwork/lajitong/lajitong_chuyu.x" displayname="厨余垃圾桶" name="chuyu"/>
-  <asset filename="character/CC/keepwork/lajitong/lajitong_kehuishou.x" displayname="可回收垃圾桶" name="kehuishou"/>
-  <asset filename="character/CC/keepwork/lajitong/lajitong_qita.x" displayname="其他垃圾桶" name="qita"/>
-  <asset filename="character/CC/keepwork/lajitong/lajitong_youhai.x" displayname="有害垃圾桶" name="youhai"/>
-  -->
+
+  
 
   <!-- 垃圾分类 -->
   <!-- <asset filename="character/CC/keepwork/laji/cy_caiyezi.x" displayname="菜叶子" name="caiyezi"/>
@@ -816,6 +819,8 @@
   <asset filename="character/CC/artwar/game/axe.x" displayname="斧子" name="axe"/>
   <asset filename="character/CC/artwar/game/lance.x" displayname="枪" name="lance"/>
   <asset filename="character/CC/artwar/game/ge.x" displayname="戈" name="ge"/>
+<!-- 2021.12.30 新增旗子 -->
+  <asset filename="character/CC/artwar/game/qizhi.x" displayname="旗帜" name="qizhi"/>
 <!-- 6·11更新 -->
   <!-- <asset filename="character/CC/artwar/game/jiguannu.x" displayname="机关弩" name="jiguannu"/>
   <asset filename="character/CC/artwar/game/jiguannu_dipan.x" displayname="机关弩底盘" name="jiguannu_dipan"/> -->

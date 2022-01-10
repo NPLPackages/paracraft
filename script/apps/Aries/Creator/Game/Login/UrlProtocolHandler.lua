@@ -1,7 +1,8 @@
 --[[
 Title: URL protocol handler
-Author(s): LiXizhi
-Date: 2016/1/19
+Author(s): LiXizhi, big
+CreateDate: 2016.1.19
+ModifyDate: 2022.1.5
 Desc: singleton class
 
 ## paracraft://cmd/loadworld/[url_filename]
@@ -17,6 +18,7 @@ if(not UrlProtocolHandler:HasUrlProtocol("paracraft")) then
 end
 -------------------------------------------------------
 ]]
+
 local UrlProtocolHandler = commonlib.gettable("MyCompany.Aries.Creator.Game.UrlProtocolHandler");
 
 -- @return nil if not found, otherwise it is a string containing the protocol
@@ -33,21 +35,22 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 
 	-- the c++ ConvertToCanonicalForm may replace : with space for standard command line
 	local urlProtocol = self:GetParacraftProtocol(cmdline);
-	if urlProtocol then
+
+	if (urlProtocol) then
 		NPL.load("(gl)script/ide/Encoding.lua");
 		urlProtocol = commonlib.Encoding.url_decode(urlProtocol);
 		LOG.std(nil, "debug", "UrlProtocolHandler", "protocol paracraft://%s", urlProtocol);
 
-		local action_text = urlProtocol:match("action=(%w+)")
+		local action_text = urlProtocol:match("action=(%w+)");
 
-		if action_text == "runcode" then
-			local action_text_text = urlProtocol:match("text=(.+)")
+		if (action_text == "runcode") then
+			local action_text_text = urlProtocol:match("text=(.+)");
 
-			if not action_text_text then
-				return false
+			if (not action_text_text) then
+				return false;
 			end
 
-			local code = action_text_text
+			local code = action_text_text;
 
 			local function CreateSandBoxEnv()
 				local env = {
@@ -103,26 +106,21 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 
 		local cmd_text = urlProtocol:match("cmd%(\"(.+)\"%)")
 
-		if cmd_text then
-			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
-			CommandManager:RunCommand(cmd_text)
+		if (cmd_text) then
+			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+			CommandManager:RunCommand(cmd_text);
 		end
 
-		-- paracraft://cmd/loadworld/[url_filename]
-		local world_url = urlProtocol:match("cmd/loadworld[%s/]+([%S]*)");
-		if world_url then
+		-- paracraft://cmd/loadworld/[url or filename or id]
+		local cmdline_world = urlProtocol:match("cmd/loadworld[%s/]+([%S]*)");
+		if (cmdline_world) then
 			-- remote duplicated ? in url, just a quick client fix to keepwork url bug. 
-			world_url = world_url:gsub("^([^%?]*%?[^%?]*)(%?.*)$", "%1")
-			-- remove the trailing /, just a quick fix to keepwork url bug. 
-			world_url = world_url:gsub("/$", "")
-			System.options.cmdline_world = world_url;
-		end
+			cmdline_world = cmdline_world:gsub("^([^%?]*%?[^%?]*)(%?.*)$", "%1");
 
-		local usertoken = urlProtocol:match("usertoken=\"([%S]+)\"");
-		if(usertoken) then
-			LOG.std(nil, "debug", "UrlProtocolHandler", "usertoken found: %s", usertoken);
-			-- TODO: signin with user token
-			
+			-- remove the trailing /, just a quick fix to keepwork url bug. 
+			cmdline_world = cmdline_world:gsub("/$", "");
+
+			System.options.cmdline_world = cmdline_world;
 		end
 	end
 end

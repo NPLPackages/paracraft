@@ -244,10 +244,23 @@ end
 ---------------------------------
 
 -- only entity that has physics or stackable or has mount points can receive entity drop on to it. 
--- @param entity: EntityLiveModel instance. 
-function ItemLiveModel:CanEntityReceiveModelDrop(entity)
+-- @param entity: the target EntityLiveModel instance. 
+-- @param draggingEntity: the dragging entity that will be dropped to the target entity. 
+function ItemLiveModel:CanEntityReceiveModelDrop(entity, draggingEntity)
 	if(entity:HasRealPhysics() or entity:IsStackable() or (entity:GetMountPointsCount() > 0)) then
 		return true;
+	elseif(self:CanEntityReceiveCustomCharItem(entity, draggingEntity)) then
+		return true
+	end
+end
+
+-- is a character entity and dragging entity is a custom char item. 
+function ItemLiveModel:CanEntityReceiveCustomCharItem(entity, draggingEntity)
+	if(entity:HasCustomGeosets() and draggingEntity) then
+		local category = draggingEntity:GetCategory()
+		if(category == "customCharItem" or draggingEntity:GetCanDrag()) then
+			return true
+		end
 	end
 end
 
@@ -259,7 +272,7 @@ function ItemLiveModel:OnFilterEntityPicking(entity)
 			return false;
 		end
 		if(entity:isa(EntityManager.EntityLiveModel) ) then
-			if( (self.draggingEntity and not self:CanEntityReceiveModelDrop(entity)) ) then
+			if( (self.draggingEntity and not self:CanEntityReceiveModelDrop(entity, self.draggingEntity)) ) then
 				-- we will filter out the given entity
 				return false;
 			end
@@ -313,7 +326,7 @@ function ItemLiveModel:CheckMousePick()
 
 	local newHoverEntity
 	if(entity) then
-		if(not self.draggingEntity or self:CanEntityReceiveModelDrop(entity)) then
+		if(not self.draggingEntity or self:CanEntityReceiveModelDrop(entity, self.draggingEntity)) then
 			newHoverEntity = entity;
 		end
 	end
@@ -447,6 +460,46 @@ function ItemLiveModel:CalculateFreeFallDropLocation(srcEntity, dropLocation, ma
 	dropLocation.dropX, dropLocation.dropY, dropLocation.dropZ = x, y, z;
 end
 
+-- we will see the target location's four directions, and if there is a nearby wall, we will return the walls facing. 
+-- @param entity: this is usually the dragging entity.
+-- @param x, y, z: usually the drop location of the entity. if nil, we will use the entity's current position. 
+-- @param radius: default to half block size
+function ItemLiveModel:GetNearbyWallFacing(entity, x, y, z, radius)
+	if(not x) then
+		x, y, z = entity:GetPosition()
+	end
+	if(not radius) then
+		radius = BlockEngine.half_blocksize + 0.01;
+	end
+	local bx, by, bz = BlockEngine:block(x, y + 0.1, z)
+	local bfx, bfy, bfz = BlockEngine:block_float(x, y+0.1, z)
+	local distSqWall = 999;
+	local wallSide;
+	local wallFacing;
+	for side = 0, 3 do
+		local dx, dy, dz = Direction.GetOffsetBySide(side);
+		local block = BlockEngine:GetBlock(bx + dx, by, bz + dz)
+		if(block and block.obstruction) then
+			local distSq = (dx~=0 and math.abs(bx + dx/2 + 0.5 - bfx) or math.abs(bz + dz/2 + 0.5 - bfz)) ^ 2
+			if(distSq < distSqWall)  then
+				distSqWall = distSq
+				wallSide = side;
+				wallFacing = Direction.directionTo3DFacing[wallSide]
+			end
+		end
+		local entity, x1, y1, z1 = self:RayPickPhysicalLiveModel(x, y, z, dx, 0, dz, radius)
+		if(entity and x1) then
+			local distSq = (x1 - x) ^ 2 + (z1 - z) ^ 2
+			if(distSq < distSqWall)  then
+				distSqWall = distSq
+				wallSide = side;
+				wallFacing = Direction.directionTo3DFacing[wallSide]
+			end
+		end
+	end
+	return wallFacing;
+end
+
 
 -- @param x, y, z: real world position, where x, z is usually near block center. 
 -- return block_id, blockY, realX, realY, realZ
@@ -553,8 +606,8 @@ end
 function ItemLiveModel:GetTopStackEntityFromEntity(srcEntity)
 	if(srcEntity) then
 		local topEntity = srcEntity;
-		-- for object with mount points or physics or non-stackable, it is always the top entity. 
-		if(not srcEntity:HasMountPoints() and not srcEntity:HasRealPhysics() and srcEntity:IsStackable()) then
+		-- for object with mount points or physics or non-stackable, or object that has attached to some other object, it is always the top entity. 
+		if(not srcEntity:HasMountPoints() and not srcEntity:HasRealPhysics() and srcEntity:IsStackable() and not srcEntity:GetLinkToTarget()) then
 			local x, y, z = srcEntity:GetPosition()
 			local MountedEntityCount = 0;
 			local mountedEntities = EntityManager.GetEntitiesByAABBOfType(EntityManager.EntityLiveModel, ShapeAABB:new_from_pool(x, y+0.5, z, 0.1, 0.55, 0.1, true))
@@ -803,7 +856,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 		local hasFound;
 		-- finding a right location to put down.
 		if(targetEntity) then
-			if(targetEntity:GetMountPoints() and targetEntity:GetMountPoints():GetCount() > 0) then
+			if(targetEntity:GetMountPointsCount() > 0) then
 				local bInside, mp, distance;
 				if(targetEntity:HasRealPhysics() and result.x) then
 					-- for physical model, we need to check if hit point is inside the AABB of mount points. 	
@@ -817,8 +870,15 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 					if(totalStackHeight) then
 						local dropX, dropY, dropZ = x, y + totalStackHeight, z;
 						local facing = targetEntity:GetMountPoints():GetMountFacingInWorldSpace(mp:GetIndex())
-						if(targetEntity:HasRealPhysics() and result.x) then
-							x, y, z = result.x, result.y, result.z;
+						if(targetEntity:HasRealPhysics()) then
+							if(result.x) then
+								x, y, z = result.x, result.y, result.z;
+							end
+						else
+							local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB());
+							if(x1) then
+								x, y, z = x1, y1, z1
+							end
 						end
 						dragParams.dropLocation = {target = targetEntity, dropX = dropX, dropY = dropY, dropZ = dropZ, x = x, y = y, z = z, mountPointIndex = mp:GetIndex(), mountFacing = facing}
 						hasFound = true	
@@ -838,12 +898,27 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 							hasFound = true	
 							local totalStackHeight = self:GetStackHeightOnLocation(draggingEntity, x, y, z, false, targetEntity)
 							dropY = dropY + (totalStackHeight or 0);
-							dragParams.dropLocation = {target = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, mountPointIndex = -1}
+							local facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+							dragParams.dropLocation = {target = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, mountPointIndex = -1, facing = facing}
 							break;
 						end
 					end
 				end
 			end
+
+			-- is custom char item mounting character. 
+			if(not hasFound and self:CanEntityReceiveCustomCharItem(targetEntity, self.draggingEntity)) then
+				local x, y, z = result.x, result.y, result.z
+				if(x) then
+					local aabb = targetEntity:GetInnerObjectAABB()
+					x, y, z = SelectionManager:GetMouseInteractionPointWithAABB(aabb);
+					if(x) then
+						dragParams.dropLocation = {target = targetEntity, x=x, y=y, z=z, dropX = x, dropY = y, dropZ = z, mountPointIndex = -1, isCustomCharItem = true}
+						hasFound = true
+					end
+				end
+			end
+
 			if(not hasFound and targetEntity:GetLinkToTarget()) then
 				local linkTarget = targetEntity:GetLinkToTarget()
 				local x, y, z = targetEntity:GetPosition();
@@ -855,10 +930,21 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 						if(totalStackHeight) then
 							local dropX, dropY, dropZ = x, y + totalStackHeight, z;
 							local facing = linkTarget:GetMountPoints():GetMountFacingInWorldSpace(mp:GetIndex())
-							if(result.physicalX) then
-								x, y, z = result.physicalX, result.physicalY, result.physicalZ
-							elseif(result.x) then
-								x, y, z = result.x, result.y, result.z;
+
+							local bHasIntersectPoint;
+							if(not targetEntity:HasRealPhysics()) then
+								local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB());
+								if(x1) then
+									x, y, z = x1, y1, z1
+									bHasIntersectPoint = true
+								end
+							end
+							if(not bHasIntersectPoint) then
+								if(result.physicalX) then
+									x, y, z = result.physicalX, result.physicalY, result.physicalZ
+								elseif(result.x) then
+									x, y, z = result.x, result.y, result.z;
+								end
 							end
 							dragParams.dropLocation = {target = targetEntity, dropX = dropX, dropY = dropY, dropZ = dropZ, x = x, y = y, z = z, mountPointIndex = mp:GetIndex(), mountFacing = facing}
 							hasFound = true	
@@ -870,12 +956,24 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 					local totalStackHeight = self:GetStackHeightOnLocation(draggingEntity, x, y, z)
 					if(totalStackHeight) then
 						local dropX, dropY, dropZ = x, y + totalStackHeight, z;
-						if(result.physicalX) then
-							x, y, z = result.physicalX, result.physicalY, result.physicalZ
-						elseif(result.x) then
-							x, y, z = result.x, result.y, result.z;
+
+						local bHasIntersectPoint;
+						if(not targetEntity:HasRealPhysics()) then
+							local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB());
+							if(x1) then
+								x, y, z = x1, y1, z1
+								bHasIntersectPoint = true
+							end
 						end
-						dragParams.dropLocation = {target = linkTarget, dropX = dropX, dropY = dropY, dropZ = dropZ, x = x, y = y, z = z, mountPointIndex = -1}
+						if(not bHasIntersectPoint) then
+							if(result.physicalX) then
+								x, y, z = result.physicalX, result.physicalY, result.physicalZ
+							elseif(result.x) then
+								x, y, z = result.x, result.y, result.z;
+							end
+						end
+						local facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+						dragParams.dropLocation = {target = linkTarget, dropX = dropX, dropY = dropY, dropZ = dropZ, x = x, y = y, z = z, mountPointIndex = -1, facing = facing}
 						hasFound = true	
 					end
 				end
@@ -890,13 +988,17 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 			if(result.x) then
 				x, y, z = result.x, result.y, result.z;
 				if(targetEntity and not targetEntity:HasRealPhysics()) then
-					x, y, z = result.physicalX or result.blockRealX or x, result.physicalY or result.blockRealY or y, result.physicalZ or result.blockRealZ or z;
+					local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB());
+					if(x1) then
+						x, y, z = x1, y1, z1
+					else
+						x, y, z = result.physicalX or result.blockRealX or x, result.physicalY or result.blockRealY or y, result.physicalZ or result.blockRealZ or z;
+					end
 				end
 			else
 				x, y, z = BlockEngine:real_bottom(bx, by, bz)
 			end
-			local dropX, dropY, dropZ = x, y, z;
-			dropX, dropY, dropZ = BlockEngine:real_bottom(bx, by, bz)
+			local dropX, dropY, dropZ = BlockEngine:real_bottom(bx, by, bz)
 			dropY = y;
 
 			-- we have to ensure that we can see the drop point without any block of physical mesh blocking it from the current eye position. 
@@ -912,7 +1014,8 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 					end
 				end
 			end
-			dragParams.dropLocation = {target = result.block_id, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, bx = bx, by = by, bz = bz, side = 5}
+			local facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+			dragParams.dropLocation = {target = result.block_id, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, bx = bx, by = by, bz = bz, side = 5, facing = facing}
 			self:CalculateFreeFallDropLocation(draggingEntity, dragParams.dropLocation);	
 		end
 		if(dragParams.dropLocation) then
@@ -987,13 +1090,16 @@ end
 function ItemLiveModel:UpdateEntityDragAnim(draggingEntity, newX, newY, newZ, oldX, oldY, oldZ)
 	-- update motionSpeed;
 	local dragParams = draggingEntity.dragParams;
+	if(not dragParams) then
+		return
+	end
 	draggingEntity.motionSpeed = (draggingEntity.motionSpeed or 0) + math.sqrt((newX - oldX) ^ 2) + ((newY - oldY) ^ 2) + ((newZ - oldZ) ^ 2)
 	draggingEntity.motionSpeed = math.min(2, draggingEntity.motionSpeed);
 
 	local targetFacing;
 	if(draggingEntity:IsAutoTurningDuringDragging()) then
-		if(dragParams.dropLocation and dragParams.dropLocation.mountFacing) then
-			targetFacing = dragParams.dropLocation.mountFacing	
+		if(dragParams.dropLocation and (dragParams.dropLocation.mountFacing or dragParams.dropLocation.facing)) then
+			targetFacing = dragParams.dropLocation.mountFacing or dragParams.dropLocation.facing
 		else
 			-- the user will drag at least this distance before we will recalculate facing relative to last position. 
 			local minTurningDragDistance = 0.2
@@ -1146,7 +1252,10 @@ function ItemLiveModel:DropEntity(entity)
 			local z = fromZ * (1 - t_xz) + destZ * t_xz;
 			entity:SetPosition(x, y, z)
 			if(t_xz == 1 and t_y == 1) then
-				if(dragParams.dropLocation.mountPointIndex and dragParams.dropLocation.target) then
+				if(dragParams.dropLocation.isCustomCharItem and dragParams.dropLocation.target) then
+					-- only send mount event, without actually linking the dragging entity to target, the target will handle mount operation by itself. 
+					dragParams.dropLocation.target:OnMount(nil, nil, entity)
+				elseif(dragParams.dropLocation.mountPointIndex and dragParams.dropLocation.target) then
 					self:MountEntityToTargetMountPoint(entity, dragParams.dropLocation.target, dragParams.dropLocation.mountPointIndex)
 				end
 				timer:Change();
@@ -1156,6 +1265,7 @@ function ItemLiveModel:DropEntity(entity)
 					entity.dragTask:DropDraggingEntity()
 					entity.dragTask = nil;
 				end
+				entity:EndDrag()
 			end
 		end})
 		entity.dropAnimTimer:Change(30, 30)
@@ -1163,6 +1273,9 @@ function ItemLiveModel:DropEntity(entity)
 		if(facing) then
 			entity:SetFacing(facing);
 		end
+	elseif(entity) then
+		-- restore to previous location or just leave as it is
+		entity:EndDrag()
 	end
 end
 
@@ -1172,13 +1285,14 @@ function ItemLiveModel:DropDraggingEntity()
 	if(entity) then
 		local dragParams = entity.dragParams
 		if(dragParams) then
-			entity:EndDrag()
-			if(dragParams.dropLocation and dragParams.dropLocation.x) then
-				self:DropEntity(entity)
-			end
+			self:DropEntity(entity)
 			entity.dragParams = nil;
 		end
 		self.draggingEntity = nil
+
+		if(not GameLogic.GameMode:IsEditor()) then
+			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.live_model.drag", { projectId = GameLogic.options:GetProjectId() or 0, filename = entity:GetModelFile(), name = entity:GetName()});
+		end
 	end
 	Game.SelectionManager:SetEntityFilterFunction(nil)
 end
@@ -1231,9 +1345,19 @@ function ItemLiveModel:mouseReleaseEvent(event)
 		self:DropDraggingEntity();
 		event:accept();
 	else
+		local normalTargetEntity;
+		if(GameLogic.GameMode:IsEditor() and event:button() == "right") then
+			-- just in case, we are right click to edit a non-pickable live entity model
+			Game.SelectionManager:SetEntityFilterFunction(nil)
+			local result = self:MousePickBlock()
+			if(result) then
+				normalTargetEntity = result.entity
+			end
+		end			
+
 		if(not event:IsCtrlKeysPressed() and event:isClick()) then
-			if(targetEntity) then
-				targetEntity:OnClick(result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side)
+			if(normalTargetEntity) then
+				normalTargetEntity:OnClick(result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side)
 				event:accept();
 			elseif(event:button() == "right") then
 				if(result.block_id and result.block_id>0) then
@@ -1269,4 +1393,3 @@ function ItemLiveModel:mouseReleaseEvent(event)
 	end
 	Game.SelectionManager:SetEntityFilterFunction(nil)
 end
-

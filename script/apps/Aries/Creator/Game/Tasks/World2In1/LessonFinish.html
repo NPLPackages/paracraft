@@ -21,13 +21,15 @@
 <pe:container alignment="_fi" width="100%" height="100%" style=" background-color: #00000080;">
     <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;background: ;">
         <div style="margin-top: -220px;margin-left: 140px; width: 1024x; height: 751px; background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/finish_1024X751_32bits.png#0 0 1024 751);">
-            <div style="margin-top: 600px; width: 1024px; height: 120px; font-weight: bold; ">
-                <div style="position: relative; margin-left: 110px; height: 60px;color:#eca927;font-size: 30px;base-font-size:30px;">太棒了！</div>
-                <div style="position: relative; margin-left: 236px; height: 60px;color:#ffffff;font-size: 30px;base-font-size:30px;"><%=GetUserName()%></div>
-                <div style="position: relative; margin-left: 430px; height: 60px;color:#eca927;font-size: 30px;base-font-size:30px;">，你完成了</div>
-                <div style="position: relative; margin-left: 582px; height: 60px;color:#ffffff;font-size: 30px;base-font-size:30px;"><%=GetTitle()%></div>
+            <pe:container uiname="lesson_finish_desc_parent_node" style="margin-top: 600px; width: 1024px; height: 120px; font-weight: bold; background: ">
+                <pe:container uiname="lesson_finish_desc_node" style="background: ;">
+                    <div style="float: left; margin-left: 0px; height: 60px;color:#eca927;font-size: 30px;base-font-size:30px;">太棒了！</div>
+                    <div style="float: left; margin-left: 0px; height: 60px;color:#ffffff;font-size: 30px;base-font-size:30px;"><%=GetUserName()%></div>
+                    <div style="float: left; margin-left: 0px; height: 60px;color:#eca927;font-size: 30px;base-font-size:30px;">，你完成了</div>
+                    <div style="float: left; margin-left: 0px; height: 60px;color:#ffffff;font-size: 30px;base-font-size:30px;"><%=GetTitle()%></div> 
+                </pe:container>  
                 <!-- <div style="position: relative; margin-left: 840px; height: 60px;color:#eca927;font-size: 30px;base-font-size:30px;">！</div> -->
-            </div>
+            </pe:container>  
         </div>    
         <input type="button" style="margin-left: 520px; margin-top: 30px; width:253px;height:83px;background: url(Texture/Aries/Creator/keepwork/macro/lessonbox/ok_253X83_32bits.png#0 0 253 83);" onclick="ClosePage()"/>
         <pe:label name="close_cutdown" style="margin-top: 36px; margin-left: -78px;height:  60px; position: relative;color: #000000; font-size: 46px; base-font-size:46px;font-weight: bold;"></pe:label>

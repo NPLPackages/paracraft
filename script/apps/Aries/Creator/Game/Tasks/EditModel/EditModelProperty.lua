@@ -95,8 +95,11 @@ function EditModelProperty.OnOK()
 			onClickEvent = page:GetValue("onClickEvent"),
 			onHoverEvent = page:GetValue("onHoverEvent"),
 			onMountEvent = page:GetValue("onMountEvent"),
+			onBeginDragEvent = page:GetValue("onBeginDragEvent"),
+			onEndDragEvent = page:GetValue("onEndDragEvent"),
 			modelfile = page:GetValue("modelfile"),
 			tag = page:GetValue("tag"),
+			staticTag = page:GetValue("staticTag"),
 			category = page:GetValue("category"),
 			mountpoints = EditModelProperty.mountpoints,
 		};
@@ -118,8 +121,10 @@ function EditModelProperty.UpdateUIFromValue(values)
 		page:SetValue("onClickEvent", tostring(values.onClickEvent or ""));
 		page:SetValue("onHoverEvent", tostring(values.onHoverEvent or ""));
 		page:SetValue("onMountEvent", tostring(values.onMountEvent or ""));
+		page:SetValue("onBeginDragEvent", tostring(values.onBeginDragEvent or ""));
+		page:SetValue("onEndDragEvent", tostring(values.onEndDragEvent or ""));
 		page:SetValue("modelfile", tostring(values.modelfile or ""));
-		page:SetValue("tag", tostring(values.tag or ""));
+		page:SetValue("staticTag", tostring(values.staticTag or ""));
 		page:SetValue("category", tostring(values.category or ""));
 		EditModelProperty.mountpoints = values.mountpoints;
 		page:CallMethod("mountpoints", "DataBind");

@@ -326,6 +326,7 @@ function options:OnLoadWorld()
 	GameLogic.RunCommand("language");
 	-- restore to default player mode, just in case the user has changed it. 
 	GameLogic.RunCommand("/hide playertouch");
+	GameLogic.RunCommand("/hide paralife");
 	-- no restrictions on camera by default
 	GameLogic.RunCommand("/camera -norestrict");
 	-- increased chunk limit

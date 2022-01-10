@@ -9,6 +9,7 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
 local BonesVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
 BonesVariables:init(actor)
+-- BonesVariables:initFromEntity(entity)  -- alternatively we can use entity
 BonesVariables:SetSelectedBone(name)
 -------------------------------------------------------
 ]]
@@ -34,6 +35,11 @@ function BonesVariable:init(actor)
 	return self;
 end
 
+function BonesVariable:initFromEntity(entity)
+	self.entity = entity;
+	return self;
+end
+
 function BonesVariable:GetActor()
 	return self.actor;
 end
@@ -41,7 +47,7 @@ end
 -- get animation instance attribute model.
 function BonesVariable:GetAnimInstance()
 	if(not self.animInstance or not self.animInstance:IsValid()) then
-		local entity = self.actor:GetEntity();
+		local entity = self.entity or self.actor:GetEntity();
 		if(entity) then
 			local obj = entity:GetInnerObject();
 			if(obj) then
@@ -262,8 +268,10 @@ function BonesVariable:GetVariables()
 				end
 			end
 		end
-		local var = self:GetRangeVariable(true)
-		self.variables:add(var);
+		if(self.actor) then
+			local var = self:GetRangeVariable(true)
+			self.variables:add(var);
+		end
 	end
 	return self.variable_names;
 end

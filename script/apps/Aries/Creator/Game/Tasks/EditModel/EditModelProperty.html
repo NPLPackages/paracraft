@@ -133,6 +133,10 @@ end
             <div style="float:left"><%=L"类别:"%></div>
             <select uiname="EditModelProperty.category" name="category" AllowUserEdit="true" style="min-width:70px;height:24px;" DataSource='<%=GetCategoryDS()%>'></select>
         </div>
+        <div style="float: left;margin-left: 20px;">
+            <div style="float:left" tooltip='<%=L"逗号分割,例如: lefthand,food"%>'><%=L"静态标签:"%></div>
+            <input type="text" uiname="EditModelProperty.staticTag" EmptyText="food, ..." name="staticTag" style="width:100px;height:24px;"/>
+        </div>
         <div style="float: left; margin-left: 20px;">
             <div style="float:left"><%=L"自定义标签:"%></div>
             <input type="text" uiname="EditModelProperty.tag" name="tag" style="width:200px;height:24px;"/>
@@ -154,20 +158,27 @@ end
     <div style="margin-top: 5px;">
         <div>
             <div style="float: left;">
-                <div style="float:left" tooltip="/sendevent XXX {x,y,z,name}"><%=L"点击事件:"%></div>
-                <input type="text" uiname="EditModelProperty.onClickEvent" name="onClickEvent" style="width:200px;height:24px;"/>
+                <div style="float:left" tooltip="/sendevent __entity_onclick {x,y,z,name}"><%=L"点击事件:"%></div>
+                <input type="text" uiname="EditModelProperty.onClickEvent" name="onClickEvent" style="width:150px;height:24px;"/>
             </div>
-            <div style="float: left; margin-left: 20px;">
-                <div style="float:left" tooltip="/sendevent XXX {x,y,z,name, hoverEntityName}"><%=L"悬停事件:"%></div>
-                <input type="text" uiname="EditModelProperty.onHoverEvent" name="onHoverEvent" style="width:200px;height:24px;"/>
+            <div style="float: left; margin-left: 10px;">
+                <div style="float:left" tooltip="/sendevent __entity_onhover {x,y,z,name, hoverEntityName}"><%=L"悬停事件:"%></div>
+                <input type="text" uiname="EditModelProperty.onHoverEvent" name="onHoverEvent" style="width:150px;height:24px;"/>
             </div>
         </div>
         <div>
             <div style="float: left;">
-                <div style="float:left" tooltip="/sendevent XXX {x,y,z,name, mountname, mountindex, mountedEntityName}"><%=L"插件点事件:"%></div>
-                <input type="text" uiname="EditModelProperty.onMountEvent" name="onMountEvent" style="width:200px;height:24px;"/>
+                <div style="float:left" tooltip="/sendevent __entity_onmount {x,y,z,name, mountname, mountindex, mountedEntityName}"><%=L"插件点事件:"%></div>
+                <input type="text" uiname="EditModelProperty.onMountEvent" name="onMountEvent" style="width:120px;height:24px;"/>
             </div>
-            
+            <div style="float: left; margin-left: 10px;">
+                <div style="float:left" tooltip="/sendevent __entity_onbegindrag {x,y,z,name}"><%=L"开始拖动:"%></div>
+                <input type="text" uiname="EditModelProperty.onBeginDragEvent" name="onBeginDragEvent" style="width:120px;height:24px;"/>
+            </div>
+            <div style="float: left; margin-left: 10px;">
+                <div style="float:left" tooltip="/sendevent __entity_onenddrag {x,y,z,name}"><%=L"结束拖动:"%></div>
+                <input type="text" uiname="EditModelProperty.onEndDragEvent" name="onEndDragEvent" style="width:120px;height:24px;"/>
+            </div>
         </div>
     </div>
     <div style="margin-top:10px;">

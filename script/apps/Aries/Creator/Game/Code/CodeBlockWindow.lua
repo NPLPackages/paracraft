@@ -1413,7 +1413,7 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 	CodeHelpWindow.SetLanguageConfigFile(entity:GetLanguageConfigFile(),entity:GetCodeLanguageType());
 
 	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
-	local width, height = self:CalculateMargins();
+	local width, height, margin_right, bottom, top, sceneMarginBottom = self:CalculateMargins();
 	local language = entity:IsUseCustomBlock() and "UserCustomBlock" or entity:GetLanguageConfigFile();
 	NplBlocklyEditorPage = Page.Show({
 		Language = (language == "npl" or language == "") and "SystemNplBlock" or "npl",
@@ -1425,7 +1425,7 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 	}, { 
 		url = "%ui%/Blockly/Pages/NplBlockly.html",
 		alignment="_rt",
-		x = 0, y = 45,
+		x = 0, y = 45 + top,
 		height = height - 45 - 54,
 		width = width,
 		isAutoScale = false,

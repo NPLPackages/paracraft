@@ -384,6 +384,12 @@ function EditModelTask.OnClickDeleteModel()
 		local modelEntity = self:GetSelectedModel()
 		if(modelEntity) then
 			self:SetTransformMode(false);
+			
+			if(GameLogic.GameMode:IsEditor()) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
+				local dragTask = MyCompany.Aries.Game.Tasks.DragEntity:new({})
+				dragTask:DeleteEntity(modelEntity)
+			end
 			modelEntity:SetDead();
 		end
 	end
@@ -482,10 +488,25 @@ function EditModelTask.OnClickProperty()
 					end
 					modelEntity:SetOnMountEvent(values.onMountEvent)
 
+					if(values.onBeginDragEvent == "") then
+						values.onBeginDragEvent = nil
+					end
+					modelEntity:SetOnBeginDragEvent(values.onBeginDragEvent)
+
+					if(values.onEndDragEvent == "") then
+						values.onEndDragEvent = nil
+					end
+					modelEntity:SetOnEndDragEvent(values.onEndDragEvent)
+
 					if(values.tag == "") then
 						values.tag = nil
 					end
 					modelEntity:SetTag(values.tag)
+
+					if(values.staticTag == "") then
+						values.staticTag = nil
+					end
+					modelEntity:SetStaticTag(values.staticTag)
 
 					if(values.category == "") then
 						values.category = nil
@@ -517,7 +538,10 @@ function EditModelTask.OnClickProperty()
 				onClickEvent = modelEntity:GetOnClickEvent(),
 				onHoverEvent = modelEntity:GetOnHoverEvent(),
 				onMountEvent = modelEntity:GetOnMountEvent(),
+				onBeginDragEvent = modelEntity:GetOnBeginDragEvent(),
+				onEndDragEvent = modelEntity:GetOnEndDragEvent(),
 				tag = modelEntity:GetTag(),
+				staticTag = modelEntity:GetStaticTag(),
 				category = modelEntity:GetCategory(),
 				modelfile = modelEntity:GetModelFile(),
 				idleAnim = modelEntity:GetIdleAnim(),
