@@ -19,6 +19,7 @@ local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -105,9 +106,13 @@ e.g.
 		if(blockid) then
 			playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 			if(playerEntity and playerEntity.inventory and playerEntity.inventory) then
-				local item = ItemStack:new():Init(blockid, count or 1, serverdata);
+				local itemStack = ItemStack:new():Init(blockid, count or 1, serverdata);
+				local item = ItemClient.GetItem(blockid)
+				if(item and item:GetPreferredBlockData()) then
+					itemStack:SetPreferredBlockData(item:GetPreferredBlockData())
+				end
 				if(playerEntity.SetBlockInRightHand) then
-					playerEntity:SetBlockInRightHand(item);
+					playerEntity:SetBlockInRightHand(itemStack);
 				end
 			end
 		end

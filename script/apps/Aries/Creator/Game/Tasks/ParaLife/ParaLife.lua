@@ -12,6 +12,10 @@ local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLif
 ParaLife:SetEnabled(true)
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/AllContext.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLife.lua");
+local ParalifeContext = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParalifeContext")
+local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local ParaLife = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife"));
 
 ParaLife:Property({"bEnabled", nil, "IsEnabled", "SetEnabled"});
@@ -71,10 +75,20 @@ function ParaLife:Show()
 	local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
     ParalifeLiveModel.ShowView()
 
+	if(not self.context) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeContext.lua");
+		local ParalifeContext = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParalifeContext")
+		self.context = ParalifeContext:new():Register("ParalifeContext");
+		self.originalPlayContext = AllContext:GetContext("play")
+	end
+	AllContext:SetContext("play", self.context)
 	GameLogic.RunCommand("/show playertouch")
+	GameLogic.RunCommand("/hide player")
 	GameLogic.RunCommand("/speedscale 1")
 	GameLogic.RunCommand("/clearbag")
 	GameLogic.RunCommand("/hide quickselectbar")
+	GameLogic.RunCommand("/camera -roomview")
+	GameLogic.RunCommand("/cameradist 8")
 end
 
 function ParaLife:IsVisible()
@@ -86,8 +100,13 @@ function ParaLife:Hide()
 	local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
     ParalifeLiveModel.ClosePage()
 
+	if(self.originalPlayContext) then
+		AllContext:SetContext("play", self.originalPlayContext)
+	end
 	GameLogic.RunCommand("/hide playertouch")
+	GameLogic.RunCommand("/show player")
 	GameLogic.RunCommand("/show quickselectbar")
+	GameLogic.RunCommand("/camera")
 end
 
 ParaLife:InitSingleton()

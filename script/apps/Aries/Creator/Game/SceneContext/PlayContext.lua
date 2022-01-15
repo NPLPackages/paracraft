@@ -18,9 +18,18 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local PlayContext = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.SceneContext.BaseContext"), commonlib.gettable("MyCompany.Aries.Game.SceneContext.PlayContext"));
 
 PlayContext:Property("Name", "PlayContext");
+PlayContext:Property({"clickToMove", false, "IsClickToMoveEnabled", "EnableClickToMove", auto = true});
 
 function PlayContext:ctor()
 	self:EnableAutoCamera(true);
+end
+
+function PlayContext:IsClickToMoveEnabled()
+	return self.clickToMove
+end
+
+function PlayContext:EnableClickToMove(enabled)
+	self.clickToMove = enabled
 end
 
 -- virtual function: 
@@ -183,6 +192,11 @@ function PlayContext:mouseReleaseEvent(event)
 		elseif(event.mouse_button == "right") then
 			self:handleRightClickScene(event, result);
 		end
+
+		if(not event:isAccepted() and self:IsClickToMoveEnabled() and result.blockZ and result.side) then
+			self:MovePlayerToBlock(result.blockX, result.blockY, result.blockZ, result.block_id, result.side)
+			event:accept();
+		end
 	end
 end
 
@@ -214,4 +228,11 @@ function PlayContext:keyPressEvent(event)
 	elseif(self:HandleQuickSelectKey(event)) then
 		-- quick select key
 	end
+end
+
+-- TODO: refactor this to another task file
+function PlayContext:MovePlayerToBlock(bx, by, bz, blockId, side)
+	local player = EntityManager.GetPlayer()
+	local px, py, pz = player:GetBlockPos()
+	player:SetBlockPos(bx, by+1, bz)
 end

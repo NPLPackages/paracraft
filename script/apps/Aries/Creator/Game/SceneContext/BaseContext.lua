@@ -945,6 +945,7 @@ function BaseContext:handleRightClickScene(event, result)
 			self:OnCreateBlock(result, event);
 		end
 	end
+	return isProcessed
 end
 
 -- virtual: undo/redo related key events, such as ctrl+Z/Y

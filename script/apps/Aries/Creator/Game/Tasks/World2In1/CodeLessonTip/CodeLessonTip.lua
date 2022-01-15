@@ -20,10 +20,40 @@ local target_desc_list = {
     [4] = "教会用户如何直接转到需要的角度，并说话",
     [5] = "教会用户使用做动作",
     [6] = "教会用户使用【如果】与【是否碰到方块】代码块来确定是否应该【转向】",
-    [7] = "教会用户使用多个【如果】与【是否碰到方块】代码块来确定是否应该【转向",
+    [7] = "教会用户使用多个【如果】与【是否碰到方块】代码块来确定是否应该【转向】",
     [8] = "教会用户使用【如果-否则】与【是否碰到方块】代码块来确定往哪个方向【转向】",
     [9] = "教会用户使用for循环来向前移动并转向",
     [10] = "教会用户使用for循环来向前移动并转向，并且每次循环使用【if-end】来判断是否应该转向",
+    [1.1]=[[用代码控制角色走到光圈处<div style="height: 6px;"></div>走到门口时，需要回答问题打开门<div style="height: 6px;"></div>运用“前进”和“说”代码块来移动和回答]],
+    [1.2]=[[在岩浆之前穿过桥，打开门，最后到达终点]],
+    [1.3]=[[向前走到传送点，说出正确的数字传送到下一个点<div style="height: 6px;"></div>然后继续前进，直到走到光圈处]],
+    [2.1]=[[向前走到围栏前，跳起来跨过围栏到达光圈处]],
+    [2.2]=[[向前跑到光圈处，并且跨过中间的围栏]],
+    [2.3]=[[向前移动爬上山顶，到达光圈处]],
+    [3.1]=[[沿着路走到光圈处目标介绍（镜头+文字）：]],
+    [3.2]=[[沿着正确的道路走到光圈处]],
+    [3.3]=[[沿着路找到黄色钥匙<div style="height: 6px;"></div>用黄色钥匙打开黄色的门拿到灰色钥匙<div style="height: 6px;"></div>再用灰色钥匙打开灰色门，最后走到光圈处]],
+    [4.1]=[[沿着路走到门口，回答问题后开门<div style="height: 6px;"></div>继续走到光圈处即可]],
+    [4.2]=[[走到门外的踏板，打开石门<div style="height: 6px;"></div>再走木质踏板，打开木门<div style="height: 6px;"></div>继续走到光圈处即可]],
+    [4.3]=[[找到门外的黄色钥匙并打开黄色门<div style="height: 6px;"></div>再走到木质踏板，打开木门<div style="height: 6px;"></div>再走到石质踏板，打开石门<div style="height: 6px;"></div>然后找到白色钥匙并打开白色门<div style="height: 6px;"></div>继续走到光圈处即可]],
+    [5.1]=[[走到门前做出对应动作打开门<div style="height: 6px;"></div>继续走到光圈处即可]],
+    [5.2]=[[找到门外的黄色钥匙并打开黄色门<div style="height: 6px;"></div>然后找到白色钥匙并打开白色门<div style="height: 6px;"></div>继续走到光圈处即可]],
+    [5.3]=[[走到宝箱前做出动作，打开宝箱获得斧头<div style="height: 6px;"></div>继续沿着路走，做出动作来砍掉挡路的树<div style="height: 6px;"></div>然后走到光圈处即可]],
+    [6.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号则右转<div style="height: 6px;"></div>直到走到光圈处即可]],
+    [6.2]=[[每次向前移动5步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则去踩左侧的踏板开门，然后返回<div style="height: 6px;"></div>如此重复，直到走到光圈处即可]],
+    [6.3]=[[每次向前移动5步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则说“芝麻开门”，大门打开<div style="height: 6px;"></div>如此重复，直到走到光圈处即可]],
+    [7.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则踩左侧的2个踏板将灯点亮，然后再回到主路<div style="height: 6px;"></div>如此重复，所有灯点亮后大门打开，走到光圈处即可]],
+    [7.2]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则右转向前爬上台阶<div style="height: 6px;"></div>如此重复，走到光圈处即可]],
+    [7.3]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则左转向前<div style="height: 6px;"></div>若遇到门，则说“开门”将门打开<div style="height: 6px;"></div>如此重复，走到光圈处即可]],
+    [8.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则右转，否则左转<div style="height: 6px;"></div>如此重复，走到光圈处即可]],
+    [8.2]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则左转踩踏板点亮灯，再返回<div style="height: 6px;"></div>若不是20号，则右转踩踏板点亮灯，再返回<div style="height: 6px;"></div>如此重复，点亮所有灯后，大门打开，继续走到光圈处即可]],
+    [8.3]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则右转，否则则左转<div style="height: 6px;"></div>继续前进5格，再次检查脚下方块编号<div style="height: 6px;"></div>若是94号，则爬上台阶，否则则爬下台阶<div style="height: 6px;"></div>如此重复，继续走到光圈处即可]],
+    [9.1]=[[仔细观察地图，运用循环走到光圈处]],
+    [9.2]=[[运用循环走到光圈处<div style="height: 6px;"></div>每条路走到底，需要说出“传送”去到下一条路<div style="height: 6px;"></div>走完4条路，即可传送到光圈处<div style="height: 6px;"></div>仔细观察地图，寻找规律，运用2次循环完成任务]],
+    [9.3]=[[运用循环走到光圈处<div style="height: 6px;"></div>环绕爬上楼，即可到达光圈处<div style="height: 6px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
+    [10.1]=[[运用循环走到光圈处<div style="height: 6px;"></div>每次向前移动，然后检查脚下方块<div style="height: 6px;"></div>如果是71号，则左转，如果是134号，则右转<div style="height: 6px;"></div>其他情况则不转方向<div style="height: 6px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
+    [10.2]=[[运用循环走到光圈处<div style="height: 6px;"></div>每次向前移动，然后检查脚下方块<div style="height: 6px;"></div>如果是20号，则做出177号动作来砍树<div style="height: 6px;"></div>如果是56号，则右转，如果是58号，则左转<div style="height: 6px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
+    [10.3]=[[运用循环走到光圈处<div style="height: 6px;"></div>每次向前移动，然后检查脚下方块编号<div style="height: 6px;"></div>如果是20号，则做出177号动作来砍树<div style="height: 6px;"></div>如果是94号，则右转，如果是56号，则左转<div style="height: 6px;"></div>如果是19号，则跨过水坑<div style="height: 6px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
 }
 
 local CodeLessonTip = NPL.export()
@@ -51,11 +81,25 @@ function CodeLessonTip.OnCreate()
     if node and node:IsValid() then
         node.width = bg_node.width
     end
-
 end
 
 function CodeLessonTip.OnClose()
+    CodeLessonTip.Report("program")
     GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", CodeLessonTip.CodeWinChangeVisible, CodeLessonTip);
+end
+
+function CodeLessonTip.Report(type, lx_index, cast)
+    cast = cast or "on_lesson_end"
+    local report_msg = {}
+    report_msg.lesson_type = "code"
+    report_msg.lesson_index = math.floor(CodeLessonTip.lesson_index)
+    report_msg.report_type = type
+    report_msg.is_lx = lx_index or CodeLessonTip.lx_index > 0
+    report_msg.step_num = 1
+    report_msg.lx_index = CodeLessonTip.lx_index or 1
+    report_msg.is_last_lesson = type == "program" and CodeLessonTip.lesson_config.is_last_lesson or false
+    report_msg.is_last_step = true
+    GameLogic.GetCodeGlobal():BroadcastTextEvent(cast, report_msg);
 end
 
 --lesson_config 课程配置
@@ -66,7 +110,9 @@ function CodeLessonTip.ShowView(lesson_config, lesson_index)
     end
     CodeLessonTip.lesson_config = lesson_config
     CodeLessonTip.lesson_index = lesson_index
+    CodeLessonTip.lx_index = (CodeLessonTip.lesson_index - math.floor(CodeLessonTip.lesson_index)) * 10
     CodeLessonTip.IsShowCodeWin = CodeLessonTip.IsEditorOpen()
+    CodeLessonTip.ClickDifficultTimes = 0
 
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/World2In1/CodeLessonTip/CodeLessonTip.html",
@@ -117,6 +163,7 @@ function CodeLessonTip.ShowView(lesson_config, lesson_index)
 
     CodeLessonTip.ShowVisible(true)
     
+    GameLogic.GetCodeGlobal():BroadcastTextEvent("on_lesson_start");
 end
 
 function CodeLessonTip.CodeWinChangeVisible(event)
@@ -160,6 +207,10 @@ end
 
 function CodeLessonTip.ClickTargetIntroduce()
     GameLogic.GetCodeGlobal():BroadcastTextEvent("playCodeTargetMovice");
+    if CodeLessonTip.lx_index == 0 then
+        CodeLessonTip.Report("introduce", false, "CodeLessonClickReport")
+    end
+    
 end
 
 function CodeLessonTip.ClickRefresh()
@@ -200,16 +251,24 @@ function CodeLessonTip.ClickSolutionTip()
     CodeLessonTip.cur_diff_index = 0
     CodeLessonTip.ShowVisible(false)
     GameLogic.GetCodeGlobal():BroadcastTextEvent("clickSimPass");
+    CodeLessonTip.Report("simPass", false, "CodeLessonClickReport")
 end
 
 -- 点击难点讲解
 function CodeLessonTip.ClickDifficult(index)
     CodeLessonTip.ShowCodeDiffView(tonumber(index))
+
+    CodeLessonTip.ClickDifficultTimes = CodeLessonTip.ClickDifficultTimes + 1
+    if CodeLessonTip.ClickDifficultTimes >= 2 then
+        CodeLessonTip.Report("cruxAnswer", false, "CodeLessonClickReport")
+    end
+   
 end
 
 -- 点击完整解答
 function CodeLessonTip.ClickAnswer()
     CodeLessonTip.ShowCodeAnswerView()
+    CodeLessonTip.Report("completeAnswer", false, "CodeLessonClickReport")
 end
 
 -- 代码编辑器是否打开
@@ -290,7 +349,14 @@ end
 function CodeLessonTip.ShowResultView(is_success)
     local content = "你没通关成功，请再接再厉！"
     if is_success then
-        content = string.format("你已完成了第%s课(%s)", commonlib.NumberToString(CodeLessonTip.lesson_index), CodeLessonTip.lesson_config.lesson_name)
+        local desc = "你已完成了第%s课(%s)"
+        if CodeLessonTip.lx_index > 0 then
+            local lesson_index = math.floor(CodeLessonTip.lesson_index)
+            content = string.format("你已完成了第%s课练习%s", commonlib.NumberToString(lesson_index), CodeLessonTip.lx_index)
+        else
+            content = string.format("你已完成了第%s课(%s)", commonlib.NumberToString(CodeLessonTip.lesson_index), CodeLessonTip.lesson_config.lesson_name)
+        end
+        
     end
 
     local left_bt_cb = function()
@@ -305,7 +371,7 @@ function CodeLessonTip.ShowResultView(is_success)
 
             GameLogic.GetCodeGlobal():BroadcastTextEvent("startCodeLesson",{lesson_index = CodeLessonTip.lesson_index + 1});
         else
-            GameLogic.GetCodeGlobal():BroadcastTextEvent("lessonNormalStart");
+            GameLogic.GetCodeGlobal():BroadcastTextEvent("restartCodelesson");
         end
     end
 
@@ -314,7 +380,7 @@ function CodeLessonTip.ShowResultView(is_success)
         CodeResultView.CloseWindow()
     end
 
-    local is_last_lesson = CodeLessonTip.lesson_config.is_last_lesson
+    local is_last_lesson = CodeLessonTip.lesson_config.is_last_lesson or CodeLessonTip.lx_index > 0
     CodeResultView.ShowView(is_success, content, left_bt_cb, right_bt_cb, is_last_lesson)
 
     if is_success then

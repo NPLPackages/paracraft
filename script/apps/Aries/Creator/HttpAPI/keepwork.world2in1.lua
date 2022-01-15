@@ -52,3 +52,7 @@ HttpWrapper.Create("keepwork.projects.allocateStar", "%MAIN%/core/v0/projects/al
 --http://yapi.kp-para.cn/project/32/interface/api/4352
 --用户随意消耗知识豆
 HttpWrapper.Create("keepwork.user.bean_reduce", "%MAIN%/core/v0/users/bean/reduce", "POST", true)
+
+--http://yapi.kp-para.cn/project/32/interface/api/4696
+--获取冬奥会排行榜
+HttpWrapper.Create("keepwork.owg.rankings", "%MAIN%/core/v0/owg/rankings", "GET", true)

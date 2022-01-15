@@ -40,10 +40,16 @@ function MovieClipController.ShowPlayEditorForMovieClip(movieClip)
 	return movieClip
 end
 
+function MovieClipController.OnCreate()
+	MovieClipController.ShowCompareUiAnim()
+end
+
 function MovieClipController.OnInit()
 	MovieClipController:InitSingleton();
 	local self = MovieClipController;
 	page = document:GetPageCtrl();
+	page.OnCreate = MovieClipController.OnCreate
+
 	self.last_time = nil;
 	self.mytimer = self.mytimer or commonlib.Timer:new({callbackFunc = self.OnTimer})
 	self.mytimer:Change(200, 200);
@@ -135,7 +141,10 @@ function MovieClipController:ShowAllGUI(bShow, bForceEditorMode)
 			MovieClipController.ShowPage(true, function() 
 				activeClip.entity:EndEdit();
 			end);
+			GameLogic.GetFilters():apply_filters("OpenMovieClipController");
 		end
+
+		
 	else
 		if(MovieClipController.IsVisible()) then
 			if(MovieManager:IsCapturing()) then
@@ -147,6 +156,8 @@ function MovieClipController:ShowAllGUI(bShow, bForceEditorMode)
 			end
 		end
 	end
+
+	
 end
 
 function MovieClipController:OnActiveMovieClipChange(clip)
@@ -180,6 +191,11 @@ function MovieClipController.OnClosePage()
 	end
 
 	MovieClipController:OnActiveMovieClipChange(nil);
+
+	if MovieClipController.ui_anim_timer then
+		MovieClipController.ui_anim_timer:Change(0)
+		MovieClipController.ui_anim_timer = nil
+	end
 end
 
 function MovieClipController:OnSelectedActorChange(actor)
@@ -860,4 +876,84 @@ end
 
 function MovieClipController.OnClickHelp()
 	ParaGlobal.ShellExecute("open", L"https://keepwork.com/official/docs/UserGuide/animation/movie_block", "", "", 1);
+end
+
+
+function MovieClipController.SetIsCompareMod(flag)
+	MovieClipController.IsCompareMod = flag
+end
+
+function MovieClipController.SetCompareData(data)
+	MovieClipController.CompareData = data
+
+	if not data and MovieClipController.ui_anim_timer then
+		MovieClipController.ui_anim_timer:Change(0)
+		MovieClipController.ui_anim_timer = nil
+	end
+end
+
+function MovieClipController.GetCompareData(data)
+	return MovieClipController.CompareData
+end
+
+function MovieClipController.IsCompareDiff(slot)
+	if not MovieClipController.CompareData then
+		return false
+	end
+
+	for key, v in pairs(MovieClipController.CompareData) do
+		if v[slot] then
+			return true
+		end
+	end
+
+	return false
+end
+
+function MovieClipController.ShowCompareUiAnim()
+	if not MovieClipController.CompareData then
+		return			
+	end
+	if MovieClipController.ui_anim_timer then
+		return
+	end
+	
+	-- local ui_object_list = {}
+	-- for k, value in pairs(MovieClipController.CompareData) do
+	-- 	local ui_object = ParaUI.GetUIObject("MovieClipController.slot_".. k .. "_bg");
+	-- 	if ui_object and ui_object:IsValid() then
+	-- 		print("aaaaaaaaaaaaaaa")
+	-- 		ui_object_list[#ui_object_list + 1] = ui_object
+	-- 	end
+	-- end
+	if not MovieClipController.ui_anim_timer then
+		local min_alpha = 0
+		local max_alpha = 100
+		local cur_alpha = 100
+		local dir = -1
+		local rate = 8
+		MovieClipController.ui_anim_timer = commonlib.Timer:new({callbackFunc = function(timer)
+			cur_alpha = cur_alpha + dir * rate
+			for k, v in pairs(MovieClipController.CompareData) do
+				local ui_object = ParaUI.GetUIObject("MovieClipController.slot_".. k .. "_bg");
+				if ui_object and ui_object:IsValid() then
+					local alpha = math.max(0, math.floor(cur_alpha/max_alpha * 255))
+					_guihelper.SetColorMask(ui_object, format("255 255 255 %d",alpha))
+				end
+
+			end
+
+			-- MovieClipTimeLine的也在这处理
+			local ui_object = ParaUI.GetUIObject("MovieClipTimeLine_end_time_compare");
+			if ui_object and ui_object:IsValid() then
+				local alpha = math.max(0, math.floor(cur_alpha/max_alpha * 255))
+				_guihelper.SetColorMask(ui_object, format("255 255 255 %d",alpha))
+			end
+			
+			if cur_alpha <= min_alpha or cur_alpha >= max_alpha then
+				dir = dir * -1
+			end
+		end})
+		MovieClipController.ui_anim_timer:Change(0, 50);
+	end
 end

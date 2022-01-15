@@ -351,9 +351,10 @@ Commands["panorama"] = {
 
 Commands["camera"] = {
 	name="camera", 
-	quick_ref="/camera [-norestrict|clear] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]]", 
+	quick_ref="/camera [-norestrict|clear|roomview] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]]", 
 	desc=[[angle should be in range [-180, 180]
 /camera      : clear all camera settings
+/camera -roomview    : good for kids
 /camera -norestrict
 /camera -restrictPitch 30 80
 /camera -restrictDist 15
@@ -363,7 +364,7 @@ Commands["camera"] = {
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
-		local minYaw, maxYaw, minDist, maxDist, minPitch, maxPitch
+		local minYaw, maxYaw, minDist, maxDist, minPitch, maxPitch, enableRoomView
 		local option_name = "";
 		while (option_name and cmd_text) do
 			option_name, cmd_text = CmdParser.ParseOption(cmd_text);
@@ -389,8 +390,11 @@ Commands["camera"] = {
 				minDist, cmd_text = CmdParser.ParseInt(cmd_text);
 				maxDist, cmd_text = CmdParser.ParseInt(cmd_text);
 				maxDist = maxDist or minDist
+			elseif(option_name == "roomview") then
+				enableRoomView = true
 			end
 		end
+		CameraController.EnableAutoRoomView(enableRoomView==true);
 		CameraController.SetCameraRestrictions(minYaw, maxYaw, minDist, maxDist, minPitch, maxPitch)
 	end,
 };

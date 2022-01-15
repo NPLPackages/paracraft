@@ -452,20 +452,25 @@ end
 function MountPointsManip:UpdateModel()
 	-- following may not need to be called every frame. 
 	if(self.entity) then
-		local facing = self.entity:GetFacing();
-		if(facing ~= 0) then
-			self.localRotQuat = self.localRotQuat or Quaternion:new();
-			self.localRotQuat:FromAngleAxis(facing, vector3d.unit_y)
-			self.localRotQuat:ToRotationMatrix(self.localTransform)
+		if(not self.entity.isMountpointDetached) then
+			local facing = self.entity:GetFacing();
+			if(facing ~= 0) then
+				self.localRotQuat = self.localRotQuat or Quaternion:new();
+				self.localRotQuat:FromAngleAxis(facing, vector3d.unit_y)
+				self.localRotQuat:ToRotationMatrix(self.localTransform)
+			else
+				self.localTransform:identity()
+			end
+			local scaling = self.entity:GetScaling()
+			if(scaling ~= 1) then
+				self.matScale = self.matScale or Matrix4:new():identity();
+				self.matScale:setScale(scaling, scaling, scaling);
+				self.localTransform:multiply(self.matScale);
+			end
 		else
 			self.localTransform:identity()
 		end
-		local scaling = self.entity:GetScaling()
-		if(scaling ~= 1) then
-			self.matScale = self.matScale or Matrix4:new():identity();
-			self.matScale:setScale(scaling, scaling, scaling);
-			self.localTransform:multiply(self.matScale);
-		end
+
 		-- TODO: bmax's local transform does not contain scaling, we will compute local transform manually
 		-- self.localTransform = self.entity:GetInnerObject():GetField("LocalTransform", self.localTransform);
 		self:SetLocalTransform(self.localTransform);

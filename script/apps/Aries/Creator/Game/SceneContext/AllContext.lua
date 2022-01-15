@@ -11,6 +11,7 @@ AllContext:Init();
 AllContext:GetContext("editor");
 ------------------------------------------------------------
 ]]
+local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 
@@ -75,3 +76,17 @@ function AllContext:GetContext(name)
     end
 end
 
+-- set or replace the given context, if the context is currently selected, we will replace it and activate the new context
+-- @return the last context
+function AllContext:SetContext(name, context)
+	local lastContext = self:GetContext(name)
+	if(lastContext ~= context) then
+		if(lastContext and lastContext == SceneContextManager:GetCurrentContext()) then
+			if(not SceneContextManager:Select(context)) then
+				return
+			end
+		end
+		contexts[name] = context;
+	end
+	return lastContext;
+end

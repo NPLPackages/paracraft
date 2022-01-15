@@ -186,7 +186,8 @@ function Notice.OnImageBgClick(data)
     -- end  
     if string.find(name, "冬令营") and string.find(name, "冬令营") > 0 then
         Notice.CloseView()
-        GameLogic.AddBBS(nil,"敬请期待~~~~~")
+        GameLogic.RunCommand(string.format("/loadworld -s -auto %s", 132939))
+        --GameLogic.AddBBS(nil,"敬请期待~~~~~")
         return
     end  
      

@@ -56,6 +56,8 @@ Entity:Property({"useRealPhysics", false, "HasRealPhysics", "EnablePhysics", aut
 Entity:Property({"gridSize", BlockEngine.blocksize*0.25, "GetGridSize", "SetGridSize", auto=true});
 Entity:Property({"dropRadius", 0.2, "GetDropRadius", "SetDropRadius", auto=true});
 Entity:Property({"isAlwaysLoadPhysics", true, "IsAlwaysLoadPhysics", "SetAlwaysLoadPhysics"});
+Entity:Property({"isDisplayModel", true, "IsDisplayModel", "SetDisplayModel", auto=true});
+Entity:Property({"isMountpointDetached", false});
 Entity:Property({"bIsAutoTurning", nil, "IsAutoTurningDuringDragging", "SetAutoTurningDuringDragging"});
 Entity:Property({"isStackable", nil, "IsStackable", "SetIsStackable"});
 Entity:Property({"stackHeight", 0.2, "GetStackHeight", "SetStackHeight"});
@@ -72,6 +74,7 @@ Entity:Property({"onendDragEvent", nil, "GetOnEndDragEvent", "SetOnEndDragEvent"
 Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
 Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
 Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
+Entity:Property({"yawOffset", 0, "GetYawOffset", "SetYawOffset", auto=true});
 
 Entity:Signal("beforeDestroyed")
 Entity:Signal("clicked", function(mouse_button) end)
@@ -126,6 +129,19 @@ function Entity:init()
 	end
 	
 	return self;
+end
+
+-- internal name 
+function Entity:SetName(v)
+	if(self.name~=v) then
+		Entity._super.SetName(self, v)
+		if(self.name == v) then
+			local obj = self:GetInnerObject()
+			if(obj) then
+				obj:SetName(self.name);
+			end
+		end
+	end
 end
 
 -- virtual function: return cloned entity. 
@@ -335,6 +351,8 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.bIsAutoTurning) then
 			self.bIsAutoTurning = (attr.bIsAutoTurning == "true") or (attr.bIsAutoTurning == true);
 		end
+		self.isDisplayModel = (attr.isDisplayModel ~= "false") and (attr.isDisplayModel ~= false);
+		
 		if(attr.canDrag) then
 			self.canDrag = (attr.canDrag == "true") or (attr.canDrag == true);
 		end
@@ -361,6 +379,9 @@ function Entity:LoadFromXMLNode(node)
 		end
 		if(attr.category) then
 			self.category = attr.category
+		end
+		if(attr.yawOffset) then
+			self.yawOffset = tonumber(attr.yawOffset)
 		end
 		if(attr.hasMount) then
 			self:CreateGetMountPoints():LoadFromXMLNode(node)
@@ -436,6 +457,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.category and self.category~="") then
 		attr.category = self.category
 	end
+	if(self.yawOffset and yawOffset~=0) then
+		attr.yawOffset = self.yawOffset
+	end
 
 	attr.linkTo = self:ConvertLinkInfoToString(self.linkInfo)
 	
@@ -460,6 +484,11 @@ function Entity:SaveToXMLNode(node, bSort)
 	attr.stackHeight = self.stackHeight;
 	attr.isStackable = self.isStackable;
 	attr.bIsAutoTurning = self.bIsAutoTurning;
+
+	if(self.isDisplayModel == false) then
+		attr.isDisplayModel = false;
+	end
+
 	local lastAnim = self:GetLastAnimId();
 	if((lastAnim or 0) ~= (self.idleAnim or 0)) then
 		attr.lastAnim = lastAnim
@@ -1477,6 +1506,15 @@ function Entity:FrameMove(deltaTime)
 	--if(self.linkInfo and self.linkInfo.boneName) then
 		--self:UpdateEntityLink()
 	--end
+	if(GameLogic.GameMode:IsEditor()) then
+		if(not self:IsVisible()) then
+			self:SetVisible(true)
+		end
+	else
+		if(self:IsVisible() ~= self:IsDisplayModel()) then
+			self:SetVisible(self:IsDisplayModel())
+		end
+	end
 end
 
 -- virtual function: this function is called by the basecontext to highlight picking entity. 
@@ -1508,6 +1546,7 @@ end
 -- @param itemId: custom character item id, such as 83127
 function Entity:BecomeCustomCharacterItem(itemId)
 	BlockInEntityHand.TransformEntityToCustomCharItem(self, itemId)
+	self:SetYawOffset(-1.57)
 end
 
 -- only call this function when the entity is a custom character.
@@ -1537,7 +1576,7 @@ function Entity:PutOnCustomCharItem(itemId)
 							break;
 						end
 					end
-					if(not bHasItem) then
+					if(not bHasItem and CustomCharItems:GetItemById(id)) then
 						replacedItemId = id
 						break
 					end

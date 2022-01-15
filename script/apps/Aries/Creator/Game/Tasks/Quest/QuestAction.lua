@@ -1313,3 +1313,16 @@ function QuestAction.SetDongaoLessonState(lesson_type, lesson_index, is_finish)
     KeepWorkItemManager.SetClientData(dongao_gsid, client_data, function()
     end)
 end
+
+function QuestAction.ReportEvent(action, data)
+    local profile = KeepWorkItemManager.GetProfile()
+    data.userId = profile.id
+    keepwork.burieddata.sendSingleBuriedData({
+        category 	= 'behavior',
+        action 		= action,
+        data 		= data
+    },function(err, msg, data)
+        if err == 200 then
+        end
+    end)
+end

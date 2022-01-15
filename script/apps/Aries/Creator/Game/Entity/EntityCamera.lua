@@ -34,6 +34,7 @@ local math_floor = math.floor;
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovable"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCamera"));
 
+Entity:Property({"isAlwaysHidden", false, "IsAlwaysHidden", "SetAlwaysHidden", auto = true});
 Entity:Signal("cameraHidden");
 Entity:Signal("cameraShown");
 Entity:Signal("targetChanged", function(newTarget, oldTarget) end);
@@ -297,7 +298,7 @@ function Entity:HideCameraModel()
 end
 
 function Entity:ShowCameraModel()
-	if(self:IsCameraHidden()) then
+	if(self:IsCameraHidden() and not self:IsAlwaysHidden()) then
 		self:SetVisible(true);
 		self:cameraShown();
 	end

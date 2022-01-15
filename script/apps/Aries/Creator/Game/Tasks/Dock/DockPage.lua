@@ -504,7 +504,7 @@ function DockPage.RenderButton_LeftTop_1(index)
     local id = node.id;
     local bg = node.bg
 	 local s = string.format([[
-        <input type="button" name='%s' onclick="OnClickLeftTop" style="width:100px;height:80px;background:url(%s)"/>
+        <input type="button" name='%s' onclick="OnClickLeftTop" style="width:101px;height:93px;background:url(%s)"/>
         %s
     ]],node.id,bg,tip_str);
     return s;
@@ -1051,7 +1051,7 @@ function DockPage.CheckWinterCampUIVisible()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 	local hide_ui_world_ids = {
-        ONLINE = { 119551,114607,91056,128252,128291},
+        ONLINE = { 119551,114607,91056,128252,128291,132939},
         RELEASE = {},
     };
     local worlds = hide_ui_world_ids[HttpWrapper.GetDevVersion()]
@@ -1070,4 +1070,3 @@ function DockPage.CheckWinterCampUIVisible()
     DockPage.SetUIVisible_CenterBottom(visible)
     DockPage.SetUIVisible_RightBottom(visible)
 end
-

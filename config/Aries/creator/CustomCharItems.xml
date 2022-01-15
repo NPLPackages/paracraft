@@ -1073,9 +1073,7 @@ model id
     <item id="88007" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a002.png"></texture></item>
     <item id="88008" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a003.png"></texture></item>
     <item id="88009" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl_fps10_a004.png"></texture></item>
-    <item id="88012" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_girl3_fps10_a002.png"></texture></item>
     <item id="88013" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_mask.png"></texture></item>
-    <item id="88015" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_02.png"></texture></item>
     <item id="88016" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_03.png"></texture></item>
     <item id="88017" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_04.png"></texture></item>
     <item id="88018" model="actor;"><texture id="4" filename="Texture/blocks/Paperman/mouth/mouth_05.png"></texture></item>

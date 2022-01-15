@@ -126,11 +126,11 @@
         <item id="83186"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83186_nurse_32bits.png" name="护士帽" avatarMode="false"/>
 
         <!-- 20211125冬令营道具-->
-        <item id="83181"  gsid="82022" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83181_omlypic_africa_32bits.png" name="冬运会（非洲）" avatarMode="false"/>
-        <item id="83182"  gsid="82023" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83182_omlypic_aisa_32bits.png" name="冬运会（亚洲）" avatarMode="false"/>
-		<item id="83183"  gsid="82024" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83183_omlypic_australia_32bits.png" name="冬运会（澳洲）" avatarMode="false"/>
-		<item id="83184"  gsid="82025" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83184_omlypic_europe_32bits.png" name="冬运会（欧洲）" avatarMode="false"/>
-		<item id="83185"  gsid="82026" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83185_omlypic_america_32bits.png" name="冬运会（美洲）" avatarMode="false"/>
+        <item id="83181"  gsid="82022" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83181_omlypic_africa_32bits.png" name="冬运会（非洲）"/>
+        <item id="83182"  gsid="82023" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83182_omlypic_aisa_32bits.png" name="冬运会（亚洲）"/>
+		<item id="83183"  gsid="82024" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83183_omlypic_australia_32bits.png" name="冬运会（澳洲）"/>
+		<item id="83184"  gsid="82025" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83184_omlypic_europe_32bits.png" name="冬运会（欧洲）"/>
+		<item id="83185"  gsid="82026" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83185_omlypic_america_32bits.png" name="冬运会（美洲）"/>
 
         <!-- 20211118新增-->
         <item id="83180"  price="100" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83180_olympic_hat_32bits.png" name="冬运会" avatarMode="false"/>
@@ -1020,23 +1020,21 @@
 		<item id="88007" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a002_32bits.png" name="嘴巴7"/>
 		<item id="88008" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a003_32bits.png" name="嘴巴8"/>
 		<item id="88009" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a004_32bits.png" name="嘴巴9"/>
-		<item id="88012" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl3_fps10_a002_32bits.png" name="嘴巴10"/>
 		<item id="88013" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_mask_32bits.png" name="口罩"/>
-		<item id="88015" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_02_32bits.png" name="嘴巴11"/>
-		<item id="88016" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_03_32bits.png" name="嘴巴12"/>
-		<item id="88017" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_04_32bits.png" name="嘴巴13"/>
-		<item id="88018" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_05_32bits.png" name="嘴巴14"/>
-		<item id="88019" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_06_32bits.png" name="嘴巴15"/>
-		<item id="88020" price="50" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_01_32bits.png" name="嘴巴16"/>
-		<item id="88021" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_02_01_32bits.png" name="嘴巴17"/>
-		<item id="88022" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_03_01_32bits.png" name="嘴巴18"/>
-		<item id="88023" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_04_01_32bits.png" name="嘴巴19"/>
-		<item id="88024" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_05_01_32bits.png" name="嘴巴20"/>
-		<item id="88025" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_06_01_32bits.png" name="嘴巴21"/>
-		<item id="88026" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_07_01_32bits.png" name="嘴巴22"/>
+		<item id="88016" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_03_32bits.png" name="嘴巴10"/>
+		<item id="88017" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_04_32bits.png" name="嘴巴11"/>
+		<item id="88018" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_05_32bits.png" name="嘴巴12"/>
+		<item id="88019" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_06_32bits.png" name="嘴巴13"/>
+		<item id="88020" price="50" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_01_32bits.png" name="嘴巴14"/>
+		<item id="88021" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_02_01_32bits.png" name="嘴巴15"/>
+		<item id="88022" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_03_01_32bits.png" name="嘴巴16"/>
+		<item id="88023" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_04_01_32bits.png" name="嘴巴17"/>
+		<item id="88024" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_05_01_32bits.png" name="嘴巴18"/>
+		<item id="88025" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_06_01_32bits.png" name="嘴巴19"/>
+		<item id="88026" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_07_01_32bits.png" name="嘴巴20"/>
       
-		<item id="88027" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_02_32bits.png" name="嘴巴23"/>
-		<item id="88028" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_03_32bits.png" name="嘴巴24"/>
+		<item id="88027" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_02_32bits.png" name="嘴巴21"/>
+		<item id="88028" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_03_32bits.png" name="嘴巴22"/>
 		
 	</category>
 

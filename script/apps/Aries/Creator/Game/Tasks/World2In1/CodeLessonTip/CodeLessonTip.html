@@ -18,9 +18,9 @@ end
 <!-- Texture/Aries/Creator/keepwork/macro/lessonbox/ -->
 <pe:container ClickThrough="true" uiname="CodeLessonTipRoot" alignment="_lt" width="1280" height="720" style="background:;">
     <div style="position: relative;">
-        <div style="float: left; width: 283px;min-height: 135px;padding-bottom: 8px; background:url(Texture/Aries/Creator/keepwork/macro/code/bg_target_421x201_32bits.png#0 0 421 201);">
-            <!-- <div style="margin-top: 8px;margin-left: 8px;base-font-size:26px;font-size: 26px;">目标：</div> -->
-            <div style="margin-left: 22px;margin-top: 40px; width: 240px;min-height: 48px;base-font-size:16px;font-size: 16px;">
+        <div style="float: left; width: 283px;min-height: 135px;padding-bottom: 8px; background:url(Texture/Aries/Creator/keepwork/macro/code/jifengban_283x135_32bits.png#0 0 283 135);">
+            <div style="margin-top: 8px;margin-left: 8px;base-font-size:26px;font-size: 26px;">目标：</div>
+            <div style="margin-left: 22px;margin-top: 4px; width: 240px;min-height: 48px;base-font-size:16px;font-size: 16px;">
                 <%=CodeLessonTip.GetTargetDesc()%>
             </div>
     
@@ -39,32 +39,34 @@ end
         <div name="bt_return" onclick="CodeLessonTip.ClickReturn" style="margin-left: 0px; margin-top: 6px; width: 100px;height: 36px;background:url(Texture/Aries/Creator/keepwork/macro/code/bt_return_137x49_32bits.png#0 0 137 49)"></div>
     </pe:container>
     
-    <pe:container name="bottom_node" alignment="_ctb" style="margin-top: -20px; width: 482px;height: 50px;background: ;">
-        <div align='center' name="bottom_node_bg" style="min-width: 100px;height: 50px;background:url(Texture/Aries/Creator/keepwork/macro/code/bg_bottom_758x70_32bits.png#0 0 758 70)">
-            <div onclick="CodeLessonTip.ClickSolutionTip" 
-                    style="float: left; margin-left: 7px; margin-top: 10px; width: 89px;height: 32px;
-                    background:url(Texture/Aries/Creator/keepwork/macro/code/bt_hint_140x49_32bits.png#0 0 140 49)"></div>
-
-            <pe:repeat DataSource="<%=CodeLessonTip.GetButtonData()%>">
-                <pe:repeatitem>
-                <div onclick="CodeLessonTip.ClickDifficult"
-                        name='<%=Eval("index")%>'
-                        style='<%=GetBottomBtStyle(Eval("index"))%>'></div>
-                </pe:repeatitem>
-            </pe:repeat>
-
-            <!-- <div onclick="CodeLessonTip.ClickSub" 
-                    style="float: left; margin-left: 7px; margin-top: 10px; width: 89px;height: 32px;
-                    background:url(Texture/Aries/Creator/keepwork/macro/code/bt_explain2_140x49_32bits.png#0 0 140 49)"></div>
-            <div onclick="CodeLessonTip.ClickSub" 
-                    style="float: left; margin-left: 7px; margin-top: 10px; width: 89px;height: 32px;
-                    background:url(Texture/Aries/Creator/keepwork/macro/code/bt_explain3_140x49_32bits.png#0 0 140 49)"></div> -->
-            <div onclick="CodeLessonTip.ClickAnswer" 
-                    style="float: left; margin-left: 7px; margin-top: 10px; width: 89px;height: 32px;
-                    background:url(Texture/Aries/Creator/keepwork/macro/code/bt_answer_140x49_32bits.png#0 0 140 49)"></div>
-        </div>
-
-    </pe:container>
+    <pe:if condition='<%=CodeLessonTip.lx_index == 0%>'>
+        <pe:container name="bottom_node" alignment="_ctb" style="margin-top: -20px; width: 482px;height: 50px;background: ;">
+            <div align='center' name="bottom_node_bg" style="min-width: 100px;height: 50px;background:url(Texture/Aries/Creator/keepwork/macro/code/bg_bottom_758x70_32bits.png#0 0 758 70)">
+                <div onclick="CodeLessonTip.ClickSolutionTip" 
+                        style="float: left; margin-left: 7px; margin-top: 10px; width: 89px;height: 32px;
+                        background:url(Texture/Aries/Creator/keepwork/macro/code/bt_hint_140x49_32bits.png#0 0 140 49)"></div>
+    
+                <pe:repeat DataSource="<%=CodeLessonTip.GetButtonData()%>">
+                    <pe:repeatitem>
+                    <div onclick="CodeLessonTip.ClickDifficult"
+                            name='<%=Eval("index")%>'
+                            style='<%=GetBottomBtStyle(Eval("index"))%>'></div>
+                    </pe:repeatitem>
+                </pe:repeat>
+    
+                <!-- <div onclick="CodeLessonTip.ClickSub" 
+                        style="float: left; margin-left: 7px; margin-top: 10px; width: 89px;height: 32px;
+                        background:url(Texture/Aries/Creator/keepwork/macro/code/bt_explain2_140x49_32bits.png#0 0 140 49)"></div>
+                <div onclick="CodeLessonTip.ClickSub" 
+                        style="float: left; margin-left: 7px; margin-top: 10px; width: 89px;height: 32px;
+                        background:url(Texture/Aries/Creator/keepwork/macro/code/bt_explain3_140x49_32bits.png#0 0 140 49)"></div> -->
+                <div onclick="CodeLessonTip.ClickAnswer" 
+                        style="float: left; margin-left: 7px; margin-top: 10px; width: 89px;height: 32px;
+                        background:url(Texture/Aries/Creator/keepwork/macro/code/bt_answer_140x49_32bits.png#0 0 140 49)"></div>
+            </div>
+    
+        </pe:container>
+    </pe:if>
 </pe:container>
 </pe:mcml>
 </body>

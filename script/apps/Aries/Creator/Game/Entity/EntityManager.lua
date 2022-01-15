@@ -131,6 +131,7 @@ function EntityManager.RegisterEntities()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityAgentSign.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityNplCadEditor.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityLiveModel.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityInvisibleClickSensor.lua");
 end
 
 -- register a new entity class
@@ -443,7 +444,7 @@ function EntityManager.SetEntityByObjectID(obj_id, entity)
 end
 
 
--- return true if there is at least one entity at the blocok position. 
+-- return true if there is at least one entity at the block position. 
 function EntityManager.HasEntityInBlock(bx, by, bz)
 	local entities = EntityManager.GetEntitiesInBlock(bx, by, bz);
 	if(entities) then

@@ -69,6 +69,9 @@ end
         </div>
         <pe:gridview name="InventoryItems" style="height:104px;" VerticalScrollBarStep="34" DataSource="<%=DS_Actor_Inventory%>" CellPadding="0" DefaultNodeHeight = "34" ItemsPerLine="5" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="512">
             <Columns>
+                <pe:if condition='<%=MovieClipController.IsCompareDiff(Eval("slotNumber"))%>'>
+                    <pe:container uiname='<%="MovieClipController.slot_"..Eval("slotNumber") .. "_bg"%>' zorder="0" style="position: relative; margin-left: 1px; width: 32px;height: 32px;background-color: #00ff00;"></pe:container>
+                </pe:if>
                 <pe:if condition='<%=IsSelectedActor(Eval("slotNumber"))%>'>
                     <div style="background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 122 26 26:1 1 1 1)">
                         <pe:mc_slot ContainerView='<%=MovieClipController.GetActorInventoryView()%>' bagpos ='<%=Eval("slotNumber")%>' uiname='<%="MovieClipController.slot_"..Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>

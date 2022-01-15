@@ -661,6 +661,21 @@ function Item:CompareItems(left, right)
 	end
 end
 
+-- return nil or a preferred block data if it is not specified in item stack. 
+function Item:GetPreferredBlockData()
+	if(self:HasColorData()) then
+		local block_template = self:GetBlock();
+		if(block_template) then
+			if(block_template.color8_data) then
+				return 0; 
+			elseif(block_template.color_data) then
+				return 4095; -- 0xfff
+			end
+			-- return self:ColorToData(0xffffff);
+		end
+	end
+end
+
 function Item:HasColorData()
 	if(self.hasColorData == nil) then
 		local block_template = self:GetBlock();

@@ -103,10 +103,19 @@ function Macros.KeyFrameCtrlMoveTrigger(name, new_time, begin_shift_time)
 		local endX, endY = ctl:GetXYPosByTime(new_time)
 		if(startX) then
 			local callback = {};
-			MacroPlayer.SetDragTrigger(startX, startY, endX, endY, "alt+left", function()
-				if(callback.OnFinish) then
+			-- MacroPlayer.SetDragTrigger(startX, startY, endX, endY, "alt+left", function()
+			-- 	if(callback.OnFinish) then
+			-- 		callback.OnFinish();
+			-- 	end
+			-- end);
+			MacroPlayer.SetClickTrigger(startX, startY, "alt+left", function()
+				local x = ctl:GetParent():GetAbsPosition();
+				ctl.single_shift = true;
+				ctl:OnBeginShiftFrame(begin_shift_time, startX - x);
+				MacroPlayer.SetClickTrigger(endX, endY, "left", function()
+					ctl:OnEndShiftFrame();
 					callback.OnFinish();
-				end
+				end)
 			end);
 			return callback;
 		end
@@ -127,10 +136,18 @@ function Macros.KeyFrameCtrlShiftTrigger(name, begin_shift_time, offset_time)
 		local endX, endY = ctl:GetXYPosByTime(begin_shift_time+offset_time)
 		if(startX) then
 			local callback = {};
-			MacroPlayer.SetDragTrigger(startX, startY, endX, endY, "left", function()
-				if(callback.OnFinish) then
+			-- MacroPlayer.SetDragTrigger(startX, startY, endX, endY, "left", function()
+			-- 	if(callback.OnFinish) then
+			-- 		callback.OnFinish();
+			-- 	end
+			-- end);
+			MacroPlayer.SetClickTrigger(startX, startY, "left", function()
+				local x = ctl:GetParent():GetAbsPosition();
+				ctl:OnBeginShiftFrame(begin_shift_time, startX - x);
+				MacroPlayer.SetClickTrigger(endX, endY, "left", function()
+					ctl:OnEndShiftFrame();
 					callback.OnFinish();
-				end
+				end)
 			end);
 			return callback;
 		end
@@ -151,10 +168,19 @@ function Macros.KeyFrameCtrlCopyTrigger(name, new_time, begin_shift_time)
 		local endX, endY = ctl:GetXYPosByTime(new_time)
 		if(startX) then
 			local callback = {};
-			MacroPlayer.SetDragTrigger(startX, startY, endX, endY, "ctrl+left", function()
-				if(callback.OnFinish) then
+			-- MacroPlayer.SetDragTrigger(startX, startY, endX, endY, "ctrl+left", function()
+			-- 	if(callback.OnFinish) then
+			-- 		callback.OnFinish();
+			-- 	end
+			-- end);
+			MacroPlayer.SetClickTrigger(startX, startY, "ctrl+left", function()
+				local x = ctl:GetParent():GetAbsPosition();
+				ctl.single_copy = true;
+				ctl:OnBeginShiftFrame(begin_shift_time, startX - x);
+				MacroPlayer.SetClickTrigger(endX, endY, "left", function()
+					ctl:OnEndShiftFrame();
 					callback.OnFinish();
-				end
+				end)
 			end);
 			return callback;
 		end

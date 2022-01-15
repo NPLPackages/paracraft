@@ -89,6 +89,7 @@ function EditModelProperty.OnOK()
 			stackHeight = stackHeight,
 			idleAnim = idleAnim, 
 			hasRealPhysics = hasRealPhysics,
+			isDisplayModel = page:GetValue("isDisplayModel"),
 			autoTurning = autoTurning,
 			isStackable = isStackable,
 			canDrag = canDrag,
@@ -113,6 +114,7 @@ function EditModelProperty.UpdateUIFromValue(values)
 			page:SetValue("name", values.name);
 		end
 		page:SetValue("isStackable", tostring(values.isStackable));
+		page:SetValue("isDisplayModel", tostring(values.isDisplayModel));
 		page:SetValue("stackHeight", tostring(values.stackHeight));
 		page:SetValue("idleAnim", tostring(values.idleAnim));
 		page:SetValue("hasRealPhysics", tostring(values.hasRealPhysics));

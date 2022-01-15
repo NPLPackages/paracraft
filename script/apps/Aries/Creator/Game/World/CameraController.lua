@@ -509,9 +509,8 @@ function CameraController.OnMousePick(result, max_picking_dist)
 	end
 end
 
--- same as render frame rate
-function CameraController.OnCameraFrameMove()
-	-- update camera stats
+-- called per camera frame move. 
+function CameraController.UpdateCameraFrameStats()
 	camera.prevPosX, camera.prevPosY, camera.prevPosZ = camera.posX, camera.posY, camera.posZ;
 	camera.last_time = camera.cur_time;
 	camera.cur_time = commonlib.TimerManager.GetCurrentTime();
@@ -521,9 +520,12 @@ function CameraController.OnCameraFrameMove()
 	camera.posX, camera.posY, camera.posZ = player:GetPosition();
 	local diffX = camera.posX - (camera.prevPosX or camera.posX);
 	local diffZ = camera.posZ - (camera.prevPosZ or camera.posZ);
+	camera.curDiffX, camera.curDiffZ = diffX, diffZ;
+
 	local dist_walked = diffX * diffX + diffZ * diffZ;
 	if(dist_walked > 0.0001) then
 		dist_walked = math.sqrt(diffX * diffX + diffZ * diffZ);
+		camera.lastDiffX, camera.lastDiffZ = diffX, diffZ;
 	else
 		dist_walked = 0;
 	end
@@ -534,12 +536,24 @@ function CameraController.OnCameraFrameMove()
 
 	camera.prevDistanceWalkedModified = camera.distanceWalkedModified;
 	camera.distanceWalkedModified = camera.distanceWalkedModified + dist_walked;
+end
 
-	CameraController.UpdateViewBobbing();
+-- same as render frame rate
+function CameraController.OnCameraFrameMove()
+	CameraController.UpdateCameraFrameStats()
+
+	if(not CameraController.IsAutoRoomViewEnabled()) then
+		CameraController.UpdateViewBobbing();
+	end
 
 	CameraController.UpdateFlyMode();
 
-	CameraController.ApplyCameraRestrictions()
+	if(not GameLogic.GameMode:IsMovieMode()) then
+		if(CameraController.IsAutoRoomViewEnabled()) then
+			CameraController.ApplyAutoRoomViewCamera();
+		end
+		CameraController.ApplyCameraRestrictions()
+	end
 end
 
 function CameraController.ClearCameraRestrictions()
@@ -979,10 +993,79 @@ function CameraController.OnSyncWorldFinish()
 							file:close();
 						end
 					end
-
-					
 				end)
 			end
 		end
 	end
 end
+
+-- we will automatically adjust camera, so that the user can always see the main player in a scene. 
+-- we also apply some basic third-person down view restrictions. The algorithm ensures that the smallest view adjustment is applied. 
+-- The algorithm we will also try to find doors on the wall of a room, once a door is detected, it will face the door or the other room 
+-- according to the current player walk direction. 
+-- room view can be enabled inside small room or even an outdoor scene as well. It is best enabled for users who can not control the camera very well. 
+-- With room view enabled, the user only need to take control of the player position. 
+function CameraController.EnableAutoRoomView(bEnabled)
+	CameraController.isAutoRoomViewEnabled = bEnabled;
+end
+
+function CameraController.IsAutoRoomViewEnabled()
+	return CameraController.isAutoRoomViewEnabled;
+end
+
+local eye_pos = {0,0,0};
+local lookat_pos = {0,0,0};
+
+function CameraController.ApplyAutoRoomViewCamera()
+	if(not CameraController.IsAutoRoomViewEnabled() or CameraController.IsFPSView()) then
+		return
+	end
+	local isCameraKeyPressed = ParaUI.IsMousePressed(0);
+	-- this fixed a temporary android bug where ParaUI.IsMousePressed(1) always return true until we long hold to right click. 
+	if(not System.os.IsMobilePlatform() and ParaUI.IsMousePressed(1)) then
+		isCameraKeyPressed = true;
+	end
+	
+	local attr = ParaCamera.GetAttributeObject()
+	local eye_pos = attr:GetField("Eye position", eye_pos);
+	local lookat_pos = attr:GetField("Lookat position", lookat_pos);
+	local camobjDist, LiftupAngle, CameraRotY = attr:GetField("CameraObjectDistance", 0), attr:GetField("CameraLiftupAngle", 0), attr:GetField("CameraRotY", 0);
+	
+	local dist, pitch, yaw = camobjDist, LiftupAngle, CameraRotY;
+
+	local eyeX, eyeY, eyeZ = eye_pos[1], eye_pos[2], eye_pos[3]
+	local lookatX, lookatY, lookatZ = lookat_pos[1], lookat_pos[2], lookat_pos[3]
+
+	if(not isCameraKeyPressed) then
+		----------------
+		-- only limit camera pitching, when user is not dragging the camera view, such as holding the right or left mouse button. 
+		----------------
+		local minPitch, maxPitch = 15/180*math.pi, 40/180*math.pi
+		local pitchTarget = math.min(math.max(minPitch, pitch), maxPitch)
+	
+		-- 60 degrees per second with some accelerations when the angle diff is very big. 
+		if(pitchTarget ~= pitch) then
+			local newPitch = mathlib.SmoothMoveFloat(pitch, pitchTarget, (60+(math.abs(pitch-pitchTarget)*100)^2/10) * camera.deltaTime/1000/180*math.pi)
+			attr:SetField("CameraLiftupAngle", newPitch)
+		end
+
+		----------------
+		-- find a yaw angle with enough cameraEyeDistance, so that we can always see the entire player. 
+		-- only do the adjustment of yaw, when pitch is already adjusted and that the camera is not moving in the last frame. 
+		----------------
+		if(pitchTarget == pitch and camera.dist_walked == 0) then
+			local minCamEyeDist = 5;
+			if(camobjDist < minCamEyeDist) then
+				attr:SetField("CameraObjectDistance", minCamEyeDist)	
+			else
+				local cameraEyeDistance = math.sqrt((eyeX-lookatX)^2 + (eyeY-lookatY)^2 + (eyeZ-lookatZ)^2)
+				if(cameraEyeDistance < minCamEyeDist) then
+					if(camera.lastDiffX ~= 0 or camera.lastDiffZ ~= 0) then
+						-- use last walk direction as a hint to find a new camera yaw location. 
+					end
+				end	
+			end
+		end
+	end
+end
+

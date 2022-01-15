@@ -156,7 +156,7 @@ end
 function ModelMountPoints:GetEntityLocalTransform(localTransform)
 	localTransform = localTransform or self.localTransform or Matrix4:new():identity();
 	local entity = self:GetEntity();
-	if(entity) then
+	if(entity and not entity.isMountpointDetached) then
 		local facing = entity:GetFacing();
 		if(facing ~= 0) then
 			self.localRotQuat = self.localRotQuat or Quaternion:new();

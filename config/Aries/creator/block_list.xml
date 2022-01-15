@@ -343,8 +343,9 @@ uid: unique id used in macro recording
     <block name="PhysicsModel" />
     <block name="BlockLight" />
     
-    <block name="InvisibleBlock" />
-    <block name="InvisibleGlowStone" />
+    <block name="InvisibleBlock" tip="拿在手中时可见"/>
+    <block name="InvisibleGlowStone" tip="拿在手中时可见"/>
+    <block name="InvisibleClickSensor" tip="拿在手中时可见"/>
     <block name="BanBlock" block_data="2730" tip="拿在手中时可编辑"/>
     <block name="TransparentBanBlock" block_data="2730" tip="拿在手中时可编辑"/>
   

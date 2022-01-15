@@ -52,6 +52,8 @@ NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLife.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/FolderManager.lua");
+local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
 local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
@@ -915,8 +917,8 @@ function GameLogic.Exit(bSoft)
 	UndoManager.Clear();
 	PhysicsWorld.Clear();
 	EntityManager.Clear();
+	FolderManager:Clear();
 
-	
 	if(playerController) then
 		playerController.force_can_fly = false;
 	end

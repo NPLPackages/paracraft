@@ -65,10 +65,7 @@ RedSummerCampCourseScheduling.lessonCnf = {
         name="寒假课",
         icon= path.."jiaqi_94x94_32bits.png#0 0 94 94",
         num = "10节",
-    } 
-}
-
-local otherConfig = {
+    },
     {
         key ="superAnimal",
         name="超级宠物",
@@ -76,14 +73,30 @@ local otherConfig = {
         num = "11节",
    },
    {
-       key ="winterOlympic",
-       name="冬季运动会",
-       icon= path.."dongao_94x94_32bits.png#0 0 94 94",
-       num = "20节",
-   },
+        key ="Jiangxi_lessons",
+        name="江西红色课",
+        icon= path.."jiangxi2_94x94_32bits.png#0 0 94 94",
+        num = "32节",
+    },
+    {
+        key ="winterOlympic",
+        name="冬季运动会",
+        icon= path.."dongao_94x94_32bits.png#0 0 94 94",
+        num = "30节",
+    }, 
 }
+
+local otherConfig = {
+    {
+        key ="winterOlympic",
+        name="冬季运动会",
+        icon= path.."dongao_94x94_32bits.png#0 0 94 94",
+        num = "30节",
+    },
+}
+
 -- true to enable lessons for the current users
-local auths = {ppt_L1 = false, ppt_L2 = false, ppt_S1 = false, ppt_X1 = false, campus_X2 = false,holiday = true, ppt_Z1 = true,superAnimal = true,winterOlympic = true}
+local auths = {ppt_L1 = false, ppt_L2 = false, ppt_S1 = false, ppt_X1 = false, campus_X2 = false,holiday = true, ppt_Z1 = true,superAnimal = true,winterOlympic = true,Jiangxi_lessons=true}
 local lessonKeys = {"LP_CommunityCourses","LP_SchoolCourses","LP_OrgCourses"}
 function RedSummerCampCourseScheduling.OnInit()
     page = document:GetPageCtrl();
@@ -95,7 +108,6 @@ end
 function RedSummerCampCourseScheduling.AddDevData()
     if System.options.isDevMode and not RedSummerCampCourseScheduling.IsAddData then
         RedSummerCampCourseScheduling.lessonCnf[#RedSummerCampCourseScheduling.lessonCnf + 1] = otherConfig[1]
-        RedSummerCampCourseScheduling.lessonCnf[#RedSummerCampCourseScheduling.lessonCnf + 1] = otherConfig[2]
         RedSummerCampCourseScheduling.IsAddData = true
     end
 end
@@ -119,7 +131,8 @@ function RedSummerCampCourseScheduling.AuthLesson(callback)
                 if curKey == "LP_OrgCourses" then
                     auths.ppt_L1 = data.data or false
                     auths.ppt_L2 = data.data or false
-                    -- auths.holiday = data.data or false
+                    -- auths.Jiangxi_lessons = data.data or false
+                    -- auths.superAnimal = data.data or false
                 end
                 times = times + 1
                 if times == #lessonKeys then
@@ -161,7 +174,6 @@ function RedSummerCampCourseScheduling.ShowView()
 end
 
 function RedSummerCampCourseScheduling.ShowPage()
-    RedSummerCampCourseScheduling.AddDevData()
     local view_width = 740
     local view_height = 560
     local params = {

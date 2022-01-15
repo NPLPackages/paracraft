@@ -3,6 +3,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local EntityMovieClip =  commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip")
 local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+local MovieClipCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/MovieClipCompare.lua");
 local LessonBoxCompare = NPL.export()
 
 function LessonBoxCompare.GetFilePath(filename)
@@ -319,72 +320,73 @@ _G.MOVIE_COMPARE_TYPE = {
 }
 
 function LessonBoxCompare.CompareMovie(entitySrc,entityDest,compareType)
+	local diff_num, compare_date = 0
     if entitySrc and entityDest then
         if compareType == "slot" then
-            return entitySrc:CompareSlot(entityDest),MOVIE_COMPARE_TYPE.ENTITY_SLOT
+            diff_num, compare_date = entitySrc:CompareSlot(entityDest)
         end
         if compareType == "timelength" then
-            return entitySrc:CompareTimeLength(entityDest),MOVIE_COMPARE_TYPE.ENTITY_TIME_LENGTH
+            diff_num, compare_date = entitySrc:CompareTimeLength(entityDest)
         end
         if compareType == "timeline" then
-            return entitySrc:CompareTimes(entityDest),MOVIE_COMPARE_TYPE.ENTITY_TIME_LINE
+            diff_num, compare_date = entitySrc:CompareTimes(entityDest)
         end
         if compareType == "text" then
-            return entitySrc:CompareText(entityDest),MOVIE_COMPARE_TYPE.ENTITY_TEXT
+            diff_num, compare_date = entitySrc:CompareText(entityDest)
         end
         if compareType == "time" then
-            return entitySrc:CompareTime(entityDest),MOVIE_COMPARE_TYPE.ENTITY_TIME
+            diff_num, compare_date = entitySrc:CompareTime(entityDest)
         end
         if compareType == "cmd" then
-            return entitySrc:CompareCmd(entityDest),MOVIE_COMPARE_TYPE.ENTITY_CMD
+            diff_num, compare_date = entitySrc:CompareCmd(entityDest)
         end
         if compareType == "child_movie_block" then
-            return entitySrc:CompareMovieBlock(entityDest),MOVIE_COMPARE_TYPE.ENTITY_CHILD_MOVIE
+            diff_num, compare_date = entitySrc:CompareMovieBlock(entityDest)
         end
         if compareType == "backmusic" then
-            return entitySrc:CompareMusic(entityDest),MOVIE_COMPARE_TYPE.ENTITY_MUSIC
+            diff_num, compare_date = entitySrc:CompareMusic(entityDest)
         end
         if compareType == "lookat" then
-            return entitySrc:ComparePosition(entityDest),MOVIE_COMPARE_TYPE.ENTITY_POSITION
+            diff_num, compare_date = entitySrc:ComparePosition(entityDest)
         end
         if compareType == "rotation" then
-            return entitySrc:CompareRotation(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ROTATE
+            diff_num, compare_date = entitySrc:CompareRotation(entityDest)
         end
         if compareType == "parent" then
-            return entitySrc:CompareParent(entityDest),MOVIE_COMPARE_TYPE.ENTITY_PARENT
+            diff_num, compare_date = entitySrc:CompareParent(entityDest)
         end
         if compareType == "actor_ani" then
-            return entitySrc:CompareActorAni(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_ANI
+            diff_num, compare_date = entitySrc:CompareActorAni(entityDest)
         end
         if compareType == "actor_bone" then
-            return entitySrc:CompareActorBones(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_BONE
+            diff_num, compare_date = entitySrc:CompareActorBones(entityDest)
         end
         if compareType == "actor_pos" then
-            return entitySrc:CompareActorPosition(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_POS
+            diff_num, compare_date = entitySrc:CompareActorPosition(entityDest)
         end
         if compareType == "actor_scale" then
-            return entitySrc:CompareActorScale(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_SCALE
+            diff_num, compare_date = entitySrc:CompareActorScale(entityDest)
         end
         if compareType == "actor_head" then
-            return entitySrc:CompareActorHead(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_HEAD
+            diff_num, compare_date = entitySrc:CompareActorHead(entityDest)
         end
         if compareType == "actor_speed" then
-            return entitySrc:CompareActorSpeed(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_SPEED
+            diff_num, compare_date = entitySrc:CompareActorSpeed(entityDest)
         end
         if compareType == "actor_model" then
-            return entitySrc:CompareActorModel(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_MODEL
+            diff_num, compare_date = entitySrc:CompareActorModel(entityDest)
         end
         if compareType == "actor_opcatiity" then
-            return entitySrc:CompareActorOpcatity(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_OPCATITY
+            diff_num, compare_date = entitySrc:CompareActorOpcatity(entityDest)
         end
         if compareType == "actor_parent" then
-            return entitySrc:CompareActorParent(entityDest),MOVIE_COMPARE_TYPE.ENTITY_PARENT
+            diff_num, compare_date = entitySrc:CompareActorParent(entityDest)
         end
         if compareType == "actor_name" then
-            return entitySrc:CompareActorName(entityDest),MOVIE_COMPARE_TYPE.ENTITY_ACTOR_NAME
+            diff_num, compare_date = entitySrc:CompareActorName(entityDest)
         end
     end
-    return false,MOVIE_COMPARE_TYPE.ENTITY_NULL
+    return diff_num, compare_date
 end
 
 function LessonBoxCompare.CompareMovieClip(entitySrc,entityDest)
@@ -448,6 +450,50 @@ function LessonBoxCompare.CompareCode(entitySrc,entityDest)
     return false,CODE_COMPARE_TYPE.ENTITY_BLOKLY_DIFF
 end
 
+local MoviceCompareType = {
+	"slot", 				-- 电影方块元素数量 演员 or 摄像机 or 命令序列
+	"timelength", 			-- 电影时长
+	"timeline",				-- 关键帧数量
+	"text",					-- 电影使用的文本
+	"time",					-- 时间
+	"cmd",					-- 命令
+	"child_movie_block",
+	"backmusic",
+	"lookat_x",
+	"lookat_y",
+	"lookat_z",
+	"eye_liftup",
+	"eye_rot_y",
+	"eye_roll",
+	"parent",
+	"eye_dist",
+	"actor_ani",
+	"actor_pos",
+	"actor_scale",
+	"actor_head",
+	"actor_speed",
+	"actor_model",
+	"actor_opcatiity",
+	-- "actor_parent",
+	"actor_name",
+	"actor_bone",
+}
+
+function LessonBoxCompare.CompareMovieAll(entitySrc,entityDest)
+	local result_list = {}
+	for key, v in pairs(MoviceCompareType) do
+		local diff_num, result = LessonBoxCompare.CompareMovie(entitySrc,entityDest,v)
+		if diff_num > 0 then
+			result_list[v] = result
+		end
+	end
+	
+	return result_list
+end
+
+function LessonBoxCompare.GetMoviceCompareType()
+	return MoviceCompareType
+end
 --[[
 local LessonBoxCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxCompare.lua");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");

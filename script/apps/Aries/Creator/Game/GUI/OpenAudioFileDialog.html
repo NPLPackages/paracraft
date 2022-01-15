@@ -33,32 +33,32 @@ end
 <aries:window mode="thin" title='<%=OpenAudioFileDialog.title or L"输入窗"%>' style="width:460px;" uiname_onclose="OpenAudioFileDialog.OnClose" onclose="OpenAudioFileDialog.OnClose">
 <div style="margin:10px;">
     <pe:if condition='<%=OpenAudioFileDialog.category_index == 1%>' >
-        <input type="button" value='本地' name="1" onclick="OnChangeCategory" 
+        <input uiname="OpenAudioFileDialog.OnChangeCategory1" type="button" value='本地' name="1" onclick="OnChangeCategory" 
             style="font-weight:bold;margin-right:8px;margin-top:9px;float: left;
                     color:#ffffff;font-size:14px;width:45px; height:26px;
                     background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:8 8 8 8);" />
     </pe:if>
     <pe:if condition='<%=OpenAudioFileDialog.category_index ~= 1%>' >
-        <input type="button" value='本地' name="1" onclick="OnChangeCategory" 
+        <input uiname="OpenAudioFileDialog.OnChangeCategory2" type="button" value='本地' name="1" onclick="OnChangeCategory" 
             style="font-weight:bold;margin-right:7px;margin-top:12px;float: left;
                 color:#ffffff;font-size:14px;width:43px; height:22px;
                 background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8);" />
     </pe:if>
 
     <pe:if condition='<%=OpenAudioFileDialog.category_index == 2%>' >
-        <input type="button" value='官方' name="2" onclick="OnChangeCategory" 
+        <input uiname="OpenAudioFileDialog.OnChangeCategory3" type="button" value='官方' name="2" onclick="OnChangeCategory" 
             style="font-weight:bold;margin-right:8px;margin-top:9px;float: left;
                     color:#ffffff;font-size:14px;width:45px; height:26px;
                     background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:8 8 8 8);" />
     </pe:if>
     <pe:if condition='<%=OpenAudioFileDialog.category_index ~= 2%>' >
-        <input type="button" value='官方' name="2" onclick="OnChangeCategory" 
+        <input uiname="OpenAudioFileDialog.OnChangeCategory4" type="button" value='官方' name="2" onclick="OnChangeCategory" 
             style="font-weight:bold;margin-right:7px;margin-top:12px;float: left;
                 color:#ffffff;font-size:14px;width:43px; height:22px;
                 background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8);" />
     </pe:if>   
     <div class="mc_paper_panel" style="padding-top:3px;padding-bottom:3px">
-        <pe:treeview ShowIcon="false" name="tvwExistingFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAudioFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">
+        <pe:treeview uiname="OpenAudioFileDialog.filelist"  ShowIcon="false" name="tvwExistingFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAudioFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">
             <NodeTemplates>
                 <NodeTemplate DataType="file">
                     <pe:treenode style="height:20px;" uiname='<%="OpenAudioFileDialog.file_"..commonlib.Encoding.DefaultToUtf8(XPath("this|filename"))%>' OnClick="OnSelectFile" can_select="true" text='<%=GetTreeNodeText(XPath("this"))%>'></pe:treenode>

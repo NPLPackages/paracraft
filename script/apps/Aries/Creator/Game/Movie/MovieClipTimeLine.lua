@@ -919,3 +919,13 @@ function MovieClipTimeLine.OnClickTimeButton(value)
 		end,tostring(value));
 	end
 end
+
+function MovieClipTimeLine.ShowCompareEndTimeBg()
+	local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
+	local compare_data = MovieClipController.GetCompareData()
+	if not compare_data then
+		return false
+	end
+
+	return compare_data["timelength"] ~= nil
+end

@@ -472,6 +472,7 @@ function EditModelTask.OnClickProperty()
 					modelEntity:SetIdleAnim(values.idleAnim or 0)
 					modelEntity:SetCanDrag(values.canDrag)
 					modelEntity:SetAutoTurningDuringDragging(values.autoTurning)
+					modelEntity.isDisplayModel = values.isDisplayModel~=false;
 					
 					if(values.onClickEvent == "") then
 						values.onClickEvent = nil
@@ -532,6 +533,7 @@ function EditModelTask.OnClickProperty()
 				itemId = modelEntity:GetItemId(),
 				hasRealPhysics = modelEntity:HasRealPhysics(),
 				isStackable = modelEntity.isStackable,
+				isDisplayModel = modelEntity.isDisplayModel~=false,
 				stackHeight = modelEntity.stackHeight,
 				autoTurning = modelEntity.bIsAutoTurning,
 				canDrag = modelEntity.canDrag,

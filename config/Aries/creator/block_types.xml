@@ -528,6 +528,8 @@ Sound related:
   <block id="10072" name="AgentItem" text="智能物品" searchkey="" item_class="ItemAgent" tooltip="智能物品" icon="Texture/blocks/items/agentitem.png"></block>
   <block id="10073" name="LinkBoy" text="LinkBoy" searchkey="linkboy" item_class="ItemLinkBoy" tooltip="LinkBoy" icon="Texture/blocks/items/linkboy.png"></block>
   <block id="10074" name="LiveModel" text="活动模型" searchkey="LiveModel" item_class="ItemLiveModel" tooltip="活动模型" icon="Texture/Aries/Creator/NM_Furniture_32bits.png"></block>
+  <block id="10075" name="InvisibleClickSensor" text="隐形点击探测器" searchkey="隐形点击探测器" item_class="ItemInvisibleClickSensor" tooltip="隐形点击探测器" icon="Texture/Aries/Creator/NC_Pets_32bits.png"/>
+  
   <block id="1010" name="nplcad3" text="nplcad3" searchkey="nplcad3" singleSideTex="true" color8_data="true" modelName="codeblock" class="BlockCode" item_class="ItemNplCadEditor" entity_class="EntityNplCadEditor" texture="Texture/blocks/nplcad3block_on.png" texture2="Texture/blocks/nplcad3block_off.png" hasAction="false" obstruction="true" solid="true" cubeMode="true"  />
   
   <!--怪物和动物： id: 20000-20999-->

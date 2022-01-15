@@ -428,6 +428,9 @@ function ItemLiveModel:CalculateFreeFallDropLocation(srcEntity, dropLocation, ma
 							dropLocation.target = entity;
 							dropLocation.mountPointIndex = i;
 							dropLocation.facing = entity:GetMountPoints():GetMountFacingInWorldSpace(i)
+							if(srcEntity.GetYawOffset) then
+								dropLocation.facing = dropLocation.facing + srcEntity:GetYawOffset();
+							end
 							canDropOnMountPoints = true;
 						end
 					end
@@ -880,6 +883,9 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 								x, y, z = x1, y1, z1
 							end
 						end
+						if(draggingEntity.GetYawOffset and facing) then
+							facing = facing + draggingEntity:GetYawOffset();
+						end
 						dragParams.dropLocation = {target = targetEntity, dropX = dropX, dropY = dropY, dropZ = dropZ, x = x, y = y, z = z, mountPointIndex = mp:GetIndex(), mountFacing = facing}
 						hasFound = true	
 					end
@@ -898,7 +904,14 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 							hasFound = true	
 							local totalStackHeight = self:GetStackHeightOnLocation(draggingEntity, x, y, z, false, targetEntity)
 							dropY = dropY + (totalStackHeight or 0);
-							local facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+
+							local facing
+							if(draggingEntity:IsAutoTurningDuringDragging()) then
+								facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+								if(draggingEntity.GetYawOffset and facing) then
+									facing = facing + draggingEntity:GetYawOffset();
+								end
+							end
 							dragParams.dropLocation = {target = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, mountPointIndex = -1, facing = facing}
 							break;
 						end
@@ -946,6 +959,9 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 									x, y, z = result.x, result.y, result.z;
 								end
 							end
+							if(facing and draggingEntity.GetYawOffset) then
+								facing = facing + draggingEntity:GetYawOffset();
+							end
 							dragParams.dropLocation = {target = targetEntity, dropX = dropX, dropY = dropY, dropZ = dropZ, x = x, y = y, z = z, mountPointIndex = mp:GetIndex(), mountFacing = facing}
 							hasFound = true	
 						end	
@@ -972,7 +988,13 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 								x, y, z = result.x, result.y, result.z;
 							end
 						end
-						local facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+						local facing
+						if(draggingEntity:IsAutoTurningDuringDragging()) then
+							facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+							if(draggingEntity.GetYawOffset and facing) then
+								facing = facing + draggingEntity:GetYawOffset();
+							end
+						end
 						dragParams.dropLocation = {target = linkTarget, dropX = dropX, dropY = dropY, dropZ = dropZ, x = x, y = y, z = z, mountPointIndex = -1, facing = facing}
 						hasFound = true	
 					end
@@ -1014,7 +1036,13 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 					end
 				end
 			end
-			local facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+			local facing
+			if(draggingEntity:IsAutoTurningDuringDragging()) then
+				facing = self:GetNearbyWallFacing(draggingEntity, (x + dropX) / 2, dropY, (z + dropZ) / 2)
+				if(draggingEntity.GetYawOffset and facing) then
+					facing = facing + draggingEntity:GetYawOffset();
+				end
+			end
 			dragParams.dropLocation = {target = result.block_id, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, bx = bx, by = by, bz = bz, side = 5, facing = facing}
 			self:CalculateFreeFallDropLocation(draggingEntity, dragParams.dropLocation);	
 		end
@@ -1110,6 +1138,9 @@ function ItemLiveModel:UpdateEntityDragAnim(draggingEntity, newX, newY, newZ, ol
 			if(length > minTurningDragDistance) then
 				dragParams.lastFacingX, dragParams.lastFacingZ = newX, newZ;
 				targetFacing = Direction.GetFacingFromOffset(newX - oldX, 0, newZ - oldZ)
+				if(draggingEntity.GetYawOffset) then
+					targetFacing = targetFacing + draggingEntity:GetYawOffset();
+				end
 			end	
 		end
 	end
@@ -1232,7 +1263,7 @@ end
 
 -- drop entity to the 3d scene or on other entity
 function ItemLiveModel:DropEntity(entity)
-	if(entity and entity.dragParams and entity.dragParams.dropLocation.x) then
+	if(entity and entity.dragParams and entity.dragParams.dropLocation and entity.dragParams.dropLocation.x) then
 		self:StopSmoothMoveTo(entity);
 		local dragParams = entity.dragParams;
 		local destX, destY, destZ, facing = dragParams.dropLocation.dropX or dragParams.dropLocation.x, dragParams.dropLocation.dropY or dragParams.dropLocation.y, dragParams.dropLocation.dropZ or dragParams.dropLocation.z, dragParams.dropLocation.facing;
@@ -1279,6 +1310,31 @@ function ItemLiveModel:DropEntity(entity)
 	end
 end
 
+-- collecting user stats
+function ItemLiveModel:SendUserStats(entity, dragParams)
+	if(not GameLogic.GameMode:IsEditor()) then
+		local mountTargetName, mountPointIndex, dropX, dropY, dropZ;
+		if(dragParams and dragParams.dropLocation) then
+			if(type(dragParams.dropLocation.target) == "table") then
+				mountTargetName = dragParams.dropLocation.target.name;
+			else
+				mountTargetName = dragParams.dropLocation.target
+			end
+			mountPointIndex = dragParams.dropLocation.mountPointIndex
+			dropX = dragParams.dropLocation.dropX
+			dropY = dragParams.dropLocation.dropY
+			dropZ = dragParams.dropLocation.dropZ
+		end
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.live_model.drag", { 
+			projectId = GameLogic.options:GetProjectId() or 0, 
+			filename = entity:GetModelFile(), 
+			name = entity:GetName(),
+			mname = mountTargetName,
+			mindex = mountPointIndex,
+			dx = dropX, dy = dropY, dz = dropZ,
+		});
+	end
+end
 
 function ItemLiveModel:DropDraggingEntity()
 	local entity = self.draggingEntity;
@@ -1289,10 +1345,7 @@ function ItemLiveModel:DropDraggingEntity()
 			entity.dragParams = nil;
 		end
 		self.draggingEntity = nil
-
-		if(not GameLogic.GameMode:IsEditor()) then
-			GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.live_model.drag", { projectId = GameLogic.options:GetProjectId() or 0, filename = entity:GetModelFile(), name = entity:GetName()});
-		end
+		self:SendUserStats(entity, dragParams)
 	end
 	Game.SelectionManager:SetEntityFilterFunction(nil)
 end
@@ -1345,19 +1398,19 @@ function ItemLiveModel:mouseReleaseEvent(event)
 		self:DropDraggingEntity();
 		event:accept();
 	else
-		local normalTargetEntity;
-		if(GameLogic.GameMode:IsEditor() and event:button() == "right") then
-			-- just in case, we are right click to edit a non-pickable live entity model
-			Game.SelectionManager:SetEntityFilterFunction(nil)
-			local result = self:MousePickBlock()
-			if(result) then
-				normalTargetEntity = result.entity
-			end
-		end			
-
 		if(not event:IsCtrlKeysPressed() and event:isClick()) then
-			if(normalTargetEntity) then
-				normalTargetEntity:OnClick(result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side)
+			local normalTargetEntity;
+			if(GameLogic.GameMode:IsEditor() and event:button() == "right") then
+				-- just in case, we are right click to edit a non-pickable live entity model
+				Game.SelectionManager:SetEntityFilterFunction(nil)
+				local result = self:MousePickBlock()
+				if(result) then
+					normalTargetEntity = result.entity
+				end
+			end			
+			local clickEntity = normalTargetEntity or targetEntity
+			if(clickEntity) then
+				clickEntity:OnClick(result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side)
 				event:accept();
 			elseif(event:button() == "right") then
 				if(result.block_id and result.block_id>0) then

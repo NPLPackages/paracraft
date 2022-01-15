@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="EditSensorTask.lua" refresh="true">
+<![CDATA[
+EditSensorTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditSensorTask");
+EditSensorTask.InitPage(Page);
+task = EditSensorTask.GetInstance();
+]]>
+</script>
+<div style='<%=format("padding:5px;background-color:%s;color:#ffffff;width:360px;height:66px", task:IsTransformMode() and "#8080ff" or "#80808080") %>' >
+    
+    <pe:if condition='<%=task:IsTransformMode()%>'>
+        <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
+            <div>
+                <span style="margin-left:5px;" tooltip="/sendevent XXX {x,y,z,name}"><%=L"点击事件"%></span><input name="onclickEvent" uiname="EditSensorTask.onclickEvent" type="text" style="margin-left:2px;width:100px;height:18px;color:#000000" value='<%=task:GetSelectedModel():GetOnClickEvent()%>' onchange="EditSensorTask.OnChangeOnClickEvent"/>
+                <span style="margin-left:5px;"><%=L"感知点"%></span><input uiname="EditSensorTask.mountpointCount" name="mountpointCount" type="text" style="margin-left:2px;width:20px;height:18px;color:#000000" value='<%=string.format("%d", task:GetMountPointCount())%>' onchange="EditSensorTask.OnMountPointCountChanged"/>
+                <div style="float:left;margin-left:3px">
+                    <input uiname="EditSensorTask.deleteBtn" name="deleteBtn" value='<%=L"删除"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditSensorTask.OnClickDeleteModel" />
+                </div>
+            </div>
+        </pe:if>
+        <pe:if condition='<%=not task:GetSelectedModel()%>'>
+            <div><%=L"右键点击场景选择模型"%></div>
+        </pe:if>
+    </pe:if>
+    <pe:if condition='<%=not task:IsTransformMode()%>'>
+        <div style="float:left;">
+            <%=L"右键点击场景创建，或选择已有模型"%>
+        </div>
+        <div><pe:label value="<%=task:GetOnClickEventInHand()%>"/></div>
+    </pe:if>
+</div>
+</pe:mcml>
+</html>
+

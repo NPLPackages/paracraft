@@ -87,7 +87,8 @@ Other show filters:
 		elseif(name == "camera" ) then
 			local entity = EntityManager.GetFocus();
 			if(entity and entity:isa(EntityManager.EntityCamera)) then
-				entity:SetVisible(true);	
+				entity:SetAlwaysHidden(false);	
+				entity:SetVisible(true);
 			end
 		elseif(name == "physics") then
 			if(bIsShow == nil) then
@@ -153,7 +154,8 @@ Other show filters:
 
 			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 			local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
-			TouchMiniKeyboard.GetSingleton():SetRockerMod()
+			TouchMiniKeyboard.CheckShow(false);
+			-- TouchMiniKeyboard.GetSingleton():SetRockerMod()
 		elseif (name == "paralife") then
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 			ParaLife:SetEnabled(true)
@@ -205,7 +207,8 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 		elseif(name == "camera" ) then
 			local entity = EntityManager.GetFocus();
 			if(entity and entity:isa(EntityManager.EntityCamera)) then
-				entity:SetVisible(false);	
+				entity:SetAlwaysHidden(true);	
+				entity:SetVisible(false);
 			end
 		elseif(name == "vision") then
 			local memoryContext = EntityManager.GetPlayer():GetMemoryContext();
@@ -248,10 +251,13 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 		elseif (name == "playertouch") then
 			local player_ctr = GameLogic.GetPlayerController()
 			player_ctr:SetEnableDragPlayerToMove(false)
-
-			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
-			local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
-			TouchMiniKeyboard.GetSingleton():SetKeyboardMod()
+			-- TouchMiniKeyboard.GetSingleton():SetKeyboardMod()
+			local isMobile = System.options.IsTouchDevice or GameLogic.options:HasTouchDevice()
+			if isMobile then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+				local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
+				TouchMiniKeyboard.CheckShow(true)
+			end
 		elseif (name == "paralife") then
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 			ParaLife:SetEnabled(false)

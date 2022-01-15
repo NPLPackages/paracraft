@@ -25,6 +25,9 @@ local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local LessonBoxCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxCompare.lua");
 local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
+local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 local LessonBoxTip = NPL.export()
 
 local compare_type = -1
@@ -62,13 +65,13 @@ LessonBoxTip.RoleAni={
 }
 
 LessonBoxTip.CheckMovieTips={
-    slot = "没能在电影方块中找到对应的【摄影机】/【演员】，请先检查一下是否正确添加了【摄影机】/【演员】，或是调换了位置？",
-    time = "电影方块的时长错了，正确的时长是【%s】，请重新设定",
-    movie_clip = "没能在【摄影机】/【演员】上找到关键帧，请再核对一下",
-    movie_prop_accurate = "",
-    movie_prop_vague = "",
-    actor_prop_accurate = "",
-    actor_prop_vague = "",
+    {type = "slot",text = "没能在电影方块中找到对应的【摄影机】/【演员】，请先检查一下是否正确添加了【摄影机】/【演员】，或是调换了位置？"},
+    {type = "timelength",text = "电影方块的时长错了，正确的时长是【%s】，请重新设定"},
+    {type = "movie_clip",text = "没能在【摄影机】/【演员】上找到关键帧，请再核对一下"},
+    {type = "movie_prop_accurate",text = ""},
+    {type = "movie_prop_vague",text = ""},
+    {type = "actor_prop_accurate",text = ""},
+    {type = "actor_prop_vague",text = ""},
 }
 
 LessonBoxTip.NomalTip = {
@@ -90,15 +93,21 @@ LessonBoxTip.CurNeedBuildBlock = {} --当前小节需要创建或者删除的方
 LessonBoxTip.m_nCreateBoxCount = 0
 LessonBoxTip.m_nCurStageIndex = 0
 LessonBoxTip.m_nMaxStageIndex = 0
+LessonBoxTip.m_ClickFollow = false
 LessonBoxTip.m_tblAllStageConfig = {}
 
 function LessonBoxTip.OnInit()
     page = document:GetPageCtrl();
+    page.OnClose = LessonBoxTip.OnClose
     if page and page:IsVisible() then
         page_root = page:GetParentUIObject()  
     end
 end
 
+function LessonBoxTip.OnClose()
+    MovieClipController.OnClose()
+    GameLogic.GetCodeGlobal():BroadcastTextEvent("stopAnimRepeatMovie");
+end
 
 function LessonBoxTip.ShowView()
     local view_width = 620
@@ -127,6 +136,8 @@ function LessonBoxTip.ShowView()
     commonlib.TimerManager.SetTimeout(function ()
         LessonBoxTip.InitTeacherPlayer()
     end, 100);
+
+    MovieClipController.OnClose()
 end
 
 
@@ -149,6 +160,7 @@ function LessonBoxTip.OnWorldUnload()
     LessonBoxTip.m_nCreateBoxCount = 0
     LessonBoxTip.m_nCurStageIndex = 0
     LessonBoxTip.m_nMaxStageIndex = 0
+    LessonBoxTip.m_ClickFollow = false
     LessonBoxTip.m_tblAllStageConfig = {}
     LessonBoxTip.UnregisterHooks()
     LessonBoxTip.ClearBlockTip()
@@ -171,7 +183,12 @@ function LessonBoxTip.InitTeacherPlayer()
                 player:SetFacing(1.57);
                 player:SetField("HeadUpdownAngle", 0.3);
                 player:SetField("HeadTurningAngle", 0);
-                player:SetField("assetfile","character/CC/02human/paperman/principal.x")
+
+                local file = "character/CC/02human/paperman/principal.x"
+                if lessonConfig.lesson_type == "anim" then
+                    file = "character/CC/artwar/movie/girl_ground_service.x"
+                end
+                player:SetField("assetfile",file)
             end
         end
     end
@@ -212,11 +229,29 @@ end
 --/select 18870,13,19151(-19,1,-19)
 function LessonBoxTip.InitLessonConfig(config)
     if config then
-        lessonConfig = config
-        echo(config,true)
+        lessonConfig = commonlib.copy(config)
+        --echo(config,true)
         LessonBoxTip.InitLessonData()
         LessonBoxTip.m_nMaxStageIndex = #lessonConfig.taskCnf
         LessonBoxTip.m_nCurStageIndex = LessonBoxTip.m_nCurStageIndex + 1
+
+        local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
+        if taskCnf.templateteacher then
+            lessonConfig.templateteacher = taskCnf.templateteacher
+        end
+
+        if taskCnf.templatemy then
+            lessonConfig.templatemy = taskCnf.templatemy
+        end
+
+        if taskCnf.regionMy then
+            lessonConfig.regionMy = taskCnf.regionMy
+        end
+
+        if taskCnf.regionOther then
+            lessonConfig.regionOther = taskCnf.regionOther
+        end
+        
         -- echo(lessonConfig.taskCnf,true)
         -- print("maxstage============",LessonBoxTip.m_nMaxStageIndex,#lessonConfig.taskCnf)
         LessonBoxTip.PrepareStageScene()
@@ -288,7 +323,10 @@ function LessonBoxTip.StartCurStage()
     local posMy = lessonConfig.templatemy
     local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     -- print("clear start")
-    LessonBoxTip.ClearLearnArea(taskArea)
+    if taskArea then
+        LessonBoxTip.ClearLearnArea(taskArea)
+    end
+    
     -- print("clear end")
     LessonBoxTip.ShowView()
     commonlib.TimerManager.SetTimeout(function()
@@ -416,6 +454,7 @@ end
 function LessonBoxTip.StartLearn()
     --print("StartLearn=================")
     if LessonBoxCompare and lessonConfig then
+        LessonBoxTip.CompareMovieResult = nil
         -- GameLogic.RunCommand(string.format("/loadtemplate 18873,12,19156 %s",lessonConfig.starttemplate))
         local regionsrc = lessonConfig.regionMy
         local regiondest = lessonConfig.regionOther
@@ -427,32 +466,85 @@ function LessonBoxTip.StartLearn()
             LessonBoxTip.SetRoleName()
             LessonBoxTip.SetLessonTitle()
         else
-            LessonBoxCompare.CompareTwoAreas(regionsrc,regiondest,function(needbuild,pivotConfig)
-                --echo(needbuild)
-                LessonBoxTip.AllNeedBuildBlock = needbuild.blocks
-                LessonBoxTip.CurNeedBuildBlock = needbuild.blocks
-                LessonBoxTip.CreatePos = pivotConfig.createpos
-                LessonBoxTip.SrcBlockOrigin = pivotConfig.srcPivot
-                LessonBoxTip.SetLessonTitle()
-                compare_type = needbuild.nAddType
-                if(#needbuild.blocks == 0 and needbuild.nAddType == 3)then
-                    local movieBlocks = needbuild.movies
-                    local codeBlocks = needbuild.codes
-                    LessonBoxTip.CompareCode(codeBlocks)
-                    --LessonBoxTip.CompareMovie(movieBlocks)
-                else
-                    -- LessonBoxTip.AutoEquipHandTools()
-                    LessonBoxTip.RegisterHooks()
-                    commonlib.TimerManager.SetTimeout(function()
-                        LessonBoxTip.SetTaskTip("check")
-                        LessonBoxTip.SetRoleName()
-                        LessonBoxTip.UpdateNextBtnStatus()
-                        LessonBoxTip.RenderBlockTip()
-                    end,200)
+            if lessonConfig.lesson_type == "anim" and lessonConfig.course_index ~= 1 then
+                if not LessonBoxCompare.BindAnimLessonFilter then
+                    LessonBoxCompare.BindAnimLessonFilter = true
+                    GameLogic.GetFilters():add_filter("OpenMovieClipController", LessonBoxCompare.OpenMovieClipController);
                 end
-            end)
+                
+                -- 比较电影
+                LessonBoxCompare.CompareAnimLesson(regionsrc, regiondest)
+            else
+                LessonBoxCompare.CompareBulidLesson(regionsrc,regiondest)
+            end
         end
+
+        commonlib.TimerManager.SetTimeout(function()
+            -- 播放重复电影 弱提示 
+            GameLogic.GetCodeGlobal():BroadcastTextEvent("playAnimRepeatMovie");
+        end,200)
     end
+end
+
+-- regiondest 标准答案
+-- regionsrc 自己
+function LessonBoxCompare.CompareAnimLesson(regiondest, regionsrc)
+
+    local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+    local answer_movice_pos = regiondest.pos
+    local entity_answer = EntityManager.GetBlockEntity(answer_movice_pos[1], answer_movice_pos[2], answer_movice_pos[3])
+    local movice_clip = entity_answer:GetMovieClip();
+    -- 激活电影以对比
+    MovieManager:SetActiveMovieClip(movice_clip);
+    MovieClipController.OnClose()
+
+    local my_movice_pos = regionsrc.pos
+    local entity_my = EntityManager.GetBlockEntity(my_movice_pos[1], my_movice_pos[2], my_movice_pos[3])
+    movice_clip = entity_my:GetMovieClip();
+    -- 激活电影以对比
+    MovieManager:SetActiveMovieClip(movice_clip);
+    MovieClipController.OnClose()
+
+    local result_list = LessonBoxCompare.CompareMovieAll(entity_my, entity_answer)
+    LessonBoxTip.CompareMovieResult = result_list
+    MovieClipController.SetCompareData(result_list)
+    MovieClipController:OnMovieClipRemotelyUpdated()
+
+    LessonBoxTip.SetLessonTitle()
+    local lesson_desc = string.gsub(lessonConfig.description, "<br/>", "")
+    local str = string.format(LessonBoxTip.NomalTip.movietarget, lesson_desc)
+    LessonBoxTip.SetTaskTip(nil, str)
+    LessonBoxTip.SetRoleName()
+    LessonBoxTip.UpdateNextBtnStatus()
+    LessonBoxTip.RenderBlockTip()
+end
+
+-- 建造课比较
+function LessonBoxCompare.CompareBulidLesson(regionsrc,regiondest)
+    LessonBoxCompare.CompareTwoAreas(regionsrc,regiondest,function(needbuild,pivotConfig)
+        --echo(needbuild)
+        LessonBoxTip.AllNeedBuildBlock = needbuild.blocks
+        LessonBoxTip.CurNeedBuildBlock = needbuild.blocks
+        LessonBoxTip.CreatePos = pivotConfig.createpos
+        LessonBoxTip.SrcBlockOrigin = pivotConfig.srcPivot
+        LessonBoxTip.SetLessonTitle()
+        compare_type = needbuild.nAddType
+        if(#needbuild.blocks == 0 and needbuild.nAddType == 3)then
+            local movieBlocks = needbuild.movies
+            local codeBlocks = needbuild.codes
+            LessonBoxTip.CompareCode(codeBlocks)
+            --LessonBoxTip.CompareMovie(movieBlocks)
+        else
+            -- LessonBoxTip.AutoEquipHandTools()
+            LessonBoxTip.RegisterHooks()
+            commonlib.TimerManager.SetTimeout(function()
+                LessonBoxTip.SetTaskTip("check")
+                LessonBoxTip.SetRoleName()
+                LessonBoxTip.UpdateNextBtnStatus()
+                LessonBoxTip.RenderBlockTip()
+            end,200)
+        end
+    end)
 end
 
 function LessonBoxTip.CompareCode(blocks)
@@ -663,9 +755,9 @@ function LessonBoxTip.SetRoleName()
     end
 end
 
-function LessonBoxTip.SetTaskTip(type)
+function LessonBoxTip.SetTaskTip(type, text)
     if page then
-        local strTip = LessonBoxTip.NomalTip[type]
+        local strTip = text or LessonBoxTip.NomalTip[type]
         page:SetValue("role_tip", strTip);
         if strTip then
             SoundManager:PlayText(strTip,10006)
@@ -821,6 +913,11 @@ function LessonBoxTip.StartCheck()
         check_timer:Change()
     end   
     check_timer = commonlib.TimerManager.SetTimeout(function()
+        if lessonConfig.lesson_type == "anim" and lessonConfig.course_index ~= 1 then
+            LessonBoxTip.StartCheckAnim()
+            return
+        end
+
         if LessonBoxTip.CheckHasePlayMovie() then
             GameLogic.AddBBS(nil,"先去老师区域，看完操作演示吧")
             return
@@ -922,7 +1019,12 @@ function LessonBoxTip.DelayShowErrBlockTip()
         errblock_timer:Change();
     end
     errblock_timer = commonlib.TimerManager.SetTimeout(function ()
-        LessonBoxTip.SetErrBlockTip()
+        if lessonConfig.lesson_type == "anim" then
+            LessonBoxTip.SetAnimErrorTip()
+        else
+            LessonBoxTip.SetErrBlockTip()
+        end
+        
     end, 3000);
 end
 function LessonBoxTip.UpdateCheckBtnStatus(type)
@@ -1091,11 +1193,16 @@ function LessonBoxTip.RemoveErrBlockTip()
 end
 
 function LessonBoxTip.OnStartMacroLearn()
+    LessonBoxTip.m_ClickFollow = true
     local taskArea = lessonConfig.stageArea
     local posTeacher = lessonConfig.templateteacher
     local posMy = lessonConfig.templatemy
     local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
-    LessonBoxTip.ClearLearnArea(taskArea)
+
+    if taskArea then
+        LessonBoxTip.ClearLearnArea(taskArea)
+    end
+    
     LessonBoxTip.EndTip()
     commonlib.TimerManager.SetTimeout(function()
         local endTemp = taskCnf.finishtemplate
@@ -1240,3 +1347,97 @@ function LessonBoxTip.PlayLessonMusic(strType)
 end
 
 
+function LessonBoxTip.SetAnimErrorTip()
+    local result_list = LessonBoxTip.CompareMovieResult
+    print("aaaaaaaaaass")
+    echo(result_list, true)
+    if not result_list then
+        return
+    end
+    local say_text
+    local result
+    for index, v in ipairs(LessonBoxTip.CheckMovieTips) do
+        result = result_list[v.type]
+        if result then
+            say_text = v.text
+            break
+        end
+    end
+    if not result then
+        return
+    end
+
+    if result then
+        say_text = string.format(say_text, result.stander_answer)
+        page:SetValue("role_tip", say_text)
+    end
+end
+
+function LessonBoxTip.StartCheckAnim()
+    local regionsrc = lessonConfig.regionMy
+    local regiondest = lessonConfig.regionOther
+    LessonBoxCompare.CompareAnimLesson(regionsrc, regiondest)
+
+    if not LessonBoxTip.CompareMovieResult then
+        return
+    end
+    local has_error = false
+    for key, v in pairs(LessonBoxTip.CompareMovieResult) do
+        if v then
+            has_error = true
+            break
+        end
+    end
+
+    if has_error then
+        LessonBoxTip.m_nCorrectCount = LessonBoxTip.m_nCorrectCount - 1
+    else
+
+        -- 作对了进入下一节
+        LessonBoxTip.RemoveErrBlockTip()
+        LessonBoxTip.SetErrorTip(1)
+        isFinishStage = true
+        local finish_desc = lessonConfig.is_lx and "当前练习已完成" or "当前小节已完成，即将进入下一小节的学习"
+        GameLogic.AddBBS(nil,finish_desc)
+        commonlib.TimerManager.SetTimeout(function()
+            LessonBoxTip.ClearErrorBlockTip()
+            LessonBoxTip.RemoveErrBlockTip()
+            LessonBoxTip.ClearBlockTip()
+            -- if lessonConfig.is_lx then
+            --     LessonBoxTip.OnRetunMacro(true)
+            -- else
+            --     LessonBoxTip.GotoNextStage()
+            -- end
+            LessonBoxTip.OnRetunMacro(true)
+        end,5000)
+        return
+    end
+    if LessonBoxTip.m_nCorrectCount <= -5 then
+        if taskCnf.follow and taskCnf.follow[1] then
+            _guihelper.MessageBox("开启教学模式，跟着帕帕卡卡拉拉一起手把手一步一步完成课程的学习吧！",function()
+                LessonBoxTip.OnStartMacroLearn()
+            end)
+        end
+
+        if lessonConfig.is_lx then
+            LessonBoxTip.m_nCorrectCount = -5
+        end
+    end
+    if LessonBoxTip.m_nCorrectCount < - 6 then LessonBoxTip.m_nCorrectCount = -6  end
+    if LessonBoxTip.m_nCorrectCount > 5 then LessonBoxTip.m_nCorrectCount = 5 end
+    if LessonBoxTip.m_nCorrectCount <=5 and LessonBoxTip.m_nCorrectCount >= -6 then
+        LessonBoxTip.RemoveErrBlockTip()
+        LessonBoxTip.SetErrorTip(LessonBoxTip.m_nCorrectCount)
+        LessonBoxTip.DelayShowErrBlockTip()
+        
+    end
+end
+
+function LessonBoxCompare.OpenMovieClipController()
+    if not page or not page_root or not page:IsVisible() then
+        print("界面初始化失败~")
+        return
+    end
+
+    GameLogic.GetCodeGlobal():BroadcastTextEvent("stopAnimRepeatMovie");
+end

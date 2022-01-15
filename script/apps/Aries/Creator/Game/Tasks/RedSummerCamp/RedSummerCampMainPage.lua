@@ -25,7 +25,7 @@ RedSummerCampMainPage.UserData = {}
 RedSummerCampMainPage.ItemData = {
 	{name="大赛", is_show_vip=false, is_show_recommend=true, node_name = "shentongbei", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_1_220x220_32bits.png#0 0 220 220"},
 	{name="新手入门", is_show_vip=false, is_show_recommend=false, node_name = "course_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_2_220x220_32bits.png#0 0 220 220"},
-	{name="乐园设计师", is_show_vip=false, is_show_recommend=false, node_name = "leyuan", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/8_219X202_32bits.png#0 0 220 220"},
+	{name="超级宠物", is_show_vip=false, is_show_recommend=false, node_name = "superAnimal", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/dongwuke_220x220_32bits.png#0 0 220 220"},
 	{name="推荐列表", is_show_vip=false, is_show_recommend=false, node_name = "explore", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"},
 	{name="虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
 	{name="家长指南", is_show_vip=false, is_show_recommend=false, node_name = "parent_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_6_220x220_32bits.png#0 0 220 220"},
@@ -546,6 +546,9 @@ function RedSummerCampMainPage.OpenPage(name)
     elseif(name == "explore")then
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.explore");
 		GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
+	elseif(name == "superAnimal") then
+		local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+        RedSummerCampPPtPage.Show("superAnimal");
     end
 end
 

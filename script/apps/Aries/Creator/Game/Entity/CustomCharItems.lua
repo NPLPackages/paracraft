@@ -83,7 +83,7 @@ local items = {};
 CustomCharItems.category_items = {};
 CustomCharItems.itemsGsidMap = {};
 CustomCharItems.itemsIdMap = {};
-CustomCharItems.itemsInCaregoryIdMap = {}
+CustomCharItems.itemsInCategoryIdMap = {}
 
 -- pet id string list
 CustomCharItems.PetIds = {};
@@ -276,7 +276,7 @@ function CustomCharItems:Init()
 						CustomCharItems.itemsGsidMap[item.gsid] = item;
 					end
 					if(item.id) then
-						CustomCharItems.itemsInCaregoryIdMap[item.id] = item;
+						CustomCharItems.itemsInCategoryIdMap[item.id] = item;
 					end
 					-- record pet category item id
 					if name == "pet" then
@@ -376,7 +376,7 @@ end
 -- this is the item in cartegory list, with price and icon, etc. 
 -- @param id: item id 
 function CustomCharItems:GetItemInCategoryById(id)
-	return CustomCharItems.itemsInCaregoryIdMap[tostring(id)]
+	return CustomCharItems.itemsInCategoryIdMap[tostring(id)]
 end
 
 CustomCharItems.defaultSkinTable = {

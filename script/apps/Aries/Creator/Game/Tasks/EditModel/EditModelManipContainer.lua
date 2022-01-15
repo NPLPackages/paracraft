@@ -31,6 +31,8 @@ EditModelManipContainer:Property({"YawPlugName", "yaw", auto=true});
 EditModelManipContainer:Property({"OffsetPosPlugName", "offsetPos", auto=true});
 EditModelManipContainer:Property({"AngleGridStep", math.pi / 12, "GetAngleGridStep", "SetAngleGridStep", auto=true});
 EditModelManipContainer:Property({"SupportUndo", true, "IsSupportUndo", "SetSupportUndo", auto=true});
+EditModelManipContainer:Property({"showRotation", true, "IsShowRotation", "ShowRotation", auto=true});
+EditModelManipContainer:Property({"showScaling", true, "IsShowScaling", "ShowScaling", auto=true});
 
 function EditModelManipContainer:ctor()
 	self:AddValue("position", {0,0,0});
@@ -61,13 +63,17 @@ end
 
 function EditModelManipContainer:OnSelectMountPoint(name)
 	local bGlobalTransVisible = (name == nil)
-	if(self.scaleManip) then
+	if(self.translateManip) then
 		self.translateManip:SetVisible(bGlobalTransVisible)
 		self.translateManip.enabled = bGlobalTransVisible
-		self.rotateManip:SetVisible(bGlobalTransVisible)
-		self.rotateManip.enabled = bGlobalTransVisible
+	end
+	if(self.scaleManip and self:IsShowScaling()) then
 		self.scaleManip:SetVisible(bGlobalTransVisible)
 		self.scaleManip.enabled = bGlobalTransVisible
+	end
+	if(self.rotateManip and self:IsShowRotation()) then
+		self.rotateManip:SetVisible(bGlobalTransVisible)
+		self.rotateManip.enabled = bGlobalTransVisible
 	end
 end
 
@@ -136,7 +142,7 @@ function EditModelManipContainer:connectToDependNode(node)
 		end
 
 		-- two-way binding for scaling conversion:
-		if(plugScale) then
+		if(plugScale and self:IsShowScaling()) then
 			local manipScalePlug = self.scaleManip:findPlug("scaling");
 			self:addManipToPlugConversionCallback(plugScale, function(self, plug)
 				commonlib.TimerManager.SetTimeout(function() self:SnapshotToHistory() end, 1000)
@@ -149,10 +155,13 @@ function EditModelManipContainer:connectToDependNode(node)
 				end
 				return scaling;
 			end);
+		else
+			self.scaleManip:SetVisible(false)
+			self.scaleManip.enabled = false
 		end
 
 		-- two-way binding for yaw conversion:
-		if(plugYaw) then
+		if(plugYaw and self:IsShowRotation()) then
 			self.rotateManip:SetGridStep(self:GetAngleGridStep());
 
 			local manipYawPlug = self.rotateManip:findPlug("yaw");
@@ -163,6 +172,9 @@ function EditModelManipContainer:connectToDependNode(node)
 			self:addPlugToManipConversionCallback(manipYawPlug, function(self, manipPlug)
 				return plugYaw:GetValue() or 0;
 			end);
+		else
+			self.rotateManip:SetVisible(false)
+			self.rotateManip.enabled = false
 		end
 
 		-- force Begin/End edit pairs for updating result to network.

@@ -16,18 +16,19 @@ PlayerController:SetHandToolIndex(nIndex);
 ]]
 NPL.load("(gl)script/ide/mathlib.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local mathlib = commonlib.gettable("mathlib");
+local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
-NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
 local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockInEntityHand");
-NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 
 -- create class
@@ -302,7 +303,14 @@ function PlayerController:SetBlockInRightHand(blockid_or_item_stack, bIsReplace)
 		if(player.petObj) then
 			BlockInEntityHand.RefreshRightHand(nil, blockid_or_item_stack, player.petObj)
 		end
-		
+		if(type(blockid_or_item_stack) == "number") then
+			local item = ItemClient.GetItem(blockid_or_item_stack)
+			if(item and item:GetPreferredBlockData()) then
+				local itemStack = ItemStack:new():Init(blockid_or_item_stack, 1);
+				itemStack:SetPreferredBlockData(item:GetPreferredBlockData())
+				blockid_or_item_stack = itemStack;
+			end
+		end
 		return player:SetBlockInRightHand(blockid_or_item_stack, bIsReplace);		
 	end
 end

@@ -103,17 +103,17 @@
             <div style="position:relative;margin-top:40px;">
                 <div style="float:left;margin-left:12px;margin-top:12px;width:225px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/dikuang_32X32_32bits.png#0 0 32 32:8 8 8 8);">
                     <div style="width:225px;height:390px;">
-                        <pe:gridview style="margin-left:9px;margin-top:4px;" name="item_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="44"
+                        <pe:gridview uiname="CustomSkinPage.ModelGridView" style="margin-left:9px;margin-top:4px;" name="item_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight="44"
                                      DataSource='<%=DS_Models%>'>
                             <Columns>
                                 <div style="width:207px;height:44px;background:url(Texture/Aries/Creator/keepwork/Avatar/btn_tiao_128X44_32bits.png#0 0 128 44:60 0 60 0);">
                                     <div style="float:left;margin-left:14px;margin-top:8px;width:26px;text-align:center;font-size:18px;base-font-size:18px;color:#ffffff;">
                                         <%=Eval("index")%>
                                     </div>
-                                    <div name='<%=Eval("index")%>' onclick="CustomSkinPage.SelectModel" style="float:left;margin-left:2px;margin-top:8px;width:124px;text-align:center;font-size:18px;base-font-size:18px;color:#ffffff;">
+                                    <div uiname='<%="CustomSkinPage.SelectModel" .. Eval("index")%>'  name='<%=Eval("index")%>' onclick="CustomSkinPage.SelectModel" style="float:left;margin-left:2px;margin-top:8px;width:124px;text-align:center;font-size:18px;base-font-size:18px;color:#ffffff;">
                                         <%=Eval("alias")%>
                                     </div>
-                                    <div name='<%=Eval("index")%>' onclick="CustomSkinPage.DeleteModel" style="float:left;margin-left:2px;margin-top:5px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/Avatar/btn_shanchu_36X36_32bits.png#0 0 36 36);"></div>
+                                    <div uiname='<%="CustomSkinPage.DeleteModel" .. Eval("index")%>' name='<%=Eval("index")%>' onclick="CustomSkinPage.DeleteModel" style="float:left;margin-left:2px;margin-top:5px;width:36px;height:36px;background:url(Texture/Aries/Creator/keepwork/Avatar/btn_shanchu_36X36_32bits.png#0 0 36 36);"></div>
                                 </div>
                             </Columns>
                             <EmptyDataTemplate>
@@ -121,22 +121,22 @@
                         </pe:gridview>
                     </div>
                     <div style="margin-top:0px;width:225px;height:42px;">
-                        <input type="button" align="center" style="margin-top:0px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.CreateNewActor" value='<%=L"新建套装"%>' />
-                        <input type="button" align="center" style="margin-top:10px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.OnClickSave" value='<%=L"保存"%>' />
+                        <input uiname="CustomSkinPage.CreateNewActor" type="button" align="center" style="margin-top:0px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.CreateNewActor" value='<%=L"新建套装"%>' />
+                        <input uiname="CustomSkinPage.OnClickSave" type="button" align="center" style="margin-top:10px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.OnClickSave" value='<%=L"保存"%>' />
                     </div>
                 </div>
                 <div style="float:left;margin-left:10px;margin-top:12px;width:334px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/renwukuangbj_334X512_32bits.png#0 0 334 512);">
                     <pe:if condition='<%=IsEditable()%>'>
                         <div style="margin-top:16px;width:334px;height:30px;">
-                            <input type="text" name="model_name" EmptyText='<%=L"请输入新的名称"%>' style="width:160px;height:26px;margin-left:60px;background:url(Texture/Aquarius/Login/TextBox_32bits.png: 8 8 5 5)" />
-                            <input type="button" style="width:40px;height:26px;margin-left:10px;color:#ffffff;" value='<%=L"确定" %>' class="mc_blue_button_with_fillet" onclick="FinishEditing()" />
-                            <input type="button" style="width:40px;height:26px;margin-left:5px;color:#ffffff;" value='<%=L"取消" %>' class="mc_blue_button_with_fillet" onclick="CancelEditing()" />
+                            <input uiname="CustomSkinPage.EditModelName" type="text" name="model_name" EmptyText='<%=L"请输入新的名称"%>' style="width:160px;height:26px;margin-left:60px;background:url(Texture/Aquarius/Login/TextBox_32bits.png: 8 8 5 5)" />
+                            <input uiname="CustomSkinPage.FinishEditing" type="button" style="width:40px;height:26px;margin-left:10px;color:#ffffff;" value='<%=L"确定" %>' class="mc_blue_button_with_fillet" onclick="FinishEditing()" />
+                            <input uiname="CustomSkinPage.CancelEditing" type="button" style="width:40px;height:26px;margin-left:5px;color:#ffffff;" value='<%=L"取消" %>' class="mc_blue_button_with_fillet" onclick="CancelEditing()" />
                         </div>
                     </pe:if>
                     <pe:if condition='<%=not IsEditable()%>'>
                         <div style="margin-top:16px;width:334px;height:30px;">
                             <div style="float:left;margin-left:0px;font-size:18px;base-font-size:18px;text-align:center;color:#ffffff;"><%=GetModelName(CustomSkinPage.model_index)%></div>
-                            <input type="button" style="float:left;margin-left:5px;width:25px;height:26px;background:url(Texture/Aries/Creator/keepwork/ggs/user/btn_bianji_24X24_32bits.png#0 0 26 26);" onclick="SetEditable()" />
+                            <input uiname="CustomSkinPage.SetEditable" type="button" style="float:left;margin-left:5px;width:25px;height:26px;background:url(Texture/Aries/Creator/keepwork/ggs/user/btn_bianji_24X24_32bits.png#0 0 26 26);" onclick="SetEditable()" />
                         </div>
                     </pe:if>
                     <div style="margin-top:20px;width:334px;height:300px;">
@@ -174,19 +174,19 @@
                         </div>
                     </div>
                     <div style="margin-top:-300px;width:334px;height:300px;">
-                        <pe:gridview style="margin-left:10px;margin-top:10px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight="60"
+                        <pe:gridview uiname="CustomSkinPage.ItemGridview" style="margin-left:10px;margin-top:10px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight="60"
                                      DataSource='<%=DS_Icons%>'>
                             <Columns>
                                 <pe:if condition='<%=Eval("icon") ~= ""%>'>
                                     <pe:if condition='<%=IsOdd(Eval("index"))%>'>
-                                        <div name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style="float:left;margin-left:0px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
-                                            <div zorder="1" name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style='<%=GetSmallIconStyle1(Eval("icon"))%>'>
+                                        <div uiname='<%="CustomSkinPage.RemoveSkin1_" .. Eval("index")%>' name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style="float:left;margin-left:0px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
+                                            <div uiname='<%="CustomSkinPage.RemoveSkin2_" .. Eval("index")%>' zorder="1" name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style='<%=GetSmallIconStyle1(Eval("icon"))%>'>
                                             </div>
                                         </div>
                                     </pe:if>
                                     <pe:if condition='<%=not IsOdd(Eval("index"))%>'>
-                                        <div name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
-                                            <div zorder="1" name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style='<%=GetSmallIconStyle2(Eval("icon"))%>'>
+                                        <div uiname='<%="CustomSkinPage.RemoveSkin1_" .. Eval("index")%>' name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
+                                            <div uiname='<%="CustomSkinPage.RemoveSkin2_" .. Eval("index")%>' zorder="1" name='<%= Eval("index")%>' onclick="CustomSkinPage.RemoveSkin" style='<%=GetSmallIconStyle2(Eval("icon"))%>'>
                                             </div>
                                         </div>
                                     </pe:if>
@@ -205,8 +205,8 @@
                             <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarCharacter" style="width:256px;height:256px;" IsInteractive="false" NoFrameMove="true" DefaultCameraObjectDist="4" LookAtHeight="0.9" DefaultLiftupAngle="0.1"/>
                         </div>
                     </div>
-                    <input type="button" align="center" style="margin-top:22px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="CustomSkinPage.OnClickOK()" value='<%=L"使用"%>' />
-                    <input type="button" align="center" style="margin-top:10px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.OnClose()" value='<%=L"取消"%>' />
+                    <input uiname="CustomSkinPage.OnClickOK" type="button" align="center" style="margin-top:22px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_yellow_button" onclick="CustomSkinPage.OnClickOK()" value='<%=L"使用"%>' />
+                    <input uiname="CustomSkinPage.OnClickClose" type="button" align="center" style="margin-top:10px;min-width:168px;height:48px;font-size:20px;base-font-size:20px;" class="kp_gray_button" onclick="CustomSkinPage.OnClose()" value='<%=L"取消"%>' />
                 </div>
                 <div style="float:left;margin-left:4px;margin-top:12px;width:590px;height:512px;background:url(Texture/Aries/Creator/keepwork/Avatar/dikuang_32X32_32bits.png#0 0 32 32:8 8 8 8);">
                     <div style="width:580px;height:36px;margin-left:2px;margin-top:10px;">
@@ -218,19 +218,19 @@
                                     </div>
                                 </pe:if>
                                 <pe:if condition='<%=CustomSkinPage.category_index ~= Eval("index") %>'>
-                                    <div name='<%=Eval("index")%>' onclick="CustomSkinPage.OnChangeCategory" style="float:left;margin-left:6px;margin-top:0px;width:52px;height:30px;background:url(Texture/Aries/Creator/keepwork/Avatar/zik2_52X30_32bits.png#0 0 52 30);">
-                                        <div zorder="1" name='<%=Eval("index")%>' onclick="CustomSkinPage.OnChangeCategory" style='<%=GetCategoryStyle(Eval("tex1"))%>'></div>
+                                    <div uiname='<%="CustomSkinPage.CategoryTitleContainer_" .. Eval("index")%>' name='<%=Eval("index")%>' onclick="CustomSkinPage.OnChangeCategory" style="float:left;margin-left:6px;margin-top:0px;width:52px;height:30px;background:url(Texture/Aries/Creator/keepwork/Avatar/zik2_52X30_32bits.png#0 0 52 30);">
+                                        <div uiname='<%="CustomSkinPage.CategoryTitle_" .. Eval("index")%>' zorder="1" name='<%=Eval("index")%>' onclick="CustomSkinPage.OnChangeCategory" style='<%=GetCategoryStyle(Eval("tex1"))%>'></div>
                                     </div>
                                 </pe:if>
                             </pe:repeatitem>
                         </pe:repeat>
                     </div>
                     <div style="width:620px;height:466px;">
-                        <pe:gridview style="margin-left:1px;" name="item_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="18" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight="140" RememberScrollPos="true" RememberLastPage="true"
+                        <pe:gridview uiname="CustomSkinPage.CategoryGridView" style="margin-left:1px;" name="item_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="18" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight="140" RememberScrollPos="true" RememberLastPage="true"
                                      DataSource='<%=DS_Items%>'>
                             <Columns>
                                 <div style="float:left;width:146px;height:140px;background:url(Texture/Aries/Creator/keepwork/ggs/user/renwuqiehuan/wupingbj_146X140_32bits.png#0 0 146 140);">
-                                    <div name='<%= Eval("index")%>' onclick="CustomSkinPage.UpdateCustomGeosets" style="margin-left:9px;margin-top:8px;width:128px;height:96px;">
+                                    <div uiname='<%="CustomSkinPage.CategoryItem_" .. Eval("index")%>' name='<%= Eval("index")%>' onclick="CustomSkinPage.UpdateCustomGeosets" style="margin-left:9px;margin-top:8px;width:128px;height:96px;">
                                         <div style='<%=GetBigIconStyle(Eval("icon"))%>'></div>
                                     </div>
                                     <div style="margin-top:2px;width:146px;text-align:center;">

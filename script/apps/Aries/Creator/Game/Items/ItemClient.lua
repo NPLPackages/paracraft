@@ -88,6 +88,7 @@ function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemWorld2In1.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemNplCadEditor.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemLiveModel.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemInvisibleClickSensor.lua");
 
 	GameLogic.GetFilters():apply_filters("register_item");
 end

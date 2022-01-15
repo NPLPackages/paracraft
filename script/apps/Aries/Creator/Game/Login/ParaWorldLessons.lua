@@ -664,6 +664,8 @@ function ParaWorldLessons.EnterWorldById(id, callbackFunc)
 		-- 19351
 		['29x118'] = 19351,
 		['28x83'] = 19352,
+		-- 830
+		['20x79'] = 830,
 	}
 
 	if (classIdMapsToProjectId[id]) then

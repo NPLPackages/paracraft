@@ -759,7 +759,15 @@ function World2In1.OnEnterCreatorRegion()
 		return;
 	end	
 	local project_id = WorldCommon.GetWorldTag("kpProjectId");
-	if project_id == 79969 or project_id == 76739 or project_id == 83044 then
+	local id_list = {
+		[79969] = 1,
+		[76739] = 1,
+		[83044] = 1,
+		[128252] = 1,
+		[132939] = 1,
+		
+	}
+	if id_list[project_id] then
 		GameLogic.RunCommand("/sendevent gotoCreate")
 		return 
 	end
