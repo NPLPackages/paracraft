@@ -293,7 +293,7 @@ function EditContext:mouseReleaseEvent(event)
 				end
 			end
 
-			if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then
+			if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then
 				-- check for click sensors
 				event:accept();
 			end

@@ -30,7 +30,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockInEntityHand");
 local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
-
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
 local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 
 -- create class
@@ -538,8 +538,10 @@ function PlayerController:OnClickSensorsByPoint(x, y, z, mouse_button)
 			if(((x-x1)^2 + (y-y1)^2 + (z-z1)^2) < maxDiffSq) then
 				local inside, facing = entity:IsPointInClickableAABB(x, y, z, pointRadius);
 				if(inside) then
-					entity:OnClick(x, y, z, mouse_button)
-					count = (count or 0) + 1;
+					local side = Direction.GetDirectionFromFacing(facing)
+					if(entity:OnClick(x, y, z, mouse_button, nil, side)) then
+						count = (count or 0) + 1;
+					end
 				end
 			end 
 		end

@@ -74,6 +74,7 @@ function GetCategoryDS()
         {value="smallobject", text=L"小物品",},
         {value="customCharItem", text=L"换装物品",},
         {value="lefthand", text=L"左手手持",},
+        {value="cameraClickSensor", text=L"摄影机点击",},
     };
 end
 ]]></script>
@@ -162,7 +163,7 @@ end
     <div style="margin-top: 5px;">
         <div>
             <div style="float: left;">
-                <div style="float:left" tooltip="/sendevent __entity_onclick {x,y,z,name}"><%=L"点击事件:"%></div>
+                <div style="float:left" tooltip="/sendevent __entity_onclick {x,y,z,name,facing}"><%=L"点击事件:"%></div>
                 <input type="text" uiname="EditModelProperty.onClickEvent" name="onClickEvent" style="width:150px;height:24px;"/>
             </div>
             <div style="float: left; margin-left: 10px;">

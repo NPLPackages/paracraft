@@ -110,7 +110,7 @@ function EditModelProperty.ShowForEntity(modelEntity)
 			itemId = modelEntity:GetItemId(),
 			hasRealPhysics = modelEntity:HasRealPhysics(),
 			isStackable = modelEntity.isStackable,
-			isDisplayModel = modelEntity.isDisplayModel~=false,
+			isDisplayModel = modelEntity:IsDisplayModel(),
 			stackHeight = modelEntity.stackHeight,
 			autoTurning = modelEntity.bIsAutoTurning,
 			canDrag = modelEntity.canDrag,
@@ -220,7 +220,7 @@ function EditModelProperty.UpdateUIFromValue(values)
 			page:SetValue("name", values.name);
 		end
 		page:SetValue("isStackable", tostring(values.isStackable));
-		page:SetValue("isDisplayModel", tostring(values.isDisplayModel));
+		page:SetValue("isDisplayModel", values.isDisplayModel);
 		page:SetValue("stackHeight", tostring(values.stackHeight));
 		page:SetValue("idleAnim", tostring(values.idleAnim));
 		page:SetValue("hasRealPhysics", tostring(values.hasRealPhysics));

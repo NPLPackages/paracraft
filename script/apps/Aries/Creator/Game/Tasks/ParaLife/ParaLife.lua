@@ -88,7 +88,7 @@ function ParaLife:Show()
 	GameLogic.RunCommand("/clearbag")
 	GameLogic.RunCommand("/hide quickselectbar")
 	GameLogic.RunCommand("/camera -roomview")
-	GameLogic.RunCommand("/cameradist 8")
+	GameLogic.RunCommand("/cameradist 6")
 end
 
 function ParaLife:IsVisible()

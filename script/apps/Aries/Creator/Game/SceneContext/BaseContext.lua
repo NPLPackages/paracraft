@@ -91,6 +91,7 @@ end
 function BaseContext:OnUnselect()
 	self:EnableMouseDownTimer(false);
 	self:EnableMousePickTimer(false);
+	self:DisablePlayerTimer();
 	self:ClearPickDisplay();
 	self:UpdateClickStrength(-1);
 	click_data.selector = nil;
@@ -1248,3 +1249,113 @@ function BaseContext:HandleGlobalKey(event)
 	end
 	return event:isAccepted();
 end
+
+function BaseContext:EnablePlayerTimer()
+	self.playerTimer = self.playerTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		self:OnPlayerTimer(timer)
+	end})
+	if(not self.playerTimer:IsEnabled()) then
+		self.playerTimer:Change(30, 30)
+	end
+end
+
+function BaseContext:DisablePlayerTimer()
+	if(self.playerTimer) then
+		self.playerTimer:Change();
+	end
+	self:SetTargetBlockPosition(nil)
+	self:SetTargetFacing(nil)
+end
+
+function BaseContext:SetTargetFacing(facing)
+	self.targetFacing = facing
+	if(self.targetFacing) then
+		self:EnablePlayerTimer()
+	end
+end
+
+function BaseContext:SetTargetPosition(x, y, z)
+	local player = EntityManager.GetPlayer()
+	local obj = player:GetInnerObject()
+	local attr = ParaCamera.GetAttributeObject();
+	self.startPlayerX, self.startPlayerY, self.startPlayerZ = player:GetPosition()
+	self.targetX, self.targetY, self.targetZ = x, y, z;
+	self.timeUsed = 0;
+	if(self.targetX) then
+		local eye_pos = attr:GetField("Eye position", {0,0,0});
+		local lookat_pos = attr:GetField("Lookat position", {0,0,0});
+		local camobjDist, LiftupAngle, CameraRotY = attr:GetField("CameraObjectDistance", 0), attr:GetField("CameraLiftupAngle", 0), attr:GetField("CameraRotY", 0);
+		local dist, pitch, yaw = camobjDist, LiftupAngle, CameraRotY;
+
+		local eyeX, eyeY, eyeZ = eye_pos[1], eye_pos[2], eye_pos[3]
+		local lookatX, lookatY, lookatZ = lookat_pos[1], lookat_pos[2], lookat_pos[3]
+		local cameraEyeDistance = math.sqrt((eyeX-lookatX)^2 + (eyeY-lookatY)^2 + (eyeZ-lookatZ)^2)
+		if(cameraEyeDistance+0.1 > camobjDist) then
+			-- only disable camera collision if the current camera is not in collision 
+			attr:SetField("EnableBlockCollision", false);
+		end
+		-- only linear movement style. 
+		obj:SetField("MovementStyle", 3)
+		self:EnablePlayerTimer()
+	else
+		-- normal movement style
+		obj:SetField("MovementStyle", 0)
+		attr:SetField("EnableBlockCollision", true);
+	end
+end
+
+function BaseContext:SetTargetBlockPosition(bx, by, bz)
+	if(bx) then
+		bx, by, bz = BlockEngine:real_bottom(bx, by, bz);
+	end
+	self:SetTargetPosition(bx, by, bz)
+end
+
+-- called on player frame move
+function BaseContext:OnPlayerTimer(timer)
+	local reachTargetTimeLeft;
+	if(self.targetX) then
+		local player = EntityManager.GetPlayer()
+		local px, py, pz = self.startPlayerX, self.startPlayerY, self.startPlayerZ;
+		local tx, ty, tz = self.targetX, self.targetY, self.targetZ;
+		local fromBX, fromBY, fromBZ = BlockEngine:block(self.startPlayerX, self.startPlayerY, self.startPlayerZ);
+		
+		local dist = math.sqrt((tx - px) ^ 2 + (ty - py) ^ 2 + (tz - pz) ^ 2)
+		local deltaTime = timer:GetDelta() / 1000
+		self.timeUsed = self.timeUsed + deltaTime;
+		-- player move speed will increase according to move distance
+		local moveDist = math.min(100, (10 + (dist^2)/20)) * self.timeUsed
+		
+		if(dist > moveDist and dist > 0.1) then
+			local ratio = moveDist / dist;
+			reachTargetTimeLeft = self.timeUsed / ratio * (1 - ratio)
+
+			local x = px + (tx - px) * ratio
+			local y = py + (ty - py) * ratio
+			local z = pz + (tz - pz) * ratio
+			
+			player:SetPosition(x, y, z)
+		else
+			-- we already reached the target position
+			player:SetPosition(tx, ty, tz)
+			self:SetTargetPosition(nil)
+		end
+	end
+	if(self.targetFacing) then
+		local player = EntityManager.GetPlayer()
+		local deltaTime = timer:GetDelta() / 1000
+		local attr = ParaCamera.GetAttributeObject();
+		local cameraRotY = attr:GetField("CameraRotY", 0);
+		local targetRotY = self.targetFacing;
+
+		local newRotY, bReached = mathlib.SmoothMoveAngle(cameraRotY, targetRotY, (30+(math.abs(mathlib.ToStandardAngle(targetRotY-cameraRotY))*100)^2/30) * deltaTime/180*math.pi)
+		attr:SetField("CameraRotY", newRotY)
+		if(bReached) then
+			self:SetTargetFacing(nil)
+		end
+	end
+	if(not self.targetX and not self.targetFacing) then
+		timer:Change();
+	end
+end
+

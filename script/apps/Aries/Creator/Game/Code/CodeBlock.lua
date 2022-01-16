@@ -1009,11 +1009,11 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 			for i, actor in ipairs(self:GetActors()) do
 				if(msg.dest == actor:GetName()) then
 					-- only activate the first matching actor
-					return event:FireForActor(actor, msg and msg.msg, msg and msg.onFinishedCallback);
+					return event:FireForActor(actor, msg and msg.msg, msg and msg.onFinishedCallback, msg and msg.bIsImmediate);
 				end
 			end
 		else
-			return event:Fire(msg and msg.msg, msg and msg.onFinishedCallback);
+			return event:Fire(msg and msg.msg, msg and msg.onFinishedCallback, msg and msg.bIsImmediate);
 		end
 	end
 	

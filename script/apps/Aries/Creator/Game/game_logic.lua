@@ -119,6 +119,8 @@ GameLogic:Signal("frameMoved");
 GameLogic:Signal("desktopLayoutRequested", function(requesterName) end);
 -- for code war
 GameLogic:Signal("CodeWarLoadLevel");
+-- called after game event is fired
+GameLogic:Signal("gameEventFired", function(event, lastReturnValue) end);
 
 -- current game mode. 
 GameLogic.mode = "editor";
@@ -1814,12 +1816,14 @@ function GameLogic.CheckSignedIn(desc, callback)
 end
 
 -- global custom user or game event
-function GameLogic:event(event)
+-- @param bIsImmediate: if true, the code block needs to immediately process it. 
+function GameLogic:event(event, bIsImmediate)
 	local homeEntity = GameLogic.GetHomeEntity();
 	if(homeEntity) then
 		homeEntity:event(event);
 	end
-	GameLogic.GetCodeGlobal():HandleGameEvent(event);
+	local lastReturnValue = GameLogic.GetCodeGlobal():HandleGameEvent(event, bIsImmediate);
+	return self:gameEventFired(event, lastReturnValue) or lastReturnValue;
 end
 
 -- @param name: vip permission to check. 

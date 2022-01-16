@@ -38,7 +38,7 @@ end
 function ParalifeContext:OnSelect()
 	ParalifeContext._super.OnSelect(self);
 	self:EnableMousePickTimer(true);
-	self:EnablePlayerTimer()
+	GameLogic:Connect("gameEventFired", self, self.OnGameEvent, "UniqueConnection");
 end
 
 -- virtual function: 
@@ -46,7 +46,7 @@ end
 -- or false, if we can not unselect the scene tool context at the moment. 
 function ParalifeContext:OnUnselect()
 	ParalifeContext._super.OnUnselect(self);
-	self:DisablePlayerTimer();
+	GameLogic:Disconnect("gameEventFired", self, self.OnGameEvent);
 	return true;
 end
 
@@ -177,7 +177,7 @@ function ParalifeContext:mouseReleaseEvent(event)
 			end
 		end
 
-		if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then
+		if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then
 			-- check for click sensors
 			event:accept();
 		elseif(not event:isAccepted() and self:IsClickToMoveEnabled() and result and result.blockZ and result.side) then
@@ -216,22 +216,6 @@ function ParalifeContext:keyPressEvent(event)
 		-- quick select key
 	end
 end
-
-function ParalifeContext:EnablePlayerTimer()
-	self.playerTimer = self.playerTimer or commonlib.Timer:new({callbackFunc = function(timer)
-		self:OnPlayerTimer(timer)
-	end})
-	self.playerTimer:Change(30, 30)
-end
-
-function ParalifeContext:DisablePlayerTimer()
-	if(self.playerTimer) then
-		self.playerTimer:Change();
-	end
-	self:SetTargetBlockPosition(nil)
-	self:SetTargetFacing(nil)
-end
-
 
 -- @return {wallHeight=0, wallToWallDistance = 0, wallWidth = 0}
 function ParalifeContext:CalculateWallParamsByBlockSide(bx, by, bz, side)
@@ -359,81 +343,75 @@ function ParalifeContext:MovePlayerToBlock(bx, by, bz, blockId, side)
 	self:SetTargetBlockPosition(bx, by, bz)
 end
 
-function ParalifeContext:SetTargetFacing(facing)
-	self.targetFacing = facing
-end
-
-function ParalifeContext:SetTargetBlockPosition(bx, by, bz)
-	local player = EntityManager.GetPlayer()
-	local obj = player:GetInnerObject()
-	local attr = ParaCamera.GetAttributeObject();
-	self.startPlayerX, self.startPlayerY, self.startPlayerZ = player:GetPosition()
-	self.targetX, self.targetY, self.targetZ = bx, by, bz;
-	self.timeUsed = 0;
-	if(self.targetX) then
-		local eye_pos = attr:GetField("Eye position", {0,0,0});
-		local lookat_pos = attr:GetField("Lookat position", {0,0,0});
-		local camobjDist, LiftupAngle, CameraRotY = attr:GetField("CameraObjectDistance", 0), attr:GetField("CameraLiftupAngle", 0), attr:GetField("CameraRotY", 0);
-		local dist, pitch, yaw = camobjDist, LiftupAngle, CameraRotY;
-
-		local eyeX, eyeY, eyeZ = eye_pos[1], eye_pos[2], eye_pos[3]
-		local lookatX, lookatY, lookatZ = lookat_pos[1], lookat_pos[2], lookat_pos[3]
-		local cameraEyeDistance = math.sqrt((eyeX-lookatX)^2 + (eyeY-lookatY)^2 + (eyeZ-lookatZ)^2)
-		if(cameraEyeDistance+0.1 > camobjDist) then
-			-- only disable camera collision if the current camera is not in collision 
-			attr:SetField("EnableBlockCollision", false);
-		end
-		-- only linear movement style. 
-		obj:SetField("MovementStyle", 3)
-	else
-		-- normal movement style
-		obj:SetField("MovementStyle", 0)
-		attr:SetField("EnableBlockCollision", true);
-	end
-end
-
--- called on player frame move
-function ParalifeContext:OnPlayerTimer(timer)
-	local reachTargetTimeLeft;
-	if(self.targetX) then
-		local player = EntityManager.GetPlayer()
-		local px, py, pz = self.startPlayerX, self.startPlayerY, self.startPlayerZ;
-		local tx, ty, tz = BlockEngine:real_bottom(self.targetX, self.targetY, self.targetZ);
-		local fromBX, fromBY, fromBZ = BlockEngine:block(self.startPlayerX, self.startPlayerY, self.startPlayerZ);
-		
-		local dist = math.sqrt((tx - px) ^ 2 + (ty - py) ^ 2 + (tz - pz) ^ 2)
-		local deltaTime = timer:GetDelta() / 1000
-		self.timeUsed = self.timeUsed + deltaTime;
-		-- player move speed will increase according to move distance
-		local moveDist = math.min(100, (10 + (dist^2)/20)) * self.timeUsed
-		
-		if(dist > moveDist and dist > 0.1) then
-			local ratio = moveDist / dist;
-			reachTargetTimeLeft = self.timeUsed / ratio * (1 - ratio)
-
-			local x = px + (tx - px) * ratio
-			local y = py + (ty - py) * ratio
-			local z = pz + (tz - pz) * ratio
-			
-			player:SetPosition(x, y, z)
-		else
-			-- we already reached the target position
-			player:SetPosition(tx, ty, tz)
-			self:SetTargetBlockPosition(nil)
+local gameEvents_ = {
+	__entity_onclick = "OnHandleEntityClickEvent",
+	__entity_onhover = "OnHandleEntityOnHover",
+	__entity_onmount = "OnHandleEntityOnMount",
+	__entity_onbegindrag = "OnHandleEntityBeginDrag",
+	__entity_onenddrag = "OnHandleEntityEndDrag",
+}
+function ParalifeContext:OnGameEvent(event, lastReturnValue)
+	if(not lastReturnValue) then
+		local eventType = event:GetType();
+		if(gameEvents_[eventType]) then
+			lastReturnValue = ParalifeContext[gameEvents_[eventType]](self, event)
 		end
 	end
-	if(self.targetFacing) then
-		local player = EntityManager.GetPlayer()
-		local deltaTime = timer:GetDelta() / 1000
-		local attr = ParaCamera.GetAttributeObject();
-		local cameraRotY = attr:GetField("CameraRotY", 0);
-		local targetRotY = self.targetFacing;
+	return lastReturnValue;
+end
 
-		local newRotY, bReached = mathlib.SmoothMoveAngle(cameraRotY, targetRotY, (30+(math.abs(mathlib.ToStandardAngle(targetRotY-cameraRotY))*100)^2/30) * deltaTime/180*math.pi)
-		attr:SetField("CameraRotY", newRotY)
-		if(bReached) then
-			self:SetTargetFacing(nil)
+function ParalifeContext:OnHandleEntityClickEvent(event)
+	local msg = commonlib.totable(event.cmd_text)
+	if(msg.name) then
+		local entity = EntityManager.GetEntity(msg.name)
+		if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+			local category = entity:GetCategory();
+			if(category == "cameraClickSensor" and msg.facing) then
+				local yaw = GameLogic.RunCommand("/camerayaw");
+				local diff = mathlib.ToStandardAngle(msg.facing-yaw)
+				if(math.abs(diff) < math.pi *0.3) then
+					local x, y, z = entity:GetPosition()
+					GameLogic.GetSceneContext():SetTargetPosition(x, y, z)
+					GameLogic.GetSceneContext():SetTargetFacing(msg.facing)
+					return true
+				end
+			end
 		end
 	end
 end
 
+function ParalifeContext:OnHandleEntityOnHover(event)
+	local msg = commonlib.totable(event.cmd_text)
+	if(msg.name) then
+		local entity = EntityManager.GetEntity(msg.name)
+		if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+		end
+	end
+end
+
+function ParalifeContext:OnHandleEntityOnMount(event)
+	local msg = commonlib.totable(event.cmd_text)
+	if(msg.name) then
+		local entity = EntityManager.GetEntity(msg.name)
+		if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+		end
+	end
+end
+
+function ParalifeContext:OnHandleEntityBeginDrag(event)
+	local msg = commonlib.totable(event.cmd_text)
+	if(msg.name) then
+		local entity = EntityManager.GetEntity(msg.name)
+		if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+		end
+	end
+end
+
+function ParalifeContext:OnHandleEntityEndDrag(event)
+	local msg = commonlib.totable(event.cmd_text)
+	if(msg.name) then
+		local entity = EntityManager.GetEntity(msg.name)
+		if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+		end
+	end
+end

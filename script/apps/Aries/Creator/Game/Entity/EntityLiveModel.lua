@@ -42,6 +42,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local Event = commonlib.gettable("System.Core.Event");
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 
@@ -962,7 +963,7 @@ function Entity:OnHover(hoverEntity)
 	if(hoverEntity) then
 		local x, y, z = self:GetBlockPos();
 		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, hoverEntityName=%q}", onhoverEvent, x, y, z, self.name, hoverEntity.name or ""))
-		return true;
+		return true; 
 	end
 end
 
@@ -988,8 +989,13 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			local onclickEvent = self.onclickEvent or "__entity_onclick"
 			if(onclickEvent) then
 				local x, y, z = self:GetBlockPos();
-				GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q}", onclickEvent, x, y, z, self.name))
-				return true;
+				local event = Event:new():init(onclickEvent);	
+				local facing = Direction.directionTo3DFacing[side or 0]
+				event.cmd_text = string.format("{x=%d, y=%d, z=%d, name=%q, facing=%f}", x, y, z, self.name, facing or 0);
+				local result = GameLogic:event(event, true);
+				if(result) then
+					return true;
+				end
 			end
 		else
 			if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
@@ -1000,23 +1006,6 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			end
 		end
 	end
-
-	-- let us handle mount point interactions here. 
-	--[[
-	if(self:GetMountPoints()) then
-		local mp = self:GetMountPoints():GetMountPointByXY();
-		if(mp) then
-			local entityPlayer = entity;
-			if(entityPlayer) then
-				local x, y, z = self:GetMountPoints():GetMountPositionInWorldSpace(mp:GetIndex())
-				local facing = self:GetMountPoints():GetMountFacingInWorldSpace(mp:GetIndex())
-				entityPlayer:SetPosition(x,y,z);
-				entityPlayer:SetFacing(facing)
-			end
-		end
-		return true
-	end
-	]]
 
 	if(self:HasRealPhysics() or self:HasAnyRule()) then
 		return true;

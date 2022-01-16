@@ -44,7 +44,7 @@ Entity:Property({"isStackable", nil, "IsStackable", "SetIsStackable", auto=true}
 Entity:Property({"stackHeight", 0.2, "GetStackHeight", "SetStackHeight", auto=true});
 Entity:Property({"canDrag", nil, "GetCanDrag", "SetCanDrag", auto=true});
 Entity:Property({"idleAnim", 0, "GetIdleAnim", "SetIdleAnim", auto=true});
-
+Entity:Property({"isDisplayModel", true, "IsDisplayModel", "SetDisplayModel", auto=true});
 Entity:Property({"onclickEvent", nil, "GetOnClickEvent", "SetOnClickEvent", auto=true});
 Entity:Property({"onhoverEvent", nil, "GetOnHoverEvent", "SetOnHoverEvent", auto=true});
 Entity:Property({"onmountEvent", nil, "GetOnMountEvent", "SetOnMountEvent", auto=true});
@@ -502,8 +502,13 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	else
 		if(mouse_button == "left" and self.onclickEvent) then
 			local x, y, z = self:GetBlockPos();
-			GameLogic.RunCommand(format("/sendevent %s {x=%d, y=%d, z=%d}", self.onclickEvent, x, y, z))
-			return true;
+			local event = Event:new():init(onclickEvent);	
+			local facing = Direction.directionTo3DFacing[side or 0]
+			event.cmd_text = string.format("{x=%d, y=%d, z=%d, name=%q, facing=%f}", x, y, z, self.name, facing or 0);
+			local result = GameLogic:event(event, true);
+			if(result) then
+				return true;
+			end
 		else
 			if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 				self:OpenEditor("entity", entity);

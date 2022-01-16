@@ -564,7 +564,8 @@ function CodeGlobals:UnregisterBlockClickEvent(callbackFunc)
 	self:UnregisterTextEvent("onBlockClicked", callbackFunc)
 end
 
-function CodeGlobals:HandleGameEvent(event)
+-- @param bIsImmediate: if true, the code block needs to immediately process it. 
+function CodeGlobals:HandleGameEvent(event, bIsImmediate)
 	local textEvent = self:GetTextEvent(event:GetType());
 	if(textEvent) then
 		local msg = event.msg;
@@ -581,7 +582,7 @@ function CodeGlobals:HandleGameEvent(event)
 			msg = event.cmd_text;
 		end
 
-		textEvent:DispatchEvent({type="msg", msg = msg, dest = event.dest});
+		return textEvent:DispatchEvent({type="msg", msg = msg, dest = event.dest, bIsImmediate = bIsImmediate}, nil, bIsImmediate);
 	end
 end
 

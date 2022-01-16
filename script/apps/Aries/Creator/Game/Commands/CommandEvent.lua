@@ -34,13 +34,13 @@ Examples:
 			local event = Event:new():init(eventname);	
 			event.cmd_text = cmd_text;
 			if(targetEntity) then
-				targetEntity:event(event);
+				return targetEntity:event(event);
 			else
 				if(playerName and playerName ~= "") then
 					-- try sending to code block actor with the exact name
 					event.dest = playerName
 				end
-				GameLogic:event(event);
+				return GameLogic:event(event);
 			end
 		end
 	end,
