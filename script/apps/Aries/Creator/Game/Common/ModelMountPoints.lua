@@ -34,6 +34,7 @@ function ModelMountPoints:ctor()
 	self.points = commonlib.Array:new();
 	self.localTransform = Matrix4:new():identity();
 	self.isTransformDirty = true
+	self.worldSpaceAABBs = {}
 end
 
 function ModelMountPoints:Init(parentEntity)
@@ -296,6 +297,34 @@ function ModelMountPoints:IsPointInMountPointAABB(x, y, z, maxDiffX, maxDiffY, m
 		end
 	end
 end
+
+-- @param bUpdate: true to update
+-- @return a array of aabb in world space. please note aabb.facing contains the world space facing 
+function ModelMountPoints:GetWorldSpaceAABBs(bUpdate)
+	if(bUpdate) then
+		-- transform in local model space to camera space. 
+		local worldMat = self:CalculateWorldMatrix(nil, true);
+		local facing = self:GetEntity():GetFacing()
+		local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+		
+		for i= 1, self:GetCount() do
+			local mountpoint = self:GetMountPoint(i);
+			local cx, cy, cz = mountpoint:GetBottomCenter();
+			local dx, dy, dz = mountpoint:GetAABBSize()
+			local aabb = self.worldSpaceAABBs[i]
+			if(not aabb) then
+				aabb = mathlib.ShapeAABB:new();
+				self.worldSpaceAABBs[i] = aabb 
+			end
+			aabb:SetCenterExtentValues(cx, cy+dy/2, cz, dx/2, dy/2, dz/2, true)
+			aabb:Rotate(worldMat);
+			aabb:Offset(origin[1], origin[2], origin[3]);
+			aabb.facing = mountpoint:GetFacing() + facing;
+		end
+	end
+	return self.worldSpaceAABBs
+end
+
 
 -- get mount point by screen position
 -- @param x, y: current mouse position in screen coordinate, if nil we will use the current mouse position. 

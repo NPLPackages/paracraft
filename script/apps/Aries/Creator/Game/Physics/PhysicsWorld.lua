@@ -23,6 +23,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
 
 local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
 

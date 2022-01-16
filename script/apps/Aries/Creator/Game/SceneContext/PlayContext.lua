@@ -193,7 +193,10 @@ function PlayContext:mouseReleaseEvent(event)
 			self:handleRightClickScene(event, result);
 		end
 
-		if(not event:isAccepted() and self:IsClickToMoveEnabled() and result.blockZ and result.side) then
+		if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then
+			-- check for click sensors
+			event:accept();
+		elseif(not event:isAccepted() and self:IsClickToMoveEnabled() and result.blockZ and result.side) then
 			self:MovePlayerToBlock(result.blockX, result.blockY, result.blockZ, result.block_id, result.side)
 			event:accept();
 		end

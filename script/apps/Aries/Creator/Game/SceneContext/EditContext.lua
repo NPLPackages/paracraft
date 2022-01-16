@@ -293,18 +293,25 @@ function EditContext:mouseReleaseEvent(event)
 				end
 			end
 
-			if setting == "DeleteBlock" then
-				event.mouse_button = "left"
-				self:handleLeftClickScene(event, result);
+			if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then
+				-- check for click sensors
 				event:accept();
-			elseif setting == "CreateBlock" then
-				event.mouse_button = "right"
-				self:handleRightClickScene(event, result);
-				event:accept();
-			elseif setting == "ChooseBlock" then
-				event.mouse_button = "middle"
-				self:handleMiddleClickScene(event, result);
-				event:accept();
+			end
+			
+			if(not event:isAccepted()) then
+				if setting == "DeleteBlock" then
+					event.mouse_button = "left"
+					self:handleLeftClickScene(event, result);
+					event:accept();
+				elseif setting == "CreateBlock" then
+					event.mouse_button = "right"
+					self:handleRightClickScene(event, result);
+					event:accept();
+				elseif setting == "ChooseBlock" then
+					event.mouse_button = "middle"
+					self:handleMiddleClickScene(event, result);
+					event:accept();
+				end
 			end
 		end
 	end

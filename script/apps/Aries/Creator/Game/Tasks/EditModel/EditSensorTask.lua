@@ -380,3 +380,13 @@ function EditSensorTask.OnClickDeleteModel()
 		end
 	end
 end
+
+function EditSensorTask.OnClickProperty()
+	local self = EditSensorTask.GetInstance();
+	if(self) then
+		local modelEntity = self:GetSelectedModel()
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelProperty.lua");
+		local EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
+		EditModelProperty.ShowForEntity(modelEntity)
+	end
+end

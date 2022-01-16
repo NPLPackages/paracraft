@@ -15,9 +15,8 @@ task = EditSensorTask.GetInstance();
             <div>
                 <span style="margin-left:5px;" tooltip="/sendevent XXX {x,y,z,name}"><%=L"点击事件"%></span><input name="onclickEvent" uiname="EditSensorTask.onclickEvent" type="text" style="margin-left:2px;width:100px;height:18px;color:#000000" value='<%=task:GetSelectedModel():GetOnClickEvent()%>' onchange="EditSensorTask.OnChangeOnClickEvent"/>
                 <span style="margin-left:5px;"><%=L"感知点"%></span><input uiname="EditSensorTask.mountpointCount" name="mountpointCount" type="text" style="margin-left:2px;width:20px;height:18px;color:#000000" value='<%=string.format("%d", task:GetMountPointCount())%>' onchange="EditSensorTask.OnMountPointCountChanged"/>
-                <div style="float:left;margin-left:3px">
-                    <input uiname="EditSensorTask.deleteBtn" name="deleteBtn" value='<%=L"删除"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditSensorTask.OnClickDeleteModel" />
-                </div>
+                <input uiname="EditSensorTask.propertyBtn" name="propertyBtn" value='<%=L"属性..."%>' type="button" style="margin-left:5px;margin-top:0px;height:20px;padding-top:3px" onclick="EditSensorTask.OnClickProperty" />
+                <input uiname="EditSensorTask.deleteBtn" name="deleteBtn" value='<%=L"删除"%>' type="button" style="margin-left:5px;margin-top:0px;height:20px;padding-top:3px;" onclick="EditSensorTask.OnClickDeleteModel" />
             </div>
         </pe:if>
         <pe:if condition='<%=not task:GetSelectedModel()%>'>

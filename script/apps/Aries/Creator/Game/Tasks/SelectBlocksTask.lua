@@ -29,6 +29,7 @@ local vector3d = commonlib.gettable("mathlib.vector3d");
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -1218,6 +1219,7 @@ function SelectBlocks.PasteFromClipboard()
 					local task = BlockTemplate:new({blockX = bx,blockY = by, blockZ = bz, 
 						UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false})
 					if(task:LoadTemplateFromXmlNode(xmlRoot)) then
+						
 					end
 				end
 			end
@@ -1227,7 +1229,12 @@ function SelectBlocks.PasteFromClipboard()
 				local attr = xmlNode.attr;
 				attr.x, attr.y, attr.z = nil, nil, nil;
 				attr.name = nil;
-				local entity = EntityManager.EntityLiveModel:Create({bx=bx,by=by,bz=bz}, xmlNode);
+				local entityClass;
+				if(attr.class) then
+					entityClass = EntityManager.GetEntityClass(attr.class)
+				end
+				entityClass = entityClass or EntityManager.EntityLiveModel
+				local entity = entityClass:Create({bx=bx,by=by,bz=bz}, xmlNode);
 				entity:Attach();
 
 				if(GameLogic.GameMode:IsEditor()) then

@@ -29,6 +29,8 @@ local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockInEntityHand");
+local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
+
 local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
 
 -- create class
@@ -515,8 +517,33 @@ function PlayerController:OnClickBlock(block_id, bx, by, bz, mouse_button, entit
 	if(block_id) then
 		local block = block_types.get(block_id);
 		if(block) then
-			return block:OnClick(bx, by, bz, mouse_button, entity, side);
+			local isProcessed = block:OnClick(bx, by, bz, mouse_button, entity, side);
+			return isProcessed;
 		end
+	end
+end
+
+
+-- send onclick event for click sensors in the scene. 
+-- @param x, y, z: in real world coordinate
+-- @return nil or number of sensors
+function PlayerController:OnClickSensorsByPoint(x, y, z, mouse_button)
+	local folder = FolderManager:GetFolder(EntityManager.EntityInvisibleClickSensor.defaultFolderName)
+	if(folder) then
+		local count;
+		local maxDiffSq = 64 ^ 2;
+		local pointRadius = 0.1;
+		for _, entity in ipairs(folder) do
+			local x1, y1, z1 = entity:GetPosition()
+			if(((x-x1)^2 + (y-y1)^2 + (z-z1)^2) < maxDiffSq) then
+				local inside, facing = entity:IsPointInClickableAABB(x, y, z, pointRadius);
+				if(inside) then
+					entity:OnClick(x, y, z, mouse_button)
+					count = (count or 0) + 1;
+				end
+			end 
+		end
+		return count
 	end
 end
 

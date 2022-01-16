@@ -252,6 +252,12 @@ function Entity:LoadFromDataWatcher()
 	end
 end
 
+function Entity:BeginModify()
+end
+
+function Entity:EndModify()
+end
+
 function Entity:SetAnimation(animId)
 	Entity._super.SetAnimation(self, animId);
 end
@@ -513,12 +519,6 @@ function Entity:ConvertLinkInfoToString(linkInfo)
 		end
 		return str;
 	end
-end
-
--- right click to show item
-function Entity:OnClick(x, y, z, mouse_button)
-	Entity._super.OnClick(self, x, y, z, mouse_button);
-	return true;
 end
 
 -- we will use C++ polygon-level physics engine for real physics. 
@@ -1031,6 +1031,9 @@ function Entity:OpenEditor(editor_name, entity)
 	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
 		local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+		if(not EditModelTask.GetInstance()) then
+			GameLogic.GetPlayerController():PickItemByEntity(self);
+		end
 		if(EditModelTask.GetInstance()) then
 			EditModelTask.GetInstance():SetTransformMode(true)
 			EditModelTask.GetInstance():SelectModel(self);
@@ -1351,6 +1354,7 @@ function Entity:BeginDrag()
 	end
 	self:ForEachChildLinkEntity(Entity.BeginDrag)
 	self:OnBeginDrag()
+	self:BeginModify()
 end
 
 -- when dragging ends, we will restore picking and physics. 
@@ -1362,6 +1366,7 @@ function Entity:EndDrag()
 	end
 	self:ForEachChildLinkEntity(Entity.EndDrag)
 	self:OnEndDrag()
+	self:EndModify()
 end
 
 function Entity:OnBeginDrag()
