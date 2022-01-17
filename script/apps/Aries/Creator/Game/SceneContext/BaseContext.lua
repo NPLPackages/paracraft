@@ -1297,10 +1297,13 @@ function BaseContext:SetTargetPosition(x, y, z)
 		-- only linear movement style. 
 		obj:SetField("MovementStyle", 3)
 		self:EnablePlayerTimer()
+		player:SetDummy(true)
+		
 	else
 		-- normal movement style
 		obj:SetField("MovementStyle", 0)
 		attr:SetField("EnableBlockCollision", true);
+		player:SetDummy(false)
 	end
 end
 
