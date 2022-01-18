@@ -353,7 +353,9 @@ end
 -- called whenever this item is clicked on the user interface when it is holding in hand of a given player (current player). 
 function ItemColorBlock:OnClickInHand(itemStack, entityPlayer)
 	-- if there is selected blocks, we will replace selection with current block in hand. 
-	if(self:HasColorData() and GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
+	if(not self:HasColorData()) then
+		return ItemColorBlock._super.OnClickInHand(self, itemStack, entityPlayer)
+	elseif(GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
 		local selected_blocks = Game.SelectionManager:GetSelectedBlocks();
 		if(selected_blocks) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");

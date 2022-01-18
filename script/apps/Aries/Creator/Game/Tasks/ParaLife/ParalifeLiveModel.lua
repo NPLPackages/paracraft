@@ -192,64 +192,63 @@ local default_role_data = {
 	},
 }
 
---[[
-"81002;88002",
-"81003;88003",
-"81005;88004",
-"81006;88015",
-"81007;88016",
-"81008;88013",
-"81014;88019",
-"81017;88019",
-]]
 local face_path = "Texture/Aries/Creator/keepwork/Paralife/expression/"
 local default_face_data = {
 	{
-		icon = face_path.."tou1_64x61_32bits.png",
-		skin = "81007;88002;83185",
+		icon = face_path.."tou1_64x53_32bits.png",
+		skin = "81007;88002",
 	},
 	{
-		icon = face_path.."tou2_64x64_32bits.png",
-		skin = "81012;88013;83180",
+		icon = face_path.."tou2_64x53_32bits.png",
+		skin = "81012;88013",
 	},
 	{
-		icon = face_path.."tou3_57x64_32bits.png",
-		skin = "81010;88015;83189",
+		icon = face_path.."tou3_64x53_32bits.png",
+		skin = "81010;88015",
 	},
 	{
-		icon = face_path.."tou5_46x64_32bits.png",
-		skin = "81017;88016;83183",
-	},{
-		icon = face_path.."tou6_62x64_32bits.png",
-		skin = "81009;88004;83188",
+		icon = face_path.."tou5_64x53_32bits.png",
+		skin = "81017;88016",
 	},
 	{
-		icon = face_path.."tou7_53x64_32bits.png",
-		skin = "81007;88004;83186",
+		icon = face_path.."tou6_64x53_32bits.png",
+		skin = "81009;88004",
+	},
+	-- {
+	-- 	icon = face_path.."tou7_64x53_32bits.png", --蓝色口罩是跟随头部挂件的
+	-- 	skin = "81007;88004",
+	-- },
+	{
+		icon = face_path.."tou8_64x53_32bits.png",
+		skin = "81008;88020",
 	},
 	{
-		icon = face_path.."tou8_62x64_32bits.png",
-		skin = "81008;88020;83182",
+		icon = face_path.."tou9_64x53_32bits.png",
+		skin = "81009;88018",
 	},
 	{
-		icon = face_path.."tou9_64x58_32bits.png",
-		skin = "81009;88018;83184",
+		icon = face_path.."tou4_64x53_32bits.png",
+		skin = "81004;88013",
+	},
+	-- {
+	-- 	icon = face_path.."tou10_64x53_32bits.png", --兔子头数据有问题，去掉
+	-- 	skin = "81004;88005",
+	-- },
+	{
+		icon = face_path.."lian1_64x53_32bits.png",
+		skin = "81017;88019",
 	},
 	{
-		icon = face_path.."tou4_64x60_32bits.png",
-		skin = "81004;88005;83187",
+		icon = face_path.."lian2_64x53_32bits.png",
+		skin = "81014;88019",
 	},
 	{
-		icon = face_path.."tou10_64x63_32bits.png",
-		skin = "81004;88005;83051",
-	},
-	{
-		icon = face_path.."lian1_64x57_32bits.png",
-		skin = "81004;88006;82001",
+		icon = face_path.."lian5_64x53_32bits.png",
+		skin = "81006;88015",
 	},
 	{
 		icon = "Texture/Aries/Creator/keepwork/Paralife/main/img_default_expression_32bits.png",
-		skin = "81001;88001;82001",
+		skin = "81001;88001",
 	},
 	-- {
 	-- 	icon = face_path.."face13_32bits.png",
@@ -266,10 +265,9 @@ local default_face_data = {
 
 }
 
-ParalifeLiveModel.main_ui_mode = "switchmain" --decorate
+ParalifeLiveModel.main_ui_mode = "switchmain"
 ParalifeLiveModel.role_data = {}
 ParalifeLiveModel.face_data = {}
-ParalifeLiveModel.cur_btn_anis = {}
 ParalifeLiveModel.movie_entity = nil
 function ParalifeLiveModel.OnInit()
     page = document:GetPageCtrl();
@@ -278,7 +276,6 @@ end
 
 function ParalifeLiveModel.ShowView(entity)
 	ParalifeLiveModel.InitRoleDataWithEntity(entity)
-	-- ParalifeLiveModel.role_data = default_role_data
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.html",
         name = "ParalifeLiveModel.ShowView", 
@@ -457,7 +454,7 @@ function ParalifeLiveModel.CreateFaceView()
 	local paralife_express = ParaUI.GetUIObject("paralife_express")
 	local screen_width,screen_height = Screen:GetWidth(),Screen:GetHeight()
 	local startx = screen_width/2 - 640
-	local starty = screen_height - ParalifeLiveModel.GetViewMargin() + 10
+	local starty = screen_height - ParalifeLiveModel.GetViewMargin() + 20
 	local mouse_x, mouse_y = ParaUI.GetMousePosition();
 	local startmousex,startmousey
 	local disx,disy = 0,0
@@ -465,57 +462,34 @@ function ParalifeLiveModel.CreateFaceView()
 	local showNum = data_num
 	local default_data_num = #ParalifeLiveModel.face_data
 	local touchNode = nil
+	local start_face_pos_x = screen_width/2 - (showNum *100)/2 -30
 	if paralife_express and paralife_express:IsValid() then
 		for i=1,showNum do
 			local face_data = ParalifeLiveModel.face_data[i]
-			local parentUser = ParaUI.CreateUIObject("container", "main_face_parent"..i, "_lt", (i-1) * 100, starty, 64, 64);
+			local parentUser = ParaUI.CreateUIObject("container", "main_face_parent"..i, "_lt", start_face_pos_x + (i-1) * 100, starty, 64, 64);
 			local icon = face_data.icon 
 			parentUser.background = icon..";0 0 64 64"
 			paralife_express:AddChild(parentUser)
-
-			local startParaX,startParaY
+			parentUser:SetScript("onmousedown",function()
+				isTouchPlayer = true
+				touchIndex = i
+				startmousex,startmousey = ParaUI.GetMousePosition();
+				touchNode = parentUser
+				paralife_express:GetAttributeObject():SetField("ClickThrough", false)
+			end)
 			parentUser:SetScript("onmouseup",function()
 				isTouchPlayer = false
 				touchIndex = -1
 				paralife_express:GetAttributeObject():SetField("ClickThrough", true)
 				ParalifeLiveModel.UpdateRoleFace(face_data)
-				parentUser.y = startParaY 
-				parentUser.x = startParaX
+				parentUser.y = starty
+				parentUser.x = (i-1) * 100 
 				touchNode = nil
 			end)
-			parentUser:SetScript("onmousedown",function()
-				isTouchPlayer = true
-				touchIndex = i
-				startmousex,startmousey = ParaUI.GetMousePosition();
-				startParaX = parentUser.x
-				startParaY = parentUser.y
-				touchNode = parentUser
-				paralife_express:GetAttributeObject():SetField("ClickThrough", false)
-			end)
-			-- parentUser:SetScript("onmousemove",function()
-			-- 	if isTouchPlayer and touchIndex == i then
-			-- 		mouse_x, mouse_y = ParaUI.GetMousePosition();
-			-- 		disx,disy = mouse_x - startmousex ,mouse_y - startmousey
-			-- 		paralife_express:GetAttributeObject():SetField("ClickThrough", false)
-			-- 		-- parentUser.y = startParaY + disy
-			-- 		-- parentUser.x = startParaX + disx
-					
-			-- 	end
-			-- end)
 		end
 
-
-		--下面的代码用来优化移动的
-		-- paralife_express:SetScript("onmouseup",function()
-		-- 	isTouchPlayer = false
-		-- 	touchIndex = -1
-		-- 	paralife_express:GetAttributeObject():SetField("ClickThrough", true)
-
-		-- end)
+		--下面的代码用来优化移动的，放置单独按钮移动过快会检测不到
 		paralife_express:SetScript("onmousemove",function()
-			-- isTouchPlayer = false
-			-- touchIndex = -1
-			-- paralife_express:GetAttributeObject():SetField("ClickThrough", true)
 			if touchNode and touchNode:IsValid() then
 				mouse_x, mouse_y = ParaUI.GetMousePosition();
 				touchNode.x = mouse_x - 32
@@ -523,6 +497,17 @@ function ParalifeLiveModel.CreateFaceView()
 			end
 			
 		end)
+	end
+end
+
+function ParalifeLiveModel.PlayRoleMoveAction(disx)
+	local data_num = #ParalifeLiveModel.face_data
+	local showNum = data_num
+	for i=1,showNum do
+		local parentUser = ParaUI.GetUIObject("main_face_parent"..i)
+		if parentUser and parentUser:IsValid() then
+			parentUser.x = parentUser.x - disx
+		end
 	end
 end
 
@@ -538,7 +523,6 @@ function ParalifeLiveModel.UpdateRoleFace(data)
 		local entity = result.entity or targetEntity
 		if entity.item_id and entity.item_id == 10074 and entity:HasCustomGeosets()  then --只能拖入可换装任务模型
 			for skin in string.gmatch(data.skin,"([^;]+)") do
-				print("skin=========",skin)
 				entity:PutOnCustomCharItem(skin)
 			end
 		end

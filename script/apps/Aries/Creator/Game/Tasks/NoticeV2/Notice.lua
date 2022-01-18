@@ -86,7 +86,8 @@ function Notice.GetPageData(data)
     -- commonlib.echo(data,true)
 end
 
-function Notice.Show(nType)
+function Notice.Show(nType,zorder)
+    Notice.LoadLocalData()
     keepwork.notic.announcements({
     },function(info_err, info_msg, info_data)
         if info_err == 200 then
@@ -103,8 +104,8 @@ function Notice.Show(nType)
                     style = CommonCtrl.WindowFrame.ContainerStyle,
                     allowDrag = true,
                     enable_esc_key = true,
-                    zorder = -1,
-                    app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+                    zorder = zorder or -1,
+                    -- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
                     directPosition = true,                
                     align = "_ct",
                     x = -viewwidth/2,
@@ -323,32 +324,41 @@ end
 --保存数据
 function Notice.SaveLocalData()
     local key = "Paracraft_Notice_Show";
-    local value = "" ;
-    local nowtime = os.time();
-    if Notice.isSelectShowToday then
-        value = string.format("1#%d",nowtime);
-    else
-        value = string.format("0#%d",nowtime) ;       
-    end
+    local nowtime = os.time()
+    local data = {}
+    data.IsAutoOpen = not Notice.isSelectShowToday
+    data.CurSetTime = nowtime
     --保存数据的方式
-    GameLogic.GetPlayerController():SaveRemoteData(key,value,true);
+    GameLogic.GetPlayerController():SaveRemoteData(key,data,true);
 end
 
 function Notice.CheckCanShow()
     local key = "Paracraft_Notice_Show"
-    local value = GameLogic.GetPlayerController():LoadRemoteData(key,"true");
-    if value == true or value =="true" then
-        Notice.isSelectShowToday = false
+    local data = GameLogic.GetPlayerController():LoadRemoteData(key,nil);
+    if not data then
         return true
     else
-        local isSelect = tonumber(string.sub(value,1,1));
-        local saveTime = os.date("%Y-%m-%d",tonumber(string.sub(value,3,-1)));
-        local nowTime = os.date("%Y-%m-%d",tonumber(os.date()));
+        local saveTime = os.date("%Y-%m-%d",data.CurSetTime or os.time())
+        local nowTime = os.date("%Y-%m-%d",tonumber(os.time()))
         if tostring(saveTime) ~= tostring(nowTime) then
-            Notice.isSelectShowToday = false ;        
-        else
-            Notice.isSelectShowToday = (isSelect == 1 and true or false);
+            return true
         end
-        return not Notice.isSelectShowToday;
+        return data.IsAutoOpen
+    end   
+end
+
+function Notice.LoadLocalData()
+    local key = "Paracraft_Notice_Show"
+    local data = GameLogic.GetPlayerController():LoadRemoteData(key,nil);
+    if not data then
+        Notice.isSelectShowToday = false
+    else
+        local saveTime = os.date("%Y-%m-%d",data.CurSetTime or os.time())
+        local nowTime = os.date("%Y-%m-%d",tonumber(os.time()))
+        if tostring(saveTime) ~= tostring(nowTime) then
+            Notice.isSelectShowToday = false        
+        else
+            Notice.isSelectShowToday = not data.IsAutoOpen 
+        end
     end   
 end

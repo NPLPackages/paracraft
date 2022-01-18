@@ -73,7 +73,7 @@ function ObjectSelectPage.ShowPage()
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = true,
 			DestroyOnClose = true,
-			text = "物体编辑器",
+			text = L"物体编辑器",
 			enable_esc_key = true,
 			bShow = true,
 			click_through = false, 
@@ -180,12 +180,21 @@ function ObjectSelectPage.SelectedObject(id)
 			local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
 			local task = MyCompany.Aries.Game.Tasks.SelectBlocks:new({blockX = x,blockY = y, blockZ = z, blocks=nil})
 			task:Run();
-		elseif(EntityManager.GetEntityByObjectID(id)) then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
-			local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=obj})
-			task:Run();
 		else
-			ParaSelection.AddObject(obj,1);
+			local entity = EntityManager.GetEntityByObjectID(id)
+			if(entity) then
+				if(entity:isa(EntityManager.EntityLiveModel)) then
+					entity:OpenEditor("entity");
+				elseif(entity:isa(EntityManager.EntityNPC)) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
+					local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=obj})
+					task:Run();
+				elseif(entity.OpenEditor) then
+					entity:OpenEditor("entity");
+				end
+			else
+				ParaSelection.AddObject(obj,1);
+			end
 		end
 	end
 end

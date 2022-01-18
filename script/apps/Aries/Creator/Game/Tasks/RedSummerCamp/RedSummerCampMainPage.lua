@@ -19,6 +19,7 @@ local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/
 local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua");
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
+local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua");
 local page
 local notice_time = 3000
 RedSummerCampMainPage.UserData = {}
@@ -140,6 +141,9 @@ function RedSummerCampMainPage.Show()
 
 	RedSummerCampMainPage.HasClickFriend = false
 	RedSummerCampMainPage.HasClickQuest = false
+	if Notice.CheckCanShow() then
+        Notice.Show(0 ,100)
+    end  
 end
 
 function RedSummerCampMainPage.OnClose()

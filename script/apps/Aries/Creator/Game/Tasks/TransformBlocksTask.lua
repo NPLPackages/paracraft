@@ -9,7 +9,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformBlocksTask.lua");
 
 -- translation
 local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({dx = 1, dy=0, dz=0, blocks={},})
-local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({x = 20000, y=0, z=20000, blocks={},operation="add"}) -- absolute position. 
+local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({x = 20000, y=0, z=20000, blocks={},operation="add", liveEntities={}}) -- absolute position. 
 
 -- rotation
 local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({rot_y = 1, aabb=aabb, blocks={},})
@@ -27,6 +27,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 
 local math_floor = math.floor;
 local math_abs = math.abs;
@@ -38,6 +39,7 @@ TransformBlocks.operation = "move";
 
 function TransformBlocks:ctor()
 	self.history = {};
+	self.history_entity = {};
 end
 
 function TransformBlocks:Run()
@@ -79,6 +81,17 @@ function TransformBlocks:Run()
 
 		self.final_blocks = final_blocks;
 	end
+	if(self.liveEntities and #(self.liveEntities) > 0 ) then
+		self.finished = true;
+		local dx, dy, dz = self:GetDeltaPosition(self.x, self.y, self.z, self.aabb)
+		local final_entities = {};
+
+		-- for translation
+		self:DoEntityTranslation(dx,dy,dz, self.liveEntities, final_entities);
+		
+		local bRemoveSourceEntities = (self.operation == "move" or self.operation == "no_clone");
+		self:DoEntityTransform(self.liveEntities, final_entities, bRemoveSourceEntities)
+	end
 	if(GameLogic.GameMode:CanAddToHistory()) then
 		if(#(self.history) > 0) then
 			UndoManager.PushCommand(self);
@@ -88,6 +101,31 @@ end
 
 function TransformBlocks:FrameMove()
 	self.finished = true;
+end
+
+function TransformBlocks:DoEntityTransform(entities, final_entities, bRemoveSourceEntities)
+	if (#final_entities > 0) then
+		for i, xmlNode in ipairs(final_entities) do
+			local attr = xmlNode.attr;
+			if(not bRemoveSourceEntities) then
+				attr.name = nil;
+				local entityClass;
+				if(attr.class) then
+					entityClass = EntityManager.GetEntityClass(attr.class)
+				end
+				entityClass = entityClass or EntityManager.EntityLiveModel
+				local entity = entityClass:Create({x=attr.x,y=attr.y,z=attr.z}, xmlNode);
+				entity:Attach();
+				attr.name = entity.name
+			else
+				local fromEntity = EntityManager.GetEntity(attr.name)
+				if(fromEntity) then
+					fromEntity:SetPosition(xmlNode.attr.x, xmlNode.attr.y, xmlNode.attr.z);
+				end
+			end
+			self.history_entity[#(self.history_entity)+1] = {from=entities[i], to=xmlNode}
+		end
+	end
 end
 
 -- perform translation to final_blocks, by first removing all old blocks and then creating the new ones. 
@@ -202,6 +240,22 @@ function TransformBlocks:DoTranslation(dx,dy,dz, blocks, final_blocks)
 		for i = 1, #(blocks) do
 			local b = blocks[i];
 			final_blocks[i] = {b[1]+dx, b[2]+dy, b[3]+dz, b[4], b[5], b[6]};
+		end
+	end
+end
+
+function TransformBlocks:DoEntityTranslation(dx,dy,dz, entities, final_entities)
+	if(dx~=0 or dy~=0 or dz~=0) then
+		dx = (dx or 0) * BlockEngine.blocksize;
+		dy = (dy or 0) * BlockEngine.blocksize;
+		dz = (dz or 0) * BlockEngine.blocksize;
+		
+		for i = 1, #(entities) do
+			local entity = commonlib.copy(entities[i]);
+			entity.attr.x = entity.attr.x + dx;
+			entity.attr.y = entity.attr.y + dy;
+			entity.attr.z = entity.attr.z + dz;
+			final_entities[i] = entity;
 		end
 	end
 end
@@ -425,6 +479,46 @@ function TransformBlocks:Redo()
 		end
 		BlockEngine:EndUpdate()
 	end
+	if((#self.history_entity) > 0) then
+		for _, item in ipairs(self.history_entity) do
+			if(item.from.attr.name == item.to.attr.name) then
+				local xmlNode = item.to;
+				local entity = EntityManager.GetEntity(xmlNode.attr.name);
+				if(entity) then
+					entity:SetPosition(xmlNode.attr.x, xmlNode.attr.y, xmlNode.attr.z)
+				end
+			elseif(item.from.attr.name and item.to.attr.name) then
+				local entity = EntityManager.GetEntity(item.from.attr.name);
+				if(entity) then
+					entity:SetPosition(item.from.attr.x, item.from.attr.y, item.from.attr.z)
+				else
+					xmlNode = item.from;
+					local attr = xmlNode.attr;
+					local entityClass;
+					if(attr.class) then
+						entityClass = EntityManager.GetEntityClass(attr.class)
+					end
+					entityClass = entityClass or EntityManager.EntityLiveModel
+					local entity = entityClass:Create({x=attr.x,y=attr.y,z=attr.z}, xmlNode);
+					entity:Attach();
+				end
+				local entity = EntityManager.GetEntity(item.to.attr.name);
+				if(entity) then
+					entity:SetPosition(item.to.attr.x, item.to.attr.y, item.to.attr.z)
+				else
+					xmlNode = item.to;
+					local attr = xmlNode.attr;
+					local entityClass;
+					if(attr.class) then
+						entityClass = EntityManager.GetEntityClass(attr.class)
+					end
+					entityClass = entityClass or EntityManager.EntityLiveModel
+					local entity = entityClass:Create({x=attr.x,y=attr.y,z=attr.z}, xmlNode);
+					entity:Attach();
+				end
+			end
+		end
+	end
 end
 
 function TransformBlocks:Undo()
@@ -435,5 +529,35 @@ function TransformBlocks:Undo()
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[5] or 0, b[6], nil, b[9]);
 		end
 		BlockEngine:EndUpdate()
+	end
+	if((#self.history_entity) > 0) then
+		for _, item in ipairs(self.history_entity) do
+			if(item.from.attr.name == item.to.attr.name) then
+				local xmlNode = item.from;
+				local entity = EntityManager.GetEntity(xmlNode.attr.name);
+				if(entity) then
+					entity:SetPosition(xmlNode.attr.x, xmlNode.attr.y, xmlNode.attr.z)
+				end
+			elseif(item.from.attr.name and item.to.attr.name) then
+				local entity = EntityManager.GetEntity(item.to.attr.name);
+				if(entity) then
+					entity:Destroy()
+				end
+				local entity = EntityManager.GetEntity(item.from.attr.name);
+				if(entity) then
+					entity:SetPosition(item.from.attr.x, item.from.attr.y, item.from.attr.z)
+				else
+					xmlNode = item.from;
+					local attr = xmlNode.attr;
+					local entityClass;
+					if(attr.class) then
+						entityClass = EntityManager.GetEntityClass(attr.class)
+					end
+					entityClass = entityClass or EntityManager.EntityLiveModel
+					local entity = entityClass:Create({x=attr.x,y=attr.y,z=attr.z}, xmlNode);
+					entity:Attach();
+				end
+			end
+		end
 	end
 end

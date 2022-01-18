@@ -12,14 +12,22 @@ local ParalifeContext = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.
 NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/BaseContext.lua");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local ParalifeContext = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.SceneContext.BaseContext"), commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParalifeContext"));
 
 ParalifeContext:Property("Name", "ParalifeContext");
 ParalifeContext:Property({"clickToMove", true, "IsClickToMoveEnabled", "EnableClickToMove", auto = true});
+ParalifeContext:Property({"isHighLightEntity", false});
+ParalifeContext:Property({"fingerRadius", 16});
+-- if entity's radius is bigger than 0.3, we will not use finger picking
+ParalifeContext:Property({"maxFingerPickingRadius", 0.3});
+
+
 
 function ParalifeContext:ctor()
 	self:EnableAutoCamera(true);
@@ -162,7 +170,7 @@ function ParalifeContext:mouseReleaseEvent(event)
 		
 		-- escape alt key for entity event, since alt key is for picking entity. 
 		if( not event.alt_pressed and result and result.obj and result.entity and (not result.block_id or result.block_id == 0)) then
-			-- for entities. 
+			-- since we already processed live model
 			isClickProcessed = GameLogic.GetPlayerController():OnClickEntity(result.entity, result.blockX, result.blockY, result.blockZ, event.mouse_button);
 		end
 
@@ -180,11 +188,40 @@ function ParalifeContext:mouseReleaseEvent(event)
 		if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then
 			-- check for click sensors
 			event:accept();
-		elseif(not event:isAccepted() and self:IsClickToMoveEnabled() and result and result.blockZ and result.side) then
-			local block = BlockEngine:GetBlock(result.blockX, result.blockY, result.blockZ)
-			if(block) then
-				self:MovePlayerToBlock(result.blockX, result.blockY, result.blockZ, result.block_id, result.side)
-				event:accept();
+		elseif(not event:isAccepted() and self:IsClickToMoveEnabled() and result and result.blockZ) then
+			if(result.physicalX) then
+				-- when clicking on physical mesh, we will only move if the point in close to horizontal plane. 
+				local x, y, z = result.physicalX, result.physicalY, result.physicalZ;
+				-- we also need to ensure that there is 4 meters free space above the click point. 
+				local entity, x1, y1, z1 = self:RayPickPhysicalLiveModel(x, y+4, z, 0, -1, 0, 10)
+				if(entity and y1 and math.abs(y-y1) < 0.1) then
+					self:SetTargetPosition(x, y, z)
+					event:accept();
+				end
+			elseif(result.side) then
+				local block = BlockEngine:GetBlock(result.blockX, result.blockY, result.blockZ)
+				if(block) then
+					self:MovePlayerToBlock(result.blockX, result.blockY, result.blockZ, result.block_id, result.side)
+					event:accept();
+				end
+			end
+		end
+	end
+end
+
+-- @param x,y,z: ray origin in world space
+-- @param dirX, dirY, dirZ: ray direction, default to 0, -1, 0
+-- @param maxDistance: default to 10
+-- @return entityLiveModel, hitX, hitY, hitZ: return entity live model that is hit by the ray. 
+function ParalifeContext:RayPickPhysicalLiveModel(x, y, z, dirX, dirY, dirZ, maxDistance)
+	local pt = ParaScene.Pick(x, y, z, dirX or 0, dirY or -1, dirZ or 0, maxDistance or 10, "point")
+	if(pt:IsValid())then
+		local entityName = pt:GetName();
+		if(entityName and entityName~="") then
+			local entity = EntityManager.GetEntity(entityName);
+			if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+				local x1, y1, z1 = pt:GetPosition();
+				return entity, x1, y1, z1;
 			end
 		end
 	end
@@ -414,4 +451,51 @@ function ParalifeContext:OnHandleEntityEndDrag(event)
 		if(entity and entity:isa(EntityManager.EntityLiveModel)) then
 		end
 	end
+end
+
+-- this function is called repeatedly if MousePickTimer is enabled. 
+-- it can also be called independently. 
+-- @param event: nil or a mouse event invoking this method. 
+-- @return the picking result table
+function ParalifeContext:CheckMousePick(event)
+	local result
+	if(event and event:GetType() == "mousePressEvent") then
+		-- we shall use finger picking for live entity smaller than 0.3
+		if(GameLogic.options:HasTouchDevice()) then
+			local results = SelectionManager:MousePickWithFingerSize(true, true, true, nil, self.fingerRadius)
+			local lastMinExtent = 9999999;
+			for _, r in ipairs(results) do
+				local entity = r.entity;
+				if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+					local aabb = entity:GetInnerObjectAABB()
+					local minExtent = aabb:GetMinExtent()
+					-- if entity's radius is bigger than 0.3, we will not use finger picking
+					if(minExtent < self.maxFingerPickingRadius and minExtent < lastMinExtent) then
+						lastMinExtent = minExtent;
+						result = r;
+					end
+				end
+			end
+			if(result) then
+				SelectionManager:GetPickingResult():CopyFrom(result);
+			end
+		end
+	end
+	result = result or SelectionManager:MousePickBlock();
+
+	CameraController.OnMousePick(result, SelectionManager:GetPickingDist());
+	
+	-- highlight the block or terrain that the mouse picked
+	if(result.length and result.length<SelectionManager:GetPickingDist() and GameLogic.GameMode:CanSelect()) then
+		if(self.isHighLightEntity) then
+			if (GameLogic.GameMode:IsEditor()) then
+				self:HighlightPickBlock(result);
+			end
+			self:HighlightPickEntity(result);
+		end
+		return result;
+	else
+		self:ClearPickDisplay();
+	end
+	return result;
 end

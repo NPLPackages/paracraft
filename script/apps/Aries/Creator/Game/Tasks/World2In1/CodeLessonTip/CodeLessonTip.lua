@@ -84,7 +84,7 @@ function CodeLessonTip.OnCreate()
 end
 
 function CodeLessonTip.OnClose()
-    CodeLessonTip.Report("program")
+    
     GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", CodeLessonTip.CodeWinChangeVisible, CodeLessonTip);
 end
 
@@ -356,7 +356,8 @@ function CodeLessonTip.ShowResultView(is_success)
         else
             content = string.format("你已完成了第%s课(%s)", commonlib.NumberToString(CodeLessonTip.lesson_index), CodeLessonTip.lesson_config.lesson_name)
         end
-        
+        -- 上报
+        CodeLessonTip.Report("program")
     end
 
     local left_bt_cb = function()
@@ -368,8 +369,8 @@ function CodeLessonTip.ShowResultView(is_success)
             if page then
                 page:CloseWindow();
             end
-
             GameLogic.GetCodeGlobal():BroadcastTextEvent("startCodeLesson",{lesson_index = CodeLessonTip.lesson_index + 1});
+
         else
             GameLogic.GetCodeGlobal():BroadcastTextEvent("restartCodelesson");
         end

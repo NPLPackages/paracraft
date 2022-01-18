@@ -106,6 +106,7 @@ end
 
 function LessonBoxTip.OnClose()
     MovieClipController.OnClose()
+    MovieClipController.SetCompareData()
     GameLogic.GetCodeGlobal():BroadcastTextEvent("stopAnimRepeatMovie");
 end
 
@@ -452,13 +453,13 @@ end
 
 
 function LessonBoxTip.StartLearn()
-    --print("StartLearn=================")
+    -- print("StartLearn=================")
     if LessonBoxCompare and lessonConfig then
         LessonBoxTip.CompareMovieResult = nil
         -- GameLogic.RunCommand(string.format("/loadtemplate 18873,12,19156 %s",lessonConfig.starttemplate))
         local regionsrc = lessonConfig.regionMy
         local regiondest = lessonConfig.regionOther
-        --print("StartLearn=================1")
+        -- print("StartLearn=================1")
         --echo({regionsrc,regiondest})
         local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
         if taskCnf and taskCnf.starttemplate == taskCnf.finishtemplate then
@@ -466,6 +467,7 @@ function LessonBoxTip.StartLearn()
             LessonBoxTip.SetRoleName()
             LessonBoxTip.SetLessonTitle()
         else
+            -- print("bbbbbbbbbbbbbbb", lessonConfig.lesson_type)
             if lessonConfig.lesson_type == "anim" and lessonConfig.course_index ~= 1 then
                 if not LessonBoxCompare.BindAnimLessonFilter then
                     LessonBoxCompare.BindAnimLessonFilter = true
@@ -493,19 +495,29 @@ function LessonBoxCompare.CompareAnimLesson(regiondest, regionsrc)
     local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
     local answer_movice_pos = regiondest.pos
     local entity_answer = EntityManager.GetBlockEntity(answer_movice_pos[1], answer_movice_pos[2], answer_movice_pos[3])
+    if not entity_answer then
+        return
+    end
     local movice_clip = entity_answer:GetMovieClip();
     -- 激活电影以对比
-    MovieManager:SetActiveMovieClip(movice_clip);
-    MovieClipController.OnClose()
+    if not MovieClipController.IsVisible() then
+        MovieManager:SetActiveMovieClip(movice_clip);
+        MovieClipController.OnClose()
+    end
+
 
     local my_movice_pos = regionsrc.pos
     local entity_my = EntityManager.GetBlockEntity(my_movice_pos[1], my_movice_pos[2], my_movice_pos[3])
     movice_clip = entity_my:GetMovieClip();
     -- 激活电影以对比
-    MovieManager:SetActiveMovieClip(movice_clip);
-    MovieClipController.OnClose()
+    if not MovieClipController.IsVisible() then
+        MovieManager:SetActiveMovieClip(movice_clip);
+        MovieClipController.OnClose()
+    end
 
     local result_list = LessonBoxCompare.CompareMovieAll(entity_my, entity_answer)
+    -- print("rrrrrrrrrrrrrrrrrrrrrrresult_list")
+    -- echo(result_list, true)
     LessonBoxTip.CompareMovieResult = result_list
     MovieClipController.SetCompareData(result_list)
     MovieClipController:OnMovieClipRemotelyUpdated()
@@ -1349,8 +1361,8 @@ end
 
 function LessonBoxTip.SetAnimErrorTip()
     local result_list = LessonBoxTip.CompareMovieResult
-    print("aaaaaaaaaass")
-    echo(result_list, true)
+    -- print("aaaaaaaaaass")
+    -- echo(result_list, true)
     if not result_list then
         return
     end
@@ -1391,6 +1403,8 @@ function LessonBoxTip.StartCheckAnim()
 
     if has_error then
         LessonBoxTip.m_nCorrectCount = LessonBoxTip.m_nCorrectCount - 1
+        MovieClipController.SetIsShowCompareError(true)
+        MovieClipController.SetCompareErrorBg()
     else
 
         -- 作对了进入下一节
@@ -1413,6 +1427,7 @@ function LessonBoxTip.StartCheckAnim()
         return
     end
     if LessonBoxTip.m_nCorrectCount <= -5 then
+        local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex] or {}
         if taskCnf.follow and taskCnf.follow[1] then
             _guihelper.MessageBox("开启教学模式，跟着帕帕卡卡拉拉一起手把手一步一步完成课程的学习吧！",function()
                 LessonBoxTip.OnStartMacroLearn()

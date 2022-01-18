@@ -957,6 +957,10 @@ function Entity:GetCommandList()
 	end
 end
 
+function Entity:CanSelectModel()
+	return false;
+end
+
 -- bool: whether has command panel
 function Entity:HasCommand()
 	return true;

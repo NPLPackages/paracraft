@@ -12,7 +12,7 @@ local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = result.blockX,
 task:Run();
 
 -- create several blocks
-local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, blocks = {{1,1,1,1}}})
+local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, blocks = {{1,1,1,1}}, liveEntities={xmlNode,xmlNode,}})
 task:Run();
 -------------------------------------------------------
 ]]
@@ -69,6 +69,7 @@ end
 function CreateBlock:Run()
 	self.finished = true;
 	self.history = {};
+	self.history_entity= {};
 
 	local add_to_history;
 
@@ -143,7 +144,19 @@ function CreateBlock:Run()
 		end
 		BlockEngine:EndUpdate()
 	end
-	
+	if(self.liveEntities) then
+		local dx = (self.blockX or 0) * BlockEngine.blocksize;
+		local dy = (self.blockY or 0) * BlockEngine.blocksize;
+		local dz = (self.blockZ or 0) * BlockEngine.blocksize;
+
+		for _, entity in ipairs(self.liveEntities) do
+			if(entity.attr and entity.attr.x) then
+				local xmlNode = commonlib.copy(entity)
+				xmlNode.attr.x, xmlNode.attr.y, xmlNode.attr.z = entity.attr.x+dx, entity.attr.y+dy, entity.attr.z+dz;
+				self:AddEntity(xmlNode)
+			end
+		end
+	end
 	if(add_to_history) then
 		UndoManager.PushCommand(self);
 	end
@@ -157,6 +170,24 @@ function CreateBlock:Run()
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 		local task = MyCompany.Aries.Game.Tasks.SelectBlocks:new({blocks = blocks})
 		task:Run();
+	end
+end
+
+function CreateBlock:AddEntity(xmlNode)
+	if(xmlNode) then
+		local attr = xmlNode.attr;
+		attr.name = nil;
+		local entityClass;
+		if(attr.class) then
+			entityClass = EntityManager.GetEntityClass(attr.class)
+		end
+		entityClass = entityClass or EntityManager.EntityLiveModel
+		local entity = entityClass:Create({x=attr.x,y=attr.y,z=attr.z}, xmlNode);
+		entity:Attach();
+		if(self.add_to_history) then
+			attr.name = entity.name
+			self.history_entity[#(self.history_entity)+1] = xmlNode
+		end
 	end
 end
 
@@ -183,6 +214,18 @@ function CreateBlock:Redo()
 		end
 		BlockEngine:EndUpdate()
 	end
+	if((#self.history_entity) > 0) then
+		for _, xmlNode in ipairs(self.history_entity) do
+			local attr = xmlNode.attr;
+			local entityClass;
+			if(attr.class) then
+				entityClass = EntityManager.GetEntityClass(attr.class)
+			end
+			entityClass = entityClass or EntityManager.EntityLiveModel
+			local entity = entityClass:Create({x=attr.x,y=attr.y,z=attr.z}, xmlNode);
+			entity:Attach();
+		end
+	end
 end
 
 function CreateBlock:Undo()
@@ -194,5 +237,16 @@ function CreateBlock:Undo()
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[5] or 0, b[6], nil, b[9]);
 		end
 		BlockEngine:EndUpdate()
+	end
+	if((#self.history_entity) > 0) then
+		for _, xmlNode in ipairs(self.history_entity) do
+			local attr = xmlNode.attr;
+			if(attr.name) then
+				local entity = EntityManager.GetEntity(xmlNode.attr.name)
+				if(entity) then
+					entity:Destroy();
+				end
+			end
+		end
 	end
 end

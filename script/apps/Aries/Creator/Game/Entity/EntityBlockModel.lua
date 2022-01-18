@@ -24,6 +24,7 @@ local vector3d = commonlib.gettable("mathlib.vector3d");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+local Event = commonlib.gettable("System.Core.Event");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")

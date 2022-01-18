@@ -192,10 +192,7 @@ function MovieClipController.OnClosePage()
 
 	MovieClipController:OnActiveMovieClipChange(nil);
 
-	if MovieClipController.ui_anim_timer then
-		MovieClipController.ui_anim_timer:Change(0)
-		MovieClipController.ui_anim_timer = nil
-	end
+	MovieClipController.ClearUiAnim()
 end
 
 function MovieClipController:OnSelectedActorChange(actor)
@@ -886,9 +883,13 @@ end
 function MovieClipController.SetCompareData(data)
 	MovieClipController.CompareData = data
 
-	if not data and MovieClipController.ui_anim_timer then
-		MovieClipController.ui_anim_timer:Change(0)
-		MovieClipController.ui_anim_timer = nil
+	if not data then
+		MovieClipController.ClearUiAnim()
+		MovieClipController.is_show_compare_error = false
+	end
+	
+	if(page) then
+		page:Refresh(0.1);
 	end
 end
 
@@ -910,10 +911,20 @@ function MovieClipController.IsCompareDiff(slot)
 	return false
 end
 
+function MovieClipController.ClearUiAnim()
+	if MovieClipController.ui_anim_timer then
+		MovieClipController.ui_anim_timer:Change(0)
+		MovieClipController.ui_anim_timer = nil
+	end
+end
+
 function MovieClipController.ShowCompareUiAnim()
 	if not MovieClipController.CompareData then
 		return			
 	end
+
+	MovieClipController.SetCompareErrorBg()
+
 	if MovieClipController.ui_anim_timer then
 		return
 	end
@@ -922,7 +933,6 @@ function MovieClipController.ShowCompareUiAnim()
 	-- for k, value in pairs(MovieClipController.CompareData) do
 	-- 	local ui_object = ParaUI.GetUIObject("MovieClipController.slot_".. k .. "_bg");
 	-- 	if ui_object and ui_object:IsValid() then
-	-- 		print("aaaaaaaaaaaaaaa")
 	-- 		ui_object_list[#ui_object_list + 1] = ui_object
 	-- 	end
 	-- end
@@ -933,20 +943,41 @@ function MovieClipController.ShowCompareUiAnim()
 		local dir = -1
 		local rate = 8
 		MovieClipController.ui_anim_timer = commonlib.Timer:new({callbackFunc = function(timer)
+			if not page then
+				MovieClipController.ClearUiAnim()
+				return
+			end
+
 			cur_alpha = cur_alpha + dir * rate
-			for k, v in pairs(MovieClipController.CompareData) do
+			local alpha = math.max(0, math.floor(cur_alpha/max_alpha * 255))
+			local slot_list = {}
+			for key, value in pairs(MovieClipController.CompareData) do
+				for k2, v2 in pairs(value) do
+					slot_list[k2] = 1
+				end
+			end
+
+			for k, v in pairs(slot_list) do
 				local ui_object = ParaUI.GetUIObject("MovieClipController.slot_".. k .. "_bg");
 				if ui_object and ui_object:IsValid() then
-					local alpha = math.max(0, math.floor(cur_alpha/max_alpha * 255))
+					
 					_guihelper.SetColorMask(ui_object, format("255 255 255 %d",alpha))
 				end
-
 			end
 
 			-- MovieClipTimeLine的也在这处理
+			local menu_uiname_list = MovieClipTimeLine.GetMenuCompareBg()
+			if menu_uiname_list then
+				for k, v in pairs(menu_uiname_list) do
+					if v.compare_ui_object then
+						_guihelper.SetColorMask(v.compare_ui_object, format("255 255 255 %d",alpha))
+					end
+				end
+			end
+
+			
 			local ui_object = ParaUI.GetUIObject("MovieClipTimeLine_end_time_compare");
 			if ui_object and ui_object:IsValid() then
-				local alpha = math.max(0, math.floor(cur_alpha/max_alpha * 255))
 				_guihelper.SetColorMask(ui_object, format("255 255 255 %d",alpha))
 			end
 			
@@ -956,4 +987,56 @@ function MovieClipController.ShowCompareUiAnim()
 		end})
 		MovieClipController.ui_anim_timer:Change(0, 50);
 	end
+end
+
+function MovieClipController.SetIsShowCompareError(flag)
+	MovieClipController.is_show_compare_error = flag
+end
+
+function MovieClipController.IsShowCompareError()
+	return MovieClipController.is_show_compare_error
+end
+
+function MovieClipController.SetCompareErrorBg()
+	if not page then
+		return
+	end
+
+	if not MovieClipController.is_show_compare_error then
+		return
+	end
+
+	local slot_list = {}
+	for key, value in pairs(MovieClipController.CompareData) do
+		for k2, v2 in pairs(value) do
+			slot_list[k2] = 1
+		end
+	end
+
+	for k, v in pairs(slot_list) do
+		local ui_object = ParaUI.GetUIObject("MovieClipController.slot_".. k .. "_bg");
+		if ui_object and ui_object:IsValid() then
+			_guihelper.SetUIColor(ui_object, "#ff0000");
+		end
+	end
+
+	-- MovieClipTimeLine的也在这处理
+	local ui_object = ParaUI.GetUIObject("MovieClipTimeLine_end_time_compare");
+	if ui_object and ui_object:IsValid() then
+		_guihelper.SetUIColor(ui_object, "#ff0000");
+	end
+end
+
+function MovieClipController.GetCurSelectSlotIndex()
+	for slotNumber = 1, 48 do
+		local view = MovieClipController.GetActorInventoryView();
+		if(view) then
+			local itemStack = view:GetSlotItemStack(slotNumber)
+			if(itemStack and MovieClipController.GetItemStack() == itemStack) then
+				return slotNumber
+			end
+		end
+	end
+
+	return 0
 end

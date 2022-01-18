@@ -501,7 +501,7 @@
 	    <!--20211118新加-->
 		<item id="84109" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84109_normal_people_32bits.png" name="平民" avatarMode="false"/>
 	    <!--20211118新加-->
-		<item id="84108" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84108_olympic_cloth_32bits.png" name="冬奥会" avatarMode="false"/>
+		<item id="84108" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84108_olympic_cloth_32bits.png" name="冬运会"/>
 	    <!--20211028新加-->
 		<item id="84107" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84107_famale_teacher_32bits.png" name="女老师"/>
 	    <!--20211021新加-->
@@ -633,7 +633,7 @@
 
 	<category name="pants" text="裤子">
         <!--20211118新增-->
-        <item id="85126" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85126_olympic_pant_32bits.png" name="冬奥会" avatarMode="false"/>
+        <item id="85126" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85126_olympic_pant_32bits.png" name="冬运会"/>
 	    
         <!--20211021新增-->
         <item id="85106" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85106_antiepidemic_32bits.png" name="防疫服" avatarMode="false"/>
@@ -776,7 +776,7 @@
 		<item id="86045" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86045_cleaner_back_32bits.png" name="环卫腰包" avatarMode="false"/>
 		<item id="86046" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86046_archaeologist_back_32bits.png" name="考古腰包" avatarMode="false"/>
          <!--20211118新加-->
-		<item id="86044" gsid="85004" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86044_olympic_back_32bits.png" name="冬奥会" avatarMode="false"/>
+		<item id="86044" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86044_olympic_back_32bits.png" name="冬运会"/>
          <!--20210929新加-->
 		<item id="86043" gsid="85003" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86043_red_flag_bag_32bits.png" name="红旗书包"/>
 	    <!--20210624新加-->

@@ -53,6 +53,7 @@ BaseContext:Property({"Name", "BaseContext"});
 BaseContext:Property({"max_break_time", 500});
 -- if true, left click to delete; if false, left click to move the player to the block. 
 BaseContext:Property({"LeftClickToDelete", true});
+BaseContext:Property({"clickToMove", false, "IsClickToMoveEnabled", "EnableClickToMove", auto = true});
 BaseContext:Property({"ShowClickStrengthUI", false});
 -- the block id for the edit marker. usually 155 (ending stone). if specified,
 -- mouse block picking is only valid when there is a marker block below. 
@@ -269,8 +270,9 @@ end
 
 -- this function is called repeatedly if MousePickTimer is enabled. 
 -- it can also be called independently. 
+-- @param event: nil or a mouse event invoking this method. 
 -- @return the picking result table
-function BaseContext:CheckMousePick()
+function BaseContext:CheckMousePick(event)
 	if(self.mousepick_timer) then
 		self.mousepick_timer:Change(50, nil);
 	end
@@ -574,7 +576,7 @@ function BaseContext:mousePressEvent(event)
 		return;
 	end
 	-- on touch screen, mouse press is fired before the timer where CheckMousePick is called, so we need to do a real mouse pick here
-	self:CheckMousePick();
+	self:CheckMousePick(event);
 	local result = SelectionManager:GetPickingResult();
 	local mouseEntity = result.entity 
 	if(mouseEntity and mouseEntity.mousePressEvent) then
@@ -1276,6 +1278,9 @@ end
 
 function BaseContext:SetTargetPosition(x, y, z)
 	local player = EntityManager.GetPlayer()
+	if(not player) then
+		return
+	end
 	local obj = player:GetInnerObject()
 	local attr = ParaCamera.GetAttributeObject();
 	self.startPlayerX, self.startPlayerY, self.startPlayerZ = player:GetPosition()

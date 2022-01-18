@@ -66,7 +66,7 @@ end
 
 function DockPopupControl.IsInSummerCampWorld()
     local id_list = {
-        ONLINE = {72966,70351,73104,72945,79969,128252},
+        ONLINE = {72966,70351,73104,72945,79969,12825,132939},
         RELEASE = {20669},
     }
     local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");

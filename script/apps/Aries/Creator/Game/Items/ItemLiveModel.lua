@@ -32,6 +32,10 @@ local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local ItemLiveModel = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.ItemToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemLiveModel"));
 
+ItemLiveModel:Property({"fingerRadius", 16});
+-- if entity's radius is bigger than 0.3, we will not use finger picking
+ItemLiveModel:Property({"maxFingerPickingRadius", 0.3});
+
 block_types.RegisterItemClass("ItemLiveModel", ItemLiveModel);
 
 -- health point
@@ -282,17 +286,41 @@ function ItemLiveModel:OnFilterEntityPicking(entity)
 end
 
 -- @return the global result. 
-function ItemLiveModel:MousePickBlock()
-	result = SelectionManager:MousePickBlock();
+function ItemLiveModel:MousePickBlock(event)
+	local result
+	if(event and event:GetType() == "mousePressEvent") then
+		-- we shall use finger picking for live entity smaller than 0.3
+		if(GameLogic.options:HasTouchDevice()) then
+			local results = SelectionManager:MousePickWithFingerSize(true, true, true, nil, self.fingerRadius)
+			local lastMinExtent = 9999999;
+			for _, r in ipairs(results) do
+				local entity = r.entity;
+				if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+					local aabb = entity:GetInnerObjectAABB()
+					local minExtent = aabb:GetMinExtent()
+					-- if entity's radius is bigger than 0.3, we will not use finger picking
+					if(minExtent < self.maxFingerPickingRadius and minExtent < lastMinExtent) then
+						lastMinExtent = minExtent;
+						result = r;
+					end
+				end
+			end
+			if(result) then
+				SelectionManager:GetPickingResult():CopyFrom(result);
+			end
+		end
+	end
+	result = result or SelectionManager:MousePickBlock();
 	return result;
 end
 
+-- @param event: nil or a mouse event invoking this method. 
 --@return pickingResult, hoverEntity
-function ItemLiveModel:CheckMousePick()
+function ItemLiveModel:CheckMousePick(event)
 	local result
 	-- we will try picking mounted objects first. 
 	local function PickEntity_(parentEntity)
-		result = self:MousePickBlock();
+		result = self:MousePickBlock(event);
 
 		if(result.entity and result.entity:isa(EntityManager.EntityLiveModel)) then
 			local entity = result.entity;
@@ -305,7 +333,7 @@ function ItemLiveModel:CheckMousePick()
 					local newEntity = PickEntity_(entity)
 					if(not newEntity) then
 						self.skipEntities[entity] = nil;
-						result = self:MousePickBlock();
+						result = self:MousePickBlock(event);
 						-- double check, result.entity should always be EntityLiveModel. 
 						if(result.entity and result.entity:isa(EntityManager.EntityLiveModel)) then
 							entity = result.entity;
@@ -335,12 +363,14 @@ function ItemLiveModel:CheckMousePick()
 		self.last_hover_entity = newHoverEntity;
 	end
 	if(newHoverEntity)  then
-		local obj = newHoverEntity:GetInnerObject();
-		if(obj) then	
-			if(newHoverEntity:CanHighlight()) then
-				ParaSelection.AddObject(obj, 1);
-			else
-				ParaSelection.ClearGroup(1);
+		if (GameLogic.GameMode:IsEditor()) then
+			local obj = newHoverEntity:GetInnerObject();
+			if(obj) then	
+				if(newHoverEntity:CanHighlight()) then
+					ParaSelection.AddObject(obj, 1);
+				else
+					ParaSelection.ClearGroup(1);
+				end
 			end
 		end
 	else
@@ -356,11 +386,11 @@ end
 
 function ItemLiveModel:mousePressEvent(event)
 	Game.SelectionManager:SetEntityFilterFunction(nil)
-	local result, entity = self:CheckMousePick()
+	local result, entity = self:CheckMousePick(event)
 
 	self.mousePressEntity = nil;
 	
-	if(event.alt_pressed and event:button() == "left") then
+	if(event.alt_pressed and event:button() == "left" and GameLogic.GameMode:IsEditor()) then
 		-- alt + click to pick both EntityBlockModel and EntityLiveModel
 		if(not entity and result.blockX) then
 			local entityBlock = EntityManager.GetBlockEntity(result.blockX, result.blockY, result.blockZ)
@@ -448,6 +478,12 @@ function ItemLiveModel:CalculateFreeFallDropLocation(srcEntity, dropLocation, ma
 		end
 	end
 
+	local aabb = srcEntity:GetInnerObjectAABB()
+	local dx, _, dz = aabb:GetExtendValues()
+	dx = dx * 2
+	dz = dz * 2
+	local maxLength = math.max(dx, dz);
+	
 	local block_id, solid_y, x1, y1, z1 = self:GetFirstObstructionBlockBelow(dropLocation.dropX, dropLocation.dropY+0.1, dropLocation.dropZ)
 	if(block_id) then
 		if((not dropLocation.mountPointIndex) or y1 > y) then
@@ -458,9 +494,66 @@ function ItemLiveModel:CalculateFreeFallDropLocation(srcEntity, dropLocation, ma
 				dropLocation.target = block_id;
 				dropLocation.mountPointIndex = nil;
 			end
+			if(maxLength > BlockEngine.blocksize * 2) then
+				-- we need to check if the target block (hole) is big enough for the entity. 
+				local newY = self:GetFreeSpaceHeightBySize(x, y, z, maxLength)
+				if(newY) then
+					y = newY;
+					dropLocation.y = math.max(dropLocation.y, newY);
+				end
+			end
 		end
 	end
+
 	dropLocation.dropX, dropLocation.dropY, dropLocation.dropZ = x, y, z;
+end
+
+-- get newY coordinate where (x, newY, z) is big enought for size. 
+-- @param x, y, z: real world position
+-- @param maxLookupDistance: if nil, default to 2. 
+-- @return size: usually bigger than 1, smaller than 3. 
+-- return block y position, where 
+function ItemLiveModel:GetFreeSpaceHeightBySize(x, y, z, size, maxLookupDistance)
+	maxLookupDistance = maxLookupDistance or 2;
+	local newY = y;
+	local bx, by, bz = BlockEngine:block(x, y + 0.1, z)
+	local maxRadius = math.min(4, math.floor(size/BlockEngine.blocksize/2));
+
+	local function HasFreeSpaceRadius(radius, dy)
+		local innerRadius = radius - 1;
+		local outerRadius = radius;
+		if(outerRadius > 0) then
+			local bHasOuterSpace;
+			local innerRadiusSq = innerRadius^2;
+			local outerRadiusSq = outerRadius^2;
+			for dx=-outerRadius, outerRadius do
+				for dz=-outerRadius, outerRadius do
+					local distSq = dx ^ 2 + dz ^2;
+					if(distSq <=innerRadiusSq) then
+						local block = BlockEngine:GetBlock(bx+dx, by+dy, bz+dz)
+						if((block and (block.obstruction or block.solid))) then
+							return false;
+						end
+					elseif(distSq <= outerRadiusSq) then
+						local block = BlockEngine:GetBlock(bx+dx, by+dy, bz+dz)
+						if(not (block and (block.obstruction or block.solid))) then
+							bHasOuterSpace = true
+						end
+					end
+				end
+			end
+			return bHasOuterSpace;
+		end
+	end
+
+	for dy = 0, math.floor(maxLookupDistance) do
+		local block = BlockEngine:GetBlock(bx, by+dy, bz)
+		if((block and (block.obstruction or block.solid))) then
+			return;
+		elseif(HasFreeSpaceRadius(maxRadius, dy)) then
+			return y + dy * BlockEngine.blocksize;
+		end
+	end
 end
 
 -- we will see the target location's four directions, and if there is a nearby wall, we will return the walls facing. 
@@ -1043,7 +1136,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 					facing = facing + draggingEntity:GetYawOffset();
 				end
 			end
-			dragParams.dropLocation = {target = result.block_id, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, bx = bx, by = by, bz = bz, side = 5, facing = facing}
+			dragParams.dropLocation = {target = result.block_id, targetEntity = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, bx = bx, by = by, bz = bz, side = 5, facing = facing}
 			self:CalculateFreeFallDropLocation(draggingEntity, dragParams.dropLocation);	
 		end
 		if(dragParams.dropLocation) then
@@ -1296,7 +1389,7 @@ function ItemLiveModel:DropEntity(entity)
 					entity.dragTask:DropDraggingEntity()
 					entity.dragTask = nil;
 				end
-				entity:EndDrag()
+				entity:EndDrag(dragParams.dropLocation)
 			end
 		end})
 		entity.dropAnimTimer:Change(30, 30)
@@ -1409,9 +1502,10 @@ function ItemLiveModel:mouseReleaseEvent(event)
 				end
 			end			
 			local clickEntity = normalTargetEntity or targetEntity
-			if(clickEntity) then
-				clickEntity:OnClick(result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side)
-				event:accept();
+			if(clickEntity and clickEntity:isa(EntityManager.EntityLiveModel)) then
+				if(clickEntity:OnClick(result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side)) then
+					event:accept();
+				end
 			elseif(event:button() == "right") then
 				if(result.block_id and result.block_id>0) then
 					-- if it is a right click, first try the game logics if it is processed. such as an action neuron block.
@@ -1434,15 +1528,17 @@ function ItemLiveModel:mouseReleaseEvent(event)
 						if(entity.dragTask) then
 							entity.dragTask:SetCreateMode()
 						end
+						event:accept();
 					end
+				else
+					event:accept();
 				end
-				event:accept();
 			end
 		end	
 	end
 	if(self.mousePressEntity) then
-		event:accept();
 		self.mousePressEntity = nil;
+		event:accept();
 	end
 	Game.SelectionManager:SetEntityFilterFunction(nil)
 end

@@ -123,6 +123,10 @@ function Entity:SetMainAssetPath(name)
 	end
 end
 
+function Entity:CanSelectModel()
+	return false;
+end
+
 function Entity:IsPlayer()
 	return true;
 end

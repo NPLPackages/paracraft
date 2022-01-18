@@ -25,6 +25,12 @@ local path = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/"
 RedSummerCampCourseScheduling.curLearnHistroy = {}
 RedSummerCampCourseScheduling.lessonCnf = {
     {
+        key ="winterOlympic",
+        name="冬季运动会",
+        icon= path.."dongao_94x94_32bits.png#0 0 94 94",
+        num = "30节",
+    }, 
+    {
         key="ppt_L1",
         name="机构课L1",
         icon= path.."i1_94X94_32bits.png#0 0 94 94",
@@ -78,12 +84,6 @@ RedSummerCampCourseScheduling.lessonCnf = {
         icon= path.."jiangxi2_94x94_32bits.png#0 0 94 94",
         num = "32节",
     },
-    {
-        key ="winterOlympic",
-        name="冬季运动会",
-        icon= path.."dongao_94x94_32bits.png#0 0 94 94",
-        num = "30节",
-    }, 
 }
 
 local otherConfig = {

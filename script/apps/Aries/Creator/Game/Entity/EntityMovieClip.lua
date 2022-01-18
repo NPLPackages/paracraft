@@ -885,6 +885,9 @@ function Entity:CompareSlot(entity)
 				diff_num = diff_num + 1
 				result[i] = 1
 			end
+		elseif itemStack and not itemStack2 then
+			diff_num = diff_num + 1
+			result[i] = 1
 		end
 	end
 	return diff_num, result
@@ -920,18 +923,24 @@ function Entity:CompareTimes(entity)
 				diff_num = diff_num + 1
 				result[slot] = 1				
 			end
-			local config = keyConfig[itemStack.id]
+			local config = keyConfig[itemStack.id] or {}
 			for k,v in pairs(config) do
 				if (timeseries1[v] and not timeseries2[v]) or (not timeseries1[v] and timeseries2[v]) then
 					diff_num = diff_num + 1
-					result[slot] = 1
+					if not result[slot] then
+						result[slot] = {}
+					end
+					result[slot][v] = 1
 				end
 				if (timeseries1[v] and  timeseries2[v])then
 					local times1 = timeseries1[v].times
 					local times2 = timeseries2[v].times
 					if #times1 ~= #times2 then
 						diff_num = diff_num + 1
-						result[slot] = 1 --关键帧数量不一样
+						if not result[slot] then
+							result[slot] = {}
+						end
+						result[slot][v] = 1 --关键帧数量不一样
 					else
 						local isSame = true
 						local num = #times1
@@ -944,8 +953,11 @@ function Entity:CompareTimes(entity)
 
 						end
 						if not isSame then
-							diff_num = diff_num + 1
-							result[slot] = 1
+							diff_num = diff_num + 1 
+							if not result[slot] then
+								result[slot] = {}
+							end
+							result[slot][v] = 1
 						end					
 					end
 				end			
@@ -1415,11 +1427,13 @@ function Entity:CompareActorBones(entity)
 						local myBoneDts = myCnf[curKey].data
 						local otherBoneDts = otherCnf[curKey].data
 						if string.find(curKey,"rot") then
+							NPL.load("(gl)script/ide/mathlib.lua");
+							local mathlib = commonlib.gettable("mathlib");
 							NPL.load("(gl)script/ide/math/Quaternion.lua");
 							local Quaternion = commonlib.gettable("mathlib.Quaternion");
-							local temp1,temp2,temp3 = Quaternion:new(myBoneDts):ToEulerAngles()
+							local temp1,temp2,temp3 = mathlib.QuatToEuler(myBoneDts) --Quaternion:new(myBoneDts):ToEulerAngles()
 							myBoneDts = {temp1,temp2,temp3 }
-							temp1,temp2,temp3 = Quaternion:new(otherBoneDts):ToEulerAngles()
+							temp1,temp2,temp3 = mathlib.QuatToEuler(otherBoneDts) --Quaternion:new(otherBoneDts):ToEulerAngles()
 							otherBoneDts = {temp1,temp2,temp3}
 							local dataNum = #myBoneDts
 							for dataIndex = 1,dataNum do 
@@ -1444,8 +1458,6 @@ function Entity:CompareActorPosition(entity, compare_type)
 		return 0
 	end
 	local diff_num = 0
-	local result = {}
-	local diff_num = 0
 	local result_list = {}
 	for i=1, self.inventory:GetSlotCount() do
 		local itemStack = self.inventory:GetItem(i);
@@ -1467,9 +1479,14 @@ function Entity:CompareActorPosition(entity, compare_type)
 						local otherCnf = timeseries2[v].data
 						local num = #myCnf
 						for cnf_i=1,num do
-							if math.abs(myCnf[cnf_i] - otherCnf[cnf_i]) > 3 then
+							-- print("rrrrrrrrrrrr", v, myCnf[cnf_i], otherCnf[cnf_i])
+							if myCnf[cnf_i] and otherCnf[cnf_i] and math.abs(myCnf[cnf_i] - otherCnf[cnf_i]) > 3 then
 								diff_num = diff_num + 1
-								result_list[i] = 1
+								if not result_list[i] then
+									result_list[i] = {}
+								end
+
+								result_list[i].pos = 1
 							end							
 						end		
 					end	

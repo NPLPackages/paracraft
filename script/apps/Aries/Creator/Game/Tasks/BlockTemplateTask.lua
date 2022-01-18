@@ -189,6 +189,15 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 				end
 			end
 
+			local node = commonlib.XPath.selectNode(root_node, "/pe:entities");
+			local liveEntities;
+			if(node) then
+				local entities = NPL.LoadTableFromString(node[1]);
+				if(entities and #entities > 0) then
+					liveEntities = entities;
+				end
+			end
+
 			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
 			if(node and node[1]) then
 				local blocks = NPL.LoadTableFromString(node[1]);
@@ -201,7 +210,7 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 					end
 
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, bSelect=self.bSelect, nohistory = self.nohistory, isSilent = true})
+					local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, liveEntities=liveEntities, bSelect=self.bSelect, nohistory = self.nohistory, isSilent = true})
 					task:Run();
 					
 					if( self.TeleportPlayer and root_node.attr.player_pos) then
@@ -218,6 +227,7 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 					return true;
 				end
 			end
+			
 		end
 	end
 end
@@ -383,6 +393,9 @@ function BlockTemplate:SaveTemplateToString()
 			end
 			self.params.pivot = string.format("%d,%d,%d",pivot[1],pivot[2],pivot[3]);
 			self.blocks = select_task:GetCopyOfBlocks(pivot);
+			if(self.withentity) then
+				self.liveEntities = select_task.GetLiveEntitiesInAABB(select_task.aabb, pivot) 
+			end
 		else
 			return;
 		end
@@ -394,6 +407,9 @@ function BlockTemplate:SaveTemplateToString()
 	local totalCount = #(self.blocks);
 	o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
 
+	if(self.liveEntities and (#(self.liveEntities)) > 0) then
+		o[#o+1] = {name="pe:entities", [1]=commonlib.serialize_compact(self.liveEntities, true),};
+	end
 	if(self.exportReferencedFiles) then
 		local files = self:GetReferenceFiles(self.blocks)
 		if(files) then

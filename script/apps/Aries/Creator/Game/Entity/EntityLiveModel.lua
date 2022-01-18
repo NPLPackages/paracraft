@@ -921,6 +921,8 @@ function Entity:MountTo(mountTarget, mountPointIndex, bUseCurrentLocation)
 					self:SetAnimation(5);
 				end
 			end
+		else
+			mountTarget:OnMount(nil, nil, self)
 		end
 	end
 end
@@ -970,6 +972,13 @@ end
 -- called when the user clicks on the block
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
+	local curTime = commonlib.TimerManager.GetCurrentTime()
+	if(self.lastClickTime == curTime) then
+		return
+	else
+		self.lastClickTime = curTime
+	end
+
 	if(GameLogic.isRemote) then
 		if(mouse_button=="left" or self.onclickEvent) then
 			GameLogic.GetPlayer():AddToSendQueue(GameLogic.Packets.PacketClickEntity:new():Init(entity or GameLogic.GetPlayer(), self, mouse_button, x, y, z));
@@ -993,7 +1002,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 				local facing = Direction.directionTo3DFacing[side or 0]
 				event.cmd_text = string.format("{x=%d, y=%d, z=%d, name=%q, facing=%f}", x, y, z, self.name, facing or 0);
 				local result = GameLogic:event(event, true);
-				if(result) then
+				if(result or self.onclickEvent) then
 					return true;
 				end
 			end
@@ -1006,8 +1015,7 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			end
 		end
 	end
-
-	if(self:HasRealPhysics() or self:HasAnyRule()) then
+	if(self:HasAnyRule()) then
 		return true;
 	end
 end
@@ -1344,17 +1352,24 @@ function Entity:BeginDrag()
 	self:ForEachChildLinkEntity(Entity.BeginDrag)
 	self:OnBeginDrag()
 	self:BeginModify()
+	self.isDragging = true;
+end
+
+-- return true if entity is being dragged. 
+function Entity:IsDragging()
+	return self.isDragging;
 end
 
 -- when dragging ends, we will restore picking and physics. 
-function Entity:EndDrag()
+function Entity:EndDrag(dragLocation)
+	self.isDragging = false;
 	self:SetSkipPicking(false);
 	if(self.beforeDragHasPhysics) then
 		self:EnablePhysics(true);
 		self.beforeDragHasPhysics = nil;
 	end
 	self:ForEachChildLinkEntity(Entity.EndDrag)
-	self:OnEndDrag()
+	self:OnEndDrag(dragLocation)
 	self:EndModify()
 end
 
@@ -1368,12 +1383,20 @@ function Entity:OnBeginDrag()
 	end
 end
 
-function Entity:OnEndDrag()
+function Entity:OnEndDrag(dragLocation)
 	-- send a general event or user defined one
 	local onendDragEvent = self.onendDragEvent or "__entity_onenddrag"
 	if(onendDragEvent) then
 		local x, y, z = self:GetBlockPos();
-		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q}", onendDragEvent, x, y, z, self.name))
+		local targetName
+		if(dragLocation) then
+			if(type(dragLocation.target) == "table") then
+				targetName = dragLocation.target:GetName()
+			elseif(dragLocation.targetEntity) then
+				targetName = dragLocation.targetEntity:GetName()
+			end
+		end
+		GameLogic.RunCommand(string.format("/sendevent %s %s", onendDragEvent, commonlib.serialize_compact({x=x, y=y, z=z, name=self.name, targetName=targetName})))
 		return true;
 	end
 end

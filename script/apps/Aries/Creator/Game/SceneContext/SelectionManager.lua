@@ -18,6 +18,8 @@ local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+local Cameras = commonlib.gettable("System.Scene.Cameras");
+local Mouse = commonlib.gettable("System.Windows.Mouse");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local Matrix4 = commonlib.gettable("mathlib.Matrix4");
 
@@ -102,18 +104,42 @@ function SelectionManager:IsMousePickingEntity(entity)
 end
 
 -- @param bPickBlocks, bPickPoint, bPickObjects: default to true
+-- @param mouseX, mouseY: if nil, it means the current mouse cursor screen position. 
 -- return result;
-function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist)
+function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist, mouseX, mouseY)
 	self:ClearPickingResult();
 	
-	local filter;
 	eye_pos = ParaCamera.GetAttributeObject():GetField("Eye position", eye_pos);
 	
 	picking_dist = picking_dist or self:GetPickingDist();
-	
+
+	local mouseRay;
+	if(mouseX and mouseY) then
+		mouseRay = Cameras:GetCurrent():GetMouseRay(mouseX, mouseY, Matrix4.IDENTITY);
+		local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+		mouseRay.mOrig:add(origin[1], origin[2], origin[3])
+	end
+
+	local function ParaTerrain_MousePick_(picking_dist, result, filters)
+		if(not mouseRay) then
+			result = ParaTerrain.MousePick(picking_dist, result, filters);
+		else
+			result = ParaTerrain.Pick(mouseRay.mOrig[1], mouseRay.mOrig[2], mouseRay.mOrig[3], mouseRay.mDir[1], mouseRay.mDir[2], mouseRay.mDir[3], picking_dist, result, filters);
+		end
+		return result;
+	end
+
+	local function ParaScene_MousePick_(picking_dist, filters)
+		if(not mouseRay) then
+			return ParaScene.MousePick(picking_dist, filters);
+		else
+			return ParaScene.Pick(mouseRay.mOrig[1], mouseRay.mOrig[2], mouseRay.mOrig[3], mouseRay.mDir[1], mouseRay.mDir[2], mouseRay.mDir[3], picking_dist, filters)
+		end
+	end
+
 	-- pick blocks
 	if(bPickBlocks~=false) then
-		result = ParaTerrain.MousePick(picking_dist, result, 0xffffffff);
+		result = ParaTerrain_MousePick_(picking_dist, result, 0xffffffff);
 		if(result.blockX) then
 			result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 			if(result.block_id > 0) then
@@ -126,13 +152,13 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 					BlockEngine:SetBlock(result.blockX,result.blockY,result.blockZ, 0);
 				elseif(block.material:isLiquid() and block_types.names.LilyPad ~= GameLogic.GetBlockInRightHand() and not GameLogic.options:GetWorldOption("selectWater")) then
 					-- if we are picking a liquid object, we discard it and pick again for solid or obstruction or customModel object. 
-					result = ParaTerrain.MousePick(picking_dist, result, 0x85);
+					result = ParaTerrain_MousePick_(picking_dist, result, 0x85);
 					if(result.blockX) then
 						result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 					end
 				elseif(block.invisible and not block.solid) then
 					-- we will skip picking for invisible non solid block. instead we will only pick solid or customModel object.
-					result = ParaTerrain.MousePick(picking_dist, result, 0x84);
+					result = ParaTerrain_MousePick_(picking_dist, result, 0x84);
 					if(result.blockX) then
 						result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 					end
@@ -147,7 +173,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 			local root_ = ParaUI.GetUIObject("root");
 			local mouse_pos = root_:GetAttributeObject():GetField("MousePosition", {0,0});
 		else
-			-- ParaTerrain.MousePick will modify the length and side for unknown reasons, since we will use these two parameters, we will reset them if no picking result is found. 
+			-- ParaTerrain_MousePick_ will modify the length and side for unknown reasons, since we will use these two parameters, we will reset them if no picking result is found. 
 			result.length = nil;
 			result.side = nil;
 		end
@@ -155,7 +181,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 
 	-- pick any physical point (like terrain and phyical mesh)
 	if(bPickPoint~=false) then
-		local pt = ParaScene.MousePick(picking_dist, "point");
+		local pt = ParaScene_MousePick_(picking_dist, "point");
 		if(pt:IsValid())then
 			local x, y, z = pt:GetPosition();
 			local blockX, blockY, blockZ = BlockEngine:block(x,y+0.1,z); -- tricky we will slightly add 0.1 to y value. 
@@ -216,7 +242,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 		-- pick recursively and ignore physical objects along the eye ray
 		-- @return entity that is picked. It will also fill result.obj with its object. 
 		local function PickEntity_()
-			local obj = ParaScene.MousePick(lastLength or picking_dist, "anyobject"); 
+			local obj = ParaScene_MousePick_(lastLength or picking_dist, "anyobject"); 
 			if(not obj:GetField("visible", false) or obj.name == "_bm_") then
 				-- ignore block custom model or invisible ones
 			else
@@ -305,7 +331,6 @@ end
 -- @param aabb: world space aabb. usually from Entity:GetInnerObjectAABB()
 -- @return x, y, z: nil or a hit point
 function SelectionManager:GetMouseInteractionPointWithAABB(aabb)
-	local Cameras = commonlib.gettable("System.Scene.Cameras");
 	local mouseRay = Cameras:GetCurrent():GetMouseRay(nil, nil, Matrix4.IDENTITY);
 	
 	aabb = aabb:clone_from_pool();
@@ -319,6 +344,28 @@ function SelectionManager:GetMouseInteractionPointWithAABB(aabb)
 		local dx, dy, dz = mouseRay:GetDirValues()
 		return origin[1]+x+dx*dist, origin[2]+y+dy*dist, origin[3]+z+dz*dist
 	end
+end
+
+-- @param fingerRadius: in pixels, default to 16. we shall cast 4 additional mouse rays in up,down, left, right directions. 
+-- @return allResults: array of all results, starting from the one that is closest to mouse point. 
+function SelectionManager:MousePickWithFingerSize(bPickBlocks, bPickPoint, bPickObjects, picking_dist, fingerRadius)
+	fingerRadius = fingerRadius or 16;
+	local results = {};
+	results[#results+1] = self:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist):CloneMe();
+	local mouse_x, mouse_y = Mouse:GetMousePosition();
+	local gridSize = 8;
+	local layerCount = math.min(5, math.floor(fingerRadius / gridSize+0.5));
+	for layer = 1, layerCount do
+		for step = 1, 4*layer do
+			local angle = math.pi*2 * step / (4*layer)
+			local r = layer*gridSize;
+			local x = math.cos(angle) * r + mouse_x;
+			local y = math.sin(angle) * r + mouse_y;
+			results[#results+1] = self:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist, x, y):CloneMe();
+		end
+	end
+	self.result:CopyFrom(results[1])
+	return results;
 end
 
 SelectionManager:InitSingleton();

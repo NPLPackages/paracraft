@@ -144,13 +144,14 @@ default name is "default"
 
 Commands["savetemplate"] = {
 	name="savetemplate", 
-	quick_ref="/savetemplate [-auto_pivot] [-relative_motion] [-hollow] [-ref] [templatename]", 
+	quick_ref="/savetemplate [-auto_pivot] [-relative_motion] [-hollow] [-ref] [-withentity] [templatename]", 
 	desc=[[save template with current selection
 @param templatename: if no name is provided, it will be default
 @param auto_pivot: if true, use the bottom center of all blocks as pivot
 @param -hollow: if true, model will be hollow
 @param -relative_motion: if true, movie block will use relative motion
 @param -ref: if true, we will export external referenced files 
+@param -withentity: if true, we will export live entities in the aabb
 /savetemplate test
 /savetemplate -hollow test
 /savetemplate -auto_pivot test
@@ -185,6 +186,7 @@ Commands["savetemplate"] = {
 			relative_motion = options.relative_motion,
 			hollow = options.hollow,
 			exportReferencedFiles = options.ref,
+			withentity = options.withentity,
 			bSelect=nil})
 		if(task:Run()) then
 			BroadcastHelper.PushLabel({id="savetemplate", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
@@ -205,6 +207,7 @@ Commands["savemodel"] = {
 /savemodel -auto_scale false test
 /savemodel -interactive test
 /savemodel -interactive "file name"
+/savemodel ~/test   in writable global temp directory
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local option;
@@ -228,10 +231,21 @@ Commands["savemodel"] = {
 		if(not templatename or templatename == "") then
 			templatename = "default";
 		end
-		templatename = templatename:gsub("^blocktemplates/", ""):gsub("%.bmax$", "");
-		templatename = commonlib.Encoding.Utf8ToDefault(templatename);
-		local relative_path = format("blocktemplates/%s.bmax", templatename);
-		local filename = GameLogic.GetWorldDirectoryAt()..relative_path;
+		local relative_path
+		if(templatename:match("^~")) then
+			templatename = ParaIO.GetWritablePath().."temp"..templatename:sub(2, -1)
+		end
+		local filename;
+		if(commonlib.Files.IsAbsolutePath(templatename)) then
+			templatename = templatename:gsub("%.bmax$", "");
+			relative_path = format("%s.bmax", templatename);
+			filename = relative_path;
+		else
+			templatename = templatename:gsub("^blocktemplates/", ""):gsub("%.bmax$", "");
+			templatename = commonlib.Encoding.Utf8ToDefault(templatename);
+			relative_path = format("blocktemplates/%s.bmax", templatename);
+			filename = GameLogic.GetWorldDirectoryAt()..relative_path;
+		end
 
 		local function saveModel_()
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");

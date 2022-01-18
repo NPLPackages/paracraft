@@ -162,6 +162,10 @@ function Entity:IsFlying()
 	return self.bFlying;
 end
 
+function Entity:CanSelectModel()
+	return true;
+end
+
 function Entity:ToggleRunning(bRunning)
 	self.isRunning = bRunning;
 end

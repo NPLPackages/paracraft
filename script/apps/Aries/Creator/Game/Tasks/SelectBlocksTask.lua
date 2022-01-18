@@ -947,6 +947,32 @@ function SelectBlocks:GetCopyOfBlocks(pivot)
 	return blocks;
 end
 
+-- @return array of entities nodes
+function SelectBlocks.GetLiveEntitiesInAABB(aabb, pivot)
+	if(aabb) then
+		local min_x, min_y, min_z = aabb:GetMinValues()
+		local max_x, max_y, max_z = aabb:GetMaxValues()
+		local entities = EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, max_z, EntityManager.EntityLiveModel)
+		local entityNodes = {}
+		if(entities and #entities > 0) then
+			local pivot_x, pivot_y, pivot_z = unpack(pivot);
+			local pivot_rx, pivot_ry, pivot_rz = pivot_x * BlockEngine.blocksize, pivot_y * BlockEngine.blocksize, pivot_z * BlockEngine.blocksize; 
+			for _, entity in ipairs(entities) do
+				local node = entity:SaveToXMLNode()
+				if(node.attr.x) then
+					node.attr.x, node.attr.y, node.attr.z = node.attr.x - pivot_rx, node.attr.y - pivot_ry, node.attr.z - pivot_rz;
+				end
+				if(node.attr.bx) then
+					node.attr.bx, node.attr.by, node.attr.bz = nil, nil, nil;
+				end
+				entityNodes[#entityNodes+1] = node;
+			end
+
+			return entityNodes;
+		end
+	end
+end
+
 function SelectBlocks.SaveToTemplate()
 	if(cur_selection and cur_instance) then
 		local self = cur_instance;
@@ -961,10 +987,11 @@ function SelectBlocks.SaveToTemplate()
 		local pivot = {pivot_x, pivot_y, pivot_z};
 
 		local blocks = self:GetCopyOfBlocks(pivot);
+		local liveEntities = SelectBlocks.GetLiveEntitiesInAABB(self.aabb, pivot)
 		
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/BlockTemplatePage.lua");
 		local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
-		BlockTemplatePage.ShowPage(true, blocks, pivot);
+		BlockTemplatePage.ShowPage(true, blocks, pivot, liveEntities);
 	end
 end
 
@@ -1125,7 +1152,9 @@ function SelectBlocks:CopyBlocks(bRemoveOld)
 
 		self:UpdateSelectionEntityData();
 
-		self.copy_task = { blocks = commonlib.copy(cur_selection), aabb = cur_instance.aabb:clone()};
+		self.copy_task = { blocks = commonlib.copy(cur_selection), aabb = self.aabb:clone(), 
+			liveEntities = SelectBlocks.GetLiveEntitiesInAABB(self.aabb, {0,0,0}),
+			};
 
 		if(not bRemoveOld) then
 			self.copy_task.operation = "add";
@@ -1143,7 +1172,8 @@ function SelectBlocks:CopyBlocks(bRemoveOld)
 					local b = cur_selection[i];
 					blocks[i] = {b[1]-pivot_x, b[2]-pivot_y, b[3]- pivot_z, b[4], if_else(b[5] == 0, nil, b[5]), b[6]};
 				end
-				SelectBlocks.CopyToClipboard(blocks)
+				local liveEntities = SelectBlocks.GetLiveEntitiesInAABB(self.aabb, {pivot_x,pivot_y,pivot_z})
+				SelectBlocks.CopyToClipboard(blocks, liveEntities)
 			end
 		end
 
@@ -1153,7 +1183,7 @@ end
 
 -- static public function: 
 -- copy current mouse cursor block to clipboard
-function SelectBlocks.CopyToClipboard(blocks)
+function SelectBlocks.CopyToClipboard(blocks, liveEntities)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
 	local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
 
@@ -1183,13 +1213,17 @@ function SelectBlocks.CopyToClipboard(blocks)
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
 			local task = BlockTemplate:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, 
-				blocks = blocks,
+				blocks = blocks,liveEntities=liveEntities,
 				relative_motion=true, UseAbsolutePos = false, TeleportPlayer = false, exportReferencedFiles = false, relative_to_player = (#blocks>1)})
 				
 			local filedata = task:SaveTemplateToString();
 			if(filedata) then
 				if(Clipboard.Save("block_template", filedata)) then
-					GameLogic.AddBBS(nil, format(L"%d个方块已存到裁剪版", #blocks), 4000, "0 255 0");
+					local text = format(L"%d个方块已存到裁剪版", #blocks)
+					if(liveEntities and #liveEntities>0) then
+						text = format(L"%d个实体, %s", #liveEntities, text);
+					end
+					GameLogic.AddBBS(nil, text, 4000, "0 255 0");
 				end
 			end
 		end
@@ -1255,7 +1289,7 @@ function SelectBlocks:PasteBlocks(bx, by, bz)
 	end
 
 	if(self.copy_task) then
-		local copy_task = {blocks = self.copy_task.blocks, aabb =  self.copy_task.aabb:clone(), operation = self.copy_task.operation};
+		local copy_task = {blocks = self.copy_task.blocks, liveEntities = self.copy_task.liveEntities, aabb =  self.copy_task.aabb:clone(), operation = self.copy_task.operation};
 		
 		if(not bx) then
 			local result = Game.SelectionManager:MousePickBlock();
@@ -1371,7 +1405,7 @@ function SelectBlocks.ShowTransformWnd()
 end
 
 -- @param trans: {dx,dy,dz, pivot, rot_axis, rot_angle, scalingX, scalingY, scalingZ, method}
--- @param method: nil or "clone" or "extrude"
+-- method can be nil or "clone" or "extrude"
 function SelectBlocks.TransformSelection(trans)
 	if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid() and #cur_selection > 0) then
 		local self = cur_instance;
@@ -1383,8 +1417,12 @@ function SelectBlocks.TransformSelection(trans)
 			SelectBlocks.ExtrudeSelection(trans.dx, trans.dy, trans.dz);
 		else
 			self:UpdateSelectionEntityData();
+			local liveEntities = SelectBlocks.GetLiveEntitiesInAABB(self.aabb, {0,0,0})
+
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TransformBlocksTask.lua");
-			local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({dx = trans.dx, dy=trans.dy, dz=trans.dz, pivot = self:GetPivotPoint(), rot_axis = trans.rot_axis, rot_angle=trans.rot_angle, scalingX=trans.scalingX, scalingY=trans.scalingY, scalingZ=trans.scalingZ, blocks=cur_selection, aabb=cur_instance.aabb, operation = trans.method})
+			local task = MyCompany.Aries.Game.Tasks.TransformBlocks:new({dx = trans.dx, dy=trans.dy, dz=trans.dz, pivot = self:GetPivotPoint(), rot_axis = trans.rot_axis, rot_angle=trans.rot_angle, scalingX=trans.scalingX, scalingY=trans.scalingY, scalingZ=trans.scalingZ, 
+				blocks=cur_selection, liveEntities = liveEntities,
+				aabb=cur_instance.aabb, operation = trans.method})
 			task:Run();
 
 			self:ReplaceSelection(commonlib.clone(task.final_blocks));

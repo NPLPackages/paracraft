@@ -48,6 +48,9 @@ function BlockTemplatePage.OnInit()
 	if(BlockTemplatePage.blocks) then
 		page:SetNodeValue("statsButton", format("%d", #(BlockTemplatePage.blocks)));
 	end
+	if(BlockTemplatePage.liveEntities) then
+		page:SetNodeValue("entityCount", format("%d", #(BlockTemplatePage.liveEntities)));
+	end
 	BlockTemplatePage.isSaveInBuildingTask = false;
 	page:SetValue("checkboxRelativeMotion", BlockTemplatePage.checkboxRelativeMotion == true);
 	page:SetValue("checkboxUsePivot", BlockTemplatePage.checkboxUsePivot == true);
@@ -56,11 +59,12 @@ function BlockTemplatePage.OnInit()
 end
 
 -- @param blocks: array of {x,y,z,block_id}
-function BlockTemplatePage.ShowPage(bShow, blocks, pivot)
+function BlockTemplatePage.ShowPage(bShow, blocks, pivot, liveEntities)
 	BlockTemplatePage.pivot = pivot;
 	if(bShow) then
 		BlockTemplatePage.OnClickTakeSnapshot();
 		BlockTemplatePage.blocks = blocks;
+		BlockTemplatePage.liveEntities = liveEntities;
 	end
 	
 	width = 420;
@@ -153,6 +157,7 @@ function BlockTemplatePage.OnClickSave()
     local name = page:GetUIValue("name") or page:GetUIValue("tl_name") or "";
 	local desc = page:GetUIValue("template_desc") or page:GetUIValue("template_desc") or "";
 	local useCustomPivot = page:GetUIValue("checkboxUsePivot", false)
+	local isSaveEntities = page:GetUIValue("checkboxSaveEntities", false)
     desc = string.gsub(desc,"\r?\n","<br/>")
 	name = name:gsub("%s", "");
 	if(name == "")  then
@@ -195,6 +200,9 @@ function BlockTemplatePage.OnClickSave()
 			if(select_task) then
 				BlockTemplatePage.pivot = select_task:GetPivotPoint();
 				BlockTemplatePage.blocks = select_task:GetCopyOfBlocks(BlockTemplatePage.pivot);
+				if(isSaveEntities) then
+					BlockTemplatePage.liveEntities = select_task.GetLiveEntitiesInAABB(select_task.aabb, BlockTemplatePage.pivot)
+				end
 			end
 		end
 
@@ -207,7 +215,9 @@ function BlockTemplatePage.OnClickSave()
 				end
 			end
 		end
-
+		if(not isSaveEntities) then
+			BlockTemplatePage.liveEntities = nil;
+		end
 		local pivot = string.format("%d,%d,%d",BlockTemplatePage.pivot[1],BlockTemplatePage.pivot[2],BlockTemplatePage.pivot[3]);
 		BlockTemplatePage.SaveToTemplate(filename, BlockTemplatePage.blocks, {
 			name = name,
@@ -224,7 +234,7 @@ function BlockTemplatePage.OnClickSave()
 				BuildQuestProvider.RefreshDataSource();
 			end
 			GameLogic.GetFilters():apply_filters("file_exported", "template", filename);
-		end, bSaveSnapshot);
+		end, bSaveSnapshot, nil, BlockTemplatePage.liveEntities);
 	end
 	if(GameLogic.Macros:IsRecording()) then
 		GameLogic.Macros:AddMacro("ConfirmNextMessageBoxClick");
@@ -241,7 +251,7 @@ function BlockTemplatePage.OnClickSave()
 end
 
 -- @params params: attributes like author, creation_date, name, relative_motion, hollow, exportReferencedFiles, etc. 
-function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc, bSaveSnapshot, isSilenceSave)
+function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc, bSaveSnapshot, isSilenceSave, liveEntities)
 	if( not GameLogic.IsOwner()) then
 		--_guihelper.MessageBox(format("只有世界的作者, 才能保存模板. 请尊重别人的创意,不要盗版!", tostring(WorldCommon.GetWorldTag("nid"))));
 		--return;
@@ -262,6 +272,7 @@ function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc
 	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
 		params = params, 
 		blocks = blocks, 
+		liveEntities = liveEntities,
 		hollow = params and params.hollow,
 		exportReferencedFiles = params and params.exportReferencedFiles,
 	})

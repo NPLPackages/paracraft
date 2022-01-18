@@ -25,6 +25,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MovieClip = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClip");
+local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 
 local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
 
@@ -401,6 +402,7 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 	local self =  MovieClipTimeLine;
 	
 	local varList = self:GetVariableList();
+	MovieClipTimeLine.menu_uiname_list = {}
 	if(varList) then
 		-- display the context menu item.
 		local ctl = MovieClipTimeLine.var_menu_ctl;
@@ -429,9 +431,19 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 		end
 		
 		local node = ctl.RootNode:GetChild(1);
+		
 		if(node) then
 			node:ClearAllChildren();
 			local totalHeight = 0;
+			--print("oooooooooooeee")
+			-- echo(varList, true)
+			-- for index, v in ipairs(varList) do
+			-- 	for k, v2 in pairs(v) do
+			-- 		print("ddddd", k, v2)
+			-- 	end
+
+			-- 	print("---------------------")
+			-- end
 			for index, var in ipairs(varList) do
 				if(var.index) then
 					local display_text = self:GetVariableDisplayName(var.name, true)
@@ -439,8 +451,10 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 						display_text = self:GetVariableDisplayName(var.name, false)
 					end
 
+					local ui_name = ctl.name.."."..(var.name or "")
+					MovieClipTimeLine.menu_uiname_list[ui_name] = {display_text = display_text, name = var.name}
 					node:AddChild(CommonCtrl.TreeNode:new({Text = display_text, 
-						uiname=ctl.name.."."..(var.name or ""),
+						uiname=ui_name,
 						actor=var.actor, originalActor = var.originalActor, originalIndex = var.originalIndex,
 						Name = var.index, Type = "Menuitem", onclick = nil, }));
 					totalHeight = totalHeight + (ctl.DefaultNodeHeight or ctl.style.DefaultNodeHeight);
@@ -455,6 +469,8 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 		if(x and y)then
 			ctl:Show(x, y - ctl.height);
 		end
+
+		MovieClipTimeLine.ShowMenuCompareBg()
 	end
 end
 
@@ -921,11 +937,49 @@ function MovieClipTimeLine.OnClickTimeButton(value)
 end
 
 function MovieClipTimeLine.ShowCompareEndTimeBg()
-	local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 	local compare_data = MovieClipController.GetCompareData()
 	if not compare_data then
 		return false
 	end
-
 	return compare_data["timelength"] ~= nil
+end
+
+function MovieClipTimeLine.ShowMenuCompareBg()
+	local compare_data = MovieClipController.GetCompareData()
+	if not compare_data then
+		return
+	end
+
+	local color = MovieClipController.IsShowCompareError() and "#ff0000" or "#00ff00"
+	for k, v in pairs(MovieClipTimeLine.menu_uiname_list) do
+		if MovieClipTimeLine.CheckNeedCreateCompareBg(compare_data, v.name) then
+			local ui_object = ParaUI.GetUIObject(k);
+			local parent = ui_object.parent
+			local _this = ParaUI.CreateUIObject("container", k .. "compare_bg", "_lt", 0, 0, parent.width, parent.height - 2);
+			_this.background = "Texture/whitedot.png";
+			_this.zorder = -1
+			_guihelper.SetUIColor(_this, color);
+			parent:AddChild(_this);
+			v.compare_ui_object = _this
+		end
+	end
+end
+
+function MovieClipTimeLine.GetMenuCompareBg()
+	return MovieClipTimeLine.menu_uiname_list
+end
+
+function MovieClipTimeLine.CheckNeedCreateCompareBg(compare_data, name)
+	-- timeline 特殊处理
+
+	for key, v in pairs(compare_data) do
+		local cur_select_slot = MovieClipController.GetCurSelectSlotIndex()
+		local slot_data = v[cur_select_slot]
+		-- print("eeee", cur_select_slot, slot_data and slot_data[name])
+		if slot_data and slot_data[name] then
+			return true
+		end
+	end
+
+	return false
 end

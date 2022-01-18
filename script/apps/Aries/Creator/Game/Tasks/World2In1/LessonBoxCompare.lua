@@ -328,6 +328,7 @@ function LessonBoxCompare.CompareMovie(entitySrc,entityDest,compareType)
         if compareType == "timelength" then
             diff_num, compare_date = entitySrc:CompareTimeLength(entityDest)
         end
+		-- 关键帧比较
         if compareType == "timeline" then
             diff_num, compare_date = entitySrc:CompareTimes(entityDest)
         end

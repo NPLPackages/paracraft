@@ -1741,6 +1741,30 @@ regularPolygon("union",6,2,'#ffc658')
 },
 
 {
+	type = "polygon_default_value", 
+	message0 = "%1",
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = "{0,0,0, 1,0,0, 1,1,0}"
+		},
+	},
+	hide_in_toolbox = true,
+	category = "Shapes", 
+	output = {type = "null",},
+	helpUrl = "", 
+	canRun = false,
+	func_description = '%s',
+    colourSecondary = "#ffffff",
+	ToNPL = function(self)
+		return self:getFieldAsString('value');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
 	type = "polygon", 
 	message0 = L" %1 多边形 %2 %3",
     arg0 = {
@@ -1753,7 +1777,7 @@ regularPolygon("union",6,2,'#ffc658')
         {
 			name = "p",
 			type = "input_value",
-			shadow = { type = "functionParams", value = "{0,0,0, 1,0,0, 1,1,0}",},
+			shadow = { type = "polygon_default_value", value = "{0,0,0, 1,0,0, 1,1,0}",},
 			text = "{0,0,0, 1,0,0, 1,1,0}",
 		},
 		{

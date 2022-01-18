@@ -31,6 +31,26 @@ function PickingResult:Clear()
 	self.side = nil
 end
 
+function PickingResult:CopyFrom(obj)
+	self.length = obj.length;
+	self.obj = obj.obj;
+	self.entity = obj.entity;
+	self.block_id = obj.block_id;
+	self.x, self.y, self.z = obj.x, obj.y, obj.z;
+	self.blockX, self.blockY, self.blockZ = obj.blockX, obj.blockY, obj.blockZ;
+	self.blockRealX, self.blockRealY, self.blockRealZ = obj.blockRealX, obj.blockRealY, obj.blockRealZ;
+	self.physicalX, self.physicalY, self.physicalZ = obj.physicalX, obj.physicalY, obj.physicalZ;
+	self.blockLength = self.blockLength;
+	self.block_template = self.block_template;
+	self.side = self.side
+end
+
+function PickingResult:CloneMe()
+	local obj = PickingResult:new();
+	obj:CopyFrom(self);
+	return obj;
+end
+
 -- get the block template or nil. 
 function PickingResult:GetBlock()
 	if(not self.block_template) then

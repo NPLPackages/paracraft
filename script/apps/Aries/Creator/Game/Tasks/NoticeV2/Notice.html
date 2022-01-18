@@ -15,7 +15,6 @@ function ClosePage()
 end
 isShowToday = Notice.isSelectShowToday
 function NoRemind()
-    print(isShowToday)
     local node = document:GetPageCtrl():GetNode("checkRemind")
     if(node) then
         isShowToday = not isShowToday

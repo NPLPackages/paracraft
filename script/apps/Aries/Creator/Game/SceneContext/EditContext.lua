@@ -177,13 +177,17 @@ function EditContext:handleLeftClickScene(event, result)
 				-- alt + left button to pick entity to item stack. 
 				GameLogic.GetPlayerController():PickItemByEntity(result.entity);
 			else
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
-				local obj = result.obj;
-				if(result.entity) then
-					obj = result.entity:GetInnerObject();
+				if(result.entity and not result.entity:CanSelectModel()) then
+					
+				else
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
+					local obj = result.obj;
+					if(result.entity) then
+						obj = result.entity:GetInnerObject();
+					end
+					local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=obj})
+					task:Run();
 				end
-				local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=obj})
-				task:Run();
 			end
 		else
 			-- for blocks
