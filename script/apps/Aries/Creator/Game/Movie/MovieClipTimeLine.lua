@@ -271,6 +271,7 @@ function MovieClipTimeLine.GetKeyFrameCtrl()
 			oncopy_keyframe = MovieClipTimeLine.OnCopyKeyFrame,
 			onmove_keyframe = MovieClipTimeLine.OnMoveKeyFrame,
 			height = MovieClipTimeLine.timelineHeight,
+			gridSize = 50,
 		});
 	end	
 	return MovieClipTimeLine.ctlKeyFrame;
@@ -305,6 +306,7 @@ function MovieClipTimeLine.GetSubFrameCtrl()
 			onmove_keyframe = MovieClipTimeLine.OnMoveKeySubFrame,
 			isShowDataOnTooltip = true,
 			height = MovieClipTimeLine.timelineHeight,
+			gridSize = 50,
 		});
 	end	
 	return MovieClipTimeLine.ctlSubFrame;
@@ -435,15 +437,6 @@ function MovieClipTimeLine.OnClickToggleSubVariable()
 		if(node) then
 			node:ClearAllChildren();
 			local totalHeight = 0;
-			--print("oooooooooooeee")
-			-- echo(varList, true)
-			-- for index, v in ipairs(varList) do
-			-- 	for k, v2 in pairs(v) do
-			-- 		print("ddddd", k, v2)
-			-- 	end
-
-			-- 	print("---------------------")
-			-- end
 			for index, var in ipairs(varList) do
 				if(var.index) then
 					local display_text = self:GetVariableDisplayName(var.name, true)
@@ -941,9 +934,21 @@ function MovieClipTimeLine.ShowCompareEndTimeBg()
 	if not compare_data then
 		return false
 	end
+	
 	return compare_data["timelength"] ~= nil
 end
 
+function MovieClipTimeLine.UpdateCompareEndTimeBgShow()
+	local ui_object = ParaUI.GetUIObject("MovieClipTimeLine_end_time_compare");
+	if ui_object and ui_object:IsValid() then
+		ui_object.visible = MovieClipTimeLine.ShowCompareEndTimeBg()
+	end
+end
+
+local ignore_in_parent_list = {
+	["pos"] = 1,
+	["rot"] = 1,
+}
 function MovieClipTimeLine.ShowMenuCompareBg()
 	local compare_data = MovieClipController.GetCompareData()
 	if not compare_data then
@@ -951,16 +956,19 @@ function MovieClipTimeLine.ShowMenuCompareBg()
 	end
 
 	local color = MovieClipController.IsShowCompareError() and "#ff0000" or "#00ff00"
+	local has_parent_diff = MovieClipTimeLine.CheckNeedCreateCompareBg(compare_data, "parent")
 	for k, v in pairs(MovieClipTimeLine.menu_uiname_list) do
-		if MovieClipTimeLine.CheckNeedCreateCompareBg(compare_data, v.name) then
-			local ui_object = ParaUI.GetUIObject(k);
-			local parent = ui_object.parent
-			local _this = ParaUI.CreateUIObject("container", k .. "compare_bg", "_lt", 0, 0, parent.width, parent.height - 2);
-			_this.background = "Texture/whitedot.png";
-			_this.zorder = -1
-			_guihelper.SetUIColor(_this, color);
-			parent:AddChild(_this);
-			v.compare_ui_object = _this
+		if (v.name == "parent" and has_parent_diff) or MovieClipTimeLine.CheckNeedCreateCompareBg(compare_data, v.name) then
+			if not (has_parent_diff and ignore_in_parent_list[v.name]) then
+				local ui_object = ParaUI.GetUIObject(k);
+				local parent = ui_object.parent
+				local _this = ParaUI.CreateUIObject("container", k .. "compare_bg", "_lt", 0, 0, parent.width, parent.height - 2);
+				_this.background = "Texture/whitedot.png";
+				_this.zorder = -1
+				_guihelper.SetUIColor(_this, color);
+				parent:AddChild(_this);
+				v.compare_ui_object = _this
+			end
 		end
 	end
 end
@@ -970,16 +978,7 @@ function MovieClipTimeLine.GetMenuCompareBg()
 end
 
 function MovieClipTimeLine.CheckNeedCreateCompareBg(compare_data, name)
-	-- timeline 特殊处理
-
-	for key, v in pairs(compare_data) do
-		local cur_select_slot = MovieClipController.GetCurSelectSlotIndex()
-		local slot_data = v[cur_select_slot]
-		-- print("eeee", cur_select_slot, slot_data and slot_data[name])
-		if slot_data and slot_data[name] then
-			return true
-		end
-	end
-
-	return false
+	local actor = self:GetSelectedActor();
+	local LessonBoxCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxCompare.lua");
+	return LessonBoxCompare.CheckNeedCreateMoviceMenuCompareBg(compare_data, name, actor.class_name)
 end

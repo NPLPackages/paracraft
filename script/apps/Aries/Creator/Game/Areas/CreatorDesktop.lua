@@ -313,7 +313,6 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 	local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
 	if(CreatorDesktop.new_page_params._page) then
 		CreatorDesktop.new_page_params._page.OnClose = function()
-			print(commonlib.debugstack())
 			DesktopMenuPage.ActivateMenu(false);
 			if CreatorDesktop.IsMovie then
 				CreatorDesktop.IsMovie = false

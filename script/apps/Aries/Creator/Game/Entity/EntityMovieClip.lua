@@ -883,11 +883,11 @@ function Entity:CompareSlot(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			if itemStack.id ~= itemStack2.id then
 				diff_num = diff_num + 1
-				result[i] = 1
+				result[i] = itemStack:GetDisplayName() or ""
 			end
 		elseif itemStack and not itemStack2 then
 			diff_num = diff_num + 1
-			result[i] = 1
+			result[i] = itemStack:GetDisplayName() or ""
 		end
 	end
 	return diff_num, result
@@ -896,22 +896,23 @@ end
 function Entity:CompareTimeLength(entity)
 	--电影方块的时间不一样
 	if(self.length ~= entity.length)then
-		return 1, {stander_answer=self.length, error_answer=entity.length}
+		return 1, {stander_answer=self.length}
 	end
 	return 0
 end
 
+local keyConfig = {
+	[10061] = {"lookat_x","lookat_y","lookat_z","eye_dist","eye_liftup","eye_roll","eye_rot_y","parent","weather"},
+	[10062] = {"blockinhand","HeadUpdownAngle","HeadTurningAngle","y","x","z","assetfile","skin","speedscale","facing","roll","block","pitch","anim","scaling","gravity","parent"},
+	[10063] = {"music","movieblock","cmd","tip","time","blocks","text","weather"}
+}
 function Entity:CompareTimes(entity)
 	if not entity then
 		return 0
 	end
 	local diff_num = 0
 	local result = {}
-	local keyConfig = {
-		[10061] = {"lookat_x","lookat_y","lookat_z","eye_dist","eye_liftup","eye_roll","eye_rot_y","parent"},
-		[10062] = {"blockinhand","HeadUpdownAngle","HeadTurningAngle","y","x","z","assetfile","skin","speedscale","facing","roll","block","pitch","anim","scaling","gravity","parent"},
-		[10063] = {"music","movieblock","cmd","tip","time","blocks","text"}
-	}
+
 	local slotCount = self.inventory:GetSlotCount()
 	for slot=1, slotCount do
 		local itemStack = self.inventory:GetItem(slot);
@@ -919,9 +920,9 @@ function Entity:CompareTimes(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
-				result[slot] = 1				
+				result[slot] = {}
 			end
 			local config = keyConfig[itemStack.id] or {}
 			for k,v in pairs(config) do
@@ -930,7 +931,7 @@ function Entity:CompareTimes(entity)
 					if not result[slot] then
 						result[slot] = {}
 					end
-					result[slot][v] = 1
+					result[slot][v] = itemStack2:GetDisplayName() or ""
 				end
 				if (timeseries1[v] and  timeseries2[v])then
 					local times1 = timeseries1[v].times
@@ -940,12 +941,13 @@ function Entity:CompareTimes(entity)
 						if not result[slot] then
 							result[slot] = {}
 						end
-						result[slot][v] = 1 --关键帧数量不一样
+						result[slot][v] = itemStack2:GetDisplayName() or ""
 					else
 						local isSame = true
 						local num = #times1
 						for i=1,num do
 							local nDeNum = math.abs(times1[i] - times2[i])
+							
 							if (nDeNum >= 200) then --关键帧大小相差200ms以上
 								isSame =  false
 								break
@@ -957,7 +959,7 @@ function Entity:CompareTimes(entity)
 							if not result[slot] then
 								result[slot] = {}
 							end
-							result[slot][v] = 1
+							result[slot][v] = itemStack2:GetDisplayName() or ""
 						end					
 					end
 				end			
@@ -981,7 +983,7 @@ function Entity:CompareText(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
 			end
@@ -1024,8 +1026,9 @@ function Entity:CompareTime(entity) --一天中的时间段
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
-				return false				
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
+				diff_num = diff_num + 1
+				result[i] = 1			
 			end
 			if itemStack.id == 10063 then
 				if (timeseries1.time and not timeseries2.time) or (not timeseries1.time and timeseries2.time) then
@@ -1061,12 +1064,13 @@ function Entity:CompareCmd(entity)
 	local diff_num = 0
 	local result = {}
 	for i=1, self.inventory:GetSlotCount() do
+		local slot = i
 		local itemStack = self.inventory:GetItem(i);
 		local itemStack2 = entity.inventory:GetItem(i)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
 			end
@@ -1086,7 +1090,7 @@ function Entity:CompareCmd(entity)
 						for i=1,num do
 							if myCnf[i] ~= otherCnf[i] then
 								diff_num = diff_num + 1
-								result[i] = 1
+								result[slot] = 1
 							end							
 						end
 					end				
@@ -1109,7 +1113,7 @@ function Entity:CompareMovieBlock(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
 			end
@@ -1152,7 +1156,7 @@ function Entity:CompareMusic(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1				
 			end
@@ -1170,10 +1174,16 @@ function Entity:CompareMusic(entity)
 					else
 						local num = #myCnf
 						for i=1,num do
-							if myCnf[i] ~= otherCnf[i] then
-								diff_num = diff_num + 1
-								result[i] = 1
-							end							
+							if type(myCnf[i]) == "table" and type(otherCnf[i]) == "table" then
+								for k2, v2 in pairs(myCnf[i]) do
+									if myCnf[i][k2] ~= otherCnf[i][k2] then
+										diff_num = diff_num + 1
+										result[i] = 1
+										break
+									end	
+								end
+							end
+						
 						end
 					end
 				end	
@@ -1197,7 +1207,7 @@ function Entity:ComparePosition(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				return false				
 			end
 			if itemStack.id == 10061 then
@@ -1239,14 +1249,14 @@ function Entity:CompareRotation(entity)
 	end
 	local diff_num = 0
 	local result = {}
-	local tempCmpKey = {"eye_rot_y","eye_liftup"}
+	local tempCmpKey = {"eye_liftup", "eye_rot_y","eye_roll"}
 	for i=1, self.inventory:GetSlotCount() do
 		local itemStack = self.inventory:GetItem(i);
 		local itemStack2 = entity.inventory:GetItem(i)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1				
 			end
@@ -1272,7 +1282,8 @@ function Entity:CompareRotation(entity)
 								end						
 							end
 							if not isSame then
-								return isSame
+								diff_num = diff_num + 1
+								result[i] = 1
 							end
 						end
 					end
@@ -1295,7 +1306,7 @@ function Entity:CompareParent(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
 			end
@@ -1354,12 +1365,13 @@ function Entity:CompareActorAni(entity)
 	local diff_num = 0
 	local result = {}
 	for i=1, self.inventory:GetSlotCount() do
+		local slot = i
 		local itemStack = self.inventory:GetItem(i);
 		local itemStack2 = entity.inventory:GetItem(i)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1				
 			end
@@ -1379,7 +1391,7 @@ function Entity:CompareActorAni(entity)
 						for i=1,num do
 							if myCnf[i] ~= otherCnf[i] then
 								diff_num = diff_num + 1
-								result[i] = 1
+								result[slot] = 1
 							end							
 						end						
 					end
@@ -1402,8 +1414,9 @@ function Entity:CompareActorBones(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
-				return false				
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
+				diff_num = diff_num + 1
+				result[i] = 1			
 			end
 			if itemStack.id == 10062 then
 				if (timeseries1.bones and not timeseries2.bones) or (not timeseries1.bones and timeseries2.bones) then
@@ -1465,8 +1478,13 @@ function Entity:CompareActorPosition(entity, compare_type)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
-				return false				
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
+				diff_num = diff_num + 1
+				if not result_list[i] then
+					result_list[i] = {}
+				end
+
+				result_list[i].pos = 1				
 			end
 			local keys = {"x","y","z"}
 			if itemStack.id == 10062 then
@@ -1479,7 +1497,6 @@ function Entity:CompareActorPosition(entity, compare_type)
 						local otherCnf = timeseries2[v].data
 						local num = #myCnf
 						for cnf_i=1,num do
-							-- print("rrrrrrrrrrrr", v, myCnf[cnf_i], otherCnf[cnf_i])
 							if myCnf[cnf_i] and otherCnf[cnf_i] and math.abs(myCnf[cnf_i] - otherCnf[cnf_i]) > 3 then
 								diff_num = diff_num + 1
 								if not result_list[i] then
@@ -1509,8 +1526,9 @@ function Entity:CompareActorScale(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
-				return false				
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
+				diff_num = diff_num + 1
+				result[i] = 1		
 			end
 			if itemStack.id == 10062 then
 				if (timeseries1.scaling and not timeseries2.scaling) or (not timeseries1.scaling and timeseries2.scaling) then
@@ -1526,7 +1544,7 @@ function Entity:CompareActorScale(entity)
 					else
 						local num = #myCnf
 						for i=1,num do
-							if math.abs(myCnf[i] - otherCnf[i]) > 0.5 then
+							if math.abs(myCnf[i] - otherCnf[i]) > 0.4 then
 								diff_num = diff_num + 1
 								result[i] = 1
 							end							
@@ -1551,7 +1569,7 @@ function Entity:CompareActorHead(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1				
 			end
@@ -1595,12 +1613,13 @@ function Entity:CompareActorSpeed(entity)
 	local diff_num = 0
 	local result = {}
 	for i=1, self.inventory:GetSlotCount() do
+		local slot = i
 		local itemStack = self.inventory:GetItem(i);
 		local itemStack2 = entity.inventory:GetItem(i)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
 			end
@@ -1620,7 +1639,7 @@ function Entity:CompareActorSpeed(entity)
 						for i=1,num do
 							if myCnf[i] ~= otherCnf[i] then
 								diff_num = diff_num + 1
-								result[i] = 1
+								result[slot] = 1
 							end							
 						end						
 					end
@@ -1638,12 +1657,13 @@ function Entity:CompareActorModel(entity)
 	local diff_num = 0
 	local result = {}
 	for i=1, self.inventory:GetSlotCount() do
+		local slot = i
 		local itemStack = self.inventory:GetItem(i);
 		local itemStack2 = entity.inventory:GetItem(i)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1				
 			end
@@ -1663,7 +1683,7 @@ function Entity:CompareActorModel(entity)
 						for i=1,num do
 							if myCnf[i] ~= otherCnf[i] then
 								diff_num = diff_num + 1
-								result[i] = 1
+								result[slot] = 1
 							end							
 						end						
 					end
@@ -1674,41 +1694,80 @@ function Entity:CompareActorModel(entity)
 	return diff_num, result
 end
 
-function Entity:CompareActorRotation(entity) 
-	-- if not entity then
-	-- 	return 0
-	-- end
-	-- for i=1, self.inventory:GetSlotCount() do
-	-- 	local itemStack = self.inventory:GetItem(i);
-	-- 	local itemStack2 = entity.inventory:GetItem(i)
-	-- 	if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
-	-- 		local timeseries1 = itemStack.serverdata.timeseries
-	-- 		local timeseries2 = itemStack2.serverdata.timeseries
-	-- 		if not timeseries1 or not timeseries2  then
-	-- 			return false				
-	-- 		end
-	-- 		if itemStack.id == 10062 then
-	-- 			if (timeseries1.skin and not timeseries2.skin) or (not timeseries1.skin and timeseries2.skin) then
-	-- 				return false
-	-- 			end	
-	-- 			if (timeseries1.skin and timeseries2.skin) then
-	-- 				local myCnf = timeseries1.skin.data
-	-- 				local otherCnf = timeseries2.skin.data
-	-- 				if #myCnf ~= #otherCnf then
-	-- 					return false
-	-- 				else
-	-- 					local num = #myCnf
-	-- 					for i=1,num do
-	-- 						if myCnf[i] ~= otherCnf[i] then
-	-- 							return false
-	-- 						end							
-	-- 					end						
-	-- 				end
-	-- 			end								
-	-- 		end		
-	-- 	end
-	-- end
-	return 0
+-- 检查是否在误差范围内
+function Entity:CheckRad(rad_1, rad_2) 
+
+	-- 先转成正的
+	if rad_1 < 0 then
+		rad_1 = math.pi * 2 + rad_1
+	end
+
+	if rad_2 < 0 then
+		rad_2 = math.pi * 2 + rad_2
+	end
+
+	local max_value = rad_1 + 0.3
+	local min_value = rad_1 - 0.3
+	if rad_2 >= min_value and rad_2 <= max_value then
+		return true
+	end
+end
+
+function Entity:CompareActorRotation(entity, is_only_facing) 
+	if not entity then
+		return 0
+	end
+
+	local diff_num = 0
+	local result = {}
+	local tempCmpKey = is_only_facing and {"facing"} or {"roll","pitch"}
+	for i=1, self.inventory:GetSlotCount() do
+		local itemStack = self.inventory:GetItem(i);
+		local itemStack2 = entity.inventory:GetItem(i)
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
+			local timeseries1 = itemStack.serverdata.timeseries
+			local timeseries2 = itemStack2.serverdata.timeseries
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
+				diff_num = diff_num + 1
+				result[i] = 1				
+			end
+			if itemStack.id == 10062 then
+				for k,v in pairs(tempCmpKey) do
+					if (timeseries1[v] and not timeseries2[v]) or (not timeseries1[v] and timeseries2[v]) then
+						diff_num = diff_num + 1
+						result[i] = 1
+					end	
+					if (timeseries1[v] and timeseries2[v]) then
+						local myCnf = timeseries1[v].data
+						local otherCnf = timeseries2[v].data
+						if #myCnf ~= #otherCnf then
+							diff_num = diff_num + 1
+							result[i] = 1
+						else
+							local num = #myCnf
+							local isSame = true
+							for i=1,num do
+								local rad_1 = math.modf(myCnf[i] * 100)/100
+								local rad_2 = math.modf(otherCnf[i] * 100)/100
+								-- 3.14特殊处理
+								-- rad_1 = math.abs(rad_1) == 3.14 and 3.14 or rad_1
+								-- rad_2 = math.abs(rad_2) == 3.14 and 3.14 or rad_2
+								if not self:CheckRad(rad_1, rad_2)  then
+									isSame = false
+									break
+								end						
+							end
+							if not isSame then
+								diff_num = diff_num + 1
+								result[i] = 1
+							end
+						end
+					end
+				end
+			end		
+		end
+	end
+	return diff_num, result
 end
 
 function Entity:CompareActorOpcatity(entity) 
@@ -1718,12 +1777,13 @@ function Entity:CompareActorOpcatity(entity)
 	local diff_num = 0
 	local result = {}
 	for i=1, self.inventory:GetSlotCount() do
+		local slot = i
 		local itemStack = self.inventory:GetItem(i);
 		local itemStack2 = entity.inventory:GetItem(i)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
 			end
@@ -1743,7 +1803,7 @@ function Entity:CompareActorOpcatity(entity)
 						for i=1,num do
 							if myCnf[i] ~= otherCnf[i] then
 								diff_num = diff_num + 1
-								result[i] = 1
+								result[slot] = 1
 							end							
 						end						
 					end
@@ -1766,7 +1826,7 @@ function Entity:CompareActorParent(entity)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
 			end
@@ -1785,13 +1845,13 @@ function Entity:CompareActorParent(entity)
 						local num = #myCnf
 						local isSame = true
 						for i=1,num do
-							if myCnf[i].target ~= otherCnf.target then
+							if myCnf[i].target ~= otherCnf[i].target then
 								isSame = false
 								break
 							end
-							if isSame and  (math.abs(myCnf[i].rot[1]*180/math.pi - otherCnf[i].rot[1]*180/math.pi) > 35 
-								or math.abs(myCnf[i].rot[2]*180/math.pi - otherCnf[i].rot[2]*180/math.pi) > 35  
-								or math.abs(myCnf[i].rot[3]*180/math.pi - otherCnf[i].rot[3]*180/math.pi) > 35) then
+							if isSame and  (math.abs(myCnf[i].rot[1] - otherCnf[i].rot[1]) > 0.3 
+								or math.abs(myCnf[i].rot[2] - otherCnf[i].rot[2]) > 0.3  
+								or math.abs(myCnf[i].rot[3] - otherCnf[i].rot[3]) > 0.3) then
 								isSame = false
 								break
 							end
@@ -1823,37 +1883,110 @@ function Entity:CompareActorName(entity)
 	for i=1, self.inventory:GetSlotCount() do
 		local itemStack = self.inventory:GetItem(i);
 		local itemStack2 = entity.inventory:GetItem(i)
+		local name1 = itemStack and itemStack:GetDisplayName() or ""
+		local name2 = itemStack2 and itemStack2:GetDisplayName() or ""
+		if itemStack and itemStack.id == 10062 then				
+			if name1 ~= name2 then
+				diff_num = diff_num + 1
+				result[i] = name1
+			end
+		end	
+	end
+	return diff_num, result
+end
+
+function Entity:CompareWeather(entity) --一天中的时间段
+	if not entity then
+		return 0
+	end
+	local diff_num = 0
+	local result = {}
+	for i=1, self.inventory:GetSlotCount() do
+		local slot = i
+		local itemStack = self.inventory:GetItem(i);
+		local itemStack2 = entity.inventory:GetItem(i)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
-			if not timeseries1 or not timeseries2  then
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
 				diff_num = diff_num + 1
 				result[i] = 1			
 			end
-			if itemStack.id == 10062 then
-				if (timeseries1.name and not timeseries2.name) or (not timeseries1.name and timeseries2.name) then
+			if itemStack.id == 10063 then
+				if (timeseries1.weather and not timeseries2.weather) or (not timeseries1.weather and timeseries2.weather) then
 					diff_num = diff_num + 1
 					result[i] = 1
-				end	
-				if (timeseries1.name and timeseries2.name) then
-					local myCnf = timeseries1.name.data
-					local otherCnf = timeseries2.name.data
+				end					
+				if (timeseries1.weather and timeseries2.weather) then
+					local myCnf = timeseries1.weather.data
+					local otherCnf = timeseries2.weather.data
 					if #myCnf ~= #otherCnf then
 						diff_num = diff_num + 1
 						result[i] = 1
 					else
 						local num = #myCnf
 						for i=1,num do
-							if myCnf[i] ~= otherCnf[i] then
-								diff_num = diff_num + 1
-								result[i] = 1
-							end							
-						end						
+							for k3, v3 in pairs(myCnf[i]) do
+								if k3 == "time" then
+									if math.abs(myCnf[i][k3] - otherCnf[i][k3]) > 0.3 then
+										diff_num = diff_num + 1
+										result[slot] = 1
+										break
+									end	
+								else
+									if myCnf[i][k3] ~= otherCnf[i][k3] then
+										diff_num = diff_num + 1
+										result[slot] = 1
+										break
+									end	
+								end
+
+							end
+						end
 					end
-				end								
-			end		
+				end				
+			end				
 		end
 	end
 	return diff_num, result
 end
 
+function Entity:CompareActorSkin(entity) --一天中的时间段
+	if not entity then
+		return 0
+	end
+	local diff_num = 0
+	local result = {}
+	for i=1, self.inventory:GetSlotCount() do
+		local slot = i
+		local itemStack = self.inventory:GetItem(i);
+		local itemStack2 = entity.inventory:GetItem(i)
+		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
+			local timeseries1 = itemStack.serverdata.timeseries
+			local timeseries2 = itemStack2.serverdata.timeseries
+			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
+				diff_num = diff_num + 1
+				result[i] = 1			
+			end
+			if itemStack.id == 10062 then
+				if (timeseries1.skin and not timeseries2.skin) or (not timeseries1.skin and timeseries2.skin) then
+					return false,compare_data
+				end	
+				if (timeseries1.skin and timeseries2.skin) then
+					local myCnf = timeseries1.skin.data
+					local otherCnf = timeseries2.skin.data
+					local num = #myCnf
+					for i=1,num do
+						-- 皮肤 只要对应帧上有值就算通过
+						if myCnf[i] and (otherCnf[i] == nil or otherCnf[i] == "") then
+							diff_num = diff_num + 1
+							result[slot] = 1
+							break
+						end							
+					end	
+				end								
+			end			
+		end
+	end
+	return diff_num, result
+end

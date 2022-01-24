@@ -120,10 +120,17 @@ function Entity:init()
 	end
 	if(not self.name) then
 		self.name = ParaGlobal.GenerateUniqueID()
+		-- no need to append filename to auto-generated names
+--		if(self.filename) then
+--			local filename = self.filename:match("([^/\\]+)$")
+--			if(filename) then
+--				self.name = format("%s-%s", filename, self.name);
+--			end
+--		end
 	end
 	self:CreateInnerObject(self.filename, self.scaling);
 
-	-- self:SetDummy(true);
+	-- self:SetDummy(true); -- still needs framemove
 
 	if(AppGeneralGameClient.SyncEntityLiveModel and self:GetCanDrag()) then
 		AppGeneralGameClient:SyncEntityLiveModel(self);
@@ -164,7 +171,7 @@ end
 
 -- bool: whether has command panel
 function Entity:HasCommand()
-	return false;
+	return true;
 end
 
 function Entity:GetCommandTitle()
@@ -189,6 +196,26 @@ end
 -- the title text to display (can be mcml)
 function Entity:GetBagTitle()
 	return L"背包";
+end
+
+function Entity:CheckCollision(deltaTime)
+	if(not self:IsCheckCollision()) then
+		return
+	end
+	local bx,by,bz = self:GetBlockPos();
+
+	-- checking collision with blocks
+	local block = BlockEngine:GetBlock(bx,by,bz);
+	if(block) then
+		if(not block.obstruction) then
+			-- fire block event if we are colliding with an non-obstruction block, such as pressure plate. 
+			block:OnEntityCollided(bx,by,bz, self, deltaTime);
+		end
+	end
+end
+
+function Entity:doesEntityTriggerPressurePlate()
+	return true
 end
 
 -- send data watcher from client to server
@@ -251,6 +278,20 @@ function Entity:LoadFromDataWatcher()
 	if(self:GetSkin() ~= curSkinId and curSkinId) then
 		self:SetSkin(curSkinId, true);
 	end
+end
+
+function Entity:SetDisplayModel(bVisible)
+	if(self.isDisplayModel ~= bVisible) then
+		self.isDisplayModel = bVisible
+		self:SetVisible(bVisible==true)
+		if(bVisible) then
+			self:SetOpacity(1)
+		end
+	end
+end
+
+function Entity:IsDisplayModel()
+	return self.isDisplayModel;
 end
 
 function Entity:BeginModify()
@@ -625,6 +666,10 @@ function Entity:CreateInnerObject()
 		self:Refresh(nil, obj)
 
 		self:UpdateBlockContainer();
+
+		if(not self:IsDisplayModel()) then
+			self:SetVisible(false);
+		end
 	end
 	return obj;
 end
@@ -1015,9 +1060,6 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			end
 		end
 	end
-	if(self:HasAnyRule()) then
-		return true;
-	end
 end
 
 
@@ -1037,6 +1079,18 @@ function Entity:OpenEditor(editor_name, entity)
 		end
 	end
 end
+
+-- support modify facing when linked
+function Entity:OnUpdateLinkFacing()
+	if(self.linkInfo and self.linkInfo.entity) then
+		self.linkInfo.facing = self:GetFacing() - self.linkInfo.entity:GetFacing();
+	end
+end
+
+-- do not support modify position when linked
+function Entity:OnUpdateLinkPosition()
+end
+
 
 -- but we use the current relative position between this and link target. 
 -- and if we move the current entity after the a link is established, we will modify the relative position.
@@ -1074,6 +1128,8 @@ function Entity:LinkTo(targetEntity, boneName, pos, rot)
 			targetEntity:Connect("facingChanged", self, self.UpdateEntityLink);
 			targetEntity:Connect("scalingChanged", self, self.UpdateEntityLink);
 			targetEntity:Connect("beforeDestroyed", self, self.UnLink);
+			self:Connect("facingChanged", self, self.OnUpdateLinkFacing);
+			--self:Connect("valueChanged", self, self.OnUpdateLinkPosition);
 			targetEntity.childLinks = targetEntity.childLinks or {};
 			targetEntity.childLinks[self] = true;
 		end
@@ -1108,6 +1164,8 @@ function Entity:UnLinkEntity(entity)
 		entity:Disconnect("facingChanged", self, self.UpdateEntityLink);
 		entity:Disconnect("scalingChanged", self, self.UpdateEntityLink);
 		entity:Disconnect("beforeDestroyed", self, self.UnLink);
+		self:Disconnect("facingChanged", self, self.OnUpdateLinkFacing);
+		--self:Disconnect("valueChanged", self, self.OnUpdateLinkPosition);
 		entity.childLinks[self] = nil;
 	end
 end
@@ -1296,6 +1354,10 @@ function Entity:GetLinkToTarget()
 	end
 end
 
+function Entity:GetLinkToName()
+	return self:ConvertLinkInfoToString(self.linkInfo);
+end
+
 -- this function is only used during world loading, in case the entity name is not loaded yet, 
 -- we will wait some time and try again. 
 -- @param name: entityName[::boneName], such as "player1::L_Hand"
@@ -1370,7 +1432,9 @@ function Entity:EndDrag(dragLocation)
 	end
 	self:ForEachChildLinkEntity(Entity.EndDrag)
 	self:OnEndDrag(dragLocation)
+	self:CheckCollision()
 	self:EndModify()
+	
 end
 
 function Entity:OnBeginDrag()
@@ -1520,11 +1584,9 @@ function Entity:FrameMove(deltaTime)
 			self:OnMainAssetLoaded()
 		end
 	end
-	--if(self.linkInfo and self.linkInfo.boneName) then
-		--self:UpdateEntityLink()
-	--end
 	if(GameLogic.GameMode:IsEditor()) then
 		if(not self:IsVisible()) then
+			self:SetOpacity(0.5)
 			self:SetVisible(true)
 		end
 	else
@@ -1532,6 +1594,11 @@ function Entity:FrameMove(deltaTime)
 			self:SetVisible(self:IsDisplayModel())
 		end
 	end
+end
+
+function Entity:SetVisible(bVisible)
+	Entity._super.SetVisible(self, bVisible)
+	self:SetSkipPicking(not bVisible);
 end
 
 -- virtual function: this function is called by the basecontext to highlight picking entity. 

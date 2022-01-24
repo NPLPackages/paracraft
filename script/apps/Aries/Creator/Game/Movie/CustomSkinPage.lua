@@ -101,7 +101,7 @@ function CustomSkinPage.ShowPage(OnClose, skinIdString)
 
 	keepwork.actors.list(nil, function(err, msg, data)
 		if (err == 200 and data and data.count > 0) then
-			CustomSkinPage.model_index = 1;
+			CustomSkinPage.model_index = -1;
 			for i = 1, data.count do
 				local actor = data.rows[i];
 				CustomSkinPage.Current_Model_DS[i] = {asset = actor.equipment.asset, skin = actor.equipment.skin, id = actor.id, name = actor.name, alias = actor.equipment.alias or string.format(L"新建模型%d", actor.id)};
@@ -110,7 +110,10 @@ function CustomSkinPage.ShowPage(OnClose, skinIdString)
 				currentModelFile = CustomSkinPage.Current_Model_DS[1].asset;
 				page:CallMethod("MyPlayer", "SetAssetFile", currentModelFile);
 			end
-			currentSkin = CustomSkinPage.Current_Model_DS[1].skin;
+			if not currentSkin then
+				CustomSkinPage.model_index = 1
+				currentSkin = CustomSkinPage.Current_Model_DS[1].skin;
+			end
 
 			local items = CustomCharItems:GetUsedItemsBySkin(currentSkin);
 			for _, item in ipairs(items) do

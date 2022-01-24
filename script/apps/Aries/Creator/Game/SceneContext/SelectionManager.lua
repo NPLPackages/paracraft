@@ -145,6 +145,7 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 			if(result.block_id > 0) then
 				result.blockRealX, result.blockRealY, result.blockRealZ = result.x, result.y, result.z;
 				result.blockLength = result.length;
+				result.blockSide = result.side;
 				local block = block_types.get(result.block_id);
 				if(not block) then
 					-- remove blocks for non-exist blocks
@@ -346,22 +347,34 @@ function SelectionManager:GetMouseInteractionPointWithAABB(aabb)
 	end
 end
 
--- @param fingerRadius: in pixels, default to 16. we shall cast 4 additional mouse rays in up,down, left, right directions. 
+-- @param fingerRadius: in pixels, default to 16 (32 in diameter). we shall cast with triangle mesh grid in spiral way.
+-- @param gridSize: default to 4 pixels, object smaller than this in screen may has a chance to miss, even if it is in fingerRadius.  
 -- @return allResults: array of all results, starting from the one that is closest to mouse point. 
-function SelectionManager:MousePickWithFingerSize(bPickBlocks, bPickPoint, bPickObjects, picking_dist, fingerRadius)
+function SelectionManager:MousePickWithFingerSize(bPickBlocks, bPickPoint, bPickObjects, picking_dist, fingerRadius, gridSize)
 	fingerRadius = fingerRadius or 16;
 	local results = {};
 	results[#results+1] = self:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist):CloneMe();
 	local mouse_x, mouse_y = Mouse:GetMousePosition();
-	local gridSize = 8;
+	gridSize = gridSize or 4;
 	local layerCount = math.min(5, math.floor(fingerRadius / gridSize+0.5));
 	for layer = 1, layerCount do
-		for step = 1, 4*layer do
-			local angle = math.pi*2 * step / (4*layer)
+		for step = 1, 6 do
+			local angle = math.pi*2 * step / (6)
 			local r = layer*gridSize;
 			local x = math.cos(angle) * r + mouse_x;
 			local y = math.sin(angle) * r + mouse_y;
 			results[#results+1] = self:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist, x, y):CloneMe();
+			if(layer > 1) then    
+				local angle1 = math.pi*2 * (step+1) / (6)
+				local x1 = math.cos(angle1) * r + mouse_x;
+				local y1 = math.sin(angle1) * r + mouse_y;
+        
+				for i=1, layer-1 do
+					local x2 = x + (x1-x)* i / layer
+					local y2 = y + (y1-y)* i / layer
+					results[#results+1] = self:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist, x2, y2):CloneMe();
+				end
+			end
 		end
 	end
 	self.result:CopyFrom(results[1])

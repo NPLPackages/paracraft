@@ -117,6 +117,7 @@ function Entity:GetClickAABBCount()
 	return count > 0 and count or 1;
 end
 
+
 -- @param x, y, z: in real world coordinate
 -- @param pointRadius: if nil, it means 0
 -- @return boolean, facing:  the first parameter is true if the point is inside one of its clickable aabb

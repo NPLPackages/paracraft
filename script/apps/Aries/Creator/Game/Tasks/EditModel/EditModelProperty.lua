@@ -49,8 +49,8 @@ function EditModelProperty.ShowForEntity(modelEntity)
 				modelEntity:SetIdleAnim(values.idleAnim or 0)
 				modelEntity:SetCanDrag(values.canDrag)
 				modelEntity:SetAutoTurningDuringDragging(values.autoTurning)
-				modelEntity.isDisplayModel = values.isDisplayModel~=false;
-					
+				modelEntity:SetDisplayModel(values.isDisplayModel~=false)
+				
 				if(values.onClickEvent == "") then
 					values.onClickEvent = nil
 				end
@@ -232,6 +232,7 @@ function EditModelProperty.UpdateUIFromValue(values)
 		page:SetValue("onBeginDragEvent", tostring(values.onBeginDragEvent or ""));
 		page:SetValue("onEndDragEvent", tostring(values.onEndDragEvent or ""));
 		page:SetValue("modelfile", tostring(values.modelfile or ""));
+		page:SetValue("tag", tostring(values.tag or ""));
 		page:SetValue("staticTag", tostring(values.staticTag or ""));
 		page:SetValue("category", tostring(values.category or ""));
 		EditModelProperty.mountpoints = values.mountpoints;

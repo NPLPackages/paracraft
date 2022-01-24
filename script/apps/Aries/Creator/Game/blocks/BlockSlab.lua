@@ -42,7 +42,8 @@ end
 -- this box can change after the pool has been cleared to be reused
 function block:GetCollisionBoundingBoxFromPool(x,y,z)
     if(self.collisionAABBs)then
-	    local aabb = self.collisionAABBs[BlockEngine:GetBlockData(x,y,z)];
+		local data = BlockEngine:GetBlockData(x,y,z)
+	    local aabb = self.collisionAABBs[mathlib.bit.band(data, 0xf)];
 	    if( aabb ) then
 		    return aabb:clone_from_pool():Offset(BlockEngine:real_min(x,y,z));
 	    end

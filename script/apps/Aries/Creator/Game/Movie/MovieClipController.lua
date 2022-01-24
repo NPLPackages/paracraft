@@ -390,6 +390,7 @@ function MovieClipController.GetActorInventoryView()
 end
 
 function MovieClipController.OnClose()
+	GameLogic.GetFilters():apply_filters("OnClickCloseMovieClip");
 	MovieManager:SetActiveMovieClip(nil);
 end
 
@@ -919,6 +920,7 @@ function MovieClipController.ClearUiAnim()
 end
 
 function MovieClipController.ShowCompareUiAnim()
+	MovieClipTimeLine.UpdateCompareEndTimeBgShow()
 	if not MovieClipController.CompareData then
 		return			
 	end
@@ -1002,10 +1004,11 @@ function MovieClipController.SetCompareErrorBg()
 		return
 	end
 
-	if not MovieClipController.is_show_compare_error then
-		return
-	end
+	-- if not MovieClipController.is_show_compare_error then
+	-- 	return
+	-- end
 
+	local color = MovieClipController.IsShowCompareError() and "#ff0000" or "#00ff00"
 	local slot_list = {}
 	for key, value in pairs(MovieClipController.CompareData) do
 		for k2, v2 in pairs(value) do
@@ -1016,14 +1019,14 @@ function MovieClipController.SetCompareErrorBg()
 	for k, v in pairs(slot_list) do
 		local ui_object = ParaUI.GetUIObject("MovieClipController.slot_".. k .. "_bg");
 		if ui_object and ui_object:IsValid() then
-			_guihelper.SetUIColor(ui_object, "#ff0000");
+			_guihelper.SetUIColor(ui_object, color);
 		end
 	end
 
 	-- MovieClipTimeLine的也在这处理
 	local ui_object = ParaUI.GetUIObject("MovieClipTimeLine_end_time_compare");
 	if ui_object and ui_object:IsValid() then
-		_guihelper.SetUIColor(ui_object, "#ff0000");
+		_guihelper.SetUIColor(ui_object, color);
 	end
 end
 

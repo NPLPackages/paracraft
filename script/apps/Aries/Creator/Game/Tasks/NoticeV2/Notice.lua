@@ -17,6 +17,9 @@ local campIds = {
     RELEASE = 1471,
 }
 
+local page
+
+local SAVE_DATA_KEY = "Paracraft_Notice_ShowV2"
 
 Notice.isSelectShowToday = true;
 Notice.nSelectIndex = 1;
@@ -323,19 +326,17 @@ end
 
 --保存数据
 function Notice.SaveLocalData()
-    local key = "Paracraft_Notice_Show";
     local nowtime = os.time()
     local data = {}
     data.IsAutoOpen = not Notice.isSelectShowToday
     data.CurSetTime = nowtime
     --保存数据的方式
-    GameLogic.GetPlayerController():SaveRemoteData(key,data,true);
+    GameLogic.GetPlayerController():SaveRemoteData(SAVE_DATA_KEY,data);
 end
 
 function Notice.CheckCanShow()
-    local key = "Paracraft_Notice_Show"
-    local data = GameLogic.GetPlayerController():LoadRemoteData(key,nil);
-    if not data then
+    local data = GameLogic.GetPlayerController():LoadRemoteData(SAVE_DATA_KEY,nil);
+    if not data or type(data) ~= "table" then
         return true
     else
         local saveTime = os.date("%Y-%m-%d",data.CurSetTime or os.time())
@@ -348,9 +349,8 @@ function Notice.CheckCanShow()
 end
 
 function Notice.LoadLocalData()
-    local key = "Paracraft_Notice_Show"
-    local data = GameLogic.GetPlayerController():LoadRemoteData(key,nil);
-    if not data then
+    local data = GameLogic.GetPlayerController():LoadRemoteData(SAVE_DATA_KEY,nil);
+    if not data or type(data) ~= "table" then
         Notice.isSelectShowToday = false
     else
         local saveTime = os.date("%Y-%m-%d",data.CurSetTime or os.time())

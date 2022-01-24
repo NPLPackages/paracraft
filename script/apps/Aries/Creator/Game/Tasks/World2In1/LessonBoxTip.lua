@@ -25,6 +25,8 @@ local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local LessonBoxCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxCompare.lua");
 local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
@@ -65,13 +67,33 @@ LessonBoxTip.RoleAni={
 }
 
 LessonBoxTip.CheckMovieTips={
-    {type = "slot",text = "没能在电影方块中找到对应的【摄影机】/【演员】，请先检查一下是否正确添加了【摄影机】/【演员】，或是调换了位置？"},
+    {type = "slot",text = "没能在电影方块中找到对应的【%s】，请先检查一下是否正确添加了【%s】，或是调换了位置？"},
     {type = "timelength",text = "电影方块的时长错了，正确的时长是【%s】，请重新设定"},
-    {type = "movie_clip",text = "没能在【摄影机】/【演员】上找到关键帧，请再核对一下"},
-    {type = "movie_prop_accurate",text = ""},
-    {type = "movie_prop_vague",text = ""},
-    {type = "actor_prop_accurate",text = ""},
-    {type = "actor_prop_vague",text = ""},
+    {type = "timeline",text = "没能在【%s】上找到关键帧，请再核对一下"},
+}
+
+LessonBoxTip.CompareTypeToDesc={
+    ["text"] = "摄像机-文字",
+    ["time"] = "摄像机-时间",
+    ["cmd"] = "摄像机-命令",
+    ["child_movie_block"] = "摄像机-子电影块",
+    ["backmusic"] = "摄像机-背景音乐",
+    ["lookat"] = "摄像机-位置",
+    ["rotation"] = "摄像机-三轴旋转",
+    ["parent"] = "摄像机-父链接",
+    ["actor_ani"] = "角色-动作",
+    ["actor_bone"] = "角色-骨骼",
+    ["actor_pos"] = "角色-位置",
+    ["actor_turn"] = "角色-转身",
+    ["actor_rotation"] = "角色-三轴旋转",
+    ["actor_scale"] = "角色-大小",
+    ["actor_head"] = "角色-头部运动",
+    ["actor_speed"] = "角色-运动速度",
+    ["actor_model"] = "角色-模型",
+    ["actor_opcatiity"] = "角色-透明度",
+    ["actor_parent"] = "角色-父链接",
+    ["actor_name"] = "角色-名称",
+    ["weather"] = "天气",
 }
 
 LessonBoxTip.NomalTip = {
@@ -79,6 +101,11 @@ LessonBoxTip.NomalTip = {
     movietarget="在电影方块中，%s",
     notfinish="像我这样，完成全部的操作吧！",
     no_change="这一步不需要改动地图，在熟悉完老师讲授的知识后，点击“开始检查”即可",
+}
+
+local VoiceType = {
+    ["build"] = 10006,
+    ["anim"] = 5118,
 }
 local checkIndex = 0
 local page = nil
@@ -231,6 +258,7 @@ end
 function LessonBoxTip.InitLessonConfig(config)
     if config then
         lessonConfig = commonlib.copy(config)
+        LessonBoxTip.is_pass_lesson = config.is_pass_lesson
         --echo(config,true)
         LessonBoxTip.InitLessonData()
         LessonBoxTip.m_nMaxStageIndex = #lessonConfig.taskCnf
@@ -263,8 +291,6 @@ function LessonBoxTip.ClearLearnArea(area)
     if not area or not area.pos or not area.size then
         return 
     end
-    -- print("ClearLearnArea==============")
-    -- echo(area)
     GameLogic.RunCommand(string.format("/select %d,%d,%d (%d %d %d)",area.pos[1],area.pos[2],area.pos[3],area.size[1],area.size[2],area.size[3]))
     GameLogic.RunCommand("/del")
     GameLogic.RunCommand("/select -clear")
@@ -285,7 +311,7 @@ function LessonBoxTip.PrepareStageScene()
     local stagePos = lessonConfig.teachStage
     if stagePos[1] then
         GameLogic.GetPlayer():MountEntity(nil);
-        GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
+    GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
     end
     local lookPos = lessonConfig.lookPos
     if lookPos then
@@ -346,11 +372,16 @@ function LessonBoxTip.StartCurStage()
             GameLogic.GetPlayer():MountEntity(nil);
             GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
             --GameLogic.RunCommand("/camerayaw 1.57")
+            commonlib.TimerManager.SetTimeout(function()
+                if stagePos[1] then
+                    GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
+                end
+            end,500)
         end
         LessonBoxTip.PlayLessonMusic("lesson_operate")
         LessonBoxTip.StartTip()
         LessonBoxTip.StartLearn()
-    end,700)
+    end,300)
 end
 
 function LessonBoxTip.ResetMyArea()
@@ -362,11 +393,59 @@ function LessonBoxTip.ResetMyArea()
     local posMy = lessonConfig.templatemy
     local regionsrc = lessonConfig.regionMy
     LessonBoxTip.ClearLearnArea(regionsrc)
+
+    if lessonConfig.lesson_type == "anim" then
+        MovieClipController.SetIsShowCompareError(false)
+        MovieClipController.SetCompareErrorBg()
+    end
     commonlib.TimerManager.SetTimeout(function()
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posMy[1],posMy[2],posMy[3],startTemp))
         GameLogic.AddBBS("resetArea","区域已恢复到初始状态")
         LessonBoxTip.RenderBlockTip()
+
+        if lessonConfig.lesson_type == "anim" then
+            local entity_answer = EntityManager.GetBlockEntity(posMy[1], posMy[2], posMy[3])
+            if entity_answer then
+                movice_clip = entity_answer:GetMovieClip();
+                -- 激活电影以对比
+                if not MovieClipController.IsVisible() then
+                    MovieManager:SetActiveMovieClip(movice_clip);
+                    MovieManager:SetActiveMovieClip(nil);
+                end
+            end
+
+        end
+
     end,500)
+end
+
+function LessonBoxTip.ResetTeacherArea()
+    if not lessonConfig then
+        return 
+    end
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
+    local finishtemplate = taskCnf.finishtemplate
+    local templateteacher = lessonConfig.templateteacher
+    local regionOther = lessonConfig.regionOther
+    LessonBoxTip.ClearLearnArea(regionOther)
+
+    commonlib.TimerManager.SetTimeout(function()
+        GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",templateteacher[1],templateteacher[2],templateteacher[3],finishtemplate))
+        LessonBoxTip.RenderBlockTip()
+
+        if lessonConfig.lesson_type == "anim" then
+            local entity = EntityManager.GetBlockEntity(templateteacher[1], templateteacher[2], templateteacher[3])
+            if entity then
+                local movice_clip = entity:GetMovieClip();
+                -- 激活电影以对比
+                if not MovieClipController.IsVisible() then
+                    MovieManager:SetActiveMovieClip(movice_clip);
+                    MovieManager:SetActiveMovieClip(nil);
+                end
+            end
+
+        end
+    end,200)
 end
 
 function LessonBoxTip.InitLessonData()
@@ -471,7 +550,8 @@ function LessonBoxTip.StartLearn()
             if lessonConfig.lesson_type == "anim" and lessonConfig.course_index ~= 1 then
                 if not LessonBoxCompare.BindAnimLessonFilter then
                     LessonBoxCompare.BindAnimLessonFilter = true
-                    GameLogic.GetFilters():add_filter("OpenMovieClipController", LessonBoxCompare.OpenMovieClipController);
+                    GameLogic.GetFilters():add_filter("OpenMovieClipController", LessonBoxTip.OpenMovieClipController);
+                    GameLogic.GetFilters():add_filter("OnClickCloseMovieClip", LessonBoxTip.OnClickCloseMovieClip);
                 end
                 
                 -- 比较电影
@@ -492,30 +572,34 @@ end
 -- regionsrc 自己
 function LessonBoxCompare.CompareAnimLesson(regiondest, regionsrc)
 
-    local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
-    local answer_movice_pos = regiondest.pos
-    local entity_answer = EntityManager.GetBlockEntity(answer_movice_pos[1], answer_movice_pos[2], answer_movice_pos[3])
-    if not entity_answer then
+    local my_movice_pos = regiondest.pos
+    local entity_my = EntityManager.GetBlockEntity(my_movice_pos[1], my_movice_pos[2], my_movice_pos[3])
+    if not entity_my then
         return
     end
-    local movice_clip = entity_answer:GetMovieClip();
+    local movice_clip = entity_my:GetMovieClip();
     -- 激活电影以对比
     if not MovieClipController.IsVisible() then
         MovieManager:SetActiveMovieClip(movice_clip);
-        MovieClipController.OnClose()
+        MovieManager:SetActiveMovieClip(nil);
     end
 
 
-    local my_movice_pos = regionsrc.pos
-    local entity_my = EntityManager.GetBlockEntity(my_movice_pos[1], my_movice_pos[2], my_movice_pos[3])
-    movice_clip = entity_my:GetMovieClip();
-    -- 激活电影以对比
-    if not MovieClipController.IsVisible() then
-        MovieManager:SetActiveMovieClip(movice_clip);
-        MovieClipController.OnClose()
+    local answer_movice_pos = regionsrc.pos
+    local entity_answer = EntityManager.GetBlockEntity(answer_movice_pos[1], answer_movice_pos[2], answer_movice_pos[3])
+    if entity_answer then
+        movice_clip = entity_answer:GetMovieClip();
+        -- 激活电影以对比
+        if not MovieClipController.IsVisible() then
+            MovieManager:SetActiveMovieClip(movice_clip);
+            MovieManager:SetActiveMovieClip(nil);
+        end
     end
 
-    local result_list = LessonBoxCompare.CompareMovieAll(entity_my, entity_answer)
+
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex] or {}
+    local result_list = LessonBoxCompare.CompareMovieAll(entity_answer, entity_my, taskCnf.teach_point)
+
     -- print("rrrrrrrrrrrrrrrrrrrrrrresult_list")
     -- echo(result_list, true)
     LessonBoxTip.CompareMovieResult = result_list
@@ -523,8 +607,8 @@ function LessonBoxCompare.CompareAnimLesson(regiondest, regionsrc)
     MovieClipController:OnMovieClipRemotelyUpdated()
 
     LessonBoxTip.SetLessonTitle()
-    local lesson_desc = string.gsub(lessonConfig.description, "<br/>", "")
-    local str = string.format(LessonBoxTip.NomalTip.movietarget, lesson_desc)
+    local str = lessonConfig.teacher_say or ""
+    -- local str = string.format(LessonBoxTip.NomalTip.movietarget, lesson_desc)
     LessonBoxTip.SetTaskTip(nil, str)
     LessonBoxTip.SetRoleName()
     LessonBoxTip.UpdateNextBtnStatus()
@@ -545,7 +629,6 @@ function LessonBoxCompare.CompareBulidLesson(regionsrc,regiondest)
             local movieBlocks = needbuild.movies
             local codeBlocks = needbuild.codes
             LessonBoxTip.CompareCode(codeBlocks)
-            --LessonBoxTip.CompareMovie(movieBlocks)
         else
             -- LessonBoxTip.AutoEquipHandTools()
             LessonBoxTip.RegisterHooks()
@@ -585,34 +668,6 @@ function LessonBoxTip.CompareCode(blocks)
             end
         end
     end
-end
-
-function LessonBoxTip.CompareMovie(blocks)
-    if type(blocks) == "table" then
-        if #blocks == 0 then
-            LessonBoxTip.RemoveErrBlockTip()
-            LessonBoxTip.SetErrorTip(LessonBoxTip.m_nCorrectCount)
-            GameLogic.AddBBS(nil,"当前小节已完成，你可以点击检查进入下一小节")
-            commonlib.TimerManager.SetTimeout(function()
-                LessonBoxTip.ClearErrorBlockTip()
-                LessonBoxTip.RemoveErrBlockTip()
-                LessonBoxTip.ClearBlockTip()
-                -- LessonBoxTip.GotoNextStage()
-            end,1000)
-        else
-            for i=1,#blocks do
-                local possrc,posdest = LessonBoxTip.AddTwoPosition(blocks[i][1],LessonBoxTip.CreatePos),LessonBoxTip.AddTwoPosition(blocks[i][2],LessonBoxTip.SrcBlockOrigin)
-                local entitySrc = EntityManager.GetBlockEntity(possrc)
-                local entityDest = EntityManager.GetBlockEntity(posdest)
-                local bSame,type = LessonBoxCompare.CompareMovieClip(entitySrc,entityDest)
-                if not bSame then
-
-                    break
-                end
-            end
-        end
-    end
-    -- LessonBoxCompare.CompareMovieClip
 end
 
 function LessonBoxTip.AddTwoPosition(pos1,pos2)
@@ -665,7 +720,7 @@ function LessonBoxTip.RenderErrorBlockTip()
 end
 
 function LessonBoxTip.UpdateErrArrow(pos)
-    if not pos or not LessonBoxTip.CreatePos[1] or not LessonBoxTip.SrcBlockOrigin[1] then
+    if not pos or not LessonBoxTip.CreatePos or not LessonBoxTip.CreatePos[1] or not LessonBoxTip.SrcBlockOrigin[1] then
         return
     end
     local startPos = LessonBoxTip.CreatePos and LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
@@ -772,7 +827,7 @@ function LessonBoxTip.SetTaskTip(type, text)
         local strTip = text or LessonBoxTip.NomalTip[type]
         page:SetValue("role_tip", strTip);
         if strTip then
-            SoundManager:PlayText(strTip,10006)
+            LessonBoxTip.PlayTextByTeacher(strTip)
         end
     end
 end
@@ -784,7 +839,7 @@ function LessonBoxTip.SetErrorTip(index)
         page:SetValue("role_tip", strTip);
         if strTip then
             LessonBoxTip.PlayRoleAni(index)
-            SoundManager:PlayText(strTip,10006)
+            LessonBoxTip.PlayTextByTeacher(strTip)
         end
     end
 end
@@ -821,6 +876,7 @@ function LessonBoxTip.ReplayMovie()
 end
 --请按照园长的讲解，在自己的区域也练习一遍吧！
 function LessonBoxTip.ResumeLessonUI()
+    
     LessonBoxTip.ShowView()
     LessonBoxTip.SetLessonTitle()
     LessonBoxTip.SetTaskTip("check")
@@ -837,6 +893,17 @@ function LessonBoxTip.ResumeLessonUI()
     commonlib.TimerManager.SetTimeout(function()
         LessonBoxTip.RenderBlockTip()
     end,200)
+    commonlib.TimerManager.SetTimeout(function()
+        if stagePos[1] then
+            GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
+        end
+
+        if lessonConfig.lesson_type == "anim" and lessonConfig.course_index ~= 1 then
+            local regionsrc = lessonConfig.regionMy
+            local regiondest = lessonConfig.regionOther
+            LessonBoxCompare.CompareAnimLesson(regionsrc, regiondest)
+        end
+    end,500)
 end
 
 function LessonBoxTip.StartTip(strType)
@@ -908,7 +975,7 @@ end
 
 function LessonBoxTip.StartCheck()
     local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
-    if taskCnf and taskCnf.starttemplate == taskCnf.finishtemplate then
+    if (taskCnf and taskCnf.starttemplate == taskCnf.finishtemplate) or LessonBoxTip.is_pass_lesson then
         LessonBoxTip.RemoveErrBlockTip()
         LessonBoxTip.SetErrorTip(1)
         isFinishStage = true
@@ -919,6 +986,8 @@ function LessonBoxTip.StartCheck()
             LessonBoxTip.ClearBlockTip()
             LessonBoxTip.GotoNextStage()
         end,4000)
+
+        return
     end
 
     if check_timer then
@@ -1149,7 +1218,7 @@ function LessonBoxTip.SetErrBlockTip()
         if blockId == 0 or block_item == nil then
             -- GameLogic.RunCommand(string.format("/goto %d %d %d",x,y,z))
             local strErrTip = string.format("红色方框里面不应该有方块，请将其清除。")
-            SoundManager:PlayText(strErrTip,10006)
+            LessonBoxTip.PlayTextByTeacher(strErrTip)
             local txtErrTip = ParaUI.GetUIObject("lessonbox_err_text")
             if not txtErrTip:IsValid() then
                 txtErrTip = ParaUI.CreateUIObject("text", "lessonbox_err_text", "_lt", 240, 70, 330, 100);
@@ -1174,7 +1243,7 @@ function LessonBoxTip.SetErrBlockTip()
         end
 
         local strErrTip = string.format("红色方框中的方块错了，正确的应该是【     】【%s】（编号：【%d】）。",name,blockId)
-        SoundManager:PlayText(strErrTip,10006)
+        LessonBoxTip.PlayTextByTeacher(strErrTip)
         local txtErrTip = ParaUI.GetUIObject("lessonbox_err_text")
         if not txtErrTip:IsValid() then
             txtErrTip = ParaUI.CreateUIObject("text", "lessonbox_err_text", "_lt", 240, 70, 330, 100);
@@ -1225,7 +1294,7 @@ function LessonBoxTip.OnStartMacroLearn()
         LessonBoxTip.ClearErrorBlockTip()
         LessonBoxTip.ClosePage()
         LessonBoxTip.StopStageMovie()
-        GameLogic.GetCodeGlobal():BroadcastTextEvent("playFollowMacro", {macroPos = taskCnf.follow, taskCnf.macro_center_pos});
+        GameLogic.GetCodeGlobal():BroadcastTextEvent("playFollowMacro", {macroPos = taskCnf.follow, macro_center_pos = taskCnf.macro_center_pos});
     end,200)
 end
 
@@ -1361,26 +1430,69 @@ end
 
 function LessonBoxTip.SetAnimErrorTip()
     local result_list = LessonBoxTip.CompareMovieResult
-    -- print("aaaaaaaaaass")
-    -- echo(result_list, true)
     if not result_list then
         return
     end
     local say_text
     local result
-    for index, v in ipairs(LessonBoxTip.CheckMovieTips) do
-        result = result_list[v.type]
-        if result then
-            say_text = v.text
-            break
-        end
-    end
-    if not result then
+    local remind_type
+
+    if result_list["actor_parent"] then
+        say_text = string.format("【%s】设定错误", LessonBoxTip.CompareTypeToDesc["actor_parent"])
+        page:SetValue("role_tip", say_text)
         return
     end
 
-    if result then
-        say_text = string.format(say_text, result.stander_answer)
+    -- 找slot/timelength/timeline
+    for index, v in ipairs(LessonBoxTip.CheckMovieTips) do
+        result = result_list[v.type]
+        if result then
+            remind_type = v.type
+            say_text = v.text
+            if v.type == "timelength" then
+                say_text = string.format(v.text, result.stander_answer)
+            elseif v.type == "timeline" or v.type == "slot" then
+                -- 是右边网格中的数据的话 给的是有错误的演员or摄影机的名字
+                local diff_type_name
+                if v.type == "timeline" then
+                    diff_type_name = ""
+                end
+
+                for index = 1, 48 do
+                    local slot_data = result[index]
+                    if slot_data then
+                        if type(slot_data) == "table" then
+                            for key, name in pairs(slot_data) do
+                                if name then
+                                    if v.type == "timeline" then
+                                        key = LessonBoxCompare.GetMovieMenuName(key)
+                                        local movie_menu_name = MovieClipTimeLine:GetVariableDisplayName(key) or ""
+                                        name = name .. "-" .. movie_menu_name
+                                    end
+                                    say_text = string.format(v.text, name)
+                                    break
+                                end
+                           end
+                        else
+                            say_text = string.format(v.text, slot_data, slot_data)
+                        end
+                    end
+                end 
+            end
+            break
+        end
+    end
+
+    if not result then
+        for remind_type, result in pairs(result_list) do
+            if result then
+                say_text = string.format("【%s】设定错误", LessonBoxTip.CompareTypeToDesc[remind_type])
+                break
+            end
+        end
+    end
+
+    if say_text then
         page:SetValue("role_tip", say_text)
     end
 end
@@ -1388,6 +1500,18 @@ end
 function LessonBoxTip.StartCheckAnim()
     local regionsrc = lessonConfig.regionMy
     local regiondest = lessonConfig.regionOther
+    -- 如果打开着老师的电影方块 不让比较
+    if MovieClipController.IsVisible() then
+        local answer_movice_pos = regiondest.pos
+        local entity_answer = EntityManager.GetBlockEntity(answer_movice_pos[1], answer_movice_pos[2], answer_movice_pos[3])
+        if entity_answer == MovieClipController.activeClip:GetEntity() then
+            GameLogic.AddBBS(nil,"请关闭老师的电影方块后再点击检查", 3000, "255 0 0")
+            return
+        end
+    end
+
+
+
     LessonBoxCompare.CompareAnimLesson(regionsrc, regiondest)
 
     if not LessonBoxTip.CompareMovieResult then
@@ -1448,11 +1572,35 @@ function LessonBoxTip.StartCheckAnim()
     end
 end
 
-function LessonBoxCompare.OpenMovieClipController()
+function LessonBoxTip.OpenMovieClipController()
     if not page or not page_root or not page:IsVisible() then
-        print("界面初始化失败~")
         return
     end
 
     GameLogic.GetCodeGlobal():BroadcastTextEvent("stopAnimRepeatMovie");
+end
+
+function LessonBoxTip.OnClickCloseMovieClip()
+    if not page or not page_root or not page:IsVisible() then
+        return
+    end
+    if not lessonConfig or not lessonConfig.regionOther then
+        return
+    end
+    if MovieClipController.activeClip then
+        local regiondest = lessonConfig.regionOther
+        local answer_movice_pos = regiondest.pos
+        local entity_answer = EntityManager.GetBlockEntity(answer_movice_pos[1], answer_movice_pos[2], answer_movice_pos[3])
+        -- 说明关掉的就是老师方块
+        if entity_answer == MovieClipController.activeClip:GetEntity() then
+            LessonBoxTip.ResetTeacherArea()
+        end
+    end
+
+end
+
+function LessonBoxTip.PlayTextByTeacher(text)
+    local lesson_type = lessonConfig.lesson_type or ""
+    local voice_type = VoiceType[lesson_type] or 10006
+    SoundManager:PlayText(text,voice_type)
 end

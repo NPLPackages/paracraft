@@ -110,10 +110,17 @@
 		<item id="81083" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_02_32bits.png" name="眼睛83"/>
 		<item id="81084" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_fps14_emoji001_32bits.png" name="眼睛84"/>
 		<item id="81085" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_G_012_32bits.png" name="眼睛85"/>
+		<item id="81099" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_A_01_32bits.png" name="眼睛99"/>
+		<item id="81100" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_A_02_32bits.png" name="眼睛100"/>
+		<item id="81101" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_yellow_32bits.png" name="眼睛101"/>
 		
 	</category>
 	
 	<category name="hair" text="头饰">
+	    <!-- 20220120新增-->
+        <item id="83191"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83191_silver_hair_32bits.png" name="银色头发" avatarMode="false"/>
+		<item id="83192"  gsid="82027" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83192_little_red_32bits.png" name="小红帽"/>
+
         <!-- 20211228新增-->
         <item id="83190"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83190_teacher_male_32bits.png" name="眼镜老师（男）"/>
 
@@ -498,6 +505,10 @@
 
 
 	<category name="shirt" text="衣服">
+	    <!--20220120新加-->
+		<item id="84110" gsid="83019" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84110_blue_skirt_32bits.png" name="小红帽的裙子"/>
+		<item id="84111" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84111_brown_skirt_32bits.png" name="褐色裙子" avatarMode="false"/>
+		<item id="84112" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84112_sliceflower_skirt_32bits.png" name="碎花裙子" avatarMode="false"/>
 	    <!--20211118新加-->
 		<item id="84109" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84109_normal_people_32bits.png" name="平民" avatarMode="false"/>
 	    <!--20211118新加-->
@@ -772,6 +783,8 @@
 	</category>
 	
 	<category name="back" text="背部">
+	    <!--20220120新加-->
+		<item id="86047" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86047_brown_backhat_32bits.png" name="环卫腰包" avatarMode="false"/>
 	    <!--20211118新加-->
 		<item id="86045" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86045_cleaner_back_32bits.png" name="环卫腰包" avatarMode="false"/>
 		<item id="86046" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86046_archaeologist_back_32bits.png" name="考古腰包" avatarMode="false"/>
@@ -1035,6 +1048,9 @@
       
 		<item id="88027" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_02_32bits.png" name="嘴巴21"/>
 		<item id="88028" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_03_32bits.png" name="嘴巴22"/>
+
+		<!--20220120新增-->
+		<item id="88029" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_07_01_32bits.png" name="嘴巴23"/>
 		
 	</category>
 

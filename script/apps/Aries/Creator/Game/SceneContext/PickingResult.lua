@@ -25,6 +25,7 @@ function PickingResult:Clear()
 	self.x, self.y, self.z = nil, nil, nil;
 	self.blockX, self.blockY, self.blockZ = nil, nil, nil;
 	self.blockRealX, self.blockRealY, self.blockRealZ = nil, nil, nil;
+	self.blockSide = nil;
 	self.physicalX, self.physicalY, self.physicalZ = nil, nil, nil;
 	self.blockLength = nil;
 	self.block_template = nil;
@@ -39,6 +40,7 @@ function PickingResult:CopyFrom(obj)
 	self.x, self.y, self.z = obj.x, obj.y, obj.z;
 	self.blockX, self.blockY, self.blockZ = obj.blockX, obj.blockY, obj.blockZ;
 	self.blockRealX, self.blockRealY, self.blockRealZ = obj.blockRealX, obj.blockRealY, obj.blockRealZ;
+	self.blockSide = obj.blockSide;
 	self.physicalX, self.physicalY, self.physicalZ = obj.physicalX, obj.physicalY, obj.physicalZ;
 	self.blockLength = self.blockLength;
 	self.block_template = self.block_template;

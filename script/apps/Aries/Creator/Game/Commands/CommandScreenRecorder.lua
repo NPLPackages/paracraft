@@ -29,10 +29,18 @@ Commands["screenrecorder"] = {
         local mode
         mode, cmd_text = CmdParser.ParseWord(cmd_text);
 
+        if (not ScreenRecorder) then
+            return;
+        end
+
         if mode == "start" then
             ScreenRecorder.start();
         elseif mode == "stop" then
             ScreenRecorder.stop();
+        elseif mode == "play" then
+            ScreenRecorder.play();
+        elseif mode == "save" then
+            ScreenRecorder.save();
         end
     end
 }

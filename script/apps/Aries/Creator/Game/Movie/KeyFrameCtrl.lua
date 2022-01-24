@@ -20,6 +20,8 @@ local tostring = tostring;
 local math_floor = math.floor;
 
 KeyFrameCtrl.start_time = 0;
+-- if specified, we will always ensure the gridSize are not skipped when dragging UI control. 
+KeyFrameCtrl.gridSize = nil;
 KeyFrameCtrl.key_button_width = 8;
 KeyFrameCtrl.key_button_height = 12;
 KeyFrameCtrl.key_button_background = "Texture/whitedot.png";
@@ -333,9 +335,23 @@ function KeyFrameCtrl:GetKeyTimeByUIPos(rx)
 	local totalTime = math.max(1, self:GetLength());
 	
 	local key_button_width = self.key_button_width;
-	local time = math_floor((rx)/(width-key_button_width)*totalTime);
-	time = self:GetStartTime() + math.max(math.min(totalTime, time),0)
-	
+
+	local function GetTimeByX(x)
+		local time = math_floor((x)/(width-key_button_width)*totalTime);
+		time = self:GetStartTime() + math.max(math.min(totalTime, time),0)
+		return time;
+	end
+	local time = GetTimeByX(rx)
+	if(self.gridSize) then
+		local valueBefore = GetTimeByX(rx-1)
+		local valueAfter = GetTimeByX(rx+1)
+		local valueAtGrid = math.floor((time/self.gridSize) + 0.5)*self.gridSize;
+		valueAtGrid = math.max(self:GetStartTime(), math.min(valueAtGrid, self:GetStartTime()+totalTime));
+		if( not (valueAtGrid < valueBefore or valueAfter < valueAtGrid)) then
+			time = valueAtGrid
+		end
+	end
+
 	-- check to see if we are clicking close to keyframe, 
 	-- if so, we will goto the frame next to the keyframe. 
 	local nUIIndex = 0;

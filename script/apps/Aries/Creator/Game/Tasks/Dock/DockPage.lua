@@ -484,17 +484,51 @@ end
 
 function DockPage.OnClickLeftTop(id)
     local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
-    if (id == 'winter_camp') then
-        Page.ShowWinterCampMainWindow("tiyujinsai")
-	elseif (id == 'papa') then
-		Page.ShowWinterCampMainWindow("quweibiancheng")
-	elseif (id == 'lala') then
-        Page.ShowWinterCampMainWindow("kuailejianzao")
-	elseif (id == 'kaka') then
-        Page.ShowWinterCampMainWindow("jingcaidonghua")
-	elseif (id == 'huanbao') then
-		Page.ShowWinterCampMainWindow("lajifenlei")
-	end
+    local idCnf = {
+        winter_camp ="tiyujinsai",
+        papa="quweibiancheng",
+        lala="kuailejianzao",
+        kaka="jingcaidonghua",
+        huanbao="lajifenlei"
+    }
+    local name = idCnf[id]
+    if name then
+        if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+            GameLogic.RunCommand("/sendevent userVerification")
+            commonlib.TimerManager.SetTimeout(function()
+				_guihelper.MessageBox("你还没有完成实名认证，需要实名认证才可以参与学习。请尽快实名", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
+                _guihelper.MsgBoxClick_CallBack = function(res)
+                    if(res == _guihelper.DialogResult.OK) then
+                        GameLogic.GetFilters():apply_filters(
+                        'show_certificate',
+                        function(result)
+                            if (result) then                        
+                                DockPage.RefreshPage(0.01)
+                                GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
+                                Page.ShowWinterCampMainWindow(name)
+                            end
+                        end)
+                    end
+                end 
+			end, 13000)
+            return
+        end
+        local profile = KeepWorkItemManager.GetProfile()
+        if profile and profile.schoolId and profile.schoolId > 0 then
+            Page.ShowWinterCampMainWindow(name)
+            return
+        end
+        GameLogic.GetFilters():apply_filters('cellar.my_school.after_selected_school', function ()
+            KeepWorkItemManager.LoadProfile(false, function()
+                local profile = KeepWorkItemManager.GetProfile()
+                -- 是否选择了学校
+                if profile and profile.schoolId and profile.schoolId > 0 then
+                    Page.ShowWinterCampMainWindow(name)
+                    return
+                end
+            end)
+        end);
+    end
     GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.winter_camp_main");
 end
 

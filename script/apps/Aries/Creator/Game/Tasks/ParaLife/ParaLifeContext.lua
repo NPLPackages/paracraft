@@ -2,7 +2,8 @@
 Title: Paralife Context
 Author(s): LiXizhi
 Date: 2022/1/12
-Desc: handles scene key/mouse events. This is the default play mode scene context 
+Desc: use "/show paralife" command to activate this context during play mode. 
+mouse event are disabled when moving accross endstone(id:155). 
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeContext.lua");
@@ -17,6 +18,7 @@ local GameMode = commonlib.gettable("MyCompany.Aries.Game.GameLogic.GameMode");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local ParalifeContext = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.SceneContext.BaseContext"), commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParalifeContext"));
 
@@ -24,9 +26,12 @@ ParalifeContext:Property("Name", "ParalifeContext");
 ParalifeContext:Property({"clickToMove", true, "IsClickToMoveEnabled", "EnableClickToMove", auto = true});
 ParalifeContext:Property({"isHighLightEntity", false});
 ParalifeContext:Property({"fingerRadius", 16});
+ParalifeContext:Property({"borderMarkerBlockId", 155});
+ParalifeContext:Property({"defaultCameraRotSpeed", 0.003});
+
+
 -- if entity's radius is bigger than 0.3, we will not use finger picking
 ParalifeContext:Property({"maxFingerPickingRadius", 0.3});
-
 
 
 function ParalifeContext:ctor()
@@ -44,6 +49,7 @@ end
 -- virtual function: 
 -- try to select this context. 
 function ParalifeContext:OnSelect()
+	self.itemLiveModel = ItemClient.GetItem(block_types.names.LiveModel)
 	ParalifeContext._super.OnSelect(self);
 	self:EnableMousePickTimer(true);
 	GameLogic:Connect("gameEventFired", self, self.OnGameEvent, "UniqueConnection");
@@ -55,6 +61,9 @@ end
 function ParalifeContext:OnUnselect()
 	ParalifeContext._super.OnUnselect(self);
 	GameLogic:Disconnect("gameEventFired", self, self.OnGameEvent);
+
+	local att = ParaCamera.GetAttributeObject();
+	att:SetField("RotationScaler", 0.01);
 	return true;
 end
 
@@ -78,8 +87,17 @@ function ParalifeContext:HandleQuickSelectKey(event)
 	end
 end
 
+function ParalifeContext:UpdateMouseRotationSpeed()
+	local att = ParaCamera.GetAttributeObject();
+	att:SetField("RotationScaler", self.defaultCameraRotSpeed);
+end
+
 -- virtual: 
 function ParalifeContext:mousePressEvent(event)
+	if(not self:CanMoveToMouseCursor()) then
+		event:accept()
+		return
+	end
 	ParalifeContext._super.mousePressEvent(self, event);
 	if(event:isAccepted()) then
 		return
@@ -90,6 +108,7 @@ function ParalifeContext:mousePressEvent(event)
 
 	local result = self:CheckMousePick();
 	self:UpdateClickStrength(0, result);
+	self:UpdateMouseRotationSpeed();
 
 	if(event.mouse_button == "left") then
 		-- play touch step sound when left click on an object
@@ -159,6 +178,11 @@ end
 
 -- virtual: 
 function ParalifeContext:mouseReleaseEvent(event)
+	if(not self:CanMoveToMouseCursor()) then
+		self:RestoreDraggingEntity()
+		event:accept()
+		return
+	end
 	ParalifeContext._super.mouseReleaseEvent(self, event);
 	if(event:isAccepted()) then
 		return
@@ -498,4 +522,61 @@ function ParalifeContext:CheckMousePick(event)
 		self:ClearPickDisplay();
 	end
 	return result;
+end
+
+function ParalifeContext:CanMoveToMouseCursor()
+	local player = EntityManager.GetPlayer()
+	if(player) then
+		local fromX, fromY, fromZ = player:GetBlockPos()
+		local result = SelectionManager:MousePickBlock()
+		if(result.blockX) then
+			local toX, toY, toZ = result.blockX, result.blockY, result.blockZ
+			return self:CanMoveFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)
+		end
+	end
+	return true;
+end
+
+-- we will check if there is endstone(id:155) between from point and to point. if there is, we will return false, otherwise true. 
+-- if fromX, fromZ is on endstone, we will always return true
+-- @param fromX, fromY, fromZ: block world coordinates
+-- @param toX, toY, toZ: block world coordinates
+-- @return boolean: true if there is no endstone in between.
+function ParalifeContext:CanMoveFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)
+	local borderMarkerBlockId = self.borderMarkerBlockId;
+
+	local dx = toX - fromX;
+	local dz = toZ - fromZ;
+	local dist = dx^2 + dz^2;
+
+	local function HasMarkerBlock(bx, bz)
+		local y = BlockEngine:GetFirstBlock(bx, 0, bz, borderMarkerBlockId, 4);
+		return y>=0;
+	end
+
+	if(dist < 0.5 or HasMarkerBlock(fromX, fromZ)) then
+		return true
+	end
+	dist = math.sqrt(dist);
+	local step = 1/dist;
+	local lastX, lastZ;
+	local bHasMarker;
+	for i = 0, math.floor(dist)+1 do
+		local percent = math.min(1, step * i);
+		local x, z = math.floor(fromX + percent * dx), math.floor(fromZ + percent * dz);
+		if(lastX~=x or lastZ~=z) then
+			lastX, lastZ = x, z;
+			if(HasMarkerBlock(x, z)) then
+				bHasMarker = true
+				break;
+			end
+		end
+	end
+	return not bHasMarker;
+end
+
+function ParalifeContext:RestoreDraggingEntity()
+	if(self.itemLiveModel) then
+		self.itemLiveModel:RestoreDraggingEntity()
+	end
 end

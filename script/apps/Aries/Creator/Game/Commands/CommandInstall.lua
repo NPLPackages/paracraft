@@ -304,3 +304,20 @@ e.g.
 		end
 	end,
 };
+
+Commands["prepareasset"] = {
+	name="prepareasset", 
+	quick_ref="/prepareasset filename", 
+	desc=[[prepare (download) the given asset file to disk without loading it. 
+@return 0 if download has begun, 1 if file is already downloaded, -1 if failed, -2 if input is not an asset file.
+e.g.
+/prepareasset audio/ambForest.ogg
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local src;
+		src, cmd_text = CmdParser.ParseFilename(cmd_text);
+		if(src) then
+			return ParaIO.SyncAssetFile_Async(src, "");
+		end
+	end,
+};

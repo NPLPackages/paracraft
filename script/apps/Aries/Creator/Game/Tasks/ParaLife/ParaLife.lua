@@ -41,6 +41,8 @@ function ParaLife:OnChangeDesktopMode(mode)
 		if(mode == "game") then
 			if(not self:IsVisible()) then
 				self:Show();
+			else
+				self:UpdateShowViewStates()
 			end
 		elseif(mode == "editor") then
 			if(self:IsVisible()) then
@@ -69,11 +71,15 @@ function ParaLife:IsEnabled()
 	return self.bEnabled
 end
 
+function ParaLife:UpdateShowViewStates(isShow)
+	GameLogic.RunCommand("/hide quickselectbar")
+end
+
 function ParaLife:Show()
 	self:Init()
 	self.visible = true;
 	local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
-    ParalifeLiveModel.ShowView()
+	ParalifeLiveModel.ShowView()
 
 	if(not self.context) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeContext.lua");

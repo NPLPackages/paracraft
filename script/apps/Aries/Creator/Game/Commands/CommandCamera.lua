@@ -351,8 +351,8 @@ Commands["panorama"] = {
 
 Commands["camera"] = {
 	name="camera", 
-	quick_ref="/camera [-norestrict|clear|roomview] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]]", 
-	desc=[[angle should be in range [-180, 180]
+	quick_ref="/camera [-norestrict|clear|roomview|disable|enable|rotspeed] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]]", 
+	desc=[[adjust camera controller settings. Angle should be in range [-180, 180]
 /camera      : clear all camera settings
 /camera -roomview    : good for kids
 /camera -norestrict
@@ -360,7 +360,9 @@ Commands["camera"] = {
 /camera -restrictDist 15
 /camera -restrictFacing 45 135
 /camera -restrictFacing 90 -restrictDist 10 -restrictPitch 30 80
-
+/camera -disable
+/camera -enable
+/camera -rotspeed 0.001   change mouse rotation speed, default to 0.1
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
@@ -392,6 +394,15 @@ Commands["camera"] = {
 				maxDist = maxDist or minDist
 			elseif(option_name == "roomview") then
 				enableRoomView = true
+			elseif(option_name == "disable" or option_name == "enable") then
+				ParaCamera.GetAttributeObject():SetField("BlockInput", option_name == "disable")
+			elseif(option_name == "rotspeed") then
+				local rotSpeed;
+				rotSpeed, cmd_text = CmdParser.ParseInt(cmd_text);
+				rotSpeed = rotSpeed or 0.01
+				if(rotSpeed >= 0 and rotSpeed < 1) then
+					ParaCamera.GetAttributeObject():SetField("RotationScaler", rotSpeed)
+				end
 			end
 		end
 		CameraController.EnableAutoRoomView(enableRoomView==true);

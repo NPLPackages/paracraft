@@ -1,9 +1,12 @@
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local EntityMovieClip =  commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip")
 local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
 local MovieClipCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/MovieClipCompare.lua");
+
+local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 local LessonBoxCompare = NPL.export()
 
 function LessonBoxCompare.GetFilePath(filename)
@@ -27,7 +30,6 @@ function LessonBoxCompare.GetFilePath(filename)
 	if(not fullpath and ParaIO.DoesFileExist(filename, true)) then
 		fullpath = filename;
 	end
-	-- print("fullpath============",fullpath)
 	return fullpath
 end
 
@@ -215,8 +217,6 @@ function LessonBoxCompare.GetRegionData(regionSrc,regionDest,callback)
 		local pivot_x, pivot_y, pivot_z = select_task:GetSelectionPivot();
 		pivotConfig.createpos = {pivot_x, pivot_y, pivot_z}
         blocksSrc = select_task:GetCopyOfBlocks({pivot_x, pivot_y, pivot_z});
-		-- print("GetRegionData=================") 
-		-- echo(blocksSrc)
 		GameLogic.RunCommand("/select -clear")
 	end
 	
@@ -251,17 +251,10 @@ if LessonBoxCompare then
 end]]
 --不适用于很大的区块比较，大区块比较尽量先存成template文件，再进行比较
 function LessonBoxCompare.CompareTwoAreas(regionSrc,regionDest,callback)
-	-- print("LessonBoxCompare.CompareTwoAreas===============0")
-	-- echo(regionSrc)
-	-- echo(regionDest)
 	LessonBoxCompare.GetRegionData(regionSrc,regionDest,function(blockSrc,blockDest,pivotConfig)
-		-- echo(blockSrc,true)
-		-- echo(blockDest,true)
-		-- print("LessonBoxCompare.CompareTwoAreas===============1")
 		if blockSrc and blockDest then
 			local needBuild = LessonBoxCompare.GetDiffBlocksAndType(blockSrc,blockDest)
 			if callback then
-				-- echo(needBuild,true)
 				callback(needBuild,pivotConfig)
 			end
 		end
@@ -365,6 +358,12 @@ function LessonBoxCompare.CompareMovie(entitySrc,entityDest,compareType)
         if compareType == "actor_pos" then
             diff_num, compare_date = entitySrc:CompareActorPosition(entityDest)
         end
+		if compareType == "actor_turn" then
+            diff_num, compare_date = entitySrc:CompareActorRotation(entityDest, true)
+        end
+        if compareType == "actor_rotation" then
+            diff_num, compare_date = entitySrc:CompareActorRotation(entityDest)
+        end
         if compareType == "actor_scale" then
             diff_num, compare_date = entitySrc:CompareActorScale(entityDest)
         end
@@ -385,6 +384,12 @@ function LessonBoxCompare.CompareMovie(entitySrc,entityDest,compareType)
         end
         if compareType == "actor_name" then
             diff_num, compare_date = entitySrc:CompareActorName(entityDest)
+        end
+        if compareType == "weather" then
+            diff_num, compare_date = entitySrc:CompareWeather(entityDest)
+        end
+        if compareType == "actor_skin" then
+            diff_num, compare_date = entitySrc:CompareActorSkin(entityDest)
         end
     end
     return diff_num, compare_date
@@ -460,29 +465,97 @@ local MoviceCompareType = {
 	"cmd",					-- 命令
 	"child_movie_block",
 	"backmusic",
-	"lookat_x",
-	"lookat_y",
-	"lookat_z",
-	"eye_liftup",
-	"eye_rot_y",
-	"eye_roll",
+	"lookat",
+	"rotation",
 	"parent",
 	"eye_dist",
 	"actor_ani",
 	"actor_pos",
+	"actor_turn",
+	"actor_rotation",
 	"actor_scale",
 	"actor_head",
 	"actor_speed",
 	"actor_model",
 	"actor_opcatiity",
-	-- "actor_parent",
+	"actor_parent",
 	"actor_name",
 	"actor_bone",
+	"actor_skin",
+	"weather",
 }
 
-function LessonBoxCompare.CompareMovieAll(entitySrc,entityDest)
+local CompareNameToMovieName = {
+	-- 摄影机
+	["ActorCamera"] = {
+		["text"] = {"text"},
+		["time"] = {"time"},
+		-- ["weather{"] = ""},
+		-- ["blocks{"] = ""},
+		["cmd"] = {"cmd"},
+		-- ["movieblock{"] = ""},
+		["music"] = {"backmusic"},
+		["pos"] = {"lookat_x","lookat_y","lookat_z"},
+		["rot"] = {"eye_liftup","eye_rot_y","eye_roll"},
+		["scaling"] = {"eye_dist"},
+		["is_fps"] = {""},
+		-- ["parent"] = {""},
+		["static"] = {""},
+		special_tab = {
+			["eye_liftup"] = "rot",
+			["eye_rot_y"] = "rot",
+			["eye_roll"] = "rot",
+			["lookat_x"] = "pos",
+			["lookat_y"] = "pos",
+			["lookat_z"] = "pos",
+			["eye_dist"] = "scaling",
+		}
+	},
+	-- 角色
+	["ActorNPC"] = {
+		["anim"] = {"actor_ani"},
+		["bones"] = {"actor_bone"},
+		["pos"] = {"actor_pos"},
+		["facing"] = {"actor_turn"},
+		["rot"] = {"actor_rotation"},
+		["scaling"] = {"actor_scale"},
+		["head"] = {"actor_head"},
+		["speedscale"] = {"actor_speed"},
+		-- ["gravity"] = {""},
+		["assetfile"] = {"actor_model"},
+		["skin"] = {"actor_skin"},
+		["opacity"] = {"actor_opcatiity"},
+		["parent"] = {"actor_parent"},
+		special_tab = {
+			["x"] = "pos",
+			["y"] = "pos",
+			["z"] = "pos",
+		}
+		-- ["blockinhand"] = {""},
+		-- ["blocks"] = {""},
+		-- ["parent"] = {""},
+		-- ["cam_dist"] = {""},
+		-- ["static"] = {""},
+	},
+	-- 命令
+	["ActorCommands"] = {
+		["text"] = {""},
+		["time"] = {"time"},
+		["weather"] = {"weather"},
+		["blocks"] = {""},
+		["cmd"] = {""},
+		["movieblock"] = {""},
+		["music"] = {""},
+	},
+
+
+}
+
+function LessonBoxCompare.CompareMovieAll(entitySrc,entityDest, compare_list)
 	local result_list = {}
-	for key, v in pairs(MoviceCompareType) do
+
+	compare_list = compare_list or MoviceCompareType
+	for key, v in pairs(compare_list) do
 		local diff_num, result = LessonBoxCompare.CompareMovie(entitySrc,entityDest,v)
 		if diff_num > 0 then
 			result_list[v] = result
@@ -494,6 +567,94 @@ end
 
 function LessonBoxCompare.GetMoviceCompareType()
 	return MoviceCompareType
+end
+
+-- 用于电影方块左下角菜单的颜色背景显示
+function LessonBoxCompare.CheckNeedCreateMoviceMenuCompareBg(compare_data, name, class_name)
+	if LessonBoxCompare.CheckKeyDiff(compare_data, name, class_name) then
+		return true
+	end
+
+	if LessonBoxCompare.CheckTimeLineNums(compare_data, name, class_name) then
+		return true
+	end
+
+	return false
+end
+
+-- 比较关键帧是否有差异
+function LessonBoxCompare.CheckKeyDiff(compare_data, name, class_name)
+	local compare_config = CompareNameToMovieName[class_name]
+
+	local function check_result(check_name)
+		if compare_config and compare_config[check_name] then
+			local compare_name_list = compare_config[check_name]
+			for key, v in pairs(compare_name_list) do
+				if compare_data[v] then
+					return true
+				end
+			end
+		end
+
+		return false
+	end
+
+	-- facing 先检查rot 三轴旋转与转身特殊处理 显示转身的时候 如果有三轴旋转 只提示三轴旋转
+	if name == "facing" and check_result("rot") then
+		return false
+	end
+
+	if check_result(name) then
+		return true
+	end
+
+	return false
+end
+
+-- 检测关键帧数量
+function LessonBoxCompare.CheckTimeLineNums(compare_data, name, class_name)
+	local compare_config = CompareNameToMovieName[class_name]
+	-- 这块目前是处理timeline的
+	local cur_select_slot = MovieClipController.GetCurSelectSlotIndex()
+	for k, v in pairs(compare_data) do
+		local slot_data = v[cur_select_slot]
+		if type(slot_data) == "table" then
+			if name == "rot" and (slot_data["pitch"] or slot_data["roll"]) then
+				return true
+			end
+			
+			if  slot_data and slot_data[name] then
+				-- facing 跟 roll特殊处理 有三轴旋转优先三轴旋转提示
+				if name == "facing" and (slot_data["pitch"] or slot_data["roll"]) then
+					return false
+				end
+	
+				return true
+			end
+
+			if compare_config.special_tab then
+				local special_tab = compare_config.special_tab
+				for k2, v2 in pairs(slot_data) do
+					if special_tab[k2] == name then
+						return true
+					end
+				end
+			end
+
+		end
+	end
+
+	return false
+end
+
+function LessonBoxCompare.GetMovieMenuName(pro_name)
+	for k2, compare_config in pairs(CompareNameToMovieName) do
+		if compare_config.special_tab and compare_config.special_tab[pro_name] then
+			return compare_config.special_tab[pro_name]
+		end
+	end
+
+	return pro_name
 end
 --[[
 local LessonBoxCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/World2In1/LessonBoxCompare.lua");

@@ -72,16 +72,16 @@
 ]]></script>
 <pe:container  uiname="paralife_back" alignment="_fi" width="100%" height="100%" style="background:;">
     <pe:if condition='<%=ParalifeLiveModel.main_ui_mode == "switchmain"%>'>
-        <pe:container alignment="_rb"  style="position: relative; margin-bottom: 0px; background:;"> <!--切换UI-->
+        <pe:container alignment="_rb"  style="position: relative; margin-bottom: -50px; margin-right: 15px; background:;"> <!--切换UI-->
             <input type="button" name="switchrole" style="width:96px;height:160px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/role_32bits.png#0 0 119 201);" onclick="switchButton()"/>
         </pe:container>
-        <pe:container ClickThrough="true" alignment="_lb" style="position: relative; background:;">
+        <pe:container ClickThrough="true" alignment="_lb" style="position: relative; margin-bottom: -50px; margin-left: 15px; background:;">
             <input align="left" type="button" name="switchexpress" style="width:96px;height:160px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/btn_expression_32bits.png#0 0 119 201);" onclick="switchButton()"/>
         </pe:container>
-        <pe:container ClickThrough="true" alignment="_lt" style="position: relative; margin-top: 4px; background:;">
+        <pe:container ClickThrough="true" alignment="_lt" style="position: relative; margin-top: 15px; margin-left: 15px; background:;">
             <input align="left" type="button" name="switchexpress" style="width:80px;height:80px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/exit_32bits.png#0 0 128 128);" onclick="OnClickExit()"/>
         </pe:container>
-        <pe:container alignment="_rt" style="position: relative;margin-top: 4px; background:;">
+        <pe:container alignment="_rt" style="position: relative;margin-top: 15px; margin-right: 10px; background:;">
             <pe:container uiname="ui_camera" style="width: 80x; height: 80x; background: url(Texture/Aries/Creator/keepwork/Paralife/main/camera_32bits.png#0 0 128 128);"></pe:container>
         </pe:container>
     </pe:if>

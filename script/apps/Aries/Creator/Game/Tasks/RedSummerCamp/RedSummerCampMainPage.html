@@ -48,7 +48,7 @@ end
 
 function OpenVip()
     local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
-    VipPage.ShowPage("red_summer_camp_main");
+    VipPage.ShowPage("2D_main");
 end
 
 function GetHeadUrl()
@@ -216,6 +216,12 @@ end
 
 function OpenOlypic()
     RedSummerCampMainPage.OpenOlypic()
+end
+
+function OpenCreateWorld()
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.main_world");
+    local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
+    RedSummerCampMainWorldPage.Show();
 end
 
 function GetOlymPicPic()
@@ -406,8 +412,8 @@ end
                                 创意空间（课程）
                             </div>
                         </div>
-                        <div onclick="OpenOlypic" style="width: 210px; height: 100px; margin-top: 100px; margin-left: 140px;">
-                            <input type="button" onclick="OpenOlypic" style="margin-top: 20px; margin-left: 125px; width: 68px; height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/jingru_68x70_32bits.png#0 0 68 70);" />
+                        <div onclick="OpenOlypic" style="margin-left: 146px; margin-top: 100px; width: 200px; height: 100px;">
+                            <input type="button" onclick="OpenOlypic" style="margin-top: 15px; margin-left: 110px; width: 68px; height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/jingru_68x70_32bits.png#0 0 68 70);" />
                         </div>
                     </div>
                 </div>

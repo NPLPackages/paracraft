@@ -14,46 +14,108 @@ local groupindex_wrong = 3;
 local groupindex_hint = 5; -- when placeable but not matching hand block
 
 local target_desc_list = {
-    [1] = "教会用户如何放置代码方块，如何打开代码方块，以及如何使用【前进】【说话】代码块",
-    [2] = "教会用户如何配合使用【前进】和【位移】来躲避陷阱。",
-    [3] = "教会用户如何配合使用【前进】和【转向】避开陷阱，并且正确使用【说话】",
-    [4] = "教会用户如何直接转到需要的角度，并说话",
-    [5] = "教会用户使用做动作",
-    [6] = "教会用户使用【如果】与【是否碰到方块】代码块来确定是否应该【转向】",
-    [7] = "教会用户使用多个【如果】与【是否碰到方块】代码块来确定是否应该【转向】",
-    [8] = "教会用户使用【如果-否则】与【是否碰到方块】代码块来确定往哪个方向【转向】",
-    [9] = "教会用户使用for循环来向前移动并转向",
-    [10] = "教会用户使用for循环来向前移动并转向，并且每次循环使用【if-end】来判断是否应该转向",
-    [1.1]=[[用代码控制角色走到光圈处<div style="height: 6px;"></div>走到门口时，需要回答问题打开门<div style="height: 6px;"></div>运用“前进”和“说”代码块来移动和回答]],
+    [1] = [[
+        观察地图，用代码控制运动员从起点移动至光圈处<div style="height: 4px;"></div>
+        到达光圈处后，说出“yeah”即可通过<div style="height: 4px;"></div>
+        运用“前进”和“说”代码块来实现运动员的移动和说话<div style="height: 4px;"></div>
+    ]],
+    [2] = [[
+        观察地图，用代码控制运动员移动至光圈处<div style="height: 4px;"></div>
+        注意路径中需要跳过大水坑<div style="height: 4px;"></div>
+        运用“前进”代码块来实现运动员移动<div style="height: 4px;"></div>
+        运用“位移”代码块来跳过水坑<div style="height: 4px;"></div>        
+    ]],
+    [3] = [[
+        观察地图，用代码控制运动员移动至光圈处<div style="height: 4px;"></div>
+        注意有分岔路，需要选择正确的路<div style="height: 4px;"></div>
+        运用“前进”代码块让运动员移动<div style="height: 4px;"></div>
+        运用“旋转”代码块让运动员转向<div style="height: 4px;"></div>
+        再移动到光圈处，说出“yeah”即可通过<div style="height: 4px;"></div>
+    ]],
+    [4] = [[
+        观察地图，用代码控制运动员去拿到球<div style="height: 4px;"></div>        
+        运用“旋转到”代码块让运动员直接转到指定角度<div style="height: 4px;"></div>
+        运用“说”代码块让运动员说话<div style="height: 4px;"></div>
+        再移动到光圈处，说出“yeah”即可通过<div style="height: 4px;"></div>
+    ]],
+    [5] = [[
+        观察地图，用代码控制运动员去NPC处拿球<div style="height: 4px;"></div>        
+        路上需要跨过栅栏障碍，碰到后任务失败<div style="height: 4px;"></div>
+        运用“旋转到”代码块让运动员转到指定角度<div style="height: 4px;"></div>
+        运用“播放动作编号”和“等待”代码块让运动员做出指定动作<div style="height: 4px;"></div>
+        然后移动到终点即可完成任务<div style="height: 4px;"></div>
+    ]],
+    [6] = [[
+        观察地图，用代码控制运动员移动到终点处<div style="height: 4px;"></div>
+        当脚下的方块id是52时顺时针转向<div style="height: 4px;"></div>       
+        运用“如果那么”和“是否碰到”代码块来判断是否踩到方块<div style="height: 4px;"></div>
+        运用“旋转”和“前进”代码块让运动员转向和移动<div style="height: 4px;"></div>
+        运用“缩放到百分之”代码块让运动员放大到原来的2倍<div style="height: 4px;"></div>
+        走到终点后，需要将运动员放大2倍即完成任务<div style="height: 4px;"></div>
+    ]],
+    [7] = [[
+        观察地图，用代码控制运动员移动到光圈处<div style="height: 4px;"></div>
+        当脚下的方块id是52时顺时针转向<div style="height: 4px;"></div>       
+        运用“如果那么”和“是否碰到”代码块来判断是否踩到方块<div style="height: 4px;"></div>
+        运用“旋转”和“前进”代码块让运动员转向和移动<div style="height: 4px;"></div>
+        运用“说”代码块让运动员说话<div style="height: 4px;"></div>
+        走到终点后，需要说出“jump”即完成任务<div style="height: 4px;"></div>
+    ]],
+    [8] = [[
+        观察地图，用代码控制运动员移动到光圈处<div style="height: 4px;"></div>
+        当脚下的方块id是52时顺时针转90度，否则则逆时针转90度<div style="height: 4px;"></div>        
+        运用“如果那么否则”和“是否碰到”代码块来判断是否踩到方块<div style="height: 4px;"></div>
+        运用“旋转”和“前进”代码块让运动员转向和移动<div style="height: 4px;"></div>
+        运用“说”代码块让运动员说话<div style="height: 4px;"></div>
+        走到终点后，需要说出“yeah”即完成任务<div style="height: 4px;"></div>
+    ]],
+    [9] = [[
+        观察地图，用代码控制运动员绕跑道一圈回到起点<div style="height: 4px;"></div>
+        重复走和转向将跑道上的3个踏板都走到<div style="height: 4px;"></div>        
+        运用“旋转”和“前进”代码块让运动员转向和移动<div style="height: 4px;"></div>
+        运用“循环”代码块来重复执行<div style="height: 4px;"></div>
+        运用“说”代码块让运动员说话<div style="height: 4px;"></div>
+        然后回到起点后，需要说出“win”即完成任务<div style="height: 4px;"></div>
+    ]],
+    [10] = [[
+        观察地图，用代码控制运动员避开水坑到达光圈处<div style="height: 4px;"></div>
+        需要重复前进并判断脚下方块来选择正确的方向<div style="height: 4px;"></div>        
+        运用“循环”代码块来重复执行<div style="height: 4px;"></div>
+        运用“如果那么否则”和“是否碰到”代码块来判断是否踩到方块<div style="height: 4px;"></div>
+        运用“旋转”和“前进”代码块让运动员转向和移动<div style="height: 4px;"></div>
+        运用“说”代码块让运动员说话<div style="height: 4px;"></div>
+        走到光圈处后，需要说出“win”即完成任务<div style="height: 4px;"></div>
+    ]],
+    [1.1]=[[用代码控制角色走到光圈处<div style="height: 4px;"></div>走到门口时，需要回答问题打开门<div style="height: 4px;"></div>运用“前进”和“说”代码块来移动和回答]],
     [1.2]=[[在岩浆之前穿过桥，打开门，最后到达终点]],
-    [1.3]=[[向前走到传送点，说出正确的数字传送到下一个点<div style="height: 6px;"></div>然后继续前进，直到走到光圈处]],
+    [1.3]=[[向前走到传送点，说出正确的数字传送到下一个点<div style="height: 4px;"></div>然后继续前进，直到走到光圈处]],
     [2.1]=[[向前走到围栏前，跳起来跨过围栏到达光圈处]],
     [2.2]=[[向前跑到光圈处，并且跨过中间的围栏]],
     [2.3]=[[向前移动爬上山顶，到达光圈处]],
     [3.1]=[[沿着路走到光圈处目标介绍（镜头+文字）：]],
     [3.2]=[[沿着正确的道路走到光圈处]],
-    [3.3]=[[沿着路找到黄色钥匙<div style="height: 6px;"></div>用黄色钥匙打开黄色的门拿到灰色钥匙<div style="height: 6px;"></div>再用灰色钥匙打开灰色门，最后走到光圈处]],
-    [4.1]=[[沿着路走到门口，回答问题后开门<div style="height: 6px;"></div>继续走到光圈处即可]],
-    [4.2]=[[走到门外的踏板，打开石门<div style="height: 6px;"></div>再走木质踏板，打开木门<div style="height: 6px;"></div>继续走到光圈处即可]],
-    [4.3]=[[找到门外的黄色钥匙并打开黄色门<div style="height: 6px;"></div>再走到木质踏板，打开木门<div style="height: 6px;"></div>再走到石质踏板，打开石门<div style="height: 6px;"></div>然后找到白色钥匙并打开白色门<div style="height: 6px;"></div>继续走到光圈处即可]],
-    [5.1]=[[走到门前做出对应动作打开门<div style="height: 6px;"></div>继续走到光圈处即可]],
-    [5.2]=[[找到门外的黄色钥匙并打开黄色门<div style="height: 6px;"></div>然后找到白色钥匙并打开白色门<div style="height: 6px;"></div>继续走到光圈处即可]],
-    [5.3]=[[走到宝箱前做出动作，打开宝箱获得斧头<div style="height: 6px;"></div>继续沿着路走，做出动作来砍掉挡路的树<div style="height: 6px;"></div>然后走到光圈处即可]],
-    [6.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号则右转<div style="height: 6px;"></div>直到走到光圈处即可]],
-    [6.2]=[[每次向前移动5步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则去踩左侧的踏板开门，然后返回<div style="height: 6px;"></div>如此重复，直到走到光圈处即可]],
-    [6.3]=[[每次向前移动5步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则说“芝麻开门”，大门打开<div style="height: 6px;"></div>如此重复，直到走到光圈处即可]],
-    [7.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则踩左侧的2个踏板将灯点亮，然后再回到主路<div style="height: 6px;"></div>如此重复，所有灯点亮后大门打开，走到光圈处即可]],
-    [7.2]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则右转向前爬上台阶<div style="height: 6px;"></div>如此重复，走到光圈处即可]],
-    [7.3]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则左转向前<div style="height: 6px;"></div>若遇到门，则说“开门”将门打开<div style="height: 6px;"></div>如此重复，走到光圈处即可]],
-    [8.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则右转，否则左转<div style="height: 6px;"></div>如此重复，走到光圈处即可]],
-    [8.2]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则左转踩踏板点亮灯，再返回<div style="height: 6px;"></div>若不是20号，则右转踩踏板点亮灯，再返回<div style="height: 6px;"></div>如此重复，点亮所有灯后，大门打开，继续走到光圈处即可]],
-    [8.3]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 6px;"></div>方块编号若为20号，则右转，否则则左转<div style="height: 6px;"></div>继续前进5格，再次检查脚下方块编号<div style="height: 6px;"></div>若是94号，则爬上台阶，否则则爬下台阶<div style="height: 6px;"></div>如此重复，继续走到光圈处即可]],
+    [3.3]=[[沿着路找到黄色钥匙<div style="height: 4px;"></div>用黄色钥匙打开黄色的门拿到灰色钥匙<div style="height: 4px;"></div>再用灰色钥匙打开灰色门，最后走到光圈处]],
+    [4.1]=[[沿着路走到门口，回答问题后开门<div style="height: 4px;"></div>继续走到光圈处即可]],
+    [4.2]=[[走到门外的踏板，打开石门<div style="height: 4px;"></div>再走木质踏板，打开木门<div style="height: 4px;"></div>继续走到光圈处即可]],
+    [4.3]=[[找到门外的黄色钥匙并打开黄色门<div style="height: 4px;"></div>再走到木质踏板，打开木门<div style="height: 4px;"></div>再走到石质踏板，打开石门<div style="height: 4px;"></div>然后找到白色钥匙并打开白色门<div style="height: 4px;"></div>继续走到光圈处即可]],
+    [5.1]=[[走到门前做出对应动作打开门<div style="height: 4px;"></div>继续走到光圈处即可]],
+    [5.2]=[[找到门外的黄色钥匙并打开黄色门<div style="height: 4px;"></div>然后找到白色钥匙并打开白色门<div style="height: 4px;"></div>继续走到光圈处即可]],
+    [5.3]=[[走到宝箱前做出动作，打开宝箱获得斧头<div style="height: 4px;"></div>继续沿着路走，做出动作来砍掉挡路的树<div style="height: 4px;"></div>然后走到光圈处即可]],
+    [6.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号则右转<div style="height: 4px;"></div>直到走到光圈处即可]],
+    [6.2]=[[每次向前移动5步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号，则去踩左侧的踏板开门，然后返回<div style="height: 4px;"></div>如此重复，直到走到光圈处即可]],
+    [6.3]=[[每次向前移动5步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号，则说“芝麻开门”，大门打开<div style="height: 4px;"></div>如此重复，直到走到光圈处即可]],
+    [7.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号，则踩左侧的2个踏板将灯点亮，然后再回到主路<div style="height: 4px;"></div>如此重复，所有灯点亮后大门打开，走到光圈处即可]],
+    [7.2]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号，则右转向前爬上台阶<div style="height: 4px;"></div>如此重复，走到光圈处即可]],
+    [7.3]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号，则左转向前<div style="height: 4px;"></div>若遇到门，则说“开门”将门打开<div style="height: 4px;"></div>如此重复，走到光圈处即可]],
+    [8.1]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号，则右转，否则左转<div style="height: 4px;"></div>如此重复，走到光圈处即可]],
+    [8.2]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号，则左转踩踏板点亮灯，再返回<div style="height: 4px;"></div>若不是20号，则右转踩踏板点亮灯，再返回<div style="height: 4px;"></div>如此重复，点亮所有灯后，大门打开，继续走到光圈处即可]],
+    [8.3]=[[每次向前移动10步，然后检查脚下方块编号<div style="height: 4px;"></div>方块编号若为20号，则右转，否则则左转<div style="height: 4px;"></div>继续前进5格，再次检查脚下方块编号<div style="height: 4px;"></div>若是94号，则爬上台阶，否则则爬下台阶<div style="height: 4px;"></div>如此重复，继续走到光圈处即可]],
     [9.1]=[[仔细观察地图，运用循环走到光圈处]],
-    [9.2]=[[运用循环走到光圈处<div style="height: 6px;"></div>每条路走到底，需要说出“传送”去到下一条路<div style="height: 6px;"></div>走完4条路，即可传送到光圈处<div style="height: 6px;"></div>仔细观察地图，寻找规律，运用2次循环完成任务]],
-    [9.3]=[[运用循环走到光圈处<div style="height: 6px;"></div>环绕爬上楼，即可到达光圈处<div style="height: 6px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
-    [10.1]=[[运用循环走到光圈处<div style="height: 6px;"></div>每次向前移动，然后检查脚下方块<div style="height: 6px;"></div>如果是71号，则左转，如果是134号，则右转<div style="height: 6px;"></div>其他情况则不转方向<div style="height: 6px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
-    [10.2]=[[运用循环走到光圈处<div style="height: 6px;"></div>每次向前移动，然后检查脚下方块<div style="height: 6px;"></div>如果是20号，则做出177号动作来砍树<div style="height: 6px;"></div>如果是56号，则右转，如果是58号，则左转<div style="height: 6px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
-    [10.3]=[[运用循环走到光圈处<div style="height: 6px;"></div>每次向前移动，然后检查脚下方块编号<div style="height: 6px;"></div>如果是20号，则做出177号动作来砍树<div style="height: 6px;"></div>如果是94号，则右转，如果是56号，则左转<div style="height: 6px;"></div>如果是19号，则跨过水坑<div style="height: 6px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
+    [9.2]=[[运用循环走到光圈处<div style="height: 4px;"></div>每条路走到底，需要说出“传送”去到下一条路<div style="height: 4px;"></div>走完4条路，即可传送到光圈处<div style="height: 4px;"></div>仔细观察地图，寻找规律，运用2次循环完成任务]],
+    [9.3]=[[运用循环走到光圈处<div style="height: 4px;"></div>环绕爬上楼，即可到达光圈处<div style="height: 4px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
+    [10.1]=[[运用循环走到光圈处<div style="height: 4px;"></div>每次向前移动，然后检查脚下方块<div style="height: 4px;"></div>如果是71号，则左转，如果是134号，则右转<div style="height: 4px;"></div>其他情况则不转方向<div style="height: 4px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
+    [10.2]=[[运用循环走到光圈处<div style="height: 4px;"></div>每次向前移动，然后检查脚下方块<div style="height: 4px;"></div>如果是20号，则做出177号动作来砍树<div style="height: 4px;"></div>如果是56号，则右转，如果是58号，则左转<div style="height: 4px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
+    [10.3]=[[运用循环走到光圈处<div style="height: 4px;"></div>每次向前移动，然后检查脚下方块编号<div style="height: 4px;"></div>如果是20号，则做出177号动作来砍树<div style="height: 4px;"></div>如果是94号，则右转，如果是56号，则左转<div style="height: 4px;"></div>如果是19号，则跨过水坑<div style="height: 4px;"></div>仔细观察地图，寻找规律，找出每次循环所需操作]],
 }
 
 local CodeLessonTip = NPL.export()

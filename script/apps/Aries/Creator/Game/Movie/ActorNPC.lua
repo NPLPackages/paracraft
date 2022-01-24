@@ -263,56 +263,8 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	end
 
 	if((isReuseActor or isAgent) and name and name~="") then
-		local entity;
-		local offsetFacing;
-		if(name == "player") then
-			entity = EntityManager.GetPlayer();
-		else
-			if(isReuseActor == "searchNearPlayer") then
-				local playerActor = movieClip and movieClip:FindActor("player");
-				if(playerActor) then	
-					-- if the movie clip already contains a player, we will use it to locate the entity
-					local x, y, z = playerActor:TransformToEntityPosition(x, y, z)
-					local bx, by, bz = BlockEngine:block(x, y+0.1, z);
-					local r = 1;
-					local entities = EntityManager.GetEntitiesByMinMax(bx-r, by-r, bz-r, bx+r, by+r, bz+r)
-					if(entities and #entities>0) then
-						-- tricky: we will match either name or assetfile 
-						local assetfile = self:GetValue("assetfile", 0);
-						for i, entity_ in ipairs(entities) do
-							if(entity_:GetName() == name) then
-								entity = entity_;
-								break;
-							elseif(entity_.GetModelFile and entity_:GetModelFile() == assetfile) then
-								entity = entity_;
-								break;
-							end
-						end
-					end
-					if (entity) then
-						-- tricky: always use relative facing of the nearby player actor
-						offsetFacing = playerActor:GetOffsetFacing()
-					end
-				else
-					-- search near the current player
-					local x, y, z = EntityManager.GetPlayer():GetBlockPos()
-					local r = 5;
-					local entities = EntityManager.FindEntities({name = name, x=x,  y=y, z=z, r=r})
-					if(entities and #entities>0) then
-						entity = entities[1];
-						if(entity and not entity.SetActor) then
-							entity = nil;
-						end
-					end
-				end
-			end
-			if(not entity) then
-				entity = EntityManager.GetEntity(name);
-				if(entity and not entity.SetActor) then
-					entity = nil;
-				end
-			end
-		end
+		local entity, offsetFacing = self:FindAgentEntity(name, isReuseActor);
+		
 		if(isAgent and isReuseActor==false and (not newName) and entity) then
 			-- tricky: we still need to reuse actor, even if isReuseActor == false under above conditions
 			isReuseActor = true;
@@ -356,6 +308,63 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 		end
 	end
 	return self;
+end
+
+-- @param name: "player" for main player or the name of a global entity object. 
+-- @param searchMode: nil or "searchNearPlayer"
+-- @return entity, offsetFacing: the second parameter is returned only if searchMode is "searchNearPlayer"
+function Actor:FindAgentEntity(name, searchMode)
+	local entity;
+	local offsetFacing;
+	if(name == "player") then
+		entity = EntityManager.GetPlayer();
+	else
+		if(searchMode == "searchNearPlayer") then
+			local playerActor = movieClip and movieClip:FindActor("player");
+			if(playerActor) then	
+				-- if the movie clip already contains a player, we will use it to locate the entity
+				local x, y, z = playerActor:TransformToEntityPosition(x, y, z)
+				local bx, by, bz = BlockEngine:block(x, y+0.1, z);
+				local r = 1;
+				local entities = EntityManager.GetEntitiesByMinMax(bx-r, by-r, bz-r, bx+r, by+r, bz+r)
+				if(entities and #entities>0) then
+					-- tricky: we will match either name or assetfile 
+					local assetfile = self:GetValue("assetfile", 0);
+					for i, entity_ in ipairs(entities) do
+						if(entity_:GetName() == name) then
+							entity = entity_;
+							break;
+						elseif(entity_.GetModelFile and entity_:GetModelFile() == assetfile) then
+							entity = entity_;
+							break;
+						end
+					end
+				end
+				if (entity) then
+					-- tricky: always use relative facing of the nearby player actor
+					offsetFacing = playerActor:GetOffsetFacing()
+				end
+			else
+				-- search near the current player
+				local x, y, z = EntityManager.GetPlayer():GetBlockPos()
+				local r = 5;
+				local entities = EntityManager.FindEntities({name = name, x=x,  y=y, z=z, r=r})
+				if(entities and #entities>0) then
+					entity = entities[1];
+					if(entity and not entity.SetActor) then
+						entity = nil;
+					end
+				end
+			end
+		end
+		if(not entity) then
+			entity = EntityManager.GetEntity(name);
+			if(entity and not entity.SetActor) then
+				entity = nil;
+			end
+		end
+	end
+	return entity, offsetFacing;
 end
 
 -- from data source coordinate to entity coordinate according to CalculateRelativeParams()
@@ -936,6 +945,36 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				self:AddKeyFrameByName("isIgnoreSkin", 0, values.isIgnoreSkin);
 				self:SetIgnoreSkinAnim(values.isIgnoreSkin)
 			end
+			local lastEntity = self:GetEntity()
+			local isAgent = self:GetValue("isAgent", 0)
+			local name = self:GetValue("name", "")
+			if(isAgent and name) then
+				local entity, offsetFacing = self:FindAgentEntity(name, isAgent);
+				if(entity) then
+					if(not self:IsAgent() or lastEntity ~= entity) then
+						self:BecomeAgent(entity);
+						-- copy transform and model file onto frame 0. 
+						local x, y, z = entity:GetPosition()
+						local facing = entity:GetFacing()
+						local scaling = entity:GetScaling()
+						local assetfile = entity.GetModelFile and entity:GetModelFile() or entity:GetMainAssetPath();
+						local skin = entity:GetSkin();
+						self:BeginUpdate();
+						self:AddKeyFrameByName("x", 0, x);
+						self:AddKeyFrameByName("y", 0, y);
+						self:AddKeyFrameByName("z", 0, z);
+						self:AddKeyFrameByName("facing", 0, facing);
+						self:AddKeyFrameByName("scaling", 0, scaling);
+						self:AddKeyFrameByName("assetfile", 0, assetfile);
+						self:AddKeyFrameByName("skin", 0, skin);
+						self:EndUpdate();
+						self:FrameMovePlaying(0);
+					end
+				end
+			elseif(not isAgent and self:IsAgent()) then
+				-- TODO: remove agent and clone, reopen the movie block will fix this. 
+			end
+
 			if(callbackFunc) then
 				callbackFunc(true);
 			end

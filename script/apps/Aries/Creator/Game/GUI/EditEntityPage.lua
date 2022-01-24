@@ -145,9 +145,11 @@ end
 function EditEntityPage.OnClickOK()
 	local entity = EditEntityPage.GetEntity();
 	if(entity) then
-		local command = page:GetValue("command", "")
-		command = command:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
-		entity:SetCommand(command);
+		if(entity:HasCommand()) then
+			local command = page:GetValue("command", "")
+			command = command:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
+			entity:SetCommand(command);
+		end
 		entity:Refresh(true);
 	end
 	page:CloseWindow();

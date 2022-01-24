@@ -275,7 +275,7 @@ function RegionContainer:LoadFromFile(filename)
 	local privateKey = WorldCommon.GetWorldTag("privateKey");
 
 	if (privateKey and type(privateKey) == "string" and privateKey ~= "") then
-		if (xmlRoot[1].attr.privateKey ~= privateKey) then
+		if (xmlRoot[1] and xmlRoot[1].attr and xmlRoot[1].attr.privateKey ~= privateKey) then
 			return;
 		end
 	end

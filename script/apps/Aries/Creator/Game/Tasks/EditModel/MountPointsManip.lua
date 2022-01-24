@@ -22,6 +22,7 @@ local Matrix4 = commonlib.gettable("mathlib.Matrix4");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local Quaternion = commonlib.gettable("mathlib.Quaternion");
 local Color = commonlib.gettable("System.Core.Color");
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local Plane = commonlib.gettable("mathlib.Plane");
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local ShapesDrawer = commonlib.gettable("System.Scene.Overlays.ShapesDrawer");
@@ -40,6 +41,8 @@ MountPointsManip:Property({"MountCount", 0, "GetMountCount"});
 MountPointsManip:Property({"UIScaling", 1, "GetUIScaling", "SetUIScaling"});
 -- default to nil, if not, the returned angle will always be snap to steps, such pi/2, pi/4, pi/6
 MountPointsManip:Property({"GridStep", math.pi/12, "GetGridStep", "SetGridStep", auto=true});
+MountPointsManip:Property({"planeColor", 0x60ffffff, "GetPlaneColor", "SetPlaneColor", auto=true});
+MountPointsManip:Property({"planeGridColor", 0x60000000, "GetPlainLineColor", "SetPlainLineColor", auto=true});
 -- each mount point has trans, scale, rotate three variables. when mountpoint is changed, varNameChanged is always changed. 
 MountPointsManip:Signal("mountPointChanged", function(mountpoint_name) end);
 
@@ -521,6 +524,36 @@ function MountPointsManip:paintEvent(painter)
 		painter:PushMatrix();
 		painter:TranslateMatrix(cx, cy, cz);
 		
+		if(mountpoint:GetFacing() ~= 0) then
+			painter:RotateMatrix(mountpoint:GetFacing(), 0, 1, 0)
+		end
+
+		-- draw bottom grid plane
+		if(self.selectedMountPoint == mountpoint and not isDrawingPickable) then
+			local blocksize = BlockEngine.blocksize
+			local gridCountX = math.floor(dx / blocksize)
+			local gridCountZ = math.floor(dz / blocksize)
+			
+			if(gridCountX > 2 or gridCountZ > 2) then
+				painter:SetBrush(self.planeColor);
+				ShapesDrawer.DrawAABB(painter, - dx / 2, 0, - dz / 2, dx / 2, 0, dz / 2, true)
+
+				painter:SetBrush(self.planeGridColor);
+				if(gridCountX > 2) then
+					gridCountX = math.floor(gridCountX/2)
+					for i=0, 2*gridCountX do
+						ShapesDrawer.DrawLine(painter, -gridCountX*blocksize+i*blocksize, 0, -dz/2, -gridCountX*blocksize+i*blocksize, 0, dz/2)
+					end
+				end
+				if(gridCountZ > 2) then
+					gridCountZ = math.floor(gridCountZ/2)
+					for i=0, 2*gridCountZ do
+						ShapesDrawer.DrawLine(painter, -dx/2, 0, -gridCountZ*blocksize+i*blocksize, dx/2, 0, -gridCountZ*blocksize+i*blocksize)
+					end
+				end
+			end
+		end
+
 		if(self.selectedMountPoint == mountpoint) then
 			self:SetColorAndName(painter, self.editColor, pickName);
 		else
@@ -531,13 +564,11 @@ function MountPointsManip:paintEvent(painter)
 				self:SetColorAndName(painter, self.AABBColor, pickName);
 			end
 		end
+
 		-- draw this mountpoint AABB
 		ShapesDrawer.DrawAABB(painter, - dx / 2, 0, - dz / 2, dx / 2, dy, dz / 2, false)
 		
 		-- draw mountpoint facing
-		if(mountpoint:GetFacing() ~= 0) then
-			painter:RotateMatrix(mountpoint:GetFacing(), 0, 1, 0)
-		end
 		ShapesDrawer.DrawLine(painter, 0, 0, 0, dx + 0.1, 0, 0)
 
 		if(not isDrawingPickable and 

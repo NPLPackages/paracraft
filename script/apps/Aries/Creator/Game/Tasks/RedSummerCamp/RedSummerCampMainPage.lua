@@ -141,8 +141,10 @@ function RedSummerCampMainPage.Show()
 
 	RedSummerCampMainPage.HasClickFriend = false
 	RedSummerCampMainPage.HasClickQuest = false
-	if Notice.CheckCanShow() then
+
+	if Notice.CheckCanShow() and not RedSummerCampMainPage.isShowNotice then
         Notice.Show(0 ,100)
+		RedSummerCampMainPage.isShowNotice = true
     end  
 end
 
@@ -559,7 +561,7 @@ end
 function RedSummerCampMainPage.QuickStart()
 	local Opus = NPL.load("(gl)Mod/WorldShare/cellar/Opus/Opus.lua")
 	Opus:Show()
-
+	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openopus");
 	-- local last_world_id = GameLogic.GetPlayerController():LoadRemoteData("summer_camp_last_worldid", 0);
 	-- if last_world_id and last_world_id > 0 then
 	-- 	GameLogic.RunCommand(format('/loadworld -s -force %d', last_world_id))
@@ -601,24 +603,30 @@ function RedSummerCampMainPage.OnClickRightBt(name)
 
 
     if name == "skin" then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openuserskin");
 		local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
 		last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="skin", username = System.User.keepworkUsername});
 	elseif name == "certificate" then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openuserhonor");
 		local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
 		last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="honor", username = System.User.keepworkUsername});
 	elseif name == "friend" then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openfriend");
         local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
         FriendsPage.Show();
 		RedSummerCampMainPage.ChangeRedTipState("friend_red_icon", false)
 	elseif name == "email" then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openemail");
         local Email = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/Email.lua");
         Email.Show();		
 	elseif name == "task" then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.opentask");
 		local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
 		QuestPage.Show();
 		RedSummerCampMainPage.HasClickQuest = true
 		RedSummerCampMainPage.ChangeRedTipState("task_red_icon", false)
 	elseif name == "rank" then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openrank");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua").Show();
     end
 end
@@ -725,6 +733,7 @@ function RedSummerCampMainPage.ChangeRedTipState(ui_name, state)
 end
 
 function RedSummerCampMainPage.OpenOlypic()
-	local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
-    RedSummerCampPPtPage.Show("winterOlympic");
+	-- local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+    -- RedSummerCampPPtPage.Show("winterOlympic");
+	GameLogic.RunCommand(string.format("/loadworld -s -auto %s", 132939))
 end

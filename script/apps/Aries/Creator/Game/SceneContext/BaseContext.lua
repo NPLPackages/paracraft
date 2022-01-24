@@ -458,12 +458,16 @@ function BaseContext:UpdateClickStrength(fDelta, result)
 				click_data.result = commonlib.clone(result);
 				-- tricky: if the user keeps pressing the button on multiple blocks, the strength does not vanish to 0 immediately, 
 				-- instead, it only decreases for a small number like 250(self.max_break_time*0.5). 
-				local block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
-				if(block_id > 0) then
-					-- holding on a different block 
-					click_data.strength = 0; -- math.max(0, (click_data.strength or 0) - self.max_break_time*0.5);
+				if(result.blockX) then
+					local block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
+					if(block_id > 0) then
+						-- holding on a different block 
+						click_data.strength = 0; -- math.max(0, (click_data.strength or 0) - self.max_break_time*0.5);
+					else
+						-- holding on the terrain
+						click_data.strength = 0;
+					end
 				else
-					-- holding on the terrain
 					click_data.strength = 0;
 				end
 			end
@@ -841,21 +845,32 @@ function BaseContext:OnCreateBlock(result, event)
 		end
 	end
 	
+	local ctrl_pressed, shift_pressed, alt_pressed;
+	if(event) then
+		ctrl_pressed, shift_pressed, alt_pressed = event.ctrl_pressed, event.shift_pressed, event.alt_pressed
+	else
+		ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
+		shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
+		alt_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU);
+	end
+
 	if(block_id and block_id > 4096) then
+		local processed;
+		if(GameLogic.GameMode:IsEditor()) then
+			if(not alt_pressed and shift_pressed) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FillLineTask.lua");
+				local task = MyCompany.Aries.Game.Tasks.FillLine:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_data = block_data, side = result.side})
+				task:Run();
+				processed = true
+			end
+		end
 		-- for special blocks. 
-		local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x,blockY = y, blockZ = z, block_id = block_id, side = result.side, entityPlayer = EntityManager.GetPlayer()})
-		task:Run();
+		if(not processed) then
+			local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x,blockY = y, blockZ = z, block_id = block_id, side = result.side, entityPlayer = EntityManager.GetPlayer()})
+			task:Run();
+		end
 		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create:"..tostring(block_id), 1, nil);
 	else
-		local ctrl_pressed, shift_pressed, alt_pressed;
-		if(event) then
-			ctrl_pressed, shift_pressed, alt_pressed = event.ctrl_pressed, event.shift_pressed, event.alt_pressed
-		else
-			ctrl_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL);
-			shift_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT);
-			alt_pressed = ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU);
-		end
-		
 		GameLogic.GetFilters():apply_filters("user_event_stat", "block", "create:"..tostring(block_id or result.block_id), 1, nil);
 
 		if(GameLogic.GameMode:IsEditor()) then

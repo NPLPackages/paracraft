@@ -12,21 +12,54 @@ GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 RolePlayMovieController = commonlib.gettable("MyCompany.Aries.Game.Movie.RolePlayMode.RolePlayMovieController");
 RolePlayMovieController.OnInit();
 
+function getOperateType()
+    return 1
+end
 
+function ShowRolePage()
+    RolePlayMovieController.ShowRolePage()
+end
+--30291c --background-color: #ff00ff;
 ]]></script>
-<pe:container style="background-color:#ff0000;height:64px;position:relative" width="100%" ClickThrough="true">
+<pe:container style="height:80px;position:relative;background:;" width="100%" ClickThrough="true">
     <div align="right" style="width:32px;position:relative;">
         <input type="button" value="X" uiname="RolePlayMovieController.Close" name="btnClose" style="width: 32px; height: 32px; " onclick="RolePlayMovieController.OnClose()"/>
     </div>
-    TODO: actor items
-</pe:container>
-<pe:container alignment="_mb" ClickThrough="true" style="width:0px;height:64px;background-color:#0000ff;position:relative">
-    <div style="width:512px">
-        <input type="button" onclick="RolePlayMovieController.OnGotoBeginFrame" uiname="RolePlayMovieController.to_begin" name="to_begin" tooltip='<%=L"到开始"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/back_off.png);" />
-        <input type="button" onclick="RolePlayMovieController.OnPlay" uiname="RolePlayMovieController.play" name="play" tooltip='<%=L"播放/暂停(P)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " />
-        <input type="button" onclick="RolePlayMovieController.OnRecord" uiname="RolePlayMovieController.record" name="record" tooltip='<%=L"开始录制MPEG(R)"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/rec_off.png); " />
-        <input type="button" onclick="RolePlayMovieController.OnGotoEndFrame" uiname="RolePlayMovieController.to_end" name="to_end" tooltip='<%=L"到结束"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/go_off.png); " />
+    <input type="button" style="width: 100x; height: 100x; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/role_icon_32bits.png);" onclick="ShowRolePage"/>
+    <div style="margin-left: 5px;margin-top: -68px;">
+        <pe:mc_player  name="movie_role_anim" miniscenegraphname="RolePlayMovie" style="width:80px;height:80px; margin-top: -50px;"  IsInteractive="false" NoFrameMove="true" RenderTargetSize="100" DefaultCameraObjectDist="2.56" />
     </div>
+    <pe:label name="role_num" value="1" style="height: 30px; margin-left: 40px; margin-top: -34px; color: #000000; font-weight: bold; font-size: 20px; base-font-size: 20px;"></pe:label>
+</pe:container>
+<pe:container alignment="_mb" ClickThrough="true" style="width:0px;height:80px;position:relative;background:;">
+    <pe:container alignment="_lb" ClickThrough="true" style="margin-left: 6px; width: 250px;height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/camera_Bg_32bits.png#0 0 493 160);">
+        <input type="button" onclick="RolePlayMovieController.OnCut" uiname="RolePlayMovieController.cut" name="cut" tooltip='<%=L"剪切(C)"%>' style="margin-left: 10px; margin-top: 10px; width: 64px; height: 64px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/cut_32bits.png); " />
+        <input type="text" uiname="RolePlayMovieClipTimeLine.recordtime" name="recordtime" enable_ime="false" spacing="0" style='font-size: 20px; base-font-size: 20px; font-weight: bold; background:;margin-left:20px;margin-top:45px;height:60px;width:164px' value='00:00:00' onchange="RolePlayMovieClipTimeLine.OnChangeRecordTime" />
+        <input type="button" onclick="RolePlayMovieController.OnPlay" uiname="RolePlayMovieController.play" name="play" tooltip='<%=L"播放/暂停(P)"%>' style="margin-left: 20px; margin-top: -33px; width: 36px; height: 36px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/start_32bits.png#0 0 78 78); " />
+    </pe:container>
+    
+    <pe:container alignment="_rb" ClickThrough="true" style="margin-right: 6px; position:relative;width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/record_bg_32bits.png#0 0 160 160);">
+        <input type="button" onclick="RolePlayMovieController.OnRecord" uiname="RolePlayMovieController.record" name="record" tooltip='<%=L"开始录制MPEG(R)"%>' style="margin-left: 10px; margin-top: 10px; width: 64px; height: 64px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/record_32bits.png); " />
+    </pe:container>
+</pe:container>
+<pe:container alignment="_ctb" ClickThrough="true" style="width: 720px; height: 96px;  margin-top: -56px; background:;">
+    <pe:container uiname="RolePlayMovieController.actorOperate" ClickThrough="true" style="margin-left: 20px; width: 680px; height: 90px; background:;">
+        <pe:container uiname="RolePlayMovieController.actor_ani1" style="position: relative; margin-top: 10px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/aniicon/bow_32bits.png#0 0 170 170);"></pe:container>
+        <pe:container uiname="RolePlayMovieController.actor_ani2" style="position: relative; margin-top: 10px; margin-left: 100px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/aniicon/bow_32bits.png#0 0 170 170);"></pe:container>
+        <pe:container uiname="RolePlayMovieController.actor_ani3" style="position: relative; margin-top: 10px; margin-left: 200px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/aniicon/bow_32bits.png#0 0 170 170);"></pe:container>
+        <pe:container uiname="RolePlayMovieController.actor_ani4" style="position: relative; margin-top: 10px; margin-left: 300px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/aniicon/bow_32bits.png#0 0 170 170);"></pe:container>
+        <pe:container uiname="RolePlayMovieController.actor_ani5" style="position: relative; margin-top: 10px; margin-left: 400px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/aniicon/bow_32bits.png#0 0 170 170);"></pe:container>
+        <input type="button" onclick="" style="position: relative; margin-top: 10px; margin-left: 500px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/aniicon/bow_32bits.png#0 0 170 170);"/>
+    </pe:container>
+    <pe:container uiname="RolePlayMovieController.cameraOperate"  ClickThrough="true" style="margin-left: 20px;margin-top: -90px; width: 680px; height: 90px; background:;" >
+        <input type="button" onclick="" style="position: relative; margin-top: 10px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/actor_select_32bits.png);"/>
+        <input type="button" onclick="" style="position: relative; margin-top: 10px; margin-left: 100px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/camera_rot1_32bits.png);"/>
+        <input type="button" onclick="" style="position: relative; margin-top: 10px; margin-left: 200px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/camera_rot2_32bits.png);"/>
+        <input type="button" onclick="" style="position: relative; margin-top: 10px; margin-left: 300px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/camera_rot3_32bits.png);"/>
+        <input type="button" onclick="" style="position: relative; margin-top: 10px; margin-left: 400px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/camera_rot4_32bits.png);"/>
+        <input type="button" onclick="" style="position: relative; margin-top: 10px; margin-left: 500px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/add_32bits.png);"/>
+        <input type="button" onclick="" style="position: relative; margin-top: 10px; margin-left: 600px; width: 80px; height: 80px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/sub_32bits.png);"/>
+    </pe:container>
 </pe:container>
 </pe:mcml>
 </body>

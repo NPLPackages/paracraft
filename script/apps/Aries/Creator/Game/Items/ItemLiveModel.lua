@@ -35,6 +35,8 @@ local ItemLiveModel = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game
 ItemLiveModel:Property({"fingerRadius", 16});
 -- if entity's radius is bigger than 0.3, we will not use finger picking
 ItemLiveModel:Property({"maxFingerPickingRadius", 0.3});
+-- between the eye lookat and the target position
+ItemLiveModel:Property({"maxDragViewDistance", 50});
 
 block_types.RegisterItemClass("ItemLiveModel", ItemLiveModel);
 
@@ -433,6 +435,7 @@ end
 -- the highest point in above three conditions is used as the final drop location. 
 -- @param dropLocation: {dropX, dropY, dropZ}, from which location to fall
 -- @param maxFallDistance: default to 10 meters. 
+-- @return true if drop location is found, and false if no drop location is found. 
 function ItemLiveModel:CalculateFreeFallDropLocation(srcEntity, dropLocation, maxFallDistance)
 	maxFallDistance = maxFallDistance or 10;
 	local x, y, z = dropLocation.dropX, dropLocation.dropY, dropLocation.dropZ;
@@ -484,7 +487,7 @@ function ItemLiveModel:CalculateFreeFallDropLocation(srcEntity, dropLocation, ma
 	dz = dz * 2
 	local maxLength = math.max(dx, dz);
 	
-	local block_id, solid_y, x1, y1, z1 = self:GetFirstObstructionBlockBelow(dropLocation.dropX, dropLocation.dropY+0.1, dropLocation.dropZ)
+	local block_id, solid_y, x1, y1, z1 = self:GetFirstObstructionBlockBelow(dropLocation.dropX, dropLocation.dropY, dropLocation.dropZ)
 	if(block_id) then
 		if((not dropLocation.mountPointIndex) or y1 > y) then
 			-- we will drop to block's bottom center
@@ -503,9 +506,13 @@ function ItemLiveModel:CalculateFreeFallDropLocation(srcEntity, dropLocation, ma
 				end
 			end
 		end
+	elseif(not dropLocation.mountPointIndex) then
+		-- no physical mesh or obstruction block to fall on. 
+		return false;
 	end
 
 	dropLocation.dropX, dropLocation.dropY, dropLocation.dropZ = x, y, z;
+	return true;
 end
 
 -- get newY coordinate where (x, newY, z) is big enought for size. 
@@ -600,15 +607,25 @@ end
 -- @param x, y, z: real world position, where x, z is usually near block center. 
 -- return block_id, blockY, realX, realY, realZ
 function ItemLiveModel:GetFirstObstructionBlockBelow(x, y, z)
-	local bx, by, bz = BlockEngine:block(x, y, z)
+	local bx, by1, bz = BlockEngine:block(x, y, z)
+	y = y + 0.1
+	bx, by, bz = BlockEngine:block(x, y, z)
+	
 	-- if first block is obstruction, we will try at most two blocks above. 
 	local b = BlockEngine:GetBlock(bx, by, bz)
 	local offset = 1;
 	if(b and b.obstruction) then
 		local bSearchUpward = true;
-		if(not self.solid) then
+		if(by1 < by) then
+			local b1 = BlockEngine:GetBlock(bx, by1, bz)
+			if(not b1 or not b1.obstruction) then
+				bSearchUpward = false;
+				offset = -1;
+			end
+		end
+		if(bSearchUpward and not b.solid) then
 			local aabb = b:GetCollisionBoundingBoxFromPool(bx,by,bz)
-			if(aabb and not aabb:ContainsPoint(x, y, z)) then
+			if(aabb and not aabb:ContainsPoint(x, y, z, 0.05)) then
 				bSearchUpward = false
 				local _, minY, _ = aabb:GetMinValues()
 				if(y < minY) then
@@ -624,6 +641,7 @@ function ItemLiveModel:GetFirstObstructionBlockBelow(x, y, z)
 				b = BlockEngine:GetBlock(bx, by+2, bz)
 				if(b and b.obstruction) then
 					-- no drop location can be found. 
+					return
 				else
 					offset = 2
 				end
@@ -947,8 +965,9 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 	if(not result) then
 		result, targetEntity = self:CheckMousePick()
 	end
-	if(draggingEntity) then
+	if(draggingEntity and draggingEntity.dragParams) then
 		local dragParams = draggingEntity.dragParams;
+		local lastDropLocation = dragParams.dropLocation;
 		local hasFound;
 		-- finding a right location to put down.
 		if(targetEntity) then
@@ -1094,6 +1113,11 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 				end
 			end
 		end
+		if(not hasFound and result.side == 4 and not targetEntity and not result.physicalX) then
+			-- do not drop on bottom side of the block
+			hasFound = true
+			dragParams.dropLocation = nil;
+		end
 		if(not hasFound and result.blockX) then
 			-- try free fall on to blocks, mount point or pure physical meshes. 
 			-- we will only free fall on block centers even for physical meshes
@@ -1137,7 +1161,21 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 				end
 			end
 			dragParams.dropLocation = {target = result.block_id, targetEntity = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, bx = bx, by = by, bz = bz, side = 5, facing = facing}
-			self:CalculateFreeFallDropLocation(draggingEntity, dragParams.dropLocation);	
+			if(not self:CalculateFreeFallDropLocation(draggingEntity, dragParams.dropLocation)) then
+				if(false and result.blockSide and result.blockSide~=result.side and not result.physicalX) then
+					-- tricky: for glass plane overlapping with another non-physical entity, we will also force trying block picking's opposite side
+					dragParams.dropLocation.dropX, dragParams.dropLocation.dropY, dragParams.dropLocation.dropZ = nil, nil, nil;
+					bx, by, bz = BlockEngine:GetBlockIndexBySide(result.blockX, result.blockY, result.blockZ, result.blockSide);
+					dropX, dropY, dropZ = BlockEngine:real_bottom(bx, by, bz)
+					dropY = y;
+					dragParams.dropLocation.dropX, dragParams.dropLocation.dropY, dragParams.dropLocation.dropZ = dropX, dropY, dropZ;
+					if(not self:CalculateFreeFallDropLocation(draggingEntity, dragParams.dropLocation)) then
+						dragParams.dropLocation.dropX, dragParams.dropLocation.dropY, dragParams.dropLocation.dropZ = nil, nil, nil;
+					end
+				else
+					dragParams.dropLocation.dropX, dragParams.dropLocation.dropY, dragParams.dropLocation.dropZ = nil, nil, nil;
+				end
+			end
 		end
 		if(dragParams.dropLocation) then
 			-- make the model a bit higher than the drop location. 
@@ -1145,7 +1183,13 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 			local x, y, z = dragParams.dropLocation.x, dragParams.dropLocation.y + dragDisplayOffsetY, dragParams.dropLocation.z;
 			local oldX, oldY, oldZ = draggingEntity:GetPosition()
 			
-			self:UpdateEntityDragAnim(draggingEntity, x, y, z, oldX, oldY, oldZ)
+			local lookatX, lookatY, lookatZ = ParaCamera.GetLookAtPos()
+			local distSq = (lookatX - x)^2 + (lookatY - y)^2 + (lookatZ - z)^2
+			if(distSq < (self.maxDragViewDistance^2)) then
+				self:UpdateEntityDragAnim(draggingEntity, x, y, z, oldX, oldY, oldZ)
+			else
+				dragParams.dropLocation = lastDropLocation;
+			end
 		end
 	end
 end
@@ -1334,6 +1378,7 @@ function ItemLiveModel:StartDraggingEntity(entity)
 	local dragParams = {
 		pos = {entity:GetPosition()},
 		facing = entity:GetFacing(),
+		linkTo = entity:GetLinkToName(),
 		hasRealPhysics = entity:HasRealPhysics(),
 	};
 	entity:BeginDrag();
@@ -1355,11 +1400,26 @@ function ItemLiveModel:MountEntityToTargetMountPoint(entity, mountTarget, mountP
 end
 
 -- drop entity to the 3d scene or on other entity
-function ItemLiveModel:DropEntity(entity)
-	if(entity and entity.dragParams and entity.dragParams.dropLocation and entity.dragParams.dropLocation.x) then
-		self:StopSmoothMoveTo(entity);
+-- @param callbackFunc: called when the drop operation ends. 
+function ItemLiveModel:DropEntity(entity, callbackFunc)
+	if(entity and entity.dragParams) then
 		local dragParams = entity.dragParams;
-		local destX, destY, destZ, facing = dragParams.dropLocation.dropX or dragParams.dropLocation.x, dragParams.dropLocation.dropY or dragParams.dropLocation.y, dragParams.dropLocation.dropZ or dragParams.dropLocation.z, dragParams.dropLocation.facing;
+		local dropLocation;
+		local old_x, old_y, old_z, old_facing;
+		local old_linkTo;
+		
+		if(dragParams.dropLocation and dragParams.dropLocation.x and dragParams.dropLocation.dropX) then
+			dropLocation = dragParams.dropLocation
+		else
+			old_x, old_y, old_z = unpack(entity.dragParams.pos);
+			old_facing = dragParams.facing;
+			old_linkTo = dragParams.linkTo;
+			dropLocation = {x=old_x, y=old_y, z=old_z, facing = old_facing, dropX = old_x, dropY = old_y, dropZ = old_z};
+		end
+		
+		self:StopSmoothMoveTo(entity);
+		
+		local destX, destY, destZ, facing = dropLocation.dropX or dropLocation.x, dropLocation.dropY or dropLocation.y, dropLocation.dropZ or dropLocation.z, dropLocation.facing;
 		-- drop animation
 		local fromX, fromY, fromZ = entity:GetPosition()
 		
@@ -1376,11 +1436,11 @@ function ItemLiveModel:DropEntity(entity)
 			local z = fromZ * (1 - t_xz) + destZ * t_xz;
 			entity:SetPosition(x, y, z)
 			if(t_xz == 1 and t_y == 1) then
-				if(dragParams.dropLocation.isCustomCharItem and dragParams.dropLocation.target) then
+				if(dropLocation.isCustomCharItem and dropLocation.target) then
 					-- only send mount event, without actually linking the dragging entity to target, the target will handle mount operation by itself. 
-					dragParams.dropLocation.target:OnMount(nil, nil, entity)
-				elseif(dragParams.dropLocation.mountPointIndex and dragParams.dropLocation.target) then
-					self:MountEntityToTargetMountPoint(entity, dragParams.dropLocation.target, dragParams.dropLocation.mountPointIndex)
+					dropLocation.target:OnMount(nil, nil, entity)
+				elseif(dropLocation.mountPointIndex and dropLocation.target) then
+					self:MountEntityToTargetMountPoint(entity, dropLocation.target, dropLocation.mountPointIndex)
 				end
 				timer:Change();
 				entity.dropAnimTimer = nil;
@@ -1389,7 +1449,19 @@ function ItemLiveModel:DropEntity(entity)
 					entity.dragTask:DropDraggingEntity()
 					entity.dragTask = nil;
 				end
-				entity:EndDrag(dragParams.dropLocation)
+				-- restore old position
+				if(old_x) then
+					entity:SetPosition(old_x, old_y, old_z);
+					entity:SetFacing(old_facing);
+					if(old_linkTo) then
+						entity:LinkToEntityByName(old_linkTo)
+					end	
+				end
+				entity:EndDrag(dropLocation)
+				
+				if(callbackFunc) then
+					callbackFunc(entity)
+				end
 			end
 		end})
 		entity.dropAnimTimer:Change(30, 30)
@@ -1400,6 +1472,9 @@ function ItemLiveModel:DropEntity(entity)
 	elseif(entity) then
 		-- restore to previous location or just leave as it is
 		entity:EndDrag()
+		if(callbackFunc) then
+			callbackFunc(entity)
+		end
 	end
 end
 
@@ -1429,18 +1504,27 @@ function ItemLiveModel:SendUserStats(entity, dragParams)
 	end
 end
 
-function ItemLiveModel:DropDraggingEntity()
+function ItemLiveModel:DropDraggingEntity(callbackFunc)
 	local entity = self.draggingEntity;
 	if(entity) then
 		local dragParams = entity.dragParams
 		if(dragParams) then
-			self:DropEntity(entity)
+			self:DropEntity(entity, callbackFunc)
 			entity.dragParams = nil;
 		end
 		self.draggingEntity = nil
 		self:SendUserStats(entity, dragParams)
 	end
 	Game.SelectionManager:SetEntityFilterFunction(nil)
+end
+
+-- @param entity: if nil, the current dragging entity is used. 
+function ItemLiveModel:RestoreDraggingEntity(entity)
+	entity = entity or self.draggingEntity;
+	if(entity and entity.dragParams) then
+		entity.dragParams.dropLocation = nil;
+		self:DropDraggingEntity()
+	end
 end
 
 -- only spawn entity if player is holding a LiveModel item in right hand. 

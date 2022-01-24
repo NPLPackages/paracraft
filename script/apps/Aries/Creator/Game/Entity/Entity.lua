@@ -1121,13 +1121,6 @@ function Entity:SetObjID(id)
 	self.obj = nil;
 end
 
-function Entity:GetOpacity()
-	return self.opacity or 1;
-end		
-
-function Entity:SetOpacity(value)
-	self.opacity = value;
-end		
 -- whether it can be searched via Ctrl+F FindBlockTask
 function Entity:IsSearchable()
 end
@@ -3042,6 +3035,7 @@ end
 
 -- @param opacity: [0,1]
 function Entity:SetOpacity(opacity)
+	self.opacity = value or 1;
 	local obj = self:GetInnerObject();
 	if(obj) then
 		obj:SetField("opacity", opacity or 1);
