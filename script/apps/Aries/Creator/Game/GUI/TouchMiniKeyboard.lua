@@ -364,7 +364,7 @@ function TouchMiniKeyboard:OnTouch(touch)
 				else
 					local x = touch.x - self.left;
 					local y = touch.y - self.top;
-					local center_item = self:GetCneterItem()
+					local center_item = self:GetCenterItem()
 					local center_pos = {center_item.pos_x + center_item.width/2, center_item.pos_y + center_item.height/2}
 					self:ChangeMoveState(x, y, center_pos)
 				end
@@ -487,7 +487,7 @@ function TouchMiniKeyboard:GetCtrlKey()
 	return self.keylayout[4][1];
 end
 
-function TouchMiniKeyboard:GetCneterItem()
+function TouchMiniKeyboard:GetCenterItem()
 	return self.keylayout[2][2];
 end
 
@@ -591,7 +591,6 @@ end
 
 function TouchMiniKeyboard:SendRawKeyEvent(btnItem, isDown)
 	if(btnItem.vKey) then
-		
 		Keyboard:SendKeyEvent(isDown and "keyDownEvent" or "keyUpEvent", btnItem.vKey);
 	end
 end
@@ -1101,7 +1100,7 @@ function TouchMiniKeyboard:ShowCtrlDrawAnim()
 		end
 	end
 
-	if start_pos.x == nil or start_pos.y == nil then
+	if (not start_pos.x or not end_pos.x) then
 		return
 	end
 
@@ -1264,15 +1263,15 @@ function TouchMiniKeyboard:ShowShiftDrawAnim()
 end
 
 function TouchMiniKeyboard:RefreshRocker(touch_x, touch_y)
-	local center_item = self:GetCneterItem()
-	local cenert_pos_x = center_item.pos_x + center_item.width/2
-	local cenert_pos_y = center_item.pos_y + center_item.height/2
+	local center_item = self:GetCenterItem()
+	local center_pos_x = center_item.pos_x + center_item.width/2
+	local center_pos_y = center_item.pos_y + center_item.height/2
 	-- 282	264
 	if nil == self.rocker then
 		local bg_size = 256
 		local bg_pos_x = (self.width - bg_size)/2
 		local bg_pos_y = (self.height - bg_size)/2
-		self.rocker = ParaUI.CreateUIObject("container","rocker_root", "lt",cenert_pos_x - bg_size/2, cenert_pos_y - bg_size/2, bg_size, bg_size);
+		self.rocker = ParaUI.CreateUIObject("container","rocker_root", "lt",center_pos_x - bg_size/2, center_pos_y - bg_size/2, bg_size, bg_size);
 		self.rocker.background = "";
 		local parent = self:GetUIControl();
 		parent:AddChild(self.rocker)
@@ -1321,17 +1320,17 @@ function TouchMiniKeyboard:RefreshRocker(touch_x, touch_y)
 	local pos_x = touch_x - self.left;
 	local pos_y = touch_y - self.top;
 	-- 计算目标点离摇杆中心的距离
-	local target_distance = (pos_x - cenert_pos_x) ^ 2 + (pos_y - cenert_pos_y) ^ 2
+	local target_distance = (pos_x - center_pos_x) ^ 2 + (pos_y - center_pos_y) ^ 2
 
 	-- 计算夹角
-	local param_y = pos_y - cenert_pos_y
-	local param_x = pos_x - cenert_pos_x
+	local param_y = pos_y - center_pos_y
+	local param_x = pos_x - center_pos_x
 	local rad = math.atan2(-param_y,  param_x)
 	local rotation = rad * 180/math.pi 
 	-- 计算圆上的点
 	-- 得到圆盘中点到手指位置连成的直线与圆的交点
-	local circle_pos_x = cenert_pos_x + math.cos(rad) * radius 
-	local circle_pos_y = cenert_pos_y + math.sin(rad) * (-radius) 
+	local circle_pos_x = center_pos_x + math.cos(rad) * radius 
+	local circle_pos_y = center_pos_y + math.sin(rad) * (-radius) 
 	
 	-- 计算摇杆在圆上的坐标
 	local point_pos_x = circle_pos_x - rocker_point.width/2

@@ -17,6 +17,7 @@ NPL.load("(gl)script/kids/3DMapSystemUI/event_handlers_mouse.lua");
 NPL.load("(gl)script/kids/3DMapSystemUI/event_handlers_keyboard.lua");
 NPL.load("(gl)script/kids/3DMapSystemUI/event_handlers_network.lua");
 NPL.load("(gl)script/kids/3DMapSystemUI/event_handlers_system.lua");
+NPL.load("(gl)script/kids/3DMapSystemUI/event_handlers_touch.lua");
 
 local Missile_Timer;
 
@@ -41,6 +42,8 @@ function Map3DSystem.ReBindEventHandlers(params)
 	ParaScene.RegisterEvent("_n_map3d_network", ";Map3DSystem.OnNetworkEvent();");
 	-- register system event handler
 	ParaScene.RegisterEvent("_s_map3d_system", ";Map3DSystem_OnSystemEvent();");
+	-- register system touch handler
+	ParaScene.RegisterEvent("_t_map3d_touch", ";Map3DSystem.OnTouchEvent();");
 	
 	-- this prevent user from closing the application by alt-f4 or clicking the x button. Instead SYS_WM_CLOSE is fired. 
 	ParaEngine.GetAttributeObject():SetField("IsWindowClosingAllowed", true);

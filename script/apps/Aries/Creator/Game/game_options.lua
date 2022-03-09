@@ -1069,21 +1069,26 @@ function options:SetUIScaling(value)
 		return 
 	end
 
-	local scaling = 1;
+	local userUIScaling = 1;
 	local key = "Paracraft_System_SetUIScaling";
-	if(value == nil) then
-		value = GameLogic.GetPlayerController():LoadLocalData(key,self:GetUIScaling(),true);
+
+	if (value == nil) then
+		value = GameLogic.GetPlayerController():LoadLocalData(key, self:GetUIScaling(), true);
 	else
 		GameLogic.GetPlayerController():SaveLocalData(key, value, true, true);
 	end
-	if(value and value~=0) then
-		scaling = value
+
+	if (value and value ~= 0) then
+		userUIScaling = value;
+
 		local frame_width, frame_height = Screen:GetWindowSolution()
-		if(frame_height < self.min_ui_height*scaling) then
-			scaling = frame_height / self.min_ui_height;
+
+		if (frame_height < self.min_ui_height * userUIScaling) then
+			userUIScaling = frame_height / self.min_ui_height;
 		end
 	end
-	Screen:SetUserUIScaling(scaling)
+
+	Screen:SetUserUIScaling(userUIScaling)
 end
 
 function options:GetUIScaling()

@@ -10,6 +10,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
 local task = MyCompany.Aries.Game.Tasks.DragEntity:new({})
 task:StartDraggingEntity(entity);
 task:DropDraggingEntity();
+
+local task = MyCompany.Aries.Game.Tasks.DragEntity:new({nohistory=true})
+task:CreateEntity(entity)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
@@ -28,14 +31,14 @@ end
 -- we have just created an entity
 function DragEntity:CreateEntity(entity)
 	self:StartDraggingEntity(entity);
-	self:DropDraggingEntity()
+	self:DropDraggingEntity(entity)
 	self:SetCreateMode()
 end
 
 -- we are about to delete an entity
 function DragEntity:DeleteEntity(entity)
 	self:StartDraggingEntity(entity);
-	self:DropDraggingEntity()
+	self:DropDraggingEntity(entity)
 	self:SetDeleteMode()
 end
 
@@ -49,9 +52,8 @@ end
 function DragEntity:DropDraggingEntity()
 	if(self.draggingEntity) then
 		self.toXmlNode = self.draggingEntity:SaveToXMLNode();
-		TaskManager.AddTask(self);
 
-		if(GameLogic.GameMode:CanAddToHistory()) then
+		if(not self.nohistory and GameLogic.GameMode:CanAddToHistory()) then
 			UndoManager.PushCommand(self);
 		end
 	end	

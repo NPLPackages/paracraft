@@ -35,6 +35,7 @@ local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local hotkey_manager = commonlib.gettable("System.mcml_controls.hotkey_manager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
+local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -277,7 +278,7 @@ function BaseContext:CheckMousePick(event)
 		self.mousepick_timer:Change(50, nil);
 	end
 
-	local result = SelectionManager:MousePickBlock();
+	local result = SelectionManager:MousePickBlock(nil, nil, nil, nil, event and event.x, event and event.y);
 
 	if(self:GetEditMarkerBlockId() and result and result.block_id and result.block_id>0 and result.blockX) then
 		local y = BlockEngine:GetFirstBlock(result.blockX, result.blockY, result.blockZ, self:GetEditMarkerBlockId(), 5);
@@ -288,7 +289,6 @@ function BaseContext:CheckMousePick(event)
 			return;
 		end
 	end
-
 	CameraController.OnMousePick(result, SelectionManager:GetPickingDist());
 	
 	if(result.length and result.blockX) then
@@ -563,13 +563,31 @@ function BaseContext:EndMouseClickCheck(event)
 	end
 end
 
+-- @param event: in case event contains a touch session object, we will save mouseCaptureEntity to it, instead of on the context object.  
+function BaseContext:SetMouseCaptureEntity(mouseCaptureEntity, event)
+	if(event and event.touchSession) then
+		event.touchSession.mouseCaptureEntity = mouseCaptureEntity;
+	end
+	self.mouseCaptureEntity = mouseCaptureEntity;
+end
+
+function BaseContext:GetMouseCaptureEntity(event)
+	if(event and event.touchSession) then
+		return event.touchSession.mouseCaptureEntity;
+	else
+		return self.mouseCaptureEntity;
+	end
+end
+
 -- virtual: 
 function BaseContext:mousePressEvent(event)
-	self.mouseCaptureEntity = nil;
+	self:SetMouseCaptureEntity(nil, event)
+	
 	if GameLogic.GetFilters():apply_filters("BaseContextMousePressEvent", false, event) then
 		return
 	end
-	if(not event.isEmulated) then
+	if(not event.isEmulated and not event.touchSession) then
+		-- if it is from touch session, we will ignore UI controls
 		local temp = ParaUI.GetUIObjectAtPoint(event.x, event.y);
 		if(temp:IsValid()) then
 			return;
@@ -587,7 +605,7 @@ function BaseContext:mousePressEvent(event)
 		mouseEntity:mousePressEvent(event)
 		if(event:isAccepted()) then
 			if(mouseEntity:isCaptureMouse()) then
-				self.mouseCaptureEntity = mouseEntity;
+				self:SetMouseCaptureEntity(mouseEntity, event)
 			end
 			return
 		end
@@ -606,8 +624,9 @@ function BaseContext:mouseMoveEvent(event)
 	if(self:handleHookedMouseEvent(event)) then
 		return;
 	end
-	if(self.mouseCaptureEntity) then
-		self.mouseCaptureEntity:mouseMoveEvent(event)
+	local mouseCaptureEntity = self:GetMouseCaptureEntity(event)
+	if(mouseCaptureEntity) then
+		mouseCaptureEntity:mouseMoveEvent(event)
 	else
 		local result = SelectionManager:GetPickingResult();
 		if(result.entity and result.entity.mouseMoveEvent) then
@@ -618,8 +637,9 @@ end
 
 -- virtual: 
 function BaseContext:mouseReleaseEvent(event)
-	local mouseCaptureEntity = self.mouseCaptureEntity;
-	self.mouseCaptureEntity = nil;
+	local mouseCaptureEntity = self:GetMouseCaptureEntity(event)
+	self:SetMouseCaptureEntity(nil, event);
+	
 	self.is_click = self:EndMouseClickCheck(event); 
 
 	if event.mouse_button == "left" and (System.options.isDevMode or System.os.IsTouchMode()) then
@@ -639,8 +659,8 @@ function BaseContext:mouseReleaseEvent(event)
 	if(mouseCaptureEntity) then
 		mouseCaptureEntity:mouseReleaseEvent(event)
 	else
-		local result = SelectionManager:GetPickingResult();
-		if(result.entity and result.entity.mouseReleaseEvent) then
+		local result = self:CheckMousePick(event);
+		if(result and result.entity and result.entity.mouseReleaseEvent) then
 			result.entity:mouseReleaseEvent(event);
 		end
 	end
@@ -885,6 +905,7 @@ function BaseContext:OnCreateBlock(result, event)
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FillLineTask.lua");
 				local task = MyCompany.Aries.Game.Tasks.FillLine:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_data = block_data, side = result.side})
 				task:Run();
+				GameLogic.GetFilters():apply_filters("create_block_event");
 			elseif(alt_pressed) then
 				if(block_id) then
 					-- if alt key is pressed, we will replace block at the cursor with the current block in right hand. 
@@ -894,6 +915,7 @@ function BaseContext:OnCreateBlock(result, event)
 				end
 			else
 				self:OnCreateSingleBlock(x,y,z, block_id, result)
+				GameLogic.GetFilters():apply_filters("create_block_event");
 			end
 		else
 			self:OnCreateSingleBlock(x,y,z, block_id, result)
@@ -1291,7 +1313,67 @@ function BaseContext:SetTargetFacing(facing)
 	end
 end
 
-function BaseContext:SetTargetPosition(x, y, z)
+-- we will check if there is invisible blocker between from point and to point. if there is, we will return false, otherwise true. 
+-- @param fromX, fromY, fromZ, toX, toY, toZ: in real coordinate 
+-- @param pointHeight: default to 0.2
+-- @return boolean
+function BaseContext:HasInvisibleBlockerFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ, pointHeight)
+	pointHeight = pointHeight or 0.2;
+	if(pointHeight > 0) then
+		if(self:HasInvisibleBlockerFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ, 0) or
+			self:HasInvisibleBlockerFromSrcToDest(fromX, fromY+pointHeight, fromZ, toX, toY+pointHeight, toZ, 0)) then
+			return true
+		end
+		return false;
+	end
+	local bHasMarker = false;
+	
+	local dx = toX - fromX;
+	local dy = toY - fromY;
+	local dz = toZ - fromZ;
+	
+	local dist = dx^2 + dy^2 + dz^2;
+	if(dist < 2) then
+		local bx1, by1, bz1 = BlockEngine:block(fromX, fromY, fromZ)
+		local bx2, by2, bz2 = BlockEngine:block(toX, toY, toZ)
+		if(bx1==bx2 and by1 == by2 and bz1==bz2) then
+			return false;
+		end
+	end
+
+	dist = math.sqrt(dist);
+
+	local step = 1/dist;
+	local lastX, lastY, lastZ;
+	local bHasMarker;
+
+	local function HasInvisibleBlocker(bx, by, bz)
+		local block = BlockEngine:GetBlock(bx, by, bz)
+		if(block and block.invisible and (block.blockcamera or block.obstruction)) then
+			return true;
+		end
+	end
+	for i = 0, math.floor(dist)+1 do
+		local percent = math.min(1, step * i);
+		local bx, by, bz = BlockEngine:block(fromX + percent * dx, fromY + percent * dy, fromZ + percent * dz);
+		if(lastX~=bx or lastZ~=bz or lastY~=by) then
+			lastX, lastY, lastZ = bx, by, bz;
+			if(HasInvisibleBlocker(bx, by, bz)) then
+				bHasMarker = true
+				break;
+			end
+		end
+	end
+	return bHasMarker;
+end
+
+function BaseContext:GetTargetPosition()
+	return self.targetX, self.targetY, self.targetZ;
+end
+
+-- @param moveTime: if nil, we will move to target location with automatic speed.
+-- if not, it will be the exact time to spend to move to the target. 
+function BaseContext:SetTargetPosition(x, y, z, moveTime)
 	local player = EntityManager.GetPlayer()
 	if(not player) then
 		return
@@ -1299,9 +1381,15 @@ function BaseContext:SetTargetPosition(x, y, z)
 	local obj = player:GetInnerObject()
 	local attr = ParaCamera.GetAttributeObject();
 	self.startPlayerX, self.startPlayerY, self.startPlayerZ = player:GetPosition()
+	if(x and self:HasInvisibleBlockerFromSrcToDest(self.startPlayerX, self.startPlayerY, self.startPlayerZ, x, y, z)) then
+		return
+	end
+
 	self.targetX, self.targetY, self.targetZ = x, y, z;
 	self.timeUsed = 0;
+	self.targetPositionMoveTime = moveTime;
 	if(self.targetX) then
+		local distance = math.sqrt((self.startPlayerX - self.targetX)^2 + (self.startPlayerY - self.targetY) ^ 2 + (self.startPlayerZ - self.targetZ) ^ 2);
 		local eye_pos = attr:GetField("Eye position", {0,0,0});
 		local lookat_pos = attr:GetField("Lookat position", {0,0,0});
 		local camobjDist, LiftupAngle, CameraRotY = attr:GetField("CameraObjectDistance", 0), attr:GetField("CameraLiftupAngle", 0), attr:GetField("CameraRotY", 0);
@@ -1310,28 +1398,30 @@ function BaseContext:SetTargetPosition(x, y, z)
 		local eyeX, eyeY, eyeZ = eye_pos[1], eye_pos[2], eye_pos[3]
 		local lookatX, lookatY, lookatZ = lookat_pos[1], lookat_pos[2], lookat_pos[3]
 		local cameraEyeDistance = math.sqrt((eyeX-lookatX)^2 + (eyeY-lookatY)^2 + (eyeZ-lookatZ)^2)
-		if(cameraEyeDistance+0.1 > camobjDist) then
-			-- only disable camera collision if the current camera is not in collision 
+		if(cameraEyeDistance+0.1 > camobjDist and distance >= 2) then
+			-- only disable camera collision if the current camera is not in collision and walk distance is big. 
 			attr:SetField("EnableBlockCollision", false);
 		end
 		-- only linear movement style. 
 		obj:SetField("MovementStyle", 3)
 		self:EnablePlayerTimer()
 		player:SetDummy(true)
+		player:SetAnimation(5);
 		
 	else
 		-- normal movement style
 		obj:SetField("MovementStyle", 0)
 		attr:SetField("EnableBlockCollision", true);
 		player:SetDummy(false)
+		player:SetAnimation(0);
 	end
 end
 
-function BaseContext:SetTargetBlockPosition(bx, by, bz)
+function BaseContext:SetTargetBlockPosition(bx, by, bz, moveTime)
 	if(bx) then
 		bx, by, bz = BlockEngine:real_bottom(bx, by, bz);
 	end
-	self:SetTargetPosition(bx, by, bz)
+	self:SetTargetPosition(bx, by, bz, moveTime)
 end
 
 -- called on player frame move
@@ -1341,23 +1431,30 @@ function BaseContext:OnPlayerTimer(timer)
 		local player = EntityManager.GetPlayer()
 		local px, py, pz = self.startPlayerX, self.startPlayerY, self.startPlayerZ;
 		local tx, ty, tz = self.targetX, self.targetY, self.targetZ;
-		local fromBX, fromBY, fromBZ = BlockEngine:block(self.startPlayerX, self.startPlayerY, self.startPlayerZ);
 		
 		local dist = math.sqrt((tx - px) ^ 2 + (ty - py) ^ 2 + (tz - pz) ^ 2)
 		local deltaTime = timer:GetDelta() / 1000
 		self.timeUsed = self.timeUsed + deltaTime;
+		local moveDist;
 		-- player move speed will increase according to move distance
-		local moveDist = math.min(100, (10 + (dist^2)/20)) * self.timeUsed
+		if(self.targetPositionMoveTime) then
+			moveDist = self.timeUsed / self.targetPositionMoveTime;
+		else
+			moveDist = math.min(100, (10 + (dist^2)/20)) * self.timeUsed	
+		end
 		
 		if(dist > moveDist and dist > 0.1) then
 			local ratio = moveDist / dist;
 			reachTargetTimeLeft = self.timeUsed / ratio * (1 - ratio)
+
+			local facing = Direction.GetFacingFromOffset(tx - px, 0, tz - pz)
 
 			local x = px + (tx - px) * ratio
 			local y = py + (ty - py) * ratio
 			local z = pz + (tz - pz) * ratio
 			
 			player:SetPosition(x, y, z)
+			player:SetFacing(facing)
 		else
 			-- we already reached the target position
 			player:SetPosition(tx, ty, tz)

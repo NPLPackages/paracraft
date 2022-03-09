@@ -23,6 +23,11 @@ HttpWrapper.Create("keepwork.qrcode.generateQR", "%MAIN%/core/v0/keepworks/gener
 -- http://yapi.kp-para.cn/project/130/interface/api/3077
 HttpWrapper.Create("keepwork.paracraftVipCode.activate", "%MAIN%/accounting/paracraftVipCode/activate", "POST", true)
 
+-- 兑换vip ,带英文字母
+--http://10.28.18.44:3001/project/32/interface/api/4719
+HttpWrapper.Create("keepwork.activateCodes.activate", "%MAIN%/core/v0/activateCodes/activate", "POST", true)
+
+
 -- 兑换机构激活码
 -- http://yapi.kp-para.cn/project/130/interface/api/3047
 HttpWrapper.Create("keepwork.orgActivateCode.activate", "%MAIN%/accounting/orgActivateCode/activate", "POST", true)

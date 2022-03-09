@@ -134,9 +134,8 @@ function Entity:init()
 			-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
 			obj:SetAttribute(128, true);
 		
-			self:SetInnerObject(obj);
-			ParaScene.Attach(obj);	
-		
+			self:AttachObjectToScene(obj)
+			
 			if(self.anim) then
 				self:SetAnimation(self.anim);
 			end

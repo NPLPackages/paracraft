@@ -35,6 +35,7 @@
         <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
             <!--Vip-->
             <pe:container alignment="_rt" style="background:url();">
+                <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 7, "ShowVip")%>
                 <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
             </pe:container>
             <!--Close-->
@@ -57,7 +58,7 @@
                                 DataSource='<%=GetItemData%>'>
                         <Columns>
                             <div style="width: 1164px; height: 2230px; font-size: 20px; base-font-size: 20px;">
-                                <div style="height: 400px;">
+                                <!-- <div style="height: 400px;">
                                     <div>
                                         ——成为《帕拉卡》会员畅享全部服务<br/>
                                         成为《帕拉卡》会员后畅享全部在线课程及数款由帕拉卡教育联盟企业共同制作的精品软件以及在线一对一的软件技术解决服务。<br/>
@@ -71,14 +72,14 @@
                                         <pe:label value='AI宏示教辅助教学功能' style="position: relative; margin-top: 5px; margin-left: 240px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
                                         <pe:label value='联盟企业特色精品课程' style="position: relative; margin-top: 5px; margin-left: 980px; text-align: center;height: 35px;font-weight: bold;"></pe:label>
                                     </div>
-                                </div>
+                                </div> -->
                                 
                                 <div style="height: 590px;">
                                     <div>
                                         ——会员权益<br/>
                                         《帕拉卡》会员服务分为家庭个人用户以及面向课外兴趣班的机构用户两种。如果您喜爱《帕拉卡》，并希望为自己孩子的作品建立专属终身保护，我们强烈建议您升级成为《帕拉卡》独立会员。<br/>
                                     </div>
-                                    <div style="margin-left: 200px;margin-top: 20px; width: 750px; height: 682px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/huiyuanquanyi_750x682_32bits.png#0 0 750 682);"></div>
+                                    <div style="margin-left: 200px;margin-top: 20px; width: 750px; height: 760px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/huiyuanquanyi_750x760_32bits.png#0 0 750 760);"></div>
                                     <div style="margin-top: 40px;">
                                         --加入会员<br/>
                                     </div>

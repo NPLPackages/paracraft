@@ -16,8 +16,10 @@ manipCont:connectToDependNode(entity);
 NPL.load("(gl)script/ide/System/Scene/Manipulators/ManipContainer.lua");
 local Plane = commonlib.gettable("mathlib.Plane");
 local vector3d = commonlib.gettable("mathlib.vector3d");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local ShapesDrawer = commonlib.gettable("System.Scene.Overlays.ShapesDrawer");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
+local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local EditModelManipContainer = commonlib.inherit(commonlib.gettable("System.Scene.Manipulators.ManipContainer"), commonlib.gettable("MyCompany.Aries.Game.Manipulators.EditModelManipContainer"));
 EditModelManipContainer:Property({"Name", "EditModelManipContainer", auto=true});
 -- EditModelManipContainer:Property({"EnablePicking", true});
@@ -126,6 +128,44 @@ function EditModelManipContainer:connectToDependNode(node)
 			-- use global position if offset pos not found, such as for EntityLiveModel 
 			self.translateManip:SetRealTimeUpdate(false);
 			self.translateManip:SetUpdatePosition(false);
+
+			-- ctrl key to drag to copy and move. 
+			local old_x, old_y, old_z;
+			local old_facing;
+			local old_linkTo;
+			self.translateManip:Connect("modifyBegun", function()
+				if(node.GetLinkToName) then
+					old_x, old_y, old_z = node:GetPosition()
+					old_facing = node:GetFacing();
+					old_linkTo = node:GetLinkToName();
+				end
+			end)
+			
+			self.translateManip:Connect("modifyEnded", function()
+				
+				if(self:SnapshotToHistory()) then
+					if(old_x and Keyboard:IsCtrlKeyPressed() and node:isa(EntityManager.EntityLiveModel) and node.CloneMe) then
+						-- Ctrl + drag to copy and move the entity
+						local entity = node:CloneMe()
+						entity:SetPosition(old_x, old_y, old_z);
+						entity:SetFacing(old_facing);
+						if(old_linkTo) then
+							entity:LinkToEntityByName(old_linkTo)
+						end
+						-- add entity to undo history
+						if(GameLogic.GameMode:IsEditor()) then
+							NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
+							local task = MyCompany.Aries.Game.Tasks.DragEntity:new({nohistory=true})
+							task:CreateEntity(entity)
+							local lastOne = self:GetHistoryItem(-1);
+							if(lastOne) then
+								lastOne.batchedTask = task
+							end
+						end
+					end
+				end
+			end)
+			
 			self:addPlugToManipConversionCallback(manipPosPlug, function(self, manipPlug)
 				return plugPos:GetValue();
 			end);
@@ -136,7 +176,6 @@ function EditModelManipContainer:connectToDependNode(node)
 				local x, y, z = pos[1]+offsetPos[1], pos[2]+offsetPos[2], pos[3]+offsetPos[3]
 				-- tricky: we SetRealTimeUpdate to false, and use offset from manipulator and then set manipulator's value back to 0
 				self.translateManip:SetField("position", {0, 0, 0});
-				commonlib.TimerManager.SetTimeout(function() self:SnapshotToHistory() end, 1000)
 				return {x, y, z};
 			end);
 		end
@@ -190,40 +229,53 @@ function EditModelManipContainer:connectToDependNode(node)
 	self:SnapshotToHistory()
 end
 
+-- @return true if added to history
 function EditModelManipContainer:SnapshotToHistory()
 	if(self:IsSupportUndo()) then
 		self.history = self.history or {}
-		-- TODO: remove duplicated calls
 		local lastItem = self:GetHistoryItem()
-		local newItem = self.node:SaveToXMLNode();
-		if(not lastItem or not commonlib.compare(newItem, lastItem)) then
+		local newItem = {self.node:SaveToXMLNode()};
+		-- remove duplicated calls
+		if(not lastItem or not commonlib.compare(newItem[1], lastItem[1])) then
 			self.history[#(self.history) + 1] = newItem;
+			return true
 		end
 	end
 end
 
-function EditModelManipContainer:GetHistoryItem()
-	return self.history and self.history[#(self.history)];
+-- @param offsetFromTop: default to 0, which is the top most one. this can be -1 to fetch the one before top most one
+function EditModelManipContainer:GetHistoryItem(offsetFromTop)
+	return self.history and self.history[#(self.history) + (offsetFromTop or 0)];
 end
 
 function EditModelManipContainer:Undo()
-	local xmlNode = self:GetHistoryItem()
+	local historyItem = self:GetHistoryItem()
+	local xmlNode = historyItem and historyItem[1];
 	if(xmlNode and self.node) then
 		local lastItem = xmlNode
 		local newItem = self.node:SaveToXMLNode();
+		local isLastOne;
 		if(commonlib.compare(newItem, lastItem)) then
 			if(#(self.history) > 1) then
 				self.history[#(self.history)] = nil;
-				xmlNode = self:GetHistoryItem()
+				historyItem = self:GetHistoryItem()
+				xmlNode = historyItem[1]
 			else
-				return true;
+				isLastOne = true;
 			end
 		end
-		-- always preserve last one and pop others. 
-		if(#(self.history) > 1) then
-			self.history[#(self.history)] = nil;
+		if(historyItem.batchedTask) then
+			historyItem.batchedTask:Undo()
+			historyItem.batchedTask = nil;
 		end
-		self.node:UpdateFromXMLNode(xmlNode)
+		if(not isLastOne) then
+			-- always preserve last one and pop others. 
+			if(#(self.history) > 1) then
+				self.history[#(self.history)] = nil;
+			end
+			self.node:UpdateFromXMLNode(xmlNode)
+			self.node:valueChanged();
+		end
 	end
 	return true
 end

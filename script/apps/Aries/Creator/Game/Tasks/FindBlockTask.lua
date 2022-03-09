@@ -36,30 +36,39 @@ function FindBlockTask.OnInit()
 	page = document:GetPageCtrl();
 end
 
-function FindBlockTask:ShowPage(bShow, entities)
+-- @param callbackFunc: function(lastGotoItemIndex) end
+function FindBlockTask:ShowPage(bShow, entities, callbackFunc)
 	curInstance = self;
 	FindBlockTask.filteredResultDS = nil;
 	FindBlockTask.resultDS = {};
 	FindBlockTask.selectedResultIndex = nil
+	FindBlockTask.lastGotoItemIndex = nil
 	local width, height = 512, 400;
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-			url = "script/apps/Aries/Creator/Game/Tasks/FindBlockTask.html", 
-			name = "FindBlockTask.ShowPage", 
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			isShowTitleBar = false,
-			bShow = bShow,
-			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			zorder = 1,
-			allowDrag = true,
-			enable_esc_key = true,
-			directPosition = true,
-				align = "_ctt",
-				x = 0,
-				y = 0,
-				width = width,
-				height = height,
-		});
+	local params = {
+		url = "script/apps/Aries/Creator/Game/Tasks/FindBlockTask.html", 
+		name = "FindBlockTask.ShowPage", 
+		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+		isShowTitleBar = false,
+		bShow = bShow,
+		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		zorder = 1,
+		allowDrag = true,
+		enable_esc_key = true,
+		directPosition = true,
+			align = "_ctt",
+			x = 0,
+			y = 0,
+			width = width,
+			height = height,
+	}
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	params._page.OnClose = function()
+		page = nil;
+		if(callbackFunc) then
+			callbackFunc(FindBlockTask.lastGotoItemIndex)
+		end
+	end
 	if(bShow and not entities) then
 		self.mode = "goto_block";
 		FindBlockTask.FindAll();
@@ -76,7 +85,7 @@ function FindBlockTask:IsGotoBlockMode()
 	return self.mode == "goto_block";
 end
 
-function FindBlockTask:FindFileImp(text)
+function FindBlockTask:FindFileImp(text, callbackFunc)
 	local movieBlockId = block_types.names.MovieClip;
 	local PhysicsModel = block_types.names.PhysicsModel;
 	local BlockModel = block_types.names.BlockModel;
@@ -125,29 +134,33 @@ function FindBlockTask:FindFileImp(text)
 	if(not next(results)) then
 		GameLogic.AddBBS("FindBlockTask", format(L"没有找到:%s", text), 4000, "255 0 0");
 	else
-		self:ShowPage(true, results);
+		self:ShowPage(true, results, callbackFunc);
 		FindBlockTask.resultDS = resultDS;
 		FindBlockTask.results = results;
 		FindBlockTask.UpdateResult();
 	end
 end
 
-function FindBlockTask:ShowFindFile(text)
+function FindBlockTask:ShowFindFile(text, callbackFunc)
 	FindBlockTask.lastSearchText = text or FindBlockTask.lastSearchText;
-	self:FindFile()
+	self:FindFile(nil, callbackFunc)
 end
 
 -- @param text: if nil, it will show an input dialog for text, otherwise it will show result of the find file
-function FindBlockTask:FindFile(text)
+function FindBlockTask:FindFile(text, callbackFunc)
 	if(text and text~="") then
-		self:FindFileImp(text)
+		self:FindFileImp(text, callbackFunc)
 	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 		local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");
 		EnterTextDialog.ShowPage(L"全文搜索:", function(result)
 			if(result and result~="") then
 				FindBlockTask.lastSearchText = result
-				self:FindFileImp(result)
+				self:FindFileImp(result, callbackFunc)
+			else
+				if(callbackFunc) then
+					callbackFunc()
+				end
 			end
 		end, FindBlockTask.lastSearchText)
 	end
@@ -438,6 +451,7 @@ function FindBlockTask.GotoItemAtIndex(index)
 				end
 			end
 		end
+		FindBlockTask.lastGotoItemIndex = index;
 	end
 end
 

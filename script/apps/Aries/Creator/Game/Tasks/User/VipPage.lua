@@ -99,6 +99,26 @@ function VipPage.ShowPage__(key, desc)
 				height = 530,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
+
+	-- 更新奖励显示
+	-- local is_verified = GameLogic.GetFilters():apply_filters('store_get', 'user/isVerified');
+	-- if not is_verified then
+	-- 	local SessionsData = NPL.load('(gl)Mod/WorldShare/database/SessionsData.lua')
+	-- 	local machineCode = SessionsData:GetDeviceUUID()
+	-- 	keepwork.user.macAddresses({
+	-- 		router_params = {
+	-- 			id = machineCode,
+	-- 		}
+	-- 	},function(err, msg, data)
+	-- 		VipPage.has_vip_reward = true
+	-- 		if err == 200 then
+	-- 			if data and data.realnameUserId and data.realnameUserId ~= 0 then
+	-- 				VipPage.has_vip_reward = false
+	-- 			end
+	-- 		end
+	-- 		VipPage.RefreshPage();
+	-- 	end)
+	-- end
 end
 
 -- 加载产品列表，获取价格
@@ -453,11 +473,7 @@ function VipPage.GetQuickResponseCode(productCode, callback)
 	local input_url = VipPage.GetQRInputUrl(productCode, VipPage.key);
 	keepwork.pay.generateQR({
 		text = input_url
-	},function(err, msg, data)
-		commonlib.echo("==========generateQR");
-		commonlib.echo(err);
-		commonlib.echo(msg);
-		commonlib.echo(data,true);             
+	},function(err, msg, data)           
         if(err ~= 200)then
             return
         end
@@ -490,6 +506,12 @@ function VipPage.OnCreate()
 	VipPage.SetActive("mouse_enter_tip",false)
 	VipPage.SetActive("phone_captcha_error",false)
 	VipPage.SetActive("phone_number_error",false)
+
+	local reward_node = page:FindUIControl("reward_node")
+	if reward_node and reward_node:IsValid() then
+		local parent_width = 686
+		reward_node.x = parent_width/2 - reward_node.width/2
+	end
 end
 
 function VipPage.SetActive(uiname,visible)
@@ -508,4 +530,8 @@ function VipPage.OnMouseLeave(tipUiName)
     if pNode then
         pNode.visible = false
     end
+end
+
+function VipPage.HasVipReward()
+	return VipPage.has_vip_reward
 end

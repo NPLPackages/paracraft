@@ -900,7 +900,7 @@ function RolePlayMovieController.PlayPlayerAni(ani_id)
 end
 
 --{normal="#ffffff", pressed="#888888"}, 
-function RolePlayMovieController:SetKeyState(btnItem, bPress);
+function RolePlayMovieController:SetKeyState(btnItem, bPress)
 	if btnItem and btnItem:IsValid() then
 		if bPress then
 			_guihelper.SetUIColor(btnItem, "#888888");

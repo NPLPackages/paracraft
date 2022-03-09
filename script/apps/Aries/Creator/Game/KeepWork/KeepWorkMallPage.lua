@@ -148,7 +148,7 @@ function KeepWorkMallPage.ShowView()
 					allowDrag = true,
 					enable_esc_key = true,
 					zorder = 0,
-					app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+					-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 					directPosition = true,
 						align = "_ct",
 						x = -view_width/2,
@@ -389,6 +389,10 @@ function KeepWorkMallPage.HandleDataSources()
 					v.show_state = KeepWorkMallPage.show_state.vip_enabled
 				end
 
+				if good_data.extra and good_data.extra.icon_size ~= nil then
+					v.use_little_icon = true
+				end
+
 				-- 如果是vip专属 再判断下是不是vip 如果是vip 那么就直接已拥有的显示
 				if v.vip_enabled and System.User.isVip then
 					bag_nums = 1
@@ -449,7 +453,7 @@ function KeepWorkMallPage.HandleDataSources()
 			v.cost_desc = v.price
 		end
 	end
-
+	
 	table.sort(KeepWorkMallPage.grid_data_sources, function(a, b)
 		return (a.id > b.id);
 	end);
@@ -523,7 +527,7 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 		-- TODO:  Add uid to url
 		url = url, 
 		name = "Aries.PurchaseItemWnd", 
-		app_key = MyCompany.Aries.app.app_key, 
+		-- app_key = MyCompany.Aries.app.app_key, 
 		isShowTitleBar = false,
 		-- isTopLevel = true,
 		click_through = false,
@@ -551,7 +555,7 @@ function KeepWorkMallPage.notEnoughBean()
 		-- TODO:  Add uid to url
 		url = url, 
 		name = "Aries.PurchaseItemWnd", 
-		app_key = MyCompany.Aries.app.app_key, 
+		-- app_key = MyCompany.Aries.app.app_key, 
 		isShowTitleBar = false,
 		isTopLevel = true,
 		allowDrag = true,

@@ -538,7 +538,25 @@ model id
     <!--20220120活动头饰-->
     <item id="83192" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83192_little_red.anim.x"></attachment></item>
     <item id="83191" model="actor;"><geoset category="0" id="8"></geoset><texture id="1" filename="Texture/blocks/CustomGeoset/hair/83191_silver_hair.png"></texture></item>
-
+    <!--20220303活动头饰-->
+    <item id="83193" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83193_chef.anim.x"></attachment></item>
+    <item id="83194" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83194_cheffy.anim.x"></attachment></item>
+    <item id="83195" model="actor;"><geoset category="0" id="0"></geoset><geoset category="3" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83195_antiapidemic.anim.x"></attachment></item>
+    <item id="83196" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83196_navy_hat.anim.x"></attachment></item>
+    <item id="83197" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83197_navy_hat_female.anim.x"></attachment></item>
+    <item id="83198" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83198_army_hat.anim.x"></attachment></item>
+    <item id="83199" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83199_army_hat_famale.anim.x"></attachment></item>
+    <item id="83200" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83200_air_hat.anim.x"></attachment></item>
+    <item id="83201" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83201_air_hat_female.anim.x"></attachment></item>
+    <item id="83202" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83202_police.anim.x"></attachment></item>
+    <item id="83203" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83203_police_female.anim.x"></attachment></item>
+    <item id="83204" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83204_police_female2.anim.x"></attachment></item>
+    <item id="83205" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83205_traffic_police_hat.anim.x"></attachment></item>
+    <item id="83206" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83206_traffic_police_hat_female.anim.x"></attachment></item>
+    <item id="83207" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83207_traffic_police_hat_female2.anim.x"></attachment></item>
+    <item id="83208" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83208_architect_hat_female.anim.x"></attachment></item>
+    <item id="83209" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83209_cleaner_hat_female.anim.x"></attachment></item>
+    <item id="83210" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83210_firefighter_hat.anim.x"></attachment></item>
 
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>

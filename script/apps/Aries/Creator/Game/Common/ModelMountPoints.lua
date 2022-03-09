@@ -190,7 +190,7 @@ function ModelMountPoints:CalculateWorldMatrix(mWorld, bUseRenderOffset)
 	local x, y, z = entity:GetPosition();
 	mWorld:offsetTrans(x, y, z);
 	if(bUseRenderOffset) then
-		local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+		local origin = Cameras:GetCurrent():GetRenderOrigin();
 		mWorld:offsetTrans(-origin[1], -origin[2], -origin[3]);
 	end
 	return mWorld;
@@ -227,7 +227,7 @@ function ModelMountPoints:TransformLocalPointToWorldSpace(point)
 	if(point) then
 		local worldMat = self:CalculateWorldMatrix(nil, true);
 		math3d.Vector4MultiplyMatrix(point, point, worldMat);
-		local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+		local origin = Cameras:GetCurrent():GetRenderOrigin();
 		return point[1]+origin[1], point[2]+origin[2], point[3]+origin[3]
 	end
 end
@@ -281,7 +281,7 @@ function ModelMountPoints:IsPointInMountPointAABB(x, y, z, maxDiffX, maxDiffY, m
 	-- transform in local model space to camera space. 
 	local worldMat = self:CalculateWorldMatrix(nil, true);
 	
-	local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+	local origin = Cameras:GetCurrent():GetRenderOrigin();
 	x, y, z = x - origin[1], y - origin[2], z - origin[3]
 	
 	for i= 1, self:GetCount() do
@@ -305,7 +305,7 @@ function ModelMountPoints:GetWorldSpaceAABBs(bUpdate)
 		-- transform in local model space to camera space. 
 		local worldMat = self:CalculateWorldMatrix(nil, true);
 		local facing = self:GetEntity():GetFacing()
-		local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+		local origin = Cameras:GetCurrent():GetRenderOrigin();
 		
 		for i= 1, self:GetCount() do
 			local mountpoint = self:GetMountPoint(i);

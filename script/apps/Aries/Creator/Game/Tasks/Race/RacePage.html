@@ -17,25 +17,25 @@
             end
 
             function GetItemData()
-                return RacePage.ItemData
+                return RacePage.Datas
             end
 
             function GetItemListData()
-                return RacePage.ItemData[RacePage.index].ListData
+                return RacePage.Datas[RacePage.index].ListData
             end
 
             function GetItemListDataTitle(index)
-                return RacePage.ItemData[RacePage.index].ListData[index].name
+                return RacePage.Datas[RacePage.index].ListData[index].name
             end
 
             function CheckRaceItemHasEnterPage()
-                local length = #RacePage.ItemData[RacePage.index].enterPage
+                local length = #RacePage.Datas[RacePage.index].enterPage
                 return length > 0
             end
 
             function GetRaceEnterPageName()
                 if CheckRaceItemHasEnterPage() then
-                    return RacePage.ItemData[RacePage.index].enterPage[1].name
+                    return RacePage.Datas[RacePage.index].enterPage[1].name
                 else
                     return ""
                 end
@@ -43,7 +43,7 @@
 
             function GetRaceEnterPageNodeName()
                 if CheckRaceItemHasEnterPage() then
-                    return RacePage.ItemData[RacePage.index].enterPage[1].node_name
+                    return RacePage.Datas[RacePage.index].enterPage[1].node_name
                 else
                     return ""
                 end
@@ -59,27 +59,27 @@
             end
 
             function GetTooltip(index)
-                return RacePage.ItemData[index];
+                return RacePage.Datas[index];
             end
 
             function GetRaceContent(index)
-                return RacePage.ItemData[RacePage.index].content;
+                return RacePage.Datas[RacePage.index].content;
             end
 
             function GetRaceTime(index)
-                return RacePage.ItemData[index].time;
+                return RacePage.Datas[index].time;
             end
 
             function GetRaceType(index)
-                return RacePage.ItemData[index].race;
+                return RacePage.Datas[index].race;
             end
 
             function GetCurrentRaceType()
-                return RacePage.ItemData[RacePage.index].race;
+                return RacePage.Datas[RacePage.index].race;
             end
 
             function GetCurrentRaceSignUpEndTime()
-                return RacePage.ItemData[RacePage.index].signUpBtnInfo.tooltip;
+                return RacePage.Datas[RacePage.index].signUpBtnInfo.tooltip;
             end
 
             function CheckSignUpEndTime()
@@ -107,11 +107,11 @@
             end
 
             function GetSignUpBtnText()
-                return RacePage.ItemData[RacePage.index].leftTopBtnInfo.btnText
+                return RacePage.Datas[RacePage.index].leftTopBtnInfo.btnText
             end
 
             function GetIcon(index)
-                return RacePage.ItemData[RacePage.index].ListData[index].icon
+                return RacePage.Datas[RacePage.index].ListData[index].icon
             end
 
             function OnClickOfficialActivities()
@@ -132,8 +132,8 @@
 
             function GetTopImg()
                 local bgs = {} 
-                for i = 1, 5 do 
-                    if i ~= 1 then
+                for i = 1, #RacePage.ItemData do 
+                    if RacePage.ItemData[i].visible then
                         table.insert(bgs,string.format("Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/tu%d_875X255_32bits.png#0 0 875 255",i))
                     end
                 end
@@ -154,8 +154,9 @@
                    </div>
                 <!--Vip&官方活动-->
                 <pe:container alignment="_rt" style="background:url();">
-                    <input type="button" value='' onclick="OnClickOfficialActivities" class="" style="margin-right:20px;margin-top:5px;width:66px;height:70px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/icon_66X70_32bits.png#0 0 66 70);" />
-                    <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
+                    <input type="button" value='' onclick="OnClickOfficialActivities" class="" style="margin-right:20px;margin-top:8px;width:66px;height:70px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/icon_66X70_32bits.png#0 0 66 70);" />
+                    <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 8, "ShowVip")%>
+                    <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:6px;" />
                 </pe:container>
                 <!--Close-->
                 <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
@@ -198,7 +199,7 @@
                     <div style="background:url();position: absolute; top: 215px; left: 11px; width: 344px; height:360px;">
                         <div style="background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/zi2_139X36_32bits.png#0 0 139 36); position: relative;margin-left:10px;margin-top:0px;width:139px;height: 36px; font-weight:bold;"></div>
                         <div style="float:left;">
-                            <pe:gridview style="margin-left:13px;margin-top:45px;width:344px;height:336px;" RememberScrollPos = true name="item_gridview" CellPadding="0" VerticalScrollBarStep="20" VerticalScrollBarOffsetX="-8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "60" 
+                            <pe:gridview style="margin-left:13px;margin-top:45px;width:344px;height:326px;" RememberScrollPos = true name="item_gridview" CellPadding="0" VerticalScrollBarStep="20" VerticalScrollBarOffsetX="4" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "60" 
                                 DataSource="<%=GetItemData()%>">
                                 <Columns>
                                     <div onclick = "OnRaceClick"  name = '<%=Eval("index")%>'  style="width:330px;height:60px;">

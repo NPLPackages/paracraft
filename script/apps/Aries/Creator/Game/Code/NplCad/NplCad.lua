@@ -6,7 +6,7 @@ Desc: NplCad is a blockly program to create shapes with nploce on web browser
 use the lib:
 -------------------------------------------------------
 local NplCad = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
-NplCad.MakeBlocklyFiles();
+NplCad.MakeBlocklyFiles("web");
 -------------------------------------------------------
 ]]
 local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
@@ -18,6 +18,11 @@ commonlib.setfield("MyCompany.Aries.Game.Code.NplCad.NplCad", NplCad);
 local is_installed = false;
 local all_cmds = {};
 local all_cmds_map = {};
+
+-- "default": Skeleton colour = "#459197"
+-- "web": Skeleton colour = "#3c3c3c"
+-- "web_lite": remove Skeleton and Animation
+NplCad.type = "default"; -- "default" or "web" or "web_lite"
 NplCad.categories = {
     {name = "Shapes", text = L"图形", colour = "#764bcc", },
     {name = "ShapeOperators", text = L"修改", colour = "#0078d7", },
@@ -31,8 +36,31 @@ NplCad.categories = {
     
 };
 
+NplCad.categories_web = {
+    {name = "Shapes", text = L"图形", colour = "#764bcc", },
+    {name = "ShapeOperators", text = L"修改", colour = "#0078d7", },
+    {name = "ObjectName", text = L"名称", colour = "#ff8c1a", custom="VARIABLE", },
+    {name = "Control", text = L"控制", colour = "#d83b01", },
+    {name = "Math", text = L"运算", colour = "#569138", },
+    {name = "Data", text = L"数据", colour = "#459197", },
+    {name = "Skeleton", text = L"骨骼", colour = "#3c3c3c", },
+    {name = "Animation", text = L"动画", colour = "#717171", },
+    
+};
+
+NplCad.categories_web_lite = {
+    {name = "Shapes", text = L"图形", colour = "#764bcc", },
+    {name = "ShapeOperators", text = L"修改", colour = "#0078d7", },
+    {name = "ObjectName", text = L"名称", colour = "#ff8c1a", custom="VARIABLE", },
+    {name = "Control", text = L"控制", colour = "#d83b01", },
+    {name = "Math", text = L"运算", colour = "#569138", },
+    {name = "Data", text = L"数据", colour = "#459197", },
+    
+};
+
 -- make files for blockly 
-function NplCad.MakeBlocklyFiles()
+function NplCad.MakeBlocklyFiles(type)
+	NplCad.type = type;
     local categories = NplCad.GetCategoryButtons();
     local all_cmds = NplCad.GetAllCmds()
 
@@ -44,7 +72,13 @@ function NplCad.MakeBlocklyFiles()
 	ParaGlobal.ShellExecute("open", ParaIO.GetCurDirectory(0).."block_configs_nplcad", "", "", 1); 
 end
 function NplCad.GetCategoryButtons()
-    return NplCad.categories;
+	if(NplCad.type == "web")then
+		return NplCad.categories_web;
+	elseif(NplCad.type == "web_lite")then
+		return NplCad.categories_web_lite;
+	else
+		return NplCad.categories;
+	end
 end
 function NplCad.AppendAll()
 	if(is_installed)then
@@ -80,6 +114,18 @@ function NplCad.AppendAll()
 		NplCadDef_Skeleton.GetCmds(),
 		NplCadDef_Animation.GetCmds(),
 	}
+
+	if(NplCad.type == "web_lite")then
+		all_source_cmds = {
+			NplCadDef_ShapeOperators.GetCmds(),
+			NplCadDef_Shapes.GetCmds(),
+			NplCadDef_Control.GetCmds(),
+			NplCadDef_Data.GetCmds(),
+			NplCadDef_Math.GetCmds(),
+--			NplCadDef_Skeleton.GetCmds(),
+--			NplCadDef_Animation.GetCmds(),
+		}
+	end
 	for k,v in ipairs(all_source_cmds) do
 		NplCad.AppendDefinitions(v);
 	end
@@ -245,7 +291,7 @@ function NplCad.GetCustomToolbarMCML()
 	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
         <input type="button" value="%s" style="float:left;margin-left:5px;margin-top:7px;width:50px;height:25px;color:#ffffff;font-size:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnShowCodeLib"/>
         <div onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickShowExport" style="float:left;margin-left:5px;margin-top:7px;"
-                tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="360" show_width="230">
+                tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="400" show_width="230">
             <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
         </div>
     

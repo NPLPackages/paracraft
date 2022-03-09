@@ -256,9 +256,16 @@ end
                             <div style="width:170px;height:108px;background:;">
                                 <!-- <pe:item zorder="2" onclick="" isdragable="false" gsid='<%=2408%>' tooltip = '<%=Eval("description")%>' icon = "" showdefaulttooltip="false" background="Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10" style="margin-left:0px;width:54px;height:54px;" /> -->
                                 <div style="position:relative;width:123px;">
-                                    <div style="position:relative;margin-left:21px;margin-top:18px;">
-                                        <img zorder="0" src='<%=Eval("icon")%>'width="128" height="64"/>
-                                    </div>
+                                    <pe:if condition='<%=Eval("use_little_icon")%>'>
+                                        <div style="position:relative;margin-left:50px;margin-top:36px;">
+                                            <img zorder="0" src='<%=Eval("icon")%>'width="64" height="64"/>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition='<%=not Eval("use_little_icon")%>'>
+                                        <div style="position:relative;margin-left:21px;margin-top:18px;">
+                                            <img zorder="0" src='<%=Eval("icon")%>'width="128" height="64"/>
+                                        </div>
+                                    </pe:if>
     
                                     <div style="margin-left: -5px; margin-top: -5px;">
                                         <pe:if condition='<%=Eval("is_show_latest_tag") %>'>

@@ -24,6 +24,10 @@ local WorldInfo = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Gam
 function WorldInfo:ctor()
 	self.totalTime = 0;
 	self.worldTime = 0;
+	self.totalEditSeconds = 0;
+	self.totalClicks = 0;
+	self.totalKeyStrokes = 0;
+	self.totalSingleBlocks = 0;
 end
 
 function WorldInfo:LoadFromXMLNode(node)
@@ -37,6 +41,10 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.selectWater = self.selectWater == "true" or self.selectWater == true;
 
 		self:SetTotalWorldTime(self.totaltime or 0);
+		self.totalEditSeconds = tonumber(self.totalEditSeconds) or 0;
+		self.totalClicks = tonumber(self.totalClicks) or 0;
+		self.totalKeyStrokes = tonumber(self.totalKeyStrokes) or 0;
+		self.totalSingleBlocks = tonumber(self.totalSingleBlocks) or 0;
 
 		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
 	end
@@ -69,10 +77,21 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		selectWater = self.selectWater,
 		extra = tostring(self.extra),
 		privateKey = self.privateKey or "",
+		totalEditSeconds = tonumber(self.totalEditSeconds) or 0,--总编辑时长， 用户在编辑模式下，并且窗口有输入焦点时的总时 长。
+		totalClicks = tonumber(self.totalClicks) or 0,--编辑模式下，每次鼠标操作点击（无论左右键）的总次数。
+		totalKeyStrokes = tonumber(self.totalKeyStrokes) or 0,--编辑模式下，总打字次数，包括命令，代码方块等一切键盘操作，但Ctrl、shift、alt除外。
+		totalSingleBlocks = tonumber(self.totalSingleBlocks) or 0,--创建的总方块数，只计算单击鼠标创建的方块数。复制粘贴，拉伸等不算。 例外，shift+右键算1个方块。 这里需要在鼠标事件的地方截取数据，程序生成的不算。
+
+		totalWorkScore = self:GetTotalWorkScore()
 	};
 
 	GameLogic.GetFilters():apply_filters("save_world_info", self, node);
 	return node;
+end
+
+--(作品体量总分 ) = (totalEditSeconds/20 + totalClicks + totalKeyStrokes * 2 + totalSingleBlocks * 3)/ 1000 （取整数）
+function WorldInfo:GetTotalWorkScore()
+	return math.floor((self.totalEditSeconds/20 + self.totalClicks + self.totalKeyStrokes * 2 + self.totalSingleBlocks * 3)/ 1000)
 end
 
 function WorldInfo:GetTerrainType()

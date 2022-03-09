@@ -54,6 +54,18 @@ function GetStackHeightDS()
         {value="1"},
     };
 end
+function GetDragOffsetDS()
+    return {
+        {value="nil", text=L"自动", selected=true},
+        {value="0"},
+        {value="0.1"},
+        {value="0.2"},
+        {value="0.3"},
+        {value="-0.1"},
+        {value="-0.2"},
+        {value="-0.3"},
+    };
+end
 function GetIdleAnimDS()
     return {
         {value="0", text=L"默认".."(0)", selected=true},
@@ -111,10 +123,6 @@ end
             <select uiname="EditModelProperty.canDrag" name="canDrag" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetCanDragDS()%>'>
             </select>
         </div>
-        <div style="float: left; margin-left: 20px;">
-            <input uiname="EditModelProperty.isDisplayModel"  type="checkbox" name="isDisplayModel" checked="checked" style="margin-top:3px;"/>
-            <div style="float:left" for="isDisplayModel"><%=L"显示模型"%></div>
-        </div>
     </div>
     <div style="margin-top: 5px;">
         <div style="float: left;">
@@ -130,6 +138,25 @@ end
         <div style="float: left; margin-left: 20px;">
             <%=L"待机动画:"%>
             <select uiname="EditModelProperty.idleAnim" name="idleAnim" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetIdleAnimDS()%>'>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top: 5px;">
+        <div style="float: left;">
+            <input uiname="EditModelProperty.isDisplayModel"  type="checkbox" name="isDisplayModel" checked="checked" style="margin-top:3px;"/>
+            <div style="float:left" for="isDisplayModel"><%=L"显示模型"%></div>
+        </div>
+        <div style="float: left;margin-left: 20px;">
+            <%=L"透明度:"%>
+            <input type="text" uiname="EditModelProperty.opacity" name="opacity" value="1" style="width:40px;height:24px;"/>
+        </div>
+        <div style="float: left;margin-left: 20px;">
+            <%=L"增高:"%>
+            <input type="text" uiname="EditModelProperty.bootHeight" name="bootHeight" value="0" style="width:40px;height:24px;"/>
+        </div>
+        <div style="float: left;margin-left: 20px;">
+            <%=L"拖动时高度:"%>
+            <select uiname="EditModelProperty.dragDisplayOffsetY" name="dragDisplayOffsetY" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetDragOffsetDS()%>'>
             </select>
         </div>
     </div>

@@ -133,6 +133,7 @@ function OpenAssetFileDialog.ShowPage(text, OnClose, default_text, title, filter
 	OpenAssetFileDialog.editButton = editButton;
 	OpenAssetFileDialog.IsSaveMode = IsSaveMode == true;
 	OpenAssetFileDialog.UpdateExistingFiles();
+	OpenAssetFileDialog.SetSearchText()
 
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.html", 
@@ -443,6 +444,7 @@ function OpenAssetFileDialog.RefreshAnims(filepath, tryCount)
 end
 
 local allFiles;
+local filteredFiles;
 function OpenAssetFileDialog.GetAllFiles()
 	if(not allFiles) then
 		allFiles = {};
@@ -501,6 +503,7 @@ function OpenAssetFileDialog.OnChangeCategory(index)
 		end
 	end
 	if(page) then
+		OpenAssetFileDialog.SetSearchText()
 		page:Refresh(0.01);
 	end
 end
@@ -539,11 +542,74 @@ function OpenAssetFileDialog.GetAnimIdsByFilename(assetfile)
 	end
 end
 
+local filteredFiles = nil;
+function OpenAssetFileDialog.GetAllFilesWithFilters()
+	return filteredFiles and filteredFiles or OpenAssetFileDialog.GetAllFiles()
+end
+
+-- @param searchText: we will filter file names with the given text. if nil or "", we will not apply search filters. 
+-- @return search text if text has been changed since last call.
+function OpenAssetFileDialog.SetSearchText(searchText)
+	if(not searchText or searchText == "") then
+		filteredFiles = nil;
+		if(OpenAssetFileDialog.searchText) then
+			OpenAssetFileDialog.searchText = nil
+			return true;
+		end
+	else
+		if(OpenAssetFileDialog.searchText ~= searchText) then
+			OpenAssetFileDialog.searchText = searchText
+			filteredFiles = {};
+			for i, category in ipairs(OpenAssetFileDialog.GetAllFiles()) do
+				if(category.attr.expanded) then
+					local files = {name="category", attr = category.attr};
+					for _, file in ipairs(category) do
+						if(file.attr.filename:find(searchText, 1, true) or (file.attr.text and file.attr.text:find(searchText, 1, true))) then
+							files[#files+1] = file;
+						end
+					end
+					filteredFiles[#filteredFiles+1] = files
+				end
+			end
+			return true
+		end
+	end
+end
+
+function OpenAssetFileDialog.Refresh()
+	if(page) then
+		page:Refresh(0.01);
+	end
+end
+
+function OpenAssetFileDialog.RefreshFileTreeView() 
+	if(page) then
+		page:CallMethod("tvwFiles","SetDataSource", OpenAssetFileDialog.GetAllFilesWithFilters());
+		page:CallMethod("tvwFiles","DataBind", true);
+	end
+end
+
 function OpenAssetFileDialog.OnTextChange(name, mcmlNode)
 	local text = mcmlNode:GetUIValue()
-	local filepath = PlayerAssetFile:GetValidAssetByString(text);
-	if(filepath) then
-		OpenAssetFileDialog.SetModelFilename(filepath);
+	if(text and text:match("^[/?]")) then
+		OpenAssetFileDialog.searchTimer = OpenAssetFileDialog.searchTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			if(page) then
+				local text = page:GetUIValue("text") or ""
+				local searchText = text:match("^[/?](.+)")
+				if(OpenAssetFileDialog.SetSearchText(searchText)) then
+					OpenAssetFileDialog.RefreshFileTreeView()
+				end
+			end
+		end})
+		OpenAssetFileDialog.searchTimer:Change(500);
+	else
+		if(OpenAssetFileDialog.SetSearchText()) then
+			OpenAssetFileDialog.RefreshFileTreeView()
+		end
+		local filepath = PlayerAssetFile:GetValidAssetByString(text);
+		if(filepath) then
+			OpenAssetFileDialog.SetModelFilename(filepath);
+		end
 	end
 end
 

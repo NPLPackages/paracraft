@@ -1326,3 +1326,11 @@ function QuestAction.ReportEvent(action, data)
         end
     end)
 end
+
+function QuestAction.SetCurWorldData(world_data)
+    QuestAction.cur_world_data = world_data
+end
+
+function QuestAction.GetCurWorldData()
+    return QuestAction.cur_world_data or {}
+end

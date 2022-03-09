@@ -204,10 +204,12 @@ function MacroPlayer.HideAll(bSkipTips)
 	if(not bSkipTips) then
 		MacroPlayer.ShowTip()
 		MacroPlayer.ShowText()
+		MacroPlayer.ShowNextController(false)
 	end
 	MacroPlayer.ShowEditBox(false);
 	MacroPlayer.ShowMouseWheel(false);
 	MacroPlayer.ShowKeyboard(false);
+	
 end
 
 function MacroPlayer.OnPlayMacro(fromLine, macros)
@@ -248,6 +250,10 @@ function MacroPlayer.OnClickStop()
 	GameLogic.Macros:Stop()
 end
 
+function MacroPlayer.OnClickNext()
+	GameLogic.Macros:Resume()
+	MacroPlayer.ShowNextController(false)
+end
 
 function MacroPlayer.InvokeTriggerCallback()
 	local callback = MacroPlayer.triggerCallbackFunc;
@@ -528,6 +534,22 @@ function MacroPlayer.ShowController(bShow)
 		local progressController = page:FindControl("progressController");
 		if(progressController) then
 			progressController.visible = bShow;
+		end
+	end
+end
+
+function MacroPlayer.ShowNextController(bShow)
+	if page then
+		local macroController = page:FindControl("macroController")
+		if macroController then
+			macroController.visible = bShow
+			if bShow then
+				local strText = "操作教学开始，理解后点击屏幕即可继续下一步"
+				-- NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+				-- local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
+				-- SoundManager:PlayText(strText,10006)
+				GameLogic.AddBBS(nil,strText)
+			end
 		end
 	end
 end

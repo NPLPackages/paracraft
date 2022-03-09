@@ -29,7 +29,7 @@ function ItemTimeSeriesCamera:ctor()
 end
 
 -- create actor from item stack. 
-function ItemTimeSeriesCamera:CreateActorFromItemStack(itemStack, movieclipEntity)
-	local actor = ActorCamera:new():Init(itemStack, movieclipEntity);
+function ItemTimeSeriesCamera:CreateActorFromItemStack(itemStack, movieclipEntity, isReuseActor, name, movieclip)
+	local actor = ActorCamera:new():Init(itemStack, movieclipEntity, isReuseActor, name, movieclip);
 	return actor;
 end

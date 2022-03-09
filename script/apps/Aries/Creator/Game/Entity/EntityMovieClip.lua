@@ -35,6 +35,8 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip"));
 Entity:Signal("remotelyUpdated")
@@ -372,20 +374,24 @@ end
 
 -- virtual function: right click to edit. 
 function Entity:OpenEditor(editor_name, entity)
-	local movieClip = self:GetMovieClip();
-	if(movieClip) then
-		movieClip:Stop();
-	end
-	self.is_playing_mode = false;
-	if(self.defaultEditor == "SimpleRolePlayingEditor") then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/RolePlayMode/RolePlayMovieController.lua");
-		local RolePlayMovieController = commonlib.gettable("MyCompany.Aries.Game.Movie.RolePlayMode.RolePlayMovieController");
-		MovieClipEditors.SetDefaultMovieClipPlayer(RolePlayMovieController)
-	else
-		-- Open with default movie clip timeline editor
-		MovieClipEditors.SetDefaultMovieClipPlayer()
-	end
-	MovieManager:SetActiveMovieClip(movieClip);
+	-- 没权限的话 不允许编辑电影方块
+	UserPermission.CheckCanEditBlock("click_movie_block", function()
+		local movieClip = self:GetMovieClip();
+		if(movieClip) then
+			movieClip:Stop();
+		end
+		self.is_playing_mode = false;
+		if(self.defaultEditor == "SimpleRolePlayingEditor") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/RolePlayMode/RolePlayMovieController.lua");
+			local RolePlayMovieController = commonlib.gettable("MyCompany.Aries.Game.Movie.RolePlayMode.RolePlayMovieController");
+			MovieClipEditors.SetDefaultMovieClipPlayer(RolePlayMovieController)
+		else
+			-- Open with default movie clip timeline editor
+			MovieClipEditors.SetDefaultMovieClipPlayer()
+		end
+		MovieManager:SetActiveMovieClip(movieClip);
+	end)
+
 	return true;
 end
 
@@ -860,8 +866,21 @@ function Entity:GetAllActorData()
 			if temp.assetfile == "customchar" then
 				temp.assetfile = "character/CC/02human/CustomGeoset/actor.x"
 			end
-			temp.skin = skin.data[1] or ""
+			local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+			temp.assetfile = PlayerAssetFile:GetValidAssetByString(temp.assetfile)
+			if skin and skin.data then
+				temp.skin = skin.data[1] or ""
+			else
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+				local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+				if CustomCharItems:GetSkinByAsset(temp.assetfile) then 
+					temp.skin = CustomCharItems:GetSkinByAsset(temp.assetfile)
+				else
+					temp.skin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString)
+				end
+			end
 			temp.scaling = scaling and scaling.data[1] or 1
+			temp.slot_index = i
 			actor_datas[#actor_datas + 1] = temp
 		end
 	end
@@ -1989,4 +2008,80 @@ function Entity:CompareActorSkin(entity) --一天中的时间段
 		end
 	end
 	return diff_num, result
+end
+
+-- static function: create a movie entity in memory from a block template file. 
+-- @param filename: block template file that should only contain one movie block. 
+-- @param bx, by, bz: movie block position
+-- @return movieEntity
+function Entity:CreateFromTemplateFile(filename, bx, by, bz)
+	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	if(xmlRoot) then
+		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		if(root_node and root_node[1]) then
+			bx = bx or 0;
+			by = by or 0;
+			bz = bz or 0;
+			
+			local references = commonlib.XPath.selectNode(root_node, "/references");
+			if(references) then
+				-- "/pe:blocktemplate/references/file"
+				local worldSearchDir = Files.CreateGetAdditionalWorldSearchPath();
+				NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+				for _, file in ipairs(commonlib.XPath.selectNodes(references, "/file") or {}) do
+					if(file.attr) then
+						local filename = file.attr.filename;
+						if(file[1] and filename) then
+							local fileData = System.Encoding.unbase64(file[1])
+							if(fileData) then
+								-- TODO: use a different search path than current world directory. 
+								local filepath = worldSearchDir..commonlib.Encoding.Utf8ToDefault(filename);
+								ParaIO.CreateDirectory(filepath)
+								local file = ParaIO.open(filepath, "w")
+								if(file:IsValid()) then
+									LOG.std(nil, "info", "BlockTemplate", "bmax file saved to : %s", filepath);
+									file:WriteString(fileData, #fileData);
+									file:close();
+								else
+									LOG.std(nil, "warn", "BlockTemplate", "failed to write file to: %s", filepath);
+								end
+							end
+						end
+					end
+				end
+			end
+
+			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+			if(node and node[1]) then
+				local blocks = NPL.LoadTableFromString(node[1]);
+				if(blocks and #blocks > 0) then
+					if(root_node.attr and root_node.attr.relative_motion == "true") then
+						-- calculate relative motion
+						local movieBlockId = block_types.names.MovieClip; -- id is 228
+						for i, block in ipairs(blocks) do
+							local block_id = block[4];
+							if(block_id == movieBlockId) then
+								local entityData = block[6];
+								if(entityData) then
+									local ox, oy, oz = entityData.attr.bx, entityData.attr.by, entityData.attr.bz;
+									if(ox and oy and oz) then
+										local offset_x, offset_y, offset_z = bx + block[1]- ox, by + block[2]- oy, bz + block[3] - oz;
+										local movieEntity = Entity:new();
+										movieEntity:LoadFromXMLNode(entityData);
+										movieEntity:OffsetActorPositions(offset_x, offset_y, offset_z);
+										movieEntity.bx = movieEntity.bx + offset_x;
+										movieEntity.by = movieEntity.by + offset_y;
+										movieEntity.bz = movieEntity.bz + offset_z;
+										return movieEntity;
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	else
+		LOG.std(nil, "warn", "MovieClip", "failed to load template from file: %s", filename);
+	end
 end

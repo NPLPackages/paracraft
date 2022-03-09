@@ -99,9 +99,14 @@
   <asset filename="character/CC/02human/paperman/zaizai.x" name="zaizai" displayname="崽崽"/>
   <asset filename="character/CC/02human/paperman/nuannuan.x" name="nuannuan" displayname="囡囡"/>
   <asset filename="character/CC/02human/paperman/principal.x" name="principal" displayname="校长"/>
+  
+  <!-- new models for shanghai team
+  <asset filename="character/CC/02human/paperman/boy.x" name="boy" displayname="boy"/>
+  <asset filename="character/CC/02human/paperman/girl.x" name="girl" displayname="girl"/>
 
+  -->
 
-    <!-- artwar in shanghai角色
+  <!-- artwar in shanghai角色
   <asset filename="character/CC/artwar/game/sunbin.x" displayname="孙膑" name="sunbin"/>
   <asset filename="character/CC/artwar/game/sunbin_junshi.x" displayname="孙膑军师" name="sunbin_adviser"/>
   <asset filename="character/CC/artwar/game/pangjuan.x" displayname="庞涓" name="pangjuan"/>
@@ -815,6 +820,14 @@
   <asset filename="character/CC/artwar/game/huoba_ming.x" displayname="火把" name="huoba"/>
   <!-- <asset filename="character/CC/artwar/game/huoba_mie.x" displayname="火把灭" name="huoba"/>   -->
   <asset filename="character/CC/artwar/game/shanzi.x" displayname="扇子" name="shanzi"/>
+<!-- 2022.2.14更新 -->
+  <asset filename="character/CC/artwar/game/danpigu.x" displayname="单皮鼓" name="danpigu"/>
+  <asset filename="character/CC/artwar/game/gubang.x" displayname="鼓棒" name="gubang"/>
+  <asset filename="character/CC/artwar/game/jinghu.x" displayname="京胡" name="jinghu"/>
+  <asset filename="character/CC/artwar/game/luo.x" displayname="锣" name="luo"/>
+  <asset filename="character/CC/artwar/game/luobang.x" displayname="锣棒" name="luobang"/>
+  <asset filename="character/CC/artwar/game/maweigong.x" displayname="马尾弓" name="maweigong"/>
+  <asset filename="character/CC/artwar/game/sanxuan.x" displayname="三弦" name="sanxuan"/>
 <!-- 5·27更新 -->
   <asset filename="character/CC/artwar/game/axe.x" displayname="斧子" name="axe"/>
   <asset filename="character/CC/artwar/game/lance.x" displayname="枪" name="lance"/>
@@ -1215,6 +1228,25 @@
   <asset filename="character/CC/05effect/firingcirclebigger.x" name="firingcirclebigger" displayname="爆炸圈" physics="false"/>
   <asset filename="character/CC/05effect/glowingcirclebigger.x" name="glowingcirclebigger" displayname="变换光圈" physics="false"/>
   <asset filename="character/CC/05effect/fireglowingcircle.x" name="fireglowingcircle" displayname="旋转光圈" physics="false"/>
+  <!-- 2022.2.28 add new effect for paralife -->
+  <asset filename="character/CC/05effect/V5/fengtong/fengtong.x" name="fengtong" displayname="风筒风" physics="false"/>
+  <asset filename="character/CC/05effect/V5/KTwu/KT_WU.x" name="KT_WU" displayname="卡通烟雾" physics="false"/>
+  <asset filename="character/CC/05effect/V5/huazhuang/huazhuang.x" name="huazhuang" displayname="化妆粉" physics="false"/>
+  <asset filename="character/CC/05effect/V5/paopao/paopao.x" name="paopao" displayname="泡泡" physics="false"/>
+  <asset filename="character/CC/05effect/V5/shiwusuipian/suixie.x" name="suixie" displayname="食物碎屑" physics="false"/>
+  <asset filename="character/CC/05effect/V5/shuaya/shuaya.x" name="shuaya" displayname="刷牙" physics="false"/>
+  <asset filename="character/CC/05effect/V5/tiaoliao/tiaoliao.x" name="tiaoliao" displayname="撒胡椒粉" physics="false"/>
+  <asset filename="character/CC/05effect/V5/tiaoliao/tiaoliao1.x" name="tiaoliao1" displayname="撒盐" physics="false"/>
+  <asset filename="character/CC/05effect/V5/wu/WU.x" name="wu" displayname="煮饭雾气" physics="false"/>
+  <asset filename="character/CC/05effect/V5/wu/wuqi.x" name="wuqi" displayname="浴缸雾气" physics="false"/>
+  <asset filename="character/CC/05effect/V5/yanhua/yanhua.x" name="yanhua" displayname="烟花" physics="false"/>
+  <asset filename="character/CC/05effect/V5/huoyan/huoyan.x" name="huoyan" displayname="火焰" physics="false"/>
+  <asset filename="character/CC/05effect/V5/huoyan/huoyan2.x" name="huoyan2" displayname="喷火1" physics="false"/>
+  <asset filename="character/CC/05effect/V5/huoyan/huoyan3.x" name="huoyan3" displayname="喷火2" physics="false"/>
+  <!-- 2022.3.4 add new effects -->
+  <asset filename="character/CC/05effect/V5/fengtong/xiangshui.x" name="xiangshui" displayname="喷香水" physics="false"/>
+  <asset filename="character/CC/05effect/V5/wu/wuqi1.x" name="wuqi1" displayname="洗手盆雾气" physics="false"/>
+  
 
   <asset filename="character/common/headarrow/headarrow.x" displayname="箭头" name="headarrow"/>
 	<asset filename="character/common/headexclaimed/headexclaimed.x" displayname="感叹号" name="headexclaimed"/>

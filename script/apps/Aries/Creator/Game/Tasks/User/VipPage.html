@@ -234,7 +234,7 @@
                         VipPage.RefreshPage()
                         RedSummerCampMainPage.RefreshPage()
                         --ClosePage()
-                    end)
+                    end, false)
                 end
 
                 function get_phone_captcha()
@@ -352,6 +352,10 @@
                     VipPage.showRealNameGift = false
                     VipPage.RefreshPage()
                 end
+                
+                function HasVipReward()
+                    return VipPage.HasVipReward()
+                end
             ]]>
         </script>
         <kp:window class="default"
@@ -438,59 +442,78 @@
                             <pe:if condition = '<%=not IsOfflineMode()%>'>
                                 <!--需要实名认证-->
                                 <pe:if condition = '<%= need_certificate()%>'>
-                                    <div style = "position:relative; margin-left:0px;margin-top:75px;width: 686px;height: 360px; background: url(Texture/Aries/Creator/keepwork/Certification/RealName/huisebeijing_24x24_32bits.png#0 0 24 24:8 8 8 8);">
+                                    <div style = "position:relative; margin-left:0px;margin-top:65px;width: 686px;height: 385px; background: url(Texture/Aries/Creator/keepwork/Certification/RealName/huisebeijing_24x24_32bits.png#0 0 24 24:8 8 8 8);">
                                         <!-- <div style="position:relative;margin-left:86px;margin-top:85px;color:#000000;" class="text_size_22" >第一步：完成实名认证，免费获得会员礼包</div> --> 
-                                        <img style="position:relative;margin-left:46px;margin-top:30px;width: 519px;height: 29px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/diyibu_519x29_32bits.png#0 0 519 29" />
-                                        <pe:container alignment="_rt" style="width:63px;height:63px;margin-right:45px;margin-top:12px;background:url(Texture/Aries/Creator/keepwork/Certification/RealName/liwu_63x63_32bits.png#0 0 63 63);">
+                                        <img style="position:relative;margin-left:105px;margin-top:11px;width: 452px;height: 29px;" src="Texture/Aries/Creator/keepwork/Certification/diyibu_452x29_32bits.png#0 0 452 29" />
+                                        <!-- <pe:container alignment="_rt" style="width:63px;height:63px;margin-right:45px;margin-top:12px;background:url(Texture/Aries/Creator/keepwork/Certification/RealName/liwu_63x63_32bits.png#0 0 63 63);">
                                             <input type="button" value="" tip="mouse_enter_tip" onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave" onclick="" style="width:50px;height:40px;background:url()" />
-                                        </pe:container>
-                                        <pe:container zorder = "2" uiname = "mouse_enter_tip" alignment="_ctt" width="427" height="266"  style="margin-left:-5px;margin-top:50px;background:url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44);">
+                                        </pe:container> -->
+                                        <!-- <pe:container zorder = "2" uiname = "mouse_enter_tip" alignment="_ctt" width="427" height="266"  style="margin-left:-5px;margin-top:50px;background:url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44);">
                                             <div style="width: 427px;margin-left: 0px;margin-top: 0px;">
                                                 <img style="margin-left:20px;margin-top:12px;width: 70px;height: 22px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/huiyuanlibao_70x22_32bits.png#0 0 70 22" />
                                                 <img style="margin-left:52px;margin-top:20px;width: 315px;height: 185px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/jiangli_315x185_32bits.png#0 0 315 185" />
                                             </div>
-                                        </pe:container>
+                                        </pe:container> -->
                 
-                                        <pe:container alignment="_ctt" width="660" height="280"  style="margin-left:0px;margin-top: 85px;background-color:#00000000;">
-                                            <div style="font-size: 18px;base-font-size: 18px;margin-left: 140px;margin-top: 5px;">
+                                        <pe:container alignment="_lt" width="660" height="180"  style="margin-left:0px;margin-top: 60px;background-color:#00000000;">
+                                            <div style="font-size: 18px;base-font-size: 18px;margin-left: 100px;margin-top: 0px;">
                                                 <!-- <pe:container uiname = "phone_number_error" style="font-size: 18px;base-font-size: 14px;margin-left: 90px;margin-top: -12px;color:#ea0a0a;background: url();">*手机格式错误</pe:container> -->
                                                 <!-- <%= L'手机号' %> -->
-                                                <img style="width: 85px;height: 25px;margin-left:-10px;margin-top: 10px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/shoujihao_85x25_32bits.png#0 0 85 25" />
-                                                <img style="width: 275px;height: 55px;margin-left: 15px;margin-top: -5px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/shurukuang_32x32_32bits.png#0 0 32 32:8 8 8 8"/>
-                                                <input type="text" style="width: 265px;height: 25px;color:#333333;font-size:18px;margin-left: -266x;margin-top: 10px;background:url();" class="" onfocusout="check_phone_number()" onfocusin="ClearNumberErrorTip" name="phonenumber"/>
+                                                <img style="width: 68px;height: 19px;margin-left:0px;margin-top: 12px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/shoujihao_85x25_32bits.png#0 0 85 25" />
+                                                <img style="width: 364px;height: 40px;margin-left: 15px;margin-top: 0px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/shurukuang_32x32_32bits.png#0 0 32 32:8 8 8 8"/>
+                                                <input type="text" style="width: 352px;height: 30px;color:#333333;font-size:18px;margin-left: -356px;margin-top: 5px;background:url();" class="" onfocusout="check_phone_number()" onfocusin="ClearNumberErrorTip" name="phonenumber"/>
                                             </div>
-                                            <div style="float: left;font-size: 18px;base-font-size: 18px;margin-left: 136px;margin-top: 10px;">
-                                                <pe:container uiname = "phone_captcha_error" style="font-size: 14px;base-font-size: 14px;margin-left: 70px;margin-top: -6px;color:#ea0a0a;;background: url();">*验证码错误</pe:container>
+                                            <div style="font-size: 18px;base-font-size: 18px;margin-left: 100px;margin-top: 0px;">
+                                                <pe:container uiname = "phone_captcha_error" style="font-size: 14px;base-font-size: 14px;margin-left: 70px;margin-top: 0px;color:#ea0a0a;;background: url();">*验证码错误</pe:container>
                                                 <!-- <%= L'验证码' %> -->
-                                                <img style="width: 85px;height: 25px;margin-left:-8px;margin-top: 4px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_85x25_32bits.png#0 0 85 25" />
-                                                <img style="width: 145px;height: 35px;margin-left: 18px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/shurukuang_32x32_32bits.png#0 0 32 32:8 8 8 8" />
-                                                <input type="text" style="position:absolute;width: 135px;height: 25px;font-size:18px;margin-left: -138x;margin-top: 4px;background:url();" class="" onfocusout="check_phone_number()" onfocusin="ClearCaptchaErrorTip"name="phonecaptcha"/>
+                                                <img style="width: 68px;height: 19px;margin-left:0px;margin-top: 12px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_85x25_32bits.png#0 0 85 25" />
+                                                <img style="width: 242px;height: 40px;margin-left: 18px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/shurukuang_32x32_32bits.png#0 0 32 32:8 8 8 8" />
+                                                <input type="text" style="position:absolute;width: 232px;height: 30px;font-size:18px;margin-left: -238x;margin-top: 6px;background:url()" class="" onfocusout="check_phone_number()" onfocusin="ClearCaptchaErrorTip"name="phonecaptcha"/>
                         
                                                 <div style="float: left; width: 118px;height: 39px;margin-left: 14px;background-color: #a74a1f00;">
-                                                    <input type="button" style="font-weight:bold;font-size:18px;position: relative;width: 118px;height: 39px;background: url(Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_28x28_32bits.png#0 0 28 28:12 12 12 12)" name="getPhoneCaptcha" class="" value="<%=L'获取验证码'%>" onclick="get_phone_captcha()"/>
+                                                    <input type="button" style="font-weight:bold;font-size:18px;position: relative;width: 118px;height: 44px;background: url(Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_28x28_32bits.png#0 0 28 28:12 12 12 12)" name="getPhoneCaptcha" class="" value="<%=L'获取验证码'%>" onclick="get_phone_captcha()"/>
                                                     <!-- <img style="position:relative;width: 89px;height: 18px;margin-left: 15px;margin-top: 10px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/huoquyanzhengma_89x18_32bits.png#0 0 89 18" /> -->
                                                     
                                                 </div>
                                             </div>
                                             <!-- 下一步 -->
-                                            <div style="margin-left: 282px;margin-top: 50px;">
+                                            <div style="margin-left: 185px;margin-top: 16px;">
                                                 <input type="button" 
                                                 icon="Texture/Aries/Creator/keepwork/Certification/RealName/xiayibu_70x24_32bits.png#0 0 70 24"
                                                     icon_width=70
                                                     icon_height=24
                                                 
                                                 class="theme1_myhome_blue_bt" value="" onclick="bind()" />
-                                            </div>
-                
-                                            <pe:if condition='<%= not HasRealName() %>'>
+
+                                                <div style="float: left;font-size: 16px;margin-left: 36px;margin-top: 6px;">
+                                                    <div style="font-weight: bold;">我要回家安装</div>
+                                                    <div style='float: left; margin-left: 15px;margin-top: 5px; font-weight: bold; color: #1ca3d7; margin-top: 0px;'
+                                                    onclick='home_install'>
+                                                    <%= L'点击这里' %>
+                                                    <div style='height: 1px;
+                                                                width: 68px;
+                                                                margin-top: 3px;
+                                                                background-color: #09abe7'></div>
+                                                </div>
+                                                </div>
+                                            </div>                
+                                            <!-- <pe:if condition='<%= not HasRealName() %>'>
                                                 <div style = "position:relative; margin-left:30px;margin-top:-65px;width: 185px;height: 70px; background: url(Texture/Aries/Creator/keepwork/Certification/RealName/huijiaanzhuang_40x70_32bits.png#0 0 40 70:16 16 16 16);">
                                                     <div style="margin-top: -20px;margin-left: 145px; width:37px;height: 55px;background:url(Texture/Aries/Creator/keepwork/Certification/RealName/wenhao_37x55_32bits.png#0 0 37 55);"></div>
                                                     <div onclick='home_install()' style="position: relative; margin-top: -27px; margin-left: 20px;font-size: 14px;base-font-size:16px;color: #000000;">回家安装指南</div>
                                                     <div onclick='home_install()' style="position: relative; margin-top: 3px; margin-left: 20px;font-size: 14px;base-font-size:16px;color: #09abe7;">点击这里</div>
                                                     <div style="position:relative; margin-left:18px;margin-top:25px;width:60px;height:1px;background-color:#09abe7;"/>
                                                 </div>
-                                            </pe:if>
+                                            </pe:if> -->
                                         </pe:container>
+                                        <div style="width: 686px;margin-top: 10px">
+                                            <pe:container name="reward_node" style="background: ;">
+                                                <div style="float: left; margin-top: 7px; width: 123px;height: 110px;margin-left: 0px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/pifujiangli_123x110_32bits.png#0 0 123 110);"></div>
+                                                <!-- <div style="float: left; width: 216px;height: 121px;margin-left: 10px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/huiyuantiyan_216x121_32bits.png#0 0 216 121);"></div> -->
+                                                <div style="float: left; margin-top: 7px; width: 123px;height: 110px;margin-left: 10px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/xinrenjiangzhuang_123x110_32bits.png#0 0 123 110);"></div>
+                                            </pe:container>
+
+                                        </div>
                                     </div>
                                 </pe:if>
                                 <!-- 不需要实名认证 -->
@@ -577,7 +600,7 @@
                     </pe:if>
                 </pe:if>
                 <pe:if condition = '<%=not ShowRealNameGift()%>'>
-                    <div style="position:absolute;margin-left:16px;margin-top:450px;">
+                    <div style="position:absolute;margin-left:16px;margin-top:455px;">
                         <div style="float:left;color:#000000;" class="text_size_18">
                             成为VIP会员，可享受帕拉卡的所有尊贵服务。
                         </div>

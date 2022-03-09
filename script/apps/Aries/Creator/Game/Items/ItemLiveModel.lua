@@ -21,6 +21,7 @@ local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local ModelTextureAtlas = commonlib.gettable("MyCompany.Aries.Game.Common.ModelTextureAtlas");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+local MouseEvent = commonlib.gettable("System.Windows.MouseEvent");
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local Cameras = commonlib.gettable("System.Scene.Cameras");
@@ -37,6 +38,12 @@ ItemLiveModel:Property({"fingerRadius", 16});
 ItemLiveModel:Property({"maxFingerPickingRadius", 0.3});
 -- between the eye lookat and the target position
 ItemLiveModel:Property({"maxDragViewDistance", 50});
+ItemLiveModel:Property({"isEntityAlwaysFacingCamera", true});
+-- hover interval 0.2
+ItemLiveModel:Property({"hoverInterval", 200});
+-- pixels
+ItemLiveModel:Property({"maxHoverMoveDistance", 10});
+ItemLiveModel:Property({"autoTurningGridSnap", math.pi/4});
 
 block_types.RegisterItemClass("ItemLiveModel", ItemLiveModel);
 
@@ -44,8 +51,6 @@ block_types.RegisterItemClass("ItemLiveModel", ItemLiveModel);
 ItemLiveModel.hp = 100;
 -- respawn in 300 000 ms. 
 ItemLiveModel.respawn_time = 300*1000;
-
--- ItemLiveModel.CreateAtPlayerFeet = true;
 
 function ItemLiveModel:ctor()
 	self:SetOwnerDrawIcon(true);
@@ -270,40 +275,44 @@ function ItemLiveModel:CanEntityReceiveCustomCharItem(entity, draggingEntity)
 	end
 end
 
--- entity picking callback function
--- this fuction is only called when entity is dragging
-function ItemLiveModel:OnFilterEntityPicking(entity)
-	if(entity) then
-		if(self.skipEntities and self.skipEntities[entity]) then
-			return false;
-		end
-		if(entity:isa(EntityManager.EntityLiveModel) ) then
-			if( (self.draggingEntity and not self:CanEntityReceiveModelDrop(entity, self.draggingEntity)) ) then
-				-- we will filter out the given entity
-				return false;
+-- @return the global result. 
+function ItemLiveModel:MousePickBlock(event)
+	local result = self:MousePickBlockWithFilters(event)
+	if(result and result.bx) then
+		local block = BlockEngine:GetBlock(result.bx, result.by, result.bz)
+		if(block and not (block.obstruction or block.solid)) then
+			if(not block.hasAction and block.name ~= "CornerGrass") then
+				result = self:MousePickBlockWithFilters(event, 0x5)
 			end
 		end
 	end
-	return true;
+	return result;
 end
 
--- @return the global result. 
-function ItemLiveModel:MousePickBlock(event)
+function ItemLiveModel:MousePickBlockWithFilters(event, blockFilters)
 	local result
+	SelectionManager:SetBlockFilters(blockFilters)
 	if(event and event:GetType() == "mousePressEvent") then
 		-- we shall use finger picking for live entity smaller than 0.3
-		if(GameLogic.options:HasTouchDevice()) then
-			local results = SelectionManager:MousePickWithFingerSize(true, true, true, nil, self.fingerRadius)
+		if(GameLogic.options:HasTouchDevice() or event.touchSession) then
+			local results = SelectionManager:MousePickWithFingerSize(true, true, true, nil, self.fingerRadius, nil, event.x, event.y)
 			local lastMinExtent = 9999999;
+			local lastEntity;
 			for _, r in ipairs(results) do
 				local entity = r.entity;
-				if(entity and entity:isa(EntityManager.EntityLiveModel)) then
+				if(entity and entity:isa(EntityManager.EntityLiveModel) and lastEntity~=entity) then
 					local aabb = entity:GetInnerObjectAABB()
 					local minExtent = aabb:GetMinExtent()
 					-- if entity's radius is bigger than 0.3, we will not use finger picking
-					if(minExtent < self.maxFingerPickingRadius and minExtent < lastMinExtent) then
-						lastMinExtent = minExtent;
-						result = r;
+					if(minExtent < self.maxFingerPickingRadius) then
+						if( (not lastEntity) or 
+							(not lastEntity:GetCanDrag() and entity:GetCanDrag()) or 
+							(minExtent < lastMinExtent and (lastEntity:GetCanDrag()==entity:GetCanDrag()))
+						) then
+							lastMinExtent = minExtent;
+							lastEntity = entity
+							result = r;
+						end
 					end
 				end
 			end
@@ -312,9 +321,11 @@ function ItemLiveModel:MousePickBlock(event)
 			end
 		end
 	end
-	result = result or SelectionManager:MousePickBlock();
+	result = result or SelectionManager:MousePickBlock(nil, nil, nil, nil, event and event.x, event and event.y);
+	SelectionManager:SetBlockFilters(nil)
 	return result;
 end
+
 
 -- @param event: nil or a mouse event invoking this method. 
 --@return pickingResult, hoverEntity
@@ -348,22 +359,32 @@ function ItemLiveModel:CheckMousePick(event)
 			end
 		end
 	end
-	
-	SelectionManager:SetEntityFilterFunction(ItemLiveModel.OnFilterEntityPicking, self)
+	local draggingEntity = self:GetDraggingEntity(event);
+	SelectionManager:SetEntityFilterFunction(function(entity)
+		if(entity) then
+			if(self.skipEntities and self.skipEntities[entity]) then
+				return false;
+			end
+			if(entity:isa(EntityManager.EntityLiveModel) ) then
+				if( (draggingEntity and not self:CanEntityReceiveModelDrop(entity, draggingEntity)) ) then
+					-- we will filter out the given entity
+					return false;
+				end
+			end
+		end
+		return true;
+	end)
 	self.skipEntities =  nil;
 	local entity = PickEntity_()
 	self.skipEntities =  nil;
-
+	
 	local newHoverEntity
 	if(entity) then
-		if(not self.draggingEntity or self:CanEntityReceiveModelDrop(entity, self.draggingEntity)) then
+		if(not draggingEntity or self:CanEntityReceiveModelDrop(entity, draggingEntity)) then
 			newHoverEntity = entity;
 		end
 	end
-
-	if(self.last_hover_entity ~= newHoverEntity) then
-		self.last_hover_entity = newHoverEntity;
-	end
+	
 	if(newHoverEntity)  then
 		if (GameLogic.GameMode:IsEditor()) then
 			local obj = newHoverEntity:GetInnerObject();
@@ -378,19 +399,66 @@ function ItemLiveModel:CheckMousePick(event)
 	else
 		ParaSelection.ClearGroup(1);
 	end
-	return result, self.last_hover_entity;
+	self:SetHoverEntity(entity, event)
+	return result, entity;
 end
 
-function ItemLiveModel:GetHoverEntity()
-	return self.last_hover_entity
+function ItemLiveModel:GetHoverEntity(event)
+	if(event and event.touchSession) then
+		return event.touchSession.hover_entity;
+	else
+		return self.hover_entity;
+	end
 end
 
+function ItemLiveModel:SetHoverEntity(hover_entity, event)
+	if(event and event.touchSession) then
+		event.touchSession.hover_entity = hover_entity;
+	end
+	self.hover_entity = hover_entity;
+end
+
+function ItemLiveModel:SetMousePressEntity(mousePressEntity, event)
+	if(event and event.touchSession) then
+		event.touchSession.mousePressEntity = mousePressEntity;
+	end
+	self.mousePressEntity = mousePressEntity;
+end
+
+function ItemLiveModel:GetMousePressEntity(event)
+	if(event and event.touchSession) then
+		return event.touchSession.mousePressEntity;
+	else
+		return self.mousePressEntity;
+	end
+end
+
+function ItemLiveModel:SetDraggingEntity(draggingEntity, event)
+	if(event and event.touchSession) then
+		event.touchSession.draggingEntity = draggingEntity;
+	end
+	self.draggingEntity = draggingEntity;
+end
+
+function ItemLiveModel:GetDraggingEntity(event)
+	if(event and event.touchSession) then
+		self.draggingEntity = event.touchSession.draggingEntity;
+		return event.touchSession.draggingEntity;
+	else
+		return self.draggingEntity;
+	end
+end
 
 function ItemLiveModel:mousePressEvent(event)
+	if(event and event.touchSession and not event.touchSession:IsEnabled()) then
+		self:RestoreDraggingEntity(event)
+		return
+	end
+
 	Game.SelectionManager:SetEntityFilterFunction(nil)
 	local result, entity = self:CheckMousePick(event)
 
-	self.mousePressEntity = nil;
+	self:SetMousePressEntity(nil, event)
 	
 	if(event.alt_pressed and event:button() == "left" and GameLogic.GameMode:IsEditor()) then
 		-- alt + click to pick both EntityBlockModel and EntityLiveModel
@@ -417,15 +485,16 @@ function ItemLiveModel:mousePressEvent(event)
 			GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ);
 		end
 		event:accept();
-	elseif(self:CanDragDropEntity(entity) and (event:button() == "left")) then
+	elseif(self:CanDragDropEntity(entity, true) and (event:button() == "left")) then
 		-- only left button to drag and drop 
-		self.mousePressEntity = entity;
+		self:SetMousePressEntity(entity, event);
 		-- mouse left dragging only enabled when we are not dragging or clicking live model. simply accept this event to do this trick.
 		event:accept();
 	end
 
-	if(self.draggingEntity) then
-		self:DropDraggingEntity()
+	local draggingEntity = self:GetDraggingEntity(event);
+	if(draggingEntity) then
+		self:DropDraggingEntity(draggingEntity, event)
 	end
 end
 
@@ -777,9 +846,10 @@ end
 -- @param x, y, z: mount point position. 
 -- @param isMountPoint: if this is a mount point
 -- @param targetEntity: if the x, y, z belongs to a point on targetEntity, this is provided. 
--- @return preferred stackHeight over x, y, z: if nil, it means that we can not stack on the location. 
+-- @return stackHeight, stackOnEntity: the first parameter is preferred stackHeight over x, y, z: if nil, it means that we can not stack on the location. 
+-- the second parameter is the top entity that is stacked on. 
 function ItemLiveModel:GetStackHeightOnLocation(draggingEntity, x, y, z, isMountPoint, targetEntity)
-	local totalStackHeight;
+	local totalStackHeight, stackOnEntity, stackOnEntityY;
 
 	if(isMountPoint) then
 		local isMountedEntitiesStackable;
@@ -794,6 +864,9 @@ function ItemLiveModel:GetStackHeightOnLocation(draggingEntity, x, y, z, isMount
 							MountedEntityCount = MountedEntityCount + 1
 							if(entity:IsStackable()) then
 								totalStackHeight = (totalStackHeight or 0) + entity:GetStackHeight();
+								if(not stackOnEntity or stackOnEntityY > y1) then
+									stackOnEntity, stackOnEntityY = entity, y1;
+								end
 								isMountedEntitiesStackable = true
 							end
 						end
@@ -803,7 +876,7 @@ function ItemLiveModel:GetStackHeightOnLocation(draggingEntity, x, y, z, isMount
 		end
 		-- do not mount on point if they are non-stackable objects
 		if(MountedEntityCount == 0 or (isMountedEntitiesStackable and draggingEntity:IsStackable())) then
-			return totalStackHeight or 0
+			return totalStackHeight or 0, stackOnEntity
 		end
 	else
 		totalStackHeight = 0
@@ -842,6 +915,9 @@ function ItemLiveModel:GetStackHeightOnLocation(draggingEntity, x, y, z, isMount
 								-- vertically stacked
 								totalStackHeight = (totalStackHeight or 0) + entity:GetStackHeight();
 								isMountedEntitiesStackable = true
+								if(not stackOnEntity or stackOnEntityY > y1) then
+									stackOnEntity, stackOnEntityY = entity, y1;
+								end
 							end
 						end
 					end
@@ -850,7 +926,7 @@ function ItemLiveModel:GetStackHeightOnLocation(draggingEntity, x, y, z, isMount
 		end
 		-- do not mount on point if they are non-stackable objects
 		if(MountedEntityCount == 0 or (isMountedEntitiesStackable and draggingEntity:IsStackable())) then
-			return totalStackHeight or 0
+			return totalStackHeight or 0, stackOnEntity
 		else
 			return 0;
 		end
@@ -961,23 +1037,76 @@ function ItemLiveModel:GetNearbyPhysicalModelDropPoints(targetEntity, x, y, z, o
 	end
 end
 
-function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity)
+local rays = {}
+function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity, event)
 	if(not result) then
-		result, targetEntity = self:CheckMousePick()
+		result, targetEntity = self:CheckMousePick(event)
 	end
 	if(draggingEntity and draggingEntity.dragParams) then
 		local dragParams = draggingEntity.dragParams;
 		local lastDropLocation = dragParams.dropLocation;
 		local hasFound;
+
+		-- for custom char items mounting on custom characters, we will first try using the center of the dragging entity, instead of the bottom center. 
+		if(draggingEntity:GetCategory() == "customCharItem" and result.x) then
+			local draggingAABB = draggingEntity:GetInnerObjectAABB()
+			local eyePos = Cameras:GetCurrent():GetEyePosition()
+			local x, y, z = draggingAABB:GetCenterValues();
+			local dx, dy, dz = draggingAABB:GetExtendValues();
+			local eyeX, eyeY, eyeZ = eyePos[1], eyePos[2], eyePos[3]
+			local dir
+			for i= 1, 4 do
+				if(i==1) then
+					dir = mathlib.vector3d:new_from_pool(x - eyeX, y - eyeY, z - eyeZ)
+				elseif(i==2) then
+					dir = mathlib.vector3d:new_from_pool(x - eyeX, y + dy - eyeY, z - eyeZ)
+				elseif(i==3) then
+					dir = mathlib.vector3d:new_from_pool(x+dx - eyeX, y - eyeY, z+dz - eyeZ)
+				else
+					dir = mathlib.vector3d:new_from_pool(x-dx - eyeX, y - eyeY, z-dz - eyeZ)
+				end
+				dir:normalize()
+				rays[i] = mathlib.ShapeRay:new():init(eyePos, dir)
+			end
+
+			local bx, by, bz = draggingEntity:GetBlockPos()
+			local entities = EntityManager.GetEntitiesByMinMax(bx-1, by-1, bz-1, bx+1, by+1, bz+1, EntityManager.EntityLiveModel)
+			if(entities) then
+				local lastDist = 9999
+				local candidateEntity;
+				for _, entity in ipairs(entities) do
+					if(entity:HasCustomGeosets()) then
+						for i=1, #rays do
+							if(rays[i]:intersectsAABB(entity:GetInnerObjectAABB())) then
+								local dist = entity:DistanceSqTo(bx, by, bz)
+								if(dist < lastDist) then
+									candidateEntity = entity;
+								end
+								break;
+							end
+						end
+					end
+				end
+				if(candidateEntity) then
+					local x, y, z = SelectionManager:GetMouseInteractionPointWithAABB(candidateEntity:GetInnerObjectAABB(), event and event.x, event and event.y);
+					if(not x) then
+						x, y, z = result.physicalX or result.blockRealX or result.x, result.physicalY or result.blockRealY or result.y, result.physicalZ or result.blockRealZ or result.z;
+					end
+					dragParams.dropLocation = {target = candidateEntity, x=x, y=y, z=z, dropX = x, dropY = y, dropZ = z, mountPointIndex = -1, isCustomCharItem = true}
+					hasFound = true
+				end
+			end
+		end
+
 		-- finding a right location to put down.
 		if(targetEntity) then
-			if(targetEntity:GetMountPointsCount() > 0) then
+			if(not hasFound and targetEntity:GetMountPointsCount() > 0) then
 				local bInside, mp, distance;
 				if(targetEntity:HasRealPhysics() and result.x) then
 					-- for physical model, we need to check if hit point is inside the AABB of mount points. 	
 					bInside, mp = targetEntity:GetMountPoints():IsPointInMountPointAABB(result.x, result.y, result.z, 0, 0.1, 0)
 				else
-					mp, distance = targetEntity:GetMountPoints():GetMountPointByXY();
+					mp, distance = targetEntity:GetMountPoints():GetMountPointByXY(event and event.x, event and event.y);
 				end
 				if(mp) then
 					local x, y, z = targetEntity:GetMountPoints():GetMountPositionInWorldSpace(mp:GetIndex())
@@ -990,7 +1119,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 								x, y, z = result.x, result.y, result.z;
 							end
 						else
-							local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB());
+							local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB(), event and event.x, event and event.y);
 							if(x1) then
 								x, y, z = x1, y1, z1
 							end
@@ -1023,6 +1152,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 								if(draggingEntity.GetYawOffset and facing) then
 									facing = facing + draggingEntity:GetYawOffset();
 								end
+								facing = self:GetValidateFacing(facing, draggingEntity)
 							end
 							dragParams.dropLocation = {target = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, mountPointIndex = -1, facing = facing}
 							break;
@@ -1032,11 +1162,11 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 			end
 
 			-- is custom char item mounting character. 
-			if(not hasFound and self:CanEntityReceiveCustomCharItem(targetEntity, self.draggingEntity)) then
+			if(not hasFound and self:CanEntityReceiveCustomCharItem(targetEntity, draggingEntity)) then
 				local x, y, z = result.x, result.y, result.z
 				if(x) then
 					local aabb = targetEntity:GetInnerObjectAABB()
-					x, y, z = SelectionManager:GetMouseInteractionPointWithAABB(aabb);
+					x, y, z = SelectionManager:GetMouseInteractionPointWithAABB(aabb, event and event.x, event and event.y);
 					if(x) then
 						dragParams.dropLocation = {target = targetEntity, x=x, y=y, z=z, dropX = x, dropY = y, dropZ = z, mountPointIndex = -1, isCustomCharItem = true}
 						hasFound = true
@@ -1058,7 +1188,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 
 							local bHasIntersectPoint;
 							if(not targetEntity:HasRealPhysics()) then
-								local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB());
+								local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB(), event and event.x, event and event.y);
 								if(x1) then
 									x, y, z = x1, y1, z1
 									bHasIntersectPoint = true
@@ -1087,7 +1217,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 
 						local bHasIntersectPoint;
 						if(not targetEntity:HasRealPhysics()) then
-							local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB());
+							local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB(), event and event.x, event and event.y);
 							if(x1) then
 								x, y, z = x1, y1, z1
 								bHasIntersectPoint = true
@@ -1106,6 +1236,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 							if(draggingEntity.GetYawOffset and facing) then
 								facing = facing + draggingEntity:GetYawOffset();
 							end
+							facing = self:GetValidateFacing(facing, draggingEntity)
 						end
 						dragParams.dropLocation = {target = linkTarget, dropX = dropX, dropY = dropY, dropZ = dropZ, x = x, y = y, z = z, mountPointIndex = -1, facing = facing}
 						hasFound = true	
@@ -1127,7 +1258,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 			if(result.x) then
 				x, y, z = result.x, result.y, result.z;
 				if(targetEntity and not targetEntity:HasRealPhysics()) then
-					local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB());
+					local x1, y1, z1 = SelectionManager:GetMouseInteractionPointWithAABB(targetEntity:GetInnerObjectAABB(), event and event.x, event and event.y);
 					if(x1) then
 						x, y, z = x1, y1, z1
 					else
@@ -1159,6 +1290,7 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 				if(draggingEntity.GetYawOffset and facing) then
 					facing = facing + draggingEntity:GetYawOffset();
 				end
+				facing = self:GetValidateFacing(facing, draggingEntity)
 			end
 			dragParams.dropLocation = {target = result.block_id, targetEntity = targetEntity, x=x, y=y, z=z, dropX = dropX, dropY = dropY, dropZ = dropZ, bx = bx, by = by, bz = bz, side = 5, facing = facing}
 			if(not self:CalculateFreeFallDropLocation(draggingEntity, dragParams.dropLocation)) then
@@ -1179,14 +1311,15 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 		end
 		if(dragParams.dropLocation) then
 			-- make the model a bit higher than the drop location. 
-			local dragDisplayOffsetY = 0.3;
+			local dragDisplayOffsetY = draggingEntity:GetDragDisplayOffsetY() or 0.3;
 			local x, y, z = dragParams.dropLocation.x, dragParams.dropLocation.y + dragDisplayOffsetY, dragParams.dropLocation.z;
 			local oldX, oldY, oldZ = draggingEntity:GetPosition()
 			
 			local lookatX, lookatY, lookatZ = ParaCamera.GetLookAtPos()
 			local distSq = (lookatX - x)^2 + (lookatY - y)^2 + (lookatZ - z)^2
 			if(distSq < (self.maxDragViewDistance^2)) then
-				self:UpdateEntityDragAnim(draggingEntity, x, y, z, oldX, oldY, oldZ)
+				mouseRay = Cameras:GetCurrent():GetMouseRay(event and event.x, event and event.y, mathlib.Matrix4.IDENTITY);
+				self:UpdateEntityDragPositionAndAnim(draggingEntity, x, y, z, oldX, oldY, oldZ)
 			else
 				dragParams.dropLocation = lastDropLocation;
 			end
@@ -1195,7 +1328,14 @@ function ItemLiveModel:UpdateDraggingEntity(draggingEntity, result, targetEntity
 end
 
 function ItemLiveModel:StopSmoothMoveTo(draggingEntity)
-	self:SmoothMoveTo(draggingEntity)
+	if(draggingEntity) then
+		if(draggingEntity.targetFacing) then
+			draggingEntity:SetFacing(draggingEntity.targetFacing)
+			draggingEntity.targetFacing = nil;
+		end
+		draggingEntity.motionSpeed = 0;
+		self:SmoothMoveTo(draggingEntity)
+	end
 end
 
 -- @param facing: targetFacing
@@ -1206,14 +1346,14 @@ function ItemLiveModel:SmoothMoveTo(draggingEntity, facing, newX, newY, newZ)
 		draggingEntity:SetPosition(newX, newY, newZ)
 	end
 	-- turning speed per tick
-	local turningSpeed = 0.17
+	local turningSpeed = 0.1
 	if(facing) then
 		draggingEntity.targetFacing = facing;
 		local newFacing;
 		newFacing, bReached = mathlib.SmoothMoveAngle(draggingEntity:GetFacing(), facing, turningSpeed)
 		draggingEntity:SetFacing(newFacing)
 	end
-	if(facing or newX) then
+	if(draggingEntity.targetFacing or newX) then
 		draggingEntity.smoothAnimTimer = draggingEntity.smoothAnimTimer or commonlib.Timer:new({callbackFunc = function(timer)
 			local bReached = true
 			if(draggingEntity.targetFacing) then
@@ -1225,7 +1365,7 @@ function ItemLiveModel:SmoothMoveTo(draggingEntity, facing, newX, newY, newZ)
 				bReached = bReached and bReached1;
 			end
 			if(draggingEntity.motionSpeed) then
-				draggingEntity.motionSpeed = math.max(0, draggingEntity.motionSpeed - math.max(draggingEntity.motionSpeed*0.2, 0.1));
+				draggingEntity.motionSpeed = math.max(0, draggingEntity.motionSpeed - math.max((draggingEntity.motionSpeed-0.1)*0.4, 0.005));
 				bReached = bReached and (draggingEntity.motionSpeed == 0);
 				self:UpdateEntityAnimationByMotionSpeed(draggingEntity, draggingEntity.motionSpeed)
 			end
@@ -1234,7 +1374,9 @@ function ItemLiveModel:SmoothMoveTo(draggingEntity, facing, newX, newY, newZ)
 				timer:Change()
 			end
 		end})
-		draggingEntity.smoothAnimTimer:Change(30, 30)
+		if(not draggingEntity.smoothAnimTimer:IsEnabled()) then
+			draggingEntity.smoothAnimTimer:Change(30, 30)
+		end
 		self:UpdateEntityAnimationByMotionSpeed(draggingEntity, draggingEntity.motionSpeed)
 	elseif(draggingEntity.smoothAnimTimer) then
 		draggingEntity:SetAnimation(draggingEntity:GetIdleAnim());
@@ -1252,7 +1394,14 @@ function ItemLiveModel:UpdateEntityAnimationByMotionSpeed(entity, motionSpeed)
 	end
 end
 
-function ItemLiveModel:UpdateEntityDragAnim(draggingEntity, newX, newY, newZ, oldX, oldY, oldZ)
+-- @param entity: can be nil
+function ItemLiveModel:GetValidateFacing(facing, entity)
+	if(facing) then
+		return mathlib.SnapToGrid(facing, self.autoTurningGridSnap)
+	end
+end
+
+function ItemLiveModel:UpdateEntityDragPositionAndAnim(draggingEntity, newX, newY, newZ, oldX, oldY, oldZ)
 	-- update motionSpeed;
 	local dragParams = draggingEntity.dragParams;
 	if(not dragParams) then
@@ -1264,6 +1413,7 @@ function ItemLiveModel:UpdateEntityDragAnim(draggingEntity, newX, newY, newZ, ol
 	local targetFacing;
 	if(draggingEntity:IsAutoTurningDuringDragging()) then
 		if(dragParams.dropLocation and (dragParams.dropLocation.mountFacing or dragParams.dropLocation.facing)) then
+			-- if the dragging entity is mounted on something or subject to wall facing, we will use its facing directly.
 			targetFacing = dragParams.dropLocation.mountFacing or dragParams.dropLocation.facing
 		else
 			-- the user will drag at least this distance before we will recalculate facing relative to last position. 
@@ -1280,94 +1430,142 @@ function ItemLiveModel:UpdateEntityDragAnim(draggingEntity, newX, newY, newZ, ol
 				end
 			end	
 		end
+		if(not dragParams.dropLocation or not dragParams.dropLocation.mountFacing) then
+			targetFacing = self:GetValidateFacing(targetFacing, draggingEntity)
+		end
 	end
 	self:SmoothMoveTo(draggingEntity, targetFacing, newX, newY, newZ)
 end
 
-local hoverInterval = 1500; -- ms
-local maxHoverMoveDistance = 10; -- pixels
-
 -- return isHover, hoverOnEntity: the first return value is true, if it is already a hover event. 
 -- the second parameter is the entity that is hovered on by the draggingEntity. 
-function ItemLiveModel:UpdateOnHoverMousePointAABB(event, bReset)
-	self.hoverTimer = self.hoverTimer or commonlib.Timer:new({callbackFunc = function(timer)
-		if(not self.draggingEntity) then
+function ItemLiveModel:UpdateOnHoverMousePointAABB(draggingEntity, event, bReset)
+	draggingEntity = draggingEntity and self:GetDraggingEntity(event);
+	if(not draggingEntity) then
+		return;
+	end
+	draggingEntity.hoverTimer = draggingEntity.hoverTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		if(not draggingEntity:IsDragging()) then
 			timer:Change();
 		else
-			self:UpdateOnHoverMousePointAABB()
+			self:UpdateOnHoverMousePointAABB(draggingEntity)
 		end
 	end})
-	self.hoverTimer:Change(200, 200);
+	draggingEntity.hoverTimer:Change(200, 200);
 	if(bReset) then 
-		self.mousePointAABB = self.mousePointAABB or mathlib.ShapeAABB:new();
+		draggingEntity.mousePointAABB = draggingEntity.mousePointAABB or mathlib.ShapeAABB:new();
 		if(event) then
-			self.mousePointAABB:SetPointAABB(mathlib.vector3d:new({event.x, event.y, 0}))
+			draggingEntity.mousePointAABB:SetPointAABB(mathlib.vector3d:new({event.x, event.y, 0}))
 		end
-		self.hoverBeginTime = commonlib.TimerManager.GetCurrentTime();
-		self.lastHoverDraggingEntity = self.draggingEntity
-		if(self.draggingEntity and self.draggingEntity.dragParams and self.draggingEntity.dragParams.dropLocation) then
-			self.lastHoverOnEntity = self.draggingEntity.dragParams.dropLocation.target;
-		else
-			self.lastHoverOnEntity = nil;
-		end
+		draggingEntity.hoverBeginTime = commonlib.TimerManager.GetCurrentTime();
+		draggingEntity.lastHoverDraggingEntity = draggingEntity
+		draggingEntity.lastHoverOnEntity = event and self:GetHoverEntity(event) or draggingEntity.lastHoverOnEntity;
 		
-	elseif(self.hoverBeginTime and self.mousePointAABB) then
-		local curHoverOnEntity;
-		if(self.draggingEntity and self.draggingEntity.dragParams and self.draggingEntity.dragParams.dropLocation) then
-			curHoverOnEntity = self.draggingEntity.dragParams.dropLocation.target;
-		end
-
+	elseif(draggingEntity.hoverBeginTime and draggingEntity.mousePointAABB) then
+		local curHoverOnEntity = event and self:GetHoverEntity(event) or draggingEntity.lastHoverOnEntity;
+		
 		local curTime = commonlib.TimerManager.GetCurrentTime();
 		if(event) then
-			self.mousePointAABB:Extend(event.x, event.y, 0)
+			draggingEntity.mousePointAABB:Extend(event.x, event.y, 0)
 		end
-		local maxDiff = self.mousePointAABB:GetMaxExtent()
-		if(maxDiff > maxHoverMoveDistance or not curHoverOnEntity or (curHoverOnEntity~=self.lastHoverOnEntity or self.draggingEntity~=self.lastHoverDraggingEntity)) then
-			self:UpdateOnHoverMousePointAABB(event, true)
-		elseif( (curTime - self.hoverBeginTime) > hoverInterval and self.draggingEntity) then
-			self:UpdateOnHoverMousePointAABB(event, true)
+		local maxDiff = draggingEntity.mousePointAABB:GetMaxExtent()
+		if(maxDiff > self.maxHoverMoveDistance or not curHoverOnEntity or (curHoverOnEntity~=draggingEntity.lastHoverOnEntity or draggingEntity~=draggingEntity.lastHoverDraggingEntity)) then
+			draggingEntity.isHovering = nil;
+			self:UpdateOnHoverMousePointAABB(draggingEntity, event, true)
+		elseif( (curTime - draggingEntity.hoverBeginTime) > self.hoverInterval and draggingEntity) then
+			self:UpdateOnHoverMousePointAABB(draggingEntity, event, true)
+			draggingEntity.isHovering = (draggingEntity.isHovering or 0) + 1;
 
-			local hoverOnEntity = self.lastHoverOnEntity;
+			local hoverOnEntity = draggingEntity.lastHoverOnEntity;
 			if(type(hoverOnEntity) == "table" and hoverOnEntity.OnHover) then
-				hoverOnEntity:OnHover(self.draggingEntity)
+				hoverOnEntity:OnHover(draggingEntity)
 			end
-			return true, self.lastHoverOnEntity;
+			return true, draggingEntity.lastHoverOnEntity;
 		end
 	end
 end
 
 function ItemLiveModel:mouseMoveEvent(event)
-	if(self.mousePressEntity) then
+	local mousePressEntity = self:GetMousePressEntity(event);
+	if(mousePressEntity) then
 		event:accept();
 	end
+	local draggingEntity = self:GetDraggingEntity(event);
 
-	if(self.mousePressEntity and event:GetDragDist() > 20) then
-		if(not self.draggingEntity) then
-			local topEntity = self:GetTopStackEntityFromEntity(self.mousePressEntity)
-			if(topEntity and topEntity:GetCanDrag()) then
-				self:StartDraggingEntity(topEntity)
-				self:UpdateOnHoverMousePointAABB(event, true)
+	if(event and event.touchSession and not event.touchSession:IsEnabled()) then
+		self:RestoreDraggingEntity(event)
+		return
+	end
+
+	if(mousePressEntity and event:GetDragDist() > 20) then
+		if(not draggingEntity) then
+			local topEntity = self:GetTopStackEntityFromEntity(mousePressEntity)
+			local bCanDrag, draggableParent;
+			if(topEntity) then
+				bCanDrag, draggableParent = topEntity:GetCanDrag(true)
+			end
+			if(bCanDrag) then
+				topEntity = draggableParent or topEntity;
+				self:StartDraggingEntity(topEntity, event)
+				self:UpdateOnHoverMousePointAABB(topEntity, event, true)
+
+				if(event.ctrl_pressed and GameLogic.GameMode:IsEditor()) then
+					-- Ctrl + drag to clone
+					local draggingEntity = self:GetDraggingEntity(event);
+					local entity = self:CloneDraggingEntityAndRestore(draggingEntity)
+					if(entity) then
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
+						local task = MyCompany.Aries.Game.Tasks.DragEntity:new({})
+						task:CreateEntity(entity)
+						if(draggingEntity.dragTask) then
+							draggingEntity.dragTask:AddBatchCommand(task)
+						end
+					end
+				end
 			end
 		end
 	end
-	local result, targetEntity = self:CheckMousePick()
-	if(self.draggingEntity) then
-		self:UpdateDraggingEntity(self.draggingEntity, result, targetEntity)
-		self:UpdateOnHoverMousePointAABB(event)
+	if(draggingEntity) then
+		-- repeat last mouse move event, just in case the camera is moving or the scene is changing
+		draggingEntity.lastDragMoveEvent = draggingEntity.lastDragMoveEvent or MouseEvent:new():init("mouseMoveEvent");
+		draggingEntity.lastDragMoveEvent.x, draggingEntity.lastDragMoveEvent.y = event.x, event.y
+		draggingEntity.lastDragMoveEvent.touchSession = event.touchSession;
+
+		Cameras:GetCurrent():ScheduleCameraMove(function()
+			self:handleMouseMoveEventImp(draggingEntity.lastDragMoveEvent)
+		end)
+	end
+end
+
+-- Tricky: this function is called in ScheduleCameraMove, just before scene rendering to ensure 
+-- there is no flickering when camera is moving while dragging entities. 
+function ItemLiveModel:handleMouseMoveEventImp(event)
+	local draggingEntity = self:GetDraggingEntity(event);
+	if(draggingEntity and self:GetDraggingEntity(draggingEntity.lastDragMoveEvent) == draggingEntity and draggingEntity:IsDragging()) then
+		local result, targetEntity = self:CheckMousePick(event)
+		self:UpdateDraggingEntity(draggingEntity, result, targetEntity, event)
+		self:UpdateOnHoverMousePointAABB(draggingEntity, event)
+
+		commonlib.TimerManager.SetTimeout(function()
+			Cameras:GetCurrent():ScheduleCameraMove(function()
+				self:handleMouseMoveEventImp(event)
+			end)
+		end, 10, "ItemLiveModelMouseMoveTimer")
 	end
 end
 
 -- drag and drop is disabled when the entity is being dragged or dropped. 
-function ItemLiveModel:CanDragDropEntity(entity)
-	return entity and entity.dropAnimTimer == nil and entity:GetCanDrag()
+function ItemLiveModel:CanDragDropEntity(entity, bCheckLinkParent)
+	return entity and entity.dropAnimTimer == nil and entity:GetCanDrag(bCheckLinkParent)
 end
 
-function ItemLiveModel:StartDraggingEntity(entity)
-	if(self.draggingEntity) then
-		self:DropDraggingEntity()
+function ItemLiveModel:StartDraggingEntity(entity, event)
+	local draggingEntity = self:GetDraggingEntity(event);
+	if(draggingEntity) then
+		self:DropDraggingEntity(draggingEntity, event)
 	end
-	self.draggingEntity = entity;
-
+	self:SetDraggingEntity(entity, event);
+	
 	if(GameLogic.GameMode:IsEditor()) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
 		local task = MyCompany.Aries.Game.Tasks.DragEntity:new({})
@@ -1383,7 +1581,7 @@ function ItemLiveModel:StartDraggingEntity(entity)
 	};
 	entity:BeginDrag();
 	entity:UnLink();
-			
+	entity.isHovering = nil;
 	entity.dragParams = dragParams;
 end
 
@@ -1466,6 +1664,18 @@ function ItemLiveModel:DropEntity(entity, callbackFunc)
 		end})
 		entity.dropAnimTimer:Change(30, 30)
 
+		if(self.isEntityAlwaysFacingCamera and entity:IsAutoTurningDuringDragging()) then
+			if(not facing and not dropLocation.mountFacing and not (entity.isHovering and entity.isHovering >= 2)) then
+				-- we will always face the camera, if auto facing is enabled and entity is not mounted or has wall facing. 
+				-- and it is not hovering at the drop location. 
+				facing = Direction.GetFacingFromCamera(nil, nil, nil, destX, destY, destZ) + math.pi
+				if(entity.GetYawOffset) then
+					facing = facing + entity:GetYawOffset();
+				end
+				facing = self:GetValidateFacing(facing, entity)
+			end
+		end
+
 		if(facing) then
 			entity:SetFacing(facing);
 		end
@@ -1504,26 +1714,25 @@ function ItemLiveModel:SendUserStats(entity, dragParams)
 	end
 end
 
-function ItemLiveModel:DropDraggingEntity(callbackFunc)
-	local entity = self.draggingEntity;
+function ItemLiveModel:DropDraggingEntity(draggingEntity, event, callbackFunc)
+	local entity = draggingEntity or self:GetDraggingEntity(event);
 	if(entity) then
 		local dragParams = entity.dragParams
 		if(dragParams) then
 			self:DropEntity(entity, callbackFunc)
 			entity.dragParams = nil;
 		end
-		self.draggingEntity = nil
+		self:SetDraggingEntity(nil, event);
 		self:SendUserStats(entity, dragParams)
 	end
 	Game.SelectionManager:SetEntityFilterFunction(nil)
 end
 
--- @param entity: if nil, the current dragging entity is used. 
-function ItemLiveModel:RestoreDraggingEntity(entity)
-	entity = entity or self.draggingEntity;
+function ItemLiveModel:RestoreDraggingEntity(event)
+	local entity = self:GetDraggingEntity(event);
 	if(entity and entity.dragParams) then
 		entity.dragParams.dropLocation = nil;
-		self:DropDraggingEntity()
+		self:DropDraggingEntity(entity, event)
 	end
 end
 
@@ -1567,20 +1776,71 @@ function ItemLiveModel:SpawnNewEntityModel(bx, by, bz, facing, serverdata)
 	return entity
 end
 
+--@return the cloned entity
+function ItemLiveModel:CloneDraggingEntityAndRestore(entity)
+	-- clone the dragging entity if ctrl key is pressed. 
+	if(entity and entity.dragParams) then
+		local old_x, old_y, old_z, old_facing;
+		local old_linkTo;
+			
+		old_x, old_y, old_z = unpack(entity.dragParams.pos);
+		old_facing = entity.dragParams.facing;
+		old_linkTo = entity.dragParams.linkTo;
+		-- restore old position
+		if(old_x) then
+			local entity = entity:CloneMe()
+			entity:SetPosition(old_x, old_y, old_z);
+			entity:SetFacing(old_facing);
+			if(old_linkTo) then
+				entity:LinkToEntityByName(old_linkTo)
+			end	
+			return entity;
+		end
+	end
+end
 
 function ItemLiveModel:mouseReleaseEvent(event)
-	local result, targetEntity = self:CheckMousePick()
+	if(event and event.touchSession and not event.touchSession:IsEnabled()) then
+		self:RestoreDraggingEntity(event)
+		return
+	end
+	local result, targetEntity = self:CheckMousePick(event)
 	
-	if(self.draggingEntity) then
-		self:DropDraggingEntity();
+	local draggingEntity = self:GetDraggingEntity(event);
+	if(draggingEntity) then
+		self:DropDraggingEntity(draggingEntity, event);
 		event:accept();
 	else
-		if(not event:IsCtrlKeysPressed() and event:isClick()) then
+		if(event.ctrl_pressed and event:isClick() and GameLogic.GameMode:IsEditor()) then
+			-- ctrl + left click to select block in edit mode
+			 if(event:button() == "left") then
+				Game.SelectionManager:SetEntityFilterFunction(nil)
+
+				local result = self:MousePickBlock(event)
+				if(result and result.blockX) then
+					local bx, by, bz = result.blockX, result.blockY, result.blockZ
+					if(result.entity) then
+						bx, by, bz = result.entity:GetBlockPos();
+					end
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+					local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+					if(SelectBlocks.GetCurrentInstance()) then
+						SelectBlocks.GetCurrentInstance().ExtendAABB(bx, by, bz)
+					else
+						local task = SelectBlocks:new({blockX = bx, blockY = by, blockZ = bz})
+						task:Run();
+					end
+					event:accept();
+				end
+			 end
+		elseif(not event.ctrl_pressed and event.shift_pressed and event:isClick()) then
+			-- Do nothing allow leaking to default context
+		elseif(not event.ctrl_pressed and event:isClick()) then
 			local normalTargetEntity;
 			if(GameLogic.GameMode:IsEditor() and event:button() == "right") then
-				-- just in case, we are right click to edit a non-pickable live entity model
+				-- just in case, we right click to edit a non-pickable live entity model
 				Game.SelectionManager:SetEntityFilterFunction(nil)
-				local result = self:MousePickBlock()
+				local result = self:MousePickBlock(event)
 				if(result) then
 					normalTargetEntity = result.entity
 				end
@@ -1606,9 +1866,9 @@ function ItemLiveModel:mouseReleaseEvent(event)
 					local entity = self:SpawnNewEntityModel(bx, by, bz)
 					if(entity) then
 						-- let it fall down: simulate a drag and drop at click point
-						self:StartDraggingEntity(entity)
-						self:UpdateDraggingEntity(entity, result, targetEntity)
-						self:DropDraggingEntity();
+						self:StartDraggingEntity(entity, event)
+						self:UpdateDraggingEntity(entity, result, targetEntity, event)
+						self:DropDraggingEntity(entity, event);
 						if(entity.dragTask) then
 							entity.dragTask:SetCreateMode()
 						end
@@ -1620,9 +1880,11 @@ function ItemLiveModel:mouseReleaseEvent(event)
 			end
 		end	
 	end
-	if(self.mousePressEntity) then
-		self.mousePressEntity = nil;
+	
+	if(self:GetMousePressEntity(event)) then
+		self:SetMousePressEntity(nil, event);
 		event:accept();
 	end
 	Game.SelectionManager:SetEntityFilterFunction(nil)
+	self:SetHoverEntity(nil, event);
 end

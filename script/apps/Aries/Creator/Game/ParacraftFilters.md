@@ -105,6 +105,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "OnClickCreateWorld"
   - "OnBeforeLoadWorld"
   - "OnWorldLoaded" when world is successfully loaded
+  - "OnWillUnloadWorld" before world unloaded
   - "OnWorldUnloaded" when world is unloaded
   - "shouldRefreshWorldFile" true, fullname: whether to refresh the world file. 
   - "cmd_loadworld", url, options: hook `/loadworld url` command

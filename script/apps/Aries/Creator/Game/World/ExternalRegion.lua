@@ -11,6 +11,9 @@ local region = ExternalRegion:new():Init("worlds/DesignHouse/lixizhi_main", 37, 
 region:Load();
 region:Save();
 region:SaveAs(nil, 37, 38)
+-- load existing if external does not exist
+local region = ExternalRegion:new():Init("worlds/DesignHouse/lixizhi_main", 37, 37, true)
+region:LoadIfExistOrCurrent();
 -----------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldFileProvider.lua");
@@ -24,7 +27,8 @@ function ExternalRegion:ctor()
 end
 
 -- @param worldpath: if nil, it will be current working directory
-function ExternalRegion:Init(worldpath, regionX, regionY)
+-- @param bDelayReplace: if true, we will delay replacing the existing region in the world, unless Load or Save is loaded. 
+function ExternalRegion:Init(worldpath, regionX, regionY, bDelayReplace)
 	local fileprovider = WorldFileProvider:new():Init(worldpath);
 	local baseDir = fileprovider:GetBlockWorldDirectory()
 	self.worldDir = fileprovider:GetWorldDirectory()
@@ -33,9 +37,18 @@ function ExternalRegion:Init(worldpath, regionX, regionY)
 	self.regionRawFilename = format("%s%d_%d.raw", baseDir, regionX, regionY)
 	self.regionEntityFilename = format("%s%d_%d.region.xml", baseDir, regionX, regionY)
 	self.regionContainer = EntityManager.GetRegionContainer(regionX*512, regionY*512)
-	self.regionContainer:SetExternalRegion(self)
-	self.regionContainer:SetRegionFileName(self.regionEntityFilename);
+	if(not bDelayReplace) then
+		self.regionContainer:SetExternalRegion(self)
+		self.regionContainer:SetRegionFileName(self.regionEntityFilename);
+	end
 	return self
+end
+
+function ExternalRegion:CheckReplaceRegion()
+	if(self.regionContainer and self.regionContainer:GetExternalRegion() ~= "self") then
+		self.regionContainer:SetExternalRegion(self)
+		self.regionContainer:SetRegionFileName(self.regionEntityFilename);
+	end
 end
 
 function ExternalRegion:GetWorldDirectory()
@@ -115,7 +128,25 @@ function ExternalRegion:PrepareSearchPath()
 	end
 end
 
+-- load external region if exist, otherwise load the current one. 
+function ExternalRegion:LoadIfExistOrCurrent()
+	if(ParaIO.DoesFileExist(self.regionRawFilename)) then
+		self:Load()
+		return true;
+	elseif(self.regionContainer) then
+		self.regionContainer:LoadRegion();
+	end
+end
+
+function ExternalRegion:DeleteRegionFile()
+	if(ParaIO.DoesFileExist(self.regionRawFilename)) then
+		ParaIO.DeleteFile(self.regionRawFilename)
+	end
+end
+
+
 function ExternalRegion:Load()
+	self:CheckReplaceRegion()
 	local attrRegion = self:GetRegionAttr(function(attrRegion)
 		self:ClearRegion()
 		self:PrepareSearchPath()
@@ -124,6 +155,10 @@ function ExternalRegion:Load()
 end
 
 function ExternalRegion:Save()
+	self:CheckReplaceRegion()
+	if(not ParaIO.DoesFileExist(self.regionRawFilename)) then
+		ParaIO.CreateDirectory(self.regionRawFilename)
+	end
 	local attrRegion = self:GetRegionAttr()
 	attrRegion:SetField("SaveToFile", self.regionRawFilename);
 	self.regionContainer:SaveToFile();
@@ -140,6 +175,7 @@ end
 -- @param worldpath: if nil, it will be current working directory
 function ExternalRegion:SaveAs(worldpath, regionX, regionY)
 	if(self.regionX ~= regionX or self.regionY ~= regionY or (worldpath and worldpath~=GameLogic.GetWorldDirectory())) then
+		self:CheckReplaceRegion()
 		local fileprovider = WorldFileProvider:new():Init(worldpath);
 		local baseDir = fileprovider:GetBlockWorldDirectory()
 		local worldDir = fileprovider:GetWorldDirectory()

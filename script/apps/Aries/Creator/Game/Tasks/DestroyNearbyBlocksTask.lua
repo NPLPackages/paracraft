@@ -21,6 +21,7 @@ local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local block = commonlib.gettable("MyCompany.Aries.Game.block")
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
 
@@ -70,11 +71,20 @@ function DestroyNearbyBlocks:Run()
 		end
 		self.destroy_blocks = destroy_blocks;
 	end
-
+	
 	if(#(self.destroy_blocks) > 0)then
 		self.start_time = commonlib.TimerManager.GetCurrentTime();
 		TaskManager.AddTask(self);
 		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",self.destroy_blocks)
+	end
+	if(self.liveEntities and #(self.liveEntities) > 0) then
+		-- TODO: save to history to support undo/redo
+		for _, entityNode in ipairs(self.liveEntities) do
+			local entity = EntityManager.GetEntity(entityNode.attr.name)
+			if(entity) then
+				entity:Destroy();
+			end
+		end
 	end
 end
 

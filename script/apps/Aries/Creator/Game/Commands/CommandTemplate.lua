@@ -464,3 +464,50 @@ Commands["exportgltf"] = {
 	end,
 };
 
+
+Commands["copy"] = {
+	name="copy", 
+	quick_ref="/copy", 
+	desc=[[copy the current selection to clipboad, as if Ctrl+C is pressed. 
+e.g.
+/copy
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+		local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+		if(SelectBlocks.GetCurrentInstance()) then
+			SelectBlocks.GetCurrentInstance():CopyBlocks();
+		end
+	end,
+};
+
+Commands["paste"] = {
+	name="paste", 
+	quick_ref="/paste [-offset] x y z", 
+	desc=[[paste the current selection to destination, as if Ctrl+V is pressed but at given precise location. 
+e.g.
+/paste -offset 512 0 512
+/paste 
+/paste 19200 5 19200
+/paste ~2 ~ ~
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text, true);
+		local x, y, z, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);	
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+		local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+		
+		if(options.offset and x) then
+			local pivot = SelectBlocks:GetPivotInClipboard()
+			if(pivot[1]) then
+				x = x + pivot[1]
+				y = y + pivot[2]
+				z = z + pivot[3]
+			else
+				return
+			end
+		end
+		SelectBlocks.PasteFromClipboard(x, y, z);
+	end,
+};

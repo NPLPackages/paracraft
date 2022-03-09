@@ -73,6 +73,17 @@ function Macros.SetAutoPlay(bAutoPlay)
 	isAutoPlay = bAutoPlay
 end
 
+--碰到text字幕是否暂停宏示教播放
+local isTextManualPlay = false
+
+function Macros.IsTextManualPlay()
+	return isTextManualPlay
+end
+
+function Macros.SetTextManualPlay(bManualPlay)
+	isTextManualPlay = bManualPlay
+end
+
 local blockOrigin = {0,0,0};
 
 function Macros.SetMacroOrigin(x, y, z)

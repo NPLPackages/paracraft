@@ -54,9 +54,17 @@ function ParaLifeSelectRole.ShowView(curItem,OnCloseFunc)
 end
 
 function ParaLifeSelectRole.InitPageData()
-    if ParaLifeSelectRole.roleDt and #ParaLifeSelectRole.roleDt == 0 then
-        ParaLifeSelectRole.roleDt[#ParaLifeSelectRole.roleDt + 1] = commonlib.copy(add_data)
+    ParaLifeSelectRole.roleDt = {}
+    local playerDt = ParaLifeSelectRole.GetPlayerData()
+    ParaLifeSelectRole.roleDt[#ParaLifeSelectRole.roleDt + 1] = playerDt
+    local movieData = ParaLifeSelectRole.GetMoviePlayerData()
+    for i=1,#movieData do
+        ParaLifeSelectRole.roleDt[#ParaLifeSelectRole.roleDt + 1] = movieData[i]
     end
+    -- if ParaLifeSelectRole.roleDt and #ParaLifeSelectRole.roleDt == 0 then
+    --     ParaLifeSelectRole.roleDt[#ParaLifeSelectRole.roleDt + 1] = commonlib.copy(add_data)
+    -- end
+    ParaLifeSelectRole.roleDt[#ParaLifeSelectRole.roleDt + 1] = commonlib.copy(add_data)
     ParaLifeSelectRole.select_index = 1
 end
 
@@ -79,7 +87,7 @@ function ParaLifeSelectRole.AddBlankData()
     params.skin = default_skin
     params.assetfile = default_model
     RolePlayMovieController.AddRoleToEntity(params)
-    table.insert( ParaLifeSelectRole.roleDt, role_num, curData)
+    table.insert(ParaLifeSelectRole.roleDt, role_num, curData)
 end
 
 function ParaLifeSelectRole.SelectCurRole(index)
@@ -103,6 +111,7 @@ function ParaLifeSelectRole.DeleteCurRole(index)
         local slot_index = cur_role.slot_index
         table.remove(ParaLifeSelectRole.roleDt, index)
         RolePlayMovieController.RemoveSlotItem(slot_index)
+        print("delete movie role=============",slot_index)
         ParaLifeSelectRole.RefreshPage()
     end
 end
@@ -183,12 +192,42 @@ function ParaLifeSelectRole.CheckIsSetSkin(index)
     return false
 end
 
+function ParaLifeSelectRole.CheckIsMainPlayer()
+    local data = ParaLifeSelectRole.roleDt[ParaLifeSelectRole.select_index]
+    if data and (data.isMainPlayer or data.slot_index == -1)  then
+        return true
+    end
+    return false
+end
+
 function ParaLifeSelectRole.GetSkinPicture(index)
     local data = ParaLifeSelectRole.roleDt[tonumber(index)]
     if data and data.skin~="" and data.model~="" then
         return string.gsub(ModelTextureAtlas:CreateGetModel(data.model, data.skin),";","#")
     end
     return ""
+end
+
+function ParaLifeSelectRole.GetPlayerData()
+    local player = GameLogic.GetPlayer()
+    local skin = player:GetSkinId()
+    local modelFile = player:GetMainAssetPath()
+    return {model = modelFile,skin = skin,isMainPlayer = true,slot_index = -1}
+end
+
+function ParaLifeSelectRole.GetMoviePlayerData()
+    local movieDatas = RolePlayMovieController.GetalExistsRoleData()
+    if movieDatas and #movieDatas > 0 then
+        local allData = {}
+        for i=1,#movieDatas do
+            local temp = {}
+            temp.model = movieDatas[i].assetfile
+            temp.skin = movieDatas[i].skin
+            temp.slot_index = movieDatas[i].slot_index
+            allData[#allData +1] = temp
+        end
+        return allData
+    end
 end
 
 function ParaLifeSelectRole.IsAddItems(index)

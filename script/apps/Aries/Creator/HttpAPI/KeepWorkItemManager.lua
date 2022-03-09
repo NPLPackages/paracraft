@@ -58,6 +58,7 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkAPI.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local Keepwork = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
+local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
 
 local KeepWorkItemManager = NPL.export()
 
@@ -154,6 +155,7 @@ function KeepWorkItemManager.OnKeepWorkLogout_Callback(res)
     Keepwork:OnLogout();  -- 用户登录成功 数据准备就绪
 
     KeepWorkItemManager.Clear();
+    UserPermission.ClearUserRoles()
     return res;
 end
 
@@ -412,6 +414,10 @@ function KeepWorkItemManager.Load(bForced, callback)
         end            
         return
     end
+
+    -- 获取用户角色信息
+    UserPermission.LoadUserRoles()
+
     KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载GlobalStore");
     KeepWorkItemManager.LoadGlobalStore(false, function()
         KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载ExtendedCost");

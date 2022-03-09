@@ -159,5 +159,27 @@ end
 function Command:Redo()
 end
 
+-- we will add cmd to the batched command list, batched commands are always undo/redo together. 
+function Command:AddBatchCommand(cmd)
+	if(cmd) then
+		self.batchedList = self.batchedList or {}
+		self.batchedList[cmd] = true;
+		self.batchedList[self] = true;
+		cmd.batchedList = self.batchedList;
+	end
+end
+
+-- @param cmd: if nil, we will return if the current command contains any batched command. 
+-- return true if we have a batch commmand of cmd. 
+function Command:HasBatchCommand(cmd)
+	if(self.batchedList) then
+		if(cmd) then
+			return self.batchedList[cmd]
+		end
+		return true;
+	end
+end
+
+
 
 

@@ -14,29 +14,31 @@ local LanQiaoBeiPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Race/L
 local GeneralPage = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua")
 local page
 RacePage.ItemData = {
-	-- {
-	-- 	time = "2021年7月15日-2022年08月30日",
-	-- 	signUpBtnInfo = {tooltip = "报名截止时间：2021年11月15日",endDay = "2021-11-15",endTime ="23:59:59"},
-	-- 	timeRule = {
-	-- 		startDay="2021-07-15",
-	-- 		startTime="00:00:00",
-	-- 		endDay="2022-08-30",
-	-- 		endTime="23:59:59"
-	-- 	},
-	-- 	race="“神通杯” 第一届全国学校联盟中小学计算机编程大赛",
-	-- 	content="大赛包含小学组图形化编程和中学组Python编程两个项目，比赛形式为理论知识（理论答题）+技能成果（作品创作）两项。大赛作品创作环节设有三大竞赛主题，分别为“编程与学科学习”、“人工智能创作”、“编程与未来生活”，同学们可创作3D动画或编程作品。例如将课本上的任意知识创作成动画，用动画或编程展示人类的未来生活等等。&#10备赛推荐课程：《盖世英雄》《长征》《孙子兵法》《征程》等系列主题课程。",
-	-- 	ListData = {
-	-- 		{name = "赛事章程",node_name = "constitution",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/constitution_32bits.png#0 0 99 98);"></div>]]},
-	-- 		{name = "课程安排",node_name = "arrange",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/course_32bits.png#0 0 99 98);"></div>]]},
-	-- 		{name = "赛事资质",node_name = "certificate",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/qualification_32bits.png#0 0 99 98);"></div>]]}
-	-- 	},
-	-- 	leftTopBtnInfo = {btnText = "集训报名"},
-	-- 	enterPage = {
-	-- 		{name = "进入集训营", node_name = "enter_train_world", worldId = 72945}
-	-- 	},
-	-- 	name = "shen_tong_bei"
-	-- },
+	{	
+		visible = false,
+		time = "2021年7月15日-2022年08月30日",
+		signUpBtnInfo = {tooltip = "报名截止时间：2021年11月15日",endDay = "2021-11-15",endTime ="23:59:59"},
+		timeRule = {
+			startDay="2021-07-15",
+			startTime="00:00:00",
+			endDay="2022-08-30",
+			endTime="23:59:59"
+		},
+		race="“神通杯” 第一届全国学校联盟中小学计算机编程大赛",
+		content="大赛包含小学组图形化编程和中学组Python编程两个项目，比赛形式为理论知识（理论答题）+技能成果（作品创作）两项。大赛作品创作环节设有三大竞赛主题，分别为“编程与学科学习”、“人工智能创作”、“编程与未来生活”，同学们可创作3D动画或编程作品。例如将课本上的任意知识创作成动画，用动画或编程展示人类的未来生活等等。&#10备赛推荐课程：《盖世英雄》《长征》《孙子兵法》《征程》等系列主题课程。",
+		ListData = {
+			{name = "赛事章程",node_name = "constitution",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/constitution_32bits.png#0 0 99 98);"></div>]]},
+			{name = "课程安排",node_name = "arrange",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/course_32bits.png#0 0 99 98);"></div>]]},
+			{name = "赛事资质",node_name = "certificate",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/qualification_32bits.png#0 0 99 98);"></div>]]}
+		},
+		leftTopBtnInfo = {btnText = "集训报名"},
+		enterPage = {
+			{name = "进入集训营", node_name = "enter_train_world", worldId = 72945}
+		},
+		name = "shen_tong_bei"
+	},
 	{
+		visible = true,
 		time = "2021年9月10日-2022年5月",
 		signUpBtnInfo = {tooltip = "报名截止时间：2022年3月",endDay = "2022-2-28",endTime ="23:59:59"},
 		timeRule = {
@@ -56,6 +58,7 @@ RacePage.ItemData = {
 		name = "lan_qiao_bei"
 	},
 	{
+		visible = true,
 		time = "2021年8月15日-2022年8月31日",
 		signUpBtnInfo = {tooltip = "提交截止时间：2022年8月31日",endDay = "2022-8-31",endTime ="23:59:59"},
 		timeRule = {
@@ -75,6 +78,7 @@ RacePage.ItemData = {
 		name = "zhong_guo_gu_shi"
 	},
 	{
+		visible = true,
 		time = "2021年8月-2022年12月",
 		signUpBtnInfo = {tooltip = "",endDay = "",endTime =""},
 		timeRule = {
@@ -87,13 +91,14 @@ RacePage.ItemData = {
 		content="大赛包含青少年科技创新成果竞赛、科技辅导员科技教育创新成果竞赛、青少年科技实践活动比赛、青少年科技创意比赛、少年儿童科学幻想绘画比赛五项赛事。可以以帕拉卡为研究基础申报青少年科技创新成果竞赛、科技辅导员科技教育创新成果竞赛、青少年科技创意比赛三项赛事。申报材料需包含项目说明文档及附件。更多申报要求可参考大赛官网。",
 		ListData = {
 		},
-		leftTopBtnInfo = {btnText = "大赛官网",url = "https://castic.cyscc.org/index.aspx"},
+		leftTopBtnInfo = {btnText = "大赛官网",url = L"https://castic.cyscc.org/index.aspx"},
 		enterPage = {
 			{name = "大赛官网", node_name = "enter_kjcxds_Official_web", url = L"https://castic.cyscc.org/index.aspx"}
 		},
 		name = "ke_ji_da_sai"
 	},
 	{
+		visible = true,
 		time = "2021年8月 -2022年12月",
 		signUpBtnInfo = {tooltip = "",endDay = "",endTime =""},
 		timeRule = {
@@ -107,13 +112,39 @@ RacePage.ItemData = {
 		ListData = {
 			{name = "往届作品",node_name = "previous_works",url = L"https://v.qq.com/x/page/v090720dwvn.html",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/common/tu2_98X98_32bits.png#0 0 98 98);"></div>]]}
 		},
-		leftTopBtnInfo = {btnText = "大赛官网",url = "https://yxj.cyscc.org/"},
+		leftTopBtnInfo = {btnText = "大赛官网",url = L"https://yxj.cyscc.org/"},
 		enterPage = {
 			{name = "大赛官网", node_name = "enter_yxj_Official_web", url = L"https://yxj.cyscc.org/ "}
 		},
 		name = "ke_xue_ying_xiang_jie"
+	},
+	{
+		visible = true,
+		time = "2022年4月10日-2022年5月10日",
+		signUpBtnInfo = {tooltip = "报名截止时间：2022年5月10日",endDay = "2022-5-10",endTime ="23:59:59"},
+		timeRule = {
+			startDay="2022-04-10",
+			startTime="00:00:00",
+			endDay="2022-05-10",
+			endTime="23:59:59"
+		},
+		race="第二十三届全国中小学生电脑制作活动",
+		content="全国学生信息素养提升实践活动（全国中小学电脑制作活动）由中央电化教育馆主办，旨在促进中国基础教育信息化应用、展示中小学生信息技术实践成果的全国性展示交流活动。活动设置有数字创作、计算思维、科创实践三大类内容，同学们可以使用帕拉卡创作作品报送参加数字创作中的微视频/微动画类别，以及计算思维中的创意编程类别。",
+		ListData = {},
+		leftTopBtnInfo = {btnText = "大赛报名",url = L"http://www.huodong2000.com.cn/files/20210903/%E9%99%84%E4%BB%B6%EF%BC%9A%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%89%E5%B1%8A%E5%85%A8%E5%9B%BD%E5%AD%A6%E7%94%9F%E4%BF%A1%E6%81%AF%E7%B4%A0%E5%85%BB%E6%8F%90%E5%8D%87%E5%AE%9E%E8%B7%B5%E6%B4%BB%E5%8A%A8%E6%8C%87%E5%8D%97.pdf"},
+		enterPage = {
+			{name = "大赛官网", node_name = "enter_zxxdnzzhd_Official_web", url = L"http://www.huodong2000.com.cn/index.html#"}
+		},
+		name = "zhong_xiao_xue_dian_nao_zhi_zuo_huo_dong"
 	}
 }
+
+RacePage.Datas = {}
+for key, value in pairs(RacePage.ItemData) do
+	if value.visible then
+		table.insert(RacePage.Datas,value)
+	end
+end
 
 function RacePage.OnInit()
 	page = document:GetPageCtrl()
@@ -157,7 +188,7 @@ end
 
 function  RacePage.CheckRaceEnd()
 	local server_time = RacePage.GetServerTime()
-	local itemData = RacePage.ItemData[RacePage.index]
+	local itemData = RacePage.Datas[RacePage.index]
 	local start_date_timestamp = RacePage.getTimeStamp(itemData.timeRule.startDay,itemData.timeRule.startTime)
 
 	local end_date_timestamp = RacePage.getTimeStamp(itemData.timeRule.endDay,itemData.timeRule.endTime)
@@ -166,7 +197,7 @@ function  RacePage.CheckRaceEnd()
 end
 
 function RacePage.CheckSignUpEndTime()
-	local itemData = RacePage.ItemData[RacePage.index]
+	local itemData = RacePage.Datas[RacePage.index]
 	if itemData.signUpBtnInfo.endDay ~= nil and itemData.signUpBtnInfo.endDay ~= "" then
 		local server_time = RacePage.GetServerTime()
 		local end_date_timestamp = RacePage.getTimeStamp(itemData.signUpBtnInfo.endDay,itemData.signUpBtnInfo.endTime)
@@ -191,7 +222,7 @@ function RacePage.ShowRaceDownTime()
 	if isEnd then
 		page:SetValue("down_time_text", "已结束")
 	else
-		local itemData = RacePage.ItemData[RacePage.index]
+		local itemData = RacePage.Datas[RacePage.index]
 		local server_time = RacePage.GetServerTime()
 		local end_date_timestamp = RacePage.getTimeStamp(itemData.timeRule.endDay,itemData.timeRule.endTime)
 		local remained_sec = end_date_timestamp - server_time
@@ -239,15 +270,19 @@ function RacePage.ClickCompetition()
         LanQiaoBeiPage.Show()
 	elseif RacePage.selectName == "zhong_guo_gu_shi"then
 		--讲好中国故事
-		local worldId = RacePage.ItemData[RacePage.index].leftTopBtnInfo.worldId
+		local worldId = RacePage.Datas[RacePage.index].leftTopBtnInfo.worldId
 		GameLogic.RunCommand(string.format("/loadworld -s -force %d", worldId))
 	elseif RacePage.selectName == "ke_ji_da_sai"then
 		--全国青少年科技创新大赛
-		local url = RacePage.ItemData[RacePage.index].leftTopBtnInfo.url
+		local url = RacePage.Datas[RacePage.index].leftTopBtnInfo.url
 		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	elseif  RacePage.selectName == "ke_xue_ying_xiang_jie" then
 		--全国青少年科学影像节
-		local url = RacePage.ItemData[RacePage.index].leftTopBtnInfo.url
+		local url = RacePage.Datas[RacePage.index].leftTopBtnInfo.url
+		ParaGlobal.ShellExecute("open", url, "", "", 1)
+	elseif  RacePage.selectName == "zhong_xiao_xue_dian_nao_zhi_zuo_huo_dong" then
+		--全国中小学生电脑制作活动
+		local url = RacePage.Datas[RacePage.index].leftTopBtnInfo.url
 		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	end
 end
@@ -264,7 +299,7 @@ end
 
 function RacePage.GetNameByIndex(index)
 	local name = ""
-	for k,v in pairs(RacePage.ItemData) do 
+	for k,v in pairs(RacePage.Datas) do 
 		if k == index then
 			name = v.name
 			break
@@ -275,7 +310,7 @@ end
 
 --[[ 右边大赛详情条目点击 ]]
 function RacePage.OnClickRaceItem(index)
-	local ListData = RacePage.ItemData[RacePage.index].ListData
+	local ListData = RacePage.Datas[RacePage.index].ListData
 	if ListData == nil then
 		return
 	end
@@ -299,13 +334,13 @@ end
 --[[ 大赛右下角点击进入]]
 function RacePage.OnEnterPage(name)
 	if name == "enter_train_world" then
-		local worldId = RacePage.ItemData[RacePage.index].enterPage[1].worldId
+		local worldId = RacePage.Datas[RacePage.index].enterPage[1].worldId
 		GameLogic.RunCommand(string.format("/loadworld -s -force %d", worldId))
 	elseif name == "enter_lqb_Official_web" then
 		LanQiaoBeiPage.SetSelectIndex(2)
 		LanQiaoBeiPage.Show()
 	else
-		local url = RacePage.ItemData[RacePage.index].enterPage[1].url
+		local url = RacePage.Datas[RacePage.index].enterPage[1].url
 		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	end
 end
@@ -320,7 +355,7 @@ end
 function RacePage.OnMouseEnter(tipUiName)
     local pNode = ParaUI.GetUIObject(tipUiName)
     if pNode then
-        local tooltip = RacePage.ItemData[RacePage.index].signUpBtnInfo.tooltip
+        local tooltip = RacePage.Datas[RacePage.index].signUpBtnInfo.tooltip
         pNode.visible = tooltip ~= nil and tooltip ~= ""
     end
 end

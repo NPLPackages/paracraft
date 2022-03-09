@@ -167,7 +167,9 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 
 		local att = ParaCamera.GetAttributeObject();
 
-		self.entity = EntityCamera:Create({x=x,y=y,z=z, item_id = block_types.names.TimeSeriesCamera});
+		self.entity = EntityCamera:Create({x=x,y=y,z=z, item_id = block_types.names.TimeSeriesCamera, 
+				sceneName = movieClip:GetScene(), -- tricky: we will assign scene name here. 
+			});
 		self.entity:SetPersistent(false);
 		self.entity:Attach();
 		return self;
@@ -403,11 +405,14 @@ function Actor:FrameMovePlaying(deltaTime)
 			self.isBehindLastFrame = isBehindLastFrame;
 		end
 		allow_user_control = (not self:IsPlayingMode() and isBehindLastFrame) and (not parent);
-		if( not allow_user_control ) then
-			ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
-			self:UpdateFPSView(curTime);
+		if(not entity:GetScene()) then
+			if( not allow_user_control ) then
+				ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
+				self:UpdateFPSView(curTime);
+			end
 		end
 		entity:SetCameraRoll(eye_roll or 0);
+		
 		if(isBehindLastFrame and not parent) then
 			return;
 		end
@@ -424,7 +429,6 @@ function Actor:FrameMovePlaying(deltaTime)
 		nx, ny, nz = mathlib.math3d.vec3Rotate(nx, ny, nz, 0, eye_rot_y or 0, 0)
 		obj:SetField("normal", {nx, ny, nz});
 	end
-	
 
 	if(not allow_user_control) then
 		local new_x, new_y, new_z = self:ComputePosition(curTime);
@@ -434,6 +438,16 @@ function Actor:FrameMovePlaying(deltaTime)
 			--LOG.std(nil, "debug", "ActorCamera", "x,y,z: %f %f %f", new_x, new_y, new_z);
 			--LOG.std(nil, "debug", "ActorCamera", "c pos: %f %f %f", ParaCamera.GetLookAtPos());
 		end
+	end
+
+	if(entity:GetScene()) then
+		if(not self.scene or not self.scene:IsValid()) then
+			self.scene = ParaScene.GetMiniSceneGraph(entity:GetScene());
+		end
+		local x, y, z = entity:GetPosition();
+		self.scene:CameraSetLookAtPos(x, y, z);
+		-- tricky: miniscene graph camera rotY needs to add math.pi/2 to match the 3d scene. 
+		self.scene:CameraSetEyePosByAngle(eye_rot_y + math.pi/2, eye_liftup, eye_dist);
 	end
 
 	local has_collision = self:GetValue("has_collision", curTime) or 1; 

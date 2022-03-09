@@ -18,17 +18,27 @@
                         return platform;
                     end
 
+                    function get_build_platform()
+                        return build_platform;
+                    end
+
                     -- ios
                     function ios()
-                        _guihelper.MessageBox(L"敬请期待");
+                        if (get_platform() ~= "mac") then
+                            _guihelper.MessageBox(L"请在mac平台下执行此操作");
 
-                        --[[GameLogic.IsVip("MakeApk", true, function(result) 
-                            if(result) then
+                            return;
+                        end
+
+                        GameLogic.IsVip("MakeApk", true, function(result) 
+                            if (result) then
                                 build_platform = "ios";
                                 page:SetValue("build_title", L"准备iOS开发环境");
+                                page:SetValue("one_click_button", L"一键生成");
+                                page:SetValue("step2_notice", get_build_folder());
                                 ios_exec();
                             end
-                        end);]]
+                        end);
                     end
 
                     function ios_exec()
@@ -37,14 +47,49 @@
 
                         step1Controller.visible = false;
                         step2Controller.visible = true;
+
+                        -- check step
+                        local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
+
+                        if (ParaIO.DoesFileExist(MakeApp.iOSBuildRoot .. "Boost") and
+                            ParaIO.DoesFileExist(MakeApp.iOSBuildRoot .. "NPLRuntime") and
+                            ParaIO.DoesFileExist(MakeApp.iOSBuildRoot .. "CMake.app") and
+                            ParaIO.DoesFileExist(MakeApp.iOSBuildRoot .. "build")) then
+
+                            local p_step1_content_controller = page:FindControl("p_step1_content");
+                            local p_step2_button_controller = page:FindControl("p_step2_button");
+
+                            p_step1_content_controller.visible = true;
+                            p_step2_button_controller.visible = true;
+
+                            if (ParaIO.DoesFileExist(MakeApp.iOSBuildRoot .. "NPLRuntime/NPLRuntime/Platform/iOS/assets/worlds/DesignHouse/" .. currentEnterWorld.foldername)) then
+                                page:SetValue("step3_content", "点击...打开工程");
+
+                                local p_step2_content_controller = page:FindControl("p_step2_content");
+                                local p_step3_button_controller = page:FindControl("p_step3_button");
+                                local p_step3_content_controller = page:FindControl("p_step3_content");
+
+                                p_step2_content_controller.visible = true;
+                                p_step3_button_controller.visible = true;
+                                p_step3_content_controller.visible = true;
+                                page:SetUIBackground("app_icon", get_app_icon());
+                            end
+                        end
                     end
 
                     -- android
                     function android()
+                        if (get_platform() ~= "win32") then
+                            _guihelper.MessageBox(L"请在windows平台下执行此操作");
+
+                            return;
+                        end
+
                         GameLogic.IsVip("MakeApk", true, function(result) 
                             if(result) then
                                 build_platform = "android";
                                 page:SetValue("build_title", L"准备安卓开发环境");
+                                page:SetValue("step2_notice", get_build_folder());
                                 android_exec();
                             end
                         end);
@@ -94,6 +139,7 @@
                                 end
 
                                 if (ParaIO.DoesFileExist(MakeApp.androidBuildRoot .. "paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk")) then
+                                    page:SetValue("step3_content", "paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk");
                                     local p_step3_content_controller = page:FindControl("p_step3_content");
 
                                     p_step3_content_controller.visible = true;
@@ -104,6 +150,12 @@
 
                     -- windows
                     function windows()
+                        if (get_platform() ~= "win32") then
+                            _guihelper.MessageBox(L"请在windows平台下执行此操作");
+
+                            return;
+                        end
+
                         local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
                         local task = MyCompany.Aries.Game.Tasks.MakeApp:new();
 
@@ -142,7 +194,21 @@
                                 end);
                             end);
                         elseif (build_platform == "ios") then
-                            
+                            MakeApp:iOSCheckENV(function(result)
+                                if (result) then
+                                    MakeApp:iOSBuildProject(function()
+                                        local p_step1_content_controller = page:FindControl("p_step1_content");
+                                        local p_step2_button_controller = page:FindControl("p_step2_button");
+
+                                        p_step1_content_controller.visible = true;
+                                        p_step2_button_controller.visible = true;
+
+                                        if (callback and type(callback) == "function") then
+                                            callback();
+                                        end
+                                    end);
+                                end
+                            end);
                         end
                     end
 
@@ -151,10 +217,30 @@
                         local p_step3_button_controller = page:FindControl("p_step3_button");
                         local copy_read_only_world = page:GetValue("copy_read_only_world");
                         local be_auto_update = page:GetValue("be_auto_update");
+                        local be_auto_update_world = page:GetValue("be_auto_update_world");
                         local login_enable = page:GetValue("login_enable");
 
-                        MakeApp:AndroidUpdateManifest(function()
-                            MakeApp:AndroidCopyWorld(
+                        if (build_platform == "android") then
+                            MakeApp:AndroidUpdateManifest(function()
+                                MakeApp:AndroidCopyWorld(
+                                    copy_read_only_world,
+                                    be_auto_update,
+                                    be_auto_update_world,
+                                    login_enable,
+                                    function()
+                                        p_step2_content_controller.visible = true;
+                                        p_step3_button_controller.visible = true;
+
+                                        page:SetUIBackground("app_icon", get_app_icon());
+
+                                        if (callback and type(callback) == "function") then
+                                            callback();
+                                        end
+                                    end
+                                )
+                            end)
+                        elseif (build_platform == "ios") then
+                            MakeApp:iOSCopyCurWorldToProject(
                                 copy_read_only_world,
                                 be_auto_update,
                                 login_enable,
@@ -168,17 +254,36 @@
                                         callback();
                                     end
                                 end
-                            )
+                            );
+                        end
+                    end
+
+                    function click_p_step3()
+                        p_step3(function()
+                            _guihelper.MessageBox(L"执行完成");
                         end)
                     end
 
-                    function p_step3()
-                        MakeApp:AndroidGenerateApk(function()
-                            MakeApp:AndroidSignApk(function()
+                    function p_step3(callback)
+                        if (get_build_platform() == "android") then
+                            MakeApp:AndroidGenerateApk(function()
+                                MakeApp:AndroidSignApk(function()
+                                    page:SetValue("step3_content", "paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk");
+                                    local p_step3_content_controller = page:FindControl("p_step3_content");
+                                    p_step3_content_controller.visible = true;
+                                end)
+                            end)
+                        elseif (get_build_platform() == "ios") then
+                            MakeApp:CopyIconToProject(function()
+                                page:SetValue("step3_content", "点击...打开工程");
                                 local p_step3_content_controller = page:FindControl("p_step3_content");
                                 p_step3_content_controller.visible = true;
-                            end)
-                        end)
+
+                                if (callback and type(callback) == "function") then
+                                    callback();
+                                end
+                            end);
+                        end
                     end
 
                     function one_click()
@@ -189,46 +294,61 @@
                         end);
                     end
 
-                    function open_paracraft_android_folder()
-                        local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
-                        local world_path = MakeApp.androidBuildRoot ..
-                                           "paracraft_android_ver" ..
-                                           MakeApp.curAndroidVersion ..
-                                           "/assets/worlds/DesignHouse/" ..
-                                           commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) ..
-                                           "/";
-                        local world_zip = MakeApp.androidBuildRoot ..
-                                          "paracraft_android_ver" ..
-                                          MakeApp.curAndroidVersion ..
-                                          "/assets/worlds/DesignHouse/" ..
-                                          commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) ..
-                                          ".zip";
+                    function open_build_world_folder()
+                        if (get_build_platform() == "android") then
+                            local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
+                            local world_path = MakeApp.androidBuildRoot ..
+                                            "paracraft_android_ver" ..
+                                            MakeApp.curAndroidVersion ..
+                                            "/assets/worlds/DesignHouse/" ..
+                                            commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) ..
+                                            "/";
+                            local world_zip = MakeApp.androidBuildRoot ..
+                                            "paracraft_android_ver" ..
+                                            MakeApp.curAndroidVersion ..
+                                            "/assets/worlds/DesignHouse/" ..
+                                            commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) ..
+                                            ".zip";
 
-                        if (ParaIO.DoesFileExist(world_path)) then
-                            System.App.Commands.Call("File.WinExplorer", world_path);
-                        else
-                            if (ParaIO.DoesFileExist(world_zip)) then
-                                System.App.Commands.Call(
-                                    "File.WinExplorer",
-                                    MakeApp.androidBuildRoot ..
-                                    "paracraft_android_ver" ..
-                                    MakeApp.curAndroidVersion ..
-                                    "/assets/worlds/DesignHouse/"
-                                );
+                            if (ParaIO.DoesFileExist(world_path)) then
+                                System.App.Commands.Call("File.WinExplorer", world_path);
+                            else
+                                if (ParaIO.DoesFileExist(world_zip)) then
+                                    System.App.Commands.Call(
+                                        "File.WinExplorer",
+                                        MakeApp.androidBuildRoot ..
+                                        "paracraft_android_ver" ..
+                                        MakeApp.curAndroidVersion ..
+                                        "/assets/worlds/DesignHouse/"
+                                    );
+                                end
                             end
+                        elseif (get_build_platform() == "ios") then
+                            local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
+                            local world_path = ParaIO.GetWritablePath() ..
+                                               MakeApp.iOSBuildRoot ..
+                                               "NPLRuntime/NPLRuntime/Platform/iOS/assets/worlds/DesignHouse/" ..
+                                               currentEnterWorld.foldername ..
+                                               "/";
+
+                            System.App.Commands.Call("File.WinExplorer", world_path);
                         end
                     end
 
                     function open_temp_folder()
-                        System.App.Commands.Call("File.WinExplorer", MakeApp.androidBuildRoot);
+                        if (get_build_platform() == "ios") then
+                            MakeApp:iOSOpenProject();
+                        elseif (get_build_platform() == "android") then
+                            System.App.Commands.Call("File.WinExplorer", MakeApp.androidBuildRoot);
+                        end
                     end
 
                     function get_build_folder()
-                        return MakeApp.androidBuildRoot .. "paracraft_android_ver" .. MakeApp.curAndroidVersion .. "/";
-                    end
-
-                    function get_apk_name()
-                        return "paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk";
+                        if (get_build_platform() == "ios") then
+                            return MakeApp.iOSBuildRoot .. "build/";
+                        elseif (get_build_platform() == "android") then
+                            return MakeApp.androidBuildRoot .. "paracraft_android_ver" .. MakeApp.curAndroidVersion .. "/";
+                        end
                     end
 
                     function need_updated()
@@ -244,10 +364,33 @@
                         return format(L"(有更新ver%s)", MakeApp.curAndroidVersion);
                     end
 
+                    function GetIconPath()
+                        if (get_build_platform() == "android") then
+                            local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
+                            local world_path = currentEnterWorld.worldpath;
+                            local icon_path = world_path .. "icon.png";
+                            
+                            return icon_path
+                        elseif (get_build_platform() == "ios") then
+                            local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
+                            local world_path = MakeApp.iOSBuildRoot ..
+                                               "NPLRuntime/NPLRuntime/Platform/iOS/assets/worlds/DesignHouse/" ..
+                                               currentEnterWorld.foldername ..
+                                               "/";
+                            local icon_path = world_path .. "icon.png";
+                            
+                            return icon_path
+                        end
+                    end
+
+                    function OnClickOpenIconFolder()
+                        local icon_path = GetIconPath():gsub("[^/\\]+$", "")
+                        ParaIO.CreateDirectory(icon_path)
+                        System.App.Commands.Call("File.WinExplorer", icon_path);
+                    end
+
                     function get_app_icon()
-                        local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
-                        local world_path = MakeApp.androidBuildRoot .. "paracraft_android_ver" .. MakeApp.curAndroidVersion .. "/assets/worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
-                        local icon_path = world_path .. "icon.png";
+                        local icon_path = GetIconPath()
 
                         if (ParaIO.DoesFileExist(icon_path)) then
                             return icon_path;
@@ -262,15 +405,15 @@
                 visible="true"
                 style="position: relative;
                        background:;">
-                <kp:window width="500"
-                           height="350"
+                <kp:window width="600"
+                           height="450"
                            title="<%= L'请选择' %>"
                            onclose="close()">
                     <div style="height: 40px;"></div>
                     <div style="padding: 15px;">
                         <div style="font-size: 18px;
                                     base-font-size: 18px;
-                                    margin-bottom: 20px;">
+                                    margin-bottom: 60px;">
                             <div>
                                 <%= format(L"准备发布世界《%s》", get_world_name()) %>
                             </div>
@@ -278,64 +421,56 @@
                                 <%= L"请选择你要发布的平台" %>
                             </div>
                         </div>
-                        <pe:if condition="<%= get_platform() == 'win32' %>">
-                            <div style="text-align: center;
-                                        font-size: 18px;
-                                        base-font-size: 18px;">
-                                <div style="float: left;
-                                            width: 235px;">
-                                    <div style="width: 112px;
-                                                height:128px;
-                                                margin-bottom: 8px;"
-                                         align="center">
-                                        <input type="button"
-                                               onclick="android()"
-                                               style="width: 112px;
-                                                      height: 128px;
-                                                      background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#13 9 112 128)" />
-                                    </div>
-                                    <div style="margin-bottom: 4px;">Android</div>
-                                    <div style="color: #515151"><%= L"APK文件" %></div>
+                        <div style="text-align: center;
+                                    font-size: 18px;
+                                    base-font-size: 18px;">
+                            <div style="float: left;
+                                        width: 190px;">
+                                <div style="width: 112px;
+                                            height:128px;
+                                            margin-bottom: 8px;"
+                                            align="center">
+                                    <input type="button"
+                                            onclick="android()"
+                                            style="width: 112px;
+                                                    height: 128px;
+                                                    background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#13 9 112 128)" />
                                 </div>
-                                <div style="float: left;
-                                            width: 235px;">
-                                    <div style="width: 105px;
-                                                height:128px;
-                                                margin-bottom: 8px;"
-                                         align="center">
-                                        <input type="button"
-                                               onclick="windows()"
-                                               style="width: 105px;
-                                                      height: 106px;
-                                                      margin-top: 11px;
-                                                      background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 23 105 106)" />
-                                    </div>
-                                    <div style="margin-bottom: 4px;">Windows</div>
-                                    <div style="color: #515151"><%= L"EXE文件" %></div>
-                                </div>
+                                <div style="margin-bottom: 4px;">Android</div>
+                                <div style="color: #515151"><%= L"APK文件" %></div>
                             </div>
-                        </pe:if>
-                        <pe:if condition="<%= get_platform() == 'mac' %>">
-                            <div style="text-align: center;
-                                        font-size: 18px;
-                                        base-font-size: 18px;">
-                                <div style="width: 235px;"
-                                     align="center">
-                                    <div style="width: 112px;
-                                                height:128px;
-                                                margin-bottom: 8px;"
-                                         align="center">
-                                        <input type="button"
-                                               onclick="ios()"
-                                               style="width: 112px;
-                                                      height: 128px;
-                                                      background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#13 9 112 128)" />
-                                    </div>
-                                    <div style="margin-bottom: 4px;">iOS</div>
-                                    <div style="color: #515151"><%= L"iOS工程" %></div>
+                            <div style="float: left;
+                                        width: 190px;">
+                                <div style="width: 105px;
+                                            height:128px;
+                                            margin-bottom: 8px;"
+                                            align="center">
+                                    <input type="button"
+                                           onclick="windows()"
+                                           style="width: 105px;
+                                                  height: 106px;
+                                                  margin-top: 11px;
+                                                  background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 23 105 106)" />
                                 </div>
+                                <div style="margin-bottom: 4px;">Windows</div>
+                                <div style="color: #515151"><%= L"EXE文件" %></div>
                             </div>
-                        </pe:if>
+                            <div style="float: left;
+                                        width: 190px;">
+                                <div style="width: 128px;
+                                            height:128px;
+                                            margin-bottom: 8px;"
+                                            align="center">
+                                    <input type="button"
+                                           onclick="ios()"
+                                           style="width: 128px;
+                                                  height: 128px;
+                                                  background: url(Texture/Aries/Creator/paracraft/apple_32bits.png#0 0 256 256)" />
+                                </div>
+                                <div style="margin-bottom: 4px;">iOS</div>
+                                <div style="color: #515151"><%= L"iOS工程" %></div>
+                            </div>
+                        </div>
                     </div>
                 </kp:window>
             </pe:container>
@@ -343,8 +478,8 @@
                           visible="false"
                           style="position: relative;
                                  background:;" >
-                <kp:window width="500"
-                           height="470"
+                <kp:window width="600"
+                           height="500"
                            title="<%= L'生成独立应用程序' %>"
                            onclose="close()">
                     <div style="height: 40px;"></div>
@@ -412,6 +547,13 @@
                                         <%= L"只读世界" %>
                                     </div>
                                     <div>
+                                        <input name="be_auto_update_world"
+                                               type="checkbox"
+                                               style="margin-top: 3px;"
+                                               checked="false" />
+                                        <%= L"自动更新世界" %>
+                                    </div>
+                                    <div>
                                         <input name="be_auto_update"
                                                type="checkbox"
                                                style="margin-top: 3px;"
@@ -439,19 +581,20 @@
                                          src="Texture/Aries/Creator/paracraft/make_app_32bits.png#10 148 63 52" />
                                 </div>
                                 <div style="float: left;
-                                            font-size: 14px;
-                                            base-font-size: 14px;
-                                            line-height: 36px;
                                             margin-left: 6px;"
                                      tooltip="<%= get_notice() %>">
-                                    <%= get_build_folder() %>
+                                    <label name="step2_notice"
+                                           style="height: 24px;
+                                                  width: 300px;
+                                                  font-size: 14px;
+                                                  base-font-size: 14px;" />
                                 </div>
                                 <div style="float: left;">
                                     <input type="button"
                                            class="mc_button_blue"
-                                           onclick="open_paracraft_android_folder()"
+                                           onclick="open_build_world_folder()"
                                            style="color: #FFFFFF;
-                                                  margin-top: 10px;
+                                                  margin-top: 0px;
                                                   margin-left: 6px;"
                                            value="..."
                                            tooltip="<%= get_notice() %>" />
@@ -464,8 +607,8 @@
                             <div style="padding-left: 30px;
                                         margin-bottom: 5px;">
                                 <input type="button"
-                                       tooltip="<%= '点击执行：签名生成APK' %>"
-                                       onclick="p_step3()"
+                                       tooltip="<%= '点击执行：签名生成APK或Xcode工程' %>"
+                                       onclick="click_p_step3()"
                                        style="width: 55px;
                                               height: 60.5px;
                                               background: url(Texture/Aries/Creator/paracraft/make_app_32bits.png#137 132 110 121)" />
@@ -473,7 +616,8 @@
                                             margin-left:5px;">
                                     <input type="button"
                                            name="app_icon"
-                                           tooltip="<%= '自动读取世界目录下的icon.png作为应用图标' %>"
+                                           tooltip="<%= '自动读取世界目录下的icon.png作为应用图标, 点击打开打包用的世界目录添加Icon' %>"
+                                           onclick="OnClickOpenIconFolder"
                                            style="width: 64px;
                                                   height: 64px;" />
                                 </div>
@@ -489,18 +633,19 @@
                                          src="Texture/Aries/Creator/paracraft/make_app_32bits.png#10 148 63 52" />
                                 </div>
                                 <div style="float: left;
-                                            font-size: 18px;
-                                            base-font-size: 18px;
-                                            line-height: 36px;
+                                            font-size: 14px;
+                                            base-font-size: 14px;
+                                            width: 300px;
                                             margin-left: 6px;">
-                                    <%= get_apk_name() %>
+                                    <label name="step3_content"
+                                           style="height: 24px;" />
                                 </div>
                                 <div style="float: left;">
                                     <input type="button"
                                            class="mc_button_blue"
                                            onclick="open_temp_folder()"
                                            style="color: #FFFFFF;
-                                                  margin-top: 10px;
+                                                  margin-top: 0px;
                                                   margin-left: 6px;"
                                            value="..." />
                                 </div>
@@ -508,12 +653,13 @@
                         </pe:container>
                         <div style="width: 100px;"
                              align="right">
-                            <input type="button"
-                                   style="width: 100px;
-                                          height: 30px;"
-                                   class="mc_button_blue"
-                                   onclick="one_click()"
-                                   value="<%= L'一键打包' %>" />
+                             <input type="button"
+                                    name="one_click_button"
+                                    style="width: 100px;
+                                           height: 30px;"
+                                    class="mc_button_blue"
+                                    onclick="one_click()"
+                                    value="<%= L'一键打包' %>" />
                         </div>
                     </div>
                 </kp:window>

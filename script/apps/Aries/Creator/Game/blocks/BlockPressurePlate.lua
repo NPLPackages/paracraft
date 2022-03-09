@@ -69,7 +69,7 @@ end
 -- Returns the current state of the pressure plate. Returns a value between 0 and 15 based on the number of items on it.
 -- @return states, the trigger entity
 function block:getPlateState(x,y,z)
-    local entities = EntityManager.GetEntitiesInBlock(x,y,z);;
+    local entities = EntityManager.GetEntitiesInBlock(x,y,z);
 
     if (entities and next(entities)) then
 		for entity, _ in pairs(entities) do

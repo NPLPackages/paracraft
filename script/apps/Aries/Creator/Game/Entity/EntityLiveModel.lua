@@ -62,6 +62,7 @@ Entity:Property({"isMountpointDetached", false});
 Entity:Property({"bIsAutoTurning", nil, "IsAutoTurningDuringDragging", "SetAutoTurningDuringDragging"});
 Entity:Property({"isStackable", nil, "IsStackable", "SetIsStackable"});
 Entity:Property({"stackHeight", 0.2, "GetStackHeight", "SetStackHeight"});
+Entity:Property({"dragDisplayOffsetY", nil, "GetDragDisplayOffsetY", "SetDragDisplayOffsetY", auto=true});
 Entity:Property({"canDrag", nil, "GetCanDrag", "SetCanDrag"});
 -- TODO: if the object can only be dragged along the given axis.
 Entity:Property({"dragDirection", nil, "GetDragDirection", "SetDragDirection"});
@@ -84,6 +85,8 @@ Entity:Signal("assetfileChanged");
 Entity.default_file = "character/common/headquest/headquest.x";
 -- persistent object by default. 
 Entity.is_persistent = true;
+-- always serialize to 512*512 regional entity file
+Entity.is_regional = true;
 -- whether this entity can be synchronized on the network by EntityTrackerEntry. 
 Entity.isServerEntity = true;
 -- class name
@@ -118,7 +121,14 @@ function Entity:init()
 	if(not Entity._super.init(self)) then
 		return
 	end
-	if(not self.name) then
+	if(self.name) then
+		if(EntityManager.GetEntity(self.name) ~= nil) then
+			-- this should never happen, just incase it happens. 
+			local lastName = self.name;
+			self.name = ParaGlobal.GenerateUniqueID()
+			LOG.std(nil, "warn", "EntityLiveModel", "duplicated entity name discovered, we will auto rename from %s to %s", lastName, self.name)
+		end
+	else
 		self.name = ParaGlobal.GenerateUniqueID()
 		-- no need to append filename to auto-generated names
 --		if(self.filename) then
@@ -396,10 +406,17 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.stackHeight) then
 			self.stackHeight = tonumber(attr.stackHeight);
 		end
+		if(attr.dragDisplayOffsetY) then
+			self.dragDisplayOffsetY = tonumber(attr.dragDisplayOffsetY);
+		end
 		if(attr.bIsAutoTurning) then
 			self.bIsAutoTurning = (attr.bIsAutoTurning == "true") or (attr.bIsAutoTurning == true);
 		end
 		self.isDisplayModel = (attr.isDisplayModel ~= "false") and (attr.isDisplayModel ~= false);
+		
+		if(attr.opacity) then
+			self.opacity = tonumber(attr.opacity)
+		end
 		
 		if(attr.canDrag) then
 			self.canDrag = (attr.canDrag == "true") or (attr.canDrag == true);
@@ -530,11 +547,14 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	attr.canDrag = self.canDrag;
 	attr.stackHeight = self.stackHeight;
+	attr.dragDisplayOffsetY = self.dragDisplayOffsetY;
 	attr.isStackable = self.isStackable;
 	attr.bIsAutoTurning = self.bIsAutoTurning;
 
 	if(self.isDisplayModel == false) then
 		attr.isDisplayModel = false;
+	elseif((self.opacity or 1) ~= 1) then
+		attr.opacity = self.opacity;
 	end
 
 	local lastAnim = self:GetLastAnimId();
@@ -649,8 +669,8 @@ function Entity:CreateInnerObject()
 				self:LoadPhysics(); 
 			end
 		end
-		self:SetInnerObject(obj);
-		ParaScene.Attach(obj);
+		self:AttachObjectToScene(obj)
+
 		if(self:GetIdleAnim() ~= 0 or (self.lastAnimId or 0) ~= 0) then
 			self:SetAnimation(self.lastAnimId or self:GetIdleAnim())
 		end
@@ -669,6 +689,8 @@ function Entity:CreateInnerObject()
 
 		if(not self:IsDisplayModel()) then
 			self:SetVisible(false);
+		elseif((self.opacity or 1) ~= 1) then
+			self:SetOpacity(self.opacity or 1);
 		end
 	end
 	return obj;
@@ -679,7 +701,7 @@ function Entity:SetBootHeight(bootHeight)
 		self.bootHeight = bootHeight
 		local obj = self:GetInnerObject();
 		if(obj) then
-			obj:SetField("BootHeight", bootHeight or 0);
+			obj:SetField("BootHeight", (bootHeight or 0));
 		end
 	end
 end
@@ -959,7 +981,11 @@ function Entity:MountTo(mountTarget, mountPointIndex, bUseCurrentLocation)
 				if(mountpoint.name == "lie") then
 					self:SetAnimation(100); -- 100 lie facing up; 88 lie facing side ways
 				elseif(mountpoint.name == "sit") then
-					self:SetAnimation(72); -- sit on ground
+					if(self:HasCustomGeosets()) then
+						self:SetAnimation(235); -- sit looking front 
+					else
+						self:SetAnimation(72); -- sit on ground
+					end
 				elseif(mountpoint.name == "eat") then
 				elseif(mountpoint.name == "create") then
 				elseif(mountpoint.name == "run") then
@@ -1511,16 +1537,36 @@ function Entity:CanHighlight()
 	return self:GetCanDrag();
 end
 
-function Entity:GetCanDrag()
-	if(self.canDrag== nil) then
-		-- some default value
-		if(self:HasRealPhysics() and (not self.filename or not self.filename:match("_drag"))) then
-			return false
-		else
+-- @param bCheckLinkParent: if true, we will also check link parent. 
+-- @return bCanDrag, draggableParent: the second parameter is the parent draggable entity if any. 
+function Entity:GetCanDrag(bCheckLinkParent)
+	if(not bCheckLinkParent) then
+		if(self.canDrag== nil) then
+			-- some default value
+			if(self:HasRealPhysics() and (not self.filename or not self.filename:match("_drag"))) then
+				return false
+			else
+				return true
+			end
+		end
+		return self.canDrag;
+	else
+		if(self:GetCanDrag()) then
 			return true
+		else
+			local targetEntity = self:GetLinkToTarget()
+			local i = 1;
+			while(targetEntity and i<10) do
+				if(targetEntity:GetCanDrag()) then
+					return true, targetEntity
+				else
+					targetEntity = targetEntity:GetLinkToTarget();
+					i = i + 1;
+				end
+			end
+			return false;
 		end
 	end
-	return self.canDrag;
 end
 
 function Entity:SetCanDrag(canDrag)
@@ -1635,8 +1681,9 @@ end
 
 -- only call this function when the entity is a custom character.
 -- we will put on the item, and it will return item_id that has been replaced. 
+-- please note: when we put on a new shirt, the old shirt and the back are both returned. 
 -- @param itemId: custom character item id, such as 83127
--- @return replacedItemId: this can be nil or the same as the itemId. 
+-- @return replacedItemId, replacedItemId2: this can be nil or the same as the itemId. or the replaced one or two items. 
 function Entity:PutOnCustomCharItem(itemId)
 	local item = CustomCharItems:GetItemById(itemId)
 	if(item and self:HasCustomGeosets()) then
@@ -1673,6 +1720,34 @@ function Entity:PutOnCustomCharItem(itemId)
 		end
 	end
 	return itemId;
+end
+
+-- only call this function when the entity is a custom character.
+-- we will take off the given item, and it will return item_id that has been taken off. 
+-- @return itemId if succeed
+function Entity:TakeOffCustomCharItem(itemId)
+	local item = CustomCharItems:GetItemById(itemId)
+	if(item and self:HasCustomGeosets()) then
+		local oldSkins = self:GetSkin();
+		if(oldSkins) then
+			local oldItems = commonlib.split(oldSkins, ";")
+			if(oldItems) then
+				local index;
+				for i, id in ipairs(oldItems) do
+					if(id == itemId) then
+						index = i;
+						break;
+					end
+				end
+				if(index) then
+					commonlib.removeArrayItem(oldItems, index)
+					local newSkins = table.concat(oldItems, ";");
+					self:SetSkin(newSkins)
+					return itemId;
+				end
+			end
+		end
+	end
 end
 
 -- let the entity fall down immediately to ground or physical mesh 
@@ -1719,5 +1794,58 @@ function Entity:GetStackedOnEntity()
 			end
 		end
 		return stackedEntity;
+	end
+end
+
+function Entity:GetDragDisplayOffsetY()
+	if(self.dragDisplayOffsetY) then
+		return self.dragDisplayOffsetY;
+	elseif(self:GetCategory() == "customCharItem" or self:HasCustomGeosets()) then
+		return 0;
+	end
+	return 0.3
+end
+
+function Entity:SetDragDisplayOffsetY(dragDisplayOffsetY)
+	self.dragDisplayOffsetY = dragDisplayOffsetY
+end
+
+-- @param value: if value is nil, name is used as string value
+function Entity:SetStaticTag(name, value)
+	if(value==nil) then
+		self.staticTag = name;
+	elseif(name) then
+		local t = commonlib.totable(self.staticTag)
+		t[name] = value;
+		self.staticTag = commonlib.serialize_compact(t);
+	end
+end
+
+-- @param name: if nil, the raw tag string is returned, otherwise we will treat tag as a key, value table
+function Entity:GetStaticTag(name)
+	if(name==nil) then
+		return self.staticTag;
+	elseif(self.staticTag) then
+		return commonlib.totable(self.staticTag)[name];
+	end
+end
+
+-- @param value: if value is nil, name is used as string value
+function Entity:SetTag(name, value)
+	if(value==nil) then
+		self.tag = name;
+	elseif(name) then
+		local t = commonlib.totable(self.tag)
+		t[name] = value;
+		self.tag = commonlib.serialize_compact(t);
+	end
+end
+
+-- @param name: if nil, the raw tag string is returned, otherwise we will treat tag as a key, value table
+function Entity:GetTag(name)
+	if(name==nil) then
+		return self.tag;
+	elseif(self.tag) then
+		return commonlib.totable(self.tag)[name];
 	end
 end

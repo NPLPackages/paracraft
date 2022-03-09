@@ -820,10 +820,30 @@ function Entity:CreateInnerObject(filename, isCharacter, offsetY, scaling, skin,
 		-- obj:SetField("persistent", false); 
 		-- obj:SetScale(BlockEngine.blocksize);
 		obj:SetField("RenderDistance", 160);
-		self:SetInnerObject(obj);
-		ParaScene.Attach(obj);	
+		
+		self:AttachObjectToScene(obj)
 	end
 	return obj;
+end
+
+-- where to attach this entity.
+-- @param miniSceneName: if nil, it defaults to main 3d scene, otherwise it is a 3d mini scene graph name. 
+function Entity:SetScene(miniSceneName)
+	self.sceneName = miniSceneName;
+end
+
+function Entity:GetScene()
+	return self.sceneName;
+end
+
+function Entity:AttachObjectToScene(obj)
+	if(not self.sceneName) then
+		ParaScene.Attach(obj);
+	else
+		local scene = ParaScene.GetMiniSceneGraph(self.sceneName);
+		scene:AddChild(obj);
+	end
+	self:SetInnerObject(obj);
 end
 
 -- this is helper function that derived class can use to destroy an inner mesh or character object. 
@@ -1145,7 +1165,6 @@ function Entity:IsDead()
 end
 
 function Entity:Destroy()
-
 	-- unload pet
 	if(self.petObj) then
 		-- delete pet objq
@@ -1177,7 +1196,6 @@ function Entity:Detach()
 		region:Remove(self)
 	end
 	EntityManager.RemoveObject(self);
-	
 end
 
 -- virtual, called when this entity is removed from EntityManager, either detached or during world exit.
@@ -1277,11 +1295,13 @@ end
 
 -- attach to entity manager
 function Entity:Attach()
-	if(self:IsAlwaysSentient()) then
-		EntityManager.AddToSentientList(self);
+	if(not self.sceneName) then
+		if(self:IsAlwaysSentient()) then
+			EntityManager.AddToSentientList(self);
+		end
+		EntityManager.AddObject(self);
+		self:UpdateBlockContainer();
 	end
-	EntityManager.AddObject(self);
-	self:UpdateBlockContainer();
 end
 
 -- virtual function: whether we can place a block where this entity stands in. 
@@ -3035,7 +3055,7 @@ end
 
 -- @param opacity: [0,1]
 function Entity:SetOpacity(opacity)
-	self.opacity = value or 1;
+	self.opacity = opacity or 1;
 	local obj = self:GetInnerObject();
 	if(obj) then
 		obj:SetField("opacity", opacity or 1);

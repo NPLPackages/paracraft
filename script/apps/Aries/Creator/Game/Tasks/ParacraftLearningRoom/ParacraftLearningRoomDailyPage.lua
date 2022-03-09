@@ -10,16 +10,17 @@ local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/G
 ParacraftLearningRoomDailyPage.DoCheckin();
 --]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
-
+local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
 local DailyTaskManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DailyTask/DailyTaskManager.lua");
-
+local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local ParacraftLearningRoomDailyPage = NPL.export()
@@ -548,13 +549,6 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 	if(index <= 16)then
 		bCheckVip = false;
 	end
-	
-	commonlib.echo("==========ParacraftLearningRoomDailyPage.OnOpenWeb");
-	commonlib.echo(index);
-	commonlib.echo(bCheckVip);
-	commonlib.echo(ParacraftLearningRoomDailyPage.IsVip());
-	commonlib.echo("======================HasCheckedToday");
-	commonlib.echo(ParacraftLearningRoomDailyPage.HasCheckedToday());
 
 	local studyFunc = function (is_association_vip)
 		if(bCheckVip and not ParacraftLearningRoomDailyPage.IsVip()) and not System.User.isVipSchool and not is_association_vip then
@@ -580,6 +574,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 		local start_time = os.time()
 		local title = ParacraftLearningRoomDailyPage.GetTitle(index);
 
+		RedSummerCampPPtPage.StartTask("dailyVideo")
 		GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { started = true, learningIndex = index });
 		if System.os.GetPlatform() ~= 'win32' then
 			-- 除了win32平台，使用默认浏览器打开视频教程
@@ -599,7 +594,8 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 					local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
 					GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
 	
-					GameLogic.QuestAction.SetDailyTaskValue("40009_1",1)
+					QuestAction.SetDailyTaskValue("40009_1",1)
+					RedSummerCampPPtPage.OnCloseDailyVideo()
 				end, function()
 					_guihelper.MessageBox(L"签到失败！");
 				end)
@@ -616,7 +612,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 				BackgroundMusic:Recover()
 				GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { ended = true, learningIndex = index });
 				NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty();
-				
+				RedSummerCampPPtPage.OnCloseDailyVideo()
 				-- 如果不是今天的签到课，就直接返回
 				if(not ParacraftLearningRoomDailyPage.IsNextDay(index))then
 					return
@@ -636,7 +632,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 						local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
 						GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
 	
-						GameLogic.QuestAction.SetDailyTaskValue("40009_1",1)
+						QuestAction.SetDailyTaskValue("40009_1",1)
 					end, function()
 						_guihelper.MessageBox(L"签到失败！");
 					end)

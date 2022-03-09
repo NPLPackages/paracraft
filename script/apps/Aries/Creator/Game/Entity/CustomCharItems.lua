@@ -192,6 +192,28 @@ function CustomCharItems:Init()
 	CustomCharItems.ReplaceableAvatars["character/CC/02human/paperman/nuannuan.x"] = "80001;82010;84022;81049;88004;85004";
 	CustomCharItems.ReplaceableAvatars["character/CC/codewar/sunbinjunshixingtai_movie.x"] = "80001;83150;84049;81018;88014;85067";
 
+	-- TODO 补充
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/thief.x"] = "80001;84053;81018;85073;83163";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_cook.x"] = "80001;84106;81018;85001;83194";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_ground_service.x"] = "80001;82028;84086;81018;85111";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_cook.x"] = "80001;84085;81018;85111;83193";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_waiter2.x"] = "80001;82126;84105;81018;85125";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_waiter1.x"] = "80001;82126;84104;81018;85119";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_waiter1.x"] = "80001;82028;84098;81018;85111";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_breeder.x"] = "80001;84097;81018;88013;85114;83178";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/fireman.x"] = "80001;84096;81018;88013;85113;83210";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/bio_man.x"] = "80001;84084;81018;88013;85106;83195";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/doctor.x"] = "80001;82028;84083;81018;88013;85022";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_traffic_police_c.x"] = "80001;84090;81070;88020;85109;83205";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_police_c.x"] = "80001;84089;81049;88020;85109;83203";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_police.x"] = "80001;84088;81049;88020;85109;83203";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_police.x"] = "80001;84088;81005;88020;85109;83202";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_police_c.x"] = "80001;84089;81005;88020;85109;83202";
+	CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_traffic_police_c.x"] = "80001;84090;81005;88020;85109;83206";
+	--CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_worker_1.x"] = "X"
+	--CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/girl_archaeologist.x"] = "X"
+	--CustomCharItems.ReplaceableAvatars["character/CC/artwar/movie/boy_worker_1.x"] = "X"
+
 	local root = ParaXML.LuaXML_ParseFile("config/Aries/creator/CustomCharItems.xml");
 	if (root) then
 		local id = 0;

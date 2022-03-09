@@ -38,6 +38,7 @@ task = EditModelTask.GetInstance();
     </pe:if>
     <pe:if condition='<%=not task:IsTransformMode()%>'>
         <input uiname="EditModelTask.changeModelBtn" name="changeModelBtn" value='<%=L"模型..."%>' tooltip='<%=L"Ctrl+左键选择方块与骨骼, 并保存为bmax模型"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnClickChangeModelFile" />
+        <input uiname="EditModelTask.changeDraggableBtn" name="changeDraggableBtn" value='<%=EditModelTask.GetDraggableText()%>' tooltip='<%=L"点击可切换模型是否可拖动"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnClickChangeDraggable" />
         <div><pe:label value="<%=task:GetModelFileInHand()%>"/></div>
         <div><pe:label value="<%=task:GetOnClickEventInHand()%>"/></div>
     </pe:if>

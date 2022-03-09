@@ -5,6 +5,7 @@
 <script refresh="true" type="text/npl" src=".lua" ><![CDATA[
     local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua");
     RedSummerCampCourseScheduling.OnInit()
+    local path = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/"
     function ClosePage()
         Page:CloseWindow();
     end
@@ -38,7 +39,7 @@
 
     function GetItemIcon(index)
         local index = tonumber(index)
-        return string.format("width: 94px;height: 94px; background: url(%s);",RedSummerCampCourseScheduling.lessonCnf[index].icon)
+        return string.format("width: 94px;height: 94px; background: url(%s)#0 0 94 94;",path..RedSummerCampCourseScheduling.lessonCnf[index].icon)
     end
 
     function OnClickLesson(name)
@@ -51,7 +52,7 @@
 
     function GetHistroyIcon(index)
         local index = tonumber(index)
-        return string.format("width: 94px;height: 94px; background: url(%s);",RedSummerCampCourseScheduling.curLearnHistroy[index].icon)
+        return string.format("width: 94px;height: 94px; background: url(%s)#0 0 94 94;",path..RedSummerCampCourseScheduling.curLearnHistroy[index].icon)
     end
 
     function CheckCanLearn(key)
@@ -100,12 +101,12 @@
                         </pe:repeatitem>
                     </pe:repeat>        
                 </div>
-                <div style= "margin-top: 5px; width: 560px; height: 300px;">
-                    <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false" pagesize="10" >
+                <div style= "margin-top: 15px; width: 560px; height: 290px;">
+                    <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false">
                         <Columns>
-                            <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
+                            <div style="float: left; margin-left: 15px;margin-top: 10px; float: left; width: 250px;height: 82px;">                    
                                 <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
-                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="width: 200px; margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
                                 <div style="margin-left: 100px; margin-top: -38px; font-size: 14px; base-font-size: 14px; color: #ffffff;"><%=Eval("num")%></div>
                                 <pe:if condition='<%=not CheckCanLearn(Eval("key"))%>'>
                                     <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">
@@ -121,11 +122,11 @@
             <pe:if condition="<%=not IsHaveHistroy()%>">
                 <div style="position: relative; margin-top: 20px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
                 <div style= "margin-top: 60px;width: 560px; height: 400px;">
-                    <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false" pagesize="10" >
+                    <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false"  >
                         <Columns>
                             <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
                                 <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
-                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="width: 200px; margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
                                 <div style="margin-left: 100px; margin-top: -38px; font-size: 14px; base-font-size: 14px; color: #ffffff;"><%=Eval("num")%></div>
                                 <pe:if condition='<%=not CheckCanLearn(Eval("key"))%>'>
                                     <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">

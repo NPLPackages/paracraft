@@ -33,9 +33,9 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 local recommended_resolution = {1020,595}
 local recommended_resolution_web_browser = {960,560}
 local recommended_resolution_teen = {1280,760}
-
+local default_sound_container_posY = 0
+local default_sound_device_container_posY = 0
 SystemSettingsPage.category_ds_index = 1;
-
 SystemSettingsPage.category_show = {
 	{left_text=L"分辨率",name="ScreenResolution",right_type=""},
 	{left_text=L"图像品质",name="graphic_quality",right_type=""},
@@ -190,6 +190,31 @@ local function UpdateCheckBox(name, bChecked)
 	end
 end
 
+function SystemSettingsPage.UpdateSoundUI()
+	local sound_container = ParaUI.GetUIObject("sound_volume")
+	local sound_device_container = ParaUI.GetUIObject("sound_device")
+	if sound_container and sound_container:IsValid() and sound_device_container and sound_device_container:IsValid() then
+		if ParaAudio.GetVolume()>0 then
+			sound_container.visible = true
+			sound_device_container.y = default_sound_device_container_posY
+		else
+			sound_container.visible = false
+			sound_device_container.y = default_sound_container_posY
+		end
+	end
+end
+
+function SystemSettingsPage.InitSoundUIData()
+	local sound_container = ParaUI.GetUIObject("sound_volume")
+	local sound_device_container = ParaUI.GetUIObject("sound_device")
+	if sound_container and sound_container:IsValid() then
+		default_sound_container_posY = sound_container.y
+	end
+	if sound_device_container and sound_device_container:IsValid() then
+		default_sound_device_container_posY = sound_device_container.y
+	end
+end
+
 function SystemSettingsPage.InitPageParams()
 	local ds = SystemSettingsPage.setting_ds;
 	-- load the current settings. 
@@ -294,9 +319,11 @@ function SystemSettingsPage.InitPageParams()
 	local is_on = SystemSettingsPage.mouse_select_list["DeleteBlock"] == "right"
 	-- UpdateCheckBox("btn_MouseChange", is_on);
 	page:SetNodeValue("ChangeMouseLeftRight", is_on);
+	SystemSettingsPage.InitSoundUIData()
 end
 
 function SystemSettingsPage.OnClose()
+	SystemSettingsPage.category_ds_index = 1
 end
 
 -- shader version
@@ -811,12 +838,17 @@ function SystemSettingsPage.OnClickEnableSound()
 	local next_state = not cur_state;
 	if(page)then
 		if(next_state) then
+			local key = "Paracraft_System_Sound_Volume"
 			local sound_volume = Game.PlayerController:LoadLocalData(key,1,true);
+			if sound_volume <= 0 then
+				sound_volume = 1
+			end
 			ParaAudio.SetVolume(sound_volume);
 		else
 			ParaAudio.SetVolume(0);
 		end
 		UpdateCheckBox("btn_EnableSound", next_state)
+		SystemSettingsPage.UpdateSoundUI()
 	end
 	SystemSettingsPage.setting_ds["open_sound"] = next_state;
 	local MapArea = commonlib.gettable("MyCompany.Aries.Desktop.MapArea");
@@ -831,6 +863,7 @@ function SystemSettingsPage.OnClickResetAudioDevice()
 	AudioEngine.ResetAudioDevice();
 	SystemSettingsPage.currentAudioDevice = nil;
 	page:Refresh(0);
+	SystemSettingsPage.UpdateSoundUI()
 	page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
 end
 
@@ -951,6 +984,9 @@ function SystemSettingsPage.OnChangeSoundVolume(value)
 	local sound_state = SystemSettingsPage.setting_ds["open_sound"];
 	if(value and sound_state) then
 		local volume = value-- math.floor(value)
+		if volume <= 0 then
+			volume = 0.1
+		end
 		ParaAudio.SetVolume(volume);
 		local key = "Paracraft_System_Sound_Volume";
 		GameLogic.GetPlayerController():SaveLocalData(key,volume,true);
@@ -1064,7 +1100,6 @@ function SystemSettingsPage.OnOK()
 	else
 		ParaEngine.WriteConfigFile("config/config.new.txt");
 	end
-
 	page:CloseWindow();
 	--[[
 	local bNeedUpdateScreen,value, bNeedRestart;

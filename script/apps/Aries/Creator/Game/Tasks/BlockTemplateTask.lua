@@ -201,14 +201,15 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
 			if(node and node[1]) then
 				local blocks = NPL.LoadTableFromString(node[1]);
-				if(blocks and #blocks > 0) then
-					local bx, by, bz = self:GetBlockPosition();
-					LOG.std(nil, "info", "BlockTemplate", "LoadTemplate from file: %s at pos:%d %d %d", filename, bx, by, bz);
+				local bx, by, bz = self:GetBlockPosition();
+				LOG.std(nil, "info", "BlockTemplate", "LoadTemplate from file: %s at pos:%d %d %d", filename, bx, by, bz);
 
+				if(blocks and #blocks > 0) then
 					if(root_node.attr and root_node.attr.relative_motion == "true") then
 						self:CalculateRelativeMotion(blocks, bx, by, bz);
 					end
-
+				end
+				if((blocks and #blocks > 0) or liveEntities) then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
 					local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, liveEntities=liveEntities, bSelect=self.bSelect, nohistory = self.nohistory, isSilent = true})
 					task:Run();

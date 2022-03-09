@@ -51,10 +51,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/SelectionManager.lua")
 NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLife.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/FolderManager.lua");
 local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
-local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
 local SelectionManager = commonlib.gettable("MyCompany.Aries.Game.SelectionManager");
@@ -170,6 +168,9 @@ function GameLogic:ctor()
 		-- end)
 	end
 	]]
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/UserJobStatistics.lua");
+	local UserJobStatistics = commonlib.gettable("MyCompany.Aries.Game.Common.UserJobStatistics")
+	UserJobStatistics.OnInit()
 end
 
 
@@ -371,8 +372,6 @@ function GameLogic.Init(worldObj)
 
 	NeuronSimulator.Init();
 	
-	ParaLife:Init()
-
 	GameLogic.LoadGame();
 
 	GameLogic.is_started = true;
@@ -890,6 +889,7 @@ function GameLogic.BeforeRestart(appName)
 end
 
 function GameLogic.Exit(bSoft)
+	GameLogic.GetFilters():apply_filters("OnWillUnloadWorld");
 	ModManager:OnWillLeaveWorld();
 
 	GameLogic.IsStarted = false;
@@ -962,6 +962,8 @@ function GameLogic.Exit(bSoft)
 		GameLogic.loadWorldTimer:Change();
 		GameLogic.loadWorldTimer = nil;
 	end
+
+	GameLogic.current_worlddir = "temp/emptyworld/";
 end
 
 local slow_timer_tick = 1;
@@ -1858,6 +1860,22 @@ function GameLogic.IsVip(name, bOpenUIIfNot, callbackFunc, uiType)
 	end
 end
 
+--没有VIP不能打开功能，进行提示跳转到VIP充值界面
+function GameLogic.ShowVipGuideTip(authName)
+	local desc = L"您需要登录并成为VIP用户，才能使用此功能"
+	if authName=="UnlimitWorldsNumber" then 
+		-- L'操作被禁止了，免费用户最多只能拥有3个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。'
+		desc = L'你目前的权限只能创建家园和一个本地世界，快去开通会员，解锁不限量创建本地世界的权限，以及更多的存储空间。'
+	end
+	_guihelper.MessageBox(desc, function(result)
+		if result == _guihelper.DialogResult.OK then
+			local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+			VipPage.ShowPage();
+		end
+	   
+	end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right, nil, nil, nil, nil, {cancel="取消",ok="开通会员"});
+end
+
 -- if the current world is social, where the current player maintains its social outfit. 
 function GameLogic.IsSocialWorld()
 	return Paracraft.Controls.ParaWorldMain:IsCurrentParaWorld();
@@ -2058,7 +2076,7 @@ function GameLogic.CheckCanLearn(type)
 	if GameLogic.IsVip() or GameLogic.KeepWorkItemManager.IsOrgVip() then
 		return true
 	end
-	local strTip = "现在不是上课时间哦，请在上课时间（周一至周五8:00-16:20）内再来上课吧。"
+	local strTip = "现在不是上课时间哦，请在上课时间（周一至周五7:30-17:00）内再来上课吧。"
 	local server_time = QuestAction.GetServerTime()
 	local year = tonumber(os.date("%Y", server_time))	
 	local month = tonumber(os.date("%m", server_time))
@@ -2067,8 +2085,8 @@ function GameLogic.CheckCanLearn(type)
 	local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
 	if strType == "school_lesson" then --校本课
         if week_day ~= 7 then
-            local limit_time_stamp = today_weehours + 8 * 60 * 60 + 0 * 60
-			local limit_time_end_stamp = today_weehours + 16 * 60 * 60 + 20 * 60
+            local limit_time_stamp = today_weehours + 7 * 60 * 60 + 30 * 60
+			local limit_time_end_stamp = today_weehours + 17 * 60 * 60 + 0 * 60
             if server_time >= limit_time_stamp and server_time <= limit_time_end_stamp then
 				if not System.User.isVipSchool then
 					strTip = "该课程是vip专属课程，需要vip权限才能学习。"

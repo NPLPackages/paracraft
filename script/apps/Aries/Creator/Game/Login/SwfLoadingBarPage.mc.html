@@ -6,37 +6,49 @@
     </head>
     <body>
         <pe:mcml>
-            <script refresh="true" type="text/npl">
-                <![CDATA[
-                    NPL.load("(gl)script/kids/3DMapSystemUI/MiniGames/SwfLoadingBarPage.lua");
-                    Map3DSystem.App.MiniGames.SwfLoadingBarPage.OnInit();
+<script refresh="true" type="text/npl">
+<![CDATA[
+        NPL.load("(gl)script/kids/3DMapSystemUI/MiniGames/SwfLoadingBarPage.lua");
+        Map3DSystem.App.MiniGames.SwfLoadingBarPage.OnInit();
 
-                    NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
-                    local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
+        NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
+        local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
 
-                    function GetEnterWorldText()
-                        if (worldname) then
-                            local world_info = WorldManager:GetWorldInfo(worldname);
 
-                            if(world_info and world_info.world_title) then
-                                return format(L"正在进入%s, 请耐心等待", world_info.world_title);
-                            end
-                        end
-                    end
+        function GetEnterWorldText()
+            if (worldname) then
+                local world_info = WorldManager:GetWorldInfo(worldname);
 
-                    function GetTipText()
-                        local LoopTips = commonlib.gettable("MyCompany.Aries.Desktop.LoopTips");
+                if(world_info and world_info.world_title) then
+                    return format(L"正在进入%s, 请耐心等待", world_info.world_title);
+                end
+            end
+        end
 
-                        if (LoopTips.GetTip) then
-                            local tiptext = LoopTips.GetTip(true);
+        function GetTipText()
+            local LoopTips = commonlib.gettable("MyCompany.Aries.Desktop.LoopTips");
 
-                            if (type(tiptext) == "string") then
-                                return format("%s", tiptext);
-                            end
-                        end
-                    end
-                ]]>
-            </script>
+            if (LoopTips.GetTip) then
+                local tiptext = LoopTips.GetTip(true);
+
+                if (type(tiptext) == "string") then
+                    return format("%s", tiptext);
+                end
+            end
+        end
+        function GetBackgroundImageStyle()
+            if(not GameLogic.isRemote) then
+                NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+                local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+                local filename = Files.GetWorldFilePath("frontpage.png") or Files.GetWorldFilePath("frontpage_32bits.png") or Files.GetWorldFilePath("frontpage.jpg")
+                if(filename) then
+                    return format("position:relative;width: 512px;height: 288px;background:url(%s)", filename)
+                end
+            end
+            return "position: relative;width: 512px;height: 178px;background: url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 550 512 175);"
+        end
+    ]]>
+</script>
             <pe:if condition='<%= Page:GetRequestParam("showbg")=="true" %>'>
                 <pe:container alignment="_fi"
                               zorder="-1"
@@ -53,11 +65,7 @@
                                      width: 512px;
                                      height: 256px;">
                     <pe:if condition='<%= Page:GetRequestParam("showtoplogo") ~= "false" %>'>
-                        <div style="position: relative;
-                                    margin-left: 0px;
-                                    width: 512px;
-                                    height: 178px;
-                                    background: url(Texture/Aries/Creator/Mobile/blocks_Background.png#0 550 512 175);"></div>
+                        <div style="<%=GetBackgroundImageStyle()%>"></div>
                     </pe:if>
                 </pe:container>
             </pe:if>

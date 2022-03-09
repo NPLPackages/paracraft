@@ -227,6 +227,13 @@ function MovieClip:GotoEndFrame()
 	end
 end
 
+function MovieClip:SetTimeNoUpdate(curTimeMS)
+	if(self.tick ~= curTimeMS) then
+		self.tick = curTimeMS;
+		self.time = (curTimeMS/1000);
+	end
+end
+
 -- time in millisecond ticks
 function MovieClip:SetTime(curTimeMS)
 	if(self:GetTime() ~= curTimeMS) then
@@ -398,7 +405,7 @@ function MovieClip:RefreshActors(bSkipPicking)
 		actor:OnCreate();
 		if(bSkipPicking) then
 			local entity = actor:GetEntity()
-			if(entity) then
+			if(entity and not actor:IsAgent()) then
 				entity:SetSkipPicking(true);
 			end
 		end
@@ -461,4 +468,16 @@ function MovieClip:FrameMove(deltaTime)
 	if(deltaTime~=0) then
 		self:timeChanged();
 	end
+end
+
+-- where the actors are played, default to the main 3d scene. 
+-- only call this function before the movie is activated. 
+-- we are load all movie actors inside a given miniscenegraph by its name. 
+-- @param miniSceneName: if nil, it is the default 3d scene, otherwise it is the miniscenegraph name. 
+function MovieClip:SetScene(miniSceneName)
+	self.sceneName = miniSceneName
+end
+
+function MovieClip:GetScene()
+	return self.sceneName
 end

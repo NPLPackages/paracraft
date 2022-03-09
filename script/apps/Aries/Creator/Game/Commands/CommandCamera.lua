@@ -164,6 +164,15 @@ Commands["panorama"] = {
 		create panorama screenshot and save
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
+		local ShootingTool = NPL.load("(gl)Mod/WorldShare/cellar/Panorama/ShootingTool.lua")
+		if ShootingTool then
+			ShootingTool:init()
+			ShootingTool:autoShoot(function()
+				-- send event
+				CommandManager:RunCommand('/sendevent after_generate_panorama')
+			end)
+			return
+		end
 		local x, y, z = CmdParser.ParsePos(cmd_text)
 
 		if not x or not y or not z then

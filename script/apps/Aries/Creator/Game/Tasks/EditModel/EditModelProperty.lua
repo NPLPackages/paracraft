@@ -13,11 +13,9 @@ EditModelProperty.ShowPage(function(values)
 end, {name="1", itemId, canDrag=true})
 -------------------------------------------------------
 ]]
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelProperty.lua");
 local EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-
 
 local page;
 function EditModelProperty.OnInit()
@@ -25,7 +23,7 @@ function EditModelProperty.OnInit()
 end
 
 -- @param modelEntity: EntityBlockModel or EntityLiveModel
-function EditModelProperty.ShowForEntity(modelEntity)
+function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 	if(modelEntity) then
 		local mountpoints
 		if(modelEntity:GetMountPoints()) then
@@ -41,16 +39,29 @@ function EditModelProperty.ShowForEntity(modelEntity)
 					if(not EntityManager.GetEntity(values.name)) then
 						modelEntity:SetName(values.name)
 					else
-						_guihelper.MessageBox(L"%s名字已经存在了, 无法改名。请换个名字")
+						_guihelper.MessageBox(format(L"%s名字已经存在了, 无法改名。请换个名字", values.name or ""))
 					end
 				end
+				-- tricky: we may transform from block model to live model in this case. 
+				modelEntity = modelEntity:SetCanDrag(values.canDrag) or modelEntity;
 				modelEntity:SetIsStackable(values.isStackable)
 				modelEntity:SetStackHeight(values.stackHeight)
+				if(modelEntity.SetDragDisplayOffsetY) then
+					modelEntity:SetDragDisplayOffsetY(values.dragDisplayOffsetY)
+				end
 				modelEntity:SetIdleAnim(values.idleAnim or 0)
-				modelEntity:SetCanDrag(values.canDrag)
 				modelEntity:SetAutoTurningDuringDragging(values.autoTurning)
 				modelEntity:SetDisplayModel(values.isDisplayModel~=false)
 				
+				local opacity = tonumber(values.opacity)
+				if(opacity and opacity>=0 and opacity<=1) then
+					modelEntity:SetOpacity(opacity);
+				end
+				local bootHeight = tonumber(values.bootHeight)
+				if(bootHeight and modelEntity.SetBootHeight ~= nil) then
+					modelEntity:SetBootHeight(bootHeight);
+				end
+
 				if(values.onClickEvent == "") then
 					values.onClickEvent = nil
 				end
@@ -104,6 +115,9 @@ function EditModelProperty.ShowForEntity(modelEntity)
 				end
 				-- this one needs to be called last, since it may change entity.  
 				modelEntity:EnablePhysics(values.hasRealPhysics)
+				if(callbackFunc) then
+					callbackFunc(modelEntity)
+				end
 			end
 		end, {
 			name=modelEntity:GetName(), 
@@ -111,7 +125,10 @@ function EditModelProperty.ShowForEntity(modelEntity)
 			hasRealPhysics = modelEntity:HasRealPhysics(),
 			isStackable = modelEntity.isStackable,
 			isDisplayModel = modelEntity:IsDisplayModel(),
+			opacity = modelEntity:GetOpacity(),
+			bootHeight = modelEntity.GetBootHeight ~= nil and modelEntity:GetBootHeight() or 0,
 			stackHeight = modelEntity.stackHeight,
+			dragDisplayOffsetY = modelEntity.dragDisplayOffsetY,
 			autoTurning = modelEntity.bIsAutoTurning,
 			canDrag = modelEntity.canDrag,
 			onClickEvent = modelEntity:GetOnClickEvent(),
@@ -152,9 +169,9 @@ function EditModelProperty.ShowPage(OnClose, last_values)
 			directPosition = true,
 				align = "_ct",
 				x = -320,
-				y = -200,
+				y = -210,
 				width = 640,
-				height = 350,
+				height = 370,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
@@ -183,6 +200,15 @@ function EditModelProperty.OnOK()
 		if(stackHeight~="nil") then
 			stackHeight = tonumber(stackHeight) or 0.2;
 			stackHeight = math.min(math.max(stackHeight, 0), 10);
+		else
+			stackHeight = nil;
+		end
+		local dragDisplayOffsetY = page:GetValue("dragDisplayOffsetY")
+		if(dragDisplayOffsetY~="nil") then
+			dragDisplayOffsetY = tonumber(dragDisplayOffsetY) or 0.3;
+			dragDisplayOffsetY = math.min(math.max(dragDisplayOffsetY, -1), 1);
+		else
+			dragDisplayOffsetY = nil;
 		end
 		local idleAnim = tonumber(page:GetValue("idleAnim", 0)) or 0
 		local hasRealPhysics = StringToBooleanNil(page:GetValue("hasRealPhysics"))
@@ -193,9 +219,12 @@ function EditModelProperty.OnOK()
 		EditModelProperty.result = {
 			name = name,
 			stackHeight = stackHeight,
+			dragDisplayOffsetY = dragDisplayOffsetY,
 			idleAnim = idleAnim, 
 			hasRealPhysics = hasRealPhysics,
 			isDisplayModel = page:GetValue("isDisplayModel"),
+			opacity = page:GetValue("opacity"),
+			bootHeight = page:GetValue("bootHeight"),
 			autoTurning = autoTurning,
 			isStackable = isStackable,
 			canDrag = canDrag,
@@ -221,7 +250,10 @@ function EditModelProperty.UpdateUIFromValue(values)
 		end
 		page:SetValue("isStackable", tostring(values.isStackable));
 		page:SetValue("isDisplayModel", values.isDisplayModel);
+		page:SetValue("opacity", values.opacity);
+		page:SetValue("bootHeight", values.bootHeight);
 		page:SetValue("stackHeight", tostring(values.stackHeight));
+		page:SetValue("dragDisplayOffsetY", tostring(values.dragDisplayOffsetY));
 		page:SetValue("idleAnim", tostring(values.idleAnim));
 		page:SetValue("hasRealPhysics", tostring(values.hasRealPhysics));
 		page:SetValue("autoTurning", tostring(values.autoTurning));

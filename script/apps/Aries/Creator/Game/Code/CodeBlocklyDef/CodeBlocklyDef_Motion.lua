@@ -101,6 +101,7 @@ end
 turnTo(-60)
 wait(1)
 turnTo(0)
+turnTo("block", 19200, 19201)
 ]]},
 {desc = L"三轴旋转", canRun = true, code = [[
 turnTo(0, 0, 45)
@@ -195,7 +196,11 @@ while(true) do
     turnTo("camera", "camera")
     wait(0.01)
 end
-]]}
+]]},
+{desc = L"面向方块", canRun = true, code = [[
+turnTo("block", 19200, 19201)
+turnTo("block", 19209, 4, 19231)
+]]},
 },
 },
 {

@@ -131,7 +131,12 @@ function Export.OnSelectExporter(id)
 	id = GameLogic.GetFilters():apply_filters("select_exporter", id);
 
 	if(id == "bmax") then
-		Export.ExportAsBMax();
+		-- 没权限的话 不允许保存bmax
+		local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+		UserPermission.CheckCanEditBlock("click_save_bmax", function()
+			Export.ExportAsBMax();
+		end)
+		
 	elseif(id == "template") then
 		Export.ExportAsTemplate();
 	end

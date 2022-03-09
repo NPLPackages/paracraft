@@ -27,6 +27,7 @@ local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
 local block = commonlib.gettable("MyCompany.Aries.Game.block")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local Cameras = commonlib.gettable("System.Scene.Cameras");
 local RemoteWorld = commonlib.gettable('MyCompany.Aries.Creator.Game.Login.RemoteWorld')
 local RailCarPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarPage.lua")
 
@@ -61,6 +62,7 @@ local camera_params = {};
 
 function CameraController.OnInit()
 	CameraController:InitSingleton();
+	Cameras:GetCurrent():EnableCameraFrameMove(false)
 	local attr = ParaCamera.GetAttributeObject();
 	if(GameLogic.options.CharacterLookupBoneIndex) then
 		attr:SetField("CharacterLookupBoneIndex", GameLogic.options.CharacterLookupBoneIndex);
@@ -408,12 +410,12 @@ function CameraController.UpdateViewBobbing()
 		-- if it is sliding and last sliding speed is not too big, stop animation. 
 		if(math.abs(speed) < 3) then
 			speed = 0;
-			player:ToCharacter():PlayAnimation(0);
+			player:SetField("AnimID", 0);
 		end
 	end
 	
 	-- swing amplitude
-	if(GameLogic.options.ViewBobbing) then
+	if(GameLogic.options.ViewBobbing and not CameraController.IsAutoRoomViewEnabled()) then
 		local amp = speed * GameLogic.options.ViewBobbingAmpScale;
 
 		local att = ParaCamera.GetAttributeObject();
@@ -490,7 +492,6 @@ function CameraController.OnMousePick(result, max_picking_dist)
 				player:FaceTarget(nil);
 				return
 			end
-
 			local attr = ParaCamera.GetAttributeObject();
 			local cam_dist = attr:GetField("CameraObjectDistance", 10);
 			if(cam_dist < disable_facing_mouse_dist) then
@@ -542,11 +543,11 @@ end
 function CameraController.OnCameraFrameMove()
 	CameraController.UpdateCameraFrameStats()
 
-	if(not CameraController.IsAutoRoomViewEnabled()) then
-		CameraController.UpdateViewBobbing();
-	end
-
+	CameraController.UpdateViewBobbing();
+	
 	CameraController.UpdateFlyMode();
+
+	Cameras:GetCurrent():FrameMoveCameraControl()
 
 	if(not GameLogic.GameMode:IsMovieMode()) then
 		if(CameraController.IsAutoRoomViewEnabled()) then
@@ -572,7 +573,7 @@ function CameraController.ApplyCameraRestrictions()
 	local self = CameraController;
 	--  and not GameLogic.GameMode:IsEditor()
 	if(not GameLogic.GameMode:IsMovieMode()) then
-		if(not ParaUI.IsMousePressed(0) and not ParaUI.IsMousePressed(1)) then
+		if(not ParaUI.IsMousePressed(0) and not ParaUI.IsMousePressed(1) and not Cameras:GetCurrent():IsDragging()) then
 			-- apply restrictions
 			local att = ParaCamera.GetAttributeObject();
 			local dist, pitch, yaw = att:GetField("CameraObjectDistance", 0), att:GetField("CameraLiftupAngle", 0), att:GetField("CameraRotY", 0);
@@ -1020,23 +1021,22 @@ function CameraController.ApplyAutoRoomViewCamera()
 	if(not CameraController.IsAutoRoomViewEnabled() or CameraController.IsFPSView()) then
 		return
 	end
-	local isCameraKeyPressed = ParaUI.IsMousePressed(0);
+	local isCameraKeyPressed = ParaUI.IsMousePressed(0) or Cameras:GetCurrent():IsDragging();
 	-- this fixed a temporary android bug where ParaUI.IsMousePressed(1) always return true until we long hold to right click. 
 	if(not System.os.IsMobilePlatform() and ParaUI.IsMousePressed(1)) then
 		isCameraKeyPressed = true;
 	end
 	
-	local attr = ParaCamera.GetAttributeObject()
-	local eye_pos = attr:GetField("Eye position", eye_pos);
-	local lookat_pos = attr:GetField("Lookat position", lookat_pos);
-	local camobjDist, LiftupAngle, CameraRotY = attr:GetField("CameraObjectDistance", 0), attr:GetField("CameraLiftupAngle", 0), attr:GetField("CameraRotY", 0);
-	
-	local dist, pitch, yaw = camobjDist, LiftupAngle, CameraRotY;
-
-	local eyeX, eyeY, eyeZ = eye_pos[1], eye_pos[2], eye_pos[3]
-	local lookatX, lookatY, lookatZ = lookat_pos[1], lookat_pos[2], lookat_pos[3]
-
 	if(not isCameraKeyPressed) then
+		local attr = ParaCamera.GetAttributeObject()
+		local eye_pos = attr:GetField("Eye position", eye_pos);
+		local lookat_pos = attr:GetField("Lookat position", lookat_pos);
+		local camobjDist, LiftupAngle, CameraRotY = attr:GetField("CameraObjectDistance", 0), attr:GetField("CameraLiftupAngle", 0), attr:GetField("CameraRotY", 0);
+	
+		local dist, pitch, yaw = camobjDist, LiftupAngle, CameraRotY;
+
+		local eyeX, eyeY, eyeZ = eye_pos[1], eye_pos[2], eye_pos[3]
+		local lookatX, lookatY, lookatZ = lookat_pos[1], lookat_pos[2], lookat_pos[3]
 		----------------
 		-- only limit camera pitching, when user is not dragging the camera view, such as holding the right or left mouse button. 
 		----------------
@@ -1069,3 +1069,7 @@ function CameraController.ApplyAutoRoomViewCamera()
 	end
 end
 
+-- handling mouse event for basic camera control
+function CameraController.handleMouseEvent(event)
+	Cameras:GetCurrent():handleMouseEvent(event)
+end

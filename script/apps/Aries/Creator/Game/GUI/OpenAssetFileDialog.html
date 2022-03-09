@@ -61,7 +61,7 @@ end
         </div>
         <div style="float:left;width:450px">
             <div class="mc_paper_panel" style="padding-top:3px;padding-bottom:3px;">
-                <pe:treeview ShowIcon="false" uiname="OpenAssetFileDialog.tvwFiles" name="tvwFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAssetFileDialog.GetAllFiles()%>' DefaultNodeHeight="20" style="height:300px;background:;">
+                <pe:treeview ShowIcon="false" uiname="OpenAssetFileDialog.tvwFiles" name="tvwFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAssetFileDialog.GetAllFilesWithFilters()%>' DefaultNodeHeight="20" style="height:300px;background:;">
                     <NodeTemplates>
                         <NodeTemplate DataType="file">
                             <pe:treenode uiname='<%="OpenAssetFileDialog.sel."..XPath("this|filename")%>'  style="height:20px;" indent="10" OnClick="OnSelectFile" can_select="true" text='<%=string.format("%s (%dKB) %s", commonlib.Encoding.DefaultToUtf8(XPath("this|filename")), math.ceil(XPath("this|filesize")/1000), XPath("this|writedate"))%>'></pe:treenode>
@@ -83,7 +83,7 @@ end
             <%=OpenAssetFileDialog.GetText()%>
         </div>
         <div>
-            <input type="text" enable_ime="false" uiname="OpenAssetFileDialog.text" name="text" style="height:24px;width:320px" onchange="OpenAssetFileDialog.OnTextChange"/>
+            <input type="text" enable_ime="false" uiname="OpenAssetFileDialog.text" EmptyText='<%=L"以/或?开头可搜索文件"%>' name="text" style="height:24px;width:320px" onchange="OpenAssetFileDialog.OnTextChange"/>
             <input type="button" class="mc_light_grey_button_with_fillet" uiname="OpenAssetFileDialog.openfile" name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenAssetFileDialog.OnOpenAssetFileDialog"/>
             <input type="button" uiname="OpenAssetFileDialog.OK" name="OK" DefaultButton="true" style="margin-left:20px;min-width:70px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OpenAssetFileDialog.OnOK" value='<%=L"确定"%>' />
             <input type="button" uiname="OpenAssetFileDialog.Cancel" name="Cancel" DefaultButton="true" style="margin-left:10px;min-width:70px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"取消"%>' />

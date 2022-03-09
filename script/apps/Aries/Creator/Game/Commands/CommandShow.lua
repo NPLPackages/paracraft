@@ -37,6 +37,8 @@ Other show filters:
 /show overlaybuffer    show overlay picking buffer on left top corner
 /show quickselectbar
 /show playertouch   : a simple touch controller for kids
+/show paralife
+/show paralife -showplayer : show the default player
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
@@ -157,7 +159,12 @@ Other show filters:
 			TouchMiniKeyboard.CheckShow(false);
 			-- TouchMiniKeyboard.GetSingleton():SetRockerMod()
 		elseif (name == "paralife") then
+			local options
+			options, cmd_text = CmdParser.ParseOptions(cmd_text);
+			
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLife.lua");
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
+			ParaLife:SetShowPlayer(options.showplayer==true)
 			ParaLife:SetEnabled(true)
 		end
 	end,
@@ -259,6 +266,7 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 				TouchMiniKeyboard.CheckShow(true)
 			end
 		elseif (name == "paralife") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLife.lua");
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 			ParaLife:SetEnabled(false)
 		end

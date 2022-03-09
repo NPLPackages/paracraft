@@ -1339,7 +1339,11 @@ function CodeBlockWindow.FindTextGlobally()
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FindBlockTask.lua");
 				local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask");
 				local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
-				task:ShowFindFile(text)
+				task:ShowFindFile(text, function(lastGotoItemIndex)
+					if(not lastGotoItemIndex) then
+						CodeBlockWindow.SetFocusToTextControl();
+					end
+				end)
 				return true;
 			end
 		end
@@ -1356,7 +1360,7 @@ end
 
 function CodeBlockWindow.IsSupportNplBlockly()
 	local entity = CodeBlockWindow.GetCodeEntity();
-	return entity and type(entity.IsBlocklyEditMode) and type(entity.IsUseNplBlockly) == "function" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
+	return not CodeBlockWindow.IsMicrobitEntity() and entity and type(entity.IsBlocklyEditMode) and type(entity.IsUseNplBlockly) == "function" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
 end
 		
 function CodeBlockWindow.OnTryOpenMicrobit()

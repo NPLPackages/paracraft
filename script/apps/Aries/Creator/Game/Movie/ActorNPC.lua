@@ -281,8 +281,14 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 		end
 	end
 	if(not self.entity) then
+		local sceneName;
+		local movieClip = self:GetMovieClip()
+		if(movieClip) then
+			sceneName = movieClip:GetScene()
+		end
 		self.entity = EntityManager[self.entityClass]:Create({name=name, x=x,y=y,z=z, facing=facing, 
 			opacity = opacity, item_id = block_types.names.TimeSeriesNPC, 
+			sceneName = sceneName, -- tricky: we will assign scene name here. 
 		});	
 	end
 		

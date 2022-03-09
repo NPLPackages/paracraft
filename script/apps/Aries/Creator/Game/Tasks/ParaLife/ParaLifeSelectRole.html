@@ -59,6 +59,10 @@
         ParaLifeSelectRole.OnClickItem(name)
     end
 
+    function CheckIsMainPlayer()
+        return ParaLifeSelectRole.CheckIsMainPlayer()
+    end
+
 ]]></script>
 <div style="width: 1151px; height: 842px; background: url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/select_role_32bits.png#0 0 1151 842);">
     <input type="button" onclick="ClosePage" style="margin-left: 1000px; margin-top: 48px; width: 94px; height:95px;background:url(Texture/Aries/Creator/keepwork/macro/lessonrubbish/close.png#0 0 94 95)"/>
@@ -88,17 +92,24 @@
         </pe:gridview>
     </div>
     <div style="margin-top: -46px;margin-left: 140px; width: 800px; height: 100px;">
-        <pe:if condition='<%=not CheckIsSelAdd()%>'>
-            <pe:if condition='<%=CheckHasSkin()%>'>
-                <input type="button"  value="选择" name="select" style="margin-left: 50px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
-                <input type="button"  value="换装" name="change" style="margin-left: 75px;margin-top: 0px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
-                <input type="button"  value="删除" name="delete" style="margin-left: 550px; margin-top: -58px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
-            </pe:if>
-            <pe:if condition='<%=not CheckHasSkin()%>'>
-                <input type="button"  value="换装" name="change" style="margin-left: 150px;margin-top: 0px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
-                <input type="button"  value="删除" name="delete" style="margin-left: 450px; margin-top: -58px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+        <pe:if condition='<%=CheckIsMainPlayer()%>'>
+            <input type="button"  value="选择" name="select" style="margin-left: 250px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+        </pe:if>
+
+        <pe:if condition='<%=not CheckIsMainPlayer()%>'>
+            <pe:if condition='<%=not CheckIsSelAdd()%>'>
+                <pe:if condition='<%=CheckHasSkin()%>'>
+                    <input type="button"  value="选择" name="select" style="margin-left: 50px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+                    <input type="button"  value="换装" name="change" style="margin-left: 75px;margin-top: 0px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+                    <input type="button"  value="删除" name="delete" style="margin-left: 550px; margin-top: -58px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+                </pe:if>
+                <pe:if condition='<%=not CheckHasSkin()%>'>
+                    <input type="button"  value="换装" name="change" style="margin-left: 150px;margin-top: 0px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+                    <input type="button"  value="删除" name="delete" style="margin-left: 450px; margin-top: -58px; width: 178px;height: 58px; font-size: 24px; base-font-size: 24px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/Window/button/btn_lvse_32bits.png#0 0 38 64:16 16 16 16) ;" onclick="OnClickOperate"/>
+                </pe:if>
             </pe:if>
         </pe:if>
+        
     </div>
 </div>
 </pe:mcml>

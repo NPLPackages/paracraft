@@ -78,6 +78,7 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 		_this.text = "打开"
 		_this:SetScript("onclick", function()
 			if projectid then
+				RedSummerCampPPtPage.OnClickAction(action_type)
 				GameLogic.RunCommand(string.format("/loadworld -s -auto %s", projectid))
 			end
 		end);
@@ -102,6 +103,7 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 			_this.background = "Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png;0 0 60 57";
 			_this:SetScript("onclick", function()
 				if course_id then
+					RedSummerCampPPtPage.OnClickAction(action_type)
 					ParacraftLearningRoomDailyPage.OnOpenWeb(tonumber(course_id),true)
 				end
 			end);
@@ -157,6 +159,7 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 		-- _this.font = fontName
 		_this:SetScript("onclick", function()
 			if projectid then
+				RedSummerCampPPtPage.OnClickAction(action_type)
 				GameLogic.RunCommand(string.format("/loadworld -s -auto %s", projectid))
 			end
 		end);
@@ -221,6 +224,7 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 		_this.text = text_value;
 		_this:GetAttributeObject():SetField("TextOffsetY", -1)
 		_this:SetScript("onclick", function()
+			RedSummerCampPPtPage.OnClickAction(action_type)
 			local Opus = NPL.load("(gl)Mod/WorldShare/cellar/Opus/Opus.lua")
 			Opus:Show()
 		end);
@@ -328,6 +332,7 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 		_this.text = "打开"
 		_this:SetScript("onclick", function()
 			if projectid then
+				RedSummerCampPPtPage.OnClickAction(action_type)
 				GameLogic.RunCommand(string.format("/loadworld -s -auto %s", projectid))
 			end
 		end);
@@ -353,6 +358,7 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 			_this.background = "Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png;0 0 60 57";
 			_this:SetScript("onclick", function()
 				if course_id then
+					RedSummerCampPPtPage.OnClickAction(action_type)
 					ParacraftLearningRoomDailyPage.OnOpenWeb(tonumber(course_id),true)
 				end
 			end);
@@ -408,6 +414,7 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 		-- _this.text = text_value;
 		_this:SetScript("onclick", function()
 			if projectid then
+				RedSummerCampPPtPage.OnClickAction(action_type)
 				GameLogic.RunCommand(string.format("/loadworld -s -auto %s", projectid))
 			end
 		end);
@@ -469,6 +476,7 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 		_this.font = "System;26;norm"
 		_this.text = text_value;
 		_this:SetScript("onclick", function()
+			RedSummerCampPPtPage.OnClickAction(action_type)
 			local Opus = NPL.load("(gl)Mod/WorldShare/cellar/Opus/Opus.lua")
 			Opus:Show()
 		end);

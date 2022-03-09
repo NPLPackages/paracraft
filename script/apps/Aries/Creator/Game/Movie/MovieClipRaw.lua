@@ -126,6 +126,12 @@ function MovieClipRaw:IsPlayingMode()
 	return true;
 end
 
+function MovieClipRaw:SetTimeNoUpdate(curTimeMS)
+	if(self.tick ~= curTimeMS) then
+		self.tick = curTimeMS;
+		self.time = (curTimeMS/1000);
+	end
+end
 
 -- time in millisecond ticks
 function MovieClipRaw:SetTime(curTimeMS)
@@ -246,7 +252,7 @@ function MovieClipRaw:RefreshActors()
 	for i, actor in pairs(self.actors) do
 		actor:OnCreate();
 		local entity = actor:GetEntity()
-		if(entity) then
+		if(entity and not actor:IsAgent()) then
 			entity:SetSkipPicking(true);
 		end
 	end
@@ -363,4 +369,16 @@ end
 -- @param movieController: nil or a table of {time = 0, FrameMove = nil}, 
 -- movieController.FrameMove(deltaTime) will be assigned by this function.
 function MovieClipRaw:PlayMatchedMovie(playerEntity, movieController)
+end
+
+-- where the actors are played, default to the main 3d scene. 
+-- only call this function before the movie is activated. 
+-- we are load all movie actors inside a given miniscenegraph by its name. 
+-- @param miniSceneName: if nil, it is the default 3d scene, otherwise it is the miniscenegraph name. 
+function MovieClipRaw:SetScene(miniSceneName)
+	self.sceneName = miniSceneName
+end
+
+function MovieClipRaw:GetScene()
+	return self.sceneName
 end

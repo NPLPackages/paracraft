@@ -450,7 +450,10 @@ function EditModelTask.OnClickProperty()
 		if(modelEntity) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelProperty.lua");
 			local EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
-			EditModelProperty.ShowForEntity(modelEntity)
+			EditModelProperty.ShowForEntity(modelEntity, function(entity)
+				self:SelectModel(entity)
+				self:UpdateValueToPage()
+			end)
 		end
 	end
 end
@@ -483,6 +486,36 @@ function EditModelTask.OnChangeModelType()
 				end
 				GameLogic.GetPlayerController():SetBlockInRightHand(itemStack, true)
 			end
+		end
+	end
+end
+
+function EditModelTask.GetDraggableText()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		if(self.itemInHand) then
+			if(self.itemInHand.id == block_types.names.LiveModel) then
+				return L"可拖动";
+			else
+				return L"不可拖动";
+			end
+		end
+	end
+end
+
+function EditModelTask.OnClickChangeDraggable()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		if(self.itemInHand) then
+			local itemStack = self.itemInHand:Copy();
+			if(self.itemInHand.id == block_types.names.BlockModel) then
+				itemStack.id = block_types.names.LiveModel;
+			elseif(self.itemInHand.id == block_types.names.PhysicsModel) then
+				itemStack.id = block_types.names.LiveModel;
+			elseif(self.itemInHand.id == block_types.names.LiveModel) then
+				itemStack.id = block_types.names.BlockModel;
+			end
+			GameLogic.GetPlayerController():SetBlockInRightHand(itemStack, true)
 		end
 	end
 end

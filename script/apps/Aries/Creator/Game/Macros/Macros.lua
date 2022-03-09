@@ -632,11 +632,13 @@ function Macros:LoadMacrosFromText(text)
 					add_idle = true;
 				end
 				last_total_idle = 0;
-
 				local params = type(m.params) == "table" and m.params or commonlib.split(m.params,",")
 				local text = params[1] or ""
 				if (string.find(text, "\"", 1) == 1 and string.find(text, "\"", string.len(text)) == string.len(text)) then
 					text = string.sub(text, 2, string.len(text) - 1);
+				end
+				if text ~= "" then
+					self.text_lines[#macros+1] = 1
 				end
 				local voiceNarrator = params[4] or 10012;
 				voiceNarrator = tonumber(voiceNarrator);
@@ -656,6 +658,7 @@ function Macros:LoadMacrosFromText(text)
 	end
 	return macros;
 end
+
 
 
 function Macros:HasUnplayedPreparedMode()
@@ -729,6 +732,7 @@ function Macros:Play(text, speed, maxPrepareTime)
 	Macros.hasUnplayedPreparedMode = false;
 	text = text or ParaMisc.GetTextFromClipboard() or "";
 	self.maxPrepareTime = maxPrepareTime or 3;
+	self.text_lines = {}
 	local macros = self:LoadMacrosFromText(text)
 	self:PlayMacros(macros, 1, speed);
 	self:InitPrePlaytextData()
@@ -839,6 +843,11 @@ function Macros:PlayMacros(macros, fromLine, speed)
 		while(true) do
 			local m = macros[fromLine];
 			if(m) then
+				if Macros.IsTextManualPlay() and self.text_lines[fromLine] == 1 and Macros.IsAutoPlay() then
+					self:Pause()
+					MacroPlayer.ShowNextController(true)
+					self.text_lines[fromLine] = 0
+				end
 				self.isPlaying = true;
 				self.curLine = fromLine
 				local isAsync = nil;

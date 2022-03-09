@@ -21,82 +21,9 @@ local curYear,curMonth
 local curSelectLesson = ""
 local gsid = 40007
 local save_key = "cource_scheduling"
-local path = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/"
 RedSummerCampCourseScheduling.curLearnHistroy = {}
-RedSummerCampCourseScheduling.lessonCnf = {
-    {
-        key ="winterOlympic",
-        name="冬季运动会",
-        icon= path.."dongao_94x94_32bits.png#0 0 94 94",
-        num = "30节",
-    }, 
-    {
-        key="ppt_L1",
-        name="机构课L1",
-        icon= path.."i1_94X94_32bits.png#0 0 94 94",
-        num = "24节",
-    },
-    {
-        key="ppt_L2",
-        name="机构课L2",
-        icon= path.."i6_94x94_32bits.png#0 0 94 94",
-        num = "24节",
-    },
-    {
-        key ="ppt_S1",
-        name="社团课S1",
-        icon= path.."i5_94X94_32bits.png#0 0 94 94",
-        num = "16节",
-    },
-    {
-        key ="ppt_X1",
-        name="校园课X1",
-        icon= path.."i3_94X94_32bits.png#0 0 94 94",
-        num = "16节",
-    },
-	{
-         key ="ppt_Z1",
-         name="试听课",
-         icon= path.."i4_94X94_32bits.png#0 0 94 94",
-		 num = "3节",
-    },
-    {
-        key ="campus_X2",
-        name="校园课X2",
-        icon= path.."xiaoyuan_94x94_32bits.png#0 0 94 94",
-        num = "16节",
-    },
-    {
-        key ="holiday",
-        name="寒假课",
-        icon= path.."jiaqi_94x94_32bits.png#0 0 94 94",
-        num = "10节",
-    },
-    {
-        key ="superAnimal",
-        name="超级宠物",
-        icon= path.."dongwuke_94x94_32bits.png#0 0 94 94",
-        num = "11节",
-   },
-   {
-        key ="Jiangxi_lessons",
-        name="江西红色课",
-        icon= path.."jiangxi2_94x94_32bits.png#0 0 94 94",
-        num = "32节",
-    },
-}
-
-local otherConfig = {
-    {
-        key ="winterOlympic",
-        name="冬季运动会",
-        icon= path.."dongao_94x94_32bits.png#0 0 94 94",
-        num = "30节",
-    },
-}
-
--- true to enable lessons for the current users
-local auths = {ppt_L1 = false, ppt_L2 = false, ppt_S1 = false, ppt_X1 = false, campus_X2 = false,holiday = true, ppt_Z1 = true,superAnimal = true,winterOlympic = true,Jiangxi_lessons=true}
+RedSummerCampCourseScheduling.lessonCnf = {}
+RedSummerCampCourseScheduling.auths = {}
 local lessonKeys = {"LP_CommunityCourses","LP_SchoolCourses","LP_OrgCourses"}
 function RedSummerCampCourseScheduling.OnInit()
     page = document:GetPageCtrl();
@@ -121,19 +48,8 @@ function RedSummerCampCourseScheduling.AuthLesson(callback)
         },function(err, msg, data)
             if err == 200 then
                 local curKey = lessonKeys[i]
-                if curKey == "LP_CommunityCourses" then
-                    auths.ppt_S1 = data.data or false
-                end
-                if curKey == "LP_SchoolCourses" then
-                    auths.ppt_X1 = data.data or false
-                    auths.campus_X2 = data.data or false
-                end
-                if curKey == "LP_OrgCourses" then
-                    auths.ppt_L1 = data.data or false
-                    auths.ppt_L2 = data.data or false
-                    -- auths.Jiangxi_lessons = data.data or false
-                    -- auths.superAnimal = data.data or false
-                end
+                local auth = data.data or false
+                RedSummerCampCourseScheduling.UpdateLessonCnf(curKey,auth)
                 times = times + 1
                 if times == #lessonKeys then
                     if callback then
@@ -142,6 +58,48 @@ function RedSummerCampCourseScheduling.AuthLesson(callback)
                 end
             end
         end) 
+    end
+end
+
+function RedSummerCampCourseScheduling.UpdateLessonCnf(auth_key,hasAuth)
+    local lessonNum = #RedSummerCampCourseScheduling.lessonCnf
+    if lessonNum > 0 then
+        for i=1,lessonNum do
+            local lessonKey =  RedSummerCampCourseScheduling.lessonCnf[i].key    
+            local lessonAuth = RedSummerCampCourseScheduling.lessonCnf[i].auth
+            if not lessonAuth then
+                RedSummerCampCourseScheduling.auths[lessonKey] = true
+            else
+                if lessonAuth == auth_key then
+                    RedSummerCampCourseScheduling.auths[lessonKey] = hasAuth
+                end
+            end  
+        end
+    end
+end
+
+function RedSummerCampCourseScheduling.LoadLessonCnf()
+    local path = "config/Aries/creator/lesson_ppt/lesson_config.xml"
+    if ParaIO.DoesFileExist(path, true) then
+        local function parseXmlData(xmlData)
+            if xmlData and #xmlData > 0 then
+                local temp = {}
+                for i,v in ipairs(xmlData) do
+                    for k,v in pairs(v.attr) do
+                        temp[k] = v
+                    end
+                end
+                return temp
+            end
+        end
+        RedSummerCampCourseScheduling.lessonCnf = {}
+        local xmlRoot = ParaXML.LuaXML_ParseFile(path);
+        if(type(xmlRoot)=="table" and table.getn(xmlRoot)>0) then
+            for i=1,table.getn(xmlRoot) do
+                local lesson = parseXmlData(xmlRoot[i])
+                RedSummerCampCourseScheduling.lessonCnf[#RedSummerCampCourseScheduling.lessonCnf + 1] = lesson
+            end
+        end
     end
 end
 
@@ -195,6 +153,9 @@ function RedSummerCampCourseScheduling.ShowPage()
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);
     RedSummerCampCourseScheduling.InitCalendar()
+
+	-- 上报
+	GameLogic.GetFilters():apply_filters('user_behavior', 1, 'crsp.courselist.visit')
 end
 
 function RedSummerCampCourseScheduling.RefreshPage()
@@ -205,7 +166,8 @@ function RedSummerCampCourseScheduling.RefreshPage()
 end
 
 function RedSummerCampCourseScheduling.InitPageData()
-    beginYear = 2000
+    RedSummerCampCourseScheduling.LoadLessonCnf()
+    beginYear = 2021
     endYear = tonumber(os.date("%Y", os.time()) ) or 2022
     Ydata = {}
     curYear = tonumber(os.date("%Y",os.time()))
@@ -290,11 +252,11 @@ end
 function RedSummerCampCourseScheduling.GetDayBack(data)
     if data then
         if RedSummerCampCourseScheduling.IsCurDay(data) then
-            return path.."4_32bits.png;0 0 32 32:14 14 14 14"
+            return "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/4_32bits.png;0 0 32 32:14 14 14 14"
         end
 
         if RedSummerCampCourseScheduling.GetDayHistroy(data) ~= nil then
-            return path.."3_32bits.png;0 0 32 32:14 14 14 14"
+            return "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/3_32bits.png;0 0 32 32:14 14 14 14"
         end
     end
     return ""
@@ -471,7 +433,7 @@ function RedSummerCampCourseScheduling.InitData()
         vo.ms = {}
         for j=2,13 do
             -- 获取该月份的天数  month参数是要填写下月个月份的 天数是0的话就是求得上个月的最后一天，所以month应该+1
-            local tianshu = os.date("%d", os.time({year=i,month=j,day=0}) )
+            local tianshu = os.date("%d",os.time({year=i,month=j,day=0}))
             vo.ms[j-1] = {}
             vo.ms[j-1].ds = {}
             -- 插入天数数据
@@ -534,7 +496,7 @@ function RedSummerCampCourseScheduling.SaveLessonHistroy()
 end
 
 function RedSummerCampCourseScheduling.CheckCanLearn(name)
-    local isCanlearn = auths[name]
+    local isCanlearn = RedSummerCampCourseScheduling.auths[name]
     -- if name == "ppt_X1"  then
     --     return isCanlearn or System.User.isVipSchool
     -- end
@@ -554,7 +516,6 @@ function RedSummerCampCourseScheduling.OnClickLesson(name)
 
     local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
     RedSummerCampPPtPage.Show(curSelectLesson);
-    -- print("RedSummerCampCourseScheduling name============",name)
 end
 
 function RedSummerCampCourseScheduling.ClosePage()

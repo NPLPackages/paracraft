@@ -9,6 +9,11 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local channel = MovieManager:CreateGetMovieChannel("main"):SetStartBlockPosition(x,y,z)
 channel:Play(0)
+
+local channel = MovieManager:CreateGetMovieChannel("main");
+channel:CreateFromTemplateFile("paracraftlogo.blocks.xml", 0,0,0);
+channel:SetScene("MyMiniSceneGraph")
+channel:Play(0)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
@@ -81,8 +86,8 @@ function MovieChannel:GetStartBlockPosition()
 end
 
 function MovieChannel:CreateGetStartMovieClip()
-	if(not self.clips and self.startX) then
-		local blockEntity = EntityManager.GetBlockEntity(self.startX, self.startY, self.startZ);
+	if(not self.clips and (self.startX or self.startupMovieEntity)) then
+		local blockEntity = self.startupMovieEntity or EntityManager.GetBlockEntity(self.startX, self.startY, self.startZ);
 		if(blockEntity and blockEntity.GetMovieClip) then
 			self.clips = {}
 			local movieClip = MovieClipRaw:new():Init(blockEntity);
@@ -129,19 +134,30 @@ function MovieChannel:IsLooping()
 	return self.bLooping;
 end
 
+function MovieChannel:SetAutoStopWhenPlayFinish(bStopWhenPlayFinish)
+	self.bStopWhenPlayFinish= bStopWhenPlayFinish;
+end
+
+function MovieChannel:IsAutoStopWhenPlayFinish()
+	return self.bStopWhenPlayFinish;
+end
+
 -- @param timeFrom: time in milliseconds, default to 0.
 -- @param timeTo: if nil, default to timeFrom. if -1, it means total movie block length. 
 function MovieChannel:Play(fromTime, toTime, bLooping)
-	
 	local movieClip = self:CreateGetStartMovieClip()
 	if(movieClip) then
+		if(movieClip:GetScene() ~= self:GetScene()) then
+			movieClip:SetScene(self:GetScene());
+		end
+
 		self:FireFinished();
 		movieClip:SetReuseActor(self:IsReuseActor());
 		if(not fromTime) then
 			movieClip:GotoBeginFrame();
 			fromTime = movieClip:GetTime();
 		else
-			movieClip:SetTime(fromTime);
+			movieClip:SetTimeNoUpdate(fromTime);
 		end
 		toTime = toTime or fromTime;
 		if(toTime == -1) then
@@ -222,6 +238,7 @@ function MovieChannel:CheckSentient()
 	return true;
 end
 
+
 function MovieChannel:OnMovieTimeChange()
 	local movieClip = self:GetCurrentMovieClip();
 	if(movieClip) then
@@ -263,6 +280,9 @@ function MovieChannel:OnMovieTimeChange()
 					movieClip:Disconnect("timeChanged", self, self.OnMovieTimeChange);
 					movieClip:SetTime(self.playToTime);
 					self:FireFinished();
+					if(self:IsAutoStopWhenPlayFinish()) then
+						movieClip:Stop()
+					end
 				else
 					self:CheckSentient()
 				end
@@ -292,4 +312,27 @@ function MovieChannel:Stop()
 	end
 	self:FireFinished();
 	self:stopped(); -- signal
+end
+
+
+-- where the actors are played, default to the main 3d scene. 
+-- only call this function before the movie is activated. 
+-- we are load all movie actors inside a given miniscenegraph by its name. 
+-- @param miniSceneName: if nil, it is the default 3d scene, otherwise it is the miniscenegraph name. 
+function MovieChannel:SetScene(miniSceneName)
+	self.sceneName = miniSceneName
+end
+
+function MovieChannel:GetScene()
+	return self.sceneName
+end
+
+-- static function: create a movie entity in memory from a block template file. 
+-- @param filename: block template file that should only contain one movie block. 
+-- @param bx, by, bz: movie block position
+-- @return movieEntity
+function MovieChannel:CreateFromTemplateFile(filename, bx, by, bz)
+	local EntityMovieClip = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip")
+	local entity = EntityMovieClip:CreateFromTemplateFile(filename, bx, by, bz)
+	self.startupMovieEntity = entity;
 end

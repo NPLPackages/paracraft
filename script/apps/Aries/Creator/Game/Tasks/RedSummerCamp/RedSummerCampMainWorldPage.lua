@@ -54,7 +54,6 @@ function RedSummerCampMainWorldPage.Show()
 		RedSummerCampMainWorldPage.IsFPSView = GameLogic.IsFPSView
 		GameLogic.ToggleCamera(false)
 	end
-	
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
 	local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
@@ -87,6 +86,8 @@ function RedSummerCampMainWorldPage.Show()
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
 	RedSummerCampMainWorldPage.BindEvent()
+	-- 上报
+	GameLogic.GetFilters():apply_filters('user_behavior', 1, 'crsp.homepage.visit')
 end
 
 function RedSummerCampMainWorldPage.InitData(name)

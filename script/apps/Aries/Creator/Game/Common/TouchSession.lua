@@ -12,10 +12,15 @@ local session = TouchSession:new();
 session:OnTouchEvent(touch);
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/timer.lua");
+NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine");
 
 -- touch Session class
-local TouchSession = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.Common.TouchSession"));
+local TouchSession = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Common.TouchSession"));
+
+-- closed when pointer up is not handled
+TouchSession:Signal("touchForceClosed");
 
 -- when hovering, we allow user to accitentally move this amount of pixels at most. 
 local touch_hover_dist_allowed = 10;
@@ -32,7 +37,8 @@ end
 local touch_sessions = commonlib.UnorderedArraySet:new();
 
 -- public static function: 
-function TouchSession.GetTouchSession(touch)
+-- @param touch: this is the message from C++ ontouch event, such as {type, id:number, x, y, time, }
+function TouchSession.CreateGetTouchSession(touch)
 	if(touch) then
 		local session;
 		for i = 1, #touch_sessions do
@@ -45,8 +51,52 @@ function TouchSession.GetTouchSession(touch)
 			session = TouchSession:new({id = touch.id});
 			touch_sessions:add(session);
 		end
+		return session;
+	end
+end
+
+function TouchSession.GetExistingTouchSession(touch)
+	if(touch) then
+		local session;
+		for i = 1, #touch_sessions do
+			if(touch_sessions[i].id == touch.id) then
+				session = touch_sessions[i];
+				break;
+			end
+		end
+		return session;
+	end
+end
+
+-- public static function: this function will call session:OnTouchEvent internally. 
+-- use CreateGetTouchSession() if one wants to just get the session without handle it. 
+function TouchSession.GetTouchSession(touch)
+	local session = TouchSession.CreateGetTouchSession(touch)
+	if(session) then
 		session:OnTouchEvent(touch);
 		return session;
+	end
+end
+
+-- we will remove already closed session or timed out sessions
+-- @param minClosedDuration: only remove sessions if it is closed for this duration. default to 1000ms
+function TouchSession.RemoveClosedSessions(minClosedDuration)
+	minClosedDuration = minClosedDuration or 1000;
+	local sessionTimeout = 15000
+	local touch_sessions = TouchSession.GetAllSessions();
+	local curTime = commonlib.TimerManager.GetCurrentTime()
+	local i = 1
+	while(true) do
+		local touch_session = touch_sessions[i];
+		if(not touch_session) then
+			break;
+		elseif((curTime > (touch_session:GetLastTickTime() + sessionTimeout)) or
+			(touch_session:IsClosed() and (curTime > (touch_session:GetLastTickTime() + minClosedDuration)))) then
+			touch_session:touchForceClosed()
+			touch_sessions:remove(i);
+		else
+			i = i + 1
+		end
 	end
 end
 
@@ -60,6 +110,14 @@ end
 
 function TouchSession:GetTouchID()
 	return self.id or 0;
+end
+
+function TouchSession:Tick(time)
+	self.lastTickTime = time or commonlib.TimerManager.GetCurrentTime();
+end
+
+function TouchSession:GetLastTickTime()
+	return self.lastTickTime or commonlib.TimerManager.GetCurrentTime();
 end
 
 function TouchSession:GetStartTouch()
@@ -287,12 +345,33 @@ function TouchSession:UpdateHoverTouch(touch)
 end
 
 function TouchSession:handleTouchMove(touch)
+	if(self.x ~= touch.x or self.y ~= touch.y) then
+		self.x = touch.x;
+		self.y = touch.y;
+		self.isMoved = true;
+	end
 	self:UpdateMaxDragDist(touch);
 	self:UpdateHoverTouch(touch);
-
+	
 	if(self.OnTouchMove) then
 		self:OnTouchMove();
 	end
+end
+
+function TouchSession:ClearIsMoved()
+	self.isMoved = false;
+end
+
+function TouchSession:IsMoved()
+	return self.isMoved;
+end
+
+function TouchSession:IsClosed()
+	return self.isClosed;
+end
+
+function TouchSession:SetClosed()
+	self.isClosed = true;
 end
 
 function TouchSession:handleTouchUp(touch)
@@ -307,7 +386,9 @@ function TouchSession:handleTouchUp(touch)
 	end
 	-- remove from session array
 	for i = 1, #touch_sessions do
-		if(touch_sessions[i].id == touch.id) then
+		local touchSession = touch_sessions[i]
+		if(touchSession.id == touch.id) then
+			touchSession:SetClosed()
 			touch_sessions:remove(i);
 			break;
 		end

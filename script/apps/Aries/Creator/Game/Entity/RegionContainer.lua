@@ -8,11 +8,13 @@ use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/RegionContainer.lua");
 local RegionContainer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.RegionContainer");
+local region = EntityManager.GetRegionContainer(regionX*512, regionY*512)
+region:LoadRegion(callbackFunc)
 -------------------------------------------------------
 ]]
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
-
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -117,6 +119,8 @@ function RegionContainer:SaveToAnotherRegion(filename, regionX, regionY)
 
 	local offsetX = (regionX - self.region_x) * 512;
 	local offsetZ = (regionY - self.region_z) * 512;
+	local offsetXReal = offsetX * BlockEngine.blocksize;
+	local offsetZReal = offsetZ * BlockEngine.blocksize;
 
 	if(not next(self.entities)) then
 		if(not ParaIO.DoesAssetFileExist(filename, true))then
@@ -150,6 +154,13 @@ function RegionContainer:SaveToAnotherRegion(filename, regionX, regionY)
 			if(entity:IsBlockEntity()) then
 				node.attr.bx = x;
 				node.attr.bz = z;
+			elseif(node.attr.x) then
+				node.attr.x = node.attr.x + offsetXReal;
+				node.attr.z = node.attr.z + offsetZReal;
+				if(node.attr.bx) then
+					node.attr.bx = x;
+					node.attr.bz = z;
+				end
 			end
 
 			posValue = (x or 0) * 100000000 +  (y or 0) * 1000000 + (z or 0);
@@ -274,7 +285,7 @@ function RegionContainer:LoadFromFile(filename)
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	local privateKey = WorldCommon.GetWorldTag("privateKey");
 
-	if (privateKey and type(privateKey) == "string" and privateKey ~= "") then
+	if (xmlRoot and privateKey and type(privateKey) == "string" and privateKey ~= "") then
 		if (xmlRoot[1] and xmlRoot[1].attr and xmlRoot[1].attr.privateKey ~= privateKey) then
 			return;
 		end
@@ -325,5 +336,28 @@ function RegionContainer:LoadFromFile(filename)
 		end
 		LOG.std(nil, "system", "RegionContainer", "loading %d entities from file: %s", count, filename);
 		return true;
+	end
+end
+
+-- @param callbackFunc: this function is called when region is loaded and not locked. if nil, we will not create region if it does not exist
+function RegionContainer:LoadRegion(callbackFunc)
+	local attrRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", self.region_x, self.region_z))
+	if(not attrRegion:IsValid()) then
+		-- create region first
+		ParaBlockWorld.LoadRegion(GameLogic.GetBlockWorld(), self.region_x * 512, 0, self.region_z * 512);
+		attrRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", self.region_x, self.region_z))
+	end
+	if(callbackFunc and attrRegion:IsValid()) then
+		if(attrRegion:GetField("IsLocked", false)) then
+			local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+				if(not attrRegion:IsValid() or not attrRegion:GetField("IsLocked", false)) then
+					timer:Change()
+					callbackFunc(true)
+				end
+			end})
+			mytimer:Change(50, 100)
+		else
+			callbackFunc(true)
+		end
 	end
 end

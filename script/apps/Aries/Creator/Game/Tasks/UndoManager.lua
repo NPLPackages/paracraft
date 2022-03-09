@@ -46,8 +46,7 @@ function UndoManager.Clear()
 	redo_list:clear();
 end
 
-function UndoManager.Undo()
-	local cmd = undo_list:last()
+function UndoManager.UndoCommandImp(cmd)
 	if(cmd) then
 		if(cmd[1].Undo) then
 			cmd[1]:Undo();
@@ -58,8 +57,26 @@ function UndoManager.Undo()
 	end
 end
 
-function UndoManager.Redo()
-	local cmd = redo_list:last()
+function UndoManager.Undo()
+	local cmd = undo_list:last()
+	if(cmd) then
+		UndoManager.UndoCommandImp(cmd)
+
+		if(cmd[1]:HasBatchCommand()) then
+			local cmd2 = undo_list:last();
+			while (cmd2) do
+				if(cmd[1]:HasBatchCommand(cmd2[1])) then
+					UndoManager.UndoCommandImp(cmd2)
+				else
+					break;
+				end
+				cmd2 = undo_list:last();
+			end
+		end
+	end
+end
+
+function UndoManager.RedoCommandImp(cmd)
 	if(cmd) then
 		if(cmd[1].Redo) then
 			cmd[1]:Redo();
@@ -67,6 +84,25 @@ function UndoManager.Redo()
 		end
 		redo_list:remove(cmd);
 		undo_list:push_back(cmd);
+	end
+end
+
+function UndoManager.Redo()
+	local cmd = redo_list:last()
+	if(cmd) then
+		UndoManager.RedoCommandImp(cmd)
+
+		if(cmd[1]:HasBatchCommand()) then
+			local cmd2 = redo_list:last();
+			while (cmd2) do
+				if(cmd[1]:HasBatchCommand(cmd2[1])) then
+					UndoManager.RedoCommandImp(cmd2)
+				else
+					break;
+				end
+				cmd2 = redo_list:last();
+			end
+		end
 	end
 end
 

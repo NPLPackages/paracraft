@@ -691,10 +691,10 @@ function QuestAllCourse.RunCommand(index, is_pre)
                             timeRules = {
                                 {
                                     endDay="2023-09-30",
-                                    endTime="16:20",
+                                    endTime="17:00",
                                     id=2,
                                     startDay="2021-09-01",
-                                    startTime="08:00",
+                                    startTime="07:30",
                                     weeks={1,2,3,4,5} 
                                 },
                             }

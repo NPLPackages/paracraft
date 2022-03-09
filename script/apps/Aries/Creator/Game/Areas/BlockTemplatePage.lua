@@ -258,7 +258,7 @@ function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc
 		GameLogic.AddBBS("copyright_respect", L"请尊重别人的创意,不要盗版!", 6000, "0 255 0");
 	end
 
-	if(not blocks or #blocks<1) then
+	if((not blocks or #blocks<1) and not liveEntities) then
 		_guihelper.MessageBox(L"需要选中多块才能存为模板");
 		return;
 	end

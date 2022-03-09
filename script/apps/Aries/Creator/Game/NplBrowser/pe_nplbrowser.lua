@@ -22,8 +22,19 @@ local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
 
 function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout)
-    if System.os.GetPlatform() == 'win32' and not NplBrowserLoaderPage.IsLoaded() then
-        return
+    if System.os.GetPlatform() == 'win32' then
+		if(not NplBrowserLoaderPage.IsLoaded())then
+			if(not pe_nplbrowser.isBrowserLoading) then
+				pe_nplbrowser.isBrowserLoading = true
+				NplBrowserLoaderPage.Check(function(bLoaded)
+					if(bLoaded) then
+						pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout)
+					end
+					pe_nplbrowser.isBrowserLoading = false
+				end)
+			end
+			return
+		end
 	end
 	
 	if System.os.GetPlatform() == 'android' then

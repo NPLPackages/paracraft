@@ -117,6 +117,26 @@
 	</category>
 	
 	<category name="hair" text="头饰">
+        <!-- 20220303新增-->
+        <item id="83193"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83193_chef_32bits.png" name="厨师（男）"/>
+		<item id="83194"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83194_cheffy_32bits.png" name="厨师（女）"/>
+        <item id="83195"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83195_antiapidemic_32bits.png" name="防疫头盔"/>
+        <item id="83196"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83196_navy_hat_32bits.png" name="海军帽（男）"/>
+		<item id="83197"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83197_navy_hat_female_32bits.png" name="海军帽（女）"/>
+		<item id="83198"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83198_army_hat_32bits.png" name="陆军帽（男）"/>
+		<item id="83199"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83199_army_hat_female_32bits.png" name="陆军帽（女）"/>
+		<item id="83200"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83200_air_hat_32bits.png" name="空军帽（男）"/>
+		<item id="83201"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83201_air_hat_female_32bits.png" name="空军帽（女）"/>
+		<item id="83202"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83202_police_hat_32bits.png" name="警察"/>
+		<item id="83203"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83203_police_hat_female_32bits.png" name="女警1"/>
+		<item id="83204"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83204_police_hat_female2_32bits.png" name="女警2"/>
+		<item id="83205"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83205_traffic_police_hat_32bits.png" name="交警"/>
+		<item id="83206"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83206_traffic_police_hat_female_32bits.png" name="女交警1"/>
+		<item id="83207"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83207_traffic_police_hat_female2_32bits.png" name="女交警2"/>
+		<item id="83208"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83208_architect_hat_female_32bits.png" name="建筑师（女）"/>
+		<item id="83209"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83209_cleaner_hat_female_32bits.png" name="环卫工（女）"/>
+		<item id="83210"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83210_firefighter_hat_32bits.png" name="消防员"/>
+
 	    <!-- 20220120新增-->
         <item id="83191"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83191_silver_hair_32bits.png" name="银色头发" avatarMode="false"/>
 		<item id="83192"  gsid="82027" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83192_little_red_32bits.png" name="小红帽"/>
@@ -784,7 +804,7 @@
 	
 	<category name="back" text="背部">
 	    <!--20220120新加-->
-		<item id="86047" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86047_brown_backhat_32bits.png" name="环卫腰包" avatarMode="false"/>
+		<item id="86047" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86047_brown_backhat_32bits.png" name="棕色背帽" avatarMode="false"/>
 	    <!--20211118新加-->
 		<item id="86045" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86045_cleaner_back_32bits.png" name="环卫腰包" avatarMode="false"/>
 		<item id="86046" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86046_archaeologist_back_32bits.png" name="考古腰包" avatarMode="false"/>

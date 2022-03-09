@@ -187,6 +187,10 @@ function Entity:CreateInnerObject(filename, scale)
 		self:SetIdleAnim(self:GetIdleAnim())
 	end
 
+	if((self.opacity or 1) ~= 1) then
+		self:SetOpacity(self.opacity or 1);
+	end
+
 	self:SetInnerObject(model);
 	ParaScene.Attach(model);
 	return model;
@@ -381,6 +385,9 @@ function Entity:LoadFromXMLNode(node)
 		else
 			self.roll = nil
 		end
+		if(attr.opacity) then
+			self.opacity = tonumber(attr.opacity)
+		end
 	end
 end
 
@@ -431,6 +438,10 @@ function Entity:SaveToXMLNode(node, bSort)
 	attr.stackHeight = self.stackHeight;
 	attr.isStackable = self.isStackable;
 	attr.bIsAutoTurning = self.bIsAutoTurning;
+
+	if((self.opacity or 1) ~= 1) then
+		attr.opacity = self.opacity;
+	end
 	
 	if(self:GetMountPoints()) then
 		self:GetMountPoints():SaveToXMLNode(node, bSort)
@@ -503,13 +514,12 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	else
 		if(mouse_button == "left" and self.onclickEvent) then
 			local x, y, z = self:GetBlockPos();
-			local event = Event:new():init(onclickEvent);	
+			local event = Event:new():init(self.onclickEvent);	
 			local facing = Direction.directionTo3DFacing[side or 0]
-			event.cmd_text = string.format("{x=%d, y=%d, z=%d, name=%q, facing=%f}", x, y, z, self.name, facing or 0);
+			event.cmd_text = string.format("{x=%d, y=%d, z=%d, name=%q, facing=%f}", x, y, z, self.name or "", facing or 0);
 			local result = GameLogic:event(event, true);
-			if(result) then
-				return true;
-			end
+			-- tricky: unlike LiveModel entity, block model will always return true if there is an onclick event
+			return true;
 		else
 			if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 				self:OpenEditor("entity", entity);
@@ -649,4 +659,31 @@ end
 -- this function may return nil if no mount points are created. 
 function Entity:GetMountPointsCount()
 	return self.mountpoints and self.mountpoints:GetCount();
+end
+
+-- @return new live model entity if changed
+function Entity:SetCanDrag(canDrag)
+	if(self.canDrag ~= canDrag) then
+		self.canDrag = canDrag;
+		if(canDrag) then
+			return self:TransformToLiveModel()
+		end
+	end
+end
+
+-- we will change this entity into entity live model instead of block model
+-- @return new live model entity
+function Entity:TransformToLiveModel()
+	local xmlNode = self:SaveToXMLNode()
+	xmlNode.attr.name = nil;
+	xmlNode.attr.linkTo = nil;
+	xmlNode.attr.item_id = block_types.names.LiveModel;
+	xmlNode.attr.class = EntityManager.EntityLiveModel.class_name;
+	local x, y, z = self:GetPosition()
+	local facing = self:GetFacing()
+	local bx, by, bz = self:GetBlockPos()
+	BlockEngine:SetBlock(bx, by, bz, 0);
+	local entity = EntityManager.EntityLiveModel:Create({x=x, y=y, z=z, facing=facing}, xmlNode);
+	entity:Attach();
+	return entity
 end

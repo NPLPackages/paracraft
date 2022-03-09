@@ -94,8 +94,7 @@ end
 
 -- virtual: 
 function ParalifeContext:mousePressEvent(event)
-	if(not self:CanMoveToMouseCursor()) then
-		event:accept()
+	if(not self:CanMoveToMouseCursor(event)) then
 		return
 	end
 	ParalifeContext._super.mousePressEvent(self, event);
@@ -106,7 +105,7 @@ function ParalifeContext:mousePressEvent(event)
 
 	self:EnableMouseDownTimer(true);
 
-	local result = self:CheckMousePick();
+	local result = self:CheckMousePick(event);
 	self:UpdateClickStrength(0, result);
 	self:UpdateMouseRotationSpeed();
 
@@ -128,7 +127,7 @@ function ParalifeContext:mouseMoveEvent(event)
 	if(event:isAccepted()) then
 		return
 	end
-	local result = self:CheckMousePick();
+	local result = self:CheckMousePick(event);
 end
 
 function ParalifeContext:handleLeftClickScene(event, result)
@@ -179,7 +178,7 @@ end
 -- virtual: 
 function ParalifeContext:mouseReleaseEvent(event)
 	if(not self:CanMoveToMouseCursor()) then
-		self:RestoreDraggingEntity()
+		self:RestoreDraggingEntity(event)
 		event:accept()
 		return
 	end
@@ -189,7 +188,7 @@ function ParalifeContext:mouseReleaseEvent(event)
 	end
 
 	if(self.is_click) then
-		local result = self:CheckMousePick();
+		local result = self:CheckMousePick(event);
 		local isClickProcessed;
 		
 		-- escape alt key for entity event, since alt key is for picking entity. 
@@ -212,21 +211,27 @@ function ParalifeContext:mouseReleaseEvent(event)
 		if(event.mouse_button == "left" and not event:IsCtrlKeysPressed() and not event:isAccepted() and result and result.x and GameLogic.GetPlayerController():OnClickSensorsByPoint(result.x, result.y, result.z, event.mouse_button)) then
 			-- check for click sensors
 			event:accept();
-		elseif(not event:isAccepted() and self:IsClickToMoveEnabled() and result and result.blockZ) then
-			if(result.physicalX) then
-				-- when clicking on physical mesh, we will only move if the point in close to horizontal plane. 
-				local x, y, z = result.physicalX, result.physicalY, result.physicalZ;
-				-- we also need to ensure that there is 4 meters free space above the click point. 
-				local entity, x1, y1, z1 = self:RayPickPhysicalLiveModel(x, y+4, z, 0, -1, 0, 10)
-				if(entity and y1 and math.abs(y-y1) < 0.1) then
-					self:SetTargetPosition(x, y, z)
-					event:accept();
-				end
-			elseif(result.side) then
-				local block = BlockEngine:GetBlock(result.blockX, result.blockY, result.blockZ)
-				if(block) then
-					self:MovePlayerToBlock(result.blockX, result.blockY, result.blockZ, result.block_id, result.side)
-					event:accept();
+		elseif(not event:isAccepted() and self:IsClickToMoveEnabled()) then
+			if(not result or not result.blockZ) then
+				result = SelectionManager:MousePickBlock(true, true, true, 256, event.x, event.y)
+			end
+			if(result and result.blockZ) then
+				if(result.physicalX) then
+					-- when clicking on physical mesh, we will only move if the point in close to horizontal plane. 
+					local x, y, z = result.physicalX, result.physicalY, result.physicalZ;
+					-- we also need to ensure that there is 4 meters free space above the click point. 
+					local entity, x1, y1, z1 = self:RayPickPhysicalLiveModel(x, y+4, z, 0, -1, 0, 10)
+					if(entity and y1 and math.abs(y-y1) < 0.1) then
+						self:SetTargetPosition(x, y, z)
+						event:accept();
+					end
+				elseif(result.side) then
+					local block = BlockEngine:GetBlock(result.blockX, result.blockY, result.blockZ)
+					if(block) then
+						if(self:MovePlayerToBlock(result.blockX, result.blockY, result.blockZ, result.block_id, result.side)) then
+							event:accept();
+						end
+					end
 				end
 			end
 		end
@@ -362,7 +367,9 @@ function ParalifeContext:CalculateWallParamsByBlockSide(bx, by, bz, side)
 	return params
 end
 
+-- @return bx, by, bz: it will return nil if no free fall position is found. 
 function ParalifeContext:GetFreeFallPosition(bx, by, bz)
+	local lastY = by;
 	while(by > 0) do
 		local block = BlockEngine:GetBlock(bx, by, bz)
 		if(block and (block.solid or block.obstruction)) then
@@ -373,15 +380,28 @@ function ParalifeContext:GetFreeFallPosition(bx, by, bz)
 			by = by - 1
 		end
 	end
-	return bx, by, bz;
+	if(by <= lastY) then
+		-- check 2 blocks above for free space, since the main player is 2 blocks high by default. 
+		for i=0, 1 do
+			local block = BlockEngine:GetBlock(bx, by+i, bz)
+			if(block and (block.solid or block.obstruction)) then
+				return;
+			end
+		end
+
+		return bx, by, bz;
+	end
 end
 
 -- refactor this to another task file
+-- @return true if we are moving or false if can not move to target
 function ParalifeContext:MovePlayerToBlock(bx, by, bz, blockId, side)
 	local oldBx, oldBy, oldBz = bx, by, bz
 	local bx, by, bz = BlockEngine:GetBlockIndexBySide(bx, by, bz, side)
 	bx, by, bz = self:GetFreeFallPosition(bx, by, bz)
-
+	if(not bx) then
+		return
+	end
 	if(side and side>=0 and side<=3) then
 		local params = self:CalculateWallParamsByBlockSide(oldBx, oldBy, oldBz, side);
 		if(params.wallHeight >= 4 and params.wallWidth >= 4) then
@@ -392,6 +412,9 @@ function ParalifeContext:MovePlayerToBlock(bx, by, bz, blockId, side)
 				local dx, dy, dz = Direction.GetOffsetBySide(side)
 				bx, bz = bx+dx*minDistanceToWall, bz+dz*minDistanceToWall
 				bx, by, bz = self:GetFreeFallPosition(bx, by, bz)
+				if(not bx) then
+					return;
+				end
 			end
 
 			local facing = Direction.directionTo3DFacing[side]
@@ -402,6 +425,7 @@ function ParalifeContext:MovePlayerToBlock(bx, by, bz, blockId, side)
 	end
 
 	self:SetTargetBlockPosition(bx, by, bz)
+	return true;
 end
 
 local gameEvents_ = {
@@ -482,33 +506,9 @@ end
 -- @param event: nil or a mouse event invoking this method. 
 -- @return the picking result table
 function ParalifeContext:CheckMousePick(event)
-	local result
-	if(event and event:GetType() == "mousePressEvent") then
-		-- we shall use finger picking for live entity smaller than 0.3
-		if(GameLogic.options:HasTouchDevice()) then
-			local results = SelectionManager:MousePickWithFingerSize(true, true, true, nil, self.fingerRadius)
-			local lastMinExtent = 9999999;
-			for _, r in ipairs(results) do
-				local entity = r.entity;
-				if(entity and entity:isa(EntityManager.EntityLiveModel)) then
-					local aabb = entity:GetInnerObjectAABB()
-					local minExtent = aabb:GetMinExtent()
-					-- if entity's radius is bigger than 0.3, we will not use finger picking
-					if(minExtent < self.maxFingerPickingRadius and minExtent < lastMinExtent) then
-						lastMinExtent = minExtent;
-						result = r;
-					end
-				end
-			end
-			if(result) then
-				SelectionManager:GetPickingResult():CopyFrom(result);
-			end
-		end
-	end
-	result = result or SelectionManager:MousePickBlock();
-
-	CameraController.OnMousePick(result, SelectionManager:GetPickingDist());
+	local result = self.itemLiveModel and self.itemLiveModel:MousePickBlock(event)
 	
+	CameraController.OnMousePick(result, SelectionManager:GetPickingDist());
 	-- highlight the block or terrain that the mouse picked
 	if(result.length and result.length<SelectionManager:GetPickingDist() and GameLogic.GameMode:CanSelect()) then
 		if(self.isHighLightEntity) then
@@ -524,11 +524,11 @@ function ParalifeContext:CheckMousePick(event)
 	return result;
 end
 
-function ParalifeContext:CanMoveToMouseCursor()
+function ParalifeContext:CanMoveToMouseCursor(event)
 	local player = EntityManager.GetPlayer()
 	if(player) then
 		local fromX, fromY, fromZ = player:GetBlockPos()
-		local result = SelectionManager:MousePickBlock()
+		local result = SelectionManager:MousePickBlock(true, true, true, 256)
 		if(result.blockX) then
 			local toX, toY, toZ = result.blockX, result.blockY, result.blockZ
 			return self:CanMoveFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)
@@ -537,7 +537,34 @@ function ParalifeContext:CanMoveToMouseCursor()
 	return true;
 end
 
--- we will check if there is endstone(id:155) between from point and to point. if there is, we will return false, otherwise true. 
+-- @param moveTime: if nil, we will move to target location with automatic speed.
+-- if not, it will be the exact time to spend to move to the target. 
+function ParalifeContext:SetTargetPosition(x, y, z, moveTime)
+	local player = EntityManager.GetPlayer()
+	if(player) then
+		local fromX, fromY, fromZ = player:GetPosition()
+		if(not x or self:CanMovePlayerFromSrcToDest(fromX, fromY, fromZ, x, y, z)) then
+			ParalifeContext._super.SetTargetPosition(self, x, y, z, moveTime)
+		end
+	end
+end
+
+-- This is used for continous moving player 
+-- @param fromX, fromY, fromZ: real world coordinates
+-- @param toX, toY, toZ: real world coordinates
+function ParalifeContext:CanMovePlayerFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)
+	if(self:HasInvisibleBlockerFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)) then
+		return false;
+	end
+	fromX, fromY, fromZ = BlockEngine:block(fromX, fromY, fromZ);
+	toX, toY, toZ = BlockEngine:block(toX, toY, toZ);
+	if(not self:CanMoveFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)) then
+		return false;
+	end
+	return true
+end
+
+-- we will check if there is endstone(id:155) between from_point and to_point. if there is, we will return false, otherwise true. 
 -- if fromX, fromZ is on endstone, we will always return true
 -- @param fromX, fromY, fromZ: block world coordinates
 -- @param toX, toY, toZ: block world coordinates
@@ -575,8 +602,8 @@ function ParalifeContext:CanMoveFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ
 	return not bHasMarker;
 end
 
-function ParalifeContext:RestoreDraggingEntity()
+function ParalifeContext:RestoreDraggingEntity(event)
 	if(self.itemLiveModel) then
-		self.itemLiveModel:RestoreDraggingEntity()
+		self.itemLiveModel:RestoreDraggingEntity(event)
 	end
 end

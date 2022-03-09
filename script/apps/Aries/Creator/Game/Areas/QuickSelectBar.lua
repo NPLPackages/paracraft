@@ -212,12 +212,14 @@ function QuickSelectBar:OnHandToolIndexChanged(event)
 	if(page) then
 		local ctl = page:FindControl("handtool_highlight_bg");
 		if(ctl) then
-			if(System.options.IsMobilePlatform) then
-				ctl.x = (GameLogic.GetPlayerController():GetHandToolIndex()-1)*77 + 1;
-			else
-				ctl.x = (GameLogic.GetPlayerController():GetHandToolIndex()-1)*41;
+			local index = GameLogic.GetPlayerController():GetHandToolIndex()
+			if(index) then
+				if(System.options.IsMobilePlatform) then
+					ctl.x = (index-1)*77 + 1;
+				else
+					ctl.x = (index-1)*41;
+				end
 			end
-			
 		end
 	end
 end

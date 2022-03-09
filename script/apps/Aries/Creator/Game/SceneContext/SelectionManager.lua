@@ -86,15 +86,27 @@ function SelectionManager:FilterEntity(entity)
 	end
 end
 
+-- @param filters: default to 0xffffffff. 
+-- 0x85: for solid(0x4) or obstruction(0x1) or customModel object(0x80).
+-- 0x84: for solid or customModel object
+-- 0x5: for solid or obstruction
+function SelectionManager:SetBlockFilters(filters)
+	self.blockFilters = filters or 0xffffffff;
+end
+
+function SelectionManager:GetBlockFilters()
+	return self.blockFilters or 0xffffffff;
+end
+
 -- return true if mouse is picking the given entity. Please note this will disregard SkipPicking attribute on the entity. 
 -- @param entity: if nil,  we will use main player
-function SelectionManager:IsMousePickingEntity(entity)
+function SelectionManager:IsMousePickingEntity(entity, event)
 	entity = entity or EntityManager.GetPlayer();
 	local bIsLastSkipPicking = entity:IsSkipPicking()
 	if(bIsLastSkipPicking) then
 		entity:SetSkipPicking(false)
 	end
-	local result = self:MousePickBlock()
+	local result = self:MousePickBlock(nil, nil, nil, nil, event and event.x, event and event.y)
 	if(bIsLastSkipPicking) then
 		entity:SetSkipPicking(true)
 	end
@@ -116,9 +128,10 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 	local mouseRay;
 	if(mouseX and mouseY) then
 		mouseRay = Cameras:GetCurrent():GetMouseRay(mouseX, mouseY, Matrix4.IDENTITY);
-		local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+		local origin = Cameras:GetCurrent():GetRenderOrigin();
 		mouseRay.mOrig:add(origin[1], origin[2], origin[3])
 	end
+	result.mouseX, result.mouseY = mouseX, mouseY;
 
 	local function ParaTerrain_MousePick_(picking_dist, result, filters)
 		if(not mouseRay) then
@@ -139,13 +152,10 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 
 	-- pick blocks
 	if(bPickBlocks~=false) then
-		result = ParaTerrain_MousePick_(picking_dist, result, 0xffffffff);
+		result = ParaTerrain_MousePick_(picking_dist, result, self:GetBlockFilters());
 		if(result.blockX) then
 			result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 			if(result.block_id > 0) then
-				result.blockRealX, result.blockRealY, result.blockRealZ = result.x, result.y, result.z;
-				result.blockLength = result.length;
-				result.blockSide = result.side;
 				local block = block_types.get(result.block_id);
 				if(not block) then
 					-- remove blocks for non-exist blocks
@@ -153,13 +163,13 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 					BlockEngine:SetBlock(result.blockX,result.blockY,result.blockZ, 0);
 				elseif(block.material:isLiquid() and block_types.names.LilyPad ~= GameLogic.GetBlockInRightHand() and not GameLogic.options:GetWorldOption("selectWater")) then
 					-- if we are picking a liquid object, we discard it and pick again for solid or obstruction or customModel object. 
-					result = ParaTerrain_MousePick_(picking_dist, result, 0x85);
+					result = ParaTerrain_MousePick_(picking_dist, result, mathlib.bit.band(0x85, self:GetBlockFilters()));
 					if(result.blockX) then
 						result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 					end
 				elseif(block.invisible and not block.solid) then
 					-- we will skip picking for invisible non solid block. instead we will only pick solid or customModel object.
-					result = ParaTerrain_MousePick_(picking_dist, result, 0x84);
+					result = ParaTerrain_MousePick_(picking_dist, result, mathlib.bit.band(0x84, self:GetBlockFilters()));
 					if(result.blockX) then
 						result.block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
 					end
@@ -169,6 +179,12 @@ function SelectionManager:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, 
 						result.block_id = nil;
 						result.blockX, result.blockY, result.blockZ = nil, nil, nil
 					end
+				end
+				if(result.blockX and result.block_id) then
+					result.blockRealX, result.blockRealY, result.blockRealZ = result.x, result.y, result.z;
+					result.bx, result.by, result.bz = result.blockX, result.blockY, result.blockZ;
+					result.blockLength = result.length;
+					result.blockSide = result.side;
 				end
 			end
 			local root_ = ParaUI.GetUIObject("root");
@@ -331,11 +347,11 @@ end
 -- get the intersection point between the mouse ray and a world space aabb. 
 -- @param aabb: world space aabb. usually from Entity:GetInnerObjectAABB()
 -- @return x, y, z: nil or a hit point
-function SelectionManager:GetMouseInteractionPointWithAABB(aabb)
-	local mouseRay = Cameras:GetCurrent():GetMouseRay(nil, nil, Matrix4.IDENTITY);
+function SelectionManager:GetMouseInteractionPointWithAABB(aabb, mouse_x, mouse_y)
+	local mouseRay = Cameras:GetCurrent():GetMouseRay(mouse_x, mouse_y, Matrix4.IDENTITY);
 	
 	aabb = aabb:clone_from_pool();
-	local origin = ParaCamera.GetAttributeObject():GetField("RenderOrigin", {0,0,0});
+	local origin = Cameras:GetCurrent():GetRenderOrigin();
 	aabb:Offset(-origin[1], -origin[2], -origin[3])
 	
 
@@ -350,11 +366,13 @@ end
 -- @param fingerRadius: in pixels, default to 16 (32 in diameter). we shall cast with triangle mesh grid in spiral way.
 -- @param gridSize: default to 4 pixels, object smaller than this in screen may has a chance to miss, even if it is in fingerRadius.  
 -- @return allResults: array of all results, starting from the one that is closest to mouse point. 
-function SelectionManager:MousePickWithFingerSize(bPickBlocks, bPickPoint, bPickObjects, picking_dist, fingerRadius, gridSize)
+function SelectionManager:MousePickWithFingerSize(bPickBlocks, bPickPoint, bPickObjects, picking_dist, fingerRadius, gridSize, mouse_x, mouse_y)
 	fingerRadius = fingerRadius or 16;
+	if(not mouse_x or not mouse_y) then
+		mouse_x, mouse_y = Mouse:GetMousePosition();
+	end
 	local results = {};
-	results[#results+1] = self:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist):CloneMe();
-	local mouse_x, mouse_y = Mouse:GetMousePosition();
+	results[#results+1] = self:MousePickBlock(bPickBlocks, bPickPoint, bPickObjects, picking_dist, mouse_x, mouse_y):CloneMe();
 	gridSize = gridSize or 4;
 	local layerCount = math.min(5, math.floor(fingerRadius / gridSize+0.5));
 	for layer = 1, layerCount do

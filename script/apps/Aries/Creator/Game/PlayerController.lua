@@ -114,12 +114,12 @@ function PlayerController:PickBlockAt(x, y, z)
 	end
 end
 
-function PlayerController:PickItemByEntity(entity)
+function PlayerController:PickItemByEntity(entity,bIsReplace)
 	if(entity and entity.GetItemClass) then
 		local item = entity:GetItemClass()
 		if(item) then
 			local item_stack = item:ConvertEntityToItem(entity);
-			self:SetBlockInRightHand(item_stack);
+			self:SetBlockInRightHand(item_stack,bIsReplace);
 		end
 	end
 end
@@ -597,7 +597,7 @@ function PlayerController:OnMouseEvent(event)
 	end
 
 	if event:isClick() and event.isDoubleClick then
-		if(GameLogic.SelectionManager:IsMousePickingEntity()) then
+		if(GameLogic.SelectionManager:IsMousePickingEntity(nil, event)) then
 			GameLogic.DoJump()
 		end
 	end
@@ -606,7 +606,7 @@ function PlayerController:OnMouseEvent(event)
 	local TouchMiniKeyboardSingleton = TouchMiniKeyboard.GetSingleton()
 	if event_type == "mousePressEvent" then
 		local is_right_mouse = event.RightButton and event:RightButton()
-		if GameLogic.SelectionManager:IsMousePickingEntity() and not is_right_mouse then
+		if GameLogic.SelectionManager:IsMousePickingEntity(nil, event) and not is_right_mouse then
 			self.move_center_pos = {ParaUI.GetMousePosition()}
 			event:accept();
 		end

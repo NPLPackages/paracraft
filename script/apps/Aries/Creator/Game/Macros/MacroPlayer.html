@@ -107,6 +107,11 @@ end
             <!-- <pe:label name="text" value="some 停止示教宏播放 here" width="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;height:120px;"></pe:label> -->
             <!-- <input type="button" ClickThrough="true" name="text" enabled="false" value="some 停止示教宏播放 here" width="100%" height="100%" style="base-font-size:32px;font-size:32px;background:url();color:#ffffff;"/> -->
     </pe:container>
+
+    <!-- 用于上海那边提出的需求 -->
+    <pe:container ClickThrough="true" name="macroController" alignment="_rb" zorder="1" style=" background:;">
+        <input type="button" onclick="MacroPlayer.OnClickNext()" name="nextMacro"  width="100%" height="100%" style="base-font-size:32px; background:url(); font-size:32px;color:#ffffff;"/>
+    </pe:container>
 </pe:container>
 
 <% MacroPlayer.OnInitEnd();%>

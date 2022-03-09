@@ -54,8 +54,8 @@ function SchoolCenter.ReportEvent(action, count)
     local data = {
         userId = profile.id,
         count = count,
-        beginAt = "",
-        traceId = "",
+        beginAt = Mod.WorldShare.Store:Get('world/currentServerTime'),
+        traceId = System.Encoding.guid.uuid(),
     }
     keepwork.burieddata.sendSingleBuriedData({
         category 	= 'behavior',

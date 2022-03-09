@@ -33,6 +33,8 @@ function OnChangeTabview(index)
     Page:Refresh(0);
     if (SystemSettingsPage.category_ds_index == 2) then
         Page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
+        SystemSettingsPage.InitSoundUIData()
+        SystemSettingsPage.UpdateSoundUI()
     end
 end
 
@@ -214,15 +216,15 @@ end
                                 <input name="btn_EnableSound" value="" type="button" onclick="SystemSettingsPage.OnClickEnableSound" style="width:108px;height:29px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
                             </div>
                         </div>
-                        <div style="height:25px;margin-top:12px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"音量" %></div>
+                        <pe:container uiname="sound_volume" style="height:25px;margin-top:12px; background:;">
+                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px; color: #ffffff;" ><%=L"音量" %></div>
                             <div style="float:left;margin-top:4px;margin-left:-20px;">
                                 <div style="width: 16px; height: 12px; background: url(Texture/Aries/Creator/keepwork/setting/icon1_16X12_32bits.png#0 0 16 12);"></div>
                                 <pe:sliderbar name="system_sound_volume" min="0.0" max="3.0" min_step="0.03" value='<%=SystemSettingsPage.setting_ds["sound_volume"]%>' button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="margin-top: -18px; margin-left: 24px; height:22px;width:140px" onchange="SystemSettingsPage.OnChangeSoundVolume" />
                             </div>
-                        </div>
-                        <div style="height:25px;margin-top:14px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;"><%=L"设备" %></div>
+                        </pe:container>
+                        <pe:container uiname="sound_device" style="height:25px;margin-top:14px; background:;">
+                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px; color: #ffffff;"><%=L"设备" %></div>
                             <div style="float:left;margin-top:-1px;margin-left:-20px;">
                                 <select name="AudioDevice" style="width:190px;height:23px" DataSource="<%=SystemSettingsPage.GetAudioDevices()%>" dropWidth="30.6" dropHeight="28.8" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" onselect="SystemSettingsPage.OnSelectAudioDevice">
                                 </select>
@@ -230,7 +232,7 @@ end
                             <div style="float:left;margin-top:0px;margin-left:6px;">
                                 <input name="btn_ResetDevice" type="button" onclick="SystemSettingsPage.OnClickResetAudioDevice" style="width:39px; height: 18px; background: url(Texture/Aries/Creator/keepwork/setting/chongzhi_39X18_32bits.png#0 0 39 18);"/>
                             </div>
-                    </div>
+                        </pe:container>
                     </pe:if>
                     <pe:if condition='<%=GetCategoryDSIndex() == 3 %>' >
                         <div style="height:25px;margin-top:14px;">

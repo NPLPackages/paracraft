@@ -46,9 +46,10 @@ Commands["save"] = {
 						if result then
 							GameLogic.QuickSave();
 						else
-							_guihelper.MessageBox(L"操作被禁止了，免费用户最多只能拥有3个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。")
+							_guihelper.MessageBox(L'操作被禁止了，免费用户最多只能拥有家园+1个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。')
 						end
-					end
+					end,
+					true
 				);
 			else
 				GameLogic.QuickSave();

@@ -37,8 +37,13 @@ end
 
 -- called when enter block world. 
 function MovieManager:Init()
+	self.inited = true
 	MovieManager:InitSingleton();
 	self:Reset();
+end
+
+function MovieManager:GetInited()
+	return self.inited
 end
 
 function MovieManager:Reset()

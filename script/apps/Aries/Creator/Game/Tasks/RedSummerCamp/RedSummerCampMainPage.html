@@ -49,6 +49,23 @@ end
 function OpenVip()
     local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
     VipPage.ShowPage("2D_main");
+    --TestVipTime()
+end
+
+function TestVipTime()
+    local on_hour_scond = 60 * 60
+    local add_time = on_hour_scond
+
+    if RedSummerCampMainPage.TimeVip and RedSummerCampMainPage.TimeVip - GameLogic.QuestAction.GetServerTime() > on_hour_scond * 24 then
+        add_time = add_time * 24
+    end
+
+    if RedSummerCampMainPage.TimeVip == nil then
+        RedSummerCampMainPage.TimeVip = GameLogic.QuestAction.GetServerTime()
+    end
+    RedSummerCampMainPage.TimeVip = RedSummerCampMainPage.TimeVip + add_time
+
+    RedSummerCampMainPage.RefreshPage()
 end
 
 function GetHeadUrl()
@@ -225,7 +242,11 @@ function OpenCreateWorld()
 end
 
 function GetOlymPicPic()
-    return "width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/chuangyi_334x421_32bits.png#0 0 334 421)"
+    return "width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/6_334X421_32bits.png#0 0 334 421)"
+end
+
+function OnClickLaba()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua").Show(1,100)
 end
 
 ]]>
@@ -272,6 +293,7 @@ end
 <pe:container alignment="_fi" width="100%" height="100%" style="background-color:#000000;">
     <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
         <pe:container alignment="_rt" style="background:;">
+            <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div')%>
             <input type="button" value='' onclick="OpenVip" class="red_summer_camp_open_vip_btn" style="margin-right:15px;margin-top:15px;" />
             <input name="helpBtn" type="button" value='' onclick="OpenHelpPage" style="margin-right:15px;margin-top:15px; width: 64px;height: 97px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bangzhu_97X27_32bits.png#0 0 64 97);" />
             <input type="button" value='' onclick="ClosePage" style="margin-right:15px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn3_64X70_32bits.png#0 0 64 70);" />
@@ -309,8 +331,11 @@ end
                         <div style="margin-left: 5px;margin-top: 1px; float: left;">
                             
                             <pe:if condition='<%=not IsOffline() %>'>
-                                <input type="button" value='' onclick="show_certificate" class="green_button" style="position: relative;" />
-                                <div class="green_button" style="position: relative;background: ;">实名认证</div>
+                                <!-- <input type="button" value='' onclick="show_certificate" class="green_button" style="position: relative;" /> -->
+                                <div onclick="show_certificate"  style="float: left; margin-top: 2px;margin-left: 0px; width: 53px;height: 18px; 
+                                        background: Texture/Aries/Creator/keepwork/Certification/renzhenganniu_53x18_32bits.png#0 0 53 18;"></div>
+                                <input zorder="1" type="button" onclick="show_certificate" style="float: left; margin-top: 2px;margin-left: 4px; width: 105px;height: 57px; 
+                                        background: Texture/Aries/Creator/keepwork/Certification/tishi_105x57_32bits.png#0 0 105 57;"/>
                             </pe:if>
 
                             <pe:if condition='<%=IsOffline()%>'>
@@ -356,7 +381,7 @@ end
             </div>
         </div>
 
-        <div style='float: left;margin-top: 25px;margin-left: 70px;'>
+        <div style='float: left;margin-top: 25px;margin-left: 10px;'>
             <!-- seach bar -->
             <div style='background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#176 173 32 42: 7 7 7 7);
                         width: 370px;
@@ -406,15 +431,15 @@ end
                         <!-- <div zorder style="position: relative;margin-left: 14px;margin-top: 8px; width: 404px;height: 468px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468);"></div> -->
                         <!-- <input type="button" zorder="-1" value='' width="404" height="468" onclick="OnOpen" name='summer_camp' style="position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468)"/> -->
                         <div zorder="-2" onclick="OnOpen" name='main_world' style="width:348px;height:431px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
-                        <div zorder="-1" style='<%=GetOlymPicPic()%>'></div>
+                        <div zorder="-1" style='width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/6_334X421_32bits.png#0 0 334 421)'></div>
                         <div style="margin-left: 14px;margin-top: 378px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                             <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
                                 创意空间（课程）
                             </div>
                         </div>
-                        <div onclick="OpenOlypic" style="margin-left: 146px; margin-top: 100px; width: 200px; height: 100px;">
+                        <!-- <div onclick="OpenOlypic" style="margin-left: 146px; margin-top: 100px; width: 200px; height: 100px;">
                             <input type="button" onclick="OpenOlypic" style="margin-top: 15px; margin-left: 110px; width: 68px; height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/jingru_68x70_32bits.png#0 0 68 70);" />
-                        </div>
+                        </div> -->
                     </div>
                 </div>
     
@@ -466,7 +491,7 @@ end
         </pe:container>
 
         <pe:container alignment="_lb" width="598" height="60" style="margin-left: 32px;margin-bottom: 48px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/di_32X60_32bits.png#0 0 32 60:8 8 8 8);">
-            <pe:container SelfPaint="true" width="598" height="60" style="background:;">
+            <pe:container SelfPaint="true" width="598" height="60" style="margin-left: 50px; background:;">
                 <pe:container width="598" onclick="OnClickNotice1" height="62" uiname="notice_container_1" style="position: relative;background: ;">
                     <pe:label value="" name="notic_text1" style="margin-left: 16px;margin-top: 18px; height: 60px;color: #000000;base-font-size:16px;font-size: 16px;font-weight: bold;"></pe:label>
                 </pe:container>
@@ -474,6 +499,7 @@ end
                     <pe:label value="" name="notic_text2" style="margin-left: 16px;margin-top: 18px; height: 60px;color: #000000;base-font-size:16px;font-size: 16px;font-weight: bold;"></pe:label>
                 </pe:container>
             </pe:container>
+            <div onclick="OnClickLaba" style="margin-top: -50px; margin-left: 10px; width: 44px; height: 41px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/laba_44x41_32bits.png#0 0 44 41);"></div>
         </pe:container>
 
         <pe:container alignment="_rb" width="465" height="102" style="margin-right: 98px;margin-bottom: 26px;background:;">

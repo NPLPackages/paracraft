@@ -947,7 +947,7 @@ function SelectBlocks:GetCopyOfBlocks(pivot)
 	return blocks;
 end
 
--- @return array of entities nodes
+-- @return array of entities XML nodes
 function SelectBlocks.GetLiveEntitiesInAABB(aabb, pivot)
 	if(aabb) then
 		local min_x, min_y, min_z = aabb:GetMinValues()
@@ -1116,18 +1116,39 @@ function SelectBlocks.ExtrudeSelection(dx, dy, dz)
 	end
 end
 
+-- delete without saving to history
+function SelectBlocks.DeleteLiveEntitiesInAABB(aabb)
+	if(aabb) then
+		local min_x, min_y, min_z = aabb:GetMinValues()
+		local max_x, max_y, max_z = aabb:GetMaxValues()
+		local entities = EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, max_z, EntityManager.EntityLiveModel)
+		if(entities and #entities > 0) then
+			for _, entity in ipairs(entities) do
+				entity:Destroy();
+			end
+		end
+	end
+end
+
 -- global function to delete a group of blocks. 
 -- @param bFastDelete: if true, we will delete blocks without generating new undergound blocks. 
 function SelectBlocks.DeleteSelection(bFastDelete)
+	local self = cur_instance;
+	if(not self) then
+		return
+	end 
+	
 	GameLogic.GetFilters():apply_filters("user_event_stat", "block", "DeleteSelection", 1, nil);
-
+	
 	if(bFastDelete) then
 		SelectBlocks.FillSelection(0);
+		SelectBlocks.DeleteLiveEntitiesInAABB(self.aabb)
 	elseif(cur_selection and #cur_selection > 0) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DestroyNearbyBlocksTask.lua");
 		local task = MyCompany.Aries.Game.Tasks.DestroyNearbyBlocks:new({
 			explode_time=200, 
 			destroy_blocks = cur_selection,
+			liveEntities = SelectBlocks.GetLiveEntitiesInAABB(self.aabb, {0,0,0}),
 		})
 		SelectBlocks.CancelSelection();
 		task:Run();
@@ -1145,8 +1166,13 @@ function SelectBlocks:UpdateSelectionEntityData()
 	end
 end
 
+local pivotInClipboard = {};
+function SelectBlocks:GetPivotInClipboard()
+	return pivotInClipboard;
+end
+
 function SelectBlocks:CopyBlocks(bRemoveOld)
-	if(self.aabb:IsValid() and #cur_selection > 0) then
+	if(self.aabb:IsValid()) then
 		local mExtents = self.aabb.mExtents;
 		local center = self.aabb:GetCenter();
 
@@ -1162,10 +1188,11 @@ function SelectBlocks:CopyBlocks(bRemoveOld)
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
 		local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
-		if(Clipboard) then
+		if(Clipboard and ((#cur_selection > 0) or (self.copy_task.liveEntities))) then
 			local pivot = self:GetPivotPoint()
 			if(pivot) then
 				local pivot_x,pivot_y,pivot_z = EntityManager.GetPlayer():GetBlockPos();
+				pivotInClipboard[1], pivotInClipboard[2], pivotInClipboard[3] = pivot_x,pivot_y,pivot_z
 				local blocks = {};
 				for i = 1, #(cur_selection) do
 					-- x,y,z,block_id, data, serverdata
@@ -1231,10 +1258,17 @@ function SelectBlocks.CopyToClipboard(blocks, liveEntities)
 end
 
 -- static public function: clipboard
-function SelectBlocks.PasteFromClipboard()
-	local result = Game.SelectionManager:MousePickBlock();
-	if(result and result.blockX and result.side) then
-		local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+function SelectBlocks.PasteFromClipboard(bx, by, bz)
+	local bHasSpecifiedPasteLocation;
+	if(bx) then
+		bHasSpecifiedPasteLocation = true;
+	else
+		local result = Game.SelectionManager:MousePickBlock();
+		if(result and result.blockX and result.side) then
+			bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+		end
+	end
+	if(bx) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Clipboard.lua");
 		local Clipboard = commonlib.gettable("MyCompany.Aries.Game.Common.Clipboard");
 
@@ -1244,7 +1278,7 @@ function SelectBlocks.PasteFromClipboard()
 				local xmlRoot = ParaXML.LuaXML_ParseString(obj);
 				if(xmlRoot and xmlRoot[1]) then
 					local attr = xmlRoot[1].attr;
-					if(attr and attr.relative_to_player=="true") then
+					if(attr and attr.relative_to_player=="true" and not bHasSpecifiedPasteLocation) then
 						bx,by,bz = EntityManager.GetPlayer():GetBlockPos();
 					end
 

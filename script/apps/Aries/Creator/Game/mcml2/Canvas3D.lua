@@ -193,7 +193,7 @@ function Canvas3D:ShowModel(obj, bAutoAdjustCamera)
 		scene:Reset();
 		-- enable camera and create render target
 		scene:EnableCamera(true);
-		-- render it each frame automatically. 
+		-- render it each frame automatically.
 		scene:EnableActiveRendering(self.IsActiveRendering);
 		
 		local att = scene:GetAttributeObject();
@@ -465,6 +465,140 @@ function Canvas3D:SetMaskTexture(textureFile)
 		if(scene:IsValid()) then
 			scene:SetMaskTexture(ParaAsset.LoadTexture("", textureFile, 1));
 		end
+	end
+end
+
+-- @param filename: block template file that should only contain one movie block. 
+-- @param fromTime: default to 0, in milliseconds
+-- @param toTime: default to -1, which is the movie length
+-- @param originX, originY, originZ: origin to play inside the mini scene graph or main 3d scene. default to 0,128,0
+-- @return movieEntity
+function Canvas3D:PlayMovieFile(filename, fromTime, toTime, originX, originY, originZ)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+	local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+	self.movieChannelName = self.resourceName or "default"
+	local channel = MovieManager:CreateGetMovieChannel(self.movieChannelName);
+	self:SetFieldOfView(1.04); --default 3d scene field of view. 
+	self:PrepareScene()
+	self:ClearScene()
+	channel.canvas3d_obj = self;
+	channel:CreateFromTemplateFile(filename, originX or 0, originY or 128, originZ or 0);
+	channel:SetScene(self.resourceName)
+	channel:Stop()
+	channel:Play(fromTime or 0, toTime or -1)
+end
+
+function Canvas3D:SetFieldOfView(defaultValue)
+	self.FieldOfView = defaultValue;
+end
+
+function Canvas3D:ClearScene()
+	local scene = ParaScene.GetMiniSceneGraph(self.resourceName);
+	scene:DestroyChildren();
+end
+
+-- @return mini scene object
+function Canvas3D:PrepareScene()
+	local scene;
+	if(self.ExternalSceneName) then
+		self.resourceName = self.ExternalSceneName;
+		scene = ParaScene.GetMiniSceneGraph(self.resourceName);
+	else
+		if(self.resourceType == nil and self.resourceName~=nil) then
+			scene = ParaScene.GetMiniSceneGraph(self.resourceName);
+		else	
+			-- create a default scene
+			-------------------------
+			-- a simple 3d scene using mini scene graph
+			-------------------------
+			local sceneName = self.Miniscenegraphname or "DefaultCanvas3D"	
+			self.resourceName = sceneName;
+			scene = ParaScene.GetMiniSceneGraph(sceneName);
+		end	
+	end	
+	if(not self.ExternalSceneName and scene and (not scene:IsCameraEnabled() or scene:IsActiveRenderingEnabled() ~= self.IsActiveRendering)) then	
+		------------------------------------
+		-- init render target
+		------------------------------------
+		-- set size
+		if(self.RenderTargetSize == nil) then
+			scene:SetRenderTargetSize(128, 128);
+		else
+			scene:SetRenderTargetSize(self.RenderTargetSize, self.RenderTargetSize);
+		end
+		-- reset scene, in case this is called multiple times
+		scene:Reset();
+		-- enable camera and create render target
+		scene:EnableCamera(true);
+		-- render it each frame automatically. 
+		scene:EnableActiveRendering(self.IsActiveRendering);
+		
+		local att = scene:GetAttributeObject();
+		att:SetField("BackgroundColor", {1, 1, 1}); 
+		att:SetField("ShowSky", false);
+		att:SetField("EnableFog", false)
+		att:SetField("EnableLight", false)
+		att:SetField("EnableSunLight", false)
+		-- set the transparent background color
+		scene:SetBackGroundColor(self.background_color or "127 127 127 0");
+		att = scene:GetAttributeObjectCamera();
+		if(self.FieldOfView) then
+			att:SetField("FieldOfView", self.FieldOfView);
+		end
+		
+		------------------------------------
+		-- init camera
+		------------------------------------
+		scene:CameraSetLookAtPos(0,0.7,0);
+		scene:CameraSetEyePosByAngle(0, 0.3, 5);
+		
+		if(self.mask_texture) then
+			scene:SetMaskTexture(ParaAsset.LoadTexture("", self.mask_texture, 1));
+		end
+	end
+	if(not self.ExternalSceneName and scene) then
+		-- bind to the mini scene graph
+		self:ShowMiniscene(scene:GetName())	
+	end
+	return scene;
+end
+
+-- public: bind the canvas to a miniscenegraph. 
+-- @param name: mini scene graph name.
+function Canvas3D:ShowMiniscene(name)
+	self.resourceType = nil;
+	self.resourceName = name;
+	if(self.resourceName ~= nil and not self.ExternalSceneName) then
+		local scene = ParaScene.GetMiniSceneGraph(self.resourceName);
+		if(scene:IsValid()) then
+			local _this=ParaUI.GetUIObject(self.name);
+			if(_this:IsValid()) then
+				_this:SetBGImage(scene:GetTexture());
+			end	
+		end
+	end	
+end
+
+function Canvas3D:Destroy()
+	if(self.ExternalSceneName) then
+		local obj = ParaUI.GetUIObject(self.name);
+		if(not obj:IsValid()) then
+			local scene = ParaScene.GetMiniSceneGraph(self.ExternalSceneName);
+			if(scene:IsValid()) then
+				scene:DestroyObject(self.miniscenegraphname);
+			end
+		end
+	end	
+	if(self.movieChannelName) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
+		local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
+		local channel = MovieManager:CreateGetMovieChannel(self.movieChannelName);
+		if(channel.canvas3d_obj == self) then
+			channel:Stop();
+			--self:GetScene():Reset();
+			ParaScene.DeleteMiniSceneGraph(self.resourceName)
+		end
+		self.movieChannelName = nil
 	end
 end
 

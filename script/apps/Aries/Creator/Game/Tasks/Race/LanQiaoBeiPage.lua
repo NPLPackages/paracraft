@@ -39,6 +39,8 @@ function LanQiaoBeiPage.Show()
             y = -view_height/2,
             width = view_width,
             height = view_height,
+			DesignResolutionWidth = 1280,
+			DesignResolutionHeight = 720,
 		}
 	System.App.Commands.Call("File.MCMLWindowFrame", params)
 end

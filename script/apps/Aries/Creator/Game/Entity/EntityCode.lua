@@ -29,6 +29,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
+local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockCodeBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCode"));
 
@@ -396,11 +397,22 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 end
 
 function Entity:OpenEditor(editor_name, entity)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
-	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
-    CodeBlockWindow.Show(true);
-	CodeBlockWindow.SetCodeEntity(self);
-	GameLogic.GetFilters():apply_filters("CodeBlockEditorOpened", CodeBlockWindow, entity)	
+	-- 没权限的话 不允许编辑代码方块
+	
+	local function open_editor()
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+		CodeBlockWindow.Show(true);
+		CodeBlockWindow.SetCodeEntity(self);
+		GameLogic.GetFilters():apply_filters("CodeBlockEditorOpened", CodeBlockWindow, entity)	
+	end
+
+	if self.languageConfigFile == "" or self.languageConfigFile == "npl_cad" then
+		local check_type = self.languageConfigFile == "npl_cad" and "click_cad_block" or "click_code_block"
+		UserPermission.CheckCanEditBlock(check_type, open_editor)
+	else
+		open_editor()
+	end
 end
 
 function Entity:CloseEditor()

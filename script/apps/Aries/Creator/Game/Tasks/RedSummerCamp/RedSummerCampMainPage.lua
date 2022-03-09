@@ -11,7 +11,7 @@ RedSummerCampMainPage.Show();
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/ide/Transitions/Tween.lua");
 local RedSummerCampMainPage = NPL.export();
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
@@ -20,13 +20,15 @@ local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpU
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua");
+local VipRewardPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipRewardPage.lua");
+local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
 local page
 local notice_time = 3000
 RedSummerCampMainPage.UserData = {}
 RedSummerCampMainPage.ItemData = {
 	{name="大赛", is_show_vip=false, is_show_recommend=true, node_name = "shentongbei", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_1_220x220_32bits.png#0 0 220 220"},
 	{name="新手入门", is_show_vip=false, is_show_recommend=false, node_name = "course_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_2_220x220_32bits.png#0 0 220 220"},
-	{name="超级宠物", is_show_vip=false, is_show_recommend=false, node_name = "superAnimal", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/dongwuke_220x220_32bits.png#0 0 220 220"},
+	{name="乐园设计师", is_show_vip=false, is_show_recommend=false, node_name = "leyuan", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/8_219X202_32bits.png#0 0 220 220"},
 	{name="推荐列表", is_show_vip=false, is_show_recommend=false, node_name = "explore", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"},
 	{name="虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
 	{name="家长指南", is_show_vip=false, is_show_recommend=false, node_name = "parent_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_6_220x220_32bits.png#0 0 220 220"},
@@ -37,8 +39,9 @@ local notice_desc = {
 	-- {desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
 	-- {desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
 	-- {desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
-	{desc = [[重温红色记忆，重走《征程》之约]], name="zhengcheng"},
-	{desc = [[为校争光，我的虚拟校园等你来建设]], name="ai_school"},
+	{desc = [[学3D动画编程，参加全国学生信息素养提升实践活动]], name="zhengcheng"},
+	{desc = [[全新世界“圣诞树”等你来体验]], name="ai_school"},
+	{desc = [[冬令营课程包全新上线]], name="ai_school"},
 }
 
 RedSummerCampMainPage.RightBtData = {
@@ -74,6 +77,10 @@ function RedSummerCampMainPage.Show()
 	RedSummerCampMainPage.ClearTween()
 	RedSummerCampMainPage.InitUserData()
 	notice_text_index = 1
+
+	if not RedSummerCampMainPage.BindFilter then
+		GameLogic.GetFilters():add_filter("get_vip_time_icon_div", RedSummerCampMainPage.GetVipTimeIconDiv);
+	end
 
 	local enable_esc_key = false
 	local params = {
@@ -146,6 +153,8 @@ function RedSummerCampMainPage.Show()
         Notice.Show(0 ,100)
 		RedSummerCampMainPage.isShowNotice = true
     end  
+
+	VipRewardPage.ShowPage()
 end
 
 function RedSummerCampMainPage.OnClose()
@@ -499,12 +508,13 @@ end
 function RedSummerCampMainPage.OnClickNotice(index)
 	local notic_text = "notic_text" .. index
 	local value = page:GetValue(notic_text)
-	for k, v in pairs(notice_desc) do
-		if string.find(value, v.desc) then
-			RedSummerCampMainPage.OpenPage(v.name)
-			break
-		end
-	end
+	-- for k, v in pairs(notice_desc) do
+	-- 	if string.find(value, v.desc) then
+	-- 		RedSummerCampMainPage.OpenPage(v.name)
+	-- 		break
+	-- 	end
+	-- end
+	Notice.Show(1 ,100)
 end
 
 function RedSummerCampMainPage.OpenPage(name)
@@ -553,6 +563,7 @@ function RedSummerCampMainPage.OpenPage(name)
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.explore");
 		GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
 	elseif(name == "superAnimal") then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.super_pet");
 		local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
         RedSummerCampPPtPage.Show("superAnimal");
     end
@@ -736,4 +747,76 @@ function RedSummerCampMainPage.OpenOlypic()
 	-- local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
     -- RedSummerCampPPtPage.Show("winterOlympic");
 	GameLogic.RunCommand(string.format("/loadworld -s -auto %s", 132939))
+end
+
+function RedSummerCampMainPage.GetVipTimeIconDiv(margin_top,click_func_name)
+    local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+    local profile = KeepWorkItemManager.GetProfile()
+	if not profile.vipDeadline or profile.vipDeadline == "" then
+		return ""
+	end
+
+    local time_stamp = commonlib.timehelp.GetTimeStampByDateTime(profile.vipDeadline)
+	--time_stamp = RedSummerCampMainPage.TimeVip or time_stamp
+    local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+    local cur_time_stamp = QuestAction.GetServerTime()
+
+    --test
+    -- time_stamp = test_time1 or time_stamp
+    -- cur_time_stamp = test2 or cur_time_stamp
+
+    local left_time = time_stamp - cur_time_stamp
+	if left_time < 0 then
+		return ""
+	end
+
+    local min = math.floor(left_time/60)
+    local hour = math.floor(min/60) 
+    local day = math.floor(hour/24)
+
+	
+    if day > 30 then
+        return ""
+    end
+
+    local show_value = day >= 1 and day or hour
+    local unit_icon = day >= 1 and "Texture/Aries/Creator/keepwork/vip/vip_time/tian_10x9_32bits.png#0 0 10 9" or "Texture/Aries/Creator/keepwork/vip/vip_time/xiaoshi_9x8_32bits.png#0 0 9 8"
+
+    local show_value_desc = "0" .. show_value
+    local num_margin_left = -8
+    local unit_margin_left = -10
+
+    if show_value == 21 then
+        num_margin_left = -13
+        unit_margin_left = 0
+    elseif show_value == 1 then
+        num_margin_left = -2
+        unit_margin_left = -20 
+    elseif show_value == 11 then
+        num_margin_left = -5
+        unit_margin_left = -15
+    elseif show_value >= 20 then
+        num_margin_left = -16
+        unit_margin_left = 3
+    elseif show_value >= 10 then
+        num_margin_left = -13
+        unit_margin_left = -3 
+    end
+
+	margin_top = margin_top or 16
+	click_func_name = click_func_name or "OpenVip"
+    local div = [[
+    <pe:container name="VipLimitTimeIcon" style="float: left;margin-right:15px;margin-top:%s; width: 66px;height: 67px; background: url()">
+        <input zorder = "-1" type="button" value='' onclick="%s" is_tool_tip_click_enabled="true" is_lock_position="true" enable_tooltip_hover="true"
+            tooltip='page_static://script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/VipTimeToolTip.html'
+            style="position:relative;margin-left:0px;margin-top:0px;width:66px;height:70px;background: url(Texture/Aries/Creator/keepwork/vip/vip_time/dipan_66x70_32bits.png#0 0 66 70)" />
+        <div style="margin-top: 18px;">
+            <pe:textsprite ClickThrough="true" name="VipLimitTimeNum" fontName="VipLimitTime" value = '%s' style="float: left;width: 63px; margin-left:%s;margin-top:2px;font-size:20pt;" />
+            <div style="float: left;margin-left: %s;margin-top: 13px; width: 10px;height: 9px; background: url(%s)"></div>
+        </div>
+    </pe:container>
+    ]]
+
+    div = string.format(div, margin_top, click_func_name, show_value_desc, num_margin_left, unit_margin_left, unit_icon)
+    return div
 end

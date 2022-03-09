@@ -80,8 +80,7 @@ function Entity:init()
 			-- no perceptive radius
 			--obj:SetAttribute(16, false);
 
-			self:SetInnerObject(obj);
-			ParaScene.Attach(obj);	
+			self:AttachObjectToScene(obj)
 		end
 		
 		self.offset_y = item.offset_y;

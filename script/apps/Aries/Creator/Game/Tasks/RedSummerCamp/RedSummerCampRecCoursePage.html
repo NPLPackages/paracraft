@@ -28,32 +28,13 @@ function SetControlVisible(name, v)
         control.visible = v
     end
 end
-function on_mouse_enter_1(index)
-    local name = "img_1_" .. index
+function on_mouse_enter(index)
+    local name = "img_" .. index
     SetControlVisible(name, true)
 end
 
-function on_mouse_leave_1(index)
-    local name = "img_1_" .. index
-    SetControlVisible(name, false)
-end
-            
-function on_mouse_enter_2(index)
-    local name = "img_2_" .. index
-    SetControlVisible(name, true)
-end
-
-function on_mouse_leave_2(index)
-    local name = "img_2_" .. index
-    SetControlVisible(name, false)
-end
-function on_mouse_enter_3(index)
-    local name = "img_3_" .. index
-    SetControlVisible(name, true)
-end
-
-function on_mouse_leave_3(index)
-    local name = "img_3_" .. index
+function on_mouse_leave(index)
+    local name = "img_" .. index
     SetControlVisible(name, false)
 end
 function ShowVip()
@@ -95,52 +76,20 @@ function goto_world(item)
 		end
 	end, _guihelper.MessageBoxButtons.OKCancel);
 end
-function OnOpenCourse_1(index)
-    goto_world(RedSummerCampRecCoursePage.courses_1[index])
+function OnOpenCourse(index)
+    goto_world(RedSummerCampRecCoursePage.courses[index])
 end
-function OnOpenCourse_2(index)
-    goto_world(RedSummerCampRecCoursePage.courses_2[index])
-end
-function OnOpenCourse_3(index)
-    goto_world(RedSummerCampRecCoursePage.courses_3[index])
-end
-function GetLabel_courses_1(index)
-    local item = RedSummerCampRecCoursePage.courses_1[index]
+function GetLabel_courses(index)
+    local item = RedSummerCampRecCoursePage.courses[index]
     if(item)then
         return item.label;
     end
 end
-function GetLabel_courses_2(index)
-    local item = RedSummerCampRecCoursePage.courses_2[index]
-    if(item)then
-        return item.label;
-    end
-end
-function GetLabel_courses_3(index)
-    local item = RedSummerCampRecCoursePage.courses_3[index]
-    if(item)then
-        return item.label;
-    end
-end
-function DS_Items_courses_1(index)
+function DS_Items_courses(index)
     if(index == nil) then
-        return #RedSummerCampRecCoursePage.courses_1;
+        return #RedSummerCampRecCoursePage.courses;
         else
-        return RedSummerCampRecCoursePage.courses_1[index];
-    end
-end
-function DS_Items_courses_2(index)
-    if(index == nil) then
-        return #RedSummerCampRecCoursePage.courses_2;
-        else
-        return RedSummerCampRecCoursePage.courses_2[index];
-    end
-end
-function DS_Items_courses_3(index)
-    if(index == nil) then
-        return #RedSummerCampRecCoursePage.courses_3;
-        else
-        return RedSummerCampRecCoursePage.courses_3[index];
+        return RedSummerCampRecCoursePage.courses[index];
     end
 end
 function DS_Items(index)
@@ -169,6 +118,8 @@ function OnCheck()
     ParacraftLearningRoomDailyPage.OnCheck();
 end
 function OnOpenWeb(index)
+    local click_behavior = "click.login_main_page.daily_learn_" .. index
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, click_behavior);
     ParacraftLearningRoomDailyPage.OnOpenWeb(index,true);
 end
 
@@ -224,6 +175,7 @@ function OpenLink(name)
     local url = name == "open_word" and "https://keepwork.com/official/docs/index" or "https://keepwork.com/official/docs/teach/lessons/small_proj_list"
     ParaGlobal.ShellExecute("open", url, "", "", 1); 
 end
+
 ]]>
         </script>
         <style type="text/mcss">
@@ -239,28 +191,25 @@ end
         <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
             <!--Vip-->
             <pe:container alignment="_rt" style="background:url();">
-                <!--全部课程按钮-->
-                <input type='button'
-                DefaultButton='true'
-                style='width: 142px;height: 52px;margin-right:45px;margin-top: 17px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/Bquanbu_142X52_32bits.png#0 0 142 52);'
-                name='open_word'
-                onclick='open_all' />   
-
+                <!-- 文档按钮 -->
                 <input type='button'
                     class='opus_bar_button'
                     DefaultButton='true'
-                    style='width: 64px; height: 64px; base-font-size: 20px; margin-top:10px;margin-right:15px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/2_64X64_32bits.png#0 0 64 64)'
+                    style='width: 65px; height: 70px; base-font-size: 20px; margin-top:11px;margin-right:23px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/wendang_65x70_32bits.png#0 0 65 70)'
                     name='open_word'
                     onclick='OpenLink'
                     value='' />   
+                <!-- 小项目按钮 -->
                 <input type='button'
                     class='opus_bar_button'
                     DefaultButton='true'
-                    style='width: 64px; height: 64px; base-font-size: 20px; margin-top:10px;margin-right:18px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/1_64X64_32bits.png#0 0 64 64)'
+                    style='width: 65px; height: 70px; base-font-size: 20px; margin-top:11px;margin-right:19px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/xiaoxiangmu_65x70_32bits.png#0 0 65 70)'
                     name='open_project'
                     onclick='OpenLink'
                     value='' />
-                <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
+                
+                <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 11, "ShowVip")%>
+                <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:26px;margin-top:10px;" />
             </pe:container>
             <!--Close-->
             <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
@@ -276,141 +225,71 @@ end
                         <div style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
                         <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
                     </div>
-                    <!--标题 每日课堂-->
-                    <div style="margin-left:30px;margin-top:13px;width:108px;height:35px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#0 0 108 35);" />
-                    <!--横线-->
-                    <div style="margin-left:25px;margin-top:5px;width:460px;height:8px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#8 38 237 8 : 135 3 10 3);" />
-                    <div>
-                        <div style="float:left;margin-top:10px;">
-                            <!--每日课堂-->
-                            <pe:gridview style="margin-left:10px;width:520px;height:577px;" name="item_gridview" CellPadding="5" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight="110"
-                                         DataSource='<%=DS_Items%>'>
-                                <Columns>
-                                    <div style="width:90px;height:90px;padding-left:0px;">
-    
-                                        <pe:if condition='<%= IsFuture(Eval("index")) %>'>
-                                            <div style="width:80px;height:80px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#76 95 80 80 : 35 35 35 35);" >
-                                                <input type="button" name='<%= Eval("index")%>' style="margin-left:10px;margin-top:12px;width:58px;height:56px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png#0 0 60 57);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb" />
-                                                <div style="position:relative;margin-left:0px;margin-top:5px;width:90px;height:60px;color:#000000;">
-                                                    <div style="text-align:center;">
-                                                        <%= GetLabel(Eval("index"))%>
-                                                    </div>
-                                                </div>
-                                                <pe:if condition='<%= Eval("index") > 16 %>'>
-                                                    <div zorder="1" style="position: relative;margin-left: 0px;margin-top: -70px; width: 35px;height: 35px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi2_48X53_32bits.png#0 0 48 53)"></div>
-                                                </pe:if>
-                                            </div>
-                                        </pe:if>
-                                        <pe:if condition='<%= not IsFuture(Eval("index")) %>'>
-                                            <pe:if condition='<%= IsNextDay(Eval("index")) %>'>
-                                                <pe:if condition='<%= HasCheckedToday(Eval("index")) %>'>
-                                                    <div style="width:80px;height:80px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#76 95 80 80 : 35 35 35 35);" >
-                                                        <input type="button" name='<%= Eval("index")%>' style="margin-left:10px;margin-top:12px;width:62px;height:62px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/xuexiwancheng_64X64_32bits.png);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb" />
-                                                        <div style="position:relative;margin-left:0px;margin-top:0px;width:90px;height:60px;color:#000000;">
-                                                            <div style="text-align:center;">
-                                                                <!--<%= L"签到成功" %>-->
-                                                                <%= GetLabel(Eval("index"))%>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-    
-                                                </pe:if>
-                                                <pe:if condition='<%= not HasCheckedToday(Eval("index")) %>'>
-                                                    <div style="width:80px;height:80px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#76 95 80 80 : 35 35 35 35);" >
-                                                        <input type="button" name='<%= Eval("index")%>' style="margin-left:10px;margin-top:12px;width:62px;height:63px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_yellow_32bits.png);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnCheckinToday" />
-                                                        <div style="position:relative;margin-left:0px;margin-top:-3px;width:90px;height:60px;color:#000000;">
-                                                            <div zorder="101" style="margin-top:0px;text-align:center;">
-                                                                <!--<%= L"点击签到" %>-->
-                                                                <%= GetLabel(Eval("index"))%>
-                                                            </div>
-                                                        </div>
-                                                        <!--fire practices-->
-                                                        <div style="position:relative;margin-left:2px;margin-top:-70px;width:70px;height:70px;background:">
-                                                            <img uiname="checkin_animator" zorder="100" enabled="false" class="animated_btn_overlay" width="72" height="70" />
-                                                        </div>
-                                                    </div>
-                                                </pe:if>
-                                            </pe:if>
-                                            <pe:if condition='<%= not IsNextDay(Eval("index")) %>'>
-                                                    <div style="width:80px;height:80px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#76 95 80 80 : 35 35 35 35);" >
-                                                        <input type="button" name='<%= Eval("index")%>' style="margin-left:10px;margin-top:12px;width:68px;height:60px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_green_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb" />
-                                                        <div style="position:relative;margin-left:0px;width:90px;height:60px;color:#000000;">
-                                                            <div style="text-align:center;">
-                                                                <%= GetLabel(Eval("index"))%>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                            </pe:if>
-                                        </pe:if>
-    
-                                    </div>
-    
-                                </Columns>
-                                <EmptyDataTemplate>
-                                </EmptyDataTemplate>
-                            </pe:gridview>
-                        </div>
-                        <!--右边背景框-->
-                        <div style="float:left;margin-left:0px;margin-top:-35px;width:740px;height:620px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 53 72 135 : 30 60 30 60);">
-                            <div style="height:700px;">
+                    <div style="margin-top: 62px;">
+                        <div style="float:left;margin-left:18px;margin-top:-25px;width:498px;height:615px;background:url();">
+                            <div style="float:left;margin-top: 3px;margin-left:3px;width: 490px;height: 52px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/kuangtou_490x52_32bits.png#0 0 490 52);">
                                 <!--大标题：推荐课程-->
-                                <div style="margin-left:15px;margin-top:10px;width:145px;height:40px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#81 54 145 40);" />
-                                <!--标题：体验课程-->
-                                <div style="margin-left:15px;margin-top:10px;width:80px;height:30px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 188 80 30);" />
-                                <pe:gridview style="margin-left:10px;margin-top:-15px;width:800px;height:200px;" name="item_gridview_courses_1" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="160"
-                                             DataSource='<%=DS_Items_courses_1%>'>
+                                <div style="margin-top: 6px;margin-left:10px;width:145px;height:40px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/meiriketang_145x40_32bits.png#0 0 145 40);" />
+                            </div>
+                            <div style="width:491px;height:556px;margin-top: 0px;margin-left:2px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/kuangdi_166x188_32bits.png#0 0 166 188:30 30 40 40);">
+                                <pe:gridview style="margin-left:8px;margin-top:24px;width:500px;height:512px;" name="item_gridview" CellPadding="2" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="16" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight="110"
+                                         DataSource='<%=DS_Items%>'>
                                     <Columns>
-                                        <div style="width:225px;height:155px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#157 95 80 80: 30 30 30 30);">
-                                            <!--高亮-->
-                                            <pe:container name='<%= "img_1_" .. Eval("index")%>' visible='false' style="position:relative;margin-left:5px;margin-top:5px;width:215px;height:145px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25);" />
-                                            <img style="position:relative;margin-left:15px;margin-top:15px;width:195px;height:100px;" src='<%= Eval("icon")%>' />
-                                            <div style="position:relative;margin-left:0px;margin-top:120px;width:225px;height:60px;color:#000000;">
-                                                <div style="text-align:center;font-size:14px;">
-                                                    <%= GetLabel_courses_1(Eval("index"))%>
+                                        <div style="width:90px;height:90px;padding-left:0px;">
+                                            <pe:if condition='<%= IsFuture(Eval("index")) %>'>
+                                                <div style="width:80px;height:80px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#76 95 80 80 : 35 35 35 35);" >
+                                                    <input type="button" name='<%= Eval("index")%>' style="margin-left:10px;margin-top:12px;width:58px;height:56px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_gray2_32bits.png#0 0 60 57);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb" />
+                                                    <div style="position:relative;margin-left:0px;margin-top:5px;width:90px;height:60px;color:#000000;">
+                                                        <div style="text-align:center;">
+                                                            <%= GetLabel(Eval("index"))%>
+                                                        </div>
+                                                    </div>
+                                                    <pe:if condition='<%= Eval("index") > 16 %>'>
+                                                        <div zorder="1" style="position: relative;margin-left: 0px;margin-top: -70px; width: 35px;height: 35px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi2_48X53_32bits.png#0 0 48 53)"></div>
+                                                    </pe:if>
                                                 </div>
-                                            </div>
-                                            <input type="button" style="position:relative;margin-left:0px;margin-top:0px;width:225px;height:155px;background:url();" tooltip="点击打开" name='<%= Eval("index")%>' onclick="OnOpenCourse_1"  onmouseenter='on_mouse_enter_1' onmouseleave='on_mouse_leave_1'/>
-    
-                                        </div>
-                                    </Columns>
-                                    <EmptyDataTemplate>
-                                    </EmptyDataTemplate>
-                                </pe:gridview>
-                                <!--标题：精选课程-->
-                                <div style="margin-left:15px;margin-top:-30px;width:80px;height:30px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 217 80 30);" />
-                                <pe:gridview style="margin-left:10px;margin-top:-15px;width:800px;height:200px;" name="item_gridview_courses_2" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="160"
-                                             DataSource='<%=DS_Items_courses_2%>'>
-                                    <Columns>
-                                        <div style="width:225px;height:155px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#157 95 80 80: 30 30 30 30);">
-                                            <!--高亮-->
-                                            <pe:container name='<%= "img_2_" .. Eval("index")%>' visible='false' style="position:relative;margin-left:5px;margin-top:5px;width:215px;height:145px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25);" />
-                                            <img style="position:relative;margin-left:15px;margin-top:15px;width:195px;height:100px;" src='<%= Eval("icon")%>' />
-                                            <div style="position:relative;margin-left:0px;margin-top:120px;width:225px;height:60px;color:#000000;">
-                                                <div style="text-align:center;">
-                                                    <%= GetLabel_courses_2(Eval("index"))%>
-                                                </div>
-                                            </div>
-                                            <input type="button" style="position:relative;margin-left:0px;margin-top:0px;width:225px;height:155px;background:url();" tooltip="点击打开" name='<%= Eval("index")%>' onclick="OnOpenCourse_2" onmouseenter='on_mouse_enter_2' onmouseleave='on_mouse_leave_2' />
-                                        </div>
-                                    </Columns>
-                                    <EmptyDataTemplate>
-                                    </EmptyDataTemplate>
-                                </pe:gridview>
-                                <!--标题：特色课程-->
-                                <div style="margin-left:15px;margin-top:-30px;width:80px;height:30px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#90 188 80 30);" />
-                                <pe:gridview style="margin-left:10px;margin-top:-15px;width:800px;height:200px;" name="item_gridview_courses_3" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="160"
-                                             DataSource='<%=DS_Items_courses_3%>'>
-                                    <Columns>
-                                        <div style="width:225px;height:155px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#157 95 80 80: 30 30 30 30);">
-                                            <!--高亮-->
-                                            <pe:container name='<%= "img_3_" .. Eval("index")%>' visible='false' style="position:relative;margin-left:5px;margin-top:5px;width:215px;height:145px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25);" />
-                                            <img style="position:relative;margin-left:15px;margin-top:15px;width:195px;height:100px;" src='<%= Eval("icon")%>' />
-                                            <div style="position:relative;margin-left:0px;margin-top:120px;width:225px;height:60px;color:#000000;">
-                                                <div style="text-align:center;">
-                                                    <%= GetLabel_courses_3(Eval("index"))%>
-                                                </div>
-                                            </div>
-                                            <input type="button" style="position:relative;margin-left:0px;margin-top:0px;width:225px;height:155px;background:url();" tooltip="点击打开" name='<%= Eval("index")%>' onclick="OnOpenCourse_3" onmouseenter='on_mouse_enter_3' onmouseleave='on_mouse_leave_3' />
+                                            </pe:if>
+                                            <pe:if condition='<%= not IsFuture(Eval("index")) %>'>
+                                                <pe:if condition='<%= IsNextDay(Eval("index")) %>'>
+                                                    <pe:if condition='<%= HasCheckedToday(Eval("index")) %>'>
+                                                        <div style="width:80px;height:80px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#76 95 80 80 : 35 35 35 35);" >
+                                                            <input type="button" name='<%= Eval("index")%>' style="margin-left:10px;margin-top:12px;width:62px;height:62px;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/xuexiwancheng_64X64_32bits.png);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb" />
+                                                            <div style="position:relative;margin-left:0px;margin-top:0px;width:90px;height:60px;color:#000000;">
+                                                                <div style="text-align:center;">
+                                                                    <!--<%= L"签到成功" %>-->
+                                                                    <%= GetLabel(Eval("index"))%>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+        
+                                                    </pe:if>
+                                                    <pe:if condition='<%= not HasCheckedToday(Eval("index")) %>'>
+                                                        <div style="width:80px;height:80px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#76 95 80 80 : 35 35 35 35);" >
+                                                            <input type="button" name='<%= Eval("index")%>' style="margin-left:10px;margin-top:12px;width:62px;height:63px;color:#e67300;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_yellow_32bits.png);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnCheckinToday" />
+                                                            <div style="position:relative;margin-left:0px;margin-top:-3px;width:90px;height:60px;color:#000000;">
+                                                                <div zorder="101" style="margin-top:0px;text-align:center;">
+                                                                    <!--<%= L"点击签到" %>-->
+                                                                    <%= GetLabel(Eval("index"))%>
+                                                                </div>
+                                                            </div>
+                                                            <!--fire practices-->
+                                                            <div style="position:relative;margin-left:2px;margin-top:-70px;width:70px;height:70px;background:">
+                                                                <img uiname="checkin_animator" zorder="100" enabled="false" class="animated_btn_overlay" width="72" height="70" />
+                                                            </div>
+                                                        </div>
+                                                    </pe:if>
+                                                </pe:if>
+                                                <pe:if condition='<%= not IsNextDay(Eval("index")) %>'>
+                                                        <div style="width:80px;height:80px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#76 95 80 80 : 35 35 35 35);" >
+                                                            <input type="button" name='<%= Eval("index")%>' style="margin-left:10px;margin-top:12px;width:68px;height:60px;color:#ffffff;background:url(Texture/Aries/Creator/keepwork/LearningDailyCheck/play_green_32bits.png#0 0 70 60);" tooltip='<%=GetTitle(Eval("index"))%>' onclick="OnOpenWeb" />
+                                                            <div style="position:relative;margin-left:0px;width:90px;height:60px;color:#000000;">
+                                                                <div style="text-align:center;">
+                                                                    <%= GetLabel(Eval("index"))%>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                </pe:if>
+                                            </pe:if>
                                         </div>
                                     </Columns>
                                     <EmptyDataTemplate>
@@ -418,12 +297,43 @@ end
                                 </pe:gridview>
                             </div>
                         </div>
+                        <!--右边背景框-->
+                        <div style="float:left;margin-left:1px;margin-top:-25px;width:749px;height:615px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 53 72 135 : 30 60 30 60);">
+                            <div style="width:750px;height:615px;">
+                                <div style="float:left;margin-left:15px;margin-top:10px;">
+                                    <!--大标题：每日课堂-->
+                                    <div style="width:145px;height:40px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#81 54 145 40);" />
+                                    <!--全部课程按钮-->
+                                    <input type='button' DefaultButton='true' style='width: 93px;height: 43px;margin-left:625px;margin-top: -40px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/quanbu_93x43_32bits.png#0 0 93 43);' name='open_word'onclick='open_all' />   
+                                </div>
+                                <div style="width:712px;height:526px;margin-left: 19px;margin-top:18px;">
+                                    <pe:gridview style="margin-left:0x;width:712px;height:526px;" name="item_gridview_courses" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="12" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="175"
+                                        DataSource='<%=DS_Items_courses%>'>
+                                        <Columns>
+                                            <div style="width:237px;height:175px; ">
+                                                <div style="width:225px;height:155px;margin-left: 6px;margin-top: 10px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#157 95 80 80: 30 30 30 30);">
+                                                    <pe:container name='<%= "img_" .. Eval("index")%>' visible='false' style="position:relative;margin-left:5px;margin-top:6px;width:215px;height:145px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25);" />
+                                                    <img style="position:relative;margin-left:15px;margin-top:15px;width:195px;height:100px;" src='<%= Eval("icon")%>' />
+                                                    <div style="position:relative;margin-left:0px;margin-top:120px;width:225px;height:60px;color:#000000;">
+                                                        <div style="text-align:center;font-size:14px;">
+                                                            <%= GetLabel_courses(Eval("index"))%>
+                                                        </div>
+                                                    </div>
+                                                    <input type="button" style="position:relative;margin-left:0px;margin-top:0px;width:225px;height:155px;background:url();" tooltip="点击打开" name='<%= Eval("index")%>' onclick="OnOpenCourse"  onmouseenter='on_mouse_enter' onmouseleave='on_mouse_leave'/>
+                                             
+                                                </div>
+                                            </div>
+                                            
+                                         </Columns>
+                                    </pe:gridview>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
             </pe:container>
         </pe:container>
-
     </pe:mcml>
 </body>
 </html>

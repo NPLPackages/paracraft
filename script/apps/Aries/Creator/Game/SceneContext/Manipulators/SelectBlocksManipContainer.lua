@@ -117,7 +117,7 @@ function SelectBlocksManipContainer:mousePressEvent(event)
 
 	if(self.op_mode and self.op_mode~="selectobj") then
 		local result = SelectionManager:MousePickBlock();
-		if(result.blockX) then
+		if(result.blockX and (not result.entity or result.entity:IsBlockEntity())) then
 			local x, y, z = result.blockX, result.blockY, result.blockZ;
 			self.block_id = result.block_id;
 			self.block_data = BlockEngine:GetBlockData(x,y,z);

@@ -71,6 +71,18 @@ function Files.AddWorldSearchPath(worldPath)
 	Files.worldSearchPath = worldPath;
 end
 
+function Files.GetAdditionalWorldSearchPath()
+	return Files.worldSearchPath;
+end
+
+-- this is a temporary folder that is cleared on world load.
+function Files.CreateGetAdditionalWorldSearchPath()
+	if(not Files.worldSearchPath) then
+		Files.worldSearchPath = ParaIO.GetWritablePath().."temp/paraworld/temp/";
+	end
+	return Files.worldSearchPath;
+end
+
 -- this is called when world exits
 function Files.ClearWorldSearchPaths()
 	Files.worldSearchPath = nil;

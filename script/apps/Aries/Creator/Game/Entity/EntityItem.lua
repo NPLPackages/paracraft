@@ -172,8 +172,7 @@ function Entity:CreateInnerObject(x,y,z,facing, scaling)
 			Image3DDisplay.ShowHeadonDisplay(true, obj, icon_path or "", 30, 30, nil, self.text_offset, -1.57);
 		end
 		
-		ParaScene.Attach(obj);	
-		self:SetInnerObject(obj);
+		self:AttachObjectToScene(obj)
 		return obj;
 	end
 end

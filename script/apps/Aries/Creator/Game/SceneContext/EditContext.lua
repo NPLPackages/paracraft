@@ -46,8 +46,8 @@ function EditContext:IsInSelectMode()
 	end
 end
 
-function EditContext:UpdateSelectManipulators()
-	if(Keyboard:IsCtrlKeyPressed() or Keyboard:IsShiftKeyPressed()) then
+function EditContext:UpdateSelectManipulators(event)
+	if((Keyboard:IsCtrlKeyPressed() or Keyboard:IsShiftKeyPressed())) then
 		if(not self.select_timer) then
 			self.select_timer = commonlib.Timer:new({callbackFunc = function(timer)
 				if(not Keyboard:IsCtrlKeyPressed() and not Keyboard:IsShiftKeyPressed()) then
@@ -410,7 +410,7 @@ function EditContext:keyPressEvent(event)
 		end
 	elseif(event.ctrl_pressed or event.shift_pressed) then
 		-- when ctrl is pressed, enter select block manipulator
-		self:UpdateSelectManipulators();
+		self:UpdateSelectManipulators(event);
 	end
 end
 

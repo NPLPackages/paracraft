@@ -195,8 +195,8 @@ function BlockEngine.OnLoadBlockRegion()
 
 	ParaTerrain.GetBlocksInRegion(startChunkX, startChunkY, startChunkZ, endChunkX, endChunkY, endChunkZ, block.attributes.onload, results);
 	
+	region:LoadFromFile();
 	if(results.count and results.count>0) then
-		region:LoadFromFile();		
 		
 		LOG.std(nil, "system", "BlockEngine", "calling onload for %d blocks in region %d %d", results.count, msg.x, msg.y);
 

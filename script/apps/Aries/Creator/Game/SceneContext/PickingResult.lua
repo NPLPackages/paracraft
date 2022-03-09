@@ -23,6 +23,7 @@ function PickingResult:Clear()
 	self.entity = nil;
 	self.block_id = nil;
 	self.x, self.y, self.z = nil, nil, nil;
+	self.bx, self.by, self.bz = nil, nil, nil;
 	self.blockX, self.blockY, self.blockZ = nil, nil, nil;
 	self.blockRealX, self.blockRealY, self.blockRealZ = nil, nil, nil;
 	self.blockSide = nil;
@@ -30,6 +31,7 @@ function PickingResult:Clear()
 	self.blockLength = nil;
 	self.block_template = nil;
 	self.side = nil
+	self.mouseX, self.mouseY = nil, nil;
 end
 
 function PickingResult:CopyFrom(obj)
@@ -38,13 +40,15 @@ function PickingResult:CopyFrom(obj)
 	self.entity = obj.entity;
 	self.block_id = obj.block_id;
 	self.x, self.y, self.z = obj.x, obj.y, obj.z;
+	self.bx, self.by, self.bz = obj.bx, obj.by, obj.bz;
 	self.blockX, self.blockY, self.blockZ = obj.blockX, obj.blockY, obj.blockZ;
 	self.blockRealX, self.blockRealY, self.blockRealZ = obj.blockRealX, obj.blockRealY, obj.blockRealZ;
 	self.blockSide = obj.blockSide;
 	self.physicalX, self.physicalY, self.physicalZ = obj.physicalX, obj.physicalY, obj.physicalZ;
-	self.blockLength = self.blockLength;
-	self.block_template = self.block_template;
-	self.side = self.side
+	self.blockLength = obj.blockLength;
+	self.block_template = obj.block_template;
+	self.side = obj.side
+	self.mouseX, self.mouseY = obj.mouseX, obj.mouseY;
 end
 
 function PickingResult:CloneMe()

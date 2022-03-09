@@ -45,6 +45,7 @@
         <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
             <!--Vip-->
             <pe:container alignment="_rt" style="background:url();">
+                <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 7, "ShowVip")%>
                 <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
             </pe:container>
             <!--Close-->

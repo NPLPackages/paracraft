@@ -36,4 +36,7 @@ function mcml_controls.register_all()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/pe_player_dir.lua");
 	MyCompany.Aries.Game.mcml2.pe_player_dir:RegisterAs("pe:player_dir");
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/pe_canvas3d.lua");
+	MyCompany.Aries.Game.mcml2.pe_canvas3d:RegisterAs("pe:canvas3d");
 end

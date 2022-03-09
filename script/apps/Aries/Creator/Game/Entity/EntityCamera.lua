@@ -62,7 +62,11 @@ end
 -- let the camera focus on this player and take control of it. 
 -- @return return true if focus is set
 function Entity:SetFocus()
-	EntityManager.SetFocus(self);
+	if(self:GetScene()) then
+		self.has_focus = true;
+	else
+		EntityManager.SetFocus(self);
+	end
 	return true;
 end
 
@@ -412,7 +416,13 @@ function Entity:PlayToTime(curTime)
 	self:SetEyeRoll(eye_roll);
 
 	if(self:HasFocus()) then
-		ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
+		if(self:GetScene()) then
+			local scene = ParaScene.GetMiniSceneGraph(self:GetScene());
+			scene:CameraSetLookAtPos(x, y, z);
+			scene:CameraSetEyePosByAngle(eye_rot_y, eye_liftup, eye_dist);
+		else
+			ParaCamera.SetEyePos(eye_dist, eye_liftup, eye_rot_y);
+		end
 	end
 end
 
