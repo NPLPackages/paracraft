@@ -3,7 +3,7 @@
 <body>
 <pe:mcml>
 <script refresh="true" type="text/npl" src=".lua" ><![CDATA[
-    local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
+    RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
     local page = document:GetPageCtrl();
     local index = tonumber(page:GetRequestParam("index"));
     local dataHistroy = RedSummerCampCourseScheduling.GetHistroyByIndex(index)
@@ -17,9 +17,16 @@
 
     function GetContent()
         if dataHistroy then
-            return RedSummerCampPPtPage.GetContent(dataHistroy);
+            local course_data = RedSummerCampCourseScheduling.GetCouseDataByName(dataHistroy.key)
+            RedSummerCampPPtPage.GetContent(dataHistroy,course_data or dataHistroy.key,function(content)
+                if RedSummerCampCourseScheduling.tipContent ~= content then
+                    RedSummerCampCourseScheduling.tipContent = content
+                    if page then
+                        page:Refresh(0)
+                    end
+                end
+            end);
         end
-        return ""
     end
 
     function OnClickReLearn()
@@ -29,14 +36,22 @@
             return
         end
         if dataHistroy then
-            RedSummerCampPPtPage.Show(dataHistroy.key, dataHistroy.pptIndex);
-            RedSummerCampCourseScheduling.RefreshPage()
+            local course_data = RedSummerCampCourseScheduling.GetCouseDataByName(dataHistroy.key)
+            local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+            RedSummerCampPPtPage.Show(course_data or dataHistroy.key,dataHistroy.pptIndex)
+
+            local root = ParaUI.GetUIObject("course_tip_root")
+            if root and root:IsValid() then
+                root.visible = false
+            end
         end
     end
+    GetContent() 
+    
 ]]></script>
 <pe:container uiname="course_tip_root" style="min-height: 50px;max-width: 400px; font-size: 14px; base-font-size: 14px;color: #ffffff;padding: 10px; background: url(Texture/Aries/Creator/keepwork/Window/tooltip/tipbj_32bits.png#0 0 32 32:12 12 14 14);">
     <div>
-        <%=GetContent()%>
+        <%=RedSummerCampCourseScheduling.tipContent or ""%>
     </div>
     
     <input uiname="course_tip_bt" zorder="10" type="button" value="复习" onclick="OnClickReLearn" style="font-size: 14px; base-font-size: 14px; font-weight: bold; margin-top: 10px; width:100px;height:32px;background: url(Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8);" />

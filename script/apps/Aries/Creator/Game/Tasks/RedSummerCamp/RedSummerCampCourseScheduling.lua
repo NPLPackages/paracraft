@@ -12,7 +12,7 @@ RedSummerCampCourseScheduling.ShowView()
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
-local strPath = ';NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua")'
+local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 local RedSummerCampCourseScheduling = NPL.export()
 local beginYear,endYear
 local Ydata
@@ -24,7 +24,6 @@ local save_key = "cource_scheduling"
 RedSummerCampCourseScheduling.curLearnHistroy = {}
 RedSummerCampCourseScheduling.lessonCnf = {}
 RedSummerCampCourseScheduling.auths = {}
-local lessonKeys = {"LP_CommunityCourses","LP_SchoolCourses","LP_OrgCourses"}
 function RedSummerCampCourseScheduling.OnInit()
     page = document:GetPageCtrl();
     if page then
@@ -32,36 +31,28 @@ function RedSummerCampCourseScheduling.OnInit()
     end
 end
 
-function RedSummerCampCourseScheduling.AddDevData()
-    if System.options.isDevMode and not RedSummerCampCourseScheduling.IsAddData then
-        RedSummerCampCourseScheduling.lessonCnf[#RedSummerCampCourseScheduling.lessonCnf + 1] = otherConfig[1]
-        RedSummerCampCourseScheduling.IsAddData = true
-    end
-end
-
-
 function RedSummerCampCourseScheduling.AuthLesson(callback)
-    local times = 0
-    for i,v in ipairs(lessonKeys) do
-        keepwork.permissions.check({
-            featureName = v
-        },function(err, msg, data)
-            if err == 200 then
-                local curKey = lessonKeys[i]
-                local auth = data.data or false
-                RedSummerCampCourseScheduling.UpdateLessonCnf(curKey,auth)
-                times = times + 1
-                if times == #lessonKeys then
-                    if callback then
-                        callback()
-                    end
-                end
-            end
-        end) 
-    end
+    RedSummerCampCourseScheduling.auths = {}
+    keepwork.permissions.all({
+    },function(err, msg, data)
+        RedSummerCampCourseScheduling.UpdateLessonCnf(data)
+        if callback then
+            callback()
+        end
+    end) 
 end
 
-function RedSummerCampCourseScheduling.UpdateLessonCnf(auth_key,hasAuth)
+function RedSummerCampCourseScheduling.UpdateLessonCnf(auth_data)
+    local temp_auth = {}
+    if auth_data then
+        for _,v in ipairs(auth_data) do
+            if v.name == v.enName then
+                temp_auth[v.name] = true
+            else
+                temp_auth[v.enName] = true
+            end
+        end  
+    end
     local lessonNum = #RedSummerCampCourseScheduling.lessonCnf
     if lessonNum > 0 then
         for i=1,lessonNum do
@@ -70,12 +61,74 @@ function RedSummerCampCourseScheduling.UpdateLessonCnf(auth_key,hasAuth)
             if not lessonAuth then
                 RedSummerCampCourseScheduling.auths[lessonKey] = true
             else
-                if lessonAuth == auth_key then
-                    RedSummerCampCourseScheduling.auths[lessonKey] = hasAuth
+                if temp_auth[lessonAuth] then
+                    RedSummerCampCourseScheduling.auths[lessonKey] = true
                 end
             end  
         end
     end
+end
+
+function RedSummerCampCourseScheduling.AuthLessonV2(callback)
+    RedSummerCampCourseScheduling.lessonCnf = {}
+    RedSummerCampCourseScheduling.auths = {}
+    keepwork.courses.userCourses({},function(err, msg, data)
+        if err ~= 200 or #data <= 0 then
+            if not RedSummerCampCourseScheduling.LoadLessons() then
+                RedSummerCampCourseScheduling.LoadLessonCnf()
+                RedSummerCampCourseScheduling.AuthLesson(callback)
+            else
+                if callback then
+                    callback()
+                end
+            end
+            return 
+        end
+        if err == 200 then
+            local lessonDt = data
+            for k,v in pairs(lessonDt) do
+                if v.code then
+                    RedSummerCampCourseScheduling.auths[v.code] = true
+                end
+            end
+            RedSummerCampCourseScheduling.LoadLessonCnfV2(callback)
+        end
+    end)
+end
+
+function RedSummerCampCourseScheduling.LoadLessonCnfV2(callback)
+    keepwork.courses.query({},function(err, msg, data) --查詢所有課程
+        if err == 200 then
+            RedSummerCampCourseScheduling.lessonCnf = {}
+            local lessonDt = data.rows
+            local lessonNum = data.count
+            for k,v in pairs(lessonDt) do
+                local temp = {}
+                temp.key = v.code
+                temp.name = v.name
+                temp.icon = v.icon
+                temp.num = v.sectionCount.."节"
+                temp.course_data = v
+                temp.displayRules = v.displayRules
+                temp.sn = v.sn
+                temp.tip = v.description
+                if RedSummerCampCourseScheduling.auths[v.code] then
+                    RedSummerCampCourseScheduling.lessonCnf[#RedSummerCampCourseScheduling.lessonCnf + 1] = temp
+                else
+                    if v.displayRules == 0 then
+                        RedSummerCampCourseScheduling.lessonCnf[#RedSummerCampCourseScheduling.lessonCnf + 1] = temp
+                        RedSummerCampCourseScheduling.auths[v.code] = true
+                    elseif v.displayRules == 1 then
+                        RedSummerCampCourseScheduling.lessonCnf[#RedSummerCampCourseScheduling.lessonCnf + 1] = temp
+                        RedSummerCampCourseScheduling.auths[v.code] = false
+                    end
+                end
+            end
+            if callback then
+                callback()
+            end
+        end
+    end)
 end
 
 function RedSummerCampCourseScheduling.LoadLessonCnf()
@@ -104,31 +157,88 @@ function RedSummerCampCourseScheduling.LoadLessonCnf()
 end
 
 function RedSummerCampCourseScheduling.ShowView()
-    if GameLogic.GetFilters():apply_filters('is_signed_in') then
+    local function show()
         RedSummerCampCourseScheduling.InitPageData()
         RedSummerCampCourseScheduling.ShowPage()
-        RedSummerCampCourseScheduling.AuthLesson(function()
-            RedSummerCampCourseScheduling.InitPageData()
-            RedSummerCampCourseScheduling.RefreshPage()
-        end)
+        RedSummerCampCourseScheduling.UpdateAuthLesson()
+    end
+    if GameLogic.GetFilters():apply_filters('is_signed_in') then
+        show()
         return
     end
 
     GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
         if result == true then
             commonlib.TimerManager.SetTimeout(function()
-                if result then
-                    RedSummerCampCourseScheduling.InitPageData()
-                    RedSummerCampCourseScheduling.ShowPage()
-                    RedSummerCampCourseScheduling.AuthLesson(function()
-                        RedSummerCampCourseScheduling.InitPageData()
-                        RedSummerCampCourseScheduling.RefreshPage()
-                    end)
-                end
-            end, 500)
+                show()
+            end, 1000)
         end
     end)
     
+end
+
+function RedSummerCampCourseScheduling.UpdateAuthLesson()
+    RedSummerCampCourseScheduling.AuthLessonV2(function()
+        RedSummerCampCourseScheduling.SortLessonByAuth()
+        RedSummerCampCourseScheduling.GetLessonHistroy()
+        RedSummerCampCourseScheduling.SaveLessons()
+        RedSummerCampCourseScheduling.RefreshPage()
+    end)
+end
+
+function RedSummerCampCourseScheduling.SortLessonByAuth()
+    if RedSummerCampCourseScheduling.lessonCnf and #RedSummerCampCourseScheduling.lessonCnf > 0 then
+        if RedSummerCampCourseScheduling.lessonCnf[1].sn then
+            table.sort(RedSummerCampCourseScheduling.lessonCnf,function(a,b)
+                return a.sn > b.sn
+            end)
+        end
+        local temp1 = {}
+        local temp2 = {}
+        for k,v in pairs(RedSummerCampCourseScheduling.lessonCnf) do
+            if RedSummerCampCourseScheduling.auths[v.key] then
+                temp1[#temp1 + 1] = v
+            else
+                temp2[#temp2 + 1] = v
+            end
+        end
+        RedSummerCampCourseScheduling.lessonCnf = {}
+        RedSummerCampCourseScheduling.lessonCnf = temp1
+        for k,v in pairs(temp2) do
+            RedSummerCampCourseScheduling.lessonCnf[#RedSummerCampCourseScheduling.lessonCnf + 1] = v
+        end
+    end
+end
+
+
+
+
+local SAVE_KEY = "PLAYER_LESSON_LIST"
+function RedSummerCampCourseScheduling.SaveLessons()
+    if #RedSummerCampCourseScheduling.lessonCnf > 0 then
+        for i,v in ipairs(RedSummerCampCourseScheduling.lessonCnf) do
+            v.auth = RedSummerCampCourseScheduling.auths[v.key] or false
+        end
+        GameLogic.GetPlayerController():SaveRemoteData(SAVE_KEY,RedSummerCampCourseScheduling.lessonCnf)
+    end
+end
+
+function RedSummerCampCourseScheduling.LoadLessons()
+    local data = GameLogic.GetPlayerController():LoadRemoteData(SAVE_KEY,nil);
+    if data then
+        RedSummerCampCourseScheduling.lessonCnf = data
+        for i,v in ipairs(data) do
+            RedSummerCampCourseScheduling.auths[v.key] = v.auth
+        end
+        return true
+    end
+    return false
+end
+
+function RedSummerCampCourseScheduling.ExchangeLessonSuc()
+    if page and page:IsVisible() then
+        RedSummerCampCourseScheduling.UpdateAuthLesson()
+    end
 end
 
 function RedSummerCampCourseScheduling.ShowPage()
@@ -143,7 +253,6 @@ function RedSummerCampCourseScheduling.ShowPage()
         allowDrag = false,
         enable_esc_key = false,
         zorder = 0,
-        -- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key,
         directPosition = true,
         align = "_fi",
             x = 0,
@@ -155,7 +264,7 @@ function RedSummerCampCourseScheduling.ShowPage()
     RedSummerCampCourseScheduling.InitCalendar()
 
 	-- 上报
-	GameLogic.GetFilters():apply_filters('user_behavior', 1, 'crsp.courselist.visit')
+	GameLogic.GetFilters():apply_filters('user_behavior', 1, 'crsp.courselist.visit', {useNoId = true})
 end
 
 function RedSummerCampCourseScheduling.RefreshPage()
@@ -166,15 +275,14 @@ function RedSummerCampCourseScheduling.RefreshPage()
 end
 
 function RedSummerCampCourseScheduling.InitPageData()
-    RedSummerCampCourseScheduling.LoadLessonCnf()
-    beginYear = 2021
-    endYear = tonumber(os.date("%Y", os.time()) ) or 2022
+    local timeStamp = QuestAction.GetServerTime()
+    curYear = tonumber(os.date("%Y",timeStamp))
+    endYear = curYear
+    beginYear = curYear
     Ydata = {}
-    curYear = tonumber(os.date("%Y",os.time()))
-    curMonth = tonumber(os.date("%m", os.time()))
+    curMonth = tonumber(os.date("%m", timeStamp))
     local userId = GameLogic.GetFilters():apply_filters('store_get', 'user/userId');
     save_key = userId.."cource_scheduling"
-    RedSummerCampCourseScheduling.GetLessonHistroy()
 end
 
 function RedSummerCampCourseScheduling.GetDateStr()
@@ -182,25 +290,25 @@ function RedSummerCampCourseScheduling.GetDateStr()
 end
 
 function RedSummerCampCourseScheduling.OnClickNextMonth()
-    if curYear >= endYear and curMonth == 12 then
-        return
-    end
     curMonth = curMonth + 1
     if curMonth > 12 then
         curMonth = 1
         curYear =  curYear + 1
+        endYear = curYear
+        beginYear = curYear
+        Ydata = {}
     end
     RedSummerCampCourseScheduling.RefreshPage()
 end
 
 function RedSummerCampCourseScheduling.OnClickPreMonth()
-    if curYear <= beginYear and curMonth == 1 then
-        return
-    end
     curMonth = curMonth - 1
     if curMonth < 1 then
         curMonth = 12
         curYear =  curYear - 1
+        endYear = curYear
+        beginYear = curYear
+        Ydata = {}
     end
     RedSummerCampCourseScheduling.RefreshPage()
 end
@@ -224,7 +332,9 @@ function RedSummerCampCourseScheduling.InitCalendar()
             _guihelper.SetButtonFontColor(textWeek, "#000000", "#0000000");
             parentNode:AddChild(textWeek);
         end
-
+        if curYear < beginYear then
+            return 
+        end
         local zsData = RedSummerCampCourseScheduling.getCurDatedata(curYear,curMonth)
         for i,data in pairs(zsData) do
             local index = i%7
@@ -264,22 +374,33 @@ end
 
 function RedSummerCampCourseScheduling.IsCurDay(data)
     if data then
-        if curYear == tonumber(os.date("%Y",os.time())) 
-            and curMonth == tonumber(os.date("%m", os.time())) 
+        local server_time = QuestAction.GetServerTime()
+        if curYear == tonumber(os.date("%Y",server_time)) 
+            and curMonth == tonumber(os.date("%m", server_time)) 
             and not data.isQs
-            and data.d == tonumber(os.date("%d", os.time())) then
+            and data.d == tonumber(os.date("%d", server_time)) then
             return true
         end
     end
     return false
 end
 
+function RedSummerCampCourseScheduling.GetTodayHistroy()
+    local server_time = QuestAction.GetServerTime()
+    local year = tonumber(os.date("%Y",server_time))
+    local month = tonumber(os.date("%m", server_time))
+    local day = tonumber(os.date("%d", server_time))
+    local time_stamp = os.time({year = year, month = month, day = day, hour=0, min=0, sec=0})
+    local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
+    if clientData[tostring(time_stamp)] ~= nil then
+        return clientData[tostring(time_stamp)]
+    end
+end
+
 function RedSummerCampCourseScheduling.GetDayHistroy(data)
     if data and not data.isQs then
         local time_stamp = os.time({year = curYear, month = curMonth, day = data.d, hour=0, min=0, sec=0})
-        -- print(string.format("%d年%d月%02d日",curYear,curMonth,data.d),time_stamp,type(time_stamp))
         local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
-        -- echo(clientData)
         if clientData[tostring(time_stamp)] ~= nil then
             return clientData[tostring(time_stamp)]
         end
@@ -296,14 +417,9 @@ function RedSummerCampCourseScheduling.SetDayHistroy(lessonKey,learnContent, ppt
 
     local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
     clientData[tostring(dateStamp)] = {key = lessonKey ,content = learnContent or "", pptIndex = pptIndex or 1}
-    -- print("setData=============")
-    -- echo(clientData)
     KeepWorkItemManager.SetClientData(gsid, clientData, function()
         print("save success")
     end,function (err, msg, data)
-        echo(err)
-        echo(msg)
-        echo(data)
     end);
 end
 
@@ -351,6 +467,9 @@ function RedSummerCampCourseScheduling.getCurDatedata(year,month)
     local jlFristIndex,jlFinalIndex = -1,-1
     -- echo(Ydata,true)
     -- 把该年月的日期相应的插入到对应的位置中
+    if not Ydata[year] or not Ydata[year].ms[month] then
+        return {}
+    end
     for i,ds in pairs( Ydata[year].ms[month] ) do
             -- 该参数为了避免 zsData的日期数据重复的插入
             -- 从2开始为了保证可以存在上个月分的日期显示
@@ -478,7 +597,7 @@ function RedSummerCampCourseScheduling.GetLessonByKey(key)
 end
 
 function RedSummerCampCourseScheduling.SaveLessonHistroy()
-    local keys = GameLogic.GetPlayerController():LoadRemoteData(save_key,{});
+    local keys = GameLogic.GetPlayerController():LoadRemoteData(save_key,{})
     if keys then
         local num = #keys
         if num == 0 then
@@ -513,9 +632,17 @@ function RedSummerCampCourseScheduling.OnClickLesson(name)
     RedSummerCampCourseScheduling.SaveLessonHistroy()
     RedSummerCampCourseScheduling.GetLessonHistroy()
     RedSummerCampCourseScheduling.RefreshPage()
+    local course_data = RedSummerCampCourseScheduling.GetCouseDataByName(curSelectLesson) 
+    local data = course_data ~= nil and course_data or curSelectLesson
+    RedSummerCampPPtPage.Show(data)
+end
 
-    local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
-    RedSummerCampPPtPage.Show(curSelectLesson);
+function RedSummerCampCourseScheduling.GetCouseDataByName(ppt_name)
+    for i=1,#RedSummerCampCourseScheduling.lessonCnf do
+        if RedSummerCampCourseScheduling.lessonCnf[i].key == ppt_name  then
+            return RedSummerCampCourseScheduling.lessonCnf[i].course_data
+        end
+    end
 end
 
 function RedSummerCampCourseScheduling.ClosePage()

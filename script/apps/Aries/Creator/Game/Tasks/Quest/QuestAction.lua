@@ -1120,7 +1120,7 @@ function QuestAction.OnWorldLoaded()
     if world_id == 70351 or world_id == 72945 then
         GameLogic.GetPlayerController():SaveRemoteData("summer_camp_last_worldid", world_id);
     end
-   
+    
 end
 
 function QuestAction.CheckSummerGameTask()
@@ -1315,14 +1315,20 @@ function QuestAction.SetDongaoLessonState(lesson_type, lesson_index, is_finish)
 end
 
 function QuestAction.ReportEvent(action, data)
-    local profile = KeepWorkItemManager.GetProfile()
-    data.userId = profile.id
+    data = data or {}
+    data.userId = Mod.WorldShare.Store:Get('user/userId') or 0
+    data.beginAt = data.beginAt or QuestAction.GetServerTime()
+    data.traceId = System.Encoding.guid.uuid()
+    local project_id = GameLogic.options:GetProjectId()
+    if project_id and tonumber(project_id) > 0 then
+        data.projectId = project_id
+    end
     keepwork.burieddata.sendSingleBuriedData({
         category 	= 'behavior',
         action 		= action,
         data 		= data
     },function(err, msg, data)
-        if err == 200 then
+        if err == 200 then 
         end
     end)
 end
@@ -1333,4 +1339,47 @@ end
 
 function QuestAction.GetCurWorldData()
     return QuestAction.cur_world_data or {}
+end
+
+function QuestAction.OnLoadedWorldEnd()
+    if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+        return
+    end
+
+    if not QuestAction.enter_world_by_id_timestamp then
+        return
+    end
+    local duration = QuestAction.GetServerTime() - QuestAction.enter_world_by_id_timestamp
+    QuestAction.enter_world_by_id_timestamp = nil
+
+    if duration == 0 then
+        return
+    end
+    local data = {duration = duration}
+
+    QuestAction.ReportEvent("duration.world_load", data)
+    -- GameLogic.GetFilters():apply_filters("user_behavior", 1, "duration.world_load", {projectId};
+end
+
+function QuestAction.ReportLoginTime()
+    if not QuestAction.click_login_timestamp then
+        return
+    end
+    local duration = QuestAction.GetServerTime() - QuestAction.click_login_timestamp
+    QuestAction.click_login_timestamp = nil
+    if duration == 0 then
+        return
+    end
+
+    local data = {duration = duration}
+    QuestAction.ReportEvent("duration.login", data)
+    -- GameLogic.GetFilters():apply_filters("user_behavior", 1, "duration.world_load", {projectId};
+end
+
+function QuestAction.EnterWorldById()
+    QuestAction.enter_world_by_id_timestamp = QuestAction.GetServerTime()
+end
+
+function QuestAction.OnClickLogin()
+    QuestAction.click_login_timestamp = QuestAction.GetServerTime()
 end

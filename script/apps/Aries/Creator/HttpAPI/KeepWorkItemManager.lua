@@ -98,7 +98,11 @@ function KeepWorkItemManager.StaticInit()
     end
     GameLogic.GetFilters():add_filter("OnKeepWorkLogin", KeepWorkItemManager.OnKeepWorkLogin_Callback);
 	GameLogic.GetFilters():add_filter("OnKeepWorkLogout", KeepWorkItemManager.OnKeepWorkLogout_Callback)
-
+    GameLogic.GetFilters():add_filter("on_start_login", function()
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+        local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+        QuestAction.OnClickLogin()
+    end);
 	
     KeepWorkItemManager.GetFilter():add_filter("KeepWorkItemManager_LoadItems", function()
         KeepWorkItemManager.LoadItems(nil, function()
@@ -415,9 +419,6 @@ function KeepWorkItemManager.Load(bForced, callback)
         return
     end
 
-    -- 获取用户角色信息
-    UserPermission.LoadUserRoles()
-
     KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载GlobalStore");
     KeepWorkItemManager.LoadGlobalStore(false, function()
         KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载ExtendedCost");
@@ -431,6 +432,7 @@ function KeepWorkItemManager.Load(bForced, callback)
                         KeepWorkItemManager.GetFilter():apply_filters("loading", L"加载学校信息");
                         KeepWorkItemManager.LoadSchool(true, function()
 
+                            UserPermission.LoadUserRoles()
                             KeepWorkItemManager.LoadItemsFromStaticExId(function()
                                 KeepWorkItemManager.loaded = true;
                                 if(callback)then

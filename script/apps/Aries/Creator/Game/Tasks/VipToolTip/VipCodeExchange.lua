@@ -9,6 +9,7 @@
 local VipCodeExchangeResult = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchangeResult.lua") 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
 local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/ide/timer.lua");
@@ -67,39 +68,12 @@ function VipCodeExchange.Exchange(code)
                 key=code,
             },function(err, msg, data)
                 if err == 200 then
+                    VipCodeExchange.ClosePage()  
                     local day = data.period
-                    if day > 0 then
-                        local goodName = ""
-                        local exchange = data.exchangeResult
-                        if exchange then
-                            local goods = exchange.gainList or {}
-                            for i = 1 ,#goods do
-                                goodName = goodName..goods[i].goodsInfo.name.."," 
-                            end
-                        end
-                        local str = goodName ~= "" and "恭喜你获得了"..day.."天会员,["..""..goodName.."]" or "恭喜你获得了"..day.."天会员"
-                        VipCodeExchangeResult.ShowView(str)
-                        VipCodeExchange.RefreshUserInfo()
-                        VipCodeExchange.ClosePage()   
-                    else
-                        --GameLogic.AddBBS(nil,"会员兑换的天数不可小于0")
-                        local goodName = ""
-                        local exchange = data.exchangeResult
-                        if exchange then
-                            local goods = exchange.gainList or {}
-                            for i = 1 ,#goods do
-                                local goodNum = goods[i].amount
-                                goodName = goodName..goods[i].goodsInfo.name.."x"..goodNum.."," 
-                            end
-                        end
-                        if goodName ~= "" then
-                            local str = "兑换成功！"
-                            VipCodeExchangeResult.ShowView(str)
-                            VipCodeExchange.ClosePage()   
-                            return
-                        end
-                        GameLogic.AddBBS(nil,"兑换配置不合理")
-                    end
+                    local role = data.role
+                    VipCodeExchange.RefreshUserInfo()
+                    RedSummerCampCourseScheduling.ExchangeLessonSuc()
+                    VipCodeExchangeResult.ShowView("恭喜你激活码使用成功。")                    
                 else
                     if data and data.message then
                         VipCodeExchangeResult.ShowView(data.message)

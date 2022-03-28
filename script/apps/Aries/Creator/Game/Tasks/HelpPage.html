@@ -145,8 +145,10 @@ end
     
 function StartBuild()
     if GameLogic.IsReadOnly() then
-        _guihelper.MessageBox(L"只读世界暂不开放该功能");
-        return
+        if(GameLogic.GetGameMode() ~= "edit") then
+            _guihelper.MessageBox(L"只读世界暂不开放该功能");
+            return
+        end
     end
 
     local cur_task = BuildQuest.GetCurrentQuest();

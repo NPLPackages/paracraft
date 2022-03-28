@@ -541,6 +541,7 @@ model id
     <!--20220303活动头饰-->
     <item id="83193" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83193_chef.anim.x"></attachment></item>
     <item id="83194" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83194_cheffy.anim.x"></attachment></item>
+    <!--<item id="83195" model="actor;"><geoset category="3" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83195_antiapidemic.anim.x"></attachment></item>-->
     <item id="83195" model="actor;"><geoset category="0" id="0"></geoset><geoset category="3" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83195_antiapidemic.anim.x"></attachment></item>
     <item id="83196" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83196_navy_hat.anim.x"></attachment></item>
     <item id="83197" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83197_navy_hat_female.anim.x"></attachment></item>
@@ -556,7 +557,10 @@ model id
     <item id="83207" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83207_traffic_police_hat_female2.anim.x"></attachment></item>
     <item id="83208" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83208_architect_hat_female.anim.x"></attachment></item>
     <item id="83209" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83209_cleaner_hat_female.anim.x"></attachment></item>
-    <item id="83210" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83210_firefighter_hat.anim.x"></attachment></item>
+    <item id="83210" model="actor;"><geoset category="0" id="0"></geoset><geoset category="3" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83210_firefighter_hat.anim.x"></attachment></item>
+    <!--20220324活动头饰-->
+    <item id="83211" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83211_danmawei.anim.x"></attachment></item>
+    <item id="83212" model="actor;"><geoset category="0" id="0"></geoset><attachment id="11" filename="character/CC/ObjectComponents/Head/83212_shuangmawei.anim.x"></attachment></item>
 
     <!--      84000 84999  衣服  geoset category="8"   2身体              1长袖衬衣 2长袖短袍 3短袖短连衣裙 4长袖长袍    -->
     <item id="84001" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/shirt_01_Avatar_boy_body_.png"></texture></item>
@@ -692,8 +696,16 @@ model id
     <item id="84110" model="actor;"><geoset category="8" id="9"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84110_blue_skirt.png"></texture></item>
     <item id="84111" model="actor;"><geoset category="8" id="9"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84111_brown_skirt.png"></texture></item>
     <item id="84112" model="actor;"><geoset category="8" id="9"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84112_sliceflower_skirt.png"></texture></item>
-
-
+    <!--20220310新增-->
+    <item id="84113" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84113_origin1.png"></texture></item>
+    <item id="84114" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84114_origin2.png"></texture></item>
+    <!--20220324新增-->
+    <item id="84115" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84115_block_shirt.png"></texture></item>
+    <item id="84116" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84116_purple_boy.png"></texture></item>
+    <item id="84117" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84117_blue_suit.png"></texture></item>
+    <item id="84118" model="actor;"><geoset category="8" id="10"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84118_dress.png"></texture></item>
+    <item id="84119" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84119_outfit_boy.png"></texture></item>
+    <item id="84120" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84120_sleep.png"></texture></item>
 
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
@@ -837,7 +849,16 @@ model id
     <!--20211118新增-->
     <item id="85126" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85126_olympic_pant.png"></texture></item>
 
-
+     <!--20220310新增-->
+    <item id="85127" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85127_origin1_pant.png"></texture></item>
+    <item id="85128" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85128_origin2_pant.png"></texture></item>
+    <!--20220324新增-->
+    <item id="85129" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85129_block_shirt.png"></texture></item>
+    <item id="85130" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85130_purple_boy.png"></texture></item>
+    <item id="85131" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85131_blue_suit.png"></texture></item>
+    <item id="85132" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85132_outfit_boy.png"></texture></item>
+    <item id="85133" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85133_sleep.png"></texture></item>
+    
     <!--      86000 86999  背部  attachment id="15"    -->
     <!--第一批数据-->
     <item id="86001" model="actor;"><attachment id="15" filename="character/v3/Item/ObjectComponents/Back/1425_FireExchangeBack03.anim.x"></attachment></item>
@@ -894,6 +915,11 @@ model id
     <item id="86046" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86046_archaeologist_back.anim.x"></attachment></item>
     <!--20220120新增-->
     <item id="86047" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86047_brown_backhat.anim.x"></attachment></item>
+    <!--20220324新增-->
+    <item id="86048" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86048_pink_chef.anim.x"></attachment></item>
+    <item id="86049" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86049_red_chef.anim.x"></attachment></item>
+    <item id="86050" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86050_blue_chef.anim.x"></attachment></item>
+    <item id="86051" model="actor;"><attachment id="15" filename="character/CC/ObjectComponents/Back/86051_antifire_back.anim.x"></attachment></item>
 
     <!--      87000 97999  手持  attachment id="1"    -->
     <item id="87001" model="actor;"><attachment id="2" filename="character/v3/Item/ObjectComponents/WEAPON/1022_LargeLollipop.x"></attachment></item>

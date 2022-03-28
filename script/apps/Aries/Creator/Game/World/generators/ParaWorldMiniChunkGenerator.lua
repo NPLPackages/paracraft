@@ -250,6 +250,11 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 					local world = data[i];
 					if (world.projectId == projectId) then
 						local player = EntityManager.GetPlayer()
+
+						if (not player or type(player) ~= "table") then
+							return;
+						end
+
 						local x, y, z = player:GetBlockPos();
 						keepwork.miniworld.upload({projectId = projectId, name = myHomeWorldName, type="main", commitId = world.commitId,
 							block = self:GetTotalCount(), bornAt = {math.floor(x), math.floor(y), math.floor(z)}}, function(err, msg, data)

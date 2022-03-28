@@ -60,6 +60,21 @@ function RedSummerCampPPtPage.OnCreate()
 	RedSummerCampPPtPage.StepNumKey = 0
 end
 
+function RedSummerCampPPtPage.ClosePage()
+	if RedSummerCampPPtPage.OpenPageTimeStamp then
+		local extend_data = {}
+		extend_data.duration = QuestAction.GetServerTime() - RedSummerCampPPtPage.OpenPageTimeStamp
+		local action = string.format("crsp.course.exit-%s", RedSummerCampPPtPage.CurCourseName)
+		GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
+		RedSummerCampPPtPage.OpenPageTimeStamp = nil
+	end
+
+	if page then
+		page:CloseWindow(true)
+		page = nil
+	end
+end
+
 function RedSummerCampPPtPage.OnClose()
 
 	if not RedSummerCampPPtPage.IsSaveIndex then
@@ -72,25 +87,85 @@ function RedSummerCampPPtPage.OnClose()
 
 	RedSummerCampPPtPage.UpdateTimer:Change()
 	RedSummerCampPPtPage.UpdateTimer = nil	
-
-	if RedSummerCampPPtPage.OpenPageTimeStamp then
-		local extend_data = {}
-		extend_data.duration = QuestAction.GetServerTime() - RedSummerCampPPtPage.OpenPageTimeStamp
-		local action = string.format("crsp.course.exit-%s", RedSummerCampPPtPage.CurCourseName)
-		GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
-		RedSummerCampPPtPage.OpenPageTimeStamp = nil
-	end
-
 end
 
-function RedSummerCampPPtPage.Show(course_name, pptIndex)
+function RedSummerCampPPtPage.CheckPPtConfigFile(course_data, pptIndex, callback)
+	course_data = course_data or {}
+	if not course_data.md5 then
+		return
+	end
+	local course_name = course_data.code or "ppt_X1"
+	RedSummerCampPPtPage.md5_file_name = course_data.md5
+
+	local disk_folder = RedSummerCampPPtPage.GetPPTConfigDiskFolder()
+	local filename = RedSummerCampPPtPage.md5_file_name .. ".xml"
+	local file_path = string.format("%s/%s/%s", disk_folder, course_name, filename)
+	if ParaIO.DoesFileExist(file_path, true) then
+		if callback then
+			callback(course_name, pptIndex)
+		end
+	else
+		local course_id = course_data.id or 1
+		keepwork.courses.course_info({
+			router_params = {
+				id = course_id,
+			}
+		},function(err, msg, data)
+			-- print("ddddddddddddddeee", err)
+			-- echo(data, true)
+			if err == 200 then
+				if data.xml then
+					ParaIO.CreateDirectory(file_path)
+					local file = ParaIO.open(file_path, "w");
+					if(file) then
+						file:write(data.xml, #data.xml);
+						file:close();
+					end
+
+					if callback then
+						callback(course_name, pptIndex)
+					end
+				end
+			end
+		end)	
+	end
+end
+
+function RedSummerCampPPtPage.Show(course_data, pptIndex)
+	if not course_data then
+		course_data = RedSummerCampPPtPage.LastParam or "ppt_X1"
+	end
+	
+	RedSummerCampPPtPage.LastParam = course_data
+
 	if not Lan then
 		Lan = NPL.load("Mod/GeneralGameServerMod/Command/Lan/Lan.lua");
 	end
 
-	RedSummerCampPPtPage.OpenPageTimeStamp = QuestAction.GetServerTime()
-	if course_name == nil and pptIndex == nil then
+	if type(course_data) == "table" then
+		RedSummerCampPPtPage.UseNewFilePath = true
+		RedSummerCampPPtPage.CheckPPtConfigFile(course_data, pptIndex, function(course_name, pptIndex)
+			RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
+		end)
+	else
+		RedSummerCampPPtPage.UseNewFilePath = false
+		local course_name = course_data
+		RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
+	end
+
+end
+
+function RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
+	if not RedSummerCampPPtPage.OpenPageTimeStamp then
+		RedSummerCampPPtPage.OpenPageTimeStamp = QuestAction.GetServerTime()
+	end
+	
+	if course_name == nil then
 		course_name = RedSummerCampPPtPage.CurCourseName or "ppt_X1"
+		
+	end
+
+	if pptIndex == nil then
 		pptIndex = RedSummerCampPPtPage.SelectLessonIndex or 1
 	end
 	RedSummerCampPPtPage.SetIsFullPage(false)
@@ -103,7 +178,6 @@ function RedSummerCampPPtPage.Show(course_name, pptIndex)
 	RedSummerCampPPtPage.StepNumKey = 0
 	RedSummerCampPPtPage.CurCourseKey = RedSummerCampPPtPage.CurCourseName .. RedSummerCampPPtPage.SplitKey .. RedSummerCampPPtPage.SelectLessonIndex
 	RedSummerCampPPtPage.InitData()
-
 	local enable_esc_key = false
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.html",
@@ -114,6 +188,7 @@ function RedSummerCampPPtPage.Show(course_name, pptIndex)
 			allowDrag = false,
 			enable_esc_key = enable_esc_key,
 			cancelShowAnimation = true,
+			click_through = false,
 			DesignResolutionWidth = 1280,
 			DesignResolutionHeight = 720,
 			--app_key = 0, 
@@ -180,9 +255,16 @@ function RedSummerCampPPtPage.GetStepNumKey()
 end
 
 function RedSummerCampPPtPage.InitPPtConfig(course_name)
-	local ppt_mark_down_file = string.format("config/Aries/creator/lesson_ppt/%s.md.xml", course_name)
+	-- local ppt_mark_down_file = string.format("config/Aries/creator/lesson_ppt/%s.md.xml", course_name)
+	local file_path = string.format("config/Aries/creator/lesson_ppt/%s.md.xml", course_name)
+	if RedSummerCampPPtPage.UseNewFilePath then
+		local disk_folder = RedSummerCampPPtPage.GetPPTConfigDiskFolder()
+		local md5_file_name = RedSummerCampPPtPage.md5_file_name or ""
+		local filename = md5_file_name .. ".xml"
+		file_path = string.format("%s/%s/%s", disk_folder, course_name, filename)
+	end
 
-	local file = ParaIO.open(ppt_mark_down_file, "r");
+	local file = ParaIO.open(file_path, "r");
 	if(file:IsValid() ~= true) then
 		commonlib.log("error: failed loading card data list file: %s\n", course_name);
 		return;
@@ -307,6 +389,8 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 		else
 			ppt_data.div_str = (ppt_data.div_str or "") .. strValue
 		end
+
+		ppt_data.is_ppt_cover = string.find(strValue, "ppt_cover") ~= nil
 	end
 
 	-- this will merge multiple notes in ppt_data.notes_str into ppt_data.div_str
@@ -314,7 +398,7 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 		for _, ppt_data in ipairs(ppt_data_list) do
 			if(ppt_data.notes_str) then
 				ppt_data.div_str = (ppt_data.div_str or "") .. table.concat({
-					[[<pe:gridview style="margin-left:0px;width:825px;height: 114px; " name="notes_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" DataSource='<%=NotesData %>'><Columns>]],
+					[[<pe:gridview style="margin-left:0px;width:825px;height: 114px; " name="notes_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" DataSource='<%=NotesData %>'><Columns>]],
 					ppt_data.notes_str,
 					[[</Columns></pe:gridview>]]
 				})
@@ -410,6 +494,11 @@ function RedSummerCampPPtPage.GetPPtTitle()
 	return ppt_data.title
 end
 
+function RedSummerCampPPtPage.IsPPTCover()
+	local ppt_data = RedSummerCampPPtPage.SelectPPtData
+	return ppt_data and ppt_data.is_ppt_cover
+end
+
 function RedSummerCampPPtPage.GetCourseClientData()
 	local clientData = KeepWorkItemManager.GetClientData(40007) or {};
 	if clientData.CourseTaskData == nil then
@@ -497,7 +586,7 @@ function RedSummerCampPPtPage.SetCourseReportClientData(key, value)
 		if lesson_data.start_time_stamp then
 			local cur_time_stamp = QuestAction.GetServerTime()
 			local second = cur_time_stamp - tonumber(lesson_data.start_time_stamp)
-			extend_data.duration = math.floor(second/60)
+			extend_data.duration = second
 		end
 
 		GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
@@ -641,39 +730,6 @@ function RedSummerCampPPtPage.OnVisitWrold(projectid)
 			RedSummerCampPPtPage.ReportFinishCurTask()
 		end
 	end
-
-	if projectid then
-		-- 上报ppt学习情况
-		for key, v in pairs(RedSummerCampCourseScheduling.lessonCnf) do
-			if RedSummerCampPPtPage.PPtCacheData == nil or RedSummerCampPPtPage.PPtCacheData[v.key] == nil then
-				RedSummerCampPPtPage.InitPPtConfig(v.key)
-			end
-		end
-
-		-- export_data.course_name = course_name
-		-- export_data.step_value = ppt_data.max_step
-		-- export_data.course_index = #ppt_data_list + 1
-		projectid = tonumber(projectid)
-		local export_data_list = RedSummerCampPPtPage.ProjectIdToPPtData[projectid]
-		if export_data_list and #export_data_list > 0 then
-			for key, v in pairs(export_data_list) do
-				local step_value = tonumber(v.step_value)
-				if step_value and step_value ~= 1 then
-					local lesson_type = key_to_report_name[v.course_name] or v.course_name
-					local section = v.course_index or 1
-					keepwork.tatfook.study_learn_records({
-						lessonType = lesson_type,
-						section = section,
-						progress = step_value,
-					}, function(err, msg, data)
-						--print("ooooooooooo", err)
-					end)
-
-					break
-				end
-			end
-		end
-	end
 end
 
 function RedSummerCampPPtPage.OnSaveWrold()
@@ -762,10 +818,7 @@ function RedSummerCampPPtPage.ClosePPtAllPage()
 		RedSummerCampPPtPage.IsOpenPage = true
 	end
 	
-	if page then
-		page:CloseWindow(true)
-		page = nil
-	end
+	RedSummerCampPPtPage.ClosePage()
 
 	RedSummerCampCourseScheduling.ClosePage()
 
@@ -778,22 +831,38 @@ function RedSummerCampPPtPage.IsShowCloseAllPageBt()
 	return true
 end
 
-function RedSummerCampPPtPage.GetContent(dataHistroy)
-	local course_name, pptIndex = dataHistroy.key, dataHistroy.pptIndex
-	if RedSummerCampPPtPage.PPtCacheData[course_name] == nil then
-		RedSummerCampPPtPage.InitPPtConfig(course_name)
+function RedSummerCampPPtPage.GetContent(dataHistroy, course_data, callback)
+	if not callback then
+		return
 	end
 
-	local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[course_name]
-	local ppt_data = ppt_data_list[pptIndex]
-	if not ppt_data then
-		return dataHistroy.content
+	local function get_content()
+		local course_name, pptIndex = dataHistroy.key, dataHistroy.pptIndex
+	
+		if RedSummerCampPPtPage.PPtCacheData[course_name] == nil then
+			RedSummerCampPPtPage.InitPPtConfig(course_name)
+		end
+	
+		local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[course_name]
+		local ppt_data = ppt_data_list[pptIndex]
+		if not ppt_data then
+			callback(dataHistroy.content or "")
+			return
+		end
+		
+		local ppt_title = ppt_data.title or ""
+		local knowledge_point_desc = ppt_data.knowledge_point_desc or ""
+		local content = string.format("%s <br/> 知识点：<br/>%s", ppt_title, knowledge_point_desc)
+		callback(content)
+	end
+
+
+	if course_data and type(course_data) == "table" then
+		RedSummerCampPPtPage.CheckPPtConfigFile(course_data, dataHistroy.pptIndex, get_content)
+	else
+		get_content()
 	end
 	
-	local ppt_title = ppt_data.title or ""
-	local knowledge_point_desc = ppt_data.knowledge_point_desc or ""
-	local content = string.format("%s <br/> 知识点：<br/>%s", ppt_title, knowledge_point_desc)
-	return content
 end
 
 function RedSummerCampPPtPage.HandleErrorData()
@@ -838,49 +907,6 @@ function RedSummerCampPPtPage.UpdateStudentNum()
 	end
 end
 
--- local test_num = 0
-function RedSummerCampPPtPage.SaveToPPtJson()
-	local json_data = {}
-	-- [{
-	-- 	"lessonType": "org",
-	-- 	"name": "小小建筑师",
-	-- 	"section": 1,
-	-- 	"totalStep":5
-	-- }]
-	for i, item in ipairs(RedSummerCampCourseScheduling.lessonCnf) do
-		local course_name = item.key or ""
-		RedSummerCampPPtPage.InitPPtConfig(course_name)
-		local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[course_name]
-		if ppt_data_list then
-			for i2, v2 in ipairs(ppt_data_list) do
-				local data = {
-					lessonType = key_to_report_name[course_name] or course_name,
-					name = v2.title,
-					section = i2,
-					totalStep = v2.max_step or 0,
-				}
-
-				json_data[#json_data + 1] = data
-			end
-		end
-	end
-
-
-	if #json_data > 0 then
-		local s = NPL.ToJson(json_data,true)
-		local file_path = string.format("temp/pptjson/ppt.json", disk_folder, voiceNarrator, filename)
-		ParaIO.CreateDirectory(file_path)
-		local file = ParaIO.open(file_path, "w");
-		if(file) then
-			file:write(s, #s);
-			file:close();
-		end
-
-		local absPath = string.gsub(ParaIO.GetCurDirectory(0) .. "temp/pptjson/", "/", "\\");
-		ParaGlobal.ShellExecute("open", "explorer.exe", absPath, "", 1)
-	end
-end
-
 function RedSummerCampPPtPage.GetExportData()
 	local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[RedSummerCampPPtPage.CurCourseName]
 	local course_data = nil
@@ -890,7 +916,7 @@ function RedSummerCampPPtPage.GetExportData()
 			break
 		end
 	end
-	return ppt_data_list or {}, course_data.name or "course"
+	return ppt_data_list or {}, course_data and course_data.name or "course"
 end
 
 function RedSummerCampPPtPage.FlushExportFullPage(index, ppt_data_list)
@@ -1005,8 +1031,7 @@ function RedSummerCampPPtPage.ReportFinishCurTask()
 
 	local cur_time_stamp = QuestAction.GetServerTime()
 	local second = cur_time_stamp - RedSummerCampPPtPage.CurTaskData.start_time_stamp
-	local min = math.floor(second/60)
-	extend_data.duration = min
+	extend_data.duration = second
 
 	RedSummerCampPPtPage.CurTaskData = nil
 	GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
@@ -1030,6 +1055,8 @@ function RedSummerCampPPtPage.GetReportData(extra_data)
 			report_data[key] = value
 		end
 	end
+
+	report_data.useNoId = true
 
 	return report_data
 end
@@ -1079,4 +1106,12 @@ function RedSummerCampPPtPage.OnCloseDailyVideo()
 
 	RedSummerCampPPtPage.SetCourseClientData("dailyVideo", 1)
 	RedSummerCampPPtPage.ReportFinishCurTask()
+end
+
+function RedSummerCampPPtPage.GetPPTConfigDiskFolder()
+    if(not RedSummerCampPPtPage.DiskFolder) then
+		RedSummerCampPPtPage.DiskFolder = ParaIO.GetWritablePath().."temp/ppt_config"
+   end
+    
+	return RedSummerCampPPtPage.DiskFolder
 end

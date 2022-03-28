@@ -715,6 +715,9 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 
 	-- let us skip all dll and exe files
 	autoUpdater.FilterFile = function(self, filename)
+		if System.options.isDevMode and System.options.channelId=="430" and System.os.GetPlatform() == "win32" then 
+			return false
+		end
 		if(filename:match("%.exe") or filename:match("%.dll")) then
 			return true;
 		end

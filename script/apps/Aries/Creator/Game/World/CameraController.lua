@@ -39,6 +39,9 @@ CameraController:Property("Name", "CameraController");
 
 CameraController:Signal("modeChanged")
 
+local eye_pos = {0,0,0};
+local lookat_pos = {0,0,0};
+
 local CameraModes = {
 	ThirdPersonFreeLooking = 0,
 	FirstPerson = 1,
@@ -550,8 +553,12 @@ function CameraController.OnCameraFrameMove()
 	Cameras:GetCurrent():FrameMoveCameraControl()
 
 	if(not GameLogic.GameMode:IsMovieMode()) then
+		local bIsAnimatingView;
 		if(CameraController.IsAutoRoomViewEnabled()) then
-			CameraController.ApplyAutoRoomViewCamera();
+			bIsAnimatingView = not CameraController.ApplyAutoRoomViewCamera();
+		end
+		if(not bIsAnimatingView and CameraController.IsCameraRotationGridEnabled()) then
+			CameraController.ApplyCameraRotationGridRestrictions();
 		end
 		CameraController.ApplyCameraRestrictions()
 	end
@@ -615,7 +622,6 @@ function CameraController.UpdateFlyMode()
 end
 
 local tick_count = 0;
-local eye_pos = {0,0,0};
 
 -- 30 FPS from game_logic
 function CameraController.OnFrameMove()
@@ -704,7 +710,7 @@ function CameraController.LockRailCarFirstPersonView()
 		att:SetField("NearPlane", 0.1);
 		att:SetField("RotationScaler", 0.0025);
 		att:SetField("IsShiftMoveSwitched", true);
-		local facing = entity.ridingEntity:GetFacing()
+		local facing = entity.ridingEntity:GetFacing() or 0
 		local rotation_pitch = entity.ridingEntity:GetRotationPitch()
 		local move_angle = entity.ridingEntity:GetmoveAngle()
 		local is_moving = entity.ridingEntity:IsMoving()
@@ -718,11 +724,11 @@ function CameraController.LockRailCarSurroundView()
 		CameraController.LockCamera(true)
 
 		local att = ParaCamera.GetAttributeObject();
-		local facing = entity.ridingEntity:GetFacing()
+		local facing = entity.ridingEntity:GetFacing() or 0
 		local rotation_pitch = entity.ridingEntity:GetRotationPitch()
 		local target_facing = facing - math.pi/2
-		if CameraController.RailCarCamareTimer then
-			local cur_facing = att:GetField("CameraRotY")%(math.pi * 2)
+		if CameraController.RailCarCameraTimer then
+			local cur_facing = att:GetField("CameraRotY", 0) % (math.pi * 2)
 			target_facing = (math.floor(cur_facing/(math.pi/2)) + 1) * math.pi/2
 		end
 		
@@ -786,9 +792,9 @@ end
 function CameraController.ClearRailCarCameraModData(is_toggle_camera)
 	CameraController.LockCamera(false)
 	CameraController.ChangeCameraFreeLookMod()
-	if CameraController.RailCarCamareTimer then
-		CameraController.RailCarCamareTimer:Change()
-		CameraController.RailCarCamareTimer = nil
+	if CameraController.RailCarCameraTimer then
+		CameraController.RailCarCameraTimer:Change()
+		CameraController.RailCarCameraTimer = nil
 	end
 
 	local channel = MovieManager:CreateGetMovieChannel("railcar_fiexd_moives");
@@ -830,15 +836,15 @@ function CameraController.IsLockRailCarFirstPersonView()
 end
 
 function CameraController.StartSurroundCamrea()
-	if CameraController.RailCarCamareTimer then
-		CameraController.RailCarCamareTimer:Change()
+	if CameraController.RailCarCameraTimer then
+		CameraController.RailCarCameraTimer:Change()
 	end
 
 	local att = ParaCamera.GetAttributeObject()
-	local start_facing = att:GetField("CameraRotY")
-	CameraController.RailCarCamareTimer =  commonlib.Timer:new({callbackFunc = function()
+	local start_facing = att:GetField("CameraRotY", 0)
+	CameraController.RailCarCameraTimer =  commonlib.Timer:new({callbackFunc = function()
 
-		local facing = att:GetField("CameraRotY")
+		local facing = att:GetField("CameraRotY", 0)
 		if facing - start_facing >= math.pi then
 			local cur_facing = facing%(math.pi * 2)
 			target_facing = math.floor(cur_facing/(math.pi/2)) * math.pi/2
@@ -850,7 +856,7 @@ function CameraController.StartSurroundCamrea()
 		facing = facing + math.pi/180;
 		att:SetField("CameraRotY", facing);
 	end})
-	CameraController.RailCarCamareTimer:Change(5000,50);
+	CameraController.RailCarCameraTimer:Change(5000,50);
 end
 
 function CameraController.StartFiexdCamrea(movies_pos_list, time, is_random)
@@ -871,10 +877,10 @@ function CameraController.StartFiexdCamrea(movies_pos_list, time, is_random)
 		channel:PlayLooped(0, -1);
 	end
 
-	CameraController.RailCarCamareTimer =  commonlib.Timer:new({callbackFunc = function()
+	CameraController.RailCarCameraTimer =  commonlib.Timer:new({callbackFunc = function()
 		CameraController.StartFiexdCamrea(movies_pos_list, time, is_random) 
 	end})
-	CameraController.RailCarCamareTimer:Change(time * 1000);
+	CameraController.RailCarCameraTimer:Change(time * 1000);
 end
 
 function CameraController.LoadFiexdCameraSetting()
@@ -1000,6 +1006,65 @@ function CameraController.OnSyncWorldFinish()
 	end
 end
 
+-- @param yaw: yaw grid restriction value, if nil or 0 we will disable it.
+-- @param pitch: pitch grid restriction value, if nil or 0 we will disable it.
+function CameraController.EnableCameraRotationGrid(yaw, pitch)
+	if(yaw and yaw == 0) then
+		yaw = nil;
+	end
+	if(pitch and pitch == 0) then
+		pitch = nil;
+	end
+	CameraController.gridYaw = yaw
+	CameraController.gridPitch = pitch
+end
+
+function CameraController.IsCameraRotationGridEnabled()
+	return CameraController.gridYaw or CameraController.gridPitch
+end
+
+function CameraController.ApplyCameraRotationGridRestrictions()
+	if(not CameraController.IsCameraRotationGridEnabled() or CameraController.IsFPSView()) then
+		return
+	end
+	local isCameraKeyPressed = ParaUI.IsMousePressed(0) or Cameras:GetCurrent():IsDragging();
+	-- this fixed a temporary android bug where ParaUI.IsMousePressed(1) always return true until we long hold to right click. 
+	if(not System.os.IsMobilePlatform() and ParaUI.IsMousePressed(1)) then
+		isCameraKeyPressed = true;
+	end
+	
+	if(not isCameraKeyPressed) then
+		local attr = ParaCamera.GetAttributeObject()
+		local eye_pos = attr:GetField("Eye position", eye_pos);
+		local lookat_pos = attr:GetField("Lookat position", lookat_pos);
+		local camobjDist, LiftupAngle, CameraRotY = attr:GetField("CameraObjectDistance", 0), attr:GetField("CameraLiftupAngle", 0), attr:GetField("CameraRotY", 0);
+	
+		local dist, pitch, yaw = camobjDist, LiftupAngle, CameraRotY;
+
+		local eyeX, eyeY, eyeZ = eye_pos[1], eye_pos[2], eye_pos[3]
+		local lookatX, lookatY, lookatZ = lookat_pos[1], lookat_pos[2], lookat_pos[3]
+		----------------
+		-- only limit camera rotation grid, when user is not dragging the camera view, such as holding the right or left mouse button. 
+		----------------
+		if(not CameraController.IsAutoRoomViewEnabled() and CameraController.gridPitch) then
+			local pitchTarget = math.floor(pitch / CameraController.gridPitch + 0.5) * CameraController.gridPitch
+			-- 60 degrees per second with some accelerations when the angle diff is very big. 
+			if(math.abs(pitchTarget - pitch) > 0.01) then
+				local newPitch = mathlib.SmoothMoveFloat(pitch, pitchTarget, (60+(math.abs(pitch-pitchTarget)*100)^2/10) * camera.deltaTime/1000/180*math.pi)
+				attr:SetField("CameraLiftupAngle", newPitch)
+			end
+		end
+		if(CameraController.gridYaw) then
+			local yawTarget = math.floor(yaw / CameraController.gridYaw + 0.5) * CameraController.gridYaw
+			-- 60 degrees per second with some accelerations when the angle diff is very big. 
+			if(math.abs(yawTarget - yaw) > 0.01) then
+				local newYaw = mathlib.SmoothMoveFloat(yaw, yawTarget, (60+(math.abs(yaw-yawTarget)*100)^2/10) * camera.deltaTime/1000/180*math.pi)
+				attr:SetField("CameraRotY", newYaw)
+			end
+		end
+	end
+end
+
 -- we will automatically adjust camera, so that the user can always see the main player in a scene. 
 -- we also apply some basic third-person down view restrictions. The algorithm ensures that the smallest view adjustment is applied. 
 -- The algorithm we will also try to find doors on the wall of a room, once a door is detected, it will face the door or the other room 
@@ -1014,12 +1079,11 @@ function CameraController.IsAutoRoomViewEnabled()
 	return CameraController.isAutoRoomViewEnabled;
 end
 
-local eye_pos = {0,0,0};
-local lookat_pos = {0,0,0};
-
+-- return true if room view restrictions are satisfied
 function CameraController.ApplyAutoRoomViewCamera()
+	local roomViewSatisfied = true;
 	if(not CameraController.IsAutoRoomViewEnabled() or CameraController.IsFPSView()) then
-		return
+		return roomViewSatisfied;
 	end
 	local isCameraKeyPressed = ParaUI.IsMousePressed(0) or Cameras:GetCurrent():IsDragging();
 	-- this fixed a temporary android bug where ParaUI.IsMousePressed(1) always return true until we long hold to right click. 
@@ -1045,6 +1109,9 @@ function CameraController.ApplyAutoRoomViewCamera()
 	
 		-- 60 degrees per second with some accelerations when the angle diff is very big. 
 		if(pitchTarget ~= pitch) then
+			if(math.abs(pitch-pitchTarget)>0.01) then
+				roomViewSatisfied = false;
+			end
 			local newPitch = mathlib.SmoothMoveFloat(pitch, pitchTarget, (60+(math.abs(pitch-pitchTarget)*100)^2/10) * camera.deltaTime/1000/180*math.pi)
 			attr:SetField("CameraLiftupAngle", newPitch)
 		end
@@ -1067,6 +1134,7 @@ function CameraController.ApplyAutoRoomViewCamera()
 			end
 		end
 	end
+	return roomViewSatisfied;
 end
 
 -- handling mouse event for basic camera control

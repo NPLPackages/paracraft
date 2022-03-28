@@ -54,3 +54,7 @@ HttpWrapper.Create("keepwork.items.setClientData", "%MAIN%/gosys/v0/userGoods/cl
 --http://yapi.kp-para.cn/project/109/interface/api/1467
 -- get
 HttpWrapper.Create("keepwork.items.getClientData", "%MAIN%/gosys/v0/userGoods/clientData", "GET", true)
+
+-- 根据物品Id获取数据
+-- http://yapi.kp-para.cn/project/109/interface/api/4824
+HttpWrapper.Create("keepwork.good.good_info", "%MAIN%/gosys/v0/goods/gsId/:gsId", "GET", true)

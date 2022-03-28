@@ -21,7 +21,6 @@ local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local FindBlockTask = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask"));
 
--- whether to suppress any gui pop up. 
 FindBlockTask:Property({"text", nil, "GetText", "SetText", auto=true});
 
 FindBlockTask.resultDS = {};

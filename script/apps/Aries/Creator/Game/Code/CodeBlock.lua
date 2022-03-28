@@ -756,6 +756,7 @@ function CodeBlock:CreateEvent(event_name)
 		self.events[event_name] = events;
 	end
 	if(#events >= self.maxEventCount) then
+		self:UnRegisterEvent(event_name);
 		self:send_message(L"注册了太多同名事件"..event_name, "error");
 		self:Stop();
 		return

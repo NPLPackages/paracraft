@@ -971,7 +971,8 @@ function MakeApp:iOSCheckNPLRuntime(callback)
     end
 
     if (not ParaIO.DoesFileExist(self.iOSBuildRoot .. "NPLRuntime/")) then
-        local url = self.iOSResourceBaseCDN .. "NPLRuntime.tar.gz";
+        local version = '2.3'
+        local url = "http://code.kp-para.cn/root/NPLRuntime/-/archive/v" .. version .. "/NPLRuntime-v" .. version .. ".tar.bz2";
 
         local fileDownloader = FileDownloader:new();
         fileDownloader.isSilent = true;
@@ -1229,7 +1230,7 @@ exit 0;
     end
 end
 
-function MakeApp:iOSCopyCurWorldToProject(compress, beAutoUpdate, loginEnable, callback)
+function MakeApp:iOSCopyCurWorldToProject(compress, beAutoUpdate, beAutoUpdateWorld, loginEnable, callback)
     local currentEnterWorld = Mod.WorldShare.Store:Get("world/currentEnterWorld");
 
     if (not currentEnterWorld or type(currentEnterWorld) ~= "table") then
@@ -1246,9 +1247,18 @@ function MakeApp:iOSCopyCurWorldToProject(compress, beAutoUpdate, loginEnable, c
     end
 
     if (compress) then
+        ParaIO.DeleteFile("temp/" .. currentEnterWorld.foldername .. "/");
+        local tempWorldPath =
+            "temp/" ..
+            currentEnterWorld.foldername ..
+            "/" ..
+            currentEnterWorld.foldername ..
+            "/";
+        commonlib.Files.CopyFolder(worldPath, tempWorldPath);
+
         GameLogic.GetFilters():apply_filters(
             "service.local_service.move_folder_to_zip",
-            worldPath,
+            "temp/" .. currentEnterWorld.foldername .. "/",
             worldsPath .. currentEnterWorld.foldername .. ".zip"
         );
     else
@@ -1265,12 +1275,22 @@ function MakeApp:iOSCopyCurWorldToProject(compress, beAutoUpdate, loginEnable, c
     local writeFile = ParaIO.open(configPath, "w");
 
     if (writeFile:IsValid()) then
+        local foldername = currentEnterWorld.foldername;
+
+        if (compress) then
+            foldername = foldername .. ".zip";
+        end
+
         local content = 
             "cmdline=mc=\"true\" debug=\"main\" IsAppVersion=\"true\" bootstrapper=\"script/apps/Aries/main_loop.lua\" " ..
-            "world=\"" .. "worlds/DesignHouse/" .. currentEnterWorld.foldername .. "\"";
+            "world=\"" .. "worlds/DesignHouse/" .. foldername .. "\"";
 
         if (not beAutoUpdate) then
             content = content .. " noclientupdate=\"true\"";
+        end
+
+        if (beAutoUpdateWorld) then
+            content = content .. " auto_update_world=\"true\"";
         end
 
         if (loginEnable) then
@@ -1289,7 +1309,6 @@ function MakeApp:iOSCopyCurWorldToProject(compress, beAutoUpdate, loginEnable, c
 end
 
 function MakeApp:CopyIconToProject(callback)
-
     local currentEnterWorld = Mod.WorldShare.Store:Get("world/currentEnterWorld");
 
     if (not currentEnterWorld or type(currentEnterWorld) ~= "table") then
@@ -1453,8 +1472,8 @@ function MakeApp:CopyIconToProject(callback)
     local appIconFolder = ParaIO.GetWritablePath() .. self.iOSBuildRoot .. "NPLRuntime/NPLRuntime/Platform/iOS/Images.xcassets/AppIcon.appiconset";
     local iconPath;
 
-    ParaIO.DeleteFile(appIconFolder);
-    ParaIO.CreateDirectory(appIconFolder);
+    ParaIO.DeleteFile(appIconFolder .. "/");
+    ParaIO.CreateDirectory(appIconFolder .. "/");
 
     if (ParaIO.DoesFileExist(currentEnterWorld.worldpath .. "/icon.png")) then
         iconPath = currentEnterWorld.worldpath .. "/icon.png"
@@ -1474,9 +1493,9 @@ function MakeApp:CopyIconToProject(callback)
         if (item.name) then
             dest = appIconFolder .. "/" .. item.name;
         else
-            dest = appIconFolder .. "/" .. format("Icon-App-%dx%d@%dx",
-                                                  item.dimensions.width,
-                                                  item.dimensions.height,
+            dest = appIconFolder .. "/" .. format("Icon-App-%sx%s@%dx",
+                                                  tostring(item.dimensions.width),
+                                                  tostring(item.dimensions.height),
                                                   item.scale
                                                  );
         end

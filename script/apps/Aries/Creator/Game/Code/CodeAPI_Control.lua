@@ -175,20 +175,24 @@ end
 
 -- return after user has pressed enter key
 -- @param callbackFunc: if there is a callback function, we will display OKCancel
+-- @param type: value is 1,2,3...;if nil use default messagebox page
 -- @return nil or "OK"
-function env_imp:alert(text, callbackFunc)
+function env_imp:alert(text, callbackFunc,type)
 	local buttons
 	if(callbackFunc) then
 		buttons = _guihelper.MessageBoxButtons.OKCancel_CustomLabel;
 	else
 		buttons = _guihelper.MessageBoxButtons.OK_CustomLabel
 	end
-
+	local default_mcml_template
+	if type and type == 1 then
+		default_mcml_template = "script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.lesson.html"
+	end
 	local res;
 	_guihelper.MessageBox(text, self.co:MakeCallbackFuncAsync(function(result)
 		res = result;
 		env_imp.resume(self)
-	end), buttons)
+	end), buttons,nil,default_mcml_template)
 	env_imp.yield(self);
 	if(res == _guihelper.DialogResult.OK) then
 		res = "OK"

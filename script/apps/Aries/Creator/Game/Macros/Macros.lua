@@ -340,8 +340,13 @@ function Macros.OnGUIEvent(obj, eventname, callInfo)
 	if(not Macros:IsRecording()) then
 		return
 	end
-	if(eventname == "onclick" or eventname == "onmouseup") then
+	if(eventname == "onclick" or eventname == "onmouseup" or (eventname == "onactivate" and param1==1)) then
 		local name = obj.name or "";
+		if(eventname == "onactivate") then
+			if(not obj.type == "editbox" and not obj.type == "imeeditbox") then
+				return
+			end
+		end
 		if(IsRecordableUIObject(obj, name)) then
 			if(not ignoreBtnList[name]) then
 				local eventName_;

@@ -1193,9 +1193,10 @@ function TouchMiniKeyboard:ShowShiftDrawAnim()
 		end
 	end
 
-	if start_pos.x == nil or start_pos.y == nil then
+	if (not start_pos.x or not end_pos.x) then
 		return
 	end
+
 
 	if nil == self.anim_circle_object then
 		

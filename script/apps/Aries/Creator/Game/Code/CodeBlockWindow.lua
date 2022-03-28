@@ -251,6 +251,7 @@ end
 
 function CodeBlockWindow.OnWorldUnload()
 	self.lastBlocklyUrl = nil;
+	self.recentOpenFiles = nil;
 end
 
 function CodeBlockWindow.OnWorldSave()
@@ -339,7 +340,35 @@ function CodeBlockWindow.RestoreCursorPosition(bImmediate)
 	end
 end
 
+function CodeBlockWindow.AddToRecentFiles(entity)
+	if(entity) then
+		local bx, by, bz = entity:GetBlockPos()
+		self.recentOpenFiles = self.recentOpenFiles or {};
+		local items = self.recentOpenFiles
+		for i, item in ipairs(items) do
+			if(item.bx == bx and item.by == by and item.bz==bz) then
+				-- already exist, shuffle it to the first item
+				for k=i, 2, -1 do
+					items[k] = items[k-1]
+				end
+				items[1] = item;
+				return
+			end
+		end
+		for k=#items+1, 2, -1 do
+			items[k] = items[k-1]
+		end
+		items[1] = {bx=bx, by=by, bz=bz};
+	end
+end
+
+-- @return nil or array of recently opened files in format {bx, by, bz}
+function CodeBlockWindow.GetRecentOpenFiles()
+	return self.recentOpenFiles
+end
+
 function CodeBlockWindow.SetCodeEntity(entity, bNoCodeUpdate, bDelayRefresh)
+	CodeBlockWindow.AddToRecentFiles(entity)
 	CodeBlockWindow.HighlightCodeEntity(entity);
 	local isEntityChanged = false;
 	if(self.entity ~= entity) then

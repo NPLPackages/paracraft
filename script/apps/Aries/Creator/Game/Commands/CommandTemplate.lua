@@ -337,13 +337,13 @@ Commands["exportgltf"] = {
 	name="exportgltf", 
 	quick_ref="/exportgltf [-region] [parax] [output]", 
 	desc=[[--export all blocks in the given regions to gltf(glb) files, save to current world dictionary
-/export -region 37_37|37_38
+/exportgltf -region 37_37|37_38
 -- export all selected blocks to gltf(glb) file, save as the output file in current world dictionary
-/export selected1.gltf(glb)
+/exportgltf selected1.gltf(glb)
 -- export all blocks in the given chunks in (x y z) radius around player
-/export 32 32 32
+/exportgltf 32 32 32
 -- export the given parax file to gltf(glb) file
-/export given.x output.gltf(glb)
+/exportgltf given.x output.gltf(glb)
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local function ParaXToGltf(parax, gltf)

@@ -243,6 +243,7 @@
                             MakeApp:iOSCopyCurWorldToProject(
                                 copy_read_only_world,
                                 be_auto_update,
+                                be_auto_update_world,
                                 login_enable,
                                 function()
                                     p_step2_content_controller.visible = true;
@@ -373,12 +374,9 @@
                             return icon_path
                         elseif (get_build_platform() == "ios") then
                             local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
-                            local world_path = MakeApp.iOSBuildRoot ..
-                                               "NPLRuntime/NPLRuntime/Platform/iOS/assets/worlds/DesignHouse/" ..
-                                               currentEnterWorld.foldername ..
-                                               "/";
+                            local world_path = currentEnterWorld.worldpath;
                             local icon_path = world_path .. "icon.png";
-                            
+
                             return icon_path
                         end
                     end

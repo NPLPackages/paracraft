@@ -568,14 +568,22 @@ function BaseContext:SetMouseCaptureEntity(mouseCaptureEntity, event)
 	if(event and event.touchSession) then
 		event.touchSession.mouseCaptureEntity = mouseCaptureEntity;
 	end
-	self.mouseCaptureEntity = mouseCaptureEntity;
+	if(event and event.mouse_button == "left") then
+		self.mouseLeftCaptureEntity = mouseCaptureEntity;
+	else
+		self.mouseCaptureEntity = mouseCaptureEntity;
+	end
 end
 
 function BaseContext:GetMouseCaptureEntity(event)
 	if(event and event.touchSession) then
 		return event.touchSession.mouseCaptureEntity;
 	else
-		return self.mouseCaptureEntity;
+		if(event and event.mouse_button == "left") then
+			return self.mouseLeftCaptureEntity;
+		else
+			return self.mouseCaptureEntity;
+		end
 	end
 end
 
@@ -1144,7 +1152,8 @@ function BaseContext:HandleGlobalKey(event)
 		elseif(dik_key == "DIK_F11") then
 			CommandManager:RunCommand("/open npl://console");
 			event:accept();
-		elseif(ctrl_pressed and dik_key == "DIK_P") then
+		elseif(ctrl_pressed and dik_key == "DIK_P" and event.shift_pressed) then
+			-- shift + ctrl + p: to stop(pause) all running code block. 
 			CommandManager:RunCommand("/stop");
 			event:accept();
 		else
@@ -1182,6 +1191,9 @@ function BaseContext:HandleGlobalKey(event)
 					-- show module manager
 					GameLogic.RunCommand("/menu file.createworld");
 					event:accept();
+				elseif(dik_key == "DIK_P") then
+					-- find code block
+					GameLogic.RunCommand("/findfile -codeblock");
 				elseif(dik_key == "DIK_F") then
 					-- find block 
 					if(event.shift_pressed) then

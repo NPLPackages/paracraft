@@ -150,6 +150,8 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 			root_width = 274
 			root_height = 67
 		end
+
+		local sendevent= mcmlNode:GetString("sendevent")
 		
 		local _this = ParaUI.CreateUIObject("button", "action_button_type", "_lt", left + 50, top + root_y - 7, root_width, root_height);
 		_this.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/b1_32X46_32bits.png;0 0 32 46:8 8 8 8";
@@ -160,7 +162,11 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 		_this:SetScript("onclick", function()
 			if projectid then
 				RedSummerCampPPtPage.OnClickAction(action_type)
-				GameLogic.RunCommand(string.format("/loadworld -s -auto %s", projectid))
+				local commandStr = string.format("/loadworld -s -auto %s", projectid)
+				if sendevent and sendevent ~= "" then
+					commandStr = string.format("/loadworld -s -auto -inplace %s  | /sendevent %s", projectid,sendevent)
+				end
+				GameLogic.RunCommand(commandStr)
 			end
 		end);
 

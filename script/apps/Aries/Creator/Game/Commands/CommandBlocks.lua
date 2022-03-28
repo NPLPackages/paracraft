@@ -267,20 +267,29 @@ e.g.
 
 Commands["findfile"] = {
 	name="findfile", 
-	quick_ref="/findfile [filename]", 
+	quick_ref="/findfile [-codeblock] [filename]", 
 	desc=[[file blocks with given filename 
+@param -codeblock: find only code block
 @param filename: if no filename, we will prompt a dialog to enter. 
 e.g.
 /findfile
 /findfile test.bmax
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		
-		local text = cmd_text;
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FindBlockTask.lua");
-		local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask");
-		local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
-		task:FindFile(text)
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
+		if(options.codeblock) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/FindCodeBlock.lua");
+			local FindCodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.FindCodeBlock");
+			FindCodeBlock.Show(true)
+		else
+			local text = cmd_text;
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FindBlockTask.lua");
+			local FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask");
+			local task = MyCompany.Aries.Game.Tasks.FindBlockTask:new()
+			task:FindFile(text)
+		end
 	end,
 };
 

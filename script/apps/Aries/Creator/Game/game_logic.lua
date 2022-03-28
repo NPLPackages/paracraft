@@ -680,7 +680,10 @@ function GameLogic.LoadGame()
 
 	CameraController.OnInit();
 
-	GameLogic.CheckCreateFileWatcher();
+	-- Exclude mac system beacause of crash
+	if (System.os.GetPlatform() ~= 'mac') then
+		GameLogic.CheckCreateFileWatcher();
+	end
 
 	GameRules:LoadFromFile();
 
@@ -2076,26 +2079,15 @@ function GameLogic.CheckCanLearn(type)
 	if GameLogic.IsVip() or GameLogic.KeepWorkItemManager.IsOrgVip() then
 		return true
 	end
-	local strTip = "现在不是上课时间哦，请在上课时间（周一至周五7:30-17:00）内再来上课吧。"
-	local server_time = QuestAction.GetServerTime()
-	local year = tonumber(os.date("%Y", server_time))	
-	local month = tonumber(os.date("%m", server_time))
-	local day = tonumber(os.date("%d", server_time))
-	local week_day = os.date("*t",server_time).wday-1 == 0 and 7 or os.date("*t",server_time).wday-1
-	local today_weehours = commonlib.timehelp.GetWeeHoursTimeStamp(server_time)
-	if strType == "school_lesson" then --校本课
-        if week_day ~= 7 then
-            local limit_time_stamp = today_weehours + 7 * 60 * 60 + 30 * 60
-			local limit_time_end_stamp = today_weehours + 17 * 60 * 60 + 0 * 60
-            if server_time >= limit_time_stamp and server_time <= limit_time_end_stamp then
-				if not System.User.isVipSchool then
-					strTip = "该课程是vip专属课程，需要vip权限才能学习。"
-					return false, strTip
-				end
-
-                return true,""
-            end
-        end	
+	local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+	if UserPermission.IsInVipSchoolCourseDay() and UserPermission.IsInVipSchoolCourseTime() then
+		return true,""
+	else
+		if not System.User.isVipSchool then
+			strTip = "该课程是vip专属课程，需要vip权限才能学习。"
+			return false, strTip
+		end
+		return false,"现在不是上课时间哦，请在上课时间（周一至周五7:30-18:30）内再来上课吧。"
 	end
-	return false,strTip
+	return true
 end

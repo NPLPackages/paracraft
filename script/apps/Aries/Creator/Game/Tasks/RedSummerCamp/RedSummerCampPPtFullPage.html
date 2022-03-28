@@ -33,6 +33,10 @@ end
 function GetPPtStr()
     return RedSummerCampPPtFullPage.GetPPtStr()
 end
+
+function IsPPTCover()
+    return RedSummerCampPPtPage.IsPPTCover()
+end
 ]]>
 </script>
 <style type="text/mcss">
@@ -87,6 +91,12 @@ end
             ["margin-left"] = 65,
             ["margin-top"] = 15,
         },  
+        ppt_cover = {
+            width = 965,
+            height = 565,
+            ["margin-left"] = 65,
+            ["margin-top"] = 45,
+        }, 
     }
 </style>
 
@@ -97,10 +107,18 @@ end
         <input type="button" value='' onclick="ClosePage" style="width: 112px;height: 52px; margin-right:20px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B2_112X52_32bits.png#0 0 112 52);" />
     </pe:container>
     <pe:container alignment="_ct" style="margin-left:-532px;margin-top:-326px;width:1024px;height:612px;background:url();">
-        <div style="position: relative;margin-left: 0px;base-font-siez:28px;font-size: 28px;">
-            <div style="margin-top: 40px;margin-left: 0px; base-font-size:40px; font-size:40px;font-weight:bold;color: #212122; "><%=GetPPtTitle()%></div>
-            <%=GetPPtStr()%>
-        </div>
+        <pe:if condition='<%=IsPPTCover()%>'>
+            <div style="position: relative;margin-left: 0px;base-font-size:16px;font-size: 16px;">
+                <%=GetPPtStr()%>
+            </div>   
+        </pe:if>
+        <pe:if condition='<%=not IsPPTCover()%>'>
+            <div style="position: relative;margin-left: 0px;base-font-siez:28px;font-size: 28px;">
+                <div style="margin-top: 40px;margin-left: 0px; base-font-size:40px; font-size:40px;font-weight:bold;color: #212122; "><%=GetPPtTitle()%></div>
+                <%=GetPPtStr()%>
+            </div>       
+        </pe:if>        
+
     </pe:container>
     
 </pe:container>

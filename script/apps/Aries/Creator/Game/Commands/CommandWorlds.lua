@@ -38,7 +38,7 @@ Commands["save"] = {
 			return 
 		end
 		local function callback()
-			if (System.options.loginmode == "online") then
+			if (GameLogic.GetFilters():apply_filters('is_signed_in')) then
 				GameLogic.GetFilters():apply_filters(
 					"service.keepwork_service_world.limit_free_user",
 					false,

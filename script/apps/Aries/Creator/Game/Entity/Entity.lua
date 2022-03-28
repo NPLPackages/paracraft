@@ -530,6 +530,13 @@ function Entity:OnFocusOut()
 	self:focusOut();
 end
 
+-- restore focus to main player if the current entity has focus
+function Entity:RestoreFocus()
+	if(self == EntityManager.GetFocus()) then
+		EntityManager.GetPlayer():SetFocus();
+	end
+end
+
 function Entity:SetVisible(bVisible)
 	local obj = self:GetInnerObject();
 	if(obj) then

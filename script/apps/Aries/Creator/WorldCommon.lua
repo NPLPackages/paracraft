@@ -353,6 +353,15 @@ function WorldCommon.SaveWorldAsImp(folderName, callbackFunc)
 						node.attr.fromProjects =  node.attr.fromProjects and (node.attr.fromProjects..","..node.attr.kpProjectId)  or node.attr.kpProjectId;
 						node.attr.kpProjectId = nil;
 					end
+					local setAttrValueDefault = function (attrs)
+						for key, value in pairs(attrs) do
+							if node.attr[value] ~=nil then
+								node.attr[value] = nil
+							end
+						end
+					end
+					setAttrValueDefault({"communityWorld","instituteVipChangeOnly","instituteVipEnabled","instituteVipSaveAsOnly","isVipWorld"})
+
 					save_world_handler:SaveWorldXmlNode(xmlRoot);
 					break;
 				end

@@ -38,8 +38,8 @@ Entity:Property({"scale", 1, "getScale", "setScale"});
 Entity:Property({"minScale", 0.02});
 Entity:Property({"maxScale", 1000});
 Entity:Property({"yaw", 0, "getYaw", "setYaw"});
-
 Entity:Property({"useRealPhysics", nil, "HasRealPhysics", "EnablePhysics", auto=true});
+Entity:Property({"enableDropFall", true, "IsDropFallEnabled", "EnableDropFall", auto=true});
 Entity:Property({"bIsAutoTurning", nil, "IsAutoTurningDuringDragging", "SetAutoTurningDuringDragging", auto=true});
 Entity:Property({"isStackable", nil, "IsStackable", "SetIsStackable", auto=true});
 Entity:Property({"stackHeight", 0.2, "GetStackHeight", "SetStackHeight", auto=true});

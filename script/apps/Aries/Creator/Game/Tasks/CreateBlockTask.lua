@@ -176,7 +176,12 @@ end
 function CreateBlock:AddEntity(xmlNode)
 	if(xmlNode) then
 		local attr = xmlNode.attr;
-		attr.name = nil;
+		if(attr.name) then
+			-- if entity already exist, we will use a different name, otherwise we will use name in xml node. 
+			if(EntityManager.GetEntity(attr.name)) then
+				attr.name = nil;
+			end
+		end
 		local entityClass;
 		if(attr.class) then
 			entityClass = EntityManager.GetEntityClass(attr.class)

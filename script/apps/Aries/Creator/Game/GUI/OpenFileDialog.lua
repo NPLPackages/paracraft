@@ -47,6 +47,10 @@ function OpenFileDialog.GetFilters(filterName)
 		return {
 			{L"bmax模型(*.bmax)",  "*.bmax"},
 		};
+	elseif(filterName == "x") then
+		return {
+			{L"ParaX模型(*.x)",  "*.x"},
+		};
 	elseif(filterName == "script" or filterName == "lua") then
 		return {
 			{L"(*.lua)",  "*.lua"},
@@ -91,7 +95,7 @@ function OpenFileDialog.GetFilters(filterName)
 end
 
 -- @param default_text: default text to be displayed. 
--- @param filters: "model", "bmax", "audio", "texture", "xml", nil for any file, or filters table
+-- @param filters: "model", "bmax", "audio", "texture", "xml", "x", nil for any file, or filters table
 -- @param editButton: this can be nil or a function(filename) end or {text="edit", callback=function(filename) end}
 -- the callback function can return a new filename to be displayed. 
 function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, IsSaveMode, editButton)

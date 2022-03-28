@@ -39,7 +39,18 @@
 
     function GetItemIcon(index)
         local index = tonumber(index)
-        return string.format("width: 94px;height: 94px; background: url(%s)#0 0 94 94;",path..RedSummerCampCourseScheduling.lessonCnf[index].icon)
+        local icon = RedSummerCampCourseScheduling.lessonCnf[index].icon
+        local key = RedSummerCampCourseScheduling.lessonCnf[index].key
+        local tip = RedSummerCampCourseScheduling.lessonCnf[index].tip
+        local html="" 
+        if not string.find(icon,"http") then
+            icon = path..icon.."#0 0 94 94"
+        end
+        html =string.format([[<img src="%s" onclick="OnClickLesson" name='%s' style="width:94px;height:94px"/>]],icon,key)
+        if tip and tip ~= "" then
+            html =string.format([[<img src="%s" bindtooltip='script/apps/Aries/Creator/Game/Tasks/Quest/QuestAiCourseToolTip.html?s=%s' onclick="OnClickLesson" name='%s' style="width:94px;height:94px"/>]],icon,tip,key)
+        end
+        return html
     end
 
     function OnClickLesson(name)
@@ -50,13 +61,48 @@
         return RedSummerCampCourseScheduling.curLearnHistroy
     end
 
+    function GetTipByLessonkey(key)
+        if RedSummerCampCourseScheduling.lessonCnf then
+            for i,v in ipairs (RedSummerCampCourseScheduling.lessonCnf) do
+                if v.key == key then
+                    return v.tip or ""
+                end
+            end
+        end
+    end
+
     function GetHistroyIcon(index)
         local index = tonumber(index)
-        return string.format("width: 94px;height: 94px; background: url(%s)#0 0 94 94;",path..RedSummerCampCourseScheduling.curLearnHistroy[index].icon)
+        local icon = RedSummerCampCourseScheduling.curLearnHistroy[index].icon
+        local key = RedSummerCampCourseScheduling.curLearnHistroy[index].key
+        local tip = GetTipByLessonkey(key)
+        local html="" 
+        if not string.find(icon,"http") then
+            icon = path..icon.."#0 0 94 94"
+        end
+        html =string.format([[<img src="%s" onclick="OnClickLesson" name='%s' style="width:94px;height:94px"/>]],icon,key)
+        if tip and tip ~= "" then
+            html =string.format([[<img src="%s" bindtooltip='script/apps/Aries/Creator/Game/Tasks/Quest/QuestAiCourseToolTip.html?s=%s' onclick="OnClickLesson" name='%s' style="width:94px;height:94px"/>]],icon,tip,key)
+        end
+        
+        return html
+    end
+
+    function GetToolTip(index)
+        local index = tonumber(index)
+        local tip = RedSummerCampCourseScheduling.lessonCnf[index].tip
+        if tip and tip ~= "" then
+            return "script/apps/Aries/Creator/Game/Tasks/Quest/QuestAiCourseToolTip.html?s="..tip
+        end
     end
 
     function CheckCanLearn(key)
         return RedSummerCampCourseScheduling.CheckCanLearn(key)
+    end
+
+    function OnClickExchange()
+        local VipCodeExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchange.lua") 
+        VipCodeExchange.ShowView()
     end
 ]]></script>
 <pe:container alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc"> </pe:container>
@@ -81,7 +127,7 @@
         <pe:container uiname="left_container" style="margin-left: 30px;margin-top: 14px; width: 630px; height: 502px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj_128X256_32bits.png#0 0 128 256:30 100 30 40);">
             <div  style="margin-left: 40px; margin-top: 20px; font-size: 26px; base-font-size: 26px; font-weight: bold; color: #ffffff;"><%=GetDateStr()%></div>
             <div style="margin-left: 480px; margin-top: -20px;">
-                <input type="button" onclick="OnClickNextMonth" style="width: 28px; height: 18px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/1_28X18_32bits.png#0 0 28 18);"/>
+                <input type="button" onclick="OnClickNextMonth" style="width: 28px; height: 18px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/1_28X18_32bits.png#0 0 28 18); "/>
                 <input type="button" onclick="OnClickPreMonth" style="margin-left: 40px; width: 28px; height: 18px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/2_28X18_32bits.png#0 0 28 18);"/>
             </div>
         </pe:container>
@@ -89,13 +135,16 @@
         <div style="float:left;margin-left:680px;margin-top:-500px;width:570px;height:482px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 53 72 135 : 30 60 30 60);">
             <pe:if condition="<%=IsHaveHistroy()%>">
                 <div zorder = "-1" style="position: relative; margin-top: 185px; margin-left: 12px; width: 546px; height: 290px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/8_32bits.png#0 0 32 32:14 14 14 14); "></div>
-                <div style="position: relative; margin-top: 16px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
+                <div style="position: relative; margin-top: 16px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);">
+                    <div onclick="OnClickExchange" style="margin-left: 320px; width: 200px; height: 26px; font-size: 20px; base-font-size:20px;font-weight: bold; color: #8db5ff;">使用激活码兑换课程</div>
+                    <div onclick="OnClickExchange" style="margin-left: 320px;  width: 190px; height: 1px; background-color: #8db5ff;"></div>
+                </div>
                 <div style="position: relative;margin-top: 58px; margin-left: 30px; font-size: 20px; base-font-size: 20px; color: #ffffff; font-weight: bold;" >最近使用</div>
                 <div style=" margin-top: 75px;">
                     <pe:repeat DataSource="<%=GetHistroyData()%>">
                         <pe:repeatitem>
-                            <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
-                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetHistroyIcon(Eval("index"))%>'></div>
+                            <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;"> 
+                                <%=GetHistroyIcon(Eval("index"))%>
                                 <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
                             </div>
                         </pe:repeatitem>
@@ -105,12 +154,12 @@
                     <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false">
                         <Columns>
                             <div style="float: left; margin-left: 15px;margin-top: 10px; float: left; width: 250px;height: 82px;">                    
-                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
+                                <%=GetItemIcon(Eval("index"))%>
                                 <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="width: 200px; margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
                                 <div style="margin-left: 100px; margin-top: -38px; font-size: 14px; base-font-size: 14px; color: #ffffff;"><%=Eval("num")%></div>
                                 <pe:if condition='<%=not CheckCanLearn(Eval("key"))%>'>
-                                    <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">
-                                    </div>
+                                    <img bindtooltip='<%=GetToolTip(Eval("index"))%>' onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);" />
+                                    <!-- </div> -->
                                 </pe:if>
                             </div>
                         </Columns>
@@ -120,17 +169,21 @@
             </pe:if>
 
             <pe:if condition="<%=not IsHaveHistroy()%>">
-                <div style="position: relative; margin-top: 20px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);"></div>
+                <div style="position: relative; margin-top: 20px; margin-left: 40px; width: 70px; height: 23px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zi1_70X23_32bits.png#0 0 70 23);">
+                    <div onclick="OnClickExchange" style="margin-left: 320px; width: 200px; height: 26px; font-size: 20px; base-font-size:20px;font-weight: bold; color: #8db5ff;">使用激活码兑换课程</div>
+                    <div onclick="OnClickExchange" style="margin-left: 320px;  width: 190px; height: 1px; background-color: #8db5ff;"></div>
+                </div>
                 <div style= "margin-top: 60px;width: 560px; height: 400px;">
                     <pe:gridview name="lessonppt " DataSource="<%=GetLessonPPT %>"  CellPadding="2" ItemsPerLine="2" AllowPaging="false"  >
                         <Columns>
                             <div style="float: left; margin-left: 15px;margin-top: 15px; float: left; width: 250px;height: 82px;">                    
-                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style='<%=GetItemIcon(Eval("index"))%>'></div>
-                                <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="width: 200px; margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
+                                <%=GetItemIcon(Eval("index"))%>
+                                <div onclick="OnClickLesson" name='<%=Eval("key")%>'  style="width: 200px; margin-left: 100px; margin-top: -64px; font-size: 18px; base-font-size: 18px; font-weight: bold; color: #ffffff;"><%=Eval("name")%></div>
                                 <div style="margin-left: 100px; margin-top: -38px; font-size: 14px; base-font-size: 14px; color: #ffffff;"><%=Eval("num")%></div>
                                 <pe:if condition='<%=not CheckCanLearn(Eval("key"))%>'>
-                                    <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">
-                                    </div>
+                                    <!-- <div onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);">
+                                    </div> -->
+                                    <img bindtooltip='<%=GetToolTip(Eval("index"))%>' onclick="OnClickLesson" name='<%=Eval("key")%>' style="margin-top: -89px; margin-left: 11px; width: 78px; height: 72px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/i11_94X94_32bits.png#0 0 78 72);" />
                                 </pe:if>
                             </div>
                         </Columns>

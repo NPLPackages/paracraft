@@ -891,7 +891,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 				end
 				
 				-- TODO: use a dedicated UI 
-				local title = format(L"起始时间%s, 请输入on或off<br/>on代表禁用骨骼动画，off代表使用骨骼动画<br/>", strTime);
+				local title = format(L"起始时间%s, 请输入on或off<br/>on代表使用骨骼动画，off代表禁用骨骼动画<br/>", strTime);
 				
 				NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");
 				local EnterTextDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.EnterTextDialog");

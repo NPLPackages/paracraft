@@ -136,7 +136,7 @@ function Keepwork:OnLogin()
         self:FirstLoginCallback();
     end
 
-    self:CheckUserQRCode();
+    -- self:CheckUserQRCode();
 
     local userinfo = self:GetUserInfo();
     LOG.std(nil, 'info', 'GetUserInfo', userinfo);

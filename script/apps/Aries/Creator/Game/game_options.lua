@@ -96,6 +96,7 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	FPS = 60,
 	render_distance = 96,
 	default_render_dist = 96,
+	defaultPickingDist = 90,
 	-- headon display text color
 	NPCHeadOnTextColor = "12 245 5",
 	PlayerHeadOnTextColor = "255 255 255",
@@ -235,17 +236,17 @@ function options:SetClickToContinue(bEnabled)
 	att:SetField("ToggleSoundWhenNotFocused", bEnabled);
 end
 
--- @param value: if nil, it will set back to 50. 
+-- @param value: if nil, it will set back to 90. 
 function options:SetPickingDist(value)
 	if(type(value) == "number") then
 		self.PickingDist = value;
 	else
-		self.PickingDist = 50;
+		self.PickingDist = 90;
 	end
 end
 
 function options:GetPickingDist()
-	return self.PickingDist or 50;
+	return self.PickingDist or 90;
 end
 
 -- get current revision number
@@ -327,8 +328,8 @@ function options:OnLoadWorld()
 	-- restore to default player mode, just in case the user has changed it. 
 	GameLogic.RunCommand("/hide playertouch");
 	GameLogic.RunCommand("/hide paralife");
-	-- no restrictions on camera by default
-	GameLogic.RunCommand("/camera -norestrict");
+	-- no restrictions and no grid on camera by default
+	GameLogic.RunCommand("/camera -norestrict -nogrid");
 	-- increased chunk limit
 	GameLogic.RunCommand("/memlimit -v -s 500");
 --	if(System.os.Is64BitsSystem()) then
@@ -337,7 +338,7 @@ function options:OnLoadWorld()
 --		GameLogic.RunCommand("/memlimit -v -s 200");
 --	end
 	GameLogic.AddBBS("options", nil);
-	self.isOfflineMode = System.options.loginmode == "local" or System.options.loginmode == "offline" or System.os.IsWindowsXP();
+	self.isOfflineMode = not GameLogic.GetFilters():apply_filters('is_signed_in') or System.os.IsWindowsXP();
 
 	local player = ParaScene.GetPlayer();
 	self:ApplyTexturePack();
@@ -352,6 +353,7 @@ function options:OnLoadWorld()
 	self.PickingDist = 50;
 	self.isAutoMovieFPS = true;
 	self:SetViewBobbing(nil);
+	self:SetPickingDist(self.defaultPickingDist);
 	self:SetEnableVibration(nil);
 	self:SetDisableShaderCommand(nil);
 	-- fixed: mobile version's file operation is not thread safe, I need to change cocos code in order to re-enable this. 
@@ -439,6 +441,7 @@ function options:OnLoadWorld()
 
 	ParaEngine.GetAttributeObject():SetField("IsWindowClosingAllowed", false);
 
+	self.world_start_time = commonlib.TimerManager.GetCurrentTime();
 	self:SetLastSaveTime();
 	self:ShowMenuPage();
 	self:ShowTouchPad();
@@ -576,6 +579,12 @@ end
 function options:GetElapsedUnSavedTime()
 	local curTime = commonlib.TimerManager.GetCurrentTime();
 	return (curTime - (self.last_save_time or 0));
+end
+
+-- get the number of ms seconds, since the world is loaded. 
+function options:GetElapsedWorldTime()
+	local curTime = commonlib.TimerManager.GetCurrentTime();
+	return (curTime - (self.world_start_time or 0));
 end
 
 function options:SetGravity(value)

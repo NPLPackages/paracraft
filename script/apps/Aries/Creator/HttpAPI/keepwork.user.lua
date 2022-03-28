@@ -137,3 +137,7 @@ HttpWrapper.Create("keepwork.user.roles", "%MAIN%/core/v0/roles","GET",true);
 -- 获取用户mac地址是否使用
 -- http://10.28.18.44:3001/project/32/interface/api/4739
 HttpWrapper.Create("keepwork.user.macAddresses", "%MAIN%/core/v0/macAddresses/:id","GET",false);
+
+-- 批量获取用户权限
+-- http://10.28.18.44:3001/project/32/interface/api/1412
+HttpWrapper.Create("keepwork.permissions.all", "%MAIN%/core/v0/permissions", "GET", true)

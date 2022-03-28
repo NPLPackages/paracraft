@@ -49,12 +49,6 @@ function env_imp:isTouching(objName)
 		return;
 	end
 
---	local actor2 = GameLogic.GetCodeGlobal():GetActorByName(objName);
---	if(actor2) then
---		if(actor:IsTouchingEntity(actor2:GetEntity())) then
---			return true;
---		end
---	end
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
 		if(objName==nil) then
@@ -68,7 +62,12 @@ function env_imp:isTouching(objName)
 				local blockId = tonumber(objName);
 				return actor:IsTouchingBlock(blockId);
 			else
-				return actor:IsTouchingActorByName(objName);	
+				if(actor:IsTouchingActorByName(objName)) then
+					return true;
+				else
+					-- also test for live entities, etc. 
+					return actor:IsTouchingEntity(EntityManager.GetEntity(objName));
+				end
 			end
 		elseif(type(objName) == "number") then
 			return actor:IsTouchingBlock(objName);

@@ -30,4 +30,6 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.email.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.rank.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world2in1.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.vip.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.update.lua");
+NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.course.lua");
 

@@ -264,6 +264,9 @@ function CodeLessonTip.RefreshSize()
 end
 
 function CodeLessonTip.GetTargetDesc()
+    if CodeLessonTip.lesson_config and CodeLessonTip.lesson_config.target_desc then
+        return CodeLessonTip.lesson_config.target_desc
+    end
     return target_desc_list[CodeLessonTip.lesson_index] or ""
 end
 
@@ -294,13 +297,15 @@ end
 
 -- 点击退出
 function CodeLessonTip.ClickExit()
-    if page then
-        page:CloseWindow();
-    end
-    CodeLessonTip.CloseCodeGoodView()
-    CodeLessonTip.CloseCodeDiffView()
-
-    GameLogic.GetCodeGlobal():BroadcastTextEvent("clickCodeExit");
+    _guihelper.MessageBox("确定退出当前课程？",function()
+        if page then
+            page:CloseWindow();
+        end
+        CodeLessonTip.CloseCodeGoodView()
+        CodeLessonTip.CloseCodeDiffView()
+    
+        GameLogic.GetCodeGlobal():BroadcastTextEvent("clickCodeExit");
+    end)
 end
 
 -- 点击返回

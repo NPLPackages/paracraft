@@ -35,8 +35,13 @@ function env_imp:playSoundAndWait(channel_name, filename, from_time, volume, pit
 	filename = filename or channel_name;
 	SoundManager:PlaySound(channel_name, filename, from_time or 0, volume, pitch);	
 	local sound = AudioEngine.CreateGet(channel_name);
-	local total_time = tonumber(sound:GetSource().TotalAudioTime);
-	env_imp.wait(self, total_time);
+	if(sound) then
+		local src = sound:GetSource()
+		if(src) then
+			local total_time = tonumber(src.TotalAudioTime);
+			env_imp.wait(self, total_time);
+		end
+	end
 end
 
 -- same as /sound [filename]

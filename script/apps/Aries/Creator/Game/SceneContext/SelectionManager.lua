@@ -33,7 +33,7 @@ SelectionManager:Signal("selectedActorVariableChanged", function(name, actor) en
 -- variable name is changed
 SelectionManager:Signal("varNameChanged", function(name) end);
 
-local default_picking_dist = 50;
+local default_picking_dist = 90;
 local result = nil;
 local eye_pos = {0,0,0};
 

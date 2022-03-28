@@ -160,13 +160,14 @@ function MainLogin:next_step(state_update)
 end
 
 function MainLogin:UpdateCoreClient()
+	self:checkAutoConnectTeacher()
 	local platform = System.os.GetPlatform();
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
 	local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
 
 	local testCoreClient = false;
-	if (not testCoreClient and platform == "win32" and not System.os.IsWindowsXP()) then
+	if (not testCoreClient and platform == "win32" and not System.os.IsWindowsXP()) and System.options.channelId~="430" then
 		-- For windows10/7/vista we will check for latest version, but will not force update 
 		-- instead it just pops up a dialog and ask user to use launcher Paracraft.exe to update.  
 		self:next_step({IsUpdaterStarted = true});
@@ -191,22 +192,22 @@ function MainLogin:UpdateCoreClient()
 						return
 					end
 					
-					System.App.Commands.Call("File.MCMLWindowFrame", {
-						url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s&curGame=%s", updater:getLatestVersion(), updater:getCurVersion(), gamename), 
-						name = "ClientUpdateDialog", 
-						isShowTitleBar = false,
-						DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-						style = CommonCtrl.WindowFrame.ContainerStyle,
-						zorder = 1,
-						allowDrag = false,
-						isTopLevel = true,
-						directPosition = true,
-							align = "_ct",
-							x = -210,
-							y = -100,
-							width = 420,
-							height = 250,
-					});
+					-- System.App.Commands.Call("File.MCMLWindowFrame", {
+					-- 	url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s&curGame=%s", updater:getLatestVersion(), updater:getCurVersion(), gamename), 
+					-- 	name = "ClientUpdateDialog", 
+					-- 	isShowTitleBar = false,
+					-- 	DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+					-- 	style = CommonCtrl.WindowFrame.ContainerStyle,
+					-- 	zorder = 1,
+					-- 	allowDrag = false,
+					-- 	isTopLevel = true,
+					-- 	directPosition = true,
+					-- 		align = "_ct",
+					-- 		x = -210,
+					-- 		y = -100,
+					-- 		width = 420,
+					-- 		height = 250,
+					-- });
 				end
 			end);
 		end
@@ -267,13 +268,33 @@ function MainLogin:UpdateCoreClient()
 			GameLogic.GetFilters():apply_filters("HideClientUpdaterNotice");
 
 			if (bNeedUpdate) then
-				updater:Download(function(bSucceed)
-					if(bSucceed) then
-						updater:Restart();
-					else
+				if System.options.channelId=="430" then --对于windows电脑的430版本特殊处理,允许跳过的更新一律跳过
+					if updater:canAutoSkip() then 
 						self:next_step({IsUpdaterStarted = true});
+					else
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.lua");
+						local ClientUpdateDialog = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdateDialog")
+						local gamename = "Paracraft"
+						gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
+						ClientUpdateDialog.Show(updater.autoUpdater:getLatestVersion(), updater:getCurVersion(),gamename,function()
+							updater:Download(function(bSucceed)
+								if(bSucceed) then
+									updater:Restart();
+								else
+									self:next_step({IsUpdaterStarted = true});
+								end
+							end);
+						end)
 					end
-				end);
+				else
+					updater:Download(function(bSucceed)
+						if(bSucceed) then
+							updater:Restart();
+						else
+							self:next_step({IsUpdaterStarted = true});
+						end
+					end);
+				end
 			else
 				if (comparedVersion == 100) then
 					self:next_step({IsUpdaterStarted = true});
@@ -288,6 +309,13 @@ function MainLogin:UpdateCoreClient()
 			end
 		end);
 	end
+end
+
+--430版本，自动连接教师服务器（教师服务器开启以后，会周期性发送局域网广播）
+function MainLogin:checkAutoConnectTeacher()
+	if System.options.channelId=="430" then 
+        GameLogic.RunCommand("/lan -auto_find_teacher=true")
+    end
 end
 
 function MainLogin:UpdateCoreBrowser()

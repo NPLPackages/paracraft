@@ -360,10 +360,13 @@ Commands["panorama"] = {
 
 Commands["camera"] = {
 	name="camera", 
-	quick_ref="/camera [-norestrict|clear|roomview|disable|enable|rotspeed] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]]", 
+	quick_ref="/camera [-norestrict|clear|roomview|disable|enable|rotspeed] [-restrictPitch from [to]] [-restrictFacing from [to]] [-restrictDist from [to]] [-grid|nogrid yawGrid pitchGrid]", 
 	desc=[[adjust camera controller settings. Angle should be in range [-180, 180]
 /camera      : clear all camera settings
 /camera -roomview    : good for kids
+/camera -grid 15   : camera yaw grid to 15 degrees
+/camera -grid 30 15   : yaw grid to 30, pitch grid to 15
+/camera -nogrid    : camera rotation grid turned off. 
 /camera -norestrict
 /camera -restrictPitch 30 80
 /camera -restrictDist 15
@@ -412,6 +415,19 @@ Commands["camera"] = {
 				if(rotSpeed >= 0 and rotSpeed < 1) then
 					ParaCamera.GetAttributeObject():SetField("RotationScaler", rotSpeed)
 				end
+			elseif(option_name == "grid") then
+				local gridValueYaw, gridValuePitch;
+				gridValueYaw, cmd_text = CmdParser.ParseInt(cmd_text);
+				gridValuePitch, cmd_text = CmdParser.ParseInt(cmd_text);
+				if(gridValueYaw) then
+					gridValueYaw = gridValueYaw / 180 * math.pi;
+				end
+				if(gridValuePitch) then
+					gridValuePitch = gridValuePitch / 180 * math.pi;
+				end
+				CameraController.EnableCameraRotationGrid(gridValueYaw, gridValuePitch)
+			elseif(option_name == "nogrid") then
+				CameraController.EnableCameraRotationGrid(nil, nil)
 			end
 		end
 		CameraController.EnableAutoRoomView(enableRoomView==true);

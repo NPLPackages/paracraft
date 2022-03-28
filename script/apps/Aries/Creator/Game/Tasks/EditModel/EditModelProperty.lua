@@ -52,6 +52,7 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 				modelEntity:SetIdleAnim(values.idleAnim or 0)
 				modelEntity:SetAutoTurningDuringDragging(values.autoTurning)
 				modelEntity:SetDisplayModel(values.isDisplayModel~=false)
+				modelEntity:EnableDropFall(values.enableDropFall~=false)
 				
 				local opacity = tonumber(values.opacity)
 				if(opacity and opacity>=0 and opacity<=1) then
@@ -125,6 +126,7 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 			hasRealPhysics = modelEntity:HasRealPhysics(),
 			isStackable = modelEntity.isStackable,
 			isDisplayModel = modelEntity:IsDisplayModel(),
+			enableDropFall = modelEntity:IsDropFallEnabled(),
 			opacity = modelEntity:GetOpacity(),
 			bootHeight = modelEntity.GetBootHeight ~= nil and modelEntity:GetBootHeight() or 0,
 			stackHeight = modelEntity.stackHeight,
@@ -223,6 +225,7 @@ function EditModelProperty.OnOK()
 			idleAnim = idleAnim, 
 			hasRealPhysics = hasRealPhysics,
 			isDisplayModel = page:GetValue("isDisplayModel"),
+			enableDropFall = page:GetValue("enableDropFall"),
 			opacity = page:GetValue("opacity"),
 			bootHeight = page:GetValue("bootHeight"),
 			autoTurning = autoTurning,
@@ -250,6 +253,7 @@ function EditModelProperty.UpdateUIFromValue(values)
 		end
 		page:SetValue("isStackable", tostring(values.isStackable));
 		page:SetValue("isDisplayModel", values.isDisplayModel);
+		page:SetValue("enableDropFall", values.enableDropFall);
 		page:SetValue("opacity", values.opacity);
 		page:SetValue("bootHeight", values.bootHeight);
 		page:SetValue("stackHeight", tostring(values.stackHeight));

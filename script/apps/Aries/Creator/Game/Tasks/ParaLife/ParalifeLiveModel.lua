@@ -199,40 +199,80 @@ local default_face_data = {
 	},
 	{
 		icon = face_path.."tou2_64x53_32bits.png",
-		skin = "81012;88013",
+		skin = "81010;88016",
 	},
 	{
 		icon = face_path.."tou3_64x53_32bits.png",
-		skin = "81010;88015",
-	},
-	{
-		icon = face_path.."tou5_64x53_32bits.png",
-		skin = "81017;88016",
-	},
-	{
-		icon = face_path.."tou6_64x53_32bits.png",
-		skin = "81009;88004",
-	},
-	-- {
-	-- 	icon = face_path.."tou7_64x53_32bits.png", --蓝色口罩是跟随头部挂件的
-	-- 	skin = "81007;88004",
-	-- },
-	{
-		icon = face_path.."tou8_64x53_32bits.png",
-		skin = "81008;88020",
-	},
-	{
-		icon = face_path.."tou9_64x53_32bits.png",
-		skin = "81009;88018",
+		skin = "81074;88017",
 	},
 	{
 		icon = face_path.."tou4_64x53_32bits.png",
 		skin = "81004;88013",
 	},
-	-- {
-	-- 	icon = face_path.."tou10_64x53_32bits.png", --兔子头数据有问题，去掉
-	-- 	skin = "81004;88005",
-	-- },
+	{
+		icon = face_path.."tou5_64x53_32bits.png",
+		skin = "81017;88007",
+	},
+	{
+		icon = face_path.."tou6_64x53_32bits.png",
+		skin = "81049;88004",
+	},
+	{
+		icon = face_path.."tou7_64x53_32bits.png",
+		skin = "81007;88008",
+	},
+	{
+		icon = face_path.."tou8_64x53_32bits.png",
+		skin = "81008;88002",
+	},
+	{
+		icon = face_path.."tou9_64x53_32bits.png",
+		skin = "81019;88002",
+	},
+	{
+		icon = face_path.."tou10_64x53_32bits.png",
+		skin = "81075;88012",
+	},
+	{
+		icon = face_path.."tou11_64x53_32bits.png",
+		skin = "81010;88009",
+	},
+	{
+		icon = face_path.."tou12_64x53_32bits.png",
+		skin = "81005;88007",
+	},
+	{
+		icon = face_path.."tou13_64x53_32bits.png",
+		skin = "81031;88002",
+	},
+	{
+		icon = face_path.."tou14_64x53_32bits.png",
+		skin = "81025;88019",
+	},
+	{
+		icon = face_path.."tou15_64x53_32bits.png",
+		skin = "81032;88013",
+	},
+	{
+		icon = face_path.."tou16_64x53_32bits.png",
+		skin = "81038;88011",
+	},
+	{
+		icon = face_path.."tou17_64x53_32bits.png",
+		skin = "81037;88010",
+	},
+	{
+		icon = face_path.."tou18_64x53_32bits.png",
+		skin = "81043;88005",
+	},
+	{
+		icon = face_path.."tou19_64x53_32bits.png",
+		skin = "81053;88016",
+	},
+	{
+		icon = face_path.."tou20_64x53_32bits.png",
+		skin = "81057;88013",
+	},
 	{
 		icon = face_path.."lian1_64x53_32bits.png",
 		skin = "81017;88019",
@@ -245,23 +285,6 @@ local default_face_data = {
 		icon = face_path.."lian5_64x53_32bits.png",
 		skin = "81006;88015",
 	},
-	-- {
-	-- 	icon = "Texture/Aries/Creator/keepwork/Paralife/main/img_default_expression_32bits.png",
-	-- 	skin = "81001;88001",
-	-- },
-	-- {
-	-- 	icon = face_path.."face13_32bits.png",
-	-- 	skin = "81002;88002",
-	-- },
-	-- {
-	-- 	icon = face_path.."face14_32bits.png",
-	-- 	skin = "81003;88003",
-	-- },
-	-- {
-	-- 	icon = face_path.."face15_32bits.png",
-	-- 	skin = "81005;88004",
-	-- },
-
 }
 
 --数据分页
@@ -456,6 +479,8 @@ function ParalifeLiveModel.InitCameraButton()
 		btnCamera.visible = false
 		local platform = System.os.GetPlatform()
 		if System.options.isDevMode or platform == "ios" then
+		-- TODO: @pbb, iOS and android should be re-enabled when it is not buggy. 
+		-- if System.options.isDevMode then
 			btnCamera.visible = true
 		end
 		btnCamera:SetScript("onmouseup",function()
@@ -466,9 +491,8 @@ function ParalifeLiveModel.InitCameraButton()
 			IsRecord = false
 		end)
 		btnCamera:SetScript("onmousedown",function()
-			--_guihelper.SetUIColor(btnCamera,"#888888")
-			btnCamera.scalingx = 1.35
-			btnCamera.scalingy = 1.35
+			btnCamera.scalingx = 1.25
+			btnCamera.scalingy = 1.25
 			_guihelper.SetUIColor(btnCamera,"#ffffff")
 			if not IsRecord then
 				ParalifeLiveModel.OnTouchCamera(true)
@@ -1046,6 +1070,7 @@ function ParalifeLiveModel.SwitchOperateButton(name)
 		end
 	elseif name== "next_page_expression" then --表情翻页
 		name = "switch_expression"
+		ParalifeLiveModel.face_data:getNextPage()
 	end
 	ParalifeLiveModel.main_ui_mode = name
 	ParalifeLiveModel.RefreshPage()

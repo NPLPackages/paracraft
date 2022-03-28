@@ -80,7 +80,7 @@ function Task:DeleteManipulators()
 end
 
 function Task:AddManipulator(manipContainer)
-	if(manipContainer) then
+	if(manipContainer and self.sceneContext) then
 		self.sceneContext:AddManipulator(manipContainer);
 	end
 end

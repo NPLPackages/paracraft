@@ -37,7 +37,7 @@ ItemLiveModel:Property({"fingerRadius", 16});
 -- if entity's radius is bigger than 0.3, we will not use finger picking
 ItemLiveModel:Property({"maxFingerPickingRadius", 0.3});
 -- between the eye lookat and the target position
-ItemLiveModel:Property({"maxDragViewDistance", 50});
+ItemLiveModel:Property({"maxDragViewDistance", 90});
 ItemLiveModel:Property({"isEntityAlwaysFacingCamera", true});
 -- hover interval 0.2
 ItemLiveModel:Property({"hoverInterval", 200});
@@ -460,7 +460,7 @@ function ItemLiveModel:mousePressEvent(event)
 
 	self:SetMousePressEntity(nil, event)
 	
-	if(event.alt_pressed and event:button() == "left" and GameLogic.GameMode:IsEditor()) then
+	if((event.alt_pressed and not event.shift_pressed and not event.ctrl_pressed) and event:button() == "left" and GameLogic.GameMode:IsEditor()) then
 		-- alt + click to pick both EntityBlockModel and EntityLiveModel
 		if(not entity and result.blockX) then
 			local entityBlock = EntityManager.GetBlockEntity(result.blockX, result.blockY, result.blockZ)
@@ -1501,7 +1501,7 @@ function ItemLiveModel:mouseMoveEvent(event)
 		if(not draggingEntity) then
 			local topEntity = self:GetTopStackEntityFromEntity(mousePressEntity)
 			local bCanDrag, draggableParent;
-			if(topEntity) then
+			if(topEntity and not topEntity:HasFocus()) then
 				bCanDrag, draggableParent = topEntity:GetCanDrag(true)
 			end
 			if(bCanDrag) then
@@ -1600,7 +1600,7 @@ end
 -- drop entity to the 3d scene or on other entity
 -- @param callbackFunc: called when the drop operation ends. 
 function ItemLiveModel:DropEntity(entity, callbackFunc)
-	if(entity and entity.dragParams) then
+	if(entity and entity:IsDropFallEnabled() and entity.dragParams) then
 		local dragParams = entity.dragParams;
 		local dropLocation;
 		local old_x, old_y, old_z, old_facing;
@@ -1680,7 +1680,7 @@ function ItemLiveModel:DropEntity(entity, callbackFunc)
 			entity:SetFacing(facing);
 		end
 	elseif(entity) then
-		-- restore to previous location or just leave as it is
+		-- just leave as it is
 		entity:EndDrag()
 		if(callbackFunc) then
 			callbackFunc(entity)
@@ -1811,7 +1811,7 @@ function ItemLiveModel:mouseReleaseEvent(event)
 		self:DropDraggingEntity(draggingEntity, event);
 		event:accept();
 	else
-		if(event.ctrl_pressed and event:isClick() and GameLogic.GameMode:IsEditor()) then
+		if(event.ctrl_pressed and not event.shift_pressed and event:isClick() and GameLogic.GameMode:IsEditor()) then
 			-- ctrl + left click to select block in edit mode
 			 if(event:button() == "left") then
 				Game.SelectionManager:SetEntityFilterFunction(nil)
@@ -1834,7 +1834,7 @@ function ItemLiveModel:mouseReleaseEvent(event)
 				end
 			 end
 		elseif(not event.ctrl_pressed and event.shift_pressed and event:isClick()) then
-			-- Do nothing allow leaking to default context
+			-- Do nothing to allow leaking to default context
 		elseif(not event.ctrl_pressed and event:isClick()) then
 			local normalTargetEntity;
 			if(GameLogic.GameMode:IsEditor() and event:button() == "right") then

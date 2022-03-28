@@ -86,9 +86,11 @@ function ParaLife:SetEnabled(bEnabled)
 			end
 			if(not self.isLogoShown) then
 				self.isLogoShown = true
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeLogo.lua");
-				local ParaLifeLogo = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeLogo")
-				ParaLifeLogo.ShowPage(true)
+				if(GameLogic.options:GetElapsedWorldTime() < 10000) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeLogo.lua");
+					local ParaLifeLogo = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeLogo")
+					ParaLifeLogo.ShowPage(true)
+				end
 			end
 		end
 		ParaLifeHomeButton.ShowPage(true)

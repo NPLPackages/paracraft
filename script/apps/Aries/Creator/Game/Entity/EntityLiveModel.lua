@@ -56,6 +56,7 @@ Entity:Property({"useRealPhysics", false, "HasRealPhysics", "EnablePhysics", aut
 -- used by ItemLiveModel:GetNearbyPhysicalModelDropPoints
 Entity:Property({"gridSize", BlockEngine.blocksize*0.25, "GetGridSize", "SetGridSize", auto=true});
 Entity:Property({"dropRadius", 0.2, "GetDropRadius", "SetDropRadius", auto=true});
+Entity:Property({"enableDropFall", true, "IsDropFallEnabled", "EnableDropFall", auto=true});
 Entity:Property({"isAlwaysLoadPhysics", true, "IsAlwaysLoadPhysics", "SetAlwaysLoadPhysics"});
 Entity:Property({"isDisplayModel", true, "IsDisplayModel", "SetDisplayModel", auto=true});
 Entity:Property({"isMountpointDetached", false});
@@ -206,6 +207,13 @@ end
 -- the title text to display (can be mcml)
 function Entity:GetBagTitle()
 	return L"背包";
+end
+
+-- let the camera focus on this player and take control of it. 
+-- @return return true if focus is set
+function Entity:SetFocus()
+	EntityManager.SetFocus(self);
+	return true;
 end
 
 function Entity:CheckCollision(deltaTime)
@@ -372,6 +380,7 @@ end
 
 -- update from XML node
 function Entity:UpdateFromXMLNode(node)
+	self.isDead = nil;
 	if(self.obj) then
 		local lastPitch = self:GetPitch()
 		local lastRoll = self:GetRoll()
@@ -412,8 +421,9 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.bIsAutoTurning) then
 			self.bIsAutoTurning = (attr.bIsAutoTurning == "true") or (attr.bIsAutoTurning == true);
 		end
+		self.enableDropFall = (attr.enableDropFall ~= "false") and (attr.enableDropFall ~= false);
 		self.isDisplayModel = (attr.isDisplayModel ~= "false") and (attr.isDisplayModel ~= false);
-		
+
 		if(attr.opacity) then
 			self.opacity = tonumber(attr.opacity)
 		end
@@ -550,6 +560,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	attr.dragDisplayOffsetY = self.dragDisplayOffsetY;
 	attr.isStackable = self.isStackable;
 	attr.bIsAutoTurning = self.bIsAutoTurning;
+	if(self.enableDropFall == false) then
+		attr.enableDropFall = false;
+	end
 
 	if(self.isDisplayModel == false) then
 		attr.isDisplayModel = false;
@@ -669,6 +682,7 @@ function Entity:CreateInnerObject()
 				self:LoadPhysics(); 
 			end
 		end
+		obj:SetField("IsControlledExternally", true)
 		self:AttachObjectToScene(obj)
 
 		if(self:GetIdleAnim() ~= 0 or (self.lastAnimId or 0) ~= 0) then

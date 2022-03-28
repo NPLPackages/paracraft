@@ -451,8 +451,11 @@ function EditModelTask.OnClickProperty()
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelProperty.lua");
 			local EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
 			EditModelProperty.ShowForEntity(modelEntity, function(entity)
-				self:SelectModel(entity)
-				self:UpdateValueToPage()
+				local self = EditModelTask.GetInstance();
+				if(self) then
+					self:SelectModel(entity)
+					self:UpdateValueToPage()
+				end
 			end)
 		end
 	end

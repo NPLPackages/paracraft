@@ -163,6 +163,9 @@ function QuestProvider:OnInit()
     GameLogic.GetFilters():add_filter("AICourse.ActivateHomework", QuestProvider.OnActivateHomework);
     GameLogic.GetFilters():add_filter("AICourse.SetStep", QuestProvider.SetStep);
     GameLogic.GetFilters():add_filter("AICourse.GetStep", QuestProvider.GetStep);
+    GameLogic.GetFilters():add_filter("enter_world_by_id", function()
+        QuestAction.EnterWorldById()
+    end);
 
     GameLogic.GetFilters():add_filter("became_vip", function()
         local Act51AskAlert = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Act51Ask/Act51AskAlert.lua")
@@ -171,6 +174,11 @@ function QuestProvider:OnInit()
 
     GameLogic.GetFilters():add_filter("OnWorldLoaded", function()
         QuestAction.OnWorldLoaded()
+    end);
+
+    GameLogic.GetFilters():add_filter("apps.aries.creator.game.login.swf_loading_bar.close_page", function()
+        QuestAction.OnLoadedWorldEnd()
+        return true
     end);
 
     QuestProvider:GetInstance():OnInit__();

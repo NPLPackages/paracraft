@@ -87,7 +87,7 @@ function RedSummerCampMainWorldPage.Show()
 
 	RedSummerCampMainWorldPage.BindEvent()
 	-- 上报
-	GameLogic.GetFilters():apply_filters('user_behavior', 1, 'crsp.homepage.visit')
+	GameLogic.GetFilters():apply_filters('user_behavior', 1, 'crsp.homepage.visit', {useNoId = true})
 end
 
 function RedSummerCampMainWorldPage.InitData(name)

@@ -58,10 +58,16 @@ end
 
 -- copy assets from package at first time
 function ClientUpdater:CopyAssetsToWritablePath()
-	local version = ParaIO.open(ParaIO.GetWritablePath() .. 'apps/haqi/version.txt', "r");
-
+	local version = ParaIO.open(self:GetRedistFolder() .. 'version.txt', "r");
 	if (version:IsValid()) then
-		return
+		self.autoUpdater:loadLocalVersion()
+		local root_curVer = self:GetCurrentVersion()
+		local redist_curVer = self:getCurVersion()
+		if self.autoUpdater:_compareVer(root_curVer,redist_curVer)>0 then --说明通过launcher更新过了，删除更新文件夹的文件，重新覆盖
+			ParaIO.DeleteFile(self:GetRedistFolder())
+		else
+			return
+		end
 	end
 
 	local fileList = {
@@ -131,10 +137,25 @@ function ClientUpdater:OnClickUpdate()
 	ParaGlobal.ShellExecute("open", L"https://www.paracraft.cn/download", "", "", 1);
 end
 
+--原始根目录下的version.txt
 function ClientUpdater:GetCurrentVersion()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 	local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
 	return options.GetClientVersion() or ""
+end
+
+--更新路径（self:GetRedistFolder()）下的version.txt
+function ClientUpdater:getCurVersion()
+	return self.autoUpdater:getCurVersion()
+end
+
+function ClientUpdater:getLatestVersion()
+	return self.autoUpdater:getLatestVersion()
+end
+
+--是否能跳过本次更新
+function ClientUpdater:canAutoSkip()
+	return self.autoUpdater:isAutoSkip()
 end
 
 function ClientUpdater:Restart()
@@ -147,9 +168,9 @@ function ClientUpdater:Restart()
 	local restartCmd = '';
 
 	if (urlProtocol and type(urlProtocol) == 'string') then
-		restartCmd = format('%s paraworldapp="%s" nplver="%s"', 'paracraft://' .. urlProtocol, self.appname, self:GetCurrentVersion())
+		restartCmd = format('%s paraworldapp="%s" nplver="%s"', 'paracraft://' .. urlProtocol, self.appname, self:GetCurrentVersion())--ParaEngine.GetVersion()
 	else
-		restartCmd = format('paraworldapp="%s" nplver="%s"', self.appname, self:GetCurrentVersion())
+		restartCmd = format('paraworldapp="%s" nplver="%s"', self.appname, self:GetCurrentVersion())--ParaEngine.GetVersion()
 	end
 
 	ParaWorldLoginDocker.Restart(self.appname, restartCmd);

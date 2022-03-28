@@ -19,7 +19,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local ItemCodeBlock = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.Item"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemCodeBlock"));
-
+ItemCodeBlock.class_name = "ItemCodeBlock";
 block_types.RegisterItemClass("ItemCodeBlock", ItemCodeBlock);
 
 function ItemCodeBlock:ctor()

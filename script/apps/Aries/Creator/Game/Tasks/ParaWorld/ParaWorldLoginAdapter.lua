@@ -137,7 +137,7 @@ function ParaWorldLoginAdapter:EnterWorld(close)
 			Desktop.ForceExit(true);
 		end
 	end
-    if(System.options.loginmode == "offline" and not GameLogic.GetFilters():apply_filters('is_signed_in'))then
+    if (not GameLogic.GetFilters():apply_filters('is_signed_in'))then
         ParaWorldLoginAdapter:EnterOfflineWorld();
         return
     end

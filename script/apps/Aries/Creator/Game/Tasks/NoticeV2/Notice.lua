@@ -9,6 +9,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua").Show();
 --]]
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local DockPopupControl = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPopupControl.lua")
+local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
 local Notice = NPL.export();
 
 local httpwrapper_version = HttpWrapper.GetDevVersion();
@@ -90,43 +91,57 @@ function Notice.GetPageData(data)
 end
 
 function Notice.Show(nType,zorder)
-    Notice.LoadLocalData()
-    keepwork.notic.announcements({
-    },function(info_err, info_msg, info_data)
-        if info_err == 200 then
-            --commonlib.echo(info_data,true)            
-            Notice.GetPageData(info_data); 
-            if Notice.nDataNum > 0 then
-                local viewwidth = 0
-                local viewheight = 0
-                local params = {
-                    url = "script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.html",
-                    name = "Notice.Show", 
-                    isShowTitleBar = false,
-                    DestroyOnClose = true,
-                    style = CommonCtrl.WindowFrame.ContainerStyle,
-                    allowDrag = false,
-                    enable_esc_key = true,
-                    zorder = zorder or -1,
-                    -- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-                    directPosition = true,                
-                    align = "_fi",
-                    x = -viewwidth/2,
-                    y = -viewheight/2,
-                    width = viewwidth,
-                    height = viewheight,
-                };                
-                System.App.Commands.Call("File.MCMLWindowFrame", params)               
+    local function showview()
+        Notice.LoadLocalData()
+        keepwork.notic.announcements({
+        },function(info_err, info_msg, info_data)
+            if info_err == 200 then
+                --commonlib.echo(info_data,true)            
+                Notice.GetPageData(info_data); 
+                if Notice.nDataNum > 0 then
+                    local viewwidth = 0
+                    local viewheight = 0
+                    local params = {
+                        url = "script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.html",
+                        name = "Notice.Show", 
+                        isShowTitleBar = false,
+                        DestroyOnClose = true,
+                        style = CommonCtrl.WindowFrame.ContainerStyle,
+                        allowDrag = false,
+                        enable_esc_key = true,
+                        zorder = zorder or -1,
+                        -- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+                        directPosition = true,                
+                        align = "_fi",
+                        x = -viewwidth/2,
+                        y = -viewheight/2,
+                        width = viewwidth,
+                        height = viewheight,
+                    };                
+                    System.App.Commands.Call("File.MCMLWindowFrame", params)               
+                else
+                    if nType == 1 then --点击活动按钮进入的
+                        _guihelper.MessageBox("目前暂无公告及活动哦");
+                    end
+                end            
             else
-                if nType == 1 then --点击活动按钮进入的
-                    _guihelper.MessageBox("目前暂无公告及活动哦");
-                end
-            end            
-        else
-            _guihelper.MessageBox("活动或者公告数据异常，请重试或者联系客服~");
+                _guihelper.MessageBox("活动或者公告数据异常，请重试或者联系客服~");
+            end
+        end) 
+    end
+    keepwork.good.good_info({
+        router_params = {
+            gsId = 12002,
+        }
+    },function(err, msg, data)
+        if err == 200 then
+            local extra = data.data.extra  
+            local show_notice = extra and extra.show_notice
+            if show_notice and tonumber(show_notice) == 1 then
+                showview()
+            end
         end
-    end) 
-
+    end)  
 end
 
 function Notice.CloseView()

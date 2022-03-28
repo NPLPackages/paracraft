@@ -14,6 +14,7 @@ local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.C
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/ide/Transitions/Tween.lua");
 local RedSummerCampMainPage = NPL.export();
+local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua");
@@ -27,9 +28,9 @@ local notice_time = 3000
 RedSummerCampMainPage.UserData = {}
 RedSummerCampMainPage.ItemData = {
 	{name="大赛", is_show_vip=false, is_show_recommend=true, node_name = "shentongbei", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_1_220x220_32bits.png#0 0 220 220"},
-	{name="新手入门", is_show_vip=false, is_show_recommend=false, node_name = "course_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_2_220x220_32bits.png#0 0 220 220"},
+	{name="自学视频", is_show_vip=false, is_show_recommend=false, node_name = "course_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_2_220x220_32bits.png#0 0 220 220"},
 	{name="乐园设计师", is_show_vip=false, is_show_recommend=false, node_name = "leyuan", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/8_219X202_32bits.png#0 0 220 220"},
-	{name="推荐列表", is_show_vip=false, is_show_recommend=false, node_name = "explore", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"},
+	{name="推荐作品", is_show_vip=false, is_show_recommend=false, node_name = "explore", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"},
 	{name="虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
 	{name="家长指南", is_show_vip=false, is_show_recommend=false, node_name = "parent_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_6_220x220_32bits.png#0 0 220 220"},
 }
@@ -40,8 +41,8 @@ local notice_desc = {
 	-- {desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
 	-- {desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
 	{desc = [[学3D动画编程，参加全国学生信息素养提升实践活动]], name="zhengcheng"},
-	{desc = [[全新世界“圣诞树”等你来体验]], name="ai_school"},
-	{desc = [[冬令营课程包全新上线]], name="ai_school"},
+	-- {desc = [[全新世界“圣诞树”等你来体验]], name="ai_school"},
+	-- {desc = [[冬令营课程包全新上线]], name="ai_school"},
 }
 
 RedSummerCampMainPage.RightBtData = {
@@ -63,6 +64,12 @@ function RedSummerCampMainPage.OnInit()
 end
 
 function RedSummerCampMainPage.Show()
+	if System.options.channelId=="430" and System.options.isDevMode then
+		local RedSummerCampSchoolMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampSchoolMainPage.lua");
+		RedSummerCampSchoolMainPage.Show();
+		return 
+	end
+
 	CustomCharItems:Init();
 
 	local Game = commonlib.gettable("MyCompany.Aries.Game")
@@ -149,12 +156,22 @@ function RedSummerCampMainPage.Show()
 	RedSummerCampMainPage.HasClickFriend = false
 	RedSummerCampMainPage.HasClickQuest = false
 
-	if Notice.CheckCanShow() and not RedSummerCampMainPage.isShowNotice then
-        Notice.Show(0 ,100)
-		RedSummerCampMainPage.isShowNotice = true
-    end  
+	commonlib.TimerManager.SetTimeout(function()  
+		if Notice.CheckCanShow() and not RedSummerCampMainPage.isShowNotice then
+			Notice.Show(0 ,100)
+			RedSummerCampMainPage.isShowNotice = true
+		end  
+	end, 1000);
+	
 
 	VipRewardPage.ShowPage()
+	QuestAction.ReportLoginTime()
+
+	if(not KeepWorkItemManager.IsLoaded())then
+		KeepWorkItemManager.GetFilter():add_filter("loaded_all", function ()
+			RedSummerCampMainPage.RefreshPage()
+		end)
+	end
 end
 
 function RedSummerCampMainPage.OnClose()
@@ -477,6 +494,42 @@ function RedSummerCampMainPage.GetLimitLabel(text, maxCharCount)
     end
 end
 
+function RedSummerCampMainPage.GetLearnHistroy()
+	return RedSummerCampCourseScheduling.GetTodayHistroy()
+end
+
+function RedSummerCampMainPage.GetLearnContent()
+	local histroy = RedSummerCampMainPage.GetLearnHistroy()
+	local function strings_split(str, sep) 
+		local list = {}
+		local str = str .. sep
+		for word in string.gmatch(str, '([^' .. sep .. ']*)' .. sep) do
+			list[#list+1] = word
+		end
+		return list
+	end
+	if histroy then
+		local content= histroy.content or ""
+		local lines = strings_split(content,"<br/>")
+		if lines and type(lines) == "table" then
+			return lines[1]
+		end
+	end
+end
+
+function RedSummerCampMainPage.OnClickLearn()
+	local dataHistroy = RedSummerCampMainPage.GetLearnHistroy()
+	if dataHistroy then
+		RedSummerCampCourseScheduling.AuthLessonV2(function()
+			local course_data = RedSummerCampCourseScheduling.GetCouseDataByName(dataHistroy.key)
+			local data = course_data ~= nil and course_data or dataHistroy.key
+			local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+			RedSummerCampPPtPage.Show(data,dataHistroy.pptIndex)
+		end)
+	else
+    	RedSummerCampCourseScheduling.ShowView()
+	end
+end
 
 function RedSummerCampMainPage.ClickRealName()
 	GameLogic.GetFilters():apply_filters(

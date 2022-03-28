@@ -268,6 +268,12 @@ function env_imp:moveTo(x, y, z)
 								entity:SetPosition(wx, wy, wz);
 							end
 						end
+					else
+						local entity2 = EntityManager.GetEntity(x);
+						if(entity2) then
+							local x2, y2, z2 = entity2:GetBlockPos();
+							env_imp.moveTo(self, x2, y2, z2);
+						end
 					end
 				end
 			end
@@ -364,7 +370,7 @@ function env_imp:turnTo(degree, pitch, roll, param4)
 					self.actor:SetFacing(facing);
 				end
 			elseif(type(degree) == "string") then
-				local entity2 = GameLogic.GetCodeGlobal():FindEntityByName(degree);
+				local entity2 = GameLogic.GetCodeGlobal():FindEntityByName(degree) or EntityManager.GetEntity(degree);
 				if(entity2) then
 					local x2, y2, z2 = entity2:GetBlockPos();
 					local x, y, z = entity:GetBlockPos();
@@ -817,6 +823,14 @@ function env_imp:focus(name)
 		local actor = GameLogic.GetCodeGlobal():GetActorByName(name);
 		if(actor) then
 			actor:SetFocus();
+		else
+			local entity = EntityManager.GetEntity(name)
+			if(entity and not entity:HasFocus()) then
+				entity:SetFocus();
+				if(self.codeblock) then
+					self.codeblock:Connect("codeUnloaded", entity, entity.RestoreFocus, "UniqueConnection")
+				end
+			end
 		end
 	elseif(type(name) == "table" and name.SetFocus) then
 		-- actor object is also supported

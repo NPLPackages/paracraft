@@ -67,6 +67,8 @@ if(not System.options.mc and commandLine and commandLine:match("mc=true")) then
 	System.options.mc = true;
 end
 
+System.options.channelId = ParaEngine.GetAppCommandLineByParam("channelId","") --特殊发行版本，如 “430”版本
+
 System.options.isDevEnv = (ParaEngine.GetAppCommandLineByParam("isDevEnv","false") == "true");
 System.options.isDevMode = (ParaEngine.GetAppCommandLineByParam("isDevMode", "false") == "true");
 

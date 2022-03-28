@@ -9,6 +9,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/BlockLilypad.lua");
 local block = commonlib.gettable("MyCompany.Aries.Game.blocks.BlockLilypad");
 -------------------------------------------------------
 ]]
+local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local TaskManager = commonlib.gettable("MyCompany.Aries.Game.TaskManager")
@@ -26,6 +27,27 @@ local side_to_data = {[0] = 4, [1] = 3, [2] = 5, [3] = 1, [4] = 0, [5] = 2, }
 local data_to_side = {[0] = 4, [1] = 3, [2] = 5, [3] = 1, [4] = 0, [5] = 2, } 
 
 function block:ctor()
+end
+
+-- set the block bounds and collision AABB. 
+function block:UpdateBlockBounds()
+	if(not self.collisionAABBs) then
+		self.collisionAABBs = {}
+		-- lower
+		self.collisionAABBs[2] = ShapeAABB:new():SetMinMaxValues(0,0,0,BlockEngine.blocksize, 0.05, BlockEngine.blocksize);
+	end
+end
+
+-- Returns a bounding box from the pool of bounding boxes.
+-- this box can change after the pool has been cleared to be reused
+function block:GetCollisionBoundingBoxFromPool(x,y,z)
+    if(self.collisionAABBs)then
+		local data = BlockEngine:GetBlockData(x,y,z)
+	    local aabb = self.collisionAABBs[mathlib.bit.band(data, 0xf)];
+	    if( aabb ) then
+		    return aabb:clone_from_pool():Offset(BlockEngine:real_min(x,y,z));
+	    end
+    end
 end
 
 -- virtual: Checks to see if its valid to put this block at the specified coordinates. Args: world, x, y, z

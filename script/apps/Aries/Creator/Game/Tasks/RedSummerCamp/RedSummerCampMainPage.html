@@ -210,7 +210,7 @@ end
 
 function GetHeadBgStyle()
     local div_str = ""
-    if System.options.loginmode == 'offline' then
+    if (not GameLogic.GetFilters():apply_filters('is_signed_in')) then
         div_str = [[float: left;width: 478px;height: 77px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bj2_g_478X77_32bits.png#0 0 478 77);]]
     else
         div_str = [[float: left;width: 478px;height: 77px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bj2_478X77_32bits.png#0 0 478 77);]]
@@ -227,23 +227,22 @@ function need_show_login()
 end
 
 function IsOffline()
-    local offline = not GameLogic.GetFilters():apply_filters('is_signed_in') --System.options.loginmode == "offline"
+    local offline = not GameLogic.GetFilters():apply_filters('is_signed_in')
     return offline
 end
 
-function OpenOlypic()
-    RedSummerCampMainPage.OpenOlypic()
+function IsHaveLearnHistroy()
+    return RedSummerCampMainPage.GetLearnHistroy() ~= nil
 end
 
-function OpenCreateWorld()
-    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.main_world");
-    local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
-    RedSummerCampMainWorldPage.Show();
+function GetLearnContent()
+    return RedSummerCampMainPage.GetLearnContent()
+end 
+
+function OnClickLearn()
+    RedSummerCampMainPage.OnClickLearn()
 end
 
-function GetOlymPicPic()
-    return "width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/6_334X421_32bits.png#0 0 334 421)"
-end
 
 function OnClickLaba()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua").Show(1,100)
@@ -346,7 +345,7 @@ end
                     </pe:if>
 
                     <pe:if condition='<%= need_show_login()  %>'>
-                        <pe:if condition='<%=System.options.loginmode == "offline" %>'>
+                        <pe:if condition='<%= not GameLogic.GetFilters():apply_filters("is_signed_in") %>'>
                             <div style="margin-left: 5px;margin-top: 1px; float: left;">
                                 <div onclick="on_click_login" style="position: relative;width: 46px;height: 23px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn1_46X23_32bits.png#0 0 46 23)"></div>
                             </div>
@@ -427,19 +426,25 @@ end
             </div>
             <div style="float: left;margin-top: 52px; width: 1280px;height: 520px;">
                 <div style="float: left;width: 380px;">
-                    <div zorder="-2" style="margin-left: 22px;margin-top: 0px; width: 362px;height:449px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
-                        <!-- <div zorder style="position: relative;margin-left: 14px;margin-top: 8px; width: 404px;height: 468px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468);"></div> -->
-                        <!-- <input type="button" zorder="-1" value='' width="404" height="468" onclick="OnOpen" name='summer_camp' style="position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_summer_404x468_32bits.png#0 0 404 468)"/> -->
-                        <div zorder="-2" onclick="OnOpen" name='main_world' style="width:348px;height:431px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div>
-                        <div zorder="-1" style='width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/6_334X421_32bits.png#0 0 334 421)'></div>
-                        <div style="margin-left: 14px;margin-top: 378px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
+                    <div zorder="-2" onclick="OnOpen" name='main_world' style="margin-left: 22px;margin-top: 0px; width: 362px;height:449px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24)">
+                        <!-- <div zorder="-2" onclick="OnOpen" name='main_world' style="width:348px;height:431px; margin-left: 7px;margin-top: 4px;position: relative;background:; background2:url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#13 112 70 66: 25 25 25 25)"></div> -->
+                        <div zorder="-1" style='width: 334px;height: 368px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/chuangyikongjian_334x368_32bits.png#0 0 334 368)'></div>
+                        <div style="margin-left: 14px;margin-top: 326px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                             <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
                                 创意空间（课程）
                             </div>
                         </div>
-                        <!-- <div onclick="OpenOlypic" style="margin-left: 146px; margin-top: 100px; width: 200px; height: 100px;">
-                            <input type="button" onclick="OpenOlypic" style="margin-top: 15px; margin-left: 110px; width: 68px; height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/jingru_68x70_32bits.png#0 0 68 70);" />
-                        </div> -->
+                        <!-- background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24) -->
+                        <div zorder="-1" style="base-font-size:20px;font-size: 20px;color: #000000;font-weight: bold;margin-left: 4px; margin-top: 356px;width: 354px; height: 88px; ">
+                            <pe:if condition="<%=IsHaveLearnHistroy()%>">
+                                <div style=" position: relative; margin-left: 30px; margin-top: 34px;">最近学习</div>
+                                <input type="button" onclick="OnClickLearn" value="<%=GetLearnContent()%>" style="base-font-size:14px;font-size: 14px;color: #000000;font-weight: bold;  margin-left: 120px; margin-top: 30px; width: 191px; height: 39px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                            </pe:if>
+                            <pe:if condition="<%=not IsHaveLearnHistroy()%>">
+                                <div style=" position: relative; margin-left: 50px; margin-top: 34px;">最近无课程记录</div>
+                                <input type="button" value="进入课程" onclick="OnClickLearn" style="base-font-size:14px;font-size: 14px;color: #000000;font-weight: bold; margin-left: 200px; margin-top: 30px; width: 131px; height: 39px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                            </pe:if>
+                        </div>
                     </div>
                 </div>
     
