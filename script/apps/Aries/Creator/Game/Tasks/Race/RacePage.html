@@ -51,7 +51,7 @@
 
             function ShowVip()
                 local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
-                VipPage.ShowPage();
+                VipPage.ShowPage("2D_race");
             end
 
             function ClickCompetition()
@@ -134,7 +134,7 @@
                 local bgs = {} 
                 for i = 1, #RacePage.ItemData do 
                     if RacePage.ItemData[i].visible then
-                        table.insert(bgs,string.format("Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/tu%d_875X255_32bits.png#0 0 875 255",i))
+                        table.insert(bgs,string.format("Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/%s.png#0 0 875 255",RacePage.ItemData[i].icon))
                     end
                 end
                 return bgs[RacePage.index]

@@ -18,4 +18,8 @@ local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.
 HttpWrapper.Create("keepwork.burieddata.sendSingleBuriedData", "%MAIN%/event-gateway/events/send", "POST", true)
 HttpWrapper.Create("keepwork.burieddata.sendBuriedData", "%MAIN%/event-gateway/events/bulk", "POST", true)
 
+--http://yapi.kp-para.cn/project/137/interface/api/4905
+-- 上传日志
+HttpWrapper.Create("keepwork.burieddata.uploadLog", "%MAIN%/event-gateway/events/logs", "POST", true)
+
 

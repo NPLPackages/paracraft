@@ -570,7 +570,7 @@ function MovieClipController.OnClickAddNPC()
 					NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/MobPropertyPage.lua");
 					local MobPropertyPage = commonlib.gettable("MyCompany.Aries.Game.GUI.MobPropertyPage");
 					MobPropertyPage.ShowPage(entity, nil, function(assetfile,skin)
-						actor:SetMovieAppearance(assetfile,skin)
+						actor:SetMovieAppearance(commonlib.Encoding.Utf8ToDefault(assetfile),skin)
 					end,"movie");
 				end
 			end
@@ -819,7 +819,13 @@ function MovieClipController.OnAddKeyFrame()
 	if(actor) then
 		if(not actor:IsRecording()) then
 			MovieUISound.PlayAddKey();
-			actor:AddKeyFrame();
+
+			local context = GameLogic.GetSceneContext()
+			if(context and context:TryInvokeManipulatorMethod("AddKeyWithCurrentValue")) then
+				-- if a manipulator contains the function, we will use the manipulator to add key frame.
+			else
+				actor:AddKeyFrame();
+			end
 		end
 	end
 end

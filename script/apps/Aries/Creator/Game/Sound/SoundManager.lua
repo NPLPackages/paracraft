@@ -24,6 +24,45 @@ local Diskfolder = nil
 
 local VoiceNarratorDefaulSpd = {
 	[10012] = 7,
+	[20011] = 7,
+}
+
+-- 20007: 'zh-CN-XiaoruiNeural', // 晓睿 （女）
+-- 20008: 'zh-CN-XiaoshuangNeural', // 晓双（女童）
+-- 20015: 'zh-HK-HiuGaaiNeural', // 曉佳 （女）
+-- 20016: 'zh-HK-WanLungNeural', // 雲龍 （男）
+-- 20017: 'zh-TW-HsiaoChenNeural', // 曉臻
+-- 20018: 'zh-TW-HsiaoYuNeural', // 曉雨
+
+-- 小燕	Xiaoxuan 晓萱
+-- 许久	Yunxi 云希
+-- 小萍	Xiaomo 晓墨
+-- 小婧	Xiaohan 晓涵
+-- 许小宝	YunJhe 雲哲
+-- 万叔	yunye 云野
+-- 一菲	xiaoyan 晓颜
+-- 小果	Xiaochen 晓辰
+-- 小梅(粤语）   晓曼	HiuMaan 曉曼
+-- 千雪	Xiaoqiu 晓秋
+-- 楠楠	xiaoyou 晓悠
+-- 芳芳	Xiaoxiao 晓晓
+-- 七哥	YunYang 云扬
+
+-- playText旧参数转新参数
+local PlayTextToMicrosoft = {
+	[10001] = 20009,
+	[10002] = 20012,
+	[10003] = 20005,
+	[10004] = 20004,
+	[10005] = 20019,
+	[10006] = 20013,
+	[10007] = 20010,
+	[10008] = 20003,
+	[10010] = 20014,
+	[10011] = 20006,
+	[10012] = 20011,
+	[10013] = 20001,
+	[10015] = 20002,
 }
 
 -- @param filename: sound name or a table array of sound names. 
@@ -125,6 +164,8 @@ function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch
 
 		self.playingSounds[sound_name] = new_sound;
     end
+
+	GameLogic.GetFilters():apply_filters('sound_starts_playing', sound_name)
 end
 
 -- @param channel_name: or sound_name, there can be only one sound playing on each channel.
@@ -247,6 +288,11 @@ function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
 	voiceNarrator = voiceNarrator or 10012
 	nTimeoutMS = nTimeoutMS or 7
 
+	-- 一部分参数转变
+	if PlayTextToMicrosoft[voiceNarrator] then
+		voiceNarrator = PlayTextToMicrosoft[voiceNarrator]
+	end
+
 	local start_timestamp = commonlib.TimerManager.GetCurrentTime();
 	self:PrepareText(text,  voiceNarrator, function(file_path)
 		if (commonlib.TimerManager.GetCurrentTime() - start_timestamp)/1000 > nTimeoutMS then
@@ -274,6 +320,12 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
 	end
 
 	voiceNarrator = voiceNarrator or 10012
+
+	-- 一部分参数转变
+	if PlayTextToMicrosoft[voiceNarrator] then
+		voiceNarrator = PlayTextToMicrosoft[voiceNarrator]
+	end
+	
 	local md5_value = self:GetPlayTextMd5(text, voiceNarrator)
 	-- 检测是否有本地文件
 	local file_path = SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
@@ -328,17 +380,27 @@ function SoundManager:SetPlayTextChannel(channel)
 end
 
 function SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
-	local filename = md5_value .. ".mp3"
+	local suffix = self:GetPlayTextFileSuffix(voiceNarrator)
+	local filename = md5_value .. suffix
 	NPL.load("(gl)script/ide/Files.lua");
 	local disk_folder = self:GetPlayTextDiskFolder()
 	local file_path = string.format("%s/%s/%s", disk_folder, voiceNarrator, filename)
 	if ParaIO.DoesFileExist(file_path, true) then
-		return file_path
+		local file = ParaIO.open(file_path, "r")
+		if(file:IsValid()) then
+			return file_path
+		end
+		
 	end
 end
 
 function SoundManager:SaveTempSoundFile(voiceNarrator, md5_value, data)
-	local filename = md5_value .. ".mp3"
+	if not data then
+		return
+	end
+
+	local suffix = self:GetPlayTextFileSuffix(voiceNarrator)
+	local filename = md5_value .. suffix
 	local disk_folder = self:GetPlayTextDiskFolder()
 	local file_path = string.format("%s/%s/%s", disk_folder, voiceNarrator, filename)
 	ParaIO.CreateDirectory(file_path)
@@ -351,6 +413,19 @@ function SoundManager:SaveTempSoundFile(voiceNarrator, md5_value, data)
 	return file_path
 end
 
+function SoundManager:GetPlayTextFileSuffix(voiceNarrator)
+	-- voiceNarrator = tonumber(voiceNarrator) 
+	-- if not voiceNarrator then
+	-- 	return ".mp3"
+	-- end
+
+	-- if PlayTextToMicrosoft[voiceNarrator] or tonumber(voiceNarrator) > 20000 then
+	-- 	return ".wav"
+	-- end
+
+	return ".mp3"
+end
+
 function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback)
 	-- 没登录的话不允许请求这个接口
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
@@ -359,6 +434,7 @@ function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback)
 
 
 	local spd = VoiceNarratorDefaulSpd[voiceNarrator] or 5
+
 	keepwork.user.playtext({
 		text = text,
 		key = md5_value,

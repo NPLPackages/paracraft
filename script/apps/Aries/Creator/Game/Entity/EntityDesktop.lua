@@ -38,6 +38,7 @@ Entity.name = "desktop";
 function Entity:ctor()
 	self.inventory = InventoryBase:new():Init();
 	self.inventory:SetClient();
+	self.inventory:SetParentEntity(self);
 end
 
 function Entity:init()

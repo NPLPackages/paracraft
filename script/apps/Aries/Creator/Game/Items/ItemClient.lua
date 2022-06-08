@@ -53,6 +53,7 @@ function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemTool.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemSlab.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemCode.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemCodePPT.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemBlockTemplate.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemMovieClip.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemRule.lua");
@@ -230,6 +231,9 @@ function ItemClient.SearchBlocks(block_id_or_name, category_name, ds)
 						bMatch = true;
 					else
 						local searchkey = item:GetSearchKey();
+						if searchkey=="" then
+							searchkey = item:GetDisplayName()
+						end
 						if(searchkey and string.match(searchkey,block_id_or_name)) then
 							bMatch = true;
 						end
@@ -353,6 +357,25 @@ function ItemClient.GetItemByName(name)
 			return items[id];
 		end
 	end
+end
+
+function ItemClient.GetItemDSByName(name)
+	if(name) then
+		return named_blocks[name];
+	 end
+end
+
+-- return name, itemDS pair
+function ItemClient.GetAllCustomAgentItemsDS()
+	local items;
+	local agentItemId = block_types.names.AgentItem;
+	for name, itemDS in pairs(named_blocks) do
+		if(itemDS.block_id == agentItemId) then
+			items = items or {};
+			items[name] = itemDS
+		end
+	end
+	return items;
 end
 
 -- create get an item by block id. 

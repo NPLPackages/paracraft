@@ -26,7 +26,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
-local DockIcon_Ctr = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockIcon_Ctr.lua");
+local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
 -- this should be the same as the items per line. 
 QuickSelectBar.static_view_len = 9;
 QuickSelectBar.static_view_page_index = 1;
@@ -294,16 +294,12 @@ function QuickSelectBar.ShowPage(bShow)
 				width = width,
 				height = height,
 		});
-	DockIcon_Ctr.ShowView(bShow)
-	if DockIcon_Ctr.IsVisible() then
-		DockIcon_Ctr.OnRefresh()
-	end
+    EscDock.ShowView(bShow)
 end
 
 function QuickSelectBar.Refresh(nDelayTime)
 	if(page) then
-		page:Refresh(nDelayTime or 0.01);
-		DockIcon_Ctr.OnRefresh()
+		page:Refresh(nDelayTime or 0);
 	end
 end
 
@@ -450,6 +446,7 @@ end
 function QuickSelectBar.OnClickMall()
 	local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
 	if not KeepWorkMallPage.isOpen then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.resource.button", {useNoId=true});
 		KeepWorkMallPage.Show();
 	else
 		KeepWorkMallPage.Close()

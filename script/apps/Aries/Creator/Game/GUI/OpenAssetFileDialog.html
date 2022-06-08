@@ -83,7 +83,7 @@ end
             <%=OpenAssetFileDialog.GetText()%>
         </div>
         <div>
-            <input type="text" enable_ime="false" uiname="OpenAssetFileDialog.text" EmptyText='<%=L"以/或?开头可搜索文件"%>' name="text" style="height:24px;width:320px" onchange="OpenAssetFileDialog.OnTextChange"/>
+            <input type="text" enable_ime="true" uiname="OpenAssetFileDialog.text" EmptyText='<%=L"以/或?开头可搜索文件"%>' name="text" style="height:24px;width:320px" onchange="OpenAssetFileDialog.OnTextChange"/>
             <input type="button" class="mc_light_grey_button_with_fillet" uiname="OpenAssetFileDialog.openfile" name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenAssetFileDialog.OnOpenAssetFileDialog"/>
             <input type="button" uiname="OpenAssetFileDialog.OK" name="OK" DefaultButton="true" style="margin-left:20px;min-width:70px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OpenAssetFileDialog.OnOK" value='<%=L"确定"%>' />
             <input type="button" uiname="OpenAssetFileDialog.Cancel" name="Cancel" DefaultButton="true" style="margin-left:10px;min-width:70px;height:24px;" class="mc_light_grey_button_with_fillet" onclick="OnClose" value='<%=L"取消"%>' />

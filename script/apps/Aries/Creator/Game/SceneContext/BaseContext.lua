@@ -412,7 +412,7 @@ function BaseContext:OnLeftMouseHold(fDelta)
 			local block = block_types.get(result.block_id);
 
 			if(block and (last_x~=result.blockX or last_y~=result.blockY or  last_z~=result.blockZ)) then
-				block:OnMouseDown(result.blockX,result.blockY,result.blockZ, "left");
+				block:OnMouseDown(event, result.blockX,result.blockY,result.blockZ);
 			end
 			
 			if(block and block:CanDestroyBlockAt(result.blockX,result.blockY,result.blockZ)) then
@@ -609,8 +609,8 @@ function BaseContext:mousePressEvent(event)
 	self:CheckMousePick(event);
 	local result = SelectionManager:GetPickingResult();
 	local mouseEntity = result.entity 
-	if(mouseEntity and mouseEntity.mousePressEvent) then
-		mouseEntity:mousePressEvent(event)
+	if(mouseEntity) then
+		mouseEntity:event(event)
 		if(event:isAccepted()) then
 			if(mouseEntity:isCaptureMouse()) then
 				self:SetMouseCaptureEntity(mouseEntity, event)
@@ -634,11 +634,11 @@ function BaseContext:mouseMoveEvent(event)
 	end
 	local mouseCaptureEntity = self:GetMouseCaptureEntity(event)
 	if(mouseCaptureEntity) then
-		mouseCaptureEntity:mouseMoveEvent(event)
+		mouseCaptureEntity:event(event)
 	else
 		local result = SelectionManager:GetPickingResult();
-		if(result.entity and result.entity.mouseMoveEvent) then
-			result.entity:mouseMoveEvent(event);
+		if(result.entity) then
+			result.entity:event(event);
 		end
 	end
 end
@@ -665,11 +665,11 @@ function BaseContext:mouseReleaseEvent(event)
 	end
 
 	if(mouseCaptureEntity) then
-		mouseCaptureEntity:mouseReleaseEvent(event)
+		mouseCaptureEntity:event(event)
 	else
 		local result = self:CheckMousePick(event);
-		if(result and result.entity and result.entity.mouseReleaseEvent) then
-			result.entity:mouseReleaseEvent(event);
+		if(result and result.entity) then
+			result.entity:event(event);
 		end
 	end
 
@@ -789,6 +789,7 @@ function BaseContext:HandleEscapeKey()
 			end
 		else
 			GameLogic.ToggleDesktop("esc");
+			GameLogic.GetFilters():apply_filters("esc_view_show",true);
 		end
 	end
 end
@@ -1164,6 +1165,10 @@ function BaseContext:HandleGlobalKey(event)
 						local angleX, angleY = GameLogic.Macros.GetSceneClickParams();
 						GameLogic.Macros:AddMacro("NextKeyPressWithMouseMove", angleX, angleY);
 					end
+					if GameLogic.Macros:IsPlaying() then
+						local mouseX, mouseY = ParaUI.GetMousePosition();
+						SelectionManager:MousePickBlock(nil, nil, nil, nil, mouseX, mouseY)
+					end
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InfoWindow.lua");
 					local InfoWindow = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InfoWindow");
 					InfoWindow.CopyToClipboard("mousepos")
@@ -1276,16 +1281,7 @@ function BaseContext:HandleGlobalKey(event)
 		GameLogic.RunCommand("/menu help.help");
 		event:accept();
 	elseif(dik_key == "DIK_F7") then
-		local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
-		local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
-		if RedSummerCampMainWorldPage.IsOpen() then
-			RedSummerCampPPtPage.ClosePPtAllPage()
-		else
-			RedSummerCampMainWorldPage.SetOpenFromCommandMenu(true)
-			RedSummerCampMainWorldPage.Show();
-			
-			RedSummerCampPPtPage.OpenLastPPtPage()
-		end
+		GameLogic.RunCommand("/menu help.creativespace");
 		event:accept();
 	end
 
@@ -1325,15 +1321,25 @@ function BaseContext:SetTargetFacing(facing)
 	end
 end
 
--- we will check if there is invisible blocker between from point and to point. if there is, we will return false, otherwise true. 
+-- we will check if there is walkable line path from point and to point. if there is, we will return false, otherwise true. 
+-- we will assume a straight line path in xz plane, however, player can walk up or down 1 block in y direction. 
 -- @param fromX, fromY, fromZ, toX, toY, toZ: in real coordinate 
 -- @param pointHeight: default to 0.2
+-- @param jumpHeight: nil or [0, 128]. if nil, we will set to 32 if current player is not visible, otherwise 1. 
 -- @return boolean
-function BaseContext:HasInvisibleBlockerFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ, pointHeight)
+function BaseContext:HasLinePathFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ, pointHeight, jumpHeight)
 	pointHeight = pointHeight or 0.2;
+	if(not jumpHeight) then
+		local player = EntityManager.GetPlayer()
+		if(player and not player:IsVisible()) then
+			jumpHeight = self:GetLinePathJumpHeightWhileHidden()
+		else
+			jumpHeight = 1
+		end
+	end
 	if(pointHeight > 0) then
-		if(self:HasInvisibleBlockerFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ, 0) or
-			self:HasInvisibleBlockerFromSrcToDest(fromX, fromY+pointHeight, fromZ, toX, toY+pointHeight, toZ, 0)) then
+		if(self:HasLinePathFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ, 0, jumpHeight) or
+			self:HasLinePathFromSrcToDest(fromX, fromY+pointHeight, fromZ, toX, toY+pointHeight, toZ, 0, jumpHeight)) then
 			return true
 		end
 		return false;
@@ -1353,30 +1359,117 @@ function BaseContext:HasInvisibleBlockerFromSrcToDest(fromX, fromY, fromZ, toX, 
 		end
 	end
 
-	dist = math.sqrt(dist);
+	dist = math.floor(math.sqrt(dist) + 2);
 
 	local step = 1/dist;
-	local lastX, lastY, lastZ;
-	local bHasMarker;
-
-	local function HasInvisibleBlocker(bx, by, bz)
+	local fromBx, fromBy, fromBz = BlockEngine:block(fromX, fromY, fromZ)
+	local lastX, lastY, lastZ = fromBx, fromBy, fromBz;
+	local toBx, toBy, toBz = BlockEngine:block(toX, toY, toZ)
+	local lastBy = fromBy
+	local bBlocked;
+	
+	local function HasBlocker(bx, by, bz)
 		local block = BlockEngine:GetBlock(bx, by, bz)
-		if(block and block.invisible and (block.blockcamera or block.obstruction)) then
+		if(block and (block.blockcamera or block.obstruction)) then
 			return true;
 		end
 	end
-	for i = 0, math.floor(dist)+1 do
+
+	if(HasBlocker(fromBx, fromBy, fromBz)) then
+		lastBy = fromBy + 1;
+	end
+
+	for i = 1, math.floor(dist)+1 do
 		local percent = math.min(1, step * i);
 		local bx, by, bz = BlockEngine:block(fromX + percent * dx, fromY + percent * dy, fromZ + percent * dz);
-		if(lastX~=bx or lastZ~=bz or lastY~=by) then
-			lastX, lastY, lastZ = bx, by, bz;
-			if(HasInvisibleBlocker(bx, by, bz)) then
-				bHasMarker = true
-				break;
+		if(lastX~=bx or lastZ~=bz) then
+			if(lastBy==by) then
+				if(HasBlocker(bx, by, bz)) then
+					if(jumpHeight>0) then
+						local bHasFreeSpace;
+						for dy = 1, jumpHeight do
+							if(HasBlocker(lastX, lastBy+dy, lastZ)) then
+								break
+							end
+							if(not HasBlocker(bx, lastBy+dy, bz)) then
+								lastBy = lastBy + dy
+								bHasFreeSpace = true;
+								break
+							end
+						end
+						if(not bHasFreeSpace) then
+							bBlocked = true
+							break;
+						end
+					else
+						bBlocked = true
+						break;
+					end
+				end
+			elseif(lastBy>by) then
+				if(not HasBlocker(bx, lastBy-1, bz)) then
+					lastBy = lastBy - 1
+					while(lastBy>by) do
+						if(not HasBlocker(bx, lastBy-1, bz)) then
+							lastBy = lastBy - 1
+						else
+							break;
+						end
+					end
+				elseif(not HasBlocker(bx, lastBy, bz)) then
+				else
+					if(jumpHeight>0) then
+						local bHasFreeSpace;
+						for dy = 1, jumpHeight do
+							if(HasBlocker(lastX, lastBy+dy, lastZ)) then
+								break;
+							end
+							if(not HasBlocker(bx, lastBy+dy, bz)) then
+								lastBy = lastBy + dy
+								bHasFreeSpace = true;
+								break
+							end
+						end
+						if(not bHasFreeSpace) then
+							bBlocked = true
+							break;
+						end
+					else
+						bBlocked = true
+						break;
+					end
+				end
+			elseif(lastBy<by) then
+				if(not HasBlocker(bx, lastBy+1, bz)) then
+					lastBy = lastBy + 1
+					for dy = 1, jumpHeight-1 do
+						if(not HasBlocker(bx, lastBy+1, bz) and lastBy<by) then
+							lastBy = lastBy + 1
+						else
+							break;
+						end
+					end
+				elseif(not HasBlocker(bx, lastBy, bz)) then
+				elseif(not HasBlocker(bx, lastBy-1, bz)) then
+					lastBy = lastBy - 1
+				else
+					bBlocked = true
+					break;
+				end
+			end
+		elseif(lastY~=by) then
+			if(lastBy < by and not HasBlocker(bx, lastBy + 1, bz)) then
+				lastBy = lastBy + 1
+			elseif(lastBy > by and not HasBlocker(bx, lastBy - 1, bz)) then
+				lastBy = lastBy - 1
 			end
 		end
+		lastX, lastY, lastZ = bx, by, bz;
 	end
-	return bHasMarker;
+	if(math.abs(lastBy - toBy) > 1) then
+		bBlocked = true
+	end
+	return bBlocked;
 end
 
 function BaseContext:GetTargetPosition()
@@ -1392,8 +1485,10 @@ function BaseContext:SetTargetPosition(x, y, z, moveTime)
 	end
 	local obj = player:GetInnerObject()
 	local attr = ParaCamera.GetAttributeObject();
-	self.startPlayerX, self.startPlayerY, self.startPlayerZ = player:GetPosition()
-	if(x and self:HasInvisibleBlockerFromSrcToDest(self.startPlayerX, self.startPlayerY, self.startPlayerZ, x, y, z)) then
+	local fromX, fromY, fromZ = player:GetPosition()
+	self.startPlayerX, self.startPlayerY, self.startPlayerZ = fromX, fromY, fromZ
+	
+	if(x and self:HasLinePathFromSrcToDest(fromX, fromY, fromZ, x, y, z)) then
 		return
 	end
 
@@ -1491,3 +1586,26 @@ function BaseContext:OnPlayerTimer(timer)
 	end
 end
 
+function BaseContext:SetMouseDownBlock(block, event)
+	if(event and event.touchSession) then
+		event.touchSession.mousedownBlock = block;
+	end
+	self.mousedownBlock = block;
+end
+
+function BaseContext:GetMouseDownBlock(event)
+	if(event and event.touchSession) then
+		self.draggingEntity = event.touchSession.mousedownBlock;
+		return event.touchSession.mousedownBlock;
+	else
+		return self.mousedownBlock;
+	end
+end
+
+function BaseContext:SetLinePathJumpHeightWhileHidden(height)
+	self.jumpHeightWhileHidden = height
+end
+
+function BaseContext:GetLinePathJumpHeightWhileHidden()
+	return self.jumpHeightWhileHidden or 32
+end

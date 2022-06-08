@@ -294,6 +294,31 @@ function EntityManager.LoadFromFile(filename)
 	RegionContainer:new():init(-1,-1, filename):LoadFromFile();
 end
 
+-- create entity from an xml node table. One needs to call entity:Attach() manually after this function
+-- @param entityNode: entity xml node table {name, attr = {}}
+-- @param obj: the entity table, default to nil. it can be {bx, by, bz} to overwrite some attributes in entityNode. 
+-- @return entity: the newly created entity object. 
+function EntityManager.CreateEntityFromXMLNode(entityNode, obj)
+	if(entityNode and entityNode.attr) then
+		local attr = entityNode.attr
+		local entity_class = EntityManager.GetEntityClass(attr.class)
+		if(attr.item_id) then
+			local item = ItemClient.GetItem(tonumber(attr.item_id));
+			if(item) then
+				if(item.entity_class and item.entity_class~=attr.class) then
+					entity_class = EntityManager.GetEntityClass(item.entity_class);
+				end
+			end
+		end
+		if(entity_class) then
+			local entity = entity_class:Create(obj or {}, entityNode);
+			if(entity) then
+				return entity;
+			end
+		end
+	end
+end
+
 -- init player. Set and load current player. 
 function EntityManager.InitPlayers()
 	if(not cur_player) then
@@ -504,7 +529,8 @@ end
 -- @param min_x, min_y, min_z: block position
 -- @param max_x, max_y, max_z: block position
 -- @param entity_class: nil to match any entity. 
-function EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, max_z, entity_class)
+-- @param excludingEntity: excluding this entity
+function EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, max_z, entity_class, excludingEntity)
 	local output;
 	for x = min_x, max_x do
 		for y = min_y, max_y do
@@ -512,7 +538,7 @@ function EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, ma
 				local entities = EntityManager.GetEntitiesInBlock(x, y, z);
 				if(entities) then
 					for entity,_ in pairs(entities) do
-						if(not entity_class or entity:isa(entity_class)) then
+						if(entity~=excludingEntity and (not entity_class or entity:isa(entity_class))) then
 							output = output or {};
 							output[#output+1] = entity;
 						end

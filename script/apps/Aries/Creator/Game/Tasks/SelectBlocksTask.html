@@ -32,7 +32,7 @@ end
             </div>
             <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(1) %>' style="float:left;width:32px;height:32px;" />
         </div>
-        <input type="button" name="title" value='<%=format(L"选中了%d块", SelectBlocks.selected_count or 1) %>' style="background:;font-size:12px;width:120px;color:#cccccc"/>
+        <input type="button" name="title" value='<%=SelectBlocks.GetBlockCountText() %>' style="background:;font-size:12px;width:120px;color:#cccccc"/>
     </div>
     <div style="margin-top:2px;">
         <input type="button" style="margin-left:11px;margin-top:7px;min-width:40px;" value='<%=L"保存"%>' tooltip='<%=L"存为模板"%>' uiname="SelectBlocksTask.btn_template" name="btn_template" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>

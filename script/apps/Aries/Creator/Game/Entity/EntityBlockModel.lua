@@ -51,6 +51,8 @@ Entity:Property({"onhoverEvent", nil, "GetOnHoverEvent", "SetOnHoverEvent", auto
 Entity:Property({"onmountEvent", nil, "GetOnMountEvent", "SetOnMountEvent", auto=true});
 Entity:Property({"onbeginDragEvent", nil, "GetOnBeginDragEvent", "SetOnBeginDragEvent", auto=true});
 Entity:Property({"onendDragEvent", nil, "GetOnEndDragEvent", "SetOnEndDragEvent", auto=true});
+Entity:Property({"onTickEvent", nil, "GetOnTickEvent", "SetOnTickEvent", auto=true});
+Entity:Property({"framemove_interval", nil, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
 Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
 Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
 Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
@@ -71,6 +73,7 @@ Entity.bIsForceLoadPhysics = true;
 function Entity:ctor()
 	self.inventory = self.inventory or InventoryBase:new():Init();
 	self.inventory:SetClient();
+	self.inventory:SetParentEntity(self);
 	self.offsetPos = vector3d:new(0,0,0);
 end
 
@@ -106,7 +109,7 @@ end
 
 -- @param filename: if nil, self.filename is used
 function Entity:GetModelDiskFilePath(filename)
-	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile()));
+	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile())) or Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile()));
 end
 
 function Entity:GetDisplayName()
@@ -272,6 +275,56 @@ function Entity:setScale(scale)
 			obj:SetScale(scale);
 		end
 		self:valueChanged();
+	end
+end
+
+-- @param value: if value is nil, name is used as string value
+function Entity:SetStaticTag(name, value)
+	if(value==nil) then
+		self.staticTag = name;
+		self.tagFields = nil;
+	elseif(name) then
+		self:SetTagField(name, value);
+	end
+end
+
+-- @param name: if nil, the raw tag string is returned, otherwise we will treat tag as a key, value table
+function Entity:GetStaticTag(name)
+	if(name==nil) then
+		return self.staticTag;
+	else
+		return self:GetTagField(name);
+	end
+end
+
+function Entity:SetTagField(name, value)
+	if(name) then
+		local t = self.tagFields;
+		if(not t) then
+			t = {};
+			self.tagFields = t;
+		end
+		if(t[name] ~= value) then
+			t[name] = value
+			if(value==nil and not next(t)) then
+				self.staticTag = ""
+			else
+				self.staticTag = commonlib.serialize_compact(t);
+			end
+		end
+	end
+end
+
+function Entity:GetTagField(name)
+	if(name) then
+		if(not self.tagFields) then
+			if(self.staticTag and self.staticTag~="") then
+				self.tagFields = commonlib.totable(self.staticTag);
+			else
+				self.tagFields = {};
+			end
+		end
+		return self.tagFields[name]
 	end
 end
 
@@ -686,4 +739,9 @@ function Entity:TransformToLiveModel()
 	local entity = EntityManager.EntityLiveModel:Create({x=x, y=y, z=z, facing=facing}, xmlNode);
 	entity:Attach();
 	return entity
+end
+
+
+-- disable activating rules
+function Entity:ActivateRules(triggerEntity)
 end

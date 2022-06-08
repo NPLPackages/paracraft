@@ -205,6 +205,7 @@ function ChatWindow.HideChatLog()
 	end
 	ChatWindow.is_shown = false;	
 	ChatWindow.is_fade_out = true;
+	GameLogic.GetFilters():apply_filters("ChatLogWindowShowAndHide", false);
 end
 
 -- return true if page is shown after switch
@@ -381,6 +382,8 @@ function ChatWindow.ShowChatLogPage(bForceRefreshPage, alignment, left, top, wid
 
 	_parent.visible = true;
 	ChatWindow.is_shown = true;
+
+	GameLogic.GetFilters():apply_filters("ChatLogWindowShowAndHide", true);
 end
 
 function ChatWindow.FadeIn(animSeconds)

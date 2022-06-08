@@ -141,3 +141,15 @@ HttpWrapper.Create("keepwork.user.macAddresses", "%MAIN%/core/v0/macAddresses/:i
 -- 批量获取用户权限
 -- http://10.28.18.44:3001/project/32/interface/api/1412
 HttpWrapper.Create("keepwork.permissions.all", "%MAIN%/core/v0/permissions", "GET", true)
+
+-- 获取用户指定权限
+-- http://10.28.18.44:3001/project/32/interface/api/4948
+HttpWrapper.Create("keepwork.permissions.single", "%MAIN%/core/v0/permissions/:featureNames", "GET", true)
+
+-- 获取paracraft软件配置
+-- http://10.28.18.44:3001/project/32/interface/api/4951
+HttpWrapper.Create("keepwork.config.all", "%MAIN%/core/v0/paracraftConfigs", "GET", false)
+
+-- 判断是否节假日
+-- http://10.28.18.44:3001/project/32/interface/api/4676
+HttpWrapper.Create("keepwork.date.isholiday", "%MAIN%/core/v0/holiday", "GET", false)

@@ -288,28 +288,105 @@ end
 -- custom toolbar UI's mcml on top of the code block window. return nil for default UI. 
 -- return nil or a mcml string. 
 function NplCad.GetCustomToolbarMCML()
-	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or string.format([[
-        <input type="button" value="%s" style="float:left;margin-left:5px;margin-top:7px;width:50px;height:25px;color:#ffffff;font-size:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnShowCodeLib"/>
-        <div onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickShowExport" style="float:left;margin-left:5px;margin-top:7px;"
-                tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="400" show_width="230">
-            <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
-        </div>
-    
-]],
-		L"代码库",L"导出");
+	NplCad.toolBarMcmlText = NplCad.toolBarMcmlText or [[
+        <input type="button" uiname="NplCad.ShowCodeLib" value='<%=L"代码库"%>' style="float:left;margin-left:5px;margin-top:7px;width:50px;height:25px;color:#ffffff;font-size:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnShowCodeLib"/>
+		<input type="button" uiname="NplCad.ShowToolMenu" value='<%=L"导出"%>'  style="float:left;margin-left:5px;margin-top:7px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8);color:#ffffff;font-size:12px;height:25px;min-width:20px;" onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickShowExport"/>
+]];
 	return NplCad.toolBarMcmlText;
 end
+
+-- function NplCad.GetToolbarMCML()
+-- 	local str = string.format([[
+--         <input type="button" value="%s" style="float:left;margin-left:5px;margin-top:7px;width:50px;height:25px;color:#ffffff;font-size:14px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnShowCodeLib"/>
+--         <div onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickShowExport" style="float:left;margin-left:5px;margin-top:7px;"
+--                 tooltip='page://script/apps/Aries/Creator/Game/Code/NplCad/NplCadToolMenus.html' use_mouse_offset="false" is_lock_position="true" tooltip_offset_x="-5" tooltip_offset_y="22" show_duration="10" enable_tooltip_hover="true" tooltip_is_interactive="true" show_height="400" show_width="230">
+--             <div style="background-color:#808080;color:#ffffff;padding:3px;font-size:12px;height:25px;min-width:20px;">%s</div>
+--         </div>]],L"代码库",L"导出");
+-- 	return str
+-- end
+
+function NplCad.GetExportContent()
+	return [[
+		<pe:container zorder=“100” uiname="NplCad.ToolMenuContent" visible="false" style="margin-left: 100px; margin-top: -6px; position:relative; background-color:#292929; padding:3px;">
+        <pe:container  style="background-color:#dddede; width: 80px;">
+            <div>
+                <input type="button" value='<%=L"导出stl"%>'  name='stl' uiname='nplcad.stl' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:2px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                <input type="button" value='<%=L"导出gltf"%>'  name='gltf' uiname='nplcad.gltf' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                <input type="button" value='<%=L"导出bmax"%>'  name='bmax' uiname='nplcad.bmax' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                <input type="button" value='<%=L"导出parax"%>'  name='parax' uiname='nplcad.parax' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                <input type="button" value='<%=L"导出fbx"%>' name='fbx' uiname='nplcad.fbx' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                <!-- <input type="button" value='<%=L"导出fbxa"%>' name='fbxa' uiname='nplcad.fbxa' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" /> -->
+                <input type="button" value='<%=L"导出obj"%>' name='obj' uiname='nplcad.obj' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                <input type="button" value='<%=L"导出step"%>' name='step' uiname='nplcad.step' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+                <input type="button" value='<%=L"导出iges"%>' name='iges' uiname='nplcad.iges' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.OnClickExport" style="min-width:80px;margin-top:7px;color:#ffffff;font-size:12px;height:25px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8)" />
+            </div>
+        </pe:container>
+    </pe:container>
+	]]
+end
+
+function NplCad.CheckShowExport() --这个宏示教使用有bug
+	local btnExport = ParaUI.GetUIObject("NplCad.ShowToolMenu")
+	local contentExport = ParaUI.GetUIObject("NplCad.ToolMenuContent")
+	if btnExport:IsValid() and contentExport:IsValid() then
+		print(contentExport:GetAbsPosition())
+		NplCad.mytimer = NplCad.mytimer or commonlib.Timer:new({callbackFunc = function(timer)
+			local x, y = ParaUI.GetMousePosition();
+			local temp = ParaUI.GetUIObjectAtPoint(x, y);
+			local cx,cy,width,height =contentExport:GetAbsPosition();
+			if temp.id ~= btnExport.id and  temp.id ~= contentExport.id then
+				if not (x > cx - 10  and x < cx + width + 10 and y > cy and y < cy + height) then
+					NplCad.CloseToolMenu()
+					timer:Change()
+				end
+			end
+		end})
+		NplCad.mytimer:Change(0, 200);
+	end
+end
+
+function NplCad.CloseWindow()
+	CodeBlockWindow.Close()
+	NplCad.CloseToolMenu()
+end
+
 function NplCad.OnShowCodeLib()
     local NplCadLibPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCadLibPage.lua");
     NplCadLibPage:ToggleVisible();
 end
 function NplCad.OnClickShowExport()
+	NplCad.ShowNplcadToolMenu()
 	if(CodeBlockWindow.IsNPLBrowserVisible()) then
 		CodeBlockWindow.SetNplBrowserVisible(false)
+	end
+	CodeBlockWindow.CloseNplBlocklyEditorPage();
+end
+
+function NplCad.ShowNplcadToolMenu()
+	local showContent = ParaUI.GetUIObject("NplCad.ToolMenuContent")
+	if showContent and showContent:IsValid() then
+		if not NplCad.bShowToolMenu then
+			showContent.visible = true
+		else
+			showContent.visible = not showContent.visible
+		end
+		NplCad.bShowToolMenu = showContent.visible
+		-- if NplCad.bShowToolMenu then
+		-- 	NplCad.CheckShowExport()
+		-- end
+	end
+end
+
+function NplCad.CloseToolMenu()
+	local showContent = ParaUI.GetUIObject("NplCad.ToolMenuContent")
+	if showContent and showContent:IsValid() then
+		showContent.visible = false
+		NplCad.bShowToolMenu = false
 	end
 end
 
 function NplCad.OnClickExport(type)
+	NplCad.CloseToolMenu()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	if(codeBlock) then
 		codeBlock:SetModified(true);

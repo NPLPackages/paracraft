@@ -8,7 +8,7 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPlayer.lua");
 local EntityPlayer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPlayer")
 local entity = MyCompany.Aries.Game.EntityManager.EntityPlayer:new({x,y,z,radius});
-EntityManager.AddObject(entity)
+entity:Attach();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");

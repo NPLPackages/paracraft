@@ -165,6 +165,11 @@ function VirtualKeyboard:Show(bShow, is_key_up_hide)
 	self.bIsVisible = bShow;
 	_parent.visible = bShow;
 
+	if bShow then
+		-- _parent:SetTopLevel(false);
+		_parent:SetTopLevel(true);
+	end
+
 	if not bShow then
 		self:StopCtrlDrawAnim()
 	end
@@ -572,7 +577,7 @@ end
 
 function VirtualKeyboard:ShowMacroCircle(item, is_show)
 	if item.circle_object == nil then
-		if not is_show then
+		if not is_show or not item.height then
 			return
 		end
 

@@ -47,7 +47,16 @@ function EscFramePage.OneTimeInit()
 		return;
 	end
 	EscFramePage.is_inited = true;
+	GameLogic:Connect("WorldUnloaded", EscFramePage, EscFramePage.OnWorldUnloaded, "UniqueConnection");
 end
+
+function EscFramePage.OnWorldUnloaded()
+	if page then
+		page:CloseWindow()
+	end
+	GameLogic:Disconnect("WorldUnloaded", EscFramePage, EscFramePage.OnWorldUnload);
+end
+
 
 -- clicked a block
 function EscFramePage.OnClickBlock(block_id)
@@ -121,6 +130,7 @@ function EscFramePage.ShowPage(bShow)
 				params._page.OnClose = function()
 					if(not EscFramePage.bForceHide) then
 						DesktopMenuPage.ActivateMenu(false);
+						page = nil
 					end
 				end;
 			end

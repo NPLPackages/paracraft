@@ -566,6 +566,40 @@ local data = actor:GetActorValue("some_data")
 },
 
 {
+	type = "GetEntity", 
+	message0 = L"获取实体对象%1", 
+	arg0 = {
+		{
+			name = "entityName",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+			text = "", 
+		},
+	},
+	output = {type = "field_variable",},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_codewindow = true,
+	hide_in_toolbox = true,
+	funcName = "GetEntity",
+	func_description = 'GetEntity(%s)',
+	ToNPL = function(self)
+		return string.format('GetEntity("%s")\n', self:getFieldAsString('entityName'));
+	end,
+	examples = {
+	{desc = L"", canRun = true, code = [[
+local entity = GetEntity()
+]]},
+	{desc = L"", canRun = true, code = [[
+local entity = GetEntity("name1")
+entity:Say("hi")
+]]},
+},
+},
+
+
+{
 	type = "getString", 
 	message0 = "\"%1\"",
 	arg0 = {
@@ -1120,6 +1154,35 @@ hello()
 ]]}},
 },
 
+{
+	type = "import", 
+	message0 = L"引入类库%1", color="#cc0000",
+	arg0 = {
+		{
+			name = "filename",
+			type = "input_value",
+            shadow = { type = "text", value = "",},
+			text = "", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	hide_in_codewindow = true,
+	hide_in_toolbox = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "import",
+	func_description = 'import(%s)',
+	ToNPL = function(self)
+		return string.format('import("%s")\n', self:getFieldAsString('filename'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [[
+import("war")
+import("airsim")
+import("macroplatform")
+]]}},
+},
 
 {
 	type = "gettable", 

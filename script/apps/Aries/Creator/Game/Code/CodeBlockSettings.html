@@ -67,6 +67,12 @@ end
         </div>
     </div>
     <div style="margin-bottom:10px;">
+        <input type="checkbox" uiname="CodeBlockSettings.isStepMode" name="isStepMode" style="margin-top:2px;" onclick="CodeBlockSettings.OnChangeStepMode"/>
+        <div uiname="CodeBlockSettings.isStepMode"  for="isStepMode" style="float:left;margin-left:5px;" >
+            <%=L"开启步进运行模式"%>
+        </div>
+    </div>
+    <div style="margin-bottom:10px;">
         <input type="checkbox" uiname="CodeBlockSettings.isOpenSource" name="isOpenSource" style="margin-top:2px" onclick="CodeBlockSettings.OnSetOpenSource"/>
         <div for="isOpenSource" uiname="CodeBlockSettings.isOpenSourceFor" style="float:left;margin-left:5px;" >
             <%=L"是否开源（只读模式下别人是否能看到代码）"%>

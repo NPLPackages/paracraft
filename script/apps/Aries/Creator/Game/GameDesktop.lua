@@ -401,11 +401,15 @@ function Desktop.OnExit(bForceExit, bRestart)
 				end
 			};
 
-			local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);			
-			if(dialog and dialog.callback and dialog.text) then
-				_guihelper.MessageBox(dialog.text, 
-					dialog.callback,dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
-			end
+			local CourseEvaluation = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/CourseEvaluation/CourseEvaluation.lua") 
+			CourseEvaluation.ShowView(function()
+				local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);			
+				if(dialog and dialog.callback and dialog.text) then
+					_guihelper.MessageBox(dialog.text, 
+						dialog.callback,dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
+				end
+			end)
+			
 		end
 	else
 		if(bForceExit or Desktop.is_exiting) then

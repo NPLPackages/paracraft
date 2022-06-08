@@ -327,9 +327,21 @@ function CreateNewWorld.CreateWorldByName(world_name, terrain)
 	if(world_name == "") then
 		_guihelper.MessageBox(L"世界名字不能为空, 请输入世界名称");
 		return
-	elseif(string.len(world_name) > 40) then	
-		_guihelper.MessageBox(L"世界名字太长了, 请重新输入");
-		return
+	else
+		local count = 0
+
+		for uchar in string.gfind(world_name, "([%z\1-\127\194-\244][\128-\191]*)") do
+			if #uchar ~= 1 then
+				count = count + 2
+			else
+				count = count + 1
+			end
+		end
+
+		if (count > 66) then
+			_guihelper.MessageBox(format(L"世界名字超过%d个字符, 请重新输入", 66));
+			return
+		end
 	end
 	
 	local params = {

@@ -77,7 +77,7 @@ function ItemMob:OnCreate(result)
 			else
 				-- ignore it if there is already an entity there. 
 				local entity = MyCompany.Aries.Game.EntityManager.EntityMob:Create({bx=bx,by=by,bz=bz, item_id = self.block_id});
-				EntityManager.AddObject(entity);
+				entity:Attach();
 				return true;
 			end
 		end

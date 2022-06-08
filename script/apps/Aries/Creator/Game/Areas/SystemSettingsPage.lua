@@ -20,12 +20,13 @@ SystemSettingsPage.ShowPage()
 NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 NPL.load("(gl)script/apps/Aries/Scene/main.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 local KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
 local Scene = commonlib.gettable("MyCompany.Aries.Scene");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
-
+local Screen = commonlib.gettable("System.Windows.Screen");
 local SystemSettingsPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SystemSettingsPage");
 
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
@@ -130,6 +131,7 @@ function SystemSettingsPage.OnInit()
 
 	--
 	local nRenderMethod = ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1);
+
 	for i, item in ipairs(SystemSettingsPage.shader_ds) do
 		if(i == nRenderMethod) then
 			item.selected = true;
@@ -139,6 +141,24 @@ function SystemSettingsPage.OnInit()
 	end
 	
 	page:SetValue("comboShader",  tostring(math.min(math.max(1, nRenderMethod), 4)) );
+
+	SystemSettingsPage.stereoMode_ds = {
+		{value="0", text=L"Off"},
+		{value="2", text=L"Left/Right"},
+		{value="5", text=L"Red/Blue"},
+	}
+	
+	local stereoMode = GameLogic.options:GetStereoMode() or 0
+	for i,item in ipairs(SystemSettingsPage.stereoMode_ds) do
+		if tonumber(item.value) == stereoMode then 
+			item.selected = true;
+		else
+			item.selected = nil;
+		end
+	end
+	page:SetValue("stereomode",  tostring(stereoMode) );
+
+	Screen:Connect("sizeChanged", SystemSettingsPage, SystemSettingsPage.OnResize, "UniqueConnection")
 end
 
 local function GetRenderDistText(dist)
@@ -183,36 +203,104 @@ local function UpdateCheckBox(name, bChecked)
 	local useDefaultStyle = GameLogic.GetFilters():apply_filters('SystemSettingsPage.CheckBoxBackground', page, name, bChecked);
 	if(page) then
 		bChecked = bChecked == true or bChecked == "true";
-		--page:SetValue(name, GetCheckBoxText(bChecked))
 		if (useDefaultStyle or useDefaultStyle == nil) then
 			page:CallMethod(name, "SetUIBackground", bChecked and "Texture/Aries/Creator/keepwork/setting/qiehuan1_108X29_32bits.png;0 0 108 29" or "Texture/Aries/Creator/keepwork/setting/qiehuan2_108X29_32bits.png;0 0 108 29");
 		end
 	end
 end
 
-function SystemSettingsPage.UpdateSoundUI()
-	local sound_container = ParaUI.GetUIObject("sound_volume")
-	local sound_device_container = ParaUI.GetUIObject("sound_device")
-	if sound_container and sound_container:IsValid() and sound_device_container and sound_device_container:IsValid() then
-		if ParaAudio.GetVolume()>0 then
-			sound_container.visible = true
-			sound_device_container.y = default_sound_device_container_posY
-		else
-			sound_container.visible = false
-			sound_device_container.y = default_sound_container_posY
+local function UpdateSliderBarValue(name,value)
+	if(page) then
+		page:SetValue(name, value);
+	end
+end
+
+function SystemSettingsPage:OnResize()
+	local ds = SystemSettingsPage.setting_ds;
+	local is_full_screen = SystemSettingsPage.IsFullScreenMode()
+	if ds["is_full_screen"]~=is_full_screen or SystemSettingsPage.needRefreshWithResize then
+		if page then
+			page:Refresh(0)
+		end
+	end
+	UpdateCheckBox("btn_FullScreenMode", is_full_screen)
+	ds["is_full_screen"] = is_full_screen;
+	SystemSettingsPage.needRefreshWithResize = nil
+	if page then
+		local ctl = page:FindControl("UI_Scaling")
+		if ctl.max~=SystemSettingsPage.GetMaxUIScale() then
+			GameLogic.options:SetUIScaling(nil)
+			ctl.min = 0.6
+			ctl.max = SystemSettingsPage.GetMaxUIScale()
+			ctl.value = SystemSettingsPage.GetDefaultUiScale()
+			ctl:UpdateUI()
+		end
+
+	end
+end
+
+function SystemSettingsPage.IsFullScreenMode()
+	local IsWindowMaximized = ParaEngine.GetAttributeObject():GetField("IsWindowMaximized", false)
+	return IsWindowMaximized
+end
+
+function SystemSettingsPage.GetDefaultUiScale()
+	local ret = GameLogic.options:GetUIScaling()
+	return ret;
+end
+
+function SystemSettingsPage.GetMaxUIScale()
+	local ret = 2
+	local frame_width, frame_height = Screen:GetWindowSolution()
+	ret = frame_height/GameLogic.options.min_ui_height
+	return ret;
+end
+--真实光影
+function SystemSettingsPage.IsRealShaderOn()
+	local nRenderMethod = tonumber(WorldCommon.GetWorldInfo().rendermethod)
+	if nRenderMethod then
+		return nRenderMethod>1
+	end
+	return false
+end
+
+function SystemSettingsPage.OnToggleShader(name, value)
+	local res = GameLogic.options:SetRenderMethod(value,true)
+	if not res then
+		Page:SetValue("comboShader", "1");
+	else
+		if page then
+			if value=="1" then
+				SystemSettingsPage.setting_ds["water_reflection"] = WorldCommon.GetWorldInfo().waterreflection~="true"
+				SystemSettingsPage.setting_ds["sunlight_shadow"] = WorldCommon.GetWorldInfo().shadow~="true"
+				SystemSettingsPage.OnClickEnableWaterReflection()
+				SystemSettingsPage.OnClickEnableShadow()
+			end
+			page:Refresh(0)
 		end
 	end
 end
 
-function SystemSettingsPage.InitSoundUIData()
-	local sound_container = ParaUI.GetUIObject("sound_volume")
-	local sound_device_container = ParaUI.GetUIObject("sound_device")
-	if sound_container and sound_container:IsValid() then
-		default_sound_container_posY = sound_container.y
-	end
-	if sound_device_container and sound_device_container:IsValid() then
-		default_sound_device_container_posY = sound_device_container.y
-	end
+function SystemSettingsPage.OnRenderDistChanged(value)
+    GameLogic.options:SetRenderDist(value,true);
+    
+end
+
+function SystemSettingsPage.GetDftRenderDist()
+	local dist = tonumber(WorldCommon.GetWorldInfo().renderdist)
+	return dist or GameLogic.options:GetRenderDist();
+end
+
+function SystemSettingsPage.OnSuperRenderDistChanged(value)
+    GameLogic.options:SetSuperRenderDist(value,true);
+    if(value and value > GameLogic.options:GetRenderDist() and value>64) then
+        GameLogic.options:SetFogEnd(value - 64);
+    end
+end
+
+function SystemSettingsPage.GetDftSuperRenderDist()
+	local dist = tonumber(WorldCommon.GetWorldInfo().superrenderdist)
+	return dist or GameLogic.options:GetSuperRenderDist();
 end
 
 function SystemSettingsPage.InitPageParams()
@@ -226,14 +314,24 @@ function SystemSettingsPage.InitPageParams()
 
 	-- 视角摇晃
 	local view_bobbing = GameLogic.options.ViewBobbing;
+	if view_bobbing ~= true then
+		view_bobbing = false
+	end
 	UpdateCheckBox("btn_ViewBobbing", view_bobbing);
 	ds["view_bobbing"] = view_bobbing;
 
 
 	-- 全屏
-	--local is_full_screen = att:GetField("IsFullScreenMode", false);
-	--UpdateCheckBox("btn_FullScreenMode", is_full_screen)
-	--ds["is_full_screen"] = is_full_screen;
+	if false then --真全屏
+		local is_full_screen = att:GetField("IsFullScreenMode", false);
+		UpdateCheckBox("btn_FullScreenMode", is_full_screen)
+		ds["is_full_screen"] = is_full_screen;
+	else
+		local is_full_screen = att:GetField("IsWindowMaximized", false);
+		UpdateCheckBox("btn_FullScreenMode", is_full_screen)
+		ds["is_full_screen"] = is_full_screen;
+	end
+	
 	-- 鼠标反转
 	--local is_mouse_inverse = att:GetField("IsMouseInverse", false);
 	--UpdateCheckBox("btn_MouseInverse", is_mouse_inverse)
@@ -283,7 +381,7 @@ function SystemSettingsPage.InitPageParams()
 	ds["water_reflection"] = water_reflection;
 
 	-- 主角显示
-	local show_mainplayer = if_else(ParaScene.GetAttributeObject():GetField("ShowMainPlayer", false) == true,true,false);
+	local show_mainplayer = if_else(GameLogic.options:IsShowMainPlayer() == true,true,false);
 	UpdateCheckBox("btn_ShowPlayer", show_mainplayer);
 	ds["show_mainplayer"] = show_mainplayer;
 
@@ -319,11 +417,20 @@ function SystemSettingsPage.InitPageParams()
 	local is_on = SystemSettingsPage.mouse_select_list["DeleteBlock"] == "right"
 	-- UpdateCheckBox("btn_MouseChange", is_on);
 	page:SetNodeValue("ChangeMouseLeftRight", is_on);
-	SystemSettingsPage.InitSoundUIData()
 end
 
 function SystemSettingsPage.OnClose()
 	SystemSettingsPage.category_ds_index = 1
+	Screen:Disconnect("sizeChanged", SystemSettingsPage, SystemSettingsPage.OnResize, "UniqueConnection")
+end
+
+function SystemSettingsPage.RefreshPage()
+	if page then
+		page:Refresh(0)
+		if (SystemSettingsPage.category_ds_index == 2) then
+			SystemSettingsPage.InitSoundDevice()
+		end
+	end
 end
 
 -- shader version
@@ -511,6 +618,7 @@ function SystemSettingsPage.GetPCStats()
 
 		local att = ParaEngine.GetAttributeObject();
 		pc_stats.IsFullScreenMode = att:GetField("IsFullScreenMode", false);
+		pc_stats.IsWindowMaximized = att:GetField("IsWindowMaximized", false);
 		pc_stats.resolution_x = tonumber(att:GetDynamicField("ScreenWidth", 1020)) or 1020;
 		pc_stats.resolution_y = tonumber(att:GetDynamicField("ScreenHeight", 680)) or 680;
 		pc_stats.IsWebBrowser = System.options.IsWebBrowser;
@@ -836,6 +944,7 @@ end
 function SystemSettingsPage.OnClickEnableSound()
 	local cur_state = SystemSettingsPage.setting_ds["open_sound"];
 	local next_state = not cur_state;
+	SystemSettingsPage.setting_ds["open_sound"] = next_state;
 	if(page)then
 		if(next_state) then
 			local key = "Paracraft_System_Sound_Volume"
@@ -847,10 +956,8 @@ function SystemSettingsPage.OnClickEnableSound()
 		else
 			ParaAudio.SetVolume(0);
 		end
-		UpdateCheckBox("btn_EnableSound", next_state)
-		SystemSettingsPage.UpdateSoundUI()
+		SystemSettingsPage.RefreshPage()
 	end
-	SystemSettingsPage.setting_ds["open_sound"] = next_state;
 	local MapArea = commonlib.gettable("MyCompany.Aries.Desktop.MapArea");
 	if(MapArea.EnableMusic) then
 		MapArea.EnableMusic(next_state);
@@ -859,12 +966,43 @@ function SystemSettingsPage.OnClickEnableSound()
 	GameLogic.GetPlayerController():SaveLocalData(key,next_state,true);
 end
 
+function SystemSettingsPage.InitSoundDevice()
+	local nodeDevice = ParaUI.GetUIObject("device_container")
+	if nodeDevice and nodeDevice:IsValid() then
+		nodeDevice.visible = false
+	end
+	if page then
+		page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
+	end
+	
+	local cur_state = SystemSettingsPage.setting_ds["open_sound"];
+	UpdateCheckBox("btn_EnableSound", cur_state)
+end
+
+function SystemSettingsPage.onClickShowDevice()
+	local nodeDevice = ParaUI.GetUIObject("device_container")
+	if nodeDevice and nodeDevice:IsValid() then
+		nodeDevice.visible = not nodeDevice.visible
+	end
+end
+
+function SystemSettingsPage.onDeviceClick(name)
+	local index = tonumber(name)
+	if index and index > 0 then
+		local devices = SystemSettingsPage.GetAudioDevices()
+		local curdevice = devices[index].value
+		if (curdevice ~= SystemSettingsPage.currentAudioDevice) then
+			AudioEngine.ResetAudioDevice(curdevice)
+			SystemSettingsPage.currentAudioDevice = curdevice
+			SystemSettingsPage.InitSoundDevice()
+		end
+	end
+end
+
 function SystemSettingsPage.OnClickResetAudioDevice()
 	AudioEngine.ResetAudioDevice();
 	SystemSettingsPage.currentAudioDevice = nil;
-	page:Refresh(0);
-	SystemSettingsPage.UpdateSoundUI()
-	page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
+	SystemSettingsPage.RefreshPage()
 end
 
 function SystemSettingsPage.GetAudioDevices()
@@ -882,13 +1020,6 @@ function SystemSettingsPage.GetAudioDevices()
 	return deviceList;
 end
 
-function SystemSettingsPage.OnSelectAudioDevice(name, value)
-	if (value ~= SystemSettingsPage.currentAudioDevice) then
-		AudioEngine.ResetAudioDevice(value);
-		SystemSettingsPage.currentAudioDevice = value;
-	end
-end
-
 function SystemSettingsPage.OnClickEnableShader()
 	local cur_state = SystemSettingsPage.setting_ds["enable_deferred_shading"];
 	local next_state = not cur_state;
@@ -903,6 +1034,7 @@ function SystemSettingsPage.OnClickEnableShader()
 		WorldCommon.GetWorldInfo().rendermethod = tostring(if_else(next_state, 2,1));
 		local key = "Paracraft_use_deferred_shading";
 		GameLogic.GetPlayerController():SaveLocalData(key,next_state,true);
+		WorldCommon.SaveWorldTag()
     end
 end
 
@@ -922,14 +1054,17 @@ function SystemSettingsPage.OnClickEnableShadow()
     ParaTerrain.GetBlockAttributeObject():SetField("UseSunlightShadowMap", next_state);
 	SystemSettingsPage.setting_ds["sunlight_shadow"] = next_state;
 	WorldCommon.GetWorldInfo().shadow = tostring(next_state);
+	WorldCommon.SaveWorldTag()
 end
 
 function SystemSettingsPage.OnClickEnableShowMainPlayer()
 	local cur_state = SystemSettingsPage.setting_ds["show_mainplayer"];
 	local next_state = not cur_state;
 	UpdateCheckBox("btn_ShowPlayer", next_state);
-	ParaScene.GetAttributeObject():SetField("ShowMainPlayer", next_state);
+	GameLogic.options:SetShowMainPlayer(next_state)
 	SystemSettingsPage.setting_ds["show_mainplayer"] = next_state;
+	WorldCommon.GetWorldInfo().hide_player = tostring(not next_state);
+	WorldCommon.SaveWorldTag()
 end
 
 function SystemSettingsPage.OnClickEnableWaterReflection()
@@ -939,6 +1074,7 @@ function SystemSettingsPage.OnClickEnableWaterReflection()
 	ParaTerrain.GetBlockAttributeObject():SetField("UseWaterReflection", next_state)
 	SystemSettingsPage.setting_ds["water_reflection"] = next_state;
 	WorldCommon.GetWorldInfo().waterreflection = tostring(next_state);
+	WorldCommon.SaveWorldTag()
 end
 
 function SystemSettingsPage.OnClickEnableMouseInverse()
@@ -958,10 +1094,11 @@ function SystemSettingsPage.OnClickChangeRenderDist()
 	local next_dist = SystemSettingsPage.render_dist_list[new_text]["dist"];
 
 	page:SetValue("btn_RenderDist", new_text);
-	GameLogic.options:SetRenderDist(next_dist);
+	GameLogic.options:SetRenderDist(next_dist,true);
 	SystemSettingsPage.setting_ds["render_dist"] = new_text;
 	WorldCommon.GetWorldInfo().renderdist = tostring(next_dist);
 	GameLogic.options:SetMaxViewDist(next_dist);
+	WorldCommon.SaveWorldTag()
 end
 
 function SystemSettingsPage.OnClickChangeSoundVolume()
@@ -1031,17 +1168,21 @@ function SystemSettingsPage.OnClickEnableSound_ByArea(bChecked)
 end
 
 function SystemSettingsPage.OnClickEnableFullScreenMode()
-	local fullScreen;
+	local attr = ParaEngine.GetAttributeObject()
+	local ds = SystemSettingsPage.setting_ds;
+	local is_full_screen = not ds["is_full_screen"];
 
-	local value = page:GetValue("btn_FullScreenMode");
-	if(value == "开启") then
-		fullScreen = true;
-	elseif(value == "关闭") then
-		fullScreen = false;
-	end	
+	UpdateCheckBox("btn_FullScreenMode", is_full_screen);
+	ds["is_full_screen"] = is_full_screen;
 
-	UpdateCheckBox("btn_FullScreenMode", not fullScreen);
-	--ds["is_full_screen"] = is_full_screen;
+	SystemSettingsPage.needRefreshWithResize = true;
+	if false then --真全屏
+		attr:SetField("ScreenResolution", attr:GetField("MonitorResolution"));
+		attr:SetField("IsFullScreenMode", is_full_screen);
+		attr:CallField("UpdateScreenMode");
+	else
+		attr:SetField("IsWindowMaximized",is_full_screen)
+	end
 end
 
 function SystemSettingsPage.OnOK()
@@ -1298,11 +1439,18 @@ function SystemSettingsPage.ShowPage()
 	--CreatorDesktop.params.bShow = bShow;
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	--SystemSettingsPage.InitPageParams()
-	page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
+	SystemSettingsPage.InitSoundDevice()
 end
 
 function SystemSettingsPage.OnCancel()
-	page:CloseWindow();
+	if page then
+		page:CloseWindow();
+	end
+end
+
+--迷你世界没有视角摇晃
+function SystemSettingsPage.NeedShowViewBobbing()
+	return WorldCommon.GetWorldTag("world_generator")=="paraworldMini" or WorldCommon.GetWorldTag("world_generator")=="paraworld"
 end
 
 function SystemSettingsPage.OnToggleViewBobbing()
@@ -1315,6 +1463,11 @@ end
 
 function SystemSettingsPage.OnChangeStereoMode(name, value)
 	GameLogic.options:EnableStereoMode(value);
+	WorldCommon.GetWorldInfo().stereoMode = tostring(value)
+	WorldCommon.SaveWorldTag()
+	if page then
+		page:Refresh(0)
+	end
 end
 
 function SystemSettingsPage.OnClearCache()
@@ -1345,7 +1498,7 @@ function SystemSettingsPage.OnChangeUIScaling(value)
 end
 
 function SystemSettingsPage.OnClickResetUIScaling()
-	GameLogic.options:SetUIScaling(0);
+	GameLogic.options:SetUIScaling(1);
 	if(page) then
 		page:SetValue("UI_Scaling", GameLogic.options:GetUIScaling());
 	end
@@ -1428,7 +1581,7 @@ function SystemSettingsPage.OnChangeMouseSetting(name, value)
 		value_to_key_list[SystemSettingsPage.mouse_select_list[k]] = k
 	end
 
-	page:Refresh(0.01);
+	SystemSettingsPage.RefreshPage()
 	
 	GameLogic.GetPlayerController():SaveRemoteData("SystemSettingsPage.mouse_select_list", SystemSettingsPage.mouse_select_list);
 	GameLogic.options:SetMouseSettingList(value_to_key_list)

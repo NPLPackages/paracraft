@@ -77,7 +77,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
     end
 
 	if System.os.GetPlatform() == 'win32' then
-		local uiScales = Screen:GetUIScaling();
+		local uiScales = Screen:GetUIScaling(true);
 	
 		if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
 			input.x = math.floor(input.x*uiScales[1]);
@@ -135,7 +135,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 				local height = height or screen_height;
 
 				if System.os.GetPlatform() == 'win32' then
-					local uiScales = Screen:GetUIScaling();
+					local uiScales = Screen:GetUIScaling(true);
 					if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
 						x = math.floor(x*uiScales[1]);
 						y = math.floor(y*uiScales[2]);

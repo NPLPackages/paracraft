@@ -22,6 +22,10 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua
 NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 NPL.load("(gl)script/ide/System/Windows/Keyboard.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeIntelliSense.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
+local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel");
+local ChatWindow = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatWindow");
 local FocusPolicy = commonlib.gettable("System.Core.Namespace.FocusPolicy");
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 local CodeIntelliSense = commonlib.gettable("MyCompany.Aries.Game.Code.CodeIntelliSense");
@@ -63,7 +67,9 @@ function CodeBlockWindow.Show(bShow)
 	else
 		GameLogic.GetFilters():add_filter("OnShowEscFrame", CodeBlockWindow.OnShowEscFrame);
 		GameLogic.GetFilters():add_filter("ShowExitDialog", CodeBlockWindow.OnShowExitDialog);
-		
+		GameLogic.GetFilters():add_filter("OnCodeBlockLineStep", CodeBlockWindow.OnCodeBlockLineStep);
+		GameLogic.GetFilters():add_filter("OnCodeBlockNplBlocklyLineStep", CodeBlockWindow.OnCodeBlockNplBlocklyLineStep);
+		GameLogic.GetFilters():add_filter("ChatLogWindowShowAndHide", CodeBlockWindow.OnChatLogWindowShowAndHide);
 		GameLogic:desktopLayoutRequested("CodeBlockWindow");
 		GameLogic:Connect("desktopLayoutRequested", CodeBlockWindow, CodeBlockWindow.OnLayoutRequested, "UniqueConnection");
 		GameLogic.GetCodeGlobal():Connect("logAdded", CodeBlockWindow, CodeBlockWindow.AddConsoleText, "UniqueConnection");
@@ -135,6 +141,36 @@ function CodeBlockWindow.GetDefaultCodeUIUrl()
 	return codeUIUrl;
 end
 
+-- @param locationInfo: in format of "filename:line:"
+function CodeBlockWindow.OnCodeBlockLineStep(locationInfo)
+	if(locationInfo) then
+		local filename, lineNumber = locationInfo:match("^([^:]+):(%d+)")
+		if(filename) then
+			lineNumber = tonumber(lineNumber);
+			local codeblock = self.GetCodeBlock();
+			if(codeblock and codeblock:GetFilename() == filename) then
+				-- flash the line for 1000 ms
+				if(not CodeBlockWindow.IsBlocklyEditMode()) then
+					local ctrl = CodeBlockWindow.GetTextControl();
+					if(ctrl) then
+						ctrl:FlashLine(lineNumber, 1000);
+					end
+				else
+					-- TODO for WXA: flash line in blockly editor
+				end
+			end
+		end
+	end
+	return locationInfo;
+end
+
+
+function CodeBlockWindow.OnCodeBlockNplBlocklyLineStep(blockid)
+	if (not NplBlocklyEditorPage) then return end 
+	local G = NplBlocklyEditorPage:GetG();
+	if (type(G.SetRunBlockId) ~= "function") then return end 
+	G.SetRunBlockId(blockid);
+end
 
 function CodeBlockWindow.OnShowEscFrame(bShow)
 	if(bShow or bShow == nil) then
@@ -1106,6 +1142,9 @@ end
 
 -- @param bForceRefresh: whether to refresh the content of the browser according to current blockly code. If nil, it will refresh if url has changed. 
 function CodeBlockWindow.SetNplBrowserVisible(bVisible, bForceRefresh)
+	if not System.options.enable_npl_brower then 
+		bVisible = false
+	end
     if(page)then
 		-- block NPL.activate "cef3/NplCefPlugin.dll" if npl browser isn't loaded
 		-- so that we can running auto updater normally
@@ -1236,7 +1275,7 @@ function CodeBlockWindow.OpenBlocklyEditor(bForceRefresh)
 			CodeBlockWindow.SetNplBrowserVisible(false)
 		end
 	end
-	if(not CodeBlockWindow.NplBrowserIsLoaded()) then
+	if(not CodeBlockWindow.NplBrowserIsLoaded() and System.options.enable_npl_brower) then
 		local isDownloading
 		isDownloading = NplBrowserLoaderPage.Check(function(result)
 			if(result) then
@@ -1331,12 +1370,26 @@ function CodeBlockWindow.NplBrowserIsLoaded()
 end
 
 function CodeBlockWindow.OnClickSettings()
-	if(CodeBlockWindow.IsNPLBrowserVisible()) then
-		CodeBlockWindow.SetNplBrowserVisible(false);
+	if(mouse_button == "left") then
+		if(CodeBlockWindow.IsNPLBrowserVisible()) then
+			CodeBlockWindow.SetNplBrowserVisible(false);
+		end
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockSettings.lua");
+		local CodeBlockSettings = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockSettings");
+		CodeBlockSettings.Show(true)
+	else
+		CodeBlockWindow.GotoCodeBlock()
 	end
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockSettings.lua");
-	local CodeBlockSettings = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockSettings");
-	CodeBlockSettings.Show(true)
+end
+
+function CodeBlockWindow.GotoCodeBlock()
+	local codeblock = CodeBlockWindow.GetCodeBlock()
+	if(codeblock) then
+		local x, y, z = codeblock:GetBlockPos()
+		if(x and y and z) then
+			GameLogic.RunCommand(format("/goto %d %d %d", x, y+1, z));
+		end
+	end
 end
 
 function CodeBlockWindow.OnMouseOverWordChange(word, line, from, to)
@@ -1389,7 +1442,8 @@ end
 
 function CodeBlockWindow.IsSupportNplBlockly()
 	local entity = CodeBlockWindow.GetCodeEntity();
-	return not CodeBlockWindow.IsMicrobitEntity() and entity and type(entity.IsBlocklyEditMode) and type(entity.IsUseNplBlockly) == "function" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
+	local language = entity and entity:GetCodeLanguageType();
+	return language ~= "python" and not CodeBlockWindow.IsMicrobitEntity() and entity and type(entity.IsBlocklyEditMode) and type(entity.IsUseNplBlockly) == "function" and entity:IsBlocklyEditMode() and entity:IsUseNplBlockly();
 end
 		
 function CodeBlockWindow.OnTryOpenMicrobit()
@@ -1447,14 +1501,23 @@ function CodeBlockWindow.ShowNplBlocklyEditorPage()
 
 	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
 	local width, height, margin_right, bottom, top, sceneMarginBottom = self:CalculateMargins();
-	local language = entity:IsUseCustomBlock() and "UserCustomBlock" or entity:GetLanguageConfigFile();
+	-- local language = entity:IsUseCustomBlock() and "UserCustomBlock" or entity:GetLanguageConfigFile();
 	NplBlocklyEditorPage = Page.Show({
-		Language = (language == "npl" or language == "") and "SystemNplBlock" or "npl",
+		-- Language = (language == "npl" or language == "") and "SystemNplBlock" or "npl",
+		Language = entity:IsUseCustomBlock() and "CustomWorldBlock" or "npl",
 		xmltext = entity:GetNPLBlocklyXMLCode() or "",
 		ToolBoxXmlText = entity:GetNplBlocklyToolboxXmlText(),
 		OnChange = function()
 			CodeBlockWindow.UpdateNplBlocklyCode();
-		end
+		end,
+		OnGenerateBlockCodeBefore = function(block)
+			if (not entity:IsStepMode() or block:IsOutput()) then return end
+			return "checkstep_nplblockly(" .. block:GetId() ..", true, 0.5)\n";
+		end,
+		OnGenerateBlockCodeAfter = function(block)
+			if (not entity:IsStepMode() or block:IsOutput()) then return end
+			return "checkstep_nplblockly(0, false, 0)\n";
+		end,
 	}, { 
 		url = "%ui%/Blockly/Pages/NplBlockly.html",
 		alignment="_rt",
@@ -1485,6 +1548,27 @@ end
 
 function CodeBlockWindow.GetFontSize()
 	return CodeBlockWindow.fontSize or 13;
+end
+
+function CodeBlockWindow.OnClickShowConsoleText()
+	ChatWindow.ShowAllPage();
+	ChatWindow.HideEdit();
+	ChatWindow.OnSwitchChannelDisplay(ChatChannel.EnumChannels.NearBy);
+end
+
+function CodeBlockWindow.OnClickHideConsoleText()
+	ChatWindow.HideChatLog();
+end
+
+function CodeBlockWindow.OnClickClearConsoleText()
+	CodeBlockWindow.SetConsoleText("");
+	ChatChannel.ClearChat(ChatChannel.EnumChannels.NearBy);
+	ChatWindow.OnSwitchChannelDisplay("0");
+end
+
+function CodeBlockWindow.OnChatLogWindowShowAndHide(bShow)
+	CodeBlockWindow.bShowChatLogWindow = bShow;
+	if(page) then page:Refresh(0.01) end
 end
 
 CodeBlockWindow:InitSingleton();

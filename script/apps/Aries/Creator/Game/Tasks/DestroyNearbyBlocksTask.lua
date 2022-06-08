@@ -72,19 +72,10 @@ function DestroyNearbyBlocks:Run()
 		self.destroy_blocks = destroy_blocks;
 	end
 	
-	if(#(self.destroy_blocks) > 0)then
+	if((#(self.destroy_blocks) > 0) or (self.liveEntities and #(self.liveEntities) > 0))then
 		self.start_time = commonlib.TimerManager.GetCurrentTime();
 		TaskManager.AddTask(self);
 		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",self.destroy_blocks)
-	end
-	if(self.liveEntities and #(self.liveEntities) > 0) then
-		-- TODO: save to history to support undo/redo
-		for _, entityNode in ipairs(self.liveEntities) do
-			local entity = EntityManager.GetEntity(entityNode.attr.name)
-			if(entity) then
-				entity:Destroy();
-			end
-		end
 	end
 end
 
@@ -140,7 +131,16 @@ function DestroyNearbyBlocks:FrameMove()
 				end
 			end
 		end
-			
+		if(self.liveEntities and #(self.liveEntities) > 0) then
+			for _, entityNode in ipairs(self.liveEntities) do
+				local entity = EntityManager.GetEntity(entityNode.attr.name)
+				if(entity) then
+					entity:Destroy();
+				end
+			end
+			count = count + (#(self.liveEntities));
+		end
+
 		if(count and count>0) then
 			self.count = count;
 
@@ -165,9 +165,19 @@ function DestroyNearbyBlocks:Redo()
 	if(self.count and self.count>0) then
 		-- update the selector effect
 		BlockEngine:BeginUpdate()
-		for _, b in ipairs(self.destroy_blocks) do
-			if(b.block_id) then
-				BlockEngine:SetBlockToAir(b[1],b[2],b[3], 3);
+		if(self.destroy_blocks) then
+			for _, b in ipairs(self.destroy_blocks) do
+				if(b.block_id) then
+					BlockEngine:SetBlockToAir(b[1],b[2],b[3], 3);
+				end
+			end
+		end
+		if(self.liveEntities and #(self.liveEntities) > 0) then
+			for _, entityNode in ipairs(self.liveEntities) do
+				local entity = EntityManager.GetEntity(entityNode.attr.name)
+				if(entity) then
+					entity:Destroy();
+				end
 			end
 		end
 		BlockEngine:EndUpdate()
@@ -178,9 +188,22 @@ function DestroyNearbyBlocks:Undo()
 	if(self.count and self.count>0) then
 		-- update the selector effect
 		BlockEngine:BeginUpdate()
-		for _, b in ipairs(self.destroy_blocks) do
-			if(b.block_id) then
-				BlockEngine:SetBlock(b[1],b[2],b[3], b.block_id, b.last_block_data, 3, b.last_entity_data);
+		if(self.destroy_blocks) then
+			for _, b in ipairs(self.destroy_blocks) do
+				if(b.block_id) then
+					BlockEngine:SetBlock(b[1],b[2],b[3], b.block_id, b.last_block_data, 3, b.last_entity_data);
+				end
+			end
+		end
+		if(self.liveEntities and #(self.liveEntities) > 0) then
+			for _, entityNode in ipairs(self.liveEntities) do
+				local entity = EntityManager.GetEntity(entityNode.attr.name)
+				if(not entity) then
+					entity = EntityManager.CreateEntityFromXMLNode(entityNode);
+					if(entity) then
+						entity:Attach();
+					end
+				end
 			end
 		end
 		BlockEngine:EndUpdate()

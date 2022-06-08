@@ -52,6 +52,13 @@ function CreatorDesktop.UpdateModeUI()
 	end
 end
 
+function CreatorDesktop.CloseWindow()
+	if page then
+		page:CloseWindow()
+		page = nil
+	end
+end
+
 -- toggle a given view by it name
 -- @param name: such as "builder", if nil, it just toggle last view
 function CreatorDesktop.ShowView(name, bShow)
@@ -300,7 +307,7 @@ function CreatorDesktop.ShowNewPage(IsExpanded)
 				x = CreatorDesktop.IsMovie and -240 or 0,
 				y = 0,
 				width = 240,
-				height = 480,
+				height = 506,
 		};
 	CreatorDesktop.new_page_params.bShow = IsExpanded;
 	System.App.Commands.Call("File.MCMLWindowFrame", CreatorDesktop.new_page_params);

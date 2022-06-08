@@ -159,9 +159,12 @@ function ModelMountPoints:GetEntityLocalTransform(localTransform)
 	local entity = self:GetEntity();
 	if(entity and not entity.isMountpointDetached) then
 		local facing = entity:GetFacing();
-		if(facing ~= 0) then
+		local roll = entity:GetRoll();
+		local pitch = entity:GetPitch();
+		if(facing ~= 0 or roll~=0 or pitch~=0) then
 			self.localRotQuat = self.localRotQuat or Quaternion:new();
-			self.localRotQuat:FromAngleAxis(facing, vector3d.unit_y)
+			--self.localRotQuat:FromAngleAxis(facing, vector3d.unit_y)
+			self.localRotQuat:FromEulerAnglesSequence(roll, pitch, facing, "zxy")
 			self.localRotQuat:ToRotationMatrix(localTransform)
 		else
 			localTransform:identity()

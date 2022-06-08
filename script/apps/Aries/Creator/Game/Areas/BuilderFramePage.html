@@ -84,12 +84,6 @@ function OnSelectOfficial()
     QuickSelectBar.OnClickTemplate();
 end
 
-function OnSelectNode(name, mcmlNode)
-    local item = mcmlNode:GetPreValue("this", true);
-    --Page:SetNodeValue("CurrentSnapshot", item.filename:gsub("xml$", "jpg"));
-    BlockTemplatePage.CreateFromTemplate(item.filename);
-end
-
 function SearchBlock(name,mcmlNode)
     local search_ctl = Page:FindUIControl("block_search_text_ctl");
     if(search_ctl and search_ctl.text) then
@@ -126,6 +120,14 @@ function GetBlockUIName(id, data, uid)
     end
     return text;
 end
+
+function isBmax()
+    return string.match(XPath("this|text"),"%.bmax$")~=nil
+end
+
+function isX()
+    return string.match(XPath("this|text"),"%.x$")~=nil
+end
 ]]></script>
 <div style="">
     <div style="margin-left:13px;margin-top:5px;width:210px;">
@@ -153,13 +155,13 @@ end
             </pe:repeatitem>
         </pe:repeat>
     </div>
-    <div style="margin-left:8px;margin-top:1px;width:240px;height:335px;color:#cccccc">
+    <div style="margin-left:8px;margin-top:5px;width:240px;height:355px;color:#cccccc">
         <pe:if condition='<%=BuilderFramePage.category_name ~= "template" and BuilderFramePage.category_name ~= "playerbag"%>'>
             <pe:gridview style="margin:0px" uiname="BuilderFramePage.gridviewItems" name="new_builder_gvwItems" CellPadding="4" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="6" DefaultNodeHeight = "32" 
                 DataSource='<%=DS_Items%>'>
 	            <Columns>
                     <div style="width:32px;height:32px;" >
-                        <pe:mc_block uiname = '<%=GetBlockUIName(Eval("block_id"), Eval("block_data"), Eval("uid"))%>' block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" tooltip2='<%=Eval("tooltip") or L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
+                        <pe:mc_block uid='<%=Eval("uid")%>' uiname = '<%=GetBlockUIName(Eval("block_id"), Eval("block_data"), Eval("uid"))%>' block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:32px;height:32px;" tooltip2='<%=Eval("tooltip") or L"Ctrl+右键帮助"%>' onclick="OnClickBlock"/>    
                     </div>
                 </Columns>
 	            <EmptyDataTemplate>
@@ -204,13 +206,20 @@ end
                         <pe:treenode text='<%=XPath("this|text")%>' style="color:#cccccc" expanded='<%=XPath("this|expanded")%>'></pe:treenode>
                     </NodeTemplate>
 		            <NodeTemplate DataType="file">
-                        <div style="height:20px;">
+                        <pe:if condition='<%= (isBmax() or isX())%>'>
+                            <pe:mc_block block_id='254' style="width:16px;height:16px;"/>
+                        </pe:if>
+                        <pe:if condition='<%= not (isBmax() or isX())%>'>
+                            <div style="width:16px;height:16px;"></div>
+                        </pe:if>
+                        
+                        <div style="height:20px;margin-top: -20px;margin-left: 18px;">
                             <input 
                                 type="button" 
                                 class="listbutton_unselected" 
                                 value='<%=XPath("this|text")%>' 
-                                onclick='OnSelectNode'
-						        style="margin-top:0px;width:200px;height:20px;text-align:left;margin-top:0px;color:#cccccc;" 
+                                onclick='BuilderFramePage.OnClickTemplateItem'
+                                style="margin-top:0px;width:200px;height:20px;text-align:left;margin-top:0px;color:#cccccc;" 
                                 MouseOver_BG="Texture/alphadot.png"
                             />
                         </div>

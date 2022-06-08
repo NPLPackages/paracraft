@@ -26,3 +26,15 @@ HttpWrapper.Create("keepwork.dismiss.post", "%MAIN%/accounting/org/classroom/dis
 
 --http://yapi.kp-para.cn/project/25/interface/api/612
 HttpWrapper.Create("keepwork.userOrgInfo.get", "%MAIN%/accounting/org/userOrg", "GET", true)
+
+
+--通过邀请码加入班级
+--http://yapi.kp-para.cn/project/130/interface/api/5025
+HttpWrapper.Create("keepwork.userclass.joinclass", "%MAIN%/accounting/orgClassInvitationCodes/joinClass", "POST", true)
+
+--获取用户所有的教学班
+--http://yapi.kp-para.cn/project/130/interface/api/5027
+HttpWrapper.Create("keepwork.userclass.getclasses", "%MAIN%/accounting/orgClass/userTeachingClasses", "GET", true)
+
+
+

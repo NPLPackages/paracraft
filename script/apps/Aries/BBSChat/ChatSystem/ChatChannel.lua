@@ -429,6 +429,17 @@ function ChatChannel.GetChat(ChannelIndexAssemble)
 	return result;
 end
 
+-- 清除指定通道数据
+function ChatChannel.ClearChat(ChannelIndex)
+	local chatdata = {};
+	for _, chat in ipairs(ChatChannel.chatdata) do
+		if (chat.ChannelIndex ~= ChannelIndex) then
+			table.insert(chatdata, chat);
+		end
+	end
+	ChatChannel.chatdata = chatdata;
+end
+
 
 function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inputType)
     inputType = inputType or ChatChannel.InputTypes.FromEditBox;

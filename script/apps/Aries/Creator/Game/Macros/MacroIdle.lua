@@ -54,7 +54,7 @@ function Macros.Idle(timeMs, bForceWait)
 			if (nextMacro.name == "CameraLookat" or nextMacro.name == "Idle" or nextMacro.name == "text") then
 				local previousMacro = Macros:PeekNextMacro(-1)
 				if(previousMacro and previousMacro.name == "text") then
-					local params = type(previousMacro.params) == "table" and previousMacro.params or commonlib.split(item.params,",")
+					local params = type(previousMacro.params) == "table" and previousMacro.params or {}
 					local text = params[1] or ""
 					local voiceNarrator = params[4] or 10012;
 					voiceNarrator = tonumber(voiceNarrator);
@@ -67,6 +67,8 @@ function Macros.Idle(timeMs, bForceWait)
 							return Macros.Idle(t * 1000 + DefaultTriggerInterval, true);
 						end
 						return Macros.Idle((math.floor(commonlib.utf8.len(text) / 5) + 1.5) * 1000, true);
+					else
+						return Macros.Idle(DefaultTriggerInterval, true);
 					end
 				elseif (previousMacro:IsTrigger() or previousMacro.name == "Idle") then
 					return Macros.Idle(DefaultTriggerInterval, true);

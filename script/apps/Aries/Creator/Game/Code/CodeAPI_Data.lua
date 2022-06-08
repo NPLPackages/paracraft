@@ -47,11 +47,13 @@ function env_imp:echo(obj, ...)
 	
 end
 
--- get the entity associated with the actor.
-function env_imp:GetEntity()
-	if(self.actor) then
+-- get the entity associated with the actor, or get global entity by name
+function env_imp:GetEntity(name)
+    if(name and name~="") then
+		return EntityManager.GetEntity(name);
+    elseif(self.actor) then
 		return self.actor:GetEntity();
-	end		
+	end
 end
 
 function env_imp:getActorEntityValue(name, key)
@@ -114,6 +116,23 @@ end
 function env_imp:include(filename)
 	if(self.codeblock) then
 		return self.codeblock:IncludeFile(filename)
+	end
+end
+
+-- importing a library is the alternative way of placing code blocks in the scene. 
+-- A library is a group of code blocks in the form of files. These files are usually organized in a folder with the same name of the library. 
+-- for example, when import("abc"), we will load all files in ./lib/abc/*.* as code blocks. These code blocks are loaded only once in a given world, 
+-- but can be imported multiple times. When the last code block that is importing a library is stopped, the imported libary will be unloaded. 
+-- This also makes debugging a library easy by just restarting the code block that referenced it. 
+-- When importing a lib, we will first search in the current world directory's ./lib folder for a given library, and then in system library folder, which is ..Game/Code/lib folder.
+-- The advantage of using library is for making the scene cleaner than placing code blocks.
+-- @param libName: import a library by name. loading all files in  "./lib/[libName]/*.*" folder.
+function env_imp:import(libName)
+	if(self.codeblock) then
+		local library = self.codeblock:ImportCodeLibrary(libName)
+		if(not library or library:IsEmpty()) then
+			env_imp.exit(self);
+		end
 	end
 end
 

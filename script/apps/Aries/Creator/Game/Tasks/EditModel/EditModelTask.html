@@ -8,22 +8,23 @@ EditModelTask.InitPage(Page);
 task = EditModelTask.GetInstance();
 ]]>
 </script>
-<div style='<%=format("padding:5px;background-color:%s;color:#ffffff;width:360px;height:66px", task:IsTransformMode() and "#8080ff" or "#80808080") %>' >
+<div style='<%=format("padding:5px;background-color:%s;color:#ffffff;width:360px;height:66px", (task and task:IsTransformMode()) and "#8080ff" or "#80808080") %>' >
     <div style="float:left;margin-left:-5px;margin-top:-5px;" onclick="EditModelTask.OnChangeModelType">
         <pe:mc_block block_id='<%=EditModelTask.GetItemID()%>' style="width:28px;height:28px;"/>
     </div>
-    <input name="toggleBtn" uiname="EditModelTask.toggleBtn" value='<%=task:IsTransformMode() and L"模型编辑" or L"模型创造"%>' tooltip='<%=L"点击切换"%>' type="button" style="height:20px;padding-top:3px;max-width:58px;" onclick="EditModelTask.OnClickToggleMode" />
-    <pe:if condition='<%=task:IsTransformMode()%>'>
+    <pe:if condition='<%=task and task:IsTransformMode()%>'>
         <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
+            <input name="toggleTransformModeBtn" uiname="EditModelTask.toggleTransformModeBtn" value='<%=task:IsWorldTransformMode() and L"世界坐标" or L"模型坐标"%>' tooltip='<%=L"点击切换坐标系(T)"%>' type="button" style="height:20px;padding-top:3px;max-width:58px;" onclick="EditModelTask.OnClickToggleTransformMode" />
             <div style="float:left;margin-left:3px">
-                <span style="margin-left:5px;"><%=L"方向"%></span><input name="facing" type="text" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%d", task:GetFacingDegree())%>' onchange="EditModelTask.OnFacingDegreeChanged"/>
-                <span style="margin-left:5px;"><%=L"大小"%></span><input name="scale" type="text" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%.2f", task:GetSelectedModel():GetScaling())%>'  onchange="EditModelTask.OnScalingChanged"/>
+                <span style="margin-left:5px;"><%=L"方向"%></span><input uiname="EditModelTask.facing" name="facing" type="text" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%d", task:GetFacingDegree())%>' onchange="EditModelTask.OnFacingDegreeChanged"/>
+                <span style="margin-left:5px;"><%=L"大小"%></span><input uiname="EditModelTask.scale" name="scale" type="text" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%.2f", task:GetSelectedModel():GetScaling())%>'  onchange="EditModelTask.OnScalingChanged"/>
                 <input uiname="EditModelTask.resetBtn" name="resetBtn" value='<%=L"重置"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnResetModel" />
                 <input uiname="EditModelTask.physicsBtn" name="physicsBtn" value='<%=task:GetSelectedModel():HasRealPhysics() and L"有物理" or L"无物理"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnClickTogglePhysics" />
                 <input uiname="EditModelTask.deleteBtn" name="deleteBtn" value='<%=L"删除"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnClickDeleteModel" />
             </div>
-            <div>
-                <pe:label value="<%=task:GetSelectedModel():GetModelFile()%>"/>
+            <div style="margin-top:-3px;height:18px;">
+                <span style="color:#ffffff;"><%=commonlib.Encoding.EncodeHTMLInnerTextWithSpace(task:GetLongDisplayName(1))%></span>
+                <pe:label style="margin-left:5px;color:#4af337;" value="<%=task:GetLongDisplayName(2)%>"/>
             </div>
             <div>
                 <input uiname="EditModelTask.propertyBtn" name="propertyBtn" value='<%=L"属性..."%>' type="button" style="margin-right:0px;height:20px;padding-top:3px" onclick="EditModelTask.OnClickProperty" />
@@ -36,7 +37,7 @@ task = EditModelTask.GetInstance();
             <div><%=L"右键点击场景选择模型"%></div>
         </pe:if>
     </pe:if>
-    <pe:if condition='<%=not task:IsTransformMode()%>'>
+    <pe:if condition='<%=task and not task:IsTransformMode()%>'>
         <input uiname="EditModelTask.changeModelBtn" name="changeModelBtn" value='<%=L"模型..."%>' tooltip='<%=L"Ctrl+左键选择方块与骨骼, 并保存为bmax模型"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnClickChangeModelFile" />
         <input uiname="EditModelTask.changeDraggableBtn" name="changeDraggableBtn" value='<%=EditModelTask.GetDraggableText()%>' tooltip='<%=L"点击可切换模型是否可拖动"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnClickChangeDraggable" />
         <div><pe:label value="<%=task:GetModelFileInHand()%>"/></div>

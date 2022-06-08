@@ -58,9 +58,12 @@ end
 SelectModulePage.url_installNewPlugins = "https://github.com/LiXizhi/ParaCraftSDK/wiki/ParacraftPlugins";
 
 function OnInstallNewPlugins()
-    SelectModulePage.StartLocalInstallService();
+    -- SelectModulePage.StartLocalInstallService();
     -- open url
-    ParaGlobal.ShellExecute("open", SelectModulePage.url_installNewPlugins, "", "", 1);
+    -- ParaGlobal.ShellExecute("open", SelectModulePage.url_installNewPlugins, "", "", 1);
+
+    local PluginManager = NPL.load("Mod/GeneralGameServerMod/Command/PluginManager/PluginManager.lua");
+    PluginManager:Show();
 end
 
 function OnClickOpen(name, mcmlNode)
@@ -131,7 +134,8 @@ end
                                 <input style="color:#808080;margin-right:5px;min-width:45px;" type="button" onclick="OnClickDelete" value='<%=L"删除"%>' class="mc_light_grey_button_with_fillet" />
                             </pe:if>
                             <pe:if condition="<%=Eval('homepage')~=false%>">
-                                <input type="button" style="color:#ffffff;min-width:50px;" onclick="OnClickOpen" value='<%=Eval("isSystem") and L"官网" or L"更新"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
+                                <!-- <input type="button" style="color:#ffffff;min-width:50px;" onclick="OnClickOpen" value='<%=Eval("isSystem") and L"官网" or L"更新"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" /> -->
+                                <input type="button" style="color:#ffffff;min-width:50px;" onclick="OnClickOpen" value='<%=L"官网"%>' class="mc_blue_button_with_fillet" tooltip="<%=Eval('homepage')%>" />
                             </pe:if>
                         </div>
                         <div style="max-width:330px">

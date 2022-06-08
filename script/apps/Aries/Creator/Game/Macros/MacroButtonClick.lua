@@ -71,7 +71,7 @@ end
 --@param btnName: button name
 --@param button: "left", "right", "shift+left"
 --@param eventname: nil or "onmouseup" or "onclick"
-function Macros.ButtonClick(btnName, button, eventname)
+function Macros.ButtonClick(btnName, button, eventName)
 	local callback = Macros.TryMacroWithTimeout(1500, Macros.ButtonClickNoWait, btnName, button, eventName)
 	return callback;
 end
@@ -161,12 +161,21 @@ function Macros.WindowClick(btnName, button, localX, localY)
 	end
 end
 
-function Macros.ButtonClickTriggerNoWait(btnName, button, eventName)
+function Macros.ButtonClickTriggerNoWait(btnName, button, eventName, offsetX, offsetY)
 	local obj = ParaUI.GetUIObject(btnName)
 	if(obj and obj:IsValid()) then
 		local x, y, width, height = obj:GetAbsPosition();
 		local mouseX = math.floor(x + width /2)
 		local mouseY = math.floor(y + height /2)
+
+		if offsetX and offsetX < width then
+			mouseX = x + offsetX
+		end
+
+		if offsetY and offsetY < height then
+			mouseY = y + offsetY
+		end
+
 		local callback = {};
 		MacroPlayer.SetClickTrigger(mouseX, mouseY, button, function()
 			if(callback.OnFinish) then
@@ -217,8 +226,8 @@ end
 -- native ParaUIObject's onclick event
 --@param btnName: button name
 --@param button: "left", "right", default to "left"
-function Macros.ButtonClickTrigger(btnName, button, eventName)
-	local callback = Macros.TryMacroWithTimeout(1500, Macros.ButtonClickTriggerNoWait, btnName, button, eventName)
+function Macros.ButtonClickTrigger(btnName, button, eventName, offsetX, offsetY)
+	local callback = Macros.TryMacroWithTimeout(1500, Macros.ButtonClickTriggerNoWait, btnName, button, eventName, offsetX, offsetY)
 	return callback;
 end
 

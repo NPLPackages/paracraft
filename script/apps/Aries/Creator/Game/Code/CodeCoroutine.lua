@@ -220,6 +220,7 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 		if(self.actor) then
 			self.actor:Connect("beforeRemoved", self, self.Stop, "UniqueConnection");
 		end
+		setfenv(self.code_func, self:GetCodeBlock():GetCodeEnv());
 
 		self.co = coroutine.create(function()
 			local result, r2, r3, r4 = self:RunImp(msg);
@@ -233,12 +234,56 @@ function CodeCoroutine:Run(msg, onFinishedCallback)
 			end
 			return result, r2, r3, r4;
 		end)
+			
 		local ok, result, r2, r3, r4 = self:Resume();
 		if(ok and self.isFinished) then
 			return result, r2, r3, r4;
 		end
 	end
 end
+
+-- if the coroutine function is still running, this function will do nothing. Otherwise it will run. 
+-- it will make the the same code coroutine object to be reusable. The same code_func can be invoked multiple times with the same C++ coroutine object. 
+-- this will save some memory overhead, but yield/resume overhead still exists. 
+-- see also: https://gist.github.com/LiXizhi/911069b7e7f98db76d295dc7d1c5e34a
+-- 1. memory overhead: 0.26KB per coroutine
+-- 2. yield/resume pair overhead: 0.0004 ms
+--   if you have 1000 objects each is calling yield/resume at 60FPS, then the time overhead is 0.2*1000/500000*60*1000 = 24ms
+--   and if you do not reuse coroutine, then memory overhead is 1000*60*0.26 = 15.6MB/sec
+function CodeCoroutine:RunSingle(msg, onFinishedCallback)
+	if(self.code_func and self.isFinished ~= false) then
+		self.isStopped = false;
+		self.isFinished = false;
+		self.onFinishedCallback = onFinishedCallback;
+		self.msg = msg;
+		if(not self.co) then
+			setfenv(self.code_func, self:GetCodeBlock():GetCodeEnv());
+		
+			self.codeBlock:Connect("beforeStopped", self, self.Stop, "UniqueConnection");
+			if(self.actor) then
+				self.actor:Connect("beforeRemoved", self, self.Stop, "UniqueConnection");
+			end
+
+			self.co = coroutine.create(function()
+				while(true) do
+					local result, r2, r3, r4 = self:RunImp(self.msg);
+					self:SetFinished();
+					if(self.onFinishedCallback) then
+						self.onFinishedCallback(result, r2, r3, r4);
+						self.onFinishedCallback = nil;
+					end
+					coroutine.yield(result, r2, r3, r4)
+				end
+			end)
+		end
+
+		local ok, result, r2, r3, r4 = self:Resume();
+		if(ok and self.isFinished) then
+			return result, r2, r3, r4;
+		end
+	end
+end
+
 
 local lastErrorCallstack = "";
 function CodeCoroutine.handleError(x)
@@ -249,7 +294,6 @@ end
 function CodeCoroutine:RunImp(msg)
 	local code_func = self.code_func;
 	if(code_func) then
-		setfenv(code_func, self:GetCodeBlock():GetCodeEnv());
 		local ok, result, r2, r3, r4 = xpcall(code_func, CodeCoroutine.handleError, msg);
 
 		if(not ok) then
@@ -263,6 +307,13 @@ function CodeCoroutine:RunImp(msg)
 				LOG.std(nil, "error", "CodeCoroutine", "%s\n%s", result, lastErrorCallstack);
 				local msg = format(L"运行时错误: %s\n在%s", self:GetCodeBlock():BeautifyRuntimeErrorMsg(tostring(result)), self:GetCodeBlock():GetFilename());
 				self:GetCodeBlock():send_message(msg, "error");
+				if not string.match(result,"_block%(%d+, %d+, %d+%)") then --代码方块的直接报错不进行上报
+					local ParacraftDebug = commonlib.gettable("MyCompany.Aries.Game.Common.ParacraftDebug");
+					ParacraftDebug:SendErrorLog("NplRuntimeError", {
+						errorMessage = msg,
+						stackInfo = lastErrorCallstack,
+					})
+				end
 			end
 		end
 		return result, r2, r3, r4;

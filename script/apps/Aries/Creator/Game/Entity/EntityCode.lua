@@ -36,6 +36,7 @@ local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Entity
 Entity:Property({"languageConfigFile", "", "GetLanguageConfigFile", "SetLanguageConfigFile"})
 Entity:Property({"isAllowClientExecution", false, "IsAllowClientExecution", "SetAllowClientExecution"})
 Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
+Entity:Property({"isStepMode", false, "IsStepMode", "SetStepMode", auto=true})
 Entity:Property({"hasDiskFileMirror", false, "HasDiskFileMirror", "SetHasDiskFileMirror"})
 Entity:Property({"isOpenSource", false, "IsOpenSource", "SetOpenSource"})
 Entity:Signal("beforeRemoved")
@@ -58,10 +59,8 @@ function Entity:ctor()
 	-- persistent actor instances as inventory items
 	self.inventory = InventoryBase:new():Init();
 	self.inventory:SetClient();
+	self.inventory:SetParentEntity(self);
 	self.inventory:SetSlotCount(10); 
-	self.inventory:SetOnChangedCallback(function(inventory, slot_index)
-		self:OnInventoryChanged(slot_index);
-	end);
 
 	-- all win32 will use NPL blockly, instead of google blockly. 
 	-- if((System.os.GetPlatform() ~= "win32" or System.os.Is64BitsSystem() or (GameLogic.options:IsOfflineMode())) and not System.options.isCodepku) then
@@ -70,9 +69,11 @@ function Entity:ctor()
 	end
 end
 
--- this should be called when inventory itemstack or its values are changed
--- this function can be called many times per frame, but only one merged inventoryChanged signal is fired.
-function Entity:OnInventoryChanged(slot_index)
+-- virtual function:
+-- @param inventory: inventory object
+-- @param slot_index: if only one slot is changed, this is the index. it could be nil, if index can not be determined. 
+function Entity:OnInventoryChanged(inventory, slot_index)
+	Entity._super.OnInventoryChanged(self, inventory, slot_index)
 	local codeblock = self:GetCodeBlock()
 	if(codeblock) then
 		if(self.slot_index_to_refresh == nil) then
@@ -91,7 +92,6 @@ function Entity:OnInventoryChanged(slot_index)
 		end})
 		self.refreshInventoryTimer:Change(0.01);
 	end
-	
 end
 
 -- @param slotIndex: if nil, it means all
@@ -137,6 +137,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self:IsAllowFastMode()) then
 		node.attr.allowFastMode= true;
 	end
+	if(self:IsStepMode()) then
+		node.attr.isStepMode = true;
+	end
 	if(self:HasDiskFileMirror()) then
 		node.attr.hasDiskFileMirror= true;
 	end
@@ -161,6 +164,7 @@ function Entity:LoadFromXMLNode(node)
 	self:SetAllowGameModeEdit(node.attr.allowGameModeEdit == "true" or node.attr.allowGameModeEdit == true);
 	self.isAllowClientExecution = (node.attr.allowClientExecution == "true" or node.attr.allowClientExecution == true);
 	self.isAllowFastMode = (node.attr.allowFastMode == "true" or node.attr.allowFastMode == true);
+	self.isStepMode = (node.attr.isStepMode == "true" or node.attr.isStepMode == true);
 	self.hasDiskFileMirror = (node.attr.hasDiskFileMirror == "true" or node.attr.hasDiskFileMirror == true);
 	self.isOpenSource = (node.attr.isOpenSource == "true" or node.attr.isOpenSource == true);
 	self.languageConfigFile = node.attr.languageConfigFile;
@@ -264,28 +268,30 @@ function Entity:FindNearByMovieEntity()
 	local movieEntity = self:GetNearByMovieEntity();
 	if(not movieEntity) then
 		local cx, cy, cz = self.bx, self.by, self.bz;
-		local id = self:GetBlockId();
-		local blocks;
-		local totalCodeBlockCount = 0;
-		local BlockEngine = self:GetBlockEngine();
-		for side = 0, 3 do
-			local dx, dy, dz = Direction.GetOffsetBySide(side);
-			local x,y,z = cx+dx, cy+dy, cz+dz;
-			local blockTemplate = BlockEngine:GetBlock(x,y,z);
-			if(blockTemplate and blockTemplate.id == id) then
-				local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
-				if(codeEntity) then
-					local idx = BlockEngine:GetSparseIndex(x,y,z);
-					blocks = blocks or {};
-					blocks[#blocks+1] = idx;
-					totalCodeBlockCount = totalCodeBlockCount + 1;
+		if(cx) then
+			local id = self:GetBlockId();
+			local blocks;
+			local totalCodeBlockCount = 0;
+			local BlockEngine = self:GetBlockEngine();
+			for side = 0, 3 do
+				local dx, dy, dz = Direction.GetOffsetBySide(side);
+				local x,y,z = cx+dx, cy+dy, cz+dz;
+				local blockTemplate = BlockEngine:GetBlock(x,y,z);
+				if(blockTemplate and blockTemplate.id == id) then
+					local codeEntity = BlockEngine:GetBlockEntity(x,y,z);
+					if(codeEntity) then
+						local idx = BlockEngine:GetSparseIndex(x,y,z);
+						blocks = blocks or {};
+						blocks[#blocks+1] = idx;
+						totalCodeBlockCount = totalCodeBlockCount + 1;
+					end
 				end
 			end
-		end
-		if(blocks) then
-			local entity_map = {};
-			entity_map[BlockEngine:GetSparseIndex(cx,cy,cz)] = true;
-			movieEntity = self:FindNearByMovieEntityImp(blocks, 1, entity_map, totalCodeBlockCount);
+			if(blocks) then
+				local entity_map = {};
+				entity_map[BlockEngine:GetSparseIndex(cx,cy,cz)] = true;
+				movieEntity = self:FindNearByMovieEntityImp(blocks, 1, entity_map, totalCodeBlockCount);
+			end
 		end
 	end
 	return movieEntity;
@@ -329,14 +335,16 @@ end
 function Entity:GetNearByMovieEntity(cx, cy, cz)
 	local BlockEngine = self:GetBlockEngine();
 	cx, cy, cz = cx or self.bx, cy or self.by, cz or self.bz;
-	for side = 0, 3 do
-		local dx, dy, dz = Direction.GetOffsetBySide(side);
-		local x,y,z = cx+dx, cy+dy, cz+dz;
-		local blockTemplate = BlockEngine:GetBlock(x,y,z);
-		if(blockTemplate and blockTemplate.id == names.MovieClip) then
-			local movieEntity = BlockEngine:GetBlockEntity(x,y,z);
-			if(movieEntity) then
-				return movieEntity;
+	if(cx) then
+		for side = 0, 3 do
+			local dx, dy, dz = Direction.GetOffsetBySide(side);
+			local x,y,z = cx+dx, cy+dy, cz+dz;
+			local blockTemplate = BlockEngine:GetBlock(x,y,z);
+			if(blockTemplate and blockTemplate.id == names.MovieClip) then
+				local movieEntity = BlockEngine:GetBlockEntity(x,y,z);
+				if(movieEntity) then
+					return movieEntity;
+				end
 			end
 		end
 	end

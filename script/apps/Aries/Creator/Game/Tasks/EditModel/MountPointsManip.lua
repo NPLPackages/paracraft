@@ -430,10 +430,6 @@ function MountPointsManip:keyPressEvent(event)
 				end
 			end
 			event:accept();
-		elseif(keyname == "DIK_K") then
-			-- force making a new key at the current pos. 
-			self:AddKeyWithCurrentValue()
-			event:accept();
 		end
 	end
 	if(keyname == "DIK_LBRACKET" or keyname == "DIK_RBRACKET") then
@@ -457,9 +453,12 @@ function MountPointsManip:UpdateModel()
 	if(self.entity) then
 		if(not self.entity.isMountpointDetached) then
 			local facing = self.entity:GetFacing();
-			if(facing ~= 0) then
+			local roll = self.entity:GetRoll();
+			local pitch = self.entity:GetPitch();
+			if(facing ~= 0 or roll~=0 or pitch~=0) then
 				self.localRotQuat = self.localRotQuat or Quaternion:new();
-				self.localRotQuat:FromAngleAxis(facing, vector3d.unit_y)
+				--self.localRotQuat:FromAngleAxis(facing, vector3d.unit_y)
+				self.localRotQuat:FromEulerAnglesSequence(roll, pitch, facing, "zxy")
 				self.localRotQuat:ToRotationMatrix(self.localTransform)
 			else
 				self.localTransform:identity()

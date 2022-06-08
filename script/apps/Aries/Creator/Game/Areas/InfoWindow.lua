@@ -30,6 +30,12 @@ function InfoWindow.OnInit()
 	page = document:GetPageCtrl();
 	my_timer = my_timer or commonlib.Timer:new({callbackFunc = InfoWindow.OnTimer})
 	my_timer:Change(300, 300);
+
+	GameLogic:Connect("WorldUnloaded", InfoWindow, InfoWindow.OnWorldUnloaded, "UniqueConnection");
+end
+
+function InfoWindow.OnWorldUnloaded()
+	InfoWindow.ShowPage(false);
 end
 
 function InfoWindow.ShowPage(bShow)

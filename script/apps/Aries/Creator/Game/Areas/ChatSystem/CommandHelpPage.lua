@@ -35,6 +35,13 @@ function CommandHelpPage.Init()
 	page = document:GetPageCtrl();
 	--CommandHelpPage.OnInit()
 --	CommandHelpPage.cmd_helps = CommandManager:GetCmdHelpDS();
+
+	GameLogic:Connect("WorldUnloaded", CommandHelpPage, CommandHelpPage.OnWorldUnload, "UniqueConnection");
+end
+
+function CommandHelpPage.OnWorldUnload()
+	GameLogic:Disconnect("WorldUnloaded", CommandHelpPage, CommandHelpPage.OnWorldUnload);
+	CommandHelpPage.ClosePage();
 end
 
 function CommandHelpPage.OnInit(page_pos)
@@ -230,7 +237,7 @@ function CommandHelpPage.GetDS()
 		end
 	else
 		for cmd_name,command in pairs(CommandHelpPage.cmd_helps) do
-			local begin_pos = string.find(cmd_name,CommandHelpPage.cmd_name);
+			local begin_pos = string.find(cmd_name,CommandHelpPage.cmd_name, nil, true);
 			if(begin_pos and begin_pos == 1) then
 				ds[#ds + 1] = command;	
 			end

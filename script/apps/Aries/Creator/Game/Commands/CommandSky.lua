@@ -298,7 +298,7 @@ Example:
 			local now;
 			now, cmd_text = CmdParser.ParseText(cmd_text, "now");
 			if(now) then
-				return GameLogic.GetSim():GetTimeOfDaySTD();
+				return GameLogic.GetSim():GetTimeOfDayStd();
 			end
 
 			local time_of_day = cmd_text:match("%-?[%d%.]+") or "0";

@@ -5,7 +5,7 @@
     local CodeHelpWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeHelpWindow");
     CodeHelpWindow.InitCmds();
     name = Page:GetRequestParam("name") or "";
-    local item = CodeHelpWindow.GetCodeItemByName(name);
+    local item = CodeHelpWindow.GetCodeItemByName(name) or CodeHelpWindow.GetTempCodeItem();
     function GetExamples()
         return item and item:GetExamples(CodeHelpWindow.codeLanguageType);
     end

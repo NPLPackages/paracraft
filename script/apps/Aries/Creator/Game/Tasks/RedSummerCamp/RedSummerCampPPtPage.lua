@@ -11,7 +11,7 @@ RedSummerCampPPtPage.Show();
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local RedSummerCampPPtPage = NPL.export();
 local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParacraftLearningRoom/ParacraftLearningRoomDailyPage.lua");
-local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
+local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseSchedulingV2.lua") 
 local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
 local RedSummerCampPPtFullPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtFullPage.lua");
 local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
@@ -26,7 +26,7 @@ RedSummerCampPPtPage.PPtCacheData = {}
 local page
 RedSummerCampPPtPage.DiskFolder = nil
 RedSummerCampPPtPage.SplitKey = "_pptindex_"
-RedSummerCampPPtPage.ProjectIdToPPtData = {}
+RedSummerCampPPtPage.ProjectIdToProjectData = {}
 
 local key_to_report_name = {
 	["ppt_L1"] = "org",		-- 机构课L1
@@ -57,6 +57,7 @@ function RedSummerCampPPtPage.OnCreate()
 		HelpPage.SetSearchIndexStrList(str_list)
 	end
 
+	RedSummerCampPPtPage.RefreshSize()
 	RedSummerCampPPtPage.StepNumKey = 0
 end
 
@@ -86,7 +87,134 @@ function RedSummerCampPPtPage.OnClose()
 	RedSummerCampMainWorldPage.SetOpenFromCommandMenu(false)
 
 	RedSummerCampPPtPage.UpdateTimer:Change()
-	RedSummerCampPPtPage.UpdateTimer = nil	
+	RedSummerCampPPtPage.UpdateTimer = nil
+	RedSummerCampPPtPage.is_in_debug = false	
+	RedSummerCampPPtPage.is_preview = false
+	RedSummerCampPPtPage.defaul_select_index = nil
+	RedSummerCampPPtPage.DebugData = {}
+end
+
+-- 获取选中的章节的服务器数据
+function RedSummerCampPPtPage.GetCurSelectLessonData(callback)
+	if RedSummerCampPPtPage.SelectPPtData and RedSummerCampPPtPage.SelectPPtData.is_ppt_cover then
+		if callback then
+			callback()
+		end
+		return
+	end
+
+	local course_data = RedSummerCampPPtPage.CourseConfigData
+	local lesson_index = RedSummerCampPPtPage.GetLessonIndex()
+
+	if not course_data then
+		return
+	end
+
+	keepwork.courses.getSectionStudyProgresses({
+		sectionIndex = lesson_index,
+		courseId = course_data.id,
+		}, function(err, msg, data)
+
+			if err == 200 then
+				local lesson_data = data[1] or {}
+				RedSummerCampPPtPage.CurLessonData = {
+					courseId = lesson_data.courseId or course_data.id,
+					status = lesson_data.status or 0,
+					completedAt = lesson_data.completedAt,
+					extra = lesson_data.extra or {},
+					sectionIndex = lesson_data.sectionIndex or lesson_index,
+					sectionId = lesson_data.sectionId or lesson_index,
+					completedStepCount = lesson_data.completedStepCount,
+					createdAt = lesson_data.createdAt,
+				}
+				if RedSummerCampPPtPage.CurLessonData.createdAt then
+					RedSummerCampPPtPage.CurLessonData.start_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(RedSummerCampPPtPage.CurLessonData.createdAt)
+				end
+			end
+
+			if callback then
+				callback(course_data, pptIndex)
+			end
+		end)
+end
+
+-- 设置选中的章节的服务器数据
+function RedSummerCampPPtPage.SetSelectLessonData(callback)
+	if not RedSummerCampPPtPage.CurLessonData then
+		return
+	end
+
+	if not RedSummerCampPPtPage.CurLessonData.courseId or RedSummerCampPPtPage.CurLessonData.courseId == 0 then
+		return
+	end
+	
+	keepwork.courses.setSectionStudyProgresses(RedSummerCampPPtPage.CurLessonData, function(err, msg, data)
+		if err == 200 then
+			if not RedSummerCampPPtPage.CurLessonData.start_time_stamp then
+				RedSummerCampPPtPage.CurLessonData.start_time_stamp = QuestAction.GetServerTime()
+			end
+			
+			if callback then
+				callback()
+			end
+		end
+	end)
+end
+
+-- 获取当前的课程包数据
+function RedSummerCampPPtPage.GetCurCourseData(callback)
+	local course_data = RedSummerCampPPtPage.CourseConfigData
+
+	if not course_data then
+		return
+	end
+	keepwork.courses.getCourseStudyProgresses({
+		courseId = course_data.id,
+		}, function(err, msg, data)
+			if err == 200 then
+				RedSummerCampPPtPage.CurCourseData = {
+					courseId = data.courseId or course_data.id,
+					status = data.status or 0,
+					completedAt = data.completedAt or 0,
+					extra = data.extra or {},
+					completedSectionCount = data.completedSectionCount or 0,
+					completedStepCount = data.completedStepCount or 0,
+				}
+
+				if RedSummerCampPPtPage.CurCourseData.createdAt then
+					RedSummerCampPPtPage.CurCourseData.start_time_stamp = commonlib.timehelp.GetTimeStampByDateTime(RedSummerCampPPtPage.CurCourseData.createdAt)
+				end
+			end
+
+			if callback then
+				callback()
+			end
+		end)
+end
+
+-- 设置当前的课程包数据
+function RedSummerCampPPtPage.SetCurCourseData(callback)
+	if not RedSummerCampPPtPage.CurCourseData then
+		return
+	end
+
+	if not RedSummerCampPPtPage.CurLessonData.courseId or RedSummerCampPPtPage.CurLessonData.courseId == 0 then
+		return
+	end
+
+	local data = {
+		courseId = RedSummerCampPPtPage.CurCourseData.courseId,
+		status = RedSummerCampPPtPage.CurCourseData.status,
+		completedAt = RedSummerCampPPtPage.CurCourseData.completedAt,
+		extra = RedSummerCampPPtPage.CurCourseData.extra,
+	}
+	keepwork.courses.setCourseStudyProgresses(data, function(err, msg, data)
+		if err == 200 then
+			if callback then
+				callback()
+			end
+		end
+	end)
 end
 
 function RedSummerCampPPtPage.CheckPPtConfigFile(course_data, pptIndex, callback)
@@ -111,8 +239,6 @@ function RedSummerCampPPtPage.CheckPPtConfigFile(course_data, pptIndex, callback
 				id = course_id,
 			}
 		},function(err, msg, data)
-			-- print("ddddddddddddddeee", err)
-			-- echo(data, true)
 			if err == 200 then
 				if data.xml then
 					ParaIO.CreateDirectory(file_path)
@@ -121,7 +247,11 @@ function RedSummerCampPPtPage.CheckPPtConfigFile(course_data, pptIndex, callback
 						file:write(data.xml, #data.xml);
 						file:close();
 					end
-
+					-- 清除课包缓存
+					if RedSummerCampPPtPage.PPtCacheData and RedSummerCampPPtPage.PPtCacheData[course_name] then
+						RedSummerCampPPtPage.PPtCacheData[course_name] = nil
+					end
+					
 					if callback then
 						callback(course_name, pptIndex)
 					end
@@ -131,19 +261,29 @@ function RedSummerCampPPtPage.CheckPPtConfigFile(course_data, pptIndex, callback
 	end
 end
 
-function RedSummerCampPPtPage.Show(course_data, pptIndex)
+function RedSummerCampPPtPage.Show(course_data, pptIndex, is_show_exit_bt)
 	if not course_data then
-		course_data = RedSummerCampPPtPage.LastParam or "ppt_X1"
+		course_data = RedSummerCampPPtPage.CourseConfigData or "ppt_X1"
 	end
-	
-	RedSummerCampPPtPage.LastParam = course_data
+	if not pptIndex then
+		if RedSummerCampPPtPage.CourseConfigData and course_data then
+			if RedSummerCampPPtPage.CourseConfigData.code ~= course_data.code then
+				pptIndex = 1
+			end
+		end
+	end
 
+	RedSummerCampPPtPage.CourseConfigData = course_data
+	RedSummerCampPPtPage.last_course_data = course_data
 	if not Lan then
 		Lan = NPL.load("Mod/GeneralGameServerMod/Command/Lan/Lan.lua");
 	end
-
+	RedSummerCampPPtPage.IsLockCourse = false
+	RedSummerCampPPtPage.is_show_exit_bt = is_show_exit_bt
 	if type(course_data) == "table" then
 		RedSummerCampPPtPage.UseNewFilePath = true
+		RedSummerCampPPtPage.IsLockCourse = not course_data.auth
+
 		RedSummerCampPPtPage.CheckPPtConfigFile(course_data, pptIndex, function(course_name, pptIndex)
 			RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
 		end)
@@ -171,6 +311,10 @@ function RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
 	RedSummerCampPPtPage.SetIsFullPage(false)
 	course_name = course_name or "ppt_X1"
 	RedSummerCampPPtPage.SelectLessonIndex = pptIndex or 1
+	if RedSummerCampPPtPage.defaul_select_index then
+		RedSummerCampPPtPage.SelectLessonIndex = RedSummerCampPPtPage.defaul_select_index
+	end
+
 	RedSummerCampPPtPage.StepValueToProjectId = {}
 	RedSummerCampPPtPage.SaveWorldStepList = {}
 	RedSummerCampPPtPage.SyncWorldStepValue = nil
@@ -178,7 +322,8 @@ function RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
 	RedSummerCampPPtPage.StepNumKey = 0
 	RedSummerCampPPtPage.CurCourseKey = RedSummerCampPPtPage.CurCourseName .. RedSummerCampPPtPage.SplitKey .. RedSummerCampPPtPage.SelectLessonIndex
 	RedSummerCampPPtPage.InitData()
-	local enable_esc_key = false
+	
+	local enable_esc_key = RedSummerCampPPtPage.is_in_debug
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.html",
 			name = "RedSummerCampPPtPage.Show", 
@@ -189,8 +334,6 @@ function RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
 			enable_esc_key = enable_esc_key,
 			cancelShowAnimation = true,
 			click_through = false,
-			DesignResolutionWidth = 1280,
-			DesignResolutionHeight = 720,
 			--app_key = 0, 
 			directPosition = true,
 				align = "_fi",
@@ -199,9 +342,15 @@ function RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
 				width = 0,
 				height = 0,
 		};
+
+	if not (RedSummerCampPPtPage.is_in_debug and RedSummerCampPPtPage.is_preview) then
+		params.DesignResolutionWidth = 1280
+		params.DesignResolutionHeight = 720
+	end
+
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
-	RedSummerCampPPtPage.HandleErrorData()
+	-- RedSummerCampPPtPage.HandleErrorData()
 
 	if not RedSummerCampPPtPage.BindFilter then
 		RedSummerCampPPtPage.BindFilter = true
@@ -209,6 +358,18 @@ function RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
 		GameLogic.GetFilters():add_filter("SyncWorldFinish", RedSummerCampPPtPage.OnSyncWorldFinish);
 		GameLogic:Connect("WorldLoaded", RedSummerCampPPtPage, RedSummerCampPPtPage.OnWorldLoaded, "UniqueConnection");
 		GameLogic:Connect("WorldUnloaded", RedSummerCampPPtPage, RedSummerCampPPtPage.OnWorldUnloaded, "UniqueConnection");
+
+		NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+		local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+        local viewport = ViewportManager:GetSceneViewport();
+        viewport:Connect("sizeChanged", CodeLessonTip, function()
+			commonlib.TimerManager.SetTimeout(function()
+				RedSummerCampPPtPage.RefreshSize()
+			end, 500);
+			
+		end, "UniqueConnection");
+
+		GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", RedSummerCampPPtPage.CodeWinChangeVisible, RedSummerCampPPtPage, "RedSummerCampPPtPage");
 	end
 	
 	if RedSummerCampPPtFullPage.IsInFullPage then
@@ -229,6 +390,97 @@ function RedSummerCampPPtPage.ShowPage(course_name, pptIndex)
 	-- 上报
 	local action = string.format("crsp.course.section.visit-%s-%s", RedSummerCampPPtPage.CurCourseName, RedSummerCampPPtPage.SelectLessonIndex)
 	GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData({section = RedSummerCampPPtPage.SelectLessonIndex}))
+
+	RedSummerCampPPtPage.GetProjectListData(function()
+		RedSummerCampPPtPage.GetCurCourseData(function()
+			RedSummerCampPPtPage.GetCurSelectLessonData(function()
+				RedSummerCampPPtPage.RefreshPage()
+			end)
+		end)	
+	end)
+
+	page:CallMethod("slot_gridview", "ScrollToRow", RedSummerCampPPtPage.SelectLessonIndex)
+end
+
+function RedSummerCampPPtPage.CodeWinChangeVisible(event)
+    RedSummerCampPPtPage.IsShowCodeWin = RedSummerCampPPtPage.IsEditorOpen()
+    RedSummerCampPPtPage.RefreshSize()
+end
+
+function RedSummerCampPPtPage.SetIsInDebug(flag)
+	RedSummerCampPPtPage.is_in_debug = flag
+end
+
+function RedSummerCampPPtPage.SetIsPreview(flag)
+	RedSummerCampPPtPage.is_preview = flag
+end
+
+function RedSummerCampPPtPage.RefreshSize()
+    if not page or not page:IsVisible() then
+        return
+    end
+
+	local Screen = commonlib.gettable("System.Windows.Screen");
+	local win_width = Screen:GetWidth()
+	local win_height = Screen:GetHeight()
+	if RedSummerCampPPtPage.is_in_debug and RedSummerCampPPtPage.is_preview then
+		local grid_node = page:GetNode("slot_gridview")
+		local TreeViewNode = grid_node:GetChild("pe:treeview");
+		local treeview_object = ParaUI.GetUIObject(TreeViewNode.control.name);
+		if treeview_object:IsValid() then
+			local VScrollBar = treeview_object:GetChild("VScrollBar");
+			if VScrollBar:IsValid() then
+				VScrollBar.visible = false
+			end
+		end
+
+		local grid_node = page:GetNode("notes_gridview")
+		if grid_node then
+			local TreeViewNode = grid_node:GetChild("pe:treeview");
+			local treeview_object = ParaUI.GetUIObject(TreeViewNode.control.name);
+			if treeview_object:IsValid() then
+				local VScrollBar = treeview_object:GetChild("VScrollBar");
+				if VScrollBar:IsValid() then
+					VScrollBar.visible = false
+				end
+			end
+		end
+		
+
+		TreeViewNode:SetAttribute("HideVerticalScrollBar", true);
+		
+		NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+		local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+		-- local bShow = event.bShow
+		local viewport = ViewportManager:GetSceneViewport();
+		local view_x,view_y,view_width,view_height = viewport:GetUIRect()
+
+		local page_root = ParaUI.GetUIObject("PPTPageRoot");
+		
+		local scale = view_width/1280
+		page_root.x = -(win_width/2-win_width*scale/2)/scale
+		page_root.y = -(win_height/2 - win_height*scale/2)/scale
+		local root = page:GetRootUIObject()
+		local att = ParaEngine.GetAttributeObject();
+		
+		root.scalingx = scale
+		root.scalingy = scale
+		root:ApplyAnim();
+		root.enabled = false
+		
+	else
+
+		local page_root = ParaUI.GetUIObject("PPTPageRoot");
+		page_root.width = win_width
+		page_root.height = win_height
+	end
+end
+
+-- 代码编辑器是否打开
+function RedSummerCampPPtPage.IsEditorOpen()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+    return CodeBlockWindow.IsVisible();
 end
 
 function RedSummerCampPPtPage.RefreshPage()
@@ -281,10 +533,16 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 	local is_start_knowledge_point = false
 	local is_hide_div = false
 	local profile = KeepWorkItemManager.GetProfile() or {}
-	local has_power = profile.tLevel == 1 or GameLogic.IsVip()
+	local has_power = RedSummerCampPPtPage.GetTeachingPlanPower()
 	local function handle_div_str(ppt_data, strValue)
 		if last_div_is_title then
-			strValue = string.format([[<div style="margin-left: 50px;margin-top: 12px;color: #e17a15;font-weight: bold;">%s</div>]], strValue)
+			strValue = string.format([[<div class="step_1_title">%s</div>]], strValue)
+			local start_index = string.find(strValue, "《")
+			local end_index = string.find(strValue, "》")
+			if start_index and end_index then
+				ppt_data.step_1_title = string.sub(strValue, start_index + 3, end_index - 1)
+				ppt_data.step_1_title = string.gsub(ppt_data.step_1_title, "<br/>", "")
+			end
 		end
 
 		if string.find(strValue, 'class="F1"') then
@@ -313,19 +571,12 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 		end
 
 		if string.find(strValue, "projectid") then
-			local project_id = tonumber(string.match(strValue, 'projectid="(%d+)"'))
+			local temp_str = string.gsub(strValue, "%s+", "")
+			local project_id = tonumber(string.match(temp_str, 'projectid="(%d+)"'))
 			if project_id then
-				if RedSummerCampPPtPage.ProjectIdToPPtData[project_id] == nil then
-					RedSummerCampPPtPage.ProjectIdToPPtData[project_id] = {}
+				if RedSummerCampPPtPage.ProjectIdToProjectData[project_id] == nil then
+					RedSummerCampPPtPage.ProjectIdToProjectData[project_id] = {}
 				end
-	
-				local export_data = {}
-				export_data.course_name = course_name
-				export_data.step_value = ppt_data.max_step
-				export_data.course_index = #ppt_data_list
-	
-				local export_project_data = RedSummerCampPPtPage.ProjectIdToPPtData[project_id]
-				export_project_data[#export_project_data + 1] = export_data
 			end
 		end
 
@@ -376,29 +627,40 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 			end
 		end
 
-		if string.find(strValue, "dailyVideo") then
-			ppt_data.has_daily_video = true
+		if RedSummerCampPPtPage.IsLockCourse and string.find(strValue, "yellon_button") then
+			strValue = string.gsub(strValue, "yellon_button", "gray_button") 
 		end
 
 		-- if string.find(strValue, "href") then
 		-- 	ppt_data.has_link = true
 		-- end
+		if string.find(strValue, "ppt_cover") or string.find(strValue, "bg_img") then
+			ppt_data.is_ppt_cover = true
+		end
 		
 		if(is_note_str or is_start_notes) then
 			ppt_data.notes_str = (ppt_data.notes_str or "") .. strValue;
 		else
 			ppt_data.div_str = (ppt_data.div_str or "") .. strValue
-		end
-
-		ppt_data.is_ppt_cover = string.find(strValue, "ppt_cover") ~= nil
+		end		
 	end
 
 	-- this will merge multiple notes in ppt_data.notes_str into ppt_data.div_str
 	local function formatNotesIntoPPT_()
 		for _, ppt_data in ipairs(ppt_data_list) do
 			if(ppt_data.notes_str) then
+				local grid_margin_left = ppt_data.is_ppt_cover and 30 or 0
+				local grid_margin_top = ppt_data.is_ppt_cover and -32 or 8
+				local notes_data_str = '<%=NotesData %>'
+				-- local grid_width = ppt_data.is_ppt_cover and 825 or 855
+
+				local div_gridview = string.format([[<pe:gridview style="margin-left:%s;margin-top:%s;width:%s;height: 114px; " name="notes_gridview" CellPadding="1" 
+				VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" 
+				ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" 
+				DataSource='%s'><Columns>]], grid_margin_left, grid_margin_top, 834, notes_data_str)
+
 				ppt_data.div_str = (ppt_data.div_str or "") .. table.concat({
-					[[<pe:gridview style="margin-left:0px;width:825px;height: 114px; " name="notes_gridview" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" DataSource='<%=NotesData %>'><Columns>]],
+					div_gridview,
 					ppt_data.notes_str,
 					[[</Columns></pe:gridview>]]
 				})
@@ -425,6 +687,7 @@ function RedSummerCampPPtPage.InitPPtConfig(course_name)
 			ppt_data = {}
 			local tab = commonlib.split(strValue,"##")
 			ppt_data.title = tab[1]
+			ppt_data.show_title = commonlib.GetLimitLabel(ppt_data.title, 20)
 			ppt_data_list[#ppt_data_list + 1] = ppt_data
 			is_div_str = true
 			last_div_is_title = false
@@ -461,19 +724,28 @@ function RedSummerCampPPtPage.SelectLesson(index)
 		return
 	end
 
+	if RedSummerCampPPtPage.IsLock(index) then
+        local strTip = "你暂时没有该课程的访问权限，请联系客服或使用对应的激活码。"
+        _guihelper.MessageBox(strTip,nil,_guihelper.MessageBoxButtons.OK_CustomLabel,nil,"script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.lesson.html")
+		return
+	end
+
 	RedSummerCampPPtPage.SelectLessonIndex = index
 	RedSummerCampPPtPage.SelectPPtData = RedSummerCampPPtPage.LessonsPPtData[RedSummerCampPPtPage.SelectLessonIndex]
 	RedSummerCampPPtPage.CurCourseKey = RedSummerCampPPtPage.CurCourseName .. RedSummerCampPPtPage.SplitKey .. RedSummerCampPPtPage.SelectLessonIndex
 	RedSummerCampPPtPage.StepValueToProjectId = {}
 	RedSummerCampPPtPage.SaveWorldStepList = {}
 	RedSummerCampPPtPage.SyncWorldStepValue = nil
-	-- 修复序号改动引发的数据不对的问题
-	RedSummerCampPPtPage.HandleErrorData()
+	-- RedSummerCampPPtPage.HandleErrorData()
 	RedSummerCampPPtPage.RefreshPage()
+	RedSummerCampPPtPage.GetCurSelectLessonData(function(course_data, pptIndex)
+		RedSummerCampPPtPage.RefreshPage()
 
-	-- 上报
-	local action = string.format("crsp.course.section.visit-%s-%s", RedSummerCampPPtPage.CurCourseName, index)
-	GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData({section = index}))
+		-- 上报
+		local action = string.format("crsp.course.section.visit-%s-%s", RedSummerCampPPtPage.CurCourseName, index)
+		GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData({section = index}))
+	end)
+
 end
 
 function RedSummerCampPPtPage.GetPPtStr()
@@ -508,175 +780,191 @@ function RedSummerCampPPtPage.GetCourseClientData()
 end
 -- 获取某个步骤是否完成
 function RedSummerCampPPtPage.GetStepIsComplete(step)
-	local course_all_data = RedSummerCampPPtPage.GetCourseClientData()
-	if course_all_data[RedSummerCampPPtPage.CurCourseKey] == nil then
-		return false
-	end
+	-- local course_all_data = RedSummerCampPPtPage.GetCourseClientData()
+	-- if course_all_data[RedSummerCampPPtPage.CurCourseKey] == nil then
+	-- 	return false
+	-- end
 
-	local course_data = course_all_data[RedSummerCampPPtPage.CurCourseKey]
-	if course_data and course_data[tostring(step)] then
-		local value = course_data[tostring(step)]
-		return tostring(value) == "1"
+	-- local course_data = course_all_data[RedSummerCampPPtPage.CurCourseKey]
+	-- if course_data and course_data[tostring(step)] then
+	-- 	local value = course_data[tostring(step)]
+	-- 	return tostring(value) == "1"
+	-- end
+	if RedSummerCampPPtPage.CurLessonData then
+		step = tostring(step)
+		local extra = RedSummerCampPPtPage.CurLessonData.extra
+		if not extra or not extra.steps then
+			return false
+		end
+
+		return extra.steps[step] and tostring(extra.steps[step].status) == "1"
 	end
 
 	return false
 end
--- 保存一些上报数据 比如这个课包的开始时间 这个课包是否完成 跟之前的逻辑区分开
-
---[[
-	course_all_data格式
-	{
-		-- 课包名
-		["ppt_L1"] = {
-			start_time_stamp = 0,
-			[1] = {
-				start_time_stamp = 0,
-				is_finish = 1, 
-			}
-		}
+-- 上报章节完成
+function RedSummerCampPPtPage.ReportLessonFinish()
+	-- 上报完成一节课
+	local lesson_index = RedSummerCampPPtPage.GetLessonIndex() + 1
+	local action = string.format("crsp.course.section.finish-%s-%s", RedSummerCampPPtPage.CurCourseName, lesson_index)
+	local extend_data = {
+		section = lesson_index,
+		sectionName = RedSummerCampPPtPage.GetPPtTitle() or "",
+		score_building = 0,
+		score_animation = 0,
+		score_coding = 0,
+		score_overall = 0,
 	}
-]]
-function RedSummerCampPPtPage.SetCourseReportClientData(key, value)
-	value = tostring(value)
-	local course_all_data = RedSummerCampPPtPage.GetCourseClientData()
-	if not course_all_data[RedSummerCampPPtPage.CurCourseName] then
-		course_all_data[RedSummerCampPPtPage.CurCourseName] = {}
-	end
-	local course_data = course_all_data[RedSummerCampPPtPage.CurCourseName]
-	if course_data.start_time_stamp == nil then
-		course_data.start_time_stamp = QuestAction.GetServerTime()
-	end
-	-- if course_data.lesson_num == nil then
-	-- 	course_data.lesson_num = #RedSummerCampPPtPage.LessonsPPtData
-	-- end
 
-	if not course_data[RedSummerCampPPtPage.SelectLessonIndex] then
-		course_data[RedSummerCampPPtPage.SelectLessonIndex] = {}
-	end
-
-	local lesson_data = course_data[RedSummerCampPPtPage.SelectLessonIndex]
-	-- if not lesson_data.task_num then
-	-- 	lesson_data.task_num = RedSummerCampPPtPage.GetCurCourseTaskNum()
-	-- end
-	if lesson_data[key] == value then
+	local lesson_data = RedSummerCampPPtPage.CurLessonData
+	if not lesson_data then
 		return
 	end
 
-	lesson_data[key] = value
-
-	local clientData = KeepWorkItemManager.GetClientData(40007) or {};
-	clientData.CourseTaskData = course_all_data
-
-    KeepWorkItemManager.SetClientData(40007, clientData, function()
-    end);
-
-	-- 上报完成一节课
-	if key == "is_finish" and value == "1" then
-		-- 上报完成一节课
-		local action = string.format("crsp.course.section.finish-%s-%s", RedSummerCampPPtPage.CurCourseName, RedSummerCampPPtPage.SelectLessonIndex)
-		local extend_data = {
-			section = RedSummerCampPPtPage.SelectLessonIndex,
-			sectionName = RedSummerCampPPtPage.GetPPtTitle() or "",
-			score_building = 0,
-			score_animation = 0,
-			score_coding = 0,
-			score_overall = 0,
-		}
-
-		if lesson_data.start_time_stamp then
-			local cur_time_stamp = QuestAction.GetServerTime()
-			local second = cur_time_stamp - tonumber(lesson_data.start_time_stamp)
-			extend_data.duration = second
-		end
-
-		GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
-	end	
-
-	local finish_num = 0
-	for key, v in pairs(course_data) do
-		if type(v) =="table" and v.is_finish and tostring(v.is_finish) == "1" then
-			finish_num = finish_num + 1
-		end
+	if lesson_data.start_time_stamp then
+		local cur_time_stamp = QuestAction.GetServerTime()
+		local second = cur_time_stamp - tonumber(lesson_data.start_time_stamp)
+		extend_data.duration = second
 	end
-
-	-- 上报完成课包
-	if finish_num >= #RedSummerCampPPtPage.LessonsPPtData then
-		-- 上报完成一节课
-		local action = string.format("crsp.course.finish-%s", RedSummerCampPPtPage.CurCourseName)
-		local extend_data = {
-			score_building = 0,
-			score_animation = 0,
-			score_coding = 0,
-			score_overall = 0,
-		}
-
-		if course_data.start_time_stamp then
-			local cur_time_stamp = QuestAction.GetServerTime()
-			local second = cur_time_stamp - tonumber(course_data.start_time_stamp)
-			extend_data.days = math.floor(second/60/60/24)
-		end
-		GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
-	end
+	GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
 end
 
-function RedSummerCampPPtPage.GetCurCourseTaskNum()
+-- 上报整个课包完成
+function RedSummerCampPPtPage.ReportCourseFinish()
+	-- 上报整个课包完成
+	local action = string.format("crsp.course.finish-%s", RedSummerCampPPtPage.CurCourseName)
+	local extend_data = {
+		score_building = 0,
+		score_animation = 0,
+		score_coding = 0,
+		score_overall = 0,
+	}
+
+	local course_data = RedSummerCampPPtPage.CurCourseData or {}
+	if course_data.start_time_stamp then
+		local cur_time_stamp = QuestAction.GetServerTime()
+		local second = cur_time_stamp - tonumber(course_data.start_time_stamp)
+		extend_data.days = math.floor(second/60/60/24)
+	end
+	GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
+end
+
+function RedSummerCampPPtPage.GetCurLessonStepNum()
 	if not RedSummerCampPPtPage.SelectPPtData then
 		return 0
 	end
 
 	local all_step_num = RedSummerCampPPtPage.SelectPPtData.max_step or 0
-	if RedSummerCampPPtPage.SelectPPtData.has_daily_video then
-		all_step_num = all_step_num + 1
-	end
-	if RedSummerCampPPtPage.SelectPPtData.has_link then
-		all_step_num = all_step_num + 1
-	end
+	-- if RedSummerCampPPtPage.SelectPPtData.has_daily_video then
+	-- 	all_step_num = all_step_num + 1
+	-- end
+	-- if RedSummerCampPPtPage.SelectPPtData.has_link then
+	-- 	all_step_num = all_step_num + 1
+	-- end
 
 	return all_step_num
 end
 
 -- 这个其实就是任务完成了
 function RedSummerCampPPtPage.SetCourseClientData(key, value)
+	if RedSummerCampPPtPage.CurCourseData and RedSummerCampPPtPage.CurCourseData.status == 1 then
+		return
+	end
+
 	key = tostring(key)
 	value = tostring(value)
+	-- 2022.5.12 改成新的接口
+	if RedSummerCampPPtPage.CurLessonData then
+		-- if RedSummerCampPPtPage.CurLessonData.status == 1 then
+		-- 	return
+		-- end
 
-	if RedSummerCampPPtPage.CurCourseKey == nil then
-		return
-	end
+		local extra = RedSummerCampPPtPage.CurLessonData.extra
 
-	local course_all_data = RedSummerCampPPtPage.GetCourseClientData()
-	if course_all_data[RedSummerCampPPtPage.CurCourseKey] == nil then
-		course_all_data[RedSummerCampPPtPage.CurCourseKey] = {}
-	end
+		if not extra or type(extra) ~= "table" then
+			return
+		end
 
-	local course_data = course_all_data[RedSummerCampPPtPage.CurCourseKey]
+		if extra.steps == nil then
+			extra.steps = {}
+		end
+		extra.steps[key] = {status = value}
 
-	if course_data[key] == value then
-		return
-	end
-	course_data.is_fix = true
-	course_data[key] = value
-	
-	local clientData = KeepWorkItemManager.GetClientData(40007) or {};
-	clientData.CourseTaskData = course_all_data
-
-	-- 任务完成的话 判断是否全部完成
-	if value == "1" then
+		-- 判断章节是否完成
 		local finish_num = 0
-		for key, v in pairs(course_data) do
-			if tostring(v) == "1" then
+		for key, v in pairs(extra.steps) do
+			if tostring(v.status) == "1" then
 				finish_num = finish_num + 1
 			end
 		end
+		RedSummerCampPPtPage.CurLessonData.extra = extra
 
-		if finish_num >= RedSummerCampPPtPage.GetCurCourseTaskNum() then
-			RedSummerCampPPtPage.SetCourseReportClientData("is_finish", 1)
+		-- 每次步骤完成的时候判断下当前章节是否完成
+		if finish_num >= RedSummerCampPPtPage.GetCurLessonStepNum() then
+			RedSummerCampPPtPage.CurLessonData.status = 1
+
+			RedSummerCampPPtPage.ReportLessonFinish()
 		end
+		RedSummerCampPPtPage.SetSelectLessonData(function()
+			-- 每次章节完成的时候判断下课包是否完成
+			RedSummerCampPPtPage.CurCourseData.completedSectionCount = RedSummerCampPPtPage.CurCourseData.completedSectionCount + 1
+			local sectionCount = RedSummerCampPPtPage.CourseConfigData.sectionCount or 0
+			if RedSummerCampPPtPage.CurCourseData.completedSectionCount >= sectionCount then
+				RedSummerCampPPtPage.CurCourseData.status = 1
+				RedSummerCampPPtPage.SetCurCourseData()
+
+				RedSummerCampPPtPage.ReportCourseFinish()
+			end
+			
+			RedSummerCampPPtPage.RefreshPage()
+		end);
 	end
 
-    KeepWorkItemManager.SetClientData(40007, clientData, function()
-        RedSummerCampPPtPage.RefreshPage()
-    end);
+	-- if RedSummerCampPPtPage.CurCourseKey == nil then
+	-- 	return
+	-- end
+
+	-- local course_all_data = RedSummerCampPPtPage.GetCourseClientData()
+	-- if course_all_data[RedSummerCampPPtPage.CurCourseKey] == nil then
+	-- 	course_all_data[RedSummerCampPPtPage.CurCourseKey] = {}
+	-- end
+
+	-- RedSummerCampPPtPage.SaveKnowledgePoint()
+
+	-- local course_data = course_all_data[RedSummerCampPPtPage.CurCourseKey]
+
+	-- if course_data[key] == value then
+	-- 	return
+	-- end
+	-- course_data.is_fix = true
+	-- course_data[key] = value
+	
+	-- local clientData = KeepWorkItemManager.GetClientData(40007) or {};
+	-- clientData.CourseTaskData = course_all_data
+
+	-- -- 任务完成的话 判断是否全部完成
+	-- if value == "1" then
+	-- 	local finish_num = 0
+	-- 	for key, v in pairs(course_data) do
+	-- 		if tostring(v) == "1" then
+	-- 			finish_num = finish_num + 1
+	-- 		end
+	-- 	end
+
+	-- 	if finish_num >= RedSummerCampPPtPage.GetCurLessonStepNum() then
+	-- 		RedSummerCampPPtPage.ReportCourseData("is_finish", 1)
+	-- 	end
+	-- end
+
+    -- KeepWorkItemManager.SetClientData(40007, clientData, function()
+    --     RedSummerCampPPtPage.RefreshPage()
+    -- end);
+end
+
+function RedSummerCampPPtPage.SaveKnowledgePoint()
+	if not RedSummerCampPPtPage.SelectPPtData then
+		return
+	end
 
 	local ppt_title = RedSummerCampPPtPage.GetPPtTitle()
 	local course_title = RedSummerCampPPtPage.CurPPtCourseTitle or ""
@@ -715,6 +1003,7 @@ function RedSummerCampPPtPage.SetSyncWorldStepValue(step_value)
 end
 
 function RedSummerCampPPtPage.OnVisitWrold(projectid)
+	echo(RedSummerCampPPtPage.StepValueToProjectId, true)
 	if projectid and RedSummerCampPPtPage.StepValueToProjectId then
 		projectid = tostring(projectid)
 		local step_value
@@ -786,6 +1075,12 @@ function RedSummerCampPPtPage.OpenFullPage()
 end
 
 function RedSummerCampPPtPage.ExportPPt()
+	if RedSummerCampPPtPage.IsLockCourse then
+        local strTip = "你暂时没有该课程的访问权限，请联系客服或使用对应的激活码。"
+        _guihelper.MessageBox(strTip,nil,_guihelper.MessageBoxButtons.OK_CustomLabel,nil,"script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.lesson.html")
+		return
+	end
+
 	local DefaultFilters = commonlib.gettable("MyCompany.Aries.Game.DefaultFilters");
 	if DefaultFilters.Install == nil then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Mod/DefaultFilters.lua");
@@ -798,17 +1093,18 @@ function RedSummerCampPPtPage.ExportPPt()
 	
 	RedSummerCampPPtPage.export_ppt_data_list = ppt_data_list
 	RedSummerCampPPtPage.export_ppt_data_index = 1
-	commonlib.TimerManager.SetTimeout(function()  
-		RedSummerCampPPtPage.FlushExportFullPage()
-	end, 300);
+	RedSummerCampPPtPage.FlushExportFullPage()
 
 	-- GameLogic.RunCommand("/open npl://console");
 end
 
-function RedSummerCampPPtPage.OpenLastPPtPage()
+function RedSummerCampPPtPage.OpenLastPPtPage(is_show_exit_bt)
 	if RedSummerCampPPtPage.GetIsReturnOpenPage() then
-		RedSummerCampCourseScheduling.ShowView()
-		RedSummerCampPPtPage.Show()
+		if not RedSummerCampCourseScheduling.IsOpen() then
+			RedSummerCampCourseScheduling.ShowView()
+		end
+		
+		RedSummerCampPPtPage.Show(nil, nil, is_show_exit_bt)
 	end
 end
 
@@ -911,7 +1207,7 @@ function RedSummerCampPPtPage.GetExportData()
 	local ppt_data_list = RedSummerCampPPtPage.PPtCacheData[RedSummerCampPPtPage.CurCourseName]
 	local course_data = nil
 	for key, v in pairs(RedSummerCampCourseScheduling.lessonCnf) do
-		if v.key == RedSummerCampPPtPage.CurCourseName then
+		if v.code == RedSummerCampPPtPage.CurCourseName then
 			course_data = v
 			break
 		end
@@ -944,8 +1240,11 @@ function RedSummerCampPPtPage.FlushExportFullPage(index, ppt_data_list)
 	RedSummerCampPPtPage.export_ppt_data_index = index
 	
 	commonlib.TimerManager.SetTimeout(function()  
-		ParaMovie.TakeScreenShot_Async(filepath,true,  1280, 720, string.format("NPL.load('(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua').FlushExportFullPage();%d",4))
-	end, 100);
+		ParaMovie.TakeScreenShot(filepath, 1280, 720);
+		commonlib.TimerManager.SetTimeout(function()
+			RedSummerCampPPtPage.FlushExportFullPage()
+		end, 200);
+	end, 300);
 end
 
 function RedSummerCampPPtPage.IsClose()
@@ -978,11 +1277,13 @@ function RedSummerCampPPtPage.OnWorldUnloaded()
 		projectid = tostring(projectid)
 		-- 完成步骤1
 		local step_1_project_id = RedSummerCampPPtPage.StepValueToProjectId[1] or RedSummerCampPPtPage.StepValueToProjectId["1"]
-		if step_1_project_id and step_1_project_id == projectid then
+		if step_1_project_id and tonumber(step_1_project_id) == tonumber(projectid) then
 			RedSummerCampPPtPage.SetCourseClientData(1, 1)
 			RedSummerCampPPtPage.ReportFinishCurTask()
 		end
 	end
+
+	-- RedSummerCampPPtPage.last_course_data = nil
 end
 
 function RedSummerCampPPtPage.StartTask(task_type, step_value, world_id)
@@ -1008,9 +1309,6 @@ function RedSummerCampPPtPage.StartTask(task_type, step_value, world_id)
 
 	RedSummerCampPPtPage.CurTaskData.start_time_stamp = QuestAction.GetServerTime()
 	GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData(extend_data))
-
-	-- 记录当前课包任务的开始时间
-	RedSummerCampPPtPage.SetCourseReportClientData("start_time_stamp", RedSummerCampPPtPage.CurTaskData.start_time_stamp)
 end
 
 function RedSummerCampPPtPage.ReportFinishCurTask()
@@ -1061,7 +1359,42 @@ function RedSummerCampPPtPage.GetReportData(extra_data)
 	return report_data
 end
 
-function RedSummerCampPPtPage.OnClickAction(action_type)
+function RedSummerCampPPtPage.OnClickAction(action_type, param1, param2, param3)
+	-- 判断时间规则
+	if RedSummerCampPPtPage.CourseConfigData then
+		local timeRules = RedSummerCampPPtPage.CourseConfigData.timeRules
+		if timeRules then
+			local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+			if not UserPermission.CheckTimeRules(timeRules) then
+				local first_time_rule = timeRules[1]
+				if first_time_rule then
+					local function get_num_str(number)
+						if number >= 10 then
+							return number
+						end
+					
+						return "0" .. number
+					end
+	
+					local time_rule = timeRules[1]
+					local start_time_t, end_time_t = UserPermission.GetTimeRuleStartEndTimeT(time_rule)
+					if not start_time_t then
+						return ""
+					end
+			
+					local start_hour,start_min = get_num_str(start_time_t.start_hour), get_num_str(start_time_t.start_min)
+					local end_hour,end_min = get_num_str(end_time_t.end_hour), get_num_str(end_time_t.end_min)
+				
+					local date_desc = UserPermission.GetTimeRuleDateTypeDesc(time_rule)
+					-- local week_desc = ContactTeacherAlert.GetVipLimitWeekDesc()
+					local desc = string.format("现在不是上课时间，请在上课时间内（%s%s:%s-%s:%s）再来吧。", date_desc, start_hour, start_min, end_hour, end_min)
+					_guihelper.MessageBox(desc);
+					return
+				end
+			end
+		end
+	end
+
 	if action_type == "explore" or action_type == "button" then
 		local step_value
 		if action_type == "explore" then
@@ -1090,6 +1423,52 @@ function RedSummerCampPPtPage.OnClickAction(action_type)
 	-- if action_type == "dailyVideo" then
 	-- 	RedSummerCampPPtPage.StartTask("dailyVideo")
 	-- end
+
+	if action_type == "button" or action_type == "explore" then
+		local projectid = param1
+		local commandStr = string.format("/loadworld -s -auto %s", projectid)
+		local sendevent = param2
+		if sendevent and sendevent ~= "" then
+			commandStr = string.format("/loadworld -s -auto -inplace %s  | /sendevent %s", projectid,sendevent)
+		end
+		if RedSummerCampPPtPage.last_course_data and action_type == "button" then
+			RedSummerCampPPtPage.last_course_data.ppt_to_projectid = projectid
+			RedSummerCampPPtPage.last_course_data.ppt_index= RedSummerCampPPtPage.GetLessonIndex()
+		end
+		GameLogic.RunCommand(commandStr)
+	elseif action_type == "loadworld" then
+		local Opus = NPL.load("(gl)Mod/WorldShare/cellar/Opus/Opus.lua")
+		Opus:Show()
+	elseif action_type == "dailyVideo" then
+		local course_id = param1
+		ParacraftLearningRoomDailyPage.OnOpenWeb(tonumber(course_id),true)
+	elseif action_type == "dailyVideoLink" then
+		local link = param1
+		local is_external_link = param2
+		local title = param3
+		
+		-- ParaGlobal.ShellExecute("open", link, "", "", 1); 
+		if System.os.GetPlatform() ~= 'win32' or not System.options.enable_npl_brower or is_external_link then
+			-- 除了win32平台，使用默认浏览器打开视频教程
+			local cmd = string.format("/open %s", link);
+			GameLogic.RunCommand(cmd);
+
+			return
+		end
+
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
+		local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
+		BackgroundMusic:Silence()
+
+		local NplBrowserManager = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserManager.lua");
+		NplBrowserManager:CreateOrGet("PPtVideoLink"):Show(link, title, false, true, { scale_screen = "4:3:v", closeBtnTitle = L"退出" }, function(state)
+			if(state == "ONCLOSE")then
+				BackgroundMusic:Recover()
+				NplBrowserManager:CreateOrGet("PPtVideoLink"):GotoEmpty();
+			end
+		end);
+	end
+
 end
 
 function RedSummerCampPPtPage.OnCloseDailyVideo()
@@ -1104,7 +1483,7 @@ function RedSummerCampPPtPage.OnCloseDailyVideo()
 		return
 	end
 
-	RedSummerCampPPtPage.SetCourseClientData("dailyVideo", 1)
+	-- RedSummerCampPPtPage.SetCourseClientData("dailyVideo", 1)
 	RedSummerCampPPtPage.ReportFinishCurTask()
 end
 
@@ -1114,4 +1493,128 @@ function RedSummerCampPPtPage.GetPPTConfigDiskFolder()
    end
     
 	return RedSummerCampPPtPage.DiskFolder
+end
+
+function RedSummerCampPPtPage.ToWorld(project_id)
+	if project_id then
+		local commandStr = string.format("/loadworld -s -auto %s", project_id)
+		GameLogic.RunCommand(commandStr)
+		if RedSummerCampPPtPage.last_course_data then
+			RedSummerCampPPtPage.last_course_data.ppt_to_projectid = project_id
+			RedSummerCampPPtPage.last_course_data.ppt_index= RedSummerCampPPtPage.GetLessonIndex()
+		end
+	end
+end
+
+function RedSummerCampPPtPage.IsLock(index)
+	return index > 1 and RedSummerCampPPtPage.IsLockCourse
+end
+
+function RedSummerCampPPtPage.CloseInDebug()
+	if RedSummerCampPPtPage.is_in_debug then
+		page:CloseWindow(true)
+		page = nil
+	end
+end
+
+function RedSummerCampPPtPage.GetLastCourseData()
+	return RedSummerCampPPtPage.last_course_data
+end
+
+function RedSummerCampPPtPage.GetDebugData()
+	RedSummerCampPPtPage.DebugData = {}
+	
+	if RedSummerCampPPtPage.LessonsPPtData then
+		for index, v in ipairs(RedSummerCampPPtPage.LessonsPPtData) do
+			RedSummerCampPPtPage.DebugData[index] = {text = v.title, value = index, selected = index == RedSummerCampPPtPage.SelectLessonIndex}
+		end
+	end
+	return RedSummerCampPPtPage.DebugData
+end
+
+function RedSummerCampPPtPage.SetDefaulIndex(index)
+	RedSummerCampPPtPage.defaul_select_index = index
+end
+
+function RedSummerCampPPtPage.IsOpen()
+    return page and page:IsVisible()
+end
+
+function RedSummerCampPPtPage.GetLessonIndex()
+	if not RedSummerCampPPtPage.LessonsPPtData then
+		return
+	end
+	local first_ppt_data = RedSummerCampPPtPage.LessonsPPtData[1] or {}
+	if first_ppt_data and first_ppt_data.is_ppt_cover then
+		return RedSummerCampPPtPage.SelectLessonIndex - 2
+	end
+	return RedSummerCampPPtPage.SelectLessonIndex - 1
+end
+
+function RedSummerCampPPtPage.GetProjectListData(callback)
+	local project_id_list = {}
+	for project_id, v in pairs(RedSummerCampPPtPage.ProjectIdToProjectData) do
+		if v.imageUrl == nil then
+			project_id_list[#project_id_list + 1] = project_id
+		end
+	end
+
+	if #project_id_list == 0 then
+		return
+	end
+
+	keepwork.world.search({
+		type = 1,
+		id = {["$in"] = project_id_list},
+	},function(err, msg, data)
+		--print("aaaaaaaaaaaaaaaaxx")
+		--commonlib.echo(data, true)
+		if err == 200 then
+			for k, v in pairs(data.rows) do
+				if v.extra then
+					RedSummerCampPPtPage.ProjectIdToProjectData[tonumber(v.id)] = {imageUrl = v.extra.imageUrl, worldTagName = v.extra.worldTagName or v.name}
+				end
+			end
+			
+			if callback then
+				callback()
+			end
+		end
+	end)
+end
+
+function RedSummerCampPPtPage.GetProjectData(project_id)
+	return RedSummerCampPPtPage.ProjectIdToProjectData[tonumber(project_id)] or {}
+end
+
+function RedSummerCampPPtPage.GetStepTitle()
+	if RedSummerCampPPtPage.SelectPPtData then
+		return RedSummerCampPPtPage.SelectPPtData.step_1_title
+	end
+end
+
+function RedSummerCampPPtPage.GetCourseTitle()
+	if RedSummerCampPPtPage.CourseConfigData then
+		return RedSummerCampPPtPage.CourseConfigData.name or ""
+	end
+
+	return ""
+end
+
+function RedSummerCampPPtPage.GetTeachingPlanPower()
+	-- if GameLogic.IsVip() then
+	-- 	return true
+	-- end
+
+	local profile = KeepWorkItemManager.GetProfile() or {}
+	if profile.tLevel == 1 then
+		return true
+	end
+
+	local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+	if UserPermission.GetRoleData("organ_school_teacher") then
+		return true
+	end
+
+	return false
 end

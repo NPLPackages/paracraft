@@ -157,3 +157,26 @@ function CodeEvent:Fire(msg, onFinishedCallback, bIsImmediate)
 	end
 end
 
+function CodeEvent:FireForEntity(entity, msg, onFinishedCallback, bIsImmediate)
+	if(entity) then
+		local co = entity:GetCodeEventCoroutine(self)
+		if(co) then
+			if(not co:IsFinished()) then
+				-- do nothing if last entity coroutine for this event is still running. 
+				return
+			end
+		else
+			co = CodeCoroutine:new():Init(self:GetCodeBlock());
+			co:SetFunction(self.callbackFunc);
+			entity:SetCodeEventCoroutine(self, co)
+		end
+
+		if(not bIsImmediate) then
+			co:SetTimeout(self:GetCodeBlock():GetDefaultTick(), function()
+				co:RunSingle(msg, onFinishedCallback);
+			end)
+		else
+			return co:RunSingle(msg, onFinishedCallback);
+		end
+	end
+end

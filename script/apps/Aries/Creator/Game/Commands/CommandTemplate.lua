@@ -30,9 +30,10 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 Commands["loadtemplate"] = {
 	name="loadtemplate", 
-	quick_ref="/loadtemplate [-r] [-history] [-abspos] [-tp] [-a seconds] [x y z] [templatename]", 
+	quick_ref="/loadtemplate [-r] [-history]  [-abspos] [-tp] [-a seconds] [x y z] [-rename bool][templatename]", 
 	desc=[[load template to the given position
 @param -a seconds: animate building progress. the followed number is the number of seconds (duration) of the animation. 
+@param -l seconds: according to the tier to load. the followed number is the number of seconds (duration) of the animation. 
 @param -r: remove blocks
 @param -abspos: whether load using absolute position. 
 @param -tp: whether teleport player to template player's location. 
@@ -42,6 +43,7 @@ Commands["loadtemplate"] = {
 default name is "default"
 /loadtemplate ~0 ~2 ~ test
 /loadtemplate -a 3 test
+/loadtemplate -l 3 test
 /loadtemplate -r test
 /loadtemplate -history test    allow ctrl+z to undo
 /loadtemplate ~/test   in writable global temp directory
@@ -57,6 +59,7 @@ default name is "default"
 		local UseAbsolutePos, TeleportPlayer;
 		local opaque;
 		local nohistory = fromEntity ~= EntityManager.GetPlayer();
+		local rename;
 
 		while(cmd_text) do
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
@@ -76,6 +79,14 @@ default name is "default"
 					TeleportPlayer = true;
 				elseif (option == "opaque") then
 					opaque = true;
+				elseif (option == "rename") then
+					option, cmd_text = CmdParser.ParseBool(cmd_text);
+					rename = option;
+				elseif (option == "l") then
+					load_anim_duration, cmd_text = CmdParser.ParseInt(cmd_text);
+					if (load_anim_duration ~= 0) then
+						operation = BlockTemplate.Operations.TierLoad;
+					end
 				end
 			else
 				break;
@@ -106,11 +117,17 @@ default name is "default"
 				filename = filename .. ".blocks.xml";
 			end
 
+			if filename and filename:match("^onlinestore/") then
+				if(not ParaIO.DoesFileExist(Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename)), true)) then
+					ParaIO.CopyFile(Files.GetTempPath()..commonlib.Encoding.Utf8ToDefault(filename), Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename)), true) 
+				end
+			end
+			
 			local fullpath;
 			if(commonlib.Files.IsAbsolutePath(filename)) then
 				fullpath = filename;
 			else
-				fullpath = Files.GetWorldFilePath(filename) or (not filename:match("[/\\]") and Files.GetWorldFilePath("blocktemplates/"..filename));
+				fullpath = Files.GetWorldFilePath(filename) or (not filename:match("[/\\]") and Files.GetWorldFilePath("blocktemplates/"..filename)) or Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename));
 			end
 			
 			if(not fullpath and ParaIO.DoesFileExist(filename, true)) then
@@ -131,6 +148,7 @@ default name is "default"
 						TeleportPlayer = TeleportPlayer,
 						nohistory = nohistory,
 						opaque = opaque,
+						rename = rename
 					}
 				);
 				task:Run();

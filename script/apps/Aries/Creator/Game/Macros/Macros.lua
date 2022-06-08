@@ -94,6 +94,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroVoice.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroControl.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroKeys.lua");
 NPL.load("(gl)script/ide/SliderBar.lua");
+NPL.load("(gl)script/ide/TreeView.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
@@ -156,6 +157,9 @@ end
 
 function Macros:BeginRecord()
 	GameLogic.options:SetClickToContinue(false);
+	local Mouse = commonlib.gettable("System.Windows.Mouse");
+	Mouse:SetCursorFromFile("Texture/Aries/Cursor/default_cursor_teen.tga", 1, 1)
+
 	Macros.lastCopyTextToClipboard = nil;
 	ParaMisc.CopyTextToClipboard = TrackedCopyTextToClipboard
 	self:Init()
@@ -182,6 +186,7 @@ function Macros:BeginRecord()
 	commonlib.__onuievent__ = Macros.OnGUIEvent;
 	System.Windows.Window.__onuievent__ = Macros.OnWindowGUIEvent;
 	CommonCtrl.SliderBar.__onuievent__ = Macros.OnSliderbarEvent;
+	CommonCtrl.TreeView.__onuievent__ = Macros.OnTreeViewEvent;
 	CommonCtrl.dropdownlistbox.__onuievent__ = Macros.OnDropdownListboxEvent;
 	KeyFrameCtrl.__onuievent__ = Macros.OnKeyFrameCtrlEvent;
 
@@ -217,6 +222,9 @@ end
 
 -- called whenever window GUI event is received
 function Macros.OnWindowGUIEvent(window, event)
+	if(not Macros:IsRecording()) then
+		return
+	end
 	if(event:isAccepted()) then
 		local event_type = event:GetType()
 		if(event_type == "mouseReleaseEvent") then
@@ -273,8 +281,27 @@ function Macros.OnWindowGUIEvent(window, event)
 	end
 end
 
+function Macros.OnTreeViewEvent(treeviewCtrl, eventName, data)
+	if(not Macros:IsRecording()) then
+		return
+	end
+	local uiname = treeviewCtrl.uiname;
+	if(uiname) then
+		if(eventName == "onmousewheel") then
+
+		elseif(eventName == "OnToggleNode") then	
+			Macros:AddMacro("TreeViewShowNode", uiname, data and data.uiname)
+		elseif(eventName == "OnClickNode") then	
+			Macros:AddMacro("TreeViewShowNode", uiname, data and data.uiname)
+		end
+	end
+end
+
 -- only for CommonCtrl.OnDropdownListboxEvent exclusively
 function Macros.OnDropdownListboxEvent(dropdownCtl, eventName, dx, dy)
+	if(not Macros:IsRecording()) then
+		return
+	end
 	local uiname = dropdownCtl.uiname;
 	if(uiname) then
 		if(eventName == "OnClickDropDownButton") then
@@ -287,12 +314,19 @@ function Macros.OnDropdownListboxEvent(dropdownCtl, eventName, dx, dy)
 			Macros:AddMacro("DropdownSelect", uiname, dropdownCtl:GetValue())
 		elseif(eventName == "OnMouseUpClose") then
 			Macros:AddMacro("DropdownMouseUpClose", uiname)
+		elseif(eventName == "OnEditBoxModify") then
+			Macros:AddMacro("DropdownEditBox", uiname, dropdownCtl:GetText())
+		elseif(eventName == "OnEditBoxKeyup") then
+			Macros:AddMacro("DropdownEditBoxKeyup", uiname, VirtualKeyToScaneCodeStr[virtual_key])
 		end
 	end
 end
 
 -- only for CommonCtrl.SliderBar exclusively
 function Macros.OnSliderbarEvent(sliderBar, eventName)
+	if(not Macros:IsRecording()) then
+		return
+	end
 	local uiname = sliderBar.uiname;
 	if(uiname) then
 		if(eventName == "OnClickButton") then
@@ -311,6 +345,9 @@ end
 
 -- only for KeyFrameCtrl in movie block
 function Macros.OnKeyFrameCtrlEvent(ctrl, eventName, p1, p2)
+	if(not Macros:IsRecording()) then
+		return
+	end
 	local uiname = ctrl.uiname;
 	if(uiname) then
 		if(eventName == "ClickKeyFrame") then
@@ -335,6 +372,10 @@ function Macros.OnKeyFrameCtrlEvent(ctrl, eventName, p1, p2)
 	end
 end
 
+function Macros.IsMousePress()
+	return ParaUI.IsMousePressed(0) or ParaUI.IsMousePressed(1) or ParaUI.IsMousePressed(2),ParaUI.IsMousePressed(0),ParaUI.IsMousePressed(1),ParaUI.IsMousePressed(2)
+end
+
 -- called whenever GUI event is received from c++ engine. 
 function Macros.OnGUIEvent(obj, eventname, callInfo)
 	if(not Macros:IsRecording()) then
@@ -353,7 +394,29 @@ function Macros.OnGUIEvent(obj, eventname, callInfo)
 				if(eventname == "onmouseup") then
 					eventName_ = eventname;
 				end
-				Macros:AddMacro("ButtonClick", name, Macros.GetButtonTextFromKeyboard(mouse_button), eventName_)
+				local mouse_button = mouse_button
+				-- 计算鼠标偏移量
+				local x, y, width, height = obj:GetAbsPosition();
+				local offsetX = mouse_x-x
+				local offsetY = mouse_y-y
+				if eventname == "onactivate" then
+					local isMousePress,isLeft,isRight,isMiddle = Macros.IsMousePress() --做鼠标点击UI修正
+					if isMousePress then
+						if isLeft then
+							mouse_button = "left"
+						end
+						if isRight then
+							mouse_button = "right"
+						end
+						if isMiddle then
+							mouse_button = "middle"
+						end
+					end
+
+					offsetX = nil
+					offsetY = nil
+				end
+				Macros:AddMacro("ButtonClick", name, Macros.GetButtonTextFromKeyboard(mouse_button), eventName_, offsetX, offsetY)
 			end
 		else
 			-- GameLogic.AddBBS("macros", format(L"警告：没有录制的宏点击事件:%s", name or ""), 4000, "255 0 0");
@@ -492,6 +555,15 @@ function Macros:AddMacro(text, ...)
 						self.macros[nCount - 1], self.macros[nCount] = mTrigger, lastMacro;
 					end
 				end
+			end
+		end
+		if(macro.name == "TreeViewShowNode") then
+			local lastMacro = self.macros[#self.macros]
+			local lastLastMacro = self.macros[#self.macros - 1];
+			if(lastLastMacro and lastMacro and lastMacro.name == "ButtonClick" and lastLastMacro.name == "ButtonClickTrigger") then
+				local nCount = #self.macros;
+				table.insert(self.macros, nCount-1, macro);
+				macro = nil;
 			end
 		end
 		self.macros[#self.macros + 1] = macro;
@@ -1116,4 +1188,8 @@ function Macros:GetLinesAsText()
 	end
 	local text = table.concat(out, "\n");
 	return text or "";
+end
+
+function Macros.IsDevMode()
+	return System.options.isDevEnv or System.options.isDevMode or System.options.isAB_SDK
 end

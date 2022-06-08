@@ -132,28 +132,68 @@ local MaxBoneLengthVertical = 50;
 -- how many blocks can be bind to a bone, just for safe checking. 
 local MaxSkinsPerBone = 1000;
 
+-- @return side, levelData;
+function Entity:GetBoneSideAndLevelData(blockData)
+	blockData = blockData or 0;
+	local side = mathlib.bit.band(blockData, 0xf)
+	local levelData = mathlib.bit.rshift(blockData, 8)
+	return side, levelData;
+end
+
 -- @param bRefresh: if true, we will search again for parent bone of this entity
 function Entity:GetParentBone(bRefresh)
 	if(bRefresh) then
 		local boneId = self:GetBlockId(); -- block_types.names.Bone;
 		local cx, cy, cz = self.bx, self.by, self.bz;
-		local side = BlockEngine:GetBlockData(cx, cy, cz) or 0;
+		local side, levelData = self:GetBoneSideAndLevelData(BlockEngine:GetBlockData(cx, cy, cz));
 		local dx, dy, dz = Direction.GetOffsetBySide(side);
 		local maxBoneLength = MaxBoneLengthHorizontal
 		if(dy~=0) then
 			maxBoneLength = MaxBoneLengthVertical;
 		end
+
+		self.parentBone = nil;
 		for i=1, maxBoneLength do
 			local x,y,z = cx+dx*i, cy+dy*i, cz+dz*i;
 			if(BlockEngine:GetBlockId(x, y, z) == boneId) then
-				local parentSide = BlockEngine:GetBlockData(x, y, z) or 0;
-				-- if two bones are opposite to each other, the lower one is the parent
-				if(Direction.directionToOpFacing[parentSide] ~= side or (dx+dy+dz) < 0) then
-					self.parentBone = BlockEngine:GetBlockEntity(x,y,z)
-				else
-					self.parentBone = nil;
+				local parentSide, parentLevelData = self:GetBoneSideAndLevelData(BlockEngine:GetBlockData(x, y, z))
+				if(parentLevelData == levelData) then
+					-- if two bones are opposite to each other, the lower one is the parent
+					if(Direction.directionToOpFacing[parentSide] ~= side or (dx+dy+dz) < 0) then
+						self.parentBone = BlockEngine:GetBlockEntity(x,y,z)
+					else
+						self.parentBone = nil;
+					end
 				end
 				break;
+			end
+		end
+		-- search for closest higher level bones
+		if(not self.parentBone) then
+			local entities = EntityManager.FindEntities({category="b", type="EntityBlockBone"})
+			if(entities) then
+				local maxParentDistance = 10;
+				local maxParentDistanceSq = maxParentDistance^2;
+				local candidateParent;
+				local candidateLevel = 9999999;
+				local candidateDistSq = 9999999;
+				for _, entity in ipairs(entities) do
+					local x, y, z = entity:GetBlockPos()
+					local distSq = (x-cx)^2 +(y-cy)^2 + (z-cz)^2  
+					if(distSq <= maxParentDistanceSq and distSq > 0) then
+						local parentSide, parentLevelData = self:GetBoneSideAndLevelData(BlockEngine:GetBlockData(x, y, z))
+						if(parentLevelData > levelData) then
+							if((candidateLevel > parentLevelData) or ((candidateLevel == parentLevelData) and (candidateDistSq > distSq))) then
+								candidateLevel = parentLevelData
+								candidateDistSq = distSq
+								candidateParent = entity;
+							end
+						end
+					end
+				end
+				if(candidateParent) then
+					self.parentBone = candidateParent
+				end
 			end
 		end
 	end
@@ -168,16 +208,14 @@ function Entity:RecalculateAllConnectedBones(allBones)
 		allBones[self] = true;
 		local boneId = self:GetBlockId(); -- block_types.names.Bone;
 		local cx, cy, cz = self.bx, self.by, self.bz;
-		local mySide = BlockEngine:GetBlockData(cx, cy, cz) or 0;
+		local mySide, myLevel = self:GetBoneSideAndLevelData(BlockEngine:GetBlockData(cx, cy, cz));
+		-- looking for parent
+		local parentBone = self:GetParentBone(true);
+		if(parentBone and not allBones[parent]) then
+			parentBone:RecalculateAllConnectedBones(allBones);
+		end
+		-- looking for child
 		for side=0,5 do
-			if(side==mySide) then
-				-- looking for parent
-				local parentBone = self:GetParentBone(true);
-				if(parentBone and not allBones[parent]) then
-					parentBone:RecalculateAllConnectedBones(allBones);
-				end
-			end
-			-- looking for child
 			local dx, dy, dz = Direction.GetOffsetBySide(side);
 			local maxBoneLength = MaxBoneLengthHorizontal
 			if(dy~=0) then
@@ -193,6 +231,27 @@ function Entity:RecalculateAllConnectedBones(allBones)
 						end
 					end
 					break;
+				end
+			end
+		end
+		if(myLevel > 0) then
+			local entities = EntityManager.FindEntities({category="b", type="EntityBlockBone"})
+			if(entities) then
+				local maxParentDistance = 10;
+				local maxParentDistanceSq = maxParentDistance^2;
+				for _, entity in ipairs(entities) do
+					local x, y, z = entity:GetBlockPos()
+					local distSq = (x-cx)^2 +(y-cy)^2 + (z-cz)^2  
+					if(distSq <= maxParentDistanceSq and distSq > 0) then
+						local parentSide, parentLevelData = self:GetBoneSideAndLevelData(BlockEngine:GetBlockData(x, y, z))
+						if(parentLevelData < myLevel) then
+							if(not allBones[entity]) then
+								if( entity:GetParentBone(true) == self) then
+									entity:RecalculateAllConnectedBones(allBones);
+								end
+							end
+						end
+					end
 				end
 			end
 		end
@@ -255,7 +314,7 @@ function Entity:GetBoneColor(bRefresh)
 	if(bRefresh) then
 		local color;
 		local cx, cy, cz = self.bx, self.by, self.bz;
-		local mySide = BlockEngine:GetBlockData(cx, cy, cz) or 0;
+		local mySide = self:GetBoneSideAndLevelData(BlockEngine:GetBlockData(cx, cy, cz));
 		for side=0,5 do
 			if(side~=mySide or not self.parentBone) then
 				local dx, dy, dz = Direction.GetOffsetBySide(side);
@@ -315,7 +374,7 @@ function Entity:GetSkin(bRefresh, minY)
 				end
 			end
 		end
-		local mySide = BlockEngine:GetBlockData(cx, cy, cz) or 0;
+		local mySide = self:GetBoneSideAndLevelData(BlockEngine:GetBlockData(cx, cy, cz) or 0);
 		for side=0,5 do
 			if(side~=mySide or not self.parentBone) then
 				local dx, dy, dz = Direction.GetOffsetBySide(side);

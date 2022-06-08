@@ -27,21 +27,24 @@ function step.create(rootName, mcmlNode, bindingContext, _parent, left, top, wid
 end
 
 function step.create_default(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, parentLayout, css)
-	local w = mcmlNode:GetNumber("width") or (width-left);
-	local default_height = mcmlNode:GetNumber("height")
-	local h = default_height or (height-top);
-	local parent_width, parent_height = w, h;
-	local _this = ParaUI.CreateUIObject("container", "c", "_lt", left, top + 10, width-left, height - top);
+	local num = mcmlNode:GetString("value") or 0;
+
+	local step_height = height - top
+	if tonumber(num) == 2 then
+		step_height = 180
+		css.height = step_height
+	end
+	
+	local _this = ParaUI.CreateUIObject("container", "c", "_lt", left, top, width-left, step_height);
 	_this.background = "";
 	_parent:AddChild(_this);
 	local _root = _this;
 
-	local step_icon = ParaUI.CreateUIObject("container", "lessonppt_step_icon", "_lt", 0, 0, 32, 32);
-	step_icon.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/v1_32bits.png;0 0 32 32";
+	local step_icon = ParaUI.CreateUIObject("container", "lessonppt_step_icon", "_lt", 0, 0, 65, 36);
+	step_icon.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/biaotiditu_65x36_32bits.png;0 0 65 36";
 	_this:AddChild(step_icon);
 
-	local num = mcmlNode:GetString("value") or 0;
-	local step_num_text = ParaUI.CreateUIObject("text", "lessonppt_step_num_text", "_lt", 10, 1, 32, 32);
+	local step_num_text = ParaUI.CreateUIObject("text", "lessonppt_step_num_text", "_lt", 18, 3, 32, 32);
 	_guihelper.SetFontColor(step_num_text, "#ffffff");
 	step_num_text.font = "System;22;norm"
 	step_num_text.text = num;
@@ -55,7 +58,7 @@ function step.create_default(rootName, mcmlNode, bindingContext, _parent, left, 
 	RedSummerCampPPtPage.SetStepNumKey(step_num)
 
 	if RedSummerCampPPtPage.GetStepIsComplete(step_num) then
-		local check_icon = ParaUI.CreateUIObject("container", "lessonppt_check_icon", "_lt", 18, 20, 26, 24);
+		local check_icon = ParaUI.CreateUIObject("container", "lessonppt_check_icon", "_lt", 42, 14, 26, 24);
 		check_icon.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/v_26X24_32bits.png;0 0 26 24";
 		_root:AddChild(check_icon);
 	end
@@ -66,36 +69,38 @@ function step.create_default(rootName, mcmlNode, bindingContext, _parent, left, 
 end
 
 function step.create_full_page(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, parentLayout, css)
-	local w = mcmlNode:GetNumber("width") or (width-left);
-	local default_height = mcmlNode:GetNumber("height")
-	local h = default_height or (height-top);
-	local parent_width, parent_height = w, h;
-	local _this = ParaUI.CreateUIObject("container", "c", "_lt", left, top + 10, width-left, height - top);
+	local num = mcmlNode:GetString("value") or 0;
+
+	local step_height = height - top
+	if tonumber(num) == 2 or tonumber(num) == 3 then
+		step_height = tonumber(num) == 2 and 180 or 150
+		css.height = step_height
+	end
+	
+	local _this = ParaUI.CreateUIObject("container", "c", "_lt", left, top, width-left, step_height);
 	_this.background = "";
 	_parent:AddChild(_this);
 	local _root = _this;
 
-	local step_icon = ParaUI.CreateUIObject("container", "lessonppt_step_icon", "_lt", 0, 0, 48, 48);
-	step_icon.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/v1_32bits.png;0 0 32 32";
-	_root:AddChild(step_icon);
+	local step_icon = ParaUI.CreateUIObject("container", "lessonppt_step_icon", "_lt", 0, 0, 97, 54);
+	step_icon.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/biaotiditu_65x36_32bits.png;0 0 65 36";
+	_this:AddChild(step_icon);
 
-	local num = mcmlNode:GetString("value") or 0;
-	local step_num_text = ParaUI.CreateUIObject("text", "lessonppt_step_num_text", "_lt", 0, 3, 48, 48);
+	local step_num_text = ParaUI.CreateUIObject("text", "lessonppt_step_num_text", "_lt", 29, 5, 48, 48);
 	_guihelper.SetFontColor(step_num_text, "#ffffff");
-	_guihelper.SetUIFontFormat(step_num_text, 17);
-	step_num_text.font = "System;32;norm"
+	step_num_text.font = "System;30;norm"
 	step_num_text.text = num;
 	step_icon:AddChild(step_num_text);
 
-	local cur_step_num = RedSummerCampPPtFullPage.GetStepNumKey()
+	local cur_step_num = RedSummerCampPPtPage.GetStepNumKey()
 	local step_num = tonumber(num)
 	if step_num == math.floor(cur_step_num) then
 		step_num = cur_step_num + 0.1
 	end
-	RedSummerCampPPtFullPage.SetStepNumKey(step_num)
+	RedSummerCampPPtPage.SetStepNumKey(step_num)
 
-	if RedSummerCampPPtPage.GetStepIsComplete(step_num) and not RedSummerCampPPtFullPage.is_expore_mode then
-		local check_icon = ParaUI.CreateUIObject("container", "lessonppt_check_icon", "_lt", 25, 30, 39, 36);
+	if RedSummerCampPPtPage.GetStepIsComplete(step_num) then
+		local check_icon = ParaUI.CreateUIObject("container", "lessonppt_check_icon", "_lt", 63, 14, 39, 36);
 		check_icon.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/v_26X24_32bits.png;0 0 26 24";
 		_root:AddChild(check_icon);
 	end

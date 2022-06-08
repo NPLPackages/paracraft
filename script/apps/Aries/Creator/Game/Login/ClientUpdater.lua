@@ -129,6 +129,7 @@ end
 -- public function:
 -- @param callbackFunc: function(bSucceed)
 function ClientUpdater:Download(callback)
+	print("hyz update log--------ClientUpdater 132",self.appname)
 	ParaWorldLoginDocker.InstallApp(self.appname, function(bInstalled)
 		callback(bInstalled)
 	end)
@@ -159,6 +160,7 @@ function ClientUpdater:canAutoSkip()
 end
 
 function ClientUpdater:Restart()
+	print("hyz update log--------ClientUpdater 163")
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
 
@@ -172,6 +174,6 @@ function ClientUpdater:Restart()
 	else
 		restartCmd = format('paraworldapp="%s" nplver="%s"', self.appname, self:GetCurrentVersion())--ParaEngine.GetVersion()
 	end
-
+	print("hyz update log--------ClientUpdater 177",self.appname,"restartCmd",restartCmd)
 	ParaWorldLoginDocker.Restart(self.appname, restartCmd);
 end

@@ -33,7 +33,6 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local names = commonlib.gettable("MyCompany.Aries.Game.block_types.names");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");	
 local ParaWorldNPC = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldNPC.lua");
 local TeachingQuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/TeachingQuest/TeachingQuestPage.lua");
 
@@ -70,8 +69,6 @@ function ParaWorldChunkGenerator:OnExit()
 	if(self.lock_timer) then
 		self.lock_timer:Change();
 	end
-
-	DockPage.Hide();
 	MyCompany.Aries.ChatSystem.ChatWindow.ResetPosition(false);
 end
 
@@ -106,9 +103,7 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 	if(GameLogic.IsReadOnly() and GameLogic.options:GetProjectId() and GameLogic.GetFilters():apply_filters('is_signed_in')) then
 		GameLogic.RunCommand("/mode strictgame")
 		GameLogic.RunCommand("/ggs connect -silent=false");
-		DockPage.Show();
 		MyCompany.Aries.ChatSystem.ChatWindow.ResetPosition(true);
-
 		for i = 1, #TeachingQuestPage.TaskTypeNames do
 			ParaWorldNPC.CreateTeacherNPC(nil, nil, TeachingQuestPage.TaskTypeNames[i]);
 		end
@@ -582,10 +577,6 @@ function ParaWorldChunkGenerator:ApplyOnLoadBlocks(params)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 	local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 	ParaWorldMinimapWnd:RefreshMap(0.5)
-
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/CourseWorldMinimapWnd.lua");
-	local CourseWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.CourseWorldMinimapWnd");
-	CourseWorldMinimapWnd:RefreshMap(0.5)
 
 	if(hasDelayedCodeBlocks and lastGridParams and lastGridParams.x == gridX and lastGridParams.y == gridY) then
 		ParaWorldChunkGenerator.EnableCodeBlocksInGrid(gridX, gridY, true)

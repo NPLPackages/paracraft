@@ -653,6 +653,12 @@ end
 -- http://yapi.kp-para.cn/project/60/interface/api/1952
 function KpChatChannel.CreateMessage( ChannelIndex, toid, toname, words, roomName)
 	local msgdata;
+    if ChannelIndex == ChatChannel.EnumChannels.KpFriend then
+        if not KpChatChannel.worldId then
+            KpChatChannel.worldId = 0
+        end
+    end
+
     local worldId = KpChatChannel.worldId;
     if(not worldId)then
 		LOG.std(nil, "warn", "KpChatChannel", "world id is required");

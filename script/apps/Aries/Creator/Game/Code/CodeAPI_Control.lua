@@ -154,8 +154,14 @@ function env_imp:runForActor(actor, mainFunc)
 		end
 	end
 	if(type(actor) == "table" and type(mainFunc) == "function") then
+		local lastActor = self.actor;
+		self.co:SetActor(actor);
+		local r1, r2, r3, r4 = mainFunc();
+		self.co:SetActor(lastActor);
+		return r1, r2, r3, r4;
+
+		--[[
 		local isFinished = false;
-		local last_co = self.co;
 		-- share the same coroutine for a given actor to improve performance when there are tons of runForActor calls. 
 		local co = self.codeblock:NewCoroutine();
 		--local co = CodeCoroutine:new():Init(self.codeblock);
@@ -170,6 +176,7 @@ function env_imp:runForActor(actor, mainFunc)
 		else
 			return result, r2, r3, r4;
 		end
+		]]
 	end
 end
 

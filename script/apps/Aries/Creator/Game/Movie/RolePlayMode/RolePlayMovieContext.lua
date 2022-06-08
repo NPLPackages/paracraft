@@ -174,16 +174,7 @@ function RolePlayMovieContext:HandleGlobalKey(event)
 		GameLogic.RunCommand("/menu help.help");
 		event:accept();
 	elseif(dik_key == "DIK_F7") then
-		local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
-		local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
-		if RedSummerCampMainWorldPage.IsOpen() then
-			RedSummerCampPPtPage.ClosePPtAllPage()
-		else
-			RedSummerCampMainWorldPage.SetOpenFromCommandMenu(true)
-			RedSummerCampMainWorldPage.Show();
-			
-			RedSummerCampPPtPage.OpenLastPPtPage()
-		end
+		GameLogic.RunCommand("/menu help.creativespace");
 		event:accept();
 	end
 
@@ -244,7 +235,7 @@ function RolePlayMovieContext:mousePressEvent(event)
 			click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
 			local block = block_types.get(result.block_id);
 			if(block and result.blockX) then
-				-- block:OnMouseDown(result.blockX,result.blockY,result.blockZ, event.mouse_button);
+				-- block:OnMouseDown(event, result.blockX,result.blockY,result.blockZ);
 				event:accept();
 			end
 		end

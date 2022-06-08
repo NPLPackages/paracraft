@@ -54,6 +54,7 @@ Entity.group_id = GameLogic.SentientGroupIDs.NPC;
 function Entity:ctor()
 	self.inventory = InventoryBase:new():Init();
 	self.inventory:SetClient();
+	self.inventory:SetParentEntity(self);
 
 	self:SetRuleBagSize(16);
 end

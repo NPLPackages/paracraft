@@ -15,11 +15,11 @@ local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 
 
---@param uiName: UI name
+--@param uiName: UI name or uiObject
 --@param text: content text
 function Macros.EditBox(uiName, text)
 	Macros.SetNextKeyPressWithMouseMove(nil, nil);
-	local obj = ParaUI.GetUIObject(uiName)
+	local obj = (type(uiName) == "string") and ParaUI.GetUIObject(uiName) or uiName;
 	if(obj and obj:IsValid()) then
 		obj.text = text or ""
 		obj:SetCaretPosition(-1);
@@ -31,7 +31,7 @@ end
 
 function Macros.EditBoxKeyup(uiName, keyname)
 	Macros.SetNextKeyPressWithMouseMove(nil, nil);
-	local obj = ParaUI.GetUIObject(uiName)
+	local obj = (type(uiName) == "string") and ParaUI.GetUIObject(uiName) or uiName;
 	if(obj and obj:IsValid()) then
 		local vKey = keyname:gsub("DIK_", "EM_KEY_");
 		if(Event_Mapping[vKey]) then
@@ -62,7 +62,7 @@ function Macros.EditBoxTrigger(uiName, text)
 	if(not text or text == "") then
 		return;
 	end
-	local obj = ParaUI.GetUIObject(uiName)
+	local obj = (type(uiName) == "string") and ParaUI.GetUIObject(uiName) or uiName;
 	if(obj and obj:IsValid()) then
 		local x, y, width, height = obj:GetAbsPosition();
 		local mouseX = math.floor(x + width /2)
@@ -110,12 +110,12 @@ function Macros.EditBoxTrigger(uiName, text)
 	end
 end
 
---@param uiName: UI name
+--@param uiName: UI name or ui object
 --@param text: content text
 function Macros.EditBoxKeyupTrigger(uiName, keyname)
 	if(keyname == "DIK_RETURN") then
 		-- we will only trigger the enter key
-		local obj = ParaUI.GetUIObject(uiName)
+		local obj = (type(uiName) == "string") and ParaUI.GetUIObject(uiName) or uiName;
 		if(obj and obj:IsValid()) then
 			local x, y, width, height = obj:GetAbsPosition();
 			local mouseX = math.floor(x + width /2)

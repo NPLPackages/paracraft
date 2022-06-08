@@ -35,7 +35,7 @@ function block:canPlaceBlockAt(x,y,z)
 end
 
 -- call when use press mouse down button over the block
-function block:OnMouseDown(x,y,z,mouse_button)
+function block:OnMouseDown(event, x, y, z)
 	-- disable play any step sound, as the default behavior. 	
 	local entity = self:GetBlockEntity(x,y,z)
 	if(entity and entity.PlayNote) then

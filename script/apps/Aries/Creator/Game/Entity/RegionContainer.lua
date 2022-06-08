@@ -319,14 +319,7 @@ function RegionContainer:LoadFromFile(filename)
 				if(entity_class) then
 					local entity = entity_class:Create({}, node);
 					if(entity) then
-						--if(entity.item_id) then
-							--local item = ItemClient.GetItem(entity.item_id);
-							--if(item and item.gold_count) then
-								--entity_count_stats["gold_count"] = (entity_count_stats["gold_count"] or 0) + item.gold_count;
-							--end
-						--end
-
-						EntityManager.AddObject(entity);
+						entity:Attach();
 						count = count + 1;
 					else
 						LOG.std(nil, "warn", "EntityLoad", "entity is not loaded. ")

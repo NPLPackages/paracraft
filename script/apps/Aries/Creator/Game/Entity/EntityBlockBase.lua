@@ -99,3 +99,8 @@ end
 -- virtual
 function Entity:OnNeighborChanged(x,y,z, from_block_id)
 end
+
+-- teleport to a given block position. 
+function Entity:TeleportToBlockPos(x,y,z)
+	-- disable
+end

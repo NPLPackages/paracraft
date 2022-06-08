@@ -92,6 +92,7 @@ function World2In1.ShowPage(offset, reload)
 
 	GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", World2In1.MoveLeft, World2In1, "World2In1");
 	GameLogic:Connect("WorldUnloaded", World2In1, World2In1.OnWorldUnload, "UniqueConnection");
+	GameLogic.GetFilters():apply_filters("esc_word2in1",true);
 	--echo({hidePage,reload})
 	if (not hidePage and not reload) then
 		allMiniWorlds = {{}, {}, {}};
@@ -230,6 +231,7 @@ function World2In1.OnClose()
 		page:CloseWindow();
 	end
 	World2In1.OnWorldUnload();
+	GameLogic.GetFilters():apply_filters("esc_word2in1",false);
 end
 
 function World2In1.HidePage()
@@ -238,6 +240,7 @@ function World2In1.HidePage()
 		page:CloseWindow();
 	end
 	hidePage = true;
+	GameLogic.GetFilters():apply_filters("esc_word2in1",false);
 end
 
 function World2In1.GetRegionType()

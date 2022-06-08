@@ -132,8 +132,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	auto_disable_fly_when_on_ground = false,
 	-- stereo mode value. 
 	stereoMode = 0,
-	-- 960*560 which is the minimum UI size allowed. 
-	min_ui_height = 560,
+	-- 1280*720 which is the minimum UI size allowed. 
+	min_ui_height = 720,
 	-- usually the left drag is enabled only in touch mode.
 	isMouseLeftDragEnabled = false,
 	-- the player asset path
@@ -178,6 +178,12 @@ function options:OneTimeInit()
 		end)
 	end
 	]]
+
+	if System.options.is_resolution_locked then 
+		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+		local Screen = commonlib.gettable("System.Windows.Screen");
+		Screen:ChangeUIDesignResolution(1280, 720)
+	end
 end
 
 function options:OnNPLErrorMessage(errorMessage, stackInfo)
@@ -367,8 +373,9 @@ function options:OnLoadWorld()
 		if(mainAssetFilename) then
 			EntityManager.GetPlayer():SetMainAssetPath(mainAssetFilename)
 		end
+		
 		local mainSkins = self:GetMainPlayerSkins();
-		if(mainSkins) then
+		if(mainSkins and mainSkins ~= "") then
 			EntityManager.GetPlayer():SetSkin(mainSkins);
 		end
 		
@@ -384,6 +391,7 @@ function options:OnLoadWorld()
 		local use_waterreflection = if_else(WorldCommon.GetWorldTag("waterreflection") ~= "false",true,false);
 		att:SetField("UseWaterReflection", use_waterreflection);
 
+		GameLogic.RunCommand('/shader 1')
 		local rendermethod = tonumber(WorldCommon.GetWorldTag("rendermethod"));
 		if(rendermethod) then
 			local res = GameLogic.RunCommand("/shader "..rendermethod);
@@ -466,14 +474,158 @@ function options:OnLoadWorld()
 		end, 3000)
 	end
 
-	local kpParentWorldId = WorldCommon.GetWorldTag("parentProjectId")
-	if kpParentWorldId and tonumber(kpParentWorldId) > 0 then
-		commonlib.TimerManager.SetTimeout(function()  
-			GameLogic.RunCommand(string.format("/loadworld -s -force  -inplace %d | /sendevent globalGotoCreate",kpParentWorldId))
-		end, 500)
+	--暂时去除二合一世界逻辑
+	-- local kpParentWorldId = WorldCommon.GetWorldTag("parentProjectId")
+	-- if kpParentWorldId and tonumber(kpParentWorldId) > 0 then
+	-- 	commonlib.TimerManager.SetTimeout(function()  
+	-- 		GameLogic.RunCommand(string.format("/loadworld -auto   -inplace %d | /sendevent globalGotoCreate",kpParentWorldId))
+	-- 	end, 500)
+	-- end
+
+	local superrenderdist = WorldCommon.GetWorldTag("superrenderdist")
+	self:SetSuperRenderDist(tonumber(superrenderdist))
+
+	self:SetUIScaling(nil)
+	
+	local hide_player = WorldCommon.GetWorldTag("hide_player")
+	self:SetShowMainPlayer(hide_player~="true")
+
+	local stereoMode = WorldCommon.GetWorldTag("stereoMode")
+	self:EnableStereoMode(tonumber(stereoMode))
+
+	self:SetWeather(WorldCommon.GetWorldTag("weather"))
+
+	local timesAutoGo = WorldCommon.GetWorldTag("timesAutoGo")~="false"
+	self:SetTimesAutoGo(timesAutoGo)
+	if not timesAutoGo then
+		self:SetFrozenDayTime(WorldCommon.GetWorldTag("frozendaytime"))
 	end
 
-	GameLogic.RunCommand('/shader 1')
+	local lightcolor = WorldCommon.GetWorldTag("lightcolor")
+	local cmd_light_color = string.format("/worldenv -lightcolor=%s",lightcolor)
+	GameLogic.RunCommand(cmd_light_color)
+
+	local eyeBrightness = tonumber(WorldCommon.GetWorldTag("eyeBrightness"))
+	if eyeBrightness then
+		self:SetEyeBrightness(eyeBrightness)
+	end
+
+	local cloudThickness = tonumber(WorldCommon.GetWorldTag("cloudThickness"))
+	if cloudThickness then
+		self:SetCloudThickness(cloudThickness)
+	end
+
+	Screen:Connect("sizeChanged", options, options.OnResize, "UniqueConnection")
+end
+
+--[[
+	sun,cloudy,rain,snow
+]]
+function options:SetWeather(weather,bSave)
+	if weather~="sun" and weather~="cloudy" and weather~="rain" and weather~="snow" then
+		return
+	end
+	NPL.load("(gl)script/apps/Aries/Creator/Env/SkyPage.lua");
+	local SkyPage = commonlib.gettable("MyCompany.Aries.Creator.SkyPage");
+	if weather=="sun" then
+		GameLogic.RunCommand("/sky model/skybox/skybox15/skybox15.x")
+		GameLogic.RunCommand("/rain 0")
+		GameLogic.RunCommand("/snow 0")
+		self.oldWeather = weather
+	elseif weather=="cloudy" then
+		GameLogic.RunCommand("/sky sim")
+		GameLogic.RunCommand("/rain 0")
+		GameLogic.RunCommand("/snow 0")
+		self.oldWeather = weather
+	elseif weather=="rain" then
+		GameLogic.RunCommand("/rain")
+		if not GameLogic.GetSkyEntity():IsRaining() then
+			weather = self.oldWeather or "sun"
+		end
+	elseif weather=="snow" then
+		GameLogic.RunCommand("/snow")
+		if not GameLogic.GetSkyEntity():IsSnowing() then
+			weather = self.oldWeather or "sun"
+		end
+	end
+	self.weather = weather
+
+	if bSave and WorldCommon.GetWorldTag("weather")~=weather then
+		WorldCommon.SetWorldTag("weather",weather)		
+		WorldCommon.SaveWorldTag()
+	end
+end
+
+function options:GetWeather()
+	return self.weather or "sun"
+end
+
+--/shader命令
+function options:SetRenderMethod(shaderIdx,bSave)
+	local res = GameLogic.RunCommand("/shader "..shaderIdx);
+    if(res==false) then
+        if(shaderIdx ~= "1") then 
+            _guihelper.MessageBox(L"您的显卡不支持这个效果, 请升级您的显卡");
+        end
+    elseif(res=="disabled") then
+        _guihelper.MessageBox(L"/shader命令被禁止, 请在设置中解禁");
+    else
+		if bSave then
+			WorldCommon.GetWorldInfo().rendermethod = shaderIdx;
+			WorldCommon.SaveWorldTag()
+		end
+		return true
+    end
+
+	return false
+end
+
+function options:IsTimesAutoGo()
+	return self.isTimesAutoGo~=false
+end
+
+function options:SetTimesAutoGo(bool,bSave)
+	self.isTimesAutoGo = bool~=false
+	if bSave and WorldCommon.GetWorldTag("timesAutoGo") ~=tostring(bool) then
+		WorldCommon.SetWorldTag("timesAutoGo",tostring(bool))
+		WorldCommon.SaveWorldTag()
+	end
+end
+
+--停止昼夜交替后(self.isTimesAutoGo=false),时间冻结在哪个时间
+function options:SetFrozenDayTime(time,bSave)
+	self.frozendaytime = tonumber(time) or 0
+	GameLogic.RunCommand(string.format("/time %s",self.frozendaytime))
+	if bSave and WorldCommon.GetWorldTag("frozendaytime")~=time then
+		WorldCommon.SetWorldTag("frozendaytime",time)
+		WorldCommon.SaveWorldTag()
+	end
+end
+
+function options:GetFrozenDayTime()
+	return self.frozendaytime or 0
+end
+
+function options:SetLightColor(r,g,b,block_light_scale)
+	WorldCommon.SetWorldTag("lightcolor",string.format("%s,%s,%s",r,g,b))
+	WorldCommon.SaveWorldTag()
+
+	r,g,b = tonumber(r) or 204,tonumber(g) or 204,tonumber(b) or 204
+	self.lightcolor = {r,g,b}
+
+	block_light_scale = block_light_scale or 172
+	r = r/block_light_scale
+	g = g/block_light_scale
+	b = b/block_light_scale
+	ParaTerrain.GetBlockAttributeObject():SetField("BlockLightColor", {r,g,b});
+end
+
+function options:GetLightColor(hax)
+	local color = self.lightcolor or {204,204,204}
+	if hax then
+		color = string.format("#%02x%02x%02x",color[1],color[2],color[3])
+	end
+	return color
 end
 
 function options:ResetWindowTitle()
@@ -561,6 +713,8 @@ function options:OnLeaveWorld()
 	local TexturePackage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TexturePackage");
 	block_types.restore_texture_pack();
 	TexturePackage.CloseLastPackageZip();
+
+	Screen:Disconnect("sizeChanged", options, options.OnResize, "UniqueConnection")
 end
 
 function options:SetLastSaveTime()
@@ -652,7 +806,7 @@ function options:GetRenderDist()
 end
 
 -- the preferred render dist, the actual one may still be limited by MaxViewDist().
-function options:SetRenderDist(dist)
+function options:SetRenderDist(dist,bSave)
 	dist = math.min(math.max(tonumber(dist) or self.default_render_dist, 0),1024);
 	self.render_distance = dist;
 
@@ -676,6 +830,11 @@ function options:SetRenderDist(dist)
 	att:SetField("FarPlane", self.fog_end+1);
 
 	LOG.std(nil, "info", "options", "actual render dist is set to %d", actual_dist);
+
+	if bSave and WorldCommon.GetWorldTag("renderdist")~=tostring(dist) then
+		WorldCommon.SetWorldTag("renderdist",tostring(dist));
+		WorldCommon.SaveWorldTag()
+	end
 end
 
 function options:SetFogStart(dist)
@@ -779,7 +938,7 @@ end
 function options:SetViewBobbing(value, noSave)
 	local key = "Paracraft_System_View_Bobbing";
 	if(value == nil) then
-		self.ViewBobbing = GameLogic.GetPlayerController():LoadLocalData(key,true,true);
+		self.ViewBobbing = GameLogic.GetPlayerController():LoadLocalData(key,false,true);
 	elseif(self.ViewBobbing ~= value) then
 		self.ViewBobbing = value;
 		if(not noSave) then
@@ -1105,6 +1264,10 @@ function options:GetUIScaling()
 	return scaling[1]
 end
 
+function options:OnResize()
+	self:SetUIScaling(nil)
+end
+
 -- async asset loader
 function options:EnableAsyncAssetLoader(bEnable)
 	ParaEngine.GetAttributeObject():GetChild("AssetManager"):SetField("AsyncLoading", bEnable);
@@ -1115,12 +1278,17 @@ function options:GetRainStrength()
 end
 
 -- @param cloud: [0,1] default to 0
-function options:SetCloudThickness(cloud)
+function options:SetCloudThickness(cloud,bSave)
 	cloud = cloud or 0.1;
 	self.CloudThickness = cloud;
 	local att = ParaScene.GetAttributeObjectSky();
 	att:SetField("SimulatedSky", true);
 	att:SetField("CloudThickness", cloud or 1);
+
+	if bSave then
+		WorldCommon.SetWorldTag("cloudThickness",tostring(cloud));
+		WorldCommon.SaveWorldTag()
+	end
 end
 
 function options:GetCloudThickness()
@@ -1188,7 +1356,7 @@ function options:GetEyeBrightness()
 end
 
 -- set brightness(exposure) factor (0-1) used in HDR shader 3, 4. default value is 0.2.
-function options:SetEyeBrightness(factor)
+function options:SetEyeBrightness(factor,bSave)
 	factor = factor or 0.2;
 
 	if(factor > 0 and factor < 1) then
@@ -1196,6 +1364,11 @@ function options:SetEyeBrightness(factor)
 	
 		if(effect) then
 			effect:SetEyeBrightness(factor);
+		end
+
+		if bSave and WorldCommon.GetWorldTag("eyeBrightness")~=tostring(factor) then
+			WorldCommon.SetWorldTag("eyeBrightness",tostring(factor))
+			WorldCommon.SaveWorldTag()
 		end
 	end
 end
@@ -1215,7 +1388,8 @@ end
 
 -- use multi-frame renderer to render remote blocks 
 -- @param dist: if 0, it will disable super rendering
-function options:SetSuperRenderDist(dist)
+function options:SetSuperRenderDist(dist,bSave)
+	dist = dist and tonumber(dist)
 	if(dist and dist>=0 and dist <= 5000) then
 		local attr = ParaTerrain.GetBlockAttributeObject():GetChild("CMultiFrameBlockWorldRenderer");
 		attr:SetField("RenderDistance", dist);
@@ -1225,6 +1399,10 @@ function options:SetSuperRenderDist(dist)
 			attr:SetField("Enabled", true);
 			attr:SetField("Dirty", true);
 		end
+	end
+	if bSave then
+		WorldCommon.SetWorldTag("superrenderdist",tostring(dist));
+		WorldCommon.SaveWorldTag()
 	end
 end
 

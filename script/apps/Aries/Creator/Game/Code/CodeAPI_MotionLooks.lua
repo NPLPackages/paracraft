@@ -27,7 +27,8 @@ local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 -- say some text and wait for some time. 
 -- @param text: if nil, it will remove text
 -- @param duration: in seconds. if nil, it means forever
-function env_imp:say(text, duration)
+-- @param bAbove3D: true to display above all 3d objects
+function env_imp:say(text, duration, bAbove3D)
 	if(duration) then
 		env_imp.say(self, text);
 		env_imp.wait(self, duration);
@@ -38,7 +39,7 @@ function env_imp:say(text, duration)
 			if(text~=nil) then
 				text = tostring(text);
 			end
-			actor:Say(text, -1)
+			actor:Say(text, -1, bAbove3D)
 		else
 			GameLogic.AddBBS("codeblock", text, 10000);
 		end
@@ -419,6 +420,7 @@ end
 
 
 -- anim(id, durationMs): play a predefined animation by id, and wait durationMs(can be nil). 
+-- anim({id1, id2}): play two animations in sequence
 -- anim(name, durationMs): play a user defined anim by name, and wait durationMs(can be nil). 
 -- anim(name, fromTime, toTime, isLooped): define a new animation by name
 -- @param anim_id: 0 for standing (default), 4 for walk. 
@@ -426,7 +428,8 @@ function env_imp:anim(anim_id, param1, toTime, isLooped)
 	anim_id = anim_id or 0;
 	local entity = env_imp.GetEntity(self);
 	if(entity) then
-		if(type(anim_id) == "number") then
+		local anim_type = type(anim_id)
+		if(anim_type == "number" or anim_type == "table") then
 			entity:EnableAnimation(true);
 			if(self.actor.UnbindAnimInstance) then
 				-- this ensures that actor are not bound to current bone position in the movie block
@@ -449,7 +452,7 @@ function env_imp:anim(anim_id, param1, toTime, isLooped)
 			if(entity.animDef) then
 				env_imp.playBone(self, "*");
 			end
-		elseif(type(anim_id) == "string") then
+		elseif(anim_type == "string") then
 			if(param1 and toTime) then
 				-- define a new animation by name
 				-- anim(name, fromTime, toTime, isLooped)

@@ -149,11 +149,32 @@ function CreateBlock:Run()
 		local dy = (self.blockY or 0) * BlockEngine.blocksize;
 		local dz = (self.blockZ or 0) * BlockEngine.blocksize;
 
+		-- rename all live entities to unique new names
+		local renameMap;
+		if(self.rename) then
+			renameMap = {};
+			for _, entity in ipairs(self.liveEntities) do
+				local name = entity.attr and entity.attr.name;
+				if(name) then
+					renameMap[name] = ParaGlobal.GenerateUniqueID()
+				end
+			end
+		else
+			-- if entity already exist, we will use a different name, otherwise we will use name in xml node. 
+			for _, entity in ipairs(self.liveEntities) do
+				local name = entity.attr and entity.attr.name;
+				if(name and EntityManager.GetEntity(name)) then
+					renameMap = renameMap or {};
+					renameMap[name] = ParaGlobal.GenerateUniqueID()
+				end
+			end
+		end
+
 		for _, entity in ipairs(self.liveEntities) do
 			if(entity.attr and entity.attr.x) then
 				local xmlNode = commonlib.copy(entity)
 				xmlNode.attr.x, xmlNode.attr.y, xmlNode.attr.z = entity.attr.x+dx, entity.attr.y+dy, entity.attr.z+dz;
-				self:AddEntity(xmlNode)
+				self:AddEntity(xmlNode, renameMap)
 			end
 		end
 	end
@@ -173,15 +194,21 @@ function CreateBlock:Run()
 	end
 end
 
-function CreateBlock:AddEntity(xmlNode)
+-- @param renameMap: if not nil, we will rename self.name, self.linkTo attribute according to this map. 
+function CreateBlock:AddEntity(xmlNode, renameMap)
 	if(xmlNode) then
 		local attr = xmlNode.attr;
 		if(attr.name) then
-			-- if entity already exist, we will use a different name, otherwise we will use name in xml node. 
-			if(EntityManager.GetEntity(attr.name)) then
-				attr.name = nil;
+			if (renameMap) then
+				attr.name = renameMap[attr.name] or attr.name;
 			end
 		end
+		if (renameMap) then
+			if attr.linkTo and attr.linkTo ~= "" then
+				attr.linkTo = renameMap[attr.linkTo] or attr.linkTo;
+			end
+		end
+		
 		local entityClass;
 		if(attr.class) then
 			entityClass = EntityManager.GetEntityClass(attr.class)

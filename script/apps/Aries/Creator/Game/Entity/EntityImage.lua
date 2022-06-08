@@ -764,9 +764,7 @@ function Entity:OnClick(x, y, z, mouse_button)
 			end
 		end
 		self:BeginEdit();
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-		OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
+		local  function startEdit(result)
 			if(result) then
 				result = result:gsub("^%s+", ""):gsub("%s+$", ""):gsub("[\r\n]+$", "");
 
@@ -776,12 +774,24 @@ function Entity:OnClick(x, y, z, mouse_button)
 						result = format("$(%s)%s", commonlib.Encoding.DefaultToUtf8(cmd), path)
 					end
 				end
-
 				self:SetCommand(result);
 				self:Refresh(true);
 			end
 			self:EndEdit();
-		end, old_value, L"贴图文件", "texture");
+		end
+		if true then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenImageDialog.lua");
+			local OpenImageDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenImageDialog");
+			OpenImageDialog.ShowPage(self:GetCommandTitle(), function(result)
+				startEdit(result)
+			end, old_value)
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+			local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+			OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
+				startEdit(result)
+			end, old_value, L"贴图文件", "texture");
+		end
 	else
 		self:RunCommand()
 	end

@@ -42,6 +42,7 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
 say("Jump!", 2)
 move(0,1,0)
+say("above all 3d objects", -1, true)
 ]]}},
 },
 {

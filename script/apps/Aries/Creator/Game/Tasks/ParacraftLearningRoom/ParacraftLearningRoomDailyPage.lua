@@ -527,7 +527,7 @@ function ParacraftLearningRoomDailyPage.SaveToLocal(callback)
 	KeepWorkItemManager.SetClientData(gsid, clientData, callback)
 end
 function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
-    if(not NplBrowserLoaderPage.IsLoaded())then
+    if(System.options.enable_npl_brower and not NplBrowserLoaderPage.IsLoaded())then
 		if(not ParacraftLearningRoomDailyPage.isLoading) then
 			ParacraftLearningRoomDailyPage.isLoading = true
 			NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
@@ -576,7 +576,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 
 		RedSummerCampPPtPage.StartTask("dailyVideo")
 		GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { started = true, learningIndex = index });
-		if System.os.GetPlatform() ~= 'win32' then
+		if System.os.GetPlatform() ~= 'win32' or not System.options.enable_npl_brower then
 			-- 除了win32平台，使用默认浏览器打开视频教程
 			local cmd = string.format("/open %s", url);
 			GameLogic.RunCommand(cmd);

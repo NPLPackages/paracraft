@@ -504,8 +504,21 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 		asset_manifest:SetField("LoadManifestFile", redistFolder.."assets_manifest.txt")
 	end
 
-	if(additional_commandline_params) then
-		newCmdLine = newCmdLine.." "..additional_commandline_params;
+	if (GameLogic.GetFilters():apply_filters("store_get", "user/isSettingLanguage")) then
+		additional_commandline_params = (additional_commandline_params or "") .. " IsSettingLanguage=\"true\"";
+
+		if (GameLogic.GetFilters():apply_filters("store_get", "user/token")) then
+			additional_commandline_params =
+				(additional_commandline_params or "") ..
+				" temptoken=" ..
+				GameLogic.GetFilters():apply_filters("store_get", "user/token")
+		else
+			additional_commandline_params = (additional_commandline_params or "") .. " temptoken=\"\"";
+		end
+	end
+
+	if (additional_commandline_params) then
+		newCmdLine = newCmdLine .. " " .. additional_commandline_params;
 	end
 
 	ParaEngine.SetAppCommandLine(newCmdLine);
@@ -653,6 +666,7 @@ end
 
 -- @param callbackFunc: function(bInstalled) end
 function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
+	print("hyz update log---PELDocker 656",appName)
 	if(System.options.isFromQQHall) then
 		if(appName=="haqi2") then
 			-- tricky: QQ hall always has haqi installed, so skip it and proceed to haqi2
@@ -668,13 +682,15 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 	end
 
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
+	print("hyz update log---PELDocker 672:")
+	echo(app,true)
 	if(not app or app.noUpdate) then
 		if(callbackFunc) then
 			callbackFunc(true);
 		end
 		return
 	end
-
+	print("hyz update log---PELDocker 680",ParaWorldLoginDocker.IsInstalling())
 	if(ParaWorldLoginDocker.IsInstalling()) then
 		_guihelper.MessageBox(L"应用在安装中, 请等待");
 		if(callbackFunc) then
@@ -683,6 +699,7 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 		return true;
 	end
 	local appVersion = ParaWorldLoginDocker.GetAppVersionInfo(appName);
+	print("hyz update log---PELDocker 689 appVersion",appVersion)
 	if(appVersion) then
 		if(not appVersion.needUpdate) then
 			if(callbackFunc) then
@@ -709,13 +726,14 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
 	end
 
 	local redist_root = ParaWorldLoginDocker.GetAppFolder(appName);
+	print("hyz update log---PELDocker 716 redist_root",redist_root)
 	ParaIO.CreateDirectory(redist_root);
 
 	local autoUpdater = AutoUpdater:new();
-
+	print("hyz update log---PELDocker 720")
 	-- let us skip all dll and exe files
 	autoUpdater.FilterFile = function(self, filename)
-		if System.options.isDevMode and System.options.channelId=="430" and System.os.GetPlatform() == "win32" then 
+		if System.options.channelId=="430" and System.os.GetPlatform() == "win32" then 
 			return false
 		end
 		if(filename:match("%.exe") or filename:match("%.dll")) then
@@ -834,7 +852,7 @@ function ParaWorldLoginDocker.InstallApp(appName, callbackFunc)
     end);
 
 	ParaWorldLoginDocker.SetInstalling(true, ParaWorldLoginDocker.GetAppTitle(appName));
-
+	print("hyz update log---PELDocker 842")
     autoUpdater:check(nil,function()
         local cur_version = autoUpdater:getCurVersion();
         local latest_version = autoUpdater:getLatestVersion();

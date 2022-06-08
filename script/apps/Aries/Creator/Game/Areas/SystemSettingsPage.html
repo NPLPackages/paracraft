@@ -30,12 +30,7 @@ end
 
 function OnChangeTabview(index)
     SystemSettingsPage.category_ds_index = tonumber(index);
-    Page:Refresh(0);
-    if (SystemSettingsPage.category_ds_index == 2) then
-        Page:SetValue("AudioDevice", SystemSettingsPage.currentAudioDevice);
-        SystemSettingsPage.InitSoundUIData()
-        SystemSettingsPage.UpdateSoundUI()
-    end
+    SystemSettingsPage.RefreshPage()
 end
 
 function GetDS(index)
@@ -74,34 +69,38 @@ function GetShaderDS()
     return SystemSettingsPage.shader_ds;
 end
 
-function OnRenderDistChanged(value)
-    GameLogic.options:SetRenderDist(value);
-    WorldCommon.GetWorldInfo().renderdist = tostring(value);
+
+function GetLimitValue(text)
+    return commonlib.GetLimitLabel(text, 25)
 end
 
-function OnSuperRenderDistChanged(value)
-    GameLogic.options:SetSuperRenderDist(value);
-    if(value and value > GameLogic.options:GetRenderDist() and value>64) then
-        GameLogic.options:SetFogEnd(value - 64);
+function onDeviceClick(name)
+    SystemSettingsPage.onDeviceClick(name)
+end
+
+function IsShowVolume()
+    return ParaAudio.GetVolume()>0
+end
+
+function GetDeviceDivStr()
+    local str1=[[<div style="height:25px;margin-top:12px;">
+        <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"音乐" %></div>
+        <div style="float:left;margin-top:-2px;margin-left:-20px;">
+            <input name="btn_EnableSound" type="button" onclick="SystemSettingsPage.OnClickEnableSound" style="width:108px;height:29px;font-size:12px; background: url(Texture/Aries/Creator/keepwork/setting/qiehuan1_108X29_32bits.png#0 0 108 29);"/>
+        </div>
+    </div>]]
+    if IsShowVolume() then
+        str1= str1..[[<div style="height:25px;margin-top:12px;">
+            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px; color: #ffffff;" ><%=L"音量" %></div>
+            <div style="float:left;margin-top:4px;margin-left:-20px;">
+                <div style="width: 16px; height: 12px; background: url(Texture/Aries/Creator/keepwork/setting/icon1_16X12_32bits.png#0 0 16 12);"></div>
+                <pe:sliderbar name="system_sound_volume" min="0.0" max="3.0" min_step="0.03" value='<%=SystemSettingsPage.setting_ds["sound_volume"]%>' button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="margin-top: -18px; margin-left: 24px; height:22px;width:140px" onchange="SystemSettingsPage.OnChangeSoundVolume" />
+            </div>
+        </div>]]
     end
+    return str1
 end
-
-function OnToggleShader(name, value)
-    local res = GameLogic.RunCommand("/shader "..value);
-    if(res==false) then
-        if(value ~= "1") then 
-            Page:SetValue("comboShader", "1");
-            _guihelper.MessageBox(L"您的显卡不支持这个效果, 请升级您的显卡");
-        end
-    elseif(res=="disabled") then
-        _guihelper.MessageBox(L"/shader命令被禁止, 请在设置中解禁");
-    else
-        -- WorldCommon.GetWorldInfo().rendermethod = value;
-    end
-end
-
 ]]></script>
-<!-- Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22  Texture/Aries/Creator/keepwork/setting/btn2_32X32_32bits.png  font-family:Consolas"-->
     <div style="width:350px;height:530px;background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
         <div style="margin-left:6px;margin-top:0px;height:35px;">
             <pe:repeat DataSource="<%=GetTabviewButtons()%>" >
@@ -115,79 +114,85 @@ end
                 </pe:repeatitem>
             </pe:repeat>
         </div>
-        <!-- content bg -->
+        
         <div style="margin-left:8px;margin-top:4px;width:330px;height:440px;background: url(Texture/Aries/Creator/keepwork/setting/bjb_64X64_32bits.png#0 0 64 64:30 30 30 30);">
-            <pe:treeview style="margin-top:6px;color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#0 0 4 4:2 2 2 2);" VerticalScrollBarStep="30" VerticalScrollBarPageSize="200" >
+            <pe:treeview style="position: relative; margin-top:6px;height: 440px; color:#ffffff;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#0 0 4 4:2 2 2 2);" VerticalScrollBarStep="30" VerticalScrollBarPageSize="200" >
                 <div style="color:#ffffff;">
                     <pe:if condition='<%=GetCategoryDSIndex() == 1 %>' >
-                        <div style="height:25px;margin-top:0px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"分辨率" %></div>
-                            <div style="float:left;margin-left:14px;font-size:11px;">
-                                <select name = "ScreenResolution" AllowUserEdit="false" dropWidth="30.6" dropHeight="28.8" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 184px; height:28px">
-                                    <option value="3840 x 2160">3840X2160 (4K)</option>
-                                    <option value="2560 x 1440">2560X1440 (2K)</option>
-                                    <option value="1920 x 1080">1920X1080 (1080p)</option>
-                                    <option value="1280 x 720" selected="true">1280X720 (720p)</option>
-                                    <option value="1600 x 1200">1600X1200 (UXGA)</option>
-                                    <option value="1024 x 768">1024X768 (XGA)</option>
-                                </select>
+                        <pe:if condition='<%=ParaEngine.GetAttributeObject():GetField("IsWindowMaximized", nil)~=nil%>'>
+                            <div style="height:25px;margin-top:13px;">
+                                <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"全屏显示" %></div>
+                                <div style="float:left;margin-top:-2px;margin-left:18px;">
+                                    <input name='btn_FullScreenMode' value='' type="button" onclick='SystemSettingsPage.OnClickEnableFullScreenMode' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
+                                </div>
                             </div>
-                        </div>
+                        </pe:if>
+                        <pe:if condition='<%=not SystemSettingsPage.IsFullScreenMode() %>' >
+                            <div style="height:25px;margin-top:10px;">
+                                <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"分辨率" %></div>
+                                <div style="float:left;margin-left:20px;font-size:11px;">
+                                    <select name = "ScreenResolution" AllowUserEdit="false" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 160px; height:28px">
+                                        <option value="3840 x 2160">3840X2160 (4K)</option>
+                                        <option value="2560 x 1440">2560X1440 (2K)</option>
+                                        <option value="1920 x 1080">1920X1080 (1080p)</option>
+                                        <option value="1280 x 720" selected="true">1280X720 (720p)</option>
+                                        <option value="1600 x 1200">1600X1200 (UXGA)</option>
+                                        <option value="1024 x 768">1024X768 (XGA)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </pe:if>
                         <div style="height:25px;margin-top:12px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" tooltip='<%=L"过大会导致运行缓慢, 可以考虑使用超级远景"%>'><%=L"可视距离"%></div>
                             <div style="float:left;margin-top:-2px;margin-left:20px;">
-                                <pe:sliderbar name="renderDist" min="30" max="200" value="96" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="width:110px;height:22px;" onchange="OnRenderDistChanged()" ></pe:sliderbar>
+                                <pe:sliderbar name="renderDist" min="30" max="200" value="<%=SystemSettingsPage.GetDftRenderDist()%>" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="width:110px;height:22px;" onchange="SystemSettingsPage.OnRenderDistChanged()" ></pe:sliderbar>
                             </div>
                         </div>
-                        <div style="height:25px;margin-top:12px;">
+                        <div style="height:25px;margin-top:10px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" tooltip='<%=L"摄影机不动时,会持续渲染几公里内的场景,并不消耗显存"%>'><%=L"超级远景"%></div>
                             <div style="float:left;margin-top:-1px;margin-left:20px;">
-                                <pe:sliderbar name="superRenderDist" min="0" max="5000" value="96" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="width:110px;height:22px;" onchange="OnSuperRenderDistChanged()"></pe:sliderbar>
+                                <pe:sliderbar name="superRenderDist" min="0" max="5000" value="<%=SystemSettingsPage.GetDftSuperRenderDist()%>" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="width:110px;height:22px;" onchange="SystemSettingsPage.OnSuperRenderDistChanged()"></pe:sliderbar>
                             </div>
                         </div>
                         <div style="height:25px;margin-top:12px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"真实光影"%></div>
                             <div style="float:left;margin-top:0px;margin-left:20px;">
-                                <select name="comboShader" dropWidth="30.6" dropHeight="28.8" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="margin-top:0px; width: 110px; height:28px" onselect="OnToggleShader" AllowUserEdit="false" DataSource="<%=GetShaderDS()%>"></select>
+                                <select name="comboShader" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="margin-top:0px; width: 110px; height:28px" onselect="SystemSettingsPage.OnToggleShader" AllowUserEdit="false" DataSource="<%=GetShaderDS()%>"></select>
                             </div>
                         </div>
-                        <div style="height:25px;margin-top:12px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"水面反射" %></div>
-                            <div style="float:left;margin-top:-2px;margin-left:20px;">
-                                <input name='btn_WaterReflection' value='' type="button" onclick='SystemSettingsPage.OnClickEnableWaterReflection' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
+                        <pe:if condition='<%=not SystemSettingsPage.IsRealShaderOn() %>' >
+                            <div style="height:25px;margin-top:12px;">
+                                <div style="float:left;margin-left:3px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"水面反射" %></div>
+                                <div style="float:left;margin-top:-2px;margin-left:20px;">
+                                    <input name='btn_WaterReflection' value='' type="button" onclick='SystemSettingsPage.OnClickEnableWaterReflection' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
+                                </div>
                             </div>
-                        </div>
-                        <div style="height:25px;margin-top:12px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"场景投影" %></div>
-                            <div style="float:left;margin-top:-2px;margin-left:20px;">
-                                <input name='btn_Shadow' value='' type="button" onclick='SystemSettingsPage.OnClickEnableShadow' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
+                            <div style="height:25px;margin-top:12px;">
+                                <div style="float:left;margin-left:3px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"场景投影" %></div>
+                                <div style="float:left;margin-top:-2px;margin-left:20px;">
+                                    <input name='btn_Shadow' value='' type="button" onclick='SystemSettingsPage.OnClickEnableShadow' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
+                                </div>
                             </div>
-                        </div>
-                        <div style="margin-top:10px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;"><%=L"光线设置" %></div>
-                            <div style="float:left;margin-left:3px;margin-top:0px;width:21px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#167 238 21 22)"/>
-                            <div style="float:left;margin-top:6px;width:138;height:7px;margin-left:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 264 138 7);">
-                                <pe:sliderbar uiname="SystemSettingsPage.mcTimeSlider" name="mcTimeSlider" min="0" max="1000" min_step="1" value="300" button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;139 238 18 18" button_width="18" button_height="18" style="float:left;margin-top:-7px;width:138px;height:18px;background:;" onchange="SystemSettingsPage.OnTimeSliderChanged" tooltip='<%=L"拖动滑块调整光线强调"%>'></pe:sliderbar>
-                            </div>
-                            <div style="float:left;margin-left:7px;margin-top:-2px;width:13px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#196 238 13 22)"/>
-                        </div>
+                        </pe:if>
                         <div style="height:25px;margin-top:12px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;"><%=L"UI放缩" %></div>
                             <div style="float:left;margin-top:-2px;margin-left:20px;">
                                 <div style="float:left;">
-                                    <pe:sliderbar name="UI_Scaling" min="0.6" max="2" min_step="0.05" value="<%=GameLogic.options:GetUIScaling() %>" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="height:22px;width:100px;" onchange="SystemSettingsPage.OnChangeUIScaling" />
+                                    <pe:sliderbar name="UI_Scaling" min="0.6" max='<%=SystemSettingsPage.GetMaxUIScale()%>' min_step="0.05" value="<%=SystemSettingsPage.GetDefaultUiScale() %>" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="height:22px;width:100px;" onchange="SystemSettingsPage.OnChangeUIScaling" />
                                 </div>
                                 <input type="button" style="margin-left:5px;width:39px; height: 18px; background: url(Texture/Aries/Creator/keepwork/setting/chongzhi_39X18_32bits.png#0 0 39 18);" name="orignalScaling" value='' onclick='SystemSettingsPage.OnClickResetUIScaling' />
                             </div>
                         </div>
-                        <div style="height:25px;margin-top:12px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"视角摇晃" %></div>
-                            <div style="float:left;margin-top:-2px;margin-left:20px;">
-                                <input name='btn_ViewBobbing' value='' type="button" onclick='SystemSettingsPage.OnToggleViewBobbing' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
+                        <pe:if condition='<%=not SystemSettingsPage.NeedShowViewBobbing() %>' >
+                            <div style="height:25px;margin-top:10px;">
+                                <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"视角摇晃" %></div>
+                                <div style="float:left;margin-top:-2px;margin-left:20px;">
+                                    <input name='btn_ViewBobbing' value='' type="button" onclick='SystemSettingsPage.OnToggleViewBobbing' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
+                                </div>
                             </div>
-                        </div>
+                        </pe:if>
                         <div style="height:25px;margin-top:12px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"显示角色" %></div>
+                            <div style="float:left;margin-left:3px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"显示角色" %></div>
                             <div style="float:left;margin-top:-2px;margin-left:20px;">
                                 <input name='btn_ShowPlayer' value='' type="button" onclick='SystemSettingsPage.OnClickEnableShowMainPlayer' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
                             </div>
@@ -195,44 +200,43 @@ end
                         <div style="height:25px;margin-top:12px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"立体输出" %></div>
                             <div style="float:left;margin-left:20px;">
-                                <select name="stereomode" AllowUserEdit="false" dropWidth="30.6" dropHeight="28.8" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 103px; height:28px" onselect="SystemSettingsPage.OnChangeStereoMode">
+                                <select name="stereomode" AllowUserEdit="false" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 103px; height:28px" onselect="SystemSettingsPage.OnChangeStereoMode">
                                     <option value="0" selected="true">Off</option>
                                     <option value="2">Left/Right</option>
                                     <option value="5">Red/Blue</option>
                                 </select>
                             </div>
                         </div>
-                        <div style="height:25px;margin-top:12px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"左右眼间距" %></div>
-                            <div style="float:left;margin-top:-2px;margin-left:20px;">
-                                <pe:sliderbar name="stereo_eye_dist" min="0.0" max="0.2" min_step="0.01" value="0.1" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="height:22px;width:140px" onchange="SystemSettingsPage.OnChangeStereoEyeDist" />
-                            </div>
-                        </div>                   
+                        <pe:if condition='<%=GameLogic.options:IsStereoMode() %>' >
+                            <div style="height:25px;margin-top:12px;">
+                                <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"左右眼间距" %></div>
+                                <div style="float:left;margin-top:-2px;margin-left:20px;">
+                                    <pe:sliderbar name="stereo_eye_dist" min="0.0" max="0.2" min_step="0.01" value="<%=GameLogic.options:GetStereoEyeSeparationDist()%>" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="height:22px;width:140px" onchange="SystemSettingsPage.OnChangeStereoEyeDist" />
+                                </div>
+                            </div>       
+                        </pe:if>            
                     </pe:if>
-                    <pe:if condition='<%=GetCategoryDSIndex() == 2 %>' >                    
-                        <div style="height:25px;margin-top:12px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"音乐" %></div>
-                            <div style="float:left;margin-top:-2px;margin-left:-20px;">
-                                <input name="btn_EnableSound" value="" type="button" onclick="SystemSettingsPage.OnClickEnableSound" style="width:108px;height:29px;font-size:12px;" class="mc_light_grey_button_with_fillet"/>
-                            </div>
-                        </div>
-                        <pe:container uiname="sound_volume" style="height:25px;margin-top:12px; background:;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px; color: #ffffff;" ><%=L"音量" %></div>
-                            <div style="float:left;margin-top:4px;margin-left:-20px;">
-                                <div style="width: 16px; height: 12px; background: url(Texture/Aries/Creator/keepwork/setting/icon1_16X12_32bits.png#0 0 16 12);"></div>
-                                <pe:sliderbar name="system_sound_volume" min="0.0" max="3.0" min_step="0.03" value='<%=SystemSettingsPage.setting_ds["sound_volume"]%>' button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="margin-top: -18px; margin-left: 24px; height:22px;width:140px" onchange="SystemSettingsPage.OnChangeSoundVolume" />
-                            </div>
-                        </pe:container>
-                        <pe:container uiname="sound_device" style="height:25px;margin-top:14px; background:;">
+                    <!--在pe:treeview中内部content大小之外的按钮会没有效果，所以把div的大小设置成300，拉大content大小，或者不设置div大小-->
+                    <pe:if condition='<%=GetCategoryDSIndex() == 2 %>' >  
+                        <%=GetDeviceDivStr()%>
+                        <div style="margin-top:14px;">
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px; color: #ffffff;"><%=L"设备" %></div>
                             <div style="float:left;margin-top:-1px;margin-left:-20px;">
-                                <select name="AudioDevice" style="width:190px;height:23px" DataSource="<%=SystemSettingsPage.GetAudioDevices()%>" dropWidth="30.6" dropHeight="28.8" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" onselect="SystemSettingsPage.OnSelectAudioDevice">
-                                </select>
+                                <input type="text" name="AudioDevice" style="position: relative; text-valign:center; line-height:28px;width:190px;height:28px; background: url(Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13);" />
+                                <input type="button" onclick="SystemSettingsPage.onClickShowDevice" style="margin-left: -33px; margin-top: -1px; width: 34px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32);"/>
+                                <pe:container uiname="device_container" style="width: 190px; margin-top: -2px; padding-top: 2px; padding-bottom: 2px;background-color: #ffffff;">
+                                    <pe:repeat DataSource="<%=SystemSettingsPage.GetAudioDevices()%>">
+                                        <pe:repeatitem>
+                                            <input type="button" tooltip='<%=Eval("value")%>' value='<%=GetLimitValue(Eval("value"))%>' name='<%=Eval("index")%>' onclick="onDeviceClick" style="background:;margin-left: 2px; text-align: left; width: 190px; height: 20px;" />
+                                        </pe:repeatitem>
+                                    </pe:repeat>   
+                                </pe:container>
+                                
                             </div>
                             <div style="float:left;margin-top:0px;margin-left:6px;">
                                 <input name="btn_ResetDevice" type="button" onclick="SystemSettingsPage.OnClickResetAudioDevice" style="width:39px; height: 18px; background: url(Texture/Aries/Creator/keepwork/setting/chongzhi_39X18_32bits.png#0 0 39 18);"/>
                             </div>
-                        </pe:container>
+                        </div>
                     </pe:if>
                     <pe:if condition='<%=GetCategoryDSIndex() == 3 %>' >
                         <div style="height:25px;margin-top:14px;">
@@ -269,11 +273,11 @@ end
                                 </pe:if>
                             </div>
                         </div>
-                        <input type="checkbox" name="ChangeMouseLeftRight" style="margin-left:102px;margin-top:14px;" onclick="SystemSettingsPage.OnClickEnableMouseChange"/>
-                        <div style="float:left;margin-left:3px;margin-top: 12px;" for="ChangeMouseLeftRight"><%=L"鼠标左右互换"%></div>
+                        <input type="checkbox" name="ChangeMouseLeftRight" style="margin-left:98px;margin-top:14px;" onclick="SystemSettingsPage.OnClickEnableMouseChange"/>
+                        <div style="float:left;margin-left:18px;margin-top: 11px;" for="ChangeMouseLeftRight"><%=L"鼠标左右互换"%></div>
 
                         <div style="height:25px;margin-top:14px;">
-                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"选择方块" %></div>
+                            <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"选择方块"%></div>
                             <div style="float:left;margin-top:-10px;margin-left:-40px;width:100px;height:20px;" >
                                 <pe:if condition='<%=GetMouseSetting("ChooseBlock") == "left" %>' >
                                     <div style="margin-left:42px;margin-top:3px;width:28px;height:40px;background:url(Texture/Aries/Creator/keepwork/setting/shubiao3_28X41_32bits.png#0 0 28 41)"/>
@@ -334,8 +338,8 @@ end
                     </pe:if>
                     <pe:if condition='<%=GetCategoryDSIndex() == 4 %>' >
                         <div>
-                            <input type="button" name="clearCache" value='<%=L"清空缓存" %>' style="font-weight: bold; font-size: 14px; width: 84px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);" onclick="SystemSettingsPage.OnClearCache()" />
-                            <span style="margin-top: 3px; margin-left:5px;font-size: 14px; color: #ffffff;">temp/webcache/*</span>
+                            <input type="button" name="clearCache" value='<%=L"清空缓存" %>' style="margin-top: 13px; font-weight: bold; font-size: 14px; width: 84px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);" onclick="SystemSettingsPage.OnClearCache()" />
+                            <span style="margin-top: 16px; margin-left:5px;font-size: 14px; color: #ffffff;">temp/webcache/*</span>
                         </div>
                         <div style="margin-top:12px;">
                             <input type="button" name="clearMemory" value='<%=L"整理内存" %>' style="font-weight: bold;font-size: 14px; width: 84px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);"  onclick="SystemSettingsPage.OnClearMemory()" />
@@ -374,10 +378,12 @@ end
                 </div>
             </pe:treeview>
         </div>
+        
         <div style="margin-top:5px;" >
             <input type="button" name="OK" value='<%=L"确定" %>' style="margin-left:40px;height:40px;width:110px;color:#000000;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="SystemSettingsPage.OnOK()"/>
             <input type="button" name="Cancel" value='<%=L"关闭" %>' style="margin-left:50px;height:40px;width:110px;color:#000000;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);" onclick="SystemSettingsPage.OnCancel()"/>
         </div>
+        
     </div>
 </pe:mcml> 
 </body>

@@ -32,6 +32,10 @@ function OpenFileDialog.OnInit()
 	page = document:GetPageCtrl();
 end
 
+local function IsAndroidPlatform() 
+	return System.os.GetPlatform() == "android"
+end
+
 -- @param filterName: "model", "bmax", "audio", "texture", "xml", "script"
 function OpenFileDialog.GetFilters(filterName)
 	if(filterName == "model") then
@@ -61,6 +65,7 @@ function OpenFileDialog.GetFilters(filterName)
 			{"(*.npl)",  "*.npl"},
 		};
 	elseif(filterName == "audio") then
+		if (IsAndroidPlatform()) then return "audio/mp3;audio/ogg;audio/wav" end 
 		return {
 			{L"全部文件(*.mp3,*.ogg,*.wav)",  "*.mp3;*.ogg;*.wav"},
 			{L"mp3(*.mp3)",  "*.mp3"},
@@ -68,6 +73,7 @@ function OpenFileDialog.GetFilters(filterName)
 			{L"wav(*.wav)",  "*.wav"},
 		};
 	elseif(filterName == "texture") then
+		if (IsAndroidPlatform()) then return "image/png;image/jpg" end 
 		return {
 			{L"全部文件(*.png,*.jpg)",  "*.png;*.jpg"},
 			{L"png(*.png)",  "*.png"},
@@ -78,6 +84,7 @@ function OpenFileDialog.GetFilters(filterName)
 			{L"全部文件(*.xml)",  "*.xml"},
 		};
 	elseif(filterName == "*.*") then
+		if (IsAndroidPlatform()) then return "*/*" end 
 		return {
 			{L"bmax模型(*.bmax)",  "*.bmax"},
 			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
@@ -163,7 +170,8 @@ end
 
 function OpenFileDialog.OnOK()
 	if(page) then
-		OpenFileDialog.OnCloseWithResult(commonlib.Encoding.Utf8ToDefault(page:GetValue("text")))
+		local text = page:GetValue("text"):gsub("^?","")
+		OpenFileDialog.OnCloseWithResult(commonlib.Encoding.Utf8ToDefault(text))
 	end
 end
 
@@ -197,6 +205,65 @@ function OpenFileDialog.GetSearchDirectory()
 		end
 	end
 	return rootPath or ParaWorld.GetWorldDirectory()
+end
+
+-- public function:
+-- @param filterName: "script", "model", etc. 
+-- @return nil or filterFunc if found
+function OpenFileDialog.GetFilterFunction(filterName)
+	local filterFunc;
+	local filters = OpenFileDialog.GetFilters(filterName)
+	if(filters) then
+		local filter = filters[1];
+		if(filter) then
+			if(filter.filterFunc) then
+				filterFunc = filter.filterFunc;
+			else
+				local filterText = filter[2];
+				if(filterText) then
+					-- "*.fbx;*.x;*.bmax;*.xml"
+					local exts = {};
+					local excludes;
+					for ext in filterText:gmatch("%*%.([^;]+)") do
+						exts[#exts + 1] = "%."..ext.."$";
+					end
+					if(filter.exclude) then
+						excludes = excludes or {};
+						for ext in filter.exclude:gmatch("%*%.([^;]+)") do
+							excludes[#excludes + 1] = "%."..ext.."$";
+						end
+					end
+				
+					-- skip these system files and all files under blockWorld.lastsave/
+					local skippedFiles = {
+						["LocalNPC.xml"] = true,
+						["entity.xml"] = true,
+						["players/0.entity.xml"] = true,
+						["revision.xml"] = true,
+						["tag.xml"] = true,
+					}
+
+					filterFunc = function(item)
+						if(not skippedFiles[item.filename] and not item.filename:match("^blockWorld")) then
+							if(excludes) then
+								for i=1, #excludes do
+									if(item.filename:match(excludes[i])) then
+										return;
+									end
+								end
+							end
+							for i=1, #exts do
+								if(item.filename:match(exts[i])) then
+									return true;
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return filterFunc;
 end
 
 function OpenFileDialog.UpdateExistingFiles()
@@ -259,10 +326,19 @@ function OpenFileDialog.UpdateExistingFiles()
 	local files = {};
 	OpenFileDialog.dsExistingFiles = files;
 	local result = commonlib.Files.Find({}, rootPath, searchLevel, 500, filterFunc);
-	for i = 1, #result do
-		files[#files+1] = {name="file", attr=result[i]};
-	end
+
 	if(System.World.worldzipfile) then
+		local localFiles = {};
+		for i = 1, #result do
+			localFiles[#localFiles+1] = {name="file", attr=result[i]};
+		end
+	
+		if (localFiles and #localFiles > 0) then
+			for _, item in ipairs(localFiles) do
+				files[#files + 1] = item;
+			end
+		end
+
 		local zip_archive = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CFileManager"):GetChild(System.World.worldzipfile);
 		local zipParentDir = zip_archive:GetField("RootDirectory", "");
 		if(zipParentDir~="") then
@@ -272,10 +348,29 @@ function OpenFileDialog.UpdateExistingFiles()
 				for i = 1, #result do
 					if(type(filterFunc) == "function" and filterFunc(result[i])) then
 						result[i].filename = commonlib.Encoding.Utf8ToDefault(result[i].filename);
-						files[#files+1] = {name="file", attr=result[i]};
+						local beExist = false;
+
+						if (localFiles and #localFiles > 0) then
+							for _, item in ipairs(localFiles) do
+								if item and item.attr and item.attr.filename and
+								   result[i] and result[i].filename and
+								   item.attr.filename == result[i].filename then
+									beExist = true;
+									break;
+								end
+							end
+						end
+
+						if (not beExist) then
+							files[#files+1] = {name="file", attr=result[i]};
+						end
 					end
 				end
 			end
+		end
+	else
+		for i = 1, #result do
+			files[#files + 1] = {name="file", attr=result[i]};
 		end
 	end
 	table.sort(files, function(a, b)
@@ -286,26 +381,48 @@ end
 function OpenFileDialog.OnOpenFileDialog()
 	NPL.load("(gl)script/ide/OpenFileDialog.lua");
 
-	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.filters, 
-		OpenFileDialog.title,
-		OpenFileDialog.GetSearchDirectory(), 
-		OpenFileDialog.IsSaveMode);
-		
-	if(filename and page) then
-		local fileItem = Files.ResolveFilePath(filename);
-		if(fileItem) then
-			if(fileItem.relativeToWorldPath) then
-				local filename = fileItem.relativeToWorldPath;
-				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
-			elseif(fileItem.relativeToRootPath) then
-				local filename = fileItem.relativeToRootPath;
-				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
-			else
-				filename = filename:match("[^/\\]+$")
-				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+	local function RefreshPage(filename)
+		if(filename and page) then
+			local fileItem = Files.ResolveFilePath(filename);
+			if(fileItem) then
+				if(fileItem.relativeToWorldPath) then
+					local filename = fileItem.relativeToWorldPath;
+					page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+				elseif(fileItem.relativeToRootPath) then
+					local filename = fileItem.relativeToRootPath;
+					page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+				else
+					filename = filename:match("[^/\\]+$")
+					page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+				end
 			end
 		end
 	end
+
+	if (System.os.GetPlatform() == "win32") then 
+		print(OpenFileDialog.filters)
+		local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenFileDialog.filters, 
+		OpenFileDialog.title,
+		OpenFileDialog.GetSearchDirectory(), 
+		OpenFileDialog.IsSaveMode);
+		RefreshPage(filename);
+	elseif (System.os.GetPlatform() == "mac") then 
+		local filename = CommonCtrl.OpenFileDialog.ShowDialog_Mac(OpenFileDialog.filters, 
+		OpenFileDialog.title,
+		OpenFileDialog.GetSearchDirectory(), 
+		OpenFileDialog.IsSaveMode);
+		RefreshPage(filename);		
+	elseif (System.os.GetPlatform() == "android") then
+		CommonCtrl.OpenFileDialog.ShowDialog_Android(OpenFileDialog.filters, function(filepath)
+			if (filepath and filepath ~= "") then
+				RefreshPage(filepath);
+			end
+		end)
+	elseif (System.os.GetPlatform() == "ios") then
+		CommonCtrl.OpenFileDialog.ShowDialog_iOS(OpenFileDialog.filters, function(filepath)
+			-- TODO: 
+		end)
+ 	end 
 end
 
 function OpenFileDialog.GetText()
@@ -324,6 +441,73 @@ function OpenFileDialog.OnClickEdit()
 		local new_filename = callback(filename);
 		if(new_filename and new_filename~=filename) then
 			page:SetValue("text", commonlib.Encoding.DefaultToUtf8(new_filename));
+		end
+	end
+end
+
+local filteredFiles = nil;
+function OpenFileDialog.GetAllFilesWithFilters()
+	return filteredFiles and filteredFiles or OpenFileDialog.GetExistingFiles()
+end
+
+-- @param searchText: we will filter file names with the given text. if nil or "", we will not apply search filters. 
+-- @return search text if text has been changed since last call.
+function OpenFileDialog.SetSearchText(searchText)
+	if(not searchText or searchText == "") then
+		filteredFiles = nil;
+		if(OpenFileDialog.searchText) then
+			OpenFileDialog.searchText = nil
+			return true;
+		end
+	else
+		if(OpenFileDialog.searchText ~= searchText) then
+			OpenFileDialog.searchText = searchText
+			filteredFiles = {};
+			for i, file in ipairs(OpenFileDialog.GetExistingFiles()) do
+				if(file.attr.filename:find(searchText, 1, true) or (file.attr.text and file.attr.text:find(searchText, 1, true))) then
+					filteredFiles[#filteredFiles+1] = file
+				end
+			end
+			return true
+		end
+	end
+end
+
+function OpenFileDialog.Refresh()
+	if(page) then
+		page:Refresh(0.01);
+	end
+end
+
+function OpenFileDialog.RefreshFileTreeView() 
+	if(page) then
+		page:CallMethod("tvwExistingFiles","SetDataSource", OpenFileDialog.GetAllFilesWithFilters());
+		page:CallMethod("tvwExistingFiles","DataBind", true);
+	end
+end
+
+function OpenFileDialog.OnTextChange(name, mcmlNode)
+	local text = mcmlNode:GetUIValue()
+	local patt = "[^a-zA-Z0-9_%.]"
+	if text and string.match(text,patt) then
+		text = string.gsub(text,patt,"")
+		page:SetUIValue("text",text)
+	end
+	
+	if(text and text:match("^[/?]")) then
+		OpenFileDialog.searchTimer = OpenFileDialog.searchTimer or commonlib.Timer:new({callbackFunc = function(timer)
+			if(page) then
+				local text = page:GetUIValue("text") or ""
+				local searchText = text:match("^[/?](.+)")
+				if(OpenFileDialog.SetSearchText(searchText)) then
+					OpenFileDialog.RefreshFileTreeView()
+				end
+			end
+		end})
+		OpenFileDialog.searchTimer:Change(500);
+	else
+		if(OpenFileDialog.SetSearchText()) then
+			OpenFileDialog.RefreshFileTreeView()
 		end
 	end
 end

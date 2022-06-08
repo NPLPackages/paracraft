@@ -24,6 +24,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelMountPoints.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/BonesVariable.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/API/ParaLifeAPI.lua");
+local Quaternion = commonlib.gettable("mathlib.Quaternion");
+local API = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.API")
 local BonesVariable = commonlib.gettable("MyCompany.Aries.Game.Movie.BonesVariable");
 local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager.BlockInEntityHand");
 local AppGeneralGameClient = commonlib.gettable("Mod.GeneralGameServerMod.App.Client.AppGeneralGameClient");
@@ -31,7 +34,6 @@ local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.C
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local ModelMountPoints = commonlib.gettable("MyCompany.Aries.Game.Common.ModelMountPoints");
-local Quaternion = commonlib.gettable("mathlib.Quaternion");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
@@ -74,6 +76,8 @@ Entity:Property({"onhoverEvent", nil, "GetOnHoverEvent", "SetOnHoverEvent", auto
 Entity:Property({"onmountEvent", nil, "GetOnMountEvent", "SetOnMountEvent", auto=true});
 Entity:Property({"onbeginDragEvent", nil, "GetOnBeginDragEvent", "SetOnBeginDragEvent", auto=true});
 Entity:Property({"onendDragEvent", nil, "GetOnEndDragEvent", "SetOnEndDragEvent", auto=true});
+Entity:Property({"onTickEvent", nil, "GetOnTickEvent", "SetOnTickEvent", auto=true});
+Entity:Property({"framemove_interval", 1, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
 Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
 Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
 Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
@@ -94,17 +98,30 @@ Entity.isServerEntity = true;
 Entity.class_name = "LiveModel";
 -- register class
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
--- enabled frame move for syncing  
+-- enabled frame move for syncing and ticking 
 Entity.framemove_interval = 1;
 Entity.group_id = GameLogic.SentientGroupIDs.NPC;
 -- we will disable code actor picking control
 Entity.disable_codeactor_picking_control = true
+-- How high this entity can step up when running into a block to try to get over it 
+Entity.stepHeight = 0;
+--private: 
+Entity.targetX = nil;
+Entity.targetY = nil;
+Entity.targetZ = nil;
+Entity.targetFacing = 0;
+Entity.targetPitch = 0;
+Entity.smoothFrames = 0;
+Entity.motionX = 0;
+Entity.motionY = 0;
+Entity.motionZ = 0;
 
 function Entity:ctor()
 	self.item_id = self.item_id or block_types.names.LiveModel;
 	self.inventory = InventoryBase:new():Init();
 	self.inventory:SetClient();
-	self:SetRuleBagSize(16);
+	self.inventory:SetParentEntity(self);
+	self:SetRuleBagSize(4);
 
 	local dataWatcher = self:GetDataWatcher(true);
 	-- main asset data. 
@@ -180,6 +197,14 @@ function Entity:SetDead()
 	self:Destroy();
 end
 
+--自己所有链接的子节点也一并删除
+function Entity:SetDeadWithAllChildren()
+	self:ForEachChildLinkEntity(function(child)
+		child:SetDeadWithAllChildren()
+	end)
+	self:SetDead()
+end
+
 -- bool: whether has command panel
 function Entity:HasCommand()
 	return true;
@@ -191,7 +216,7 @@ end
 
 -- bool: whether show the rule panel
 function Entity:HasRule()
-	return false;
+	return true;
 end
 
 -- the title text to display (can be mcml)
@@ -446,6 +471,12 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.onendDragEvent) then
 			self.onendDragEvent = attr.onendDragEvent
 		end
+		if(attr.onTickEvent) then
+			self.onTickEvent = attr.onTickEvent
+		end
+		if(attr.framemove_interval) then
+			self.framemove_interval = tonumber(attr.framemove_interval)
+		end
 		if(attr.tag) then
 			self:SetTag(attr.tag);
 		end
@@ -523,6 +554,12 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.onendDragEvent and self.onendDragEvent~="") then
 		attr.onendDragEvent = self.onendDragEvent
 	end
+	if(self.onTickEvent and self.onTickEvent~="") then
+		attr.onTickEvent = self.onTickEvent
+	end
+	if(self.framemove_interval ~= Entity.framemove_interval) then
+		attr.framemove_interval = self.framemove_interval
+	end
 	if(self.tag and self.tag~="") then
 		attr.tag = self.tag
 	end
@@ -554,6 +591,8 @@ function Entity:SaveToXMLNode(node, bSort)
 	attr.x, attr.y, attr.z = self:GetPosition()
 	if(self.useRealPhysics) then
 		attr.useRealPhysics = true;
+	elseif self.isDragging and self.beforeDragHasPhysics then
+		attr.beforeDragHasPhysics = true
 	end
 	attr.canDrag = self.canDrag;
 	attr.stackHeight = self.stackHeight;
@@ -580,6 +619,44 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 
 	return node;
+end
+
+--比SaveToXMLNode多包含了linkedChild的信息
+function Entity:SaveToXMLNodeWithAllLinkedInfo()
+	local _xmlInfo = self:SaveToXMLNode()
+    local loadLinkedXmls;
+    loadLinkedXmls = function (_entity,xmlInfo)
+        xmlInfo.linkList = {}
+        local num = _entity:GetMountPointsCount() or 0
+        _entity:ForEachChildLinkEntity(function(eee)
+            local mountIdx = nil
+            for i=1,num do
+                if eee==_entity:GetMountedEntityAt(i) then
+                    mountIdx = i 
+                    break
+                end
+            end
+            local _xml = eee:SaveToXMLNode()
+            loadLinkedXmls(eee,_xml)
+            local _linkInfo = eee.linkInfo or {}
+            table.insert(xmlInfo.linkList,{
+                mountIdx = mountIdx, --如果是插件点上的点，记录是本节点的哪个插件点
+                xmlInfo = _xml,
+                linkInfo = {
+                    boneName = _linkInfo.boneName,
+                    pos = _linkInfo.pos,
+                    rot = _linkInfo.rot,
+                },
+                nodeInfo = { --记录相对与本节点的位移
+                    x = _xml.attr.x - _xmlInfo.attr.x,
+                    y = _xml.attr.y - _xmlInfo.attr.y,
+                    z = _xml.attr.z - _xmlInfo.attr.z,
+                }
+            })
+        end)
+    end
+	loadLinkedXmls(self,_xmlInfo)
+	return _xmlInfo
 end
 
 -- convert all link info into a string, such as "name1::L_Hand@{rot={1,0,0},pos={0,1,0}}"
@@ -669,6 +746,7 @@ function Entity:CreateInnerObject()
 		scaling = self.scaling,
 		facing = self.facing, 
 		IsPersistent = false,
+		localTransform = self.modelLocalTransform,
 	});
 
 	if(obj) then
@@ -732,6 +810,7 @@ function Entity:SetRoll(roll)
 		if(obj) then
 			obj:SetField("roll", roll or 0);
 		end
+		self:valueChanged();
 	end
 end
 
@@ -748,6 +827,7 @@ function Entity:SetPitch(pitch)
 		if(obj) then
 			obj:SetField("pitch", pitch or 0);
 		end
+		self:valueChanged();
 	end
 end
 
@@ -822,11 +902,12 @@ end
 function Entity:EndEdit()
 	Entity._super.EndEdit(self);
 	self:MarkForUpdate();
+	self:CheckLoadPhysics();
 end
 
 -- @param filename: if nil, self.filename is used
 function Entity:GetModelDiskFilePath(filename)
-	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile()));
+	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile())) or Files.GetTempPath()..commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile())
 end
 
 function Entity:SetModelFile(filename)
@@ -1017,7 +1098,7 @@ function Entity:GetMountedEntityAt(mountPointIndex)
 	if(self:GetMountPoints()) then
 		local x, y, z = self:GetMountPoints():GetMountPositionInWorldSpace(mountPointIndex)
 		if(x and self.childLinks) then
-			for child, _ in pairs(self.childLinks) do
+			for _, child in ipairs(self.childLinks) do
 				local x1, y1, z1 = child:GetPosition()
 				if((math.abs(x-x1)+math.abs(z-z1)) < 0.05 and math.abs(y-y1) < 0.3) then
 					return child;
@@ -1027,7 +1108,6 @@ function Entity:GetMountedEntityAt(mountPointIndex)
 	end
 end
 
-
 function Entity:OnMount(mountPointName, mountpointIndex, mountedEntity)
 	local event = Event:new():init("onmount");	
 	self:event(event);
@@ -1035,7 +1115,7 @@ function Entity:OnMount(mountPointName, mountpointIndex, mountedEntity)
 	local onmountEvent = self.onmountEvent or "__entity_onmount"
 	if(mountedEntity) then
 		local x, y, z = self:GetBlockPos();
-		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, mountname=%q, mountindex=%d, mountedEntityName=%q}", onmountEvent, x, y, z, self.name, mountPointName or "", mountpointIndex or 0, mountedEntity.name or ""))
+		local result = self:BroadcastEvents(onmountEvent, {x=x, y=y, z=z, name=self.name, mountname = mountPointName or "", mountindex = mountpointIndex or 0, mountedEntityName = mountedEntity.name or ""});
 		return true;
 	end
 end
@@ -1049,8 +1129,37 @@ function Entity:OnHover(hoverEntity)
 	local onhoverEvent = self.onhoverEvent or "__entity_onhover"
 	if(hoverEntity) then
 		local x, y, z = self:GetBlockPos();
-		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q, hoverEntityName=%q}", onhoverEvent, x, y, z, self.name, hoverEntity.name or ""))
+		local result = self:BroadcastEvents(onhoverEvent, {x=x, y=y, z=z, name=self.name, hoverEntityName = hoverEntity.name or ""});
 		return true; 
+	end
+end
+
+-- broadcase global games like onclick, onhover, ondrag, etc. 
+-- @param eventNames: string separated by ; such as "name1;name2", it can also be buildin functions like "API.showTag"
+-- @param msg: table or string
+-- @param entity: broadcast to this entity, this is usually self. 
+-- @return if any function has return value, subsequent functions will not be executed. And this function will return the first non-nil return value.
+function Entity:BroadcastEvents(eventNames, msg, entity)
+	if(eventNames) then
+		local result;
+		for eventname in string.gmatch(eventNames, "%s*([^;]+)%s*") do
+			local funcItem = API.GetFunctionItem(eventname)
+			if(funcItem and funcItem.func) then
+				if(funcItem.isDirectCall) then
+					result = funcItem.func(msg);
+				else
+					result = GameLogic.GetCodeGlobal():RunAsCodeBlockFunction(funcItem.func, msg);
+				end
+			else
+				-- uncomment to pass msg as string, such as from command line. 
+				-- msg = commonlib.serialize_compact(msg);
+				result = GameLogic.GetCodeGlobal():BroadcastTextEventTo(entity, eventname, msg, true);
+			end
+			if(result) then
+				break;
+			end
+		end
+		return result;
 	end
 end
 
@@ -1083,10 +1192,8 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 			local onclickEvent = self.onclickEvent or "__entity_onclick"
 			if(onclickEvent) then
 				local x, y, z = self:GetBlockPos();
-				local event = Event:new():init(onclickEvent);	
 				local facing = Direction.directionTo3DFacing[side or 0]
-				event.cmd_text = string.format("{x=%d, y=%d, z=%d, name=%q, facing=%f}", x, y, z, self.name, facing or 0);
-				local result = GameLogic:event(event, true);
+				local result = self:BroadcastEvents(onclickEvent, {x=x, y=y, z=z, name=self.name, facing = facing or 0});
 				if(result or self.onclickEvent) then
 					return true;
 				end
@@ -1152,7 +1259,9 @@ function Entity:LinkTo(targetEntity, boneName, pos, rot)
 		local x, y, z = srcEntity:GetPosition()
 		local tx, ty, tz = targetEntity:GetPosition()
 
-		local quatRot = Quaternion:new():FromAngleAxis(-targetEntity:GetFacing(), mathlib.vector3d.unit_y)
+		--local quatRot = Quaternion:new():FromAngleAxis(-targetEntity:GetFacing(), mathlib.vector3d.unit_y)
+		local quatRot = Quaternion:new():FromEulerAnglesSequence(-targetEntity:GetRoll(), -targetEntity:GetPitch(), -targetEntity:GetFacing(), "zxy")
+
 		self.linkInfo.x, self.linkInfo.y, self.linkInfo.z = quatRot:RotateVector3(x - tx, y - ty, z - tz)
 		self.linkInfo.facing = srcEntity:GetFacing() - targetEntity:GetFacing();
 		self.linkInfo.scaling = targetEntity:GetScaling()
@@ -1168,10 +1277,11 @@ function Entity:LinkTo(targetEntity, boneName, pos, rot)
 			targetEntity:Connect("facingChanged", self, self.UpdateEntityLink);
 			targetEntity:Connect("scalingChanged", self, self.UpdateEntityLink);
 			targetEntity:Connect("beforeDestroyed", self, self.UnLink);
+			self:Connect("beforeDestroyed", self, self.UnLink);
 			self:Connect("facingChanged", self, self.OnUpdateLinkFacing);
 			--self:Connect("valueChanged", self, self.OnUpdateLinkPosition);
-			targetEntity.childLinks = targetEntity.childLinks or {};
-			targetEntity.childLinks[self] = true;
+			targetEntity.childLinks = targetEntity.childLinks or commonlib.UnorderedArraySet:new();
+			targetEntity.childLinks:add(self);
 		end
 		if(targetEntity and boneName) then
 			local animId = targetEntity:GetCurrentAnimId()
@@ -1206,7 +1316,7 @@ function Entity:UnLinkEntity(entity)
 		entity:Disconnect("beforeDestroyed", self, self.UnLink);
 		self:Disconnect("facingChanged", self, self.OnUpdateLinkFacing);
 		--self:Disconnect("valueChanged", self, self.OnUpdateLinkPosition);
-		entity.childLinks[self] = nil;
+		entity.childLinks:removeByValue(self);
 	end
 end
 
@@ -1324,7 +1434,9 @@ function Entity:UpdateEntityLink()
 			end
 		else
 			local x, y, z = targetEntity:GetPosition();
-			self.linkInfo.quatRot:FromAngleAxis(targetEntity:GetFacing(), mathlib.vector3d.unit_y)
+			--self.linkInfo.quatRot:FromAngleAxis(targetEntity:GetFacing(), mathlib.vector3d.unit_y)
+			self.linkInfo.quatRot:FromEulerAnglesSequence(targetEntity:GetRoll(), targetEntity:GetPitch(), targetEntity:GetFacing(), "zxy")
+
 			local rx, ry, rz = self.linkInfo.quatRot:RotateVector3(self.linkInfo.x, self.linkInfo.y, self.linkInfo.z)
 			local curScaling = targetEntity:GetScaling();
 			if(curScaling ~= self.linkInfo.scaling) then
@@ -1340,7 +1452,7 @@ end
 -- @param callbackFunc: function(childEntity) end
 function Entity:ForEachChildLinkEntity(callbackFunc, ...)
 	if(self.childLinks) then
-		for child, _ in pairs(self.childLinks) do
+		for _, child in ipairs(self.childLinks) do
 			callbackFunc(child, ...)
 		end
 	end
@@ -1349,7 +1461,7 @@ end
 -- @return true 
 function Entity:HasLinkChild(childEntity)
 	if(self.childLinks) then
-		for child, _ in pairs(self.childLinks) do
+		for _, child in ipairs(self.childLinks) do
 			if(child == childEntity) then
 				return true;
 			elseif(child:HasLinkChild(childEntity)) then
@@ -1359,9 +1471,12 @@ function Entity:HasLinkChild(childEntity)
 	end
 end
 
+function Entity:GetLinkChild()
+end
+
 function Entity:GetLinkChildAtBone(boneName)
 	if(boneName and self.childLinks) then
-		for child, _ in pairs(self.childLinks) do
+		for _, child in ipairs(self.childLinks) do
 			if(child.linkInfo and child.linkInfo.boneName == boneName) then
 				return child;
 			end
@@ -1381,11 +1496,15 @@ end
 function Entity:GetLinkChildCount()
 	local count = 0
 	if(self.childLinks) then
-		for child, _ in pairs(self.childLinks) do
-			count = count + 1
-		end
+		count = self.childLinks:size();
 	end
 	return count
+end
+
+function Entity:GetLinkChildAt(index)
+	if(self.childLinks) then
+		return self.childLinks[index or 1];
+	end
 end
 
 function Entity:GetLinkToTarget()
@@ -1482,8 +1601,33 @@ function Entity:OnBeginDrag()
 	local onbeginDragEvent = self.onbeginDragEvent or "__entity_onbegindrag"
 	if(onbeginDragEvent) then
 		local x, y, z = self:GetBlockPos();
-		GameLogic.RunCommand(string.format("/sendevent %s {x=%d, y=%d, z=%d, name=%q}", onbeginDragEvent, x, y, z, self.name))
+		local result = self:BroadcastEvents(onbeginDragEvent, {x=x, y=y, z=z, name=self.name,});
 		return true;
+	end
+end
+
+-- self.restoreDragParams: {pos = {x,y,z}, facing, linkTo}
+function Entity:RestoreDragLocation()
+	-- TODO: what happens if restoring to player's bag?
+	if(self.restoreDragParams) then
+		local dragParams = self.restoreDragParams;
+		old_x, old_y, old_z = unpack(dragParams.pos);
+		old_facing = dragParams.facing;
+		old_linkTo = dragParams.linkTo;
+
+		if(old_x) then
+			self:SetPosition(old_x, old_y, old_z);
+			self:SetFacing(old_facing);
+			if(old_linkTo) then
+				self:LinkToEntityByName(old_linkTo)
+			else
+				self:UnLink();
+			end	
+		end
+
+		if dragParams.restoreFunc then
+			dragParams.restoreFunc()
+		end
 	end
 end
 
@@ -1500,7 +1644,10 @@ function Entity:OnEndDrag(dragLocation)
 				targetName = dragLocation.targetEntity:GetName()
 			end
 		end
-		GameLogic.RunCommand(string.format("/sendevent %s %s", onendDragEvent, commonlib.serialize_compact({x=x, y=y, z=z, name=self.name, targetName=targetName})))
+		local result = self:BroadcastEvents(onendDragEvent, {x=x, y=y, z=z, name=self.name, targetName=targetName});
+		if(result) then
+			self:RestoreDragLocation()
+		end
 		return true;
 	end
 end
@@ -1634,25 +1781,58 @@ end
 
 -- called every frame
 function Entity:FrameMove(deltaTime)
-	-- Entity._super.FrameMove(self, deltaTime);
-	self:SyncDataWatcher();
+	-- only sync data at 1.5 seconds interval
+	if(self:IsTick("SyncData", deltaTime, 1.5)) then
+		-- Entity._super.FrameMove(self, deltaTime);
+		self:SyncDataWatcher();
 
-	if(self.asset_rendertech) then
-		local obj = self:GetInnerObject()
-		if(obj and obj:GetField("render_tech", 0) > 0) then
-			self.asset_rendertech = nil;
-			self:OnMainAssetLoaded()
+		if(self.asset_rendertech) then
+			local obj = self:GetInnerObject()
+			if(obj and obj:GetField("render_tech", 0) > 0) then
+				self.asset_rendertech = nil;
+				self:OnMainAssetLoaded()
+			end
+		end
+		if(GameLogic.GameMode:IsEditor()) then
+			if(not self:IsVisible()) then
+				self:SetOpacity(0.5)
+				self:SetVisible(true)
+			end
+		else
+			if(self:IsVisible() ~= self:IsDisplayModel()) then
+				self:SetVisible(self:IsDisplayModel())
+			end
 		end
 	end
-	if(GameLogic.GameMode:IsEditor()) then
-		if(not self:IsVisible()) then
-			self:SetOpacity(0.5)
-			self:SetVisible(true)
+
+	self:SendTickEvent(deltaTime)
+
+	if(self:HasTarget()) then
+		if(self:IsDragging()) then
+			self:SetBlockTarget(nil);
+			return;
 		end
-	else
-		if(self:IsVisible() ~= self:IsDisplayModel()) then
-			self:SetVisible(self:IsDisplayModel())
+		self:MoveEntity(deltaTime);
+	end
+end
+
+function Entity:SendTickEvent(deltaTime)
+	if(self.onTickEvent or self:GetLastRuleItemIndex() > 0) then
+		-- only one tick event can be running at the moment. 
+		local tickEvent = self.tickEvent_;
+		if(not tickEvent) then
+			tickEvent = System.Core.Event:new():init("ontick")
+			self.tickEvent_ = tickEvent;
 		end
+		tickEvent.name = self.name
+		tickEvent.deltaTime = deltaTime
+		tickEvent:setAccepted(false) 
+		self:event(tickEvent)
+
+		if(not tickEvent:isAccepted() and self.onTickEvent) then
+			local result = self:BroadcastEvents(self.onTickEvent, tickEvent, self);
+		end
+		return true;
 	end
 end
 
@@ -1828,10 +2008,9 @@ end
 function Entity:SetStaticTag(name, value)
 	if(value==nil) then
 		self.staticTag = name;
+		self.tagFields = nil;
 	elseif(name) then
-		local t = commonlib.totable(self.staticTag)
-		t[name] = value;
-		self.staticTag = commonlib.serialize_compact(t);
+		self:SetTagField(name, value);
 	end
 end
 
@@ -1839,8 +2018,39 @@ end
 function Entity:GetStaticTag(name)
 	if(name==nil) then
 		return self.staticTag;
-	elseif(self.staticTag) then
-		return commonlib.totable(self.staticTag)[name];
+	else
+		return self:GetTagField(name);
+	end
+end
+
+function Entity:SetTagField(name, value)
+	if(name) then
+		local t = self.tagFields;
+		if(not t) then
+			t = {};
+			self.tagFields = t;
+		end
+		if(t[name] ~= value) then
+			t[name] = value
+			if(value==nil and not next(t)) then
+				self.staticTag = ""
+			else
+				self.staticTag = commonlib.serialize_compact(t);
+			end
+		end
+	end
+end
+
+function Entity:GetTagField(name)
+	if(name) then
+		if(not self.tagFields) then
+			if(self.staticTag and self.staticTag~="") then
+				self.tagFields = commonlib.totable(self.staticTag);
+			else
+				self.tagFields = {};
+			end
+		end
+		return self.tagFields[name]
 	end
 end
 
@@ -1861,5 +2071,157 @@ function Entity:GetTag(name)
 		return self.tag;
 	elseif(self.tag) then
 		return commonlib.totable(self.tag)[name];
+	end
+end
+
+function Entity:IsBiped()
+	return true
+end
+
+-- virtual function: get array of item stacks that will be displayed to the user when user try to create a new item. 
+-- @return nil or array of item stack.
+function Entity:GetNewItemsList()
+	local itemStackArray = Entity._super.GetNewItemsList(self) or {};
+	local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
+	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.CommandLine,1);
+	itemStackArray[#itemStackArray+1] = ItemStack:new():Init(block_types.names.Code,1);
+	local items = ItemClient.GetAllCustomAgentItemsDS()
+	if(items) then
+		for name, itemDS in pairs(items) do
+			local itemStack = ItemStack:new():Init(itemDS.block_id, 1, itemDS.server_data);
+			itemStack.uid = name;
+			itemStackArray[#itemStackArray+1] = itemStack
+		end
+	end
+	return itemStackArray;
+end
+
+function Entity:ActivateRules(triggerEntity)
+	-- disable activating rules
+end
+
+-- move to the given block(can only be one block from where the entity is)
+-- @return true if successfully moved
+function Entity:MoveTo(bx,by,bz)
+	local canMove, new_x, new_y, new_z = self:CanMoveTo(bx,by,bz);
+	if(canMove) then
+		self:SetBlockTarget(bx,by,bz);
+		return true;
+	end 
+end
+
+-- automatically walk to a given position. 
+function Entity:WalkTo(bx,by,bz)
+	-- TODO: needs to calculate valid path to given pos. 
+	self:MoveTo(bx,by,bz);
+end
+
+-- walk to the top center position of given block. usually by is ignored. 
+function Entity:SetBlockTarget(bx, by, bz)
+	if(bx) then
+		self:SetFrameMoveInterval(self:GetTickRateInterval());
+		self.targetX, self.targetY, self.targetZ = BlockEngine:real_top(bx, by, bz);
+	else
+		self.targetX, self.targetY, self.targetZ = nil, nil, nil;
+	end
+end
+
+function Entity:HasTarget()
+	return (self.targetX ~= nil);
+end
+
+-- virtual: if this entity can collide with physical objects during movement. 
+function Entity:CanCollidePhysicalObject()
+	return true;
+end
+
+-- called by framemove to move to target position and according to its current motion and walk speed. 
+function Entity:MoveEntity(deltaTime, bTryMove)
+	if(self:IsRemote()) then
+		if (self.smoothFrames > 0) then
+            local newX = self.x + (self.targetX - self.x) / self.smoothFrames;
+            local newY = self.y + (self.targetY - self.y) / self.smoothFrames;
+            local newZ = self.z + (self.targetZ - self.z) / self.smoothFrames;
+            self.rotationYaw = (self.rotationYaw + mathlib.WrapAngleTo180(self.targetYaw - self.rotationYaw) / self.smoothFrames);
+            self.rotationPitch = (self.rotationPitch + mathlib.WrapAngleTo180(self.targetPitch - self.rotationPitch) / self.smoothFrames);
+			self.smoothFrames = self.smoothFrames - 1;
+            self:SetPosition(newX, newY, newZ);
+        else
+			local newX = self.targetX or self.x;
+			local newY = self.targetY or self.y;
+			local newZ = self.targetZ or self.z;
+			self.rotationYaw = self.targetYaw or self.rotationYaw;
+			self.rotationPitch = self.targetPitch or self.rotationPitch;
+            self:SetPosition(newX, newY, newZ);
+        end
+		if(self.prevRotationPitch~=self.rotationPitch or self.prevRotationYaw~=self.RotationYaw) then
+			self.prevRotationPitch = self.rotationPitch;
+			self.prevRotationYaw = self.rotationYaw;
+			self:SetRotation(self.rotationYaw, self.rotationPitch);
+		end
+	else
+		deltaTime = math.min(0.05, deltaTime);
+		local obj = self:GetInnerObject();
+		if(not obj) then
+			return;
+		end
+		if(self:HasTarget()) then
+			local dx, dy, dz;
+			dx = self.targetX - self.x;
+			dz = self.targetZ - self.z;
+			
+			local moveLength = self:GetWalkSpeed() * deltaTime;
+			local dist = (dx)^2 + (dz)^2;
+			if(dist <= (moveLength^2) or dist < 0.01) then
+				-- reached position
+				self:SetPosition(self.targetX, self.y, self.targetZ);
+				self:SetBlockTarget(nil, nil, nil);
+				self.motionX = 0;
+				self.motionY = 0;
+				self.motionZ = 0;
+			else
+				local inverse_dist = 1 / (dist ^ 0.5) * moveLength;
+				self.motionX = dx * inverse_dist;
+				-- self.motionY = dy * inverse_dist;
+				self.motionZ = dz * inverse_dist;
+				
+				local facing = self:GetFacing()*0.4 + Direction.GetFacingFromOffset(dx, 0, dz) * 0.6;
+				self:SetFacing(facing);
+			end
+		else
+			if (self.onGround and self:HasMotion()) then
+				local dist_sq = self.motionX ^ 2 + self.motionZ ^ 2;
+				local decayFactor = 1-self:GetSurfaceDecay();
+				self.motionX = self.motionX * decayFactor;
+				self.motionZ = self.motionZ * decayFactor;
+				if(dist_sq < 0.00001) then
+					-- make it stop when motion is very small
+					self.motionX = 0;
+					-- self.motionY = 0;
+					self.motionZ = 0;
+				end
+			end
+		end
+
+		local dist_sq = self.motionX ^ 2 + self.motionZ ^ 2;
+		
+		if(dist_sq > 0.0001 or (not self.onGround) ) then
+			obj:SetField("AnimID", 5);
+		else
+			obj:SetField("AnimID", self:GetLastAnimId() or 0);
+		end
+
+		-- we will double gravity to make it look better
+		self.motionY = math.max(-1, self.motionY - self:GetGravity()*2*deltaTime*deltaTime);
+		
+		self:MoveEntityByDisplacement(self.motionX,self.motionY,self.motionZ);
+
+		if(dist_sq == 0 and self.onGround) then
+			-- restore to normal frame move interval. 
+			self:SetFrameMoveInterval(nil);
+		else
+			-- tick at high FPS
+			self:SetFrameMoveInterval(self:GetTickRateInterval());
+		end
 	end
 end

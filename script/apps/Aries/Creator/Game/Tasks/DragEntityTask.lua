@@ -1,18 +1,27 @@
 --[[
-Title: Drag live model entity task
+Title: Drag/Modify/Create/Delete live model entity task
 Author(s): LiXizhi
 Date: 2021/12/28
-Desc: drag and drop live model entity
+Desc: used for saving operations to undo/redo task history. 
 Support undo/redo
 use the lib:
 ------------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
 local task = MyCompany.Aries.Game.Tasks.DragEntity:new({})
+
+-- drag and drop
 task:StartDraggingEntity(entity);
 task:DropDraggingEntity();
 
-local task = MyCompany.Aries.Game.Tasks.DragEntity:new({nohistory=true})
+-- modify properties
+task:BeginModifyEntity(entity)
+task:EndModifyEntity();
+
+-- create entity
 task:CreateEntity(entity)
+
+-- delete entity
+task:DeleteEntity(entity)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
@@ -59,6 +68,27 @@ function DragEntity:DropDraggingEntity()
 	end	
 end
 
+function DragEntity:BeginModifyEntity(dragEntity)
+	self.draggingEntity = dragEntity;
+	if(self.draggingEntity) then
+		self.fromXmlNode = self.draggingEntity:SaveToXMLNode()
+		self:SetModifyMode()
+	end
+end
+
+
+function DragEntity:EndModifyEntity()
+	if(self.draggingEntity) then
+		self.toXmlNode = self.draggingEntity:SaveToXMLNode();
+		if(not self.nohistory and GameLogic.GameMode:CanAddToHistory()) then
+			-- do nothing if they are equal.
+			if(not commonlib.compare(self.fromXmlNode, self.toXmlNode)) then
+				UndoManager.PushCommand(self);
+			end
+		end
+	end
+end
+
 function DragEntity:Run()
 end
 
@@ -90,8 +120,11 @@ function DragEntity:SetCreateMode()
 	self.mode = "create"
 end
 
--- in create mode, when undo, we will delete the object. 
 function DragEntity:SetDeleteMode()
 	self.mode = "delete"
 	self.toXmlNode = nil;
+end
+
+function DragEntity:SetModifyMode()
+	self.mode = "modify"
 end

@@ -167,7 +167,7 @@ function TextureRegion:OnTick()
 			end
 		end
 	elseif(self:GetModelFilename()) then
-		local model_filename = Files.FindFile(self:GetModelFilename())
+		local model_filename = Files.FindFile(self:GetModelFilename()) or Files.GetTempPath()..self:GetModelFilename()
 		if(model_filename) then
 			local asset = ParaAsset.LoadParaX("", model_filename);
 			if(asset) then
@@ -473,7 +473,7 @@ function TexturePacker:RebuildScene(bClearAll)
 					skin = region:GetModelSkin()
 				end
 
-				model_filename = model_filename or Files.FindFile(region:GetModelFilename())
+				model_filename = model_filename or Files.FindFile(region:GetModelFilename()) or Files.GetTempPath()..region:GetModelFilename()
 				if(model_filename) then
 					local model_offset_y = 0;
 					local obj_name = region:GetName();

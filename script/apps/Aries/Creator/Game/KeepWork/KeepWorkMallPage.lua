@@ -2,7 +2,7 @@
 Title: KeepWorkMallPage
 Author(s): yangguiyi
 Date: 2020/7/14
-Desc:  
+Desc:
 Use Lib:
 -------------------------------------------------------
 local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
@@ -13,11 +13,20 @@ local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keep
 local KeepWorkMallPage = NPL.export();
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+
 commonlib.setfield("MyCompany.Aries.Creator.Game.KeepWork.KeepWorkMallPage", KeepWorkMallPage);
 local page;
 local level_to_index = {}
 local menu_item_index = 0
-local cur_classifyId = 0
+local cur_classifyId = nil
 local bean_gsid = 998;
 local coin_gsid = 888;
 
@@ -53,9 +62,8 @@ KeepWorkMallPage.menu_data_sources = {
 }
 
 KeepWorkMallPage.grid_data_sources = {
-	{enabled=true, name="1_1"},{enabled=true, name="1_2"},{enabled=true, name="1_3"},{enabled=true, name="1_4"},{enabled=true, name="1_5"},{enabled=true, name="1_6"},
-	{enabled=true, name="1_7"},{enabled=true, name="1_8"},{enabled=true, name="1_9"},{enabled=true, name="1_10"},{enabled=true, name="1_11"},{enabled=true, name="1_12"},
-	{enabled=true, name="1_13"},{enabled=true, name="1_14"}
+	{enabled=true, name="1_1",invented = true},{enabled=true, name="1_2",invented = true},{enabled=true, name="1_3",invented = true},{enabled=true, name="1_4",invented = true},{enabled=true, name="1_5",invented = true},{enabled=true, name="1_6",invented = true},
+	{enabled=true, name="1_7",invented = true},{enabled=true, name="1_8",invented = true},{enabled=true, name="1_9",invented = true},{enabled=true, name="1_10",invented = true},{enabled=true, name="1_11",invented = true},{enabled=true, name="1_12",invented = true}
 }
 
 KeepWorkMallPage.cur_select_level = 1
@@ -64,6 +72,10 @@ KeepWorkMallPage.top_bt_index = 1;
 
 KeepWorkMallPage.defaul_select_menu_item_index = 1
 KeepWorkMallPage.menu_item_index = KeepWorkMallPage.defaul_select_menu_item_index
+local loadCount = 0
+local needLoadCount = 0
+local wholeScale = 0.75
+local loadElse = true
 
 KeepWorkMallPage.show_state = {
 	sell = 1, 			--出售状态
@@ -87,7 +99,7 @@ function KeepWorkMallPage.OnCreate()
 	-- 	VScrollBar.visible = false
 	-- 	-- KeepWorkMallPage.OnRefresh()
 	-- 	TreeViewNode.control:RefreshUI()
-	-- end	
+	-- end
 
 	KeepWorkMallPage.RefreshBeanNum()
 end
@@ -101,7 +113,7 @@ function KeepWorkMallPage.Show()
         KeepWorkMallPage.ShowView()
         return
 	end
-	GameLogic.GetFilters():apply_filters('is_signed_in', L"请先登录", function(result)
+	GameLogic.GetFilters():apply_filters('check_signed_in', L"请先登录", function(result)
 		if result == true then
 			commonlib.TimerManager.SetTimeout(function()
 				KeepWorkMallPage.ShowView()
@@ -110,6 +122,7 @@ function KeepWorkMallPage.Show()
 	end)
 end
 
+local insertAll = false
 function KeepWorkMallPage.ShowView()
 	KeepWorkMallPage.isOpen = true
 	keepwork.mall.menus.get({
@@ -127,6 +140,10 @@ function KeepWorkMallPage.ShowView()
 			local level = 1
 			KeepWorkMallPage.menu_data_sources = {}
 			menu_node_data = {}
+			if not insertAll then
+				table.insert(data,1,{platform=1,tag="",sn=1,createdAt="2020-08-10T22:27:54.000Z",updatedAt="2022-04-13T03:07:35.000Z",id=nil,name="全部",parentId=0,})
+				insertAll = true
+			end
 			KeepWorkMallPage.HandleMenuData(KeepWorkMallPage.menu_data_sources, data, level)
 			local att = ParaEngine.GetAttributeObject();
 			local oldsize = att:GetField("ScreenResolution", {1280,720});
@@ -148,7 +165,7 @@ function KeepWorkMallPage.ShowView()
 					allowDrag = true,
 					enable_esc_key = true,
 					zorder = 0,
-					-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+					-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key,
 					directPosition = true,
 						align = "_ct",
 						x = -view_width/2,
@@ -167,7 +184,7 @@ function KeepWorkMallPage.ShowView()
 				end, 500)
 			end);
 	
-			KeepWorkMallPage.OnChangeTopBt(1);
+			-- KeepWorkMallPage.OnChangeTopBt(1);
 			KeepWorkMallPage.ChangeMenuType(KeepWorkMallPage.cur_select_level, KeepWorkMallPage.cur_select_type_index);
 	
 			if(KeepWorkMallPage.show_callback)then
@@ -183,18 +200,22 @@ function KeepWorkMallPage.OnChangeTopBt(index)
 	-- KeepWorkMallPage.OnRefresh()
 	KeepWorkMallPage.GetGoodsData()
 end
+
 function KeepWorkMallPage.ChangeMenuItem(attr)
-	
+	loadElse = false
+	KeepWorkMallPage.dataLoaded = false
 	local menu_item_index = tonumber(attr.menu_item_index)
 	KeepWorkMallPage.menu_item_index = menu_item_index;
 	local server_item_data = attr.server_data
 	KeepWorkMallPage.GetGoodsData(server_item_data.id)
 end
+
 function KeepWorkMallPage.OnRefresh()
     if(page)then
         page:Refresh(0);
     end
 end
+
 function KeepWorkMallPage.ChangeMenuType(level, index)
 	KeepWorkItemManager.is_select_show_model = false
 	KeepWorkMallPage.cur_select_level = level
@@ -294,7 +315,7 @@ local tagList = {
 	[3] = "hot",
 }
 
-function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid)
+function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid,count)
 	-- classifyId 类别id
 	-- tag hot，latest 火热 最新
 	-- keyword 按商品名称模糊匹配
@@ -307,17 +328,30 @@ function KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid)
 
 	local top_bt_index = KeepWorkMallPage.top_bt_index
 	local tag = tagList[top_bt_index]
+	local menuItemIndex = tonumber(KeepWorkMallPage.menu_item_index)
+	if menuItemIndex == 1  then
+		classifyId  = nil
+	end
+	local pageCount = 1000
+	if count ~= nil then
+		pageCount = count
+	end
     keepwork.mall.goods.get({
         classifyId = classifyId,
         tag = tag,
         keyword = keyword,
         platform = 1,
-		["x-per-page"] = 800,
+		["x-per-page"] = pageCount,
 		["x-page"] = 1,
 	},function(err, msg, data)
-		KeepWorkMallPage.grid_data_sources = data.rows
-		KeepWorkMallPage.HandleDataSources()
-		KeepWorkMallPage.FlushView(only_refresh_grid)
+		if tonumber(data.count) > pageCount then
+			KeepWorkMallPage.GetGoodsData(classifyId, keyword, only_refresh_grid,tonumber(data.count))
+		else
+			KeepWorkMallPage.grid_data_sources = data.rows
+			KeepWorkMallPage.dataLoaded = true
+			KeepWorkMallPage.HandleDataSources()
+			KeepWorkMallPage.FlushView(only_refresh_grid)
+		end
     end)
 end
 
@@ -345,9 +379,9 @@ function KeepWorkMallPage.HandleDataSources()
             break;
         end
     end
-
+	local count = 0
 	for k, v in pairs(KeepWorkMallPage.grid_data_sources) do
-			
+		v.name = commonlib.GetLimitLabel(v.name,20)
 		v.goods_data = {}
 		if v.rule and v.rule.exchangeTargets and v.rule.exchangeTargets[1] then
 			local goods = v.rule.exchangeTargets[1].goods			
@@ -364,20 +398,39 @@ function KeepWorkMallPage.HandleDataSources()
 		v.enabled = true
 		v.is_show_hot_tag = string.find(v.tags, "hot") and string.find(v.tags, "hot") > 0
 		v.is_show_latest_tag = string.find(v.tags, "latest") and string.find(v.tags, "latest") > 0
-		v.isLink = v.purchaseUrl ~= nil and v.purchaseUrl ~= ""
+		v.isLink = v.method == 1  or (v.purchaseUrl ~= nil and v.purchaseUrl ~= "") --购买方式，0：内部购买；1：外部购买
 		local modelUrl = v.goods_data[1] and v.goods_data[1].modelUrl or ""
 		v.isModelProduct = #v.goods_data == 1 and modelUrl ~= ""
+		local downloadUrl =  (modelUrl ~= nil and modelUrl ~= "") and modelUrl or v.modelUrl
 		v.vip_enabled = false
 		-- 售完或者到达购买上限的情况下不允许购买
+		v.hasIcon = v.icon ~= "" and v.icon ~= nil
 		v.buy_txt = "购买"
 		v.show_state = KeepWorkMallPage.show_state.sell
+		v.isLiveModel = v.modelType == "liveModel"
+		v.hasPermission = KeepWorkItemManager.CheckHasPermission(v)
 		if v.rule and v.rule.storage == 0 then
 			v.buy_txt = "售完"
 			v.enabled = false
 			v.is_sell = true
 			v.show_state = KeepWorkMallPage.show_state.sell_out
 		else
-			v.enabled = KeepWorkMallPage.checkIsGetLimit(v)
+			v.enabled = KeepWorkMallPage.checkIsGetLimit(v) or v.hasPermission
+			if v.hasPermission then
+				v.buy_txt = "使用"
+				v.enabled = true
+				v.is_use = false
+				if v.isLink then
+					v.can_use = false
+				else
+					v.can_use = true
+				end
+				v.show_state = KeepWorkMallPage.show_state.can_use
+			else
+				v.vip_enabled = true
+				v.enabled = false
+				v.show_state = KeepWorkMallPage.show_state.vip_enabled
+			end
 			if v.isModelProduct then
 				local good_data = v.goods_data[1]
 				local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(good_data.gsId)
@@ -394,9 +447,16 @@ function KeepWorkMallPage.HandleDataSources()
 				end
 
 				-- 如果是vip专属 再判断下是不是vip 如果是vip 那么就直接已拥有的显示
-				if v.vip_enabled and System.User.isVip then
+				if v.vip_enabled and System.User.isVip or v.vip_enabled == false then
 					bag_nums = 1
 				end
+
+				if not good_data.fileType and v.modelType then
+					good_data.fileType = v.modelType
+				end
+				v.modelType = (v.modelType and v.modelType~= "") and v.modelType or good_data.fileType
+
+				v.isLiveModel = good_data.fileType == "liveModel"
 
 				v.bag_nums = bag_nums
 				v.is_use_in_player = good_data.bagId == bagId
@@ -452,14 +512,75 @@ function KeepWorkMallPage.HandleDataSources()
 		elseif v.price then
 			v.cost_desc = v.price
 		end
+		
+
+		v.needDownload = (downloadUrl~= nil and downloadUrl ~= "") and not downloadUrl:match("character/") and v.modelType ~= "blocks"
+		if v.needDownload then
+			count = count + 1
+		end
 	end
-	
-	table.sort(KeepWorkMallPage.grid_data_sources, function(a, b)
-		return (a.id > b.id);
-	end);
+
+	-- table.sort(KeepWorkMallPage.grid_data_sources, function(a, b)
+	-- 	return (a.id > b.id);
+	-- end);
+
+	local index = 1
+	loadCount = 0
+	local loadFunc = nil
+	loadFunc = function (item_data)
+		if index > #KeepWorkMallPage.grid_data_sources then
+			KeepWorkMallPage.FlushView(false)
+			return
+		end
+		index = index + 1
+		if item_data.needDownload then
+			KeepWorkMallPage.LoadLiveModelXml(item_data,function (data)
+				item_data.xmlInfo = data.xmlInfo
+				item_data.tooltip = data.tooltip
+				item_data.hasLoad = true
+				loadCount = loadCount + 1
+				if loadCount <= 12 then
+					loadFunc(KeepWorkMallPage.grid_data_sources[index])
+				else
+					KeepWorkMallPage.FlushView(false)
+					commonlib.TimerManager.SetTimeout(function ()
+						KeepWorkMallPage.LoadElseModel(index)
+					end, 1000)
+				end
+			end)
+		else
+			loadFunc(KeepWorkMallPage.grid_data_sources[index])
+		end
+	end
+	loadFunc(KeepWorkMallPage.grid_data_sources[index])
+end
+
+function KeepWorkMallPage.LoadElseModel(index)
+	local loadFunc = nil
+	loadFunc = function (item_data)
+		if index > #KeepWorkMallPage.grid_data_sources then
+			return
+		end
+		index = index + 1
+		if item_data.needDownload then
+			KeepWorkMallPage.LoadLiveModelXml(item_data,function (data)
+				item_data.xmlInfo = data.xmlInfo
+				item_data.tooltip = data.tooltip
+				item_data.hasLoad = true
+				loadFunc(KeepWorkMallPage.grid_data_sources[index])
+			end)
+		else
+			loadFunc(KeepWorkMallPage.grid_data_sources[index])
+		end
+	end
+	loadFunc(KeepWorkMallPage.grid_data_sources[index])
 end
 
 function KeepWorkMallPage.OnClickBuy(item_data)
+	if not item_data.invented then
+		local name = string.format("click.resource.%s",item_data.name)
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, name, {useNoId=true});
+	end
 	if item_data.isLink then
 		ParaGlobal.ShellExecute("open", item_data.purchaseUrl, "", "", 1); 
 		return
@@ -492,16 +613,29 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 		end
 		return
 	end
-	
-	if item_data.isModelProduct and item_data.bag_nums and item_data.bag_nums > 0 then
+
+	if (item_data.isModelProduct and item_data.bag_nums and item_data.bag_nums > 0) or item_data.vip_enabled == false then
 		if not GameLogic.GameMode:IsEditor() then
 			return
 		end
 		local good_data = item_data.goods_data[1]
-		local model_url = good_data.modelUrl or ""
-		-- model_url = "character/CC/05effect/fire.x"   
+		local model_url = good_data and good_data.modelUrl or item_data.modelUrl
+		local name = good_data and good_data.name or item_data.name
+		local fileType = good_data and good_data.fileType or item_data.modelType
+		local filename =  good_data and good_data.desc or item_data.name
+		-- model_url = "character/CC/05effect/fire.x"
 		if model_url:match("^https?://") then
-			local command = string.format("/install -ext %s -filename %s %s", good_data.fileType, good_data.desc, model_url)
+			NPL.load("(gl)script/apps/Aries/Desktop/GameMemoryProtector.lua");
+			local GameMemoryProtector = commonlib.gettable("MyCompany.Aries.Desktop.GameMemoryProtector");
+			local downloadList = GameLogic.GetPlayerController():LoadLocalData("mall_download_list",{})
+			local needReload = false
+			local md5 = GameMemoryProtector.hash_func_md5(item_data)
+			if downloadList[name] ~= md5 then
+				downloadList[name] = md5
+				GameLogic.GetPlayerController():SaveLocalData("mall_download_list",downloadList)
+				needReload = true
+			end
+			local command = string.format("/install -ext %s -reload %s -filename %s %s", fileType,needReload, "onlinestore/"..filename,model_url)
 			GameLogic.RunCommand(command)
 		elseif model_url:match("character/") then         
 			GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", model_url));  
@@ -621,6 +755,8 @@ end
 
 function KeepWorkMallPage.CloseView()
 	KeepWorkMallPage.isOpen = false
+	insertAll = false
+	loadElse = false
 end
 
 function KeepWorkMallPage.Close()
@@ -652,3 +788,214 @@ function KeepWorkMallPage.GetItemTemplate(item)
 		return KeepWorkItemManager.GetItemTemplateById(item.id)
 	end
 end
+
+local needFilterList = {"character/CC/artwar/furnitures/motianlun.x"}
+function KeepWorkMallPage.IsInFilterList(filename)
+	for key, value in pairs(needFilterList) do
+		if tostring(filename) ==value then
+			return true
+		end
+	end
+	return false
+end
+
+function KeepWorkMallPage.IsSpecialModel(item_data)
+	local good_data = item_data and item_data.goods_data and item_data.goods_data[1]
+	local model_url = good_data and good_data.modelUrl or (item_data and item_data.modelUrl)
+	return KeepWorkMallPage.IsInFilterList(model_url)
+end
+
+function KeepWorkMallPage.CanUseCanvas3dIcon(item_data)
+	return not item_data.hasIcon or (not item_data.hasIcon and item_data.isLiveModel) or item_data.isLiveModel
+end
+
+function KeepWorkMallPage.GetIcon(item_data)
+	if not KeepWorkMallPage.dataLoaded then
+		return nil
+	end
+	if item_data.isLiveModel then
+		return nil
+	else
+		local good_data = item_data and item_data.goods_data and item_data.goods_data[1]
+		local model_url = good_data and good_data.modelUrl or (item_data and item_data.modelUrl)
+		local filename = ""
+		if model_url and model_url:match("^https?://") then
+			filename = item_data.tooltip
+		elseif model_url and model_url:match("character/") then
+			filename = model_url
+		else
+			return nil
+		end
+		local filepath = PlayerAssetFile:GetValidAssetByString(filename)
+		if not filepath and filename then
+			filepath = Files.GetTempPath()..filename
+		end
+	
+		local ReplaceableTextures, CCSInfoStr, CustomGeosets;
+	
+		local skin = nil
+		if skin then
+			CustomGeosets = skin
+		elseif(PlayerAssetFile:IsCustomModel(filepath)) then
+			CCSInfoStr = PlayerAssetFile:GetDefaultCCSString()
+		elseif(PlayerSkins:CheckModelHasSkin(filepath)) then
+			-- TODO:  hard code worker skin here
+			ReplaceableTextures = {[2] = PlayerSkins:GetSkinByID(12)};
+		end
+		return {
+			AssetFile = filepath, IsCharacter=true, x=0, y=0, z=0,
+			ReplaceableTextures=ReplaceableTextures, CCSInfoStr=CCSInfoStr, CustomGeosets = CustomGeosets
+		}
+	end
+end
+
+--#region 新版商城 20220506
+
+function KeepWorkMallPage.LoadModelFile(item_data,index)
+end
+
+function KeepWorkMallPage.LoadLiveModelXml(item_data,cb)
+	if item_data.needDownload then
+		local good_data = item_data.goods_data[1]
+		local model_url = good_data and good_data.modelUrl or (item_data and item_data.modelUrl)
+		local name = good_data and good_data.desc or (item_data and item_data.name)
+		if not item_data.isLiveModeland and not item_data.modelType then
+			return
+		end
+		local filename = item_data.isLiveModel and "onlinestore/"..name..".blocks.xml" or  "onlinestore/"..name.."."..item_data.modelType
+		if model_url:match("^https?://") then
+			KeepWorkMallPage.LoadBlocksXmlToLocal(filename,model_url,function (data)
+				if data.xmlInfo then
+					data.xmlInfo.wholeScale = wholeScale
+				end
+				cb(data)
+			end,item_data.isLiveModel)
+		end
+	end
+end
+
+function KeepWorkMallPage.LoadBlocksXmlToLocal(filename,url,cb,isLiveModel)
+	local dest = ""
+	if not filename:match("^onlinestore/") then
+		dest = Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename))
+	else
+		dest = Files.GetTempPath()..commonlib.Encoding.Utf8ToDefault(filename)
+	end
+	local func = function ()
+		if isLiveModel then
+			KeepWorkMallPage.ParseXml(dest,cb)
+		else
+			cb({tooltip = commonlib.Encoding.Utf8ToDefault(filename)})
+		end
+	end
+	if(ParaIO.DoesFileExist(dest, true)) then
+		func()
+	else
+		NPL.load("(gl)script/ide/System/localserver/factory.lua");
+		local cache_policy = System.localserver.CachePolicy:new("access plus 1 year");
+		local ls = System.localserver.CreateStore();
+		if(not ls) then
+			log("error: failed creating local server resource store \n")
+			return
+		end
+		ls:GetFile(cache_policy, url, function(entry)
+			if(entry and entry.entry and entry.entry.url and entry.payload and entry.payload.cached_filepath) then
+				ParaIO.CreateDirectory(dest);
+				if(ParaIO.CopyFile(entry.payload.cached_filepath, dest, true)) then
+					Files.NotifyNetworkFileChange(dest)
+					func()
+				else
+					LOG.std(nil, "warn", "CommandInstall", "failed to copy from %s to %s", entry.payload.cached_filepath, dest);
+				end
+			end
+		end)
+	end
+
+end
+
+function KeepWorkMallPage.ParseXml(path,cb)
+	local xmlRoot = ParaXML.LuaXML_ParseFile(path);
+	if xmlRoot then
+		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		if(root_node and root_node[1]) then
+			local node = commonlib.XPath.selectNode(root_node, "/references");
+			if(node) then
+				for _, fileNode in ipairs(node) do
+					local filename = fileNode.attr.filename
+					local filepath = GameLogic.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(filename);
+					if(not ParaIO.DoesFileExist(filepath, true)) then
+						local text = fileNode[1];
+						NPL.load("(gl)script/ide/System/Encoding/base64.lua");
+						text = System.Encoding.unbase64(text)
+						ParaIO.CreateDirectory(filepath)
+						local file = ParaIO.open(filepath, "w")
+						if(file:IsValid()) then
+							file:WriteString(text, #text);
+							file:close();
+						else
+							LOG.std(nil, "warn", "BlockTemplate", "failed to write file to: %s", filepath);
+						end
+					else
+						LOG.std(nil, "warn", "BlockTemplate", "load template ignored existing world file: %s", filename);
+					end
+				end
+			end
+			local node = commonlib.XPath.selectNode(root_node, "/pe:entities");
+			if(node) then
+				local entities = NPL.LoadTableFromString(node[1])
+				local liveEntities = commonlib.copy(entities)
+				if(entities and #entities > 0) then
+					for _, entity in ipairs(entities) do
+						if entity.attr.linkTo == nil then
+							local _xmlInfo = entity
+							local xmlInfo = KeepWorkMallPage.GetXmlNodeWithAllLinkedInfo(_xmlInfo,liveEntities)
+							cb({xmlInfo = xmlInfo})
+							break
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function KeepWorkMallPage.GetXmlNodeWithAllLinkedInfo(_xmlInfo,entities)
+	local getXmlInfo
+	getXmlInfo = function (xmlInfo)
+		xmlInfo.linkList = {}
+		for key, entity in pairs(entities) do
+			if entity.attr.linkTo == xmlInfo.attr.name then
+				getXmlInfo(entity)
+				local result =  commonlib.split(entity.attr.linkTo,"::")
+				table.insert(xmlInfo.linkList,{
+					mountIdx = nil, --如果是插件点上的点，记录是本节点的哪个插件点
+					xmlInfo = entity,
+					linkInfo = {
+						boneName = result[2],
+						pos = nil,
+						rot = nil,
+					},
+					nodeInfo = { --记录相对与本节点的位移
+						x = (entity.attr.x - xmlInfo.attr.x)*wholeScale,
+						y = (entity.attr.y - xmlInfo.attr.y)*wholeScale,
+						z = (entity.attr.z - xmlInfo.attr.z)*wholeScale,
+					}
+				})
+			end
+		end
+	end
+	getXmlInfo(_xmlInfo)
+	return _xmlInfo
+end
+
+function KeepWorkItemManager.CheckHasPermission(item_data)
+	if item_data.isPublic == 1 then
+		return true
+	else
+		local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+		local enabled = UserPermission.CheckUserPermission("onlinestore")
+		return enabled ~= nil and enabled or false
+	end
+end
+
+--#endregion

@@ -167,8 +167,14 @@ function NplBrowserFrame:_Show(url)
 		local page = System.mcml.PageCtrl:new({
 			url = mcml_url
 		});
-		page:Create(name.."page", _this, "_fi", 0, 0, 0, 0);
-
+		local align = self.options.align or "_fi"
+		local width = self.options.width or 0
+		local height = self.options.height or 0
+		if align == "_ct" and width > 0 and height > 0 then
+			page:Create(name.."page", _this, "_ct", -width/2, -height/2, width, height);
+		else
+ 			page:Create(name.."page", _this, "_fi", 0, 0, 0, 0);
+		end
 		self.page = page;
 	end
     

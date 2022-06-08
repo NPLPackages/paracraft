@@ -96,6 +96,7 @@ e.g.
 /take BlockModel {tooltip="blocktemplates/1.bmax"}
 /take ColorBlock 100 {color="#ff0000"}
 /take AgentItem {name="circuit.lever"}
+/take LiveModel {tooltip="onlinestore/1.blocks.xml"}
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local playerEntity, blockid, count, data, method, serverdata, hasInputName;
@@ -107,6 +108,37 @@ e.g.
 			playerEntity = playerEntity or (not hasInputName and EntityManager.GetPlayer());
 			if(playerEntity and playerEntity.inventory and playerEntity.inventory) then
 				local itemStack = ItemStack:new():Init(blockid, count or 1, serverdata);
+				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+				local filename = serverdata and serverdata.tooltip or nil
+				if filename ~=nil and filename ~="" and itemStack.id == block_types.names.LiveModel then
+					local path = Files.GetTempPath()..commonlib.Encoding.Utf8ToDefault(filename)
+					local xmlRoot = ParaXML.LuaXML_ParseFile(path);
+					if xmlRoot then
+						local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+						if(root_node and root_node[1]) then
+							local node = commonlib.XPath.selectNode(root_node, "/pe:entities");
+							local liveEntities;
+							if(node) then
+								local entities = NPL.LoadTableFromString(node[1]);
+								if(entities and #entities > 0) then
+									liveEntities = entities;
+									if #entities > 1 then
+										itemStack:SetDataField("loadPath", filename)
+									end
+									for _, entity in ipairs(liveEntities) do
+										if(entity.attr and entity.attr.x and (entity.attr.linkTo == "" or entity.attr.linkTo == nil))then
+											local xmlNode = commonlib.copy(entity)
+											itemStack:SetDataField("tooltip",xmlNode.attr.filename)
+											itemStack:SetDataField("xmlNode", xmlNode)
+											break
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+
 				local item = ItemClient.GetItem(blockid)
 				if(item and item:GetPreferredBlockData()) then
 					itemStack:SetPreferredBlockData(item:GetPreferredBlockData())
@@ -265,7 +297,7 @@ Commands["move"] = {
 				x, y, z = fromEntity:GetBlockPos();
 			end
 
-			if(x and y and z and playerEntity) then
+			if(x and y and z and playerEntity and not playerEntity:IsBlockEntity()) then
 				playerEntity:TeleportToBlockPos(x,y,z);
 			end
 		end

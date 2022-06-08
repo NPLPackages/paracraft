@@ -34,20 +34,6 @@ end
 function Dummy()
 end
 
-function OnToggleShader(name, value)
-    local res = GameLogic.RunCommand("/shader "..value);
-    if(res==false) then
-        if(value ~= "1") then 
-            Page:SetValue("comboShader", "1");
-            _guihelper.MessageBox(L"您的显卡不支持这个效果, 请升级您的显卡");
-        end
-    elseif(res=="disabled") then
-        _guihelper.MessageBox(L"/shader命令被禁止, 请在设置中解禁");
-    else
-        -- WorldCommon.GetWorldInfo().rendermethod = value;
-    end
-end
-
 function OnToggleReflection(bChecked)
     ParaTerrain.GetBlockAttributeObject():SetField("UseWaterReflection", bChecked==true)
     WorldCommon.GetWorldInfo().waterreflection = tostring(bChecked);
@@ -56,54 +42,6 @@ end
 function OnToggleShadow(bChecked)
     ParaTerrain.GetBlockAttributeObject():SetField("UseSunlightShadowMap", bChecked==true)
     WorldCommon.GetWorldInfo().shadow = tostring(bChecked);
-end
-
-function OnRenderDistChanged(value)
-    GameLogic.options:SetRenderDist(value);
-    WorldCommon.GetWorldInfo().renderdist = tostring(value);
-end
-
-function OnSuperRenderDistChanged(value)
-    GameLogic.options:SetSuperRenderDist(value);
-    if(value and value > GameLogic.options:GetRenderDist() and value>64) then
-        GameLogic.options:SetFogEnd(value - 64);
-    end
-end
-
-function OnCloudnessChanged(value)
-    GameLogic.options:SetCloudThickness(value);
-end
-    
-function OnChangeEyeBrightness(value)
-    GameLogic.options:SetEyeBrightness(value);
-end
-
-function ChangeWeather(name,mcmlNode)
-    NPL.load("(gl)script/apps/Aries/Creator/Env/SkyPage.lua");
-	local SkyPage = commonlib.gettable("MyCompany.Aries.Creator.SkyPage");
-    local cmdStr = ""
-    if(string.match(name,"sun")) then
-        SkyPage.OnChangeSkybox(2); 
-        cmdStr = "/sky model/skybox/skybox15/skybox15.x"
-    elseif(string.match(name,"cloudy")) then
-        SkyPage.OnChangeSkybox(1); 
-        cmdStr = "/sky sim"
-    elseif(string.match(name,"rain")) then
-        GameLogic.RunCommand("/rain");
-        cmdStr = "/rain"
-    elseif(string.match(name,"snow")) then
-        GameLogic.RunCommand("/snow");
-        cmdStr = "/snow"
-    end
-
-    if EnvFramePage.changecb then
-        EnvFramePage.changecb("cmd",cmdStr)
-    end
-end
-
-function SetLightColor(name,mcmlNode)    
-    local color_name = string.match(name,"btn_(.*)");
-    EnvFramePage.SetLightColor(color_name);
 end
 
 ]]></script>
@@ -124,61 +62,67 @@ end
     <div style="margin-left:8px;margin-top:5px;padding-left:5px;width:225px;color:#cccccc;">
         <pe:if condition='<%=EnvFramePage.category_index == 1%>'>
             <div style="padding:8px;padding-right:5px;width:220px;height:60px;" class="mc_border" >
-                <div style="float:left;margin-left:9px;margin-top:-2px;"><%=L"天气设置"%></div>
-                <!--<div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>-->
-                <div>
-                    <input type="button" uiname="EnvFramePage.weather_sun" name="weather_sun" style="margin-left:9px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 238 19 20)" onclick="ChangeWeather" tooltip='<%=L"切换至原始天空"%>'/>
-                    <input type="button" uiname="EnvFramePage.weather_cloudy" name="weather_cloudy" style="margin-left:11px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#59 238 19 20)" onclick="ChangeWeather" tooltip='<%=L"切换至仿真天空"%>'/>
-                    <input type="button" uiname="EnvFramePage.weather_rain" name="weather_rain" style="margin-left:14px;width:11px;height:19px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#89 239 11 19)" onclick="ChangeWeather" tooltip='<%=L"切换下雨效果"%>'/>
-                    <input type="button" uiname="EnvFramePage.weather_snow" name="weather_snow" style="margin-left:14px;width:17px;height:18px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#112 238 17 18)" onclick="ChangeWeather" tooltip='<%=L"切换下雪效果"%>'/>
+                <div style="float:left;margin-left:9px;margin-top:-3px;"><%=L"天气"%></div>
+                <input type="button" name='copy_weather' onclick="EnvFramePage.OnCopyCmd" align="right" style="margin-right:3px;margin-top:-1px;width:16px;height:16px;background:url(Texture/Aries/Common/fuzhidaima_16x16_32bits.png)" tooltip='<%=L"将环境命令复制到剪贴板"%>'/>
+                <div style="margin-top:3px;">
+                    <input type="button" uiname="EnvFramePage.weather_sun" name="weather_sun" style="margin-left:9px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 238 19 20)" onclick="EnvFramePage.ChangeWeather" tooltip='<%=L"切换至原始天空"%>'/>
+                    <input type="button" uiname="EnvFramePage.weather_cloudy" name="weather_cloudy" style="margin-left:11px;width:19px;height:20px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#59 238 19 20)" onclick="EnvFramePage.ChangeWeather" tooltip='<%=L"切换至仿真天空"%>'/>
+                    <input type="button" uiname="EnvFramePage.weather_rain" name="weather_rain" style="margin-left:14px;width:11px;height:19px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#89 239 11 19)" onclick="EnvFramePage.ChangeWeather" tooltip='<%=L"切换下雨效果"%>'/>
+                    <input type="button" uiname="EnvFramePage.weather_snow" name="weather_snow" style="margin-left:14px;width:17px;height:18px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#112 238 17 18)" onclick="EnvFramePage.ChangeWeather" tooltip='<%=L"切换下雪效果"%>'/>
                 </div>
                 
             </div>
             <div style="padding:8px;padding-right:5px;margin-top:7px;width:220px;" class="mc_border" >
-                <!--<div style="float:left;margin-left:9px;margin-top:-2px;"><%=L"时间设置"%></div>-->
-                <div style="margin-left:5px;margin-top:10px;">
+                <div style="float:left;margin-left:9px;margin-top:-3px;"><%=L"光照"%></div>
+                <input type="button" name='copy_light' onclick="EnvFramePage.OnCopyCmd" align="right" style="margin-right:3px;margin-top:-1px;width:16px;height:16px;background:url(Texture/Aries/Common/fuzhidaima_16x16_32bits.png)" tooltip='<%=L"将环境命令复制到剪贴板"%>'/>
+                <div style="margin-left:5px;margin-top:4px;">
                     <div style="float:left;margin-left:3px;margin-top:0px;width:21px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#167 238 21 22)"/>
                     <div style="float:left;margin-top:6px;width:138;height:7px;margin-left:8px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#33 264 138 7);">
-                        <pe:sliderbar uiname="EnvFramePage.mcTimeSlider" name="mcTimeSlider" min="0" max="1000" min_step="1" value="300" button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;139 238 18 18" button_width="18" button_height="18" style="float:left;margin-top:-7px;width:138px;height:18px;background:;" onchange="EnvFramePage.OnTimeSliderChanged" tooltip='<%=L"拖动滑块调整光线强调"%>'></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.mcTimeSlider" name="mcTimeSlider" min="0" max="1000" min_step="1" value="<%=(GameLogic.RunCommand('/time now')/2+0.5)*1000%>" button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;139 238 18 18" button_width="18" button_height="18" style="float:left;margin-top:-7px;width:138px;height:18px;background:;" onchange="EnvFramePage.OnTimeSliderChanged" tooltip='<%=L"拖动滑块调整光线强调"%>'></pe:sliderbar>
                     </div>
                     <div style="float:left;margin-left:7px;margin-top:-2px;width:13px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#196 238 13 22)"/>
                 </div>
+                <div style="float:left;margin-left:9px;margin-top: 6px;font-size:10px">
+                    <input type="checkbox" checked="<%=GameLogic.options:IsTimesAutoGo()%>" onclick="EnvFramePage.OnToggleAutoTimesGo"  name="auto_times_go"/>自动昼夜交替<br />
+                </div>
             </div>
             <div style="padding:8px;padding-right:5px;margin-top:7px;width:220px;height:105px;" class="mc_border" >
-                <div style="float:left;margin-left:9px;margin-top:-2px;"><%=L"光源颜色设置"%></div>
+                <div style="float:left;margin-left:9px;margin-top:-3px;"><%=L"光源颜色"%></div>
+                <input type="button" name='copy_light_color' onclick="EnvFramePage.OnCopyCmd" align="right" style="margin-right:3px;margin-top:-1px;width:16px;height:16px;background:url(Texture/Aries/Common/fuzhidaima_16x16_32bits.png)" tooltip='<%=L"将环境命令复制到剪贴板"%>'/>
                 <!--<div style="float:left;margin-left:5px;margin-top:5px;width:7px;height:11px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#177 207 7 11)"/>-->
                 <div>
                     <pe:colorpicker tooltip='<%=L"火把等积木的颜色"%>' version="1" style="color:#cccccc"  name="NewBlockColorpicker" onchange="EnvFramePage.OnBlockColorChanged" />
                 </div>
                 <div style="margin-top:2px;">
-                    <input type="button" uiname="EnvFramePage.btn_red" name="btn_red" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" uiname="EnvFramePage.btn_yellow" name="btn_yellow" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" uiname="EnvFramePage.btn_green" name="btn_green" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#448 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" uiname="EnvFramePage.btn_light_blue" name="btn_light_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#468 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" uiname="EnvFramePage.btn_dark_blue" name="btn_dark_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#487 238 13 13)" onclick="SetLightColor"/>
-                    <input type="button" uiname="EnvFramePage.btn_purple" name="btn_purple" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#388 256 13 13)" onclick="SetLightColor"/>
-                    <input type="button" uiname="EnvFramePage.btn_white" name="btn_white" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 256 13 13)" onclick="SetLightColor"/>
-                    <input type="button" uiname="EnvFramePage.btn_black" name="btn_black" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 256 13 13)" onclick="SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_red" name="btn_red" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_yellow" name="btn_yellow" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_green" name="btn_green" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#448 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_light_blue" name="btn_light_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#468 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_dark_blue" name="btn_dark_blue" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#487 238 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_purple" name="btn_purple" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#388 256 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_white" name="btn_white" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#408 256 13 13)" onclick="EnvFramePage.SetLightColor"/>
+                    <input type="button" uiname="EnvFramePage.btn_black" name="btn_black" style="float:left;margin-left:7px;margin-top:4px;width:13px;height:13px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 256 13 13)" onclick="EnvFramePage.SetLightColor"/>
                 </div>            
             </div>
             <div style="margin-top:7px;padding:8px;padding-right:5px;" class="mc_border" width="100%">
-                <div style="float:left;margin-left:7px;margin-top:-2px;"><%=L"效果设置"%></div>
+                <div style="float:left;margin-left:7px;margin-top:-2px;"><%=L"效果"%></div>
+                <input type="button" name='copy_shader_effect' onclick="EnvFramePage.OnCopyCmd" align="right" style="margin-right:3px;margin-top:-1px;width:16px;height:16px;background:url(Texture/Aries/Common/fuzhidaima_16x16_32bits.png)" tooltip='<%=L"将环境命令复制到剪贴板"%>'/>
                 <div style="margin-top:5px;">
                     <div style="float:left;margin-left:7px;width:90px;height:20px;" ><%=L"真实光影"%></div>
                     <div style="float:left;margin-top:0px;margin-left:9px;">
-                        <select uiname="EnvFramePage.comboShader" name="comboShader" style="margin-top:0px;height:22px" onselect="OnToggleShader" AllowUserEdit="false" DataSource="<%=GetShaderDS()%>"></select>
+                        <select uiname="EnvFramePage.comboShader" name="comboShader" style="margin-top:0px;height:22px" onselect="EnvFramePage.OnToggleShader" AllowUserEdit="false" DataSource="<%=GetShaderDS()%>"></select>
                     </div>
                 </div>
                 <div style="margin-top:5px;">
-                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"需要shader HDR下生效,可调整画面整体亮度"%>'><%=L"眼睛亮度"%></div>
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"需要shader HDR下生效,可调整画面整体亮度"%>'><%=L"亮度"%></div>
                     <div style="float:left;margin-top:1px;margin-left:9px;">
-                        <pe:sliderbar uiname="EnvFramePage.eye_bightness" name="eye_bightness" min="0.01" max="0.9" value="0.5" style="width:80px;height:22px;" onchange="OnChangeEyeBrightness()"></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.eye_bightness" name="eye_bightness" min="0.01" max="0.9" value="0.5" style="width:80px;height:22px;" onchange="EnvFramePage.OnChangeEyeBrightness()"></pe:sliderbar>
                     </div>
                 </div>
                 <div style="margin-top:5px;">
-                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"高级shader中影响影子的深浅"%>'><%=L"多云"%></div>
+                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"高级shader中影响影子的深浅"%>'><%=L"云量"%></div>
                     <div style="float:left;margin-top:1px;margin-left:9px;">
-                        <pe:sliderbar uiname="EnvFramePage.cloudness" name="cloudness" min="0" max="1" value='<%=GameLogic.options:GetCloudThickness()%>' style="width:80px;height:22px;" onchange="OnCloudnessChanged()"></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.cloudness" name="cloudness" min="0" max="1" value='<%=GameLogic.options:GetCloudThickness()%>' style="width:80px;height:22px;" onchange="EnvFramePage.OnCloudnessChanged()"></pe:sliderbar>
                     </div>
                 </div>
                 <!--<div style="margin-top:5px;">
@@ -196,13 +140,13 @@ end
                 <div style="margin-top:5px;">
                     <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"过大会导致运行缓慢, 可以考虑使用超级远景"%>'><%=L"可视距离"%></div>
                     <div style="float:left;margin-top:1px;margin-left:9px;">
-                        <pe:sliderbar uiname="EnvFramePage.renderDist" name="renderDist" min="30" max="200" value="96" style="width:80px;height:22px;" onchange="OnRenderDistChanged()" ></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.renderDist" name="renderDist" min="30" max="200" value="96" style="width:80px;height:22px;" onchange="EnvFramePage.OnRenderDistChanged()" ></pe:sliderbar>
                     </div>
                 </div>
                 <div style="margin-top:5px;">
                     <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"摄影机不动时,会持续渲染几公里内的场景,并不消耗显存"%>'><%=L"超级远景"%></div>
                     <div style="float:left;margin-top:4px;margin-left:9px;">
-                        <pe:sliderbar uiname="EnvFramePage.superRenderDist" name="superRenderDist" min="0" max="5000" value="96" style="width:80px;height:22px;" onchange="OnSuperRenderDistChanged()"></pe:sliderbar>
+                        <pe:sliderbar uiname="EnvFramePage.superRenderDist" name="superRenderDist" min="0" max="5000" value="96" style="width:80px;height:22px;" onchange="EnvFramePage.OnSuperRenderDistChanged()"></pe:sliderbar>
                     </div>
                 </div>
             </div>

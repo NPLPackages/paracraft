@@ -74,6 +74,15 @@ function BuilderFramePage.OnInit(uiversion)
 	BuilderFramePage.OneTimeInit(uiversion);
 	page = document:GetPageCtrl();
 	BuilderFramePage.OnChangeCategory(nil, false);
+	GameLogic.GetFilters():remove_filter("bulid_frame_page_refresh",BuilderFramePage.RefreshPage)
+	GameLogic.GetFilters():add_filter("bulid_frame_page_refresh",BuilderFramePage.RefreshPage)
+end
+
+function BuilderFramePage.RefreshPage()
+	if(page) then
+		BlockTemplatePage.GetAllTemplatesDS(true)
+		page:Refresh(0)
+	end
 end
 
 function BuilderFramePage.OneTimeInit(uiversion)
@@ -249,3 +258,170 @@ function BuilderFramePage.ShowMobilePage(bShow)
 				--height = 550,
 		--});
 end
+
+function BuilderFramePage._TakeBmax(filename)
+	local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
+	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+	filename = Files.GetRelativePath(filename)
+	filename = commonlib.Encoding.DefaultToUtf8(filename)
+	if(xmlRoot) then
+		local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+		local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+		if(node and node[1]) then
+			local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+			if(root_node and root_node[1]) then
+				local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+				if(node and node[1]) then
+					local blocks = NPL.LoadTableFromString(node[1]);
+					for _, b in ipairs(blocks) do
+						if(b[4]) then
+							local block_template = block_types.get(b[4]);
+							if(block_template) then
+								if b[6] and b[6].attr and b[6].attr.filename then
+									filename = b[6].attr.filename
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	if not filename:match("%.bmax$") and not filename:match("%.x$") then
+		return
+	end
+
+	GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
+
+	-- local block_id = 254
+	-- local x, y, z = ParaScene.GetPlayer():GetPosition();
+	-- local bx, by, bz = BlockEngine:block(x, y+0.5, z);
+	
+	-- local xml_data = {
+	-- 	attr={
+	-- 		bx=bx,
+	-- 		by=by,
+	-- 		bz=bz,
+	-- 		class="EntityBlockModel",
+	-- 		facing=3.14,
+	-- 		filename=filename,
+	-- 		item_id=block_id,
+	-- 		stackHeight=0.2 
+	-- 	},
+	-- 	name="entity" 
+	-- }
+	
+	-- local block = block_types.get(block_id);
+	-- local block_data = block:GetMetaDataFromEnv(bx, by, bz, side, side_region);
+	-- if(BlockEngine:SetBlock(bx, by, bz, block_id, block_data, 3, xml_data)) then
+	-- 	block:play_create_sound();
+	-- end
+end
+
+function BuilderFramePage.OnClickActorContextMenuItem(node)
+	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+	local filename = BuilderFramePage.rightCtxValue
+	local isBmax = filename:match("%.bmax$")
+	if(node.Name == "take") then
+		BuilderFramePage._TakeBmax(filename)
+	elseif(node.Name == "loadtemplate") then
+		BlockTemplatePage.CreateFromTemplate(filename);
+	elseif(node.Name == "delete") then
+		
+		local path = GameLogic.RunCommand(string.format("/deletefile %s -backup",filename))
+		if path then
+			path = string.gsub(path,ParaIO.GetWritablePath(),"")
+			GameLogic.AddBBS(nil, L"成功删除文件并备份为："..commonlib.Encoding.DefaultToUtf8(path))
+		end
+		BlockTemplatePage.GetAllTemplatesDS(true)
+		if page then
+			page:Refresh(0)
+		end
+	end
+end
+
+function BuilderFramePage.OnShowActorContextMenu(x,y, width, height)
+	if(BuilderFramePage.contextMenuActor == nil)then
+		BuilderFramePage.contextMenuActor = CommonCtrl.ContextMenu:new{
+			name = "contextMenuActor",
+			width = 180,
+			height = 30,
+			DefaultNodeHeight = 26,
+			onclick = BuilderFramePage.OnClickActorContextMenuItem,
+		};
+		local node = BuilderFramePage.contextMenuActor.RootNode;
+		node:AddChild(CommonCtrl.TreeNode:new{Text = "", Name = "root_node", Type = "Group", NodeHeight = 0 });
+		local node = node:GetChild(1);
+	end
+	local ctl = BuilderFramePage.contextMenuActor
+	local node = ctl.RootNode:GetChild(1);
+	if(node) then
+		node:ClearAllChildren();
+		local filename = BuilderFramePage.rightCtxValue
+
+		local _ctxMenuItems
+		local isX = filename:match("%.x$")
+		local isBmax = filename:match("%.bmax$")
+		if isBmax then
+			_ctxMenuItems = {
+				{name="take", text=L"拿在手上"}, 
+				{name="loadtemplate", text=L"展示bmax原型"},
+				{name="delete", text=L"删除模板"},
+			};
+		elseif isX then
+			_ctxMenuItems = {
+				{name="take", text=L"拿在手上"},
+				{name="delete", text=L"删除模板"},
+			};
+		else
+			_ctxMenuItems = {
+				{name="loadtemplate", text=L"加载模板"},
+				{name="delete", text=L"删除模板"},
+			};
+		end
+		for index, item in ipairs(_ctxMenuItems) do
+			local text = item.text or item.name;
+				
+			if(item.name == "take") then
+				
+			elseif(item.name == "loadtemplate") then
+			elseif(item.name == "delete") then
+				
+			end
+			if(text) then
+				local uiname;
+				if(item.name~="") then
+					uiname = "contextMenuActor."..item.name
+				end
+				node:AddChild(CommonCtrl.TreeNode:new({Text = text, uiname=uiname, Name = item.name, Type = "Menuitem", onclick = nil, }))
+			end
+		end
+		ctl.height = (#_ctxMenuItems) * 26 + 4;
+	end
+	if(not x or not width) then
+		x, y, width, height = _guihelper.GetLastUIObjectPos();
+	end
+	if(x and width) then
+		BuilderFramePage.contextMenuActor:Show(x, y+height);
+	end
+end
+
+function BuilderFramePage.OnClickTemplateItem(name, mcmlNode)
+	local item = mcmlNode:GetPreValue("this", true);
+    local isBmax = item.filename:match("%.bmax$")
+    local isX = item.filename:match("%.x$")
+
+	local mouse_button = mouse_button;
+	if(mouse_button=="left") then
+		if isBmax or isX then
+			BuilderFramePage._TakeBmax(item.filename)
+		else
+			BlockTemplatePage.CreateFromTemplate(item.filename);
+		end
+	elseif(mouse_button=="right") then
+		BuilderFramePage.rightCtxValue = item.filename
+		BuilderFramePage.OnShowActorContextMenu()
+	end
+end 

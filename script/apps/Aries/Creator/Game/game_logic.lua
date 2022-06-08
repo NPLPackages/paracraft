@@ -52,6 +52,8 @@ NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/FolderManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockManager.lua") 
+local DockManager = commonlib.gettable("MyCompany.Aries.Game.DockManager")
 local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
 local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
 local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
@@ -89,7 +91,6 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local block = commonlib.gettable("MyCompany.Aries.Game.block")
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
-
 -- block names enumeration
 local names;
 -- TODO: testing only, replace this with 
@@ -184,7 +185,12 @@ function GameLogic:InitAPIPath()
     GameLogic.QuestAction = QuestAction;
 	GameLogic.SelectionManager = SelectionManager;
 
+	
+	GameLogic.DockManager = DockManager:InitSingleton()
+
 	_G["GameLogic"] = GameLogic; 
+
+
 	_G["Game"] = commonlib.gettable("MyCompany.Aries.Game");
 
 	-- register DOM for advanced editors.  
@@ -198,6 +204,8 @@ function GameLogic:InitAPIPath()
 	DOM.AddDOM("System", function() return TableAttribute:create(System) end);
 	DOM.AddDOM("commonlib", function() return TableAttribute:create(commonlib) end);
 	GameLogic.gameFRC = DOM.GetDOM("gameFRC");
+
+	
 end
 
 -- static method called at the very beginning when paracraft start
@@ -267,10 +275,6 @@ function GameLogic.InitCommon()
 
 	local SchoolCenter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SchoolCenter/SchoolCenter.lua")
 	SchoolCenter.OnInt()
-
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMain.lua");
-	local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
-	ParaWorldMain:Init()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/Macros.lua");
 	local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
@@ -707,6 +711,21 @@ function GameLogic.LoadGame()
 
 	local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
 	GameLogic.GetFilters():apply_filters("user_event_stat", "world", "enter:"..tostring(worldname), 3, nil);
+
+	if not GameLogic.IsReadOnly() then
+		local second = 0
+		GameLogic.saveWorldTipTimer = commonlib.Timer:new({callbackFunc = function(timer)
+			second = second + 1;
+			if second==60*3 then
+				GameLogic.AddBBS("saveWorldTip",L"Ctrl+S 可快速保存世界",5000)
+			elseif second==60*5 then
+				GameLogic.AddBBS("saveWorldTip",L"上传分享后，可在不同的设备访问自己的作品",5000)
+				GameLogic.saveWorldTipTimer:Change()
+				GameLogic.saveWorldTipTimer = nil
+			end
+		end})
+		GameLogic.saveWorldTipTimer:Change(0,1000)
+	end
 end
 
 function GameLogic.Pause()
@@ -967,6 +986,11 @@ function GameLogic.Exit(bSoft)
 	end
 
 	GameLogic.current_worlddir = "temp/emptyworld/";
+
+	if(GameLogic.saveWorldTipTimer) then
+		GameLogic.saveWorldTipTimer:Change();
+		GameLogic.saveWorldTipTimer = nil;
+	end
 end
 
 local slow_timer_tick = 1;
@@ -1873,7 +1897,7 @@ function GameLogic.ShowVipGuideTip(authName)
 	_guihelper.MessageBox(desc, function(result)
 		if result == _guihelper.DialogResult.OK then
 			local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
-			VipPage.ShowPage();
+			VipPage.ShowPage("create_world_guide");
 		end
 	   
 	end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right, nil, nil, nil, nil, {cancel="取消",ok="开通会员"});
@@ -2091,3 +2115,4 @@ function GameLogic.CheckCanLearn(type)
 	end
 	return true
 end
+

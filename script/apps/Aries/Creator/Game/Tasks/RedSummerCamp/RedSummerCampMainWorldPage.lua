@@ -76,6 +76,8 @@ function RedSummerCampMainWorldPage.Show()
 			enable_esc_key = enable_esc_key,
 			cancelShowAnimation = true,
 			--app_key = 0, 
+			DesignResolutionWidth = 1280,
+			DesignResolutionHeight = 720,
 			directPosition = true,
 				align = "_fi",
 				x = 0,

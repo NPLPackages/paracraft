@@ -237,14 +237,33 @@ function MovieManager:GetActorNames()
 	local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
 	local files = OpenAssetFileDialog.GetLocalModelFiles()
 	if(files) then
+		-- actor names are added when actor is created. 
+		local names = commonlib.OrderedArraySet:new();
+
+		-- add all biped entities like movable entities and live model entities and sort by names. 
+		local entities = EntityManager.GetAllEntities();
+		for id, entity in pairs(entities) do
+			if(entity:IsBiped() and entity.name and entity.name~="" and #(entity.name) < 16) then
+				names:add(entity.name)
+			end
+		end
+		table.sort(names, function(a, b)
+			return a<b;
+		end)
+
+		-- also append local model file. 
 		for _, node in ipairs(files) do
 			local filename = node.attr.filename;
 			if(filename) then
 				local name = filename:match("([^/%.]+)%.[^/]+$");
 				if(name) then
-					self:AddActorName(name)
+					names:add(name)
 				end
 			end
+		end
+		
+		for i=1, #names do
+			self:AddActorName(names[i])
 		end
 	end
 	return self.actor_names;

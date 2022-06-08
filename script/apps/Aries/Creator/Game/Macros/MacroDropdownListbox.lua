@@ -1,5 +1,5 @@
 --[[
-Title: Macro for Dropdown listbox
+Title: Macro for Dropdown listbox & TreeView Control 
 Author(s): LiXizhi
 Date: 2021/1/29
 Desc: 
@@ -133,5 +133,38 @@ function Macros.DropdownMouseUpClose(name)
 	local ctl = CommonCtrl.GetControl(name)
 	if(ctl and ctl.handleEvent) then
 		ctl:handleEvent("OnMouseUpClose");
+	end
+end
+
+local function GetDropDownEditBoxCtrl(name)
+	local ctl = CommonCtrl.GetControl(name)
+	if(ctl and ctl.GetEditBoxUIObject) then
+		return ctl:GetEditBoxUIObject()
+	end
+end
+
+function Macros.DropdownEditBox(name, text)
+	return Macros.EditBox(GetDropDownEditBoxCtrl(name), text)
+end
+
+function Macros.DropdownEditBoxKeyup(name, keyname)
+	return Macros.EditBoxKeyup(GetDropDownEditBoxCtrl(name), keyname)
+end
+
+function Macros.DropdownEditBoxTrigger(name, text)
+	return Macros.EditBoxTrigger(GetDropDownEditBoxCtrl(name), text)
+end
+
+function Macros.DropdownEditBoxKeyupTrigger(name, keyname)
+	return Macros.EditBoxKeyupTrigger(GetDropDownEditBoxCtrl(name), keyname)
+end
+
+function Macros.TreeViewShowNode(name, nodeName)
+	local ctl = CommonCtrl.TreeView and CommonCtrl.TreeView.GetControlByUIName(name)
+	if(ctl and ctl.uiname == name) then
+		local node = ctl:FindVisibleNodeByUIName(nodeName)
+		if(node) then
+			ctl:Update(nil, node)
+		end
 	end
 end

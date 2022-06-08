@@ -16,14 +16,22 @@ end, {name="1", itemId, canDrag=true})
 local EditModelProperty = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelProperty");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local page;
 function EditModelProperty.OnInit()
 	page = document:GetPageCtrl();
 end
 
+function EditModelProperty.GetEntity()
+	return EditModelProperty.entity;
+end
+
 -- @param modelEntity: EntityBlockModel or EntityLiveModel
 function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
+	EditModelProperty.entity = modelEntity;
 	if(modelEntity) then
 		local mountpoints
 		if(modelEntity:GetMountPoints()) then
@@ -46,6 +54,7 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 				modelEntity = modelEntity:SetCanDrag(values.canDrag) or modelEntity;
 				modelEntity:SetIsStackable(values.isStackable)
 				modelEntity:SetStackHeight(values.stackHeight)
+				modelEntity:SetFrameMoveInterval(values.framemove_interval);
 				if(modelEntity.SetDragDisplayOffsetY) then
 					modelEntity:SetDragDisplayOffsetY(values.dragDisplayOffsetY)
 				end
@@ -62,7 +71,7 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 				if(bootHeight and modelEntity.SetBootHeight ~= nil) then
 					modelEntity:SetBootHeight(bootHeight);
 				end
-
+				
 				if(values.onClickEvent == "") then
 					values.onClickEvent = nil
 				end
@@ -87,6 +96,11 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 					values.onEndDragEvent = nil
 				end
 				modelEntity:SetOnEndDragEvent(values.onEndDragEvent)
+
+				if(values.onTickEvent == "") then
+					values.onTickEvent = nil
+				end
+				modelEntity:SetOnTickEvent(values.onTickEvent)
 
 				if(values.tag == "") then
 					values.tag = nil
@@ -130,6 +144,7 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 			opacity = modelEntity:GetOpacity(),
 			bootHeight = modelEntity.GetBootHeight ~= nil and modelEntity:GetBootHeight() or 0,
 			stackHeight = modelEntity.stackHeight,
+			framemove_interval = modelEntity.framemove_interval,
 			dragDisplayOffsetY = modelEntity.dragDisplayOffsetY,
 			autoTurning = modelEntity.bIsAutoTurning,
 			canDrag = modelEntity.canDrag,
@@ -138,6 +153,7 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 			onMountEvent = modelEntity:GetOnMountEvent(),
 			onBeginDragEvent = modelEntity:GetOnBeginDragEvent(),
 			onEndDragEvent = modelEntity:GetOnEndDragEvent(),
+			onTickEvent = modelEntity:GetOnTickEvent(),
 			tag = modelEntity:GetTag(),
 			staticTag = modelEntity:GetStaticTag(),
 			category = modelEntity:GetCategory(),
@@ -166,13 +182,14 @@ function EditModelProperty.ShowPage(OnClose, last_values)
 			click_through = false, 
 			enable_esc_key = true,
 			bShow = true,
-			isTopLevel = true,
+			-- isTopLevel = true,
+			zorder = -1,
 			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 			directPosition = true,
 				align = "_ct",
 				x = -320,
 				y = -210,
-				width = 640,
+				width = 650,
 				height = 370,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
@@ -205,6 +222,9 @@ function EditModelProperty.OnOK()
 		else
 			stackHeight = nil;
 		end
+		local framemove_interval = page:GetValue("framemove_interval")
+		framemove_interval = tonumber(framemove_interval);
+		
 		local dragDisplayOffsetY = page:GetValue("dragDisplayOffsetY")
 		if(dragDisplayOffsetY~="nil") then
 			dragDisplayOffsetY = tonumber(dragDisplayOffsetY) or 0.3;
@@ -221,6 +241,7 @@ function EditModelProperty.OnOK()
 		EditModelProperty.result = {
 			name = name,
 			stackHeight = stackHeight,
+			framemove_interval = framemove_interval, 
 			dragDisplayOffsetY = dragDisplayOffsetY,
 			idleAnim = idleAnim, 
 			hasRealPhysics = hasRealPhysics,
@@ -236,6 +257,7 @@ function EditModelProperty.OnOK()
 			onMountEvent = page:GetValue("onMountEvent"),
 			onBeginDragEvent = page:GetValue("onBeginDragEvent"),
 			onEndDragEvent = page:GetValue("onEndDragEvent"),
+			onTickEvent = page:GetValue("onTickEvent"),
 			modelfile = page:GetValue("modelfile"),
 			tag = page:GetValue("tag"),
 			staticTag = page:GetValue("staticTag"),
@@ -257,6 +279,7 @@ function EditModelProperty.UpdateUIFromValue(values)
 		page:SetValue("opacity", values.opacity);
 		page:SetValue("bootHeight", values.bootHeight);
 		page:SetValue("stackHeight", tostring(values.stackHeight));
+		page:SetValue("framemove_interval", tostring(values.framemove_interval or ""));
 		page:SetValue("dragDisplayOffsetY", tostring(values.dragDisplayOffsetY));
 		page:SetValue("idleAnim", tostring(values.idleAnim));
 		page:SetValue("hasRealPhysics", tostring(values.hasRealPhysics));
@@ -267,6 +290,7 @@ function EditModelProperty.UpdateUIFromValue(values)
 		page:SetValue("onMountEvent", tostring(values.onMountEvent or ""));
 		page:SetValue("onBeginDragEvent", tostring(values.onBeginDragEvent or ""));
 		page:SetValue("onEndDragEvent", tostring(values.onEndDragEvent or ""));
+		page:SetValue("onTickEvent", tostring(values.onTickEvent or ""));
 		page:SetValue("modelfile", tostring(values.modelfile or ""));
 		page:SetValue("tag", tostring(values.tag or ""));
 		page:SetValue("staticTag", tostring(values.staticTag or ""));
@@ -302,6 +326,60 @@ function EditModelProperty.OnTextChange(name, mcmlNode)
 		local text = mcmlNode:GetUIValue()
 		if(EditModelProperty.mountpoints) then
 			EditModelProperty.mountpoints[index].name = text;
+		end
+	end
+end
+
+function EditModelProperty.OnClickBuildinFunctions(name)
+	name = name:gsub("More$", "")
+	local oldValue = page:GetValue(name);
+	local staticTag = page:GetValue("staticTag");
+	local properties = commonlib.totable(staticTag)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/API/ParaLifeAPISelector.lua");
+	local ParaLifeAPISelector = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeAPISelector")
+	ParaLifeAPISelector.ShowPage(true, name, function(value)
+		if(page) then
+			page:SetValue(name, value);
+			-- apply properties to static tag. 
+			local oldProperties = commonlib.totable(staticTag);
+			if(not commonlib.compare(oldProperties, properties)) then
+				local staticTag = commonlib.serialize_compact(properties)
+				page:SetValue("staticTag", staticTag);
+			end
+		end
+	end, oldValue, properties)
+end
+
+function EditModelProperty.GetModelAnimDs()
+	local animIds = {}
+	if not EditModelProperty.result or not EditModelProperty.result.modelfile then
+		return animIds
+	end
+	local modelfile = EditModelProperty.result.modelfile
+	modelfile = PlayerAssetFile:GetValidAssetByString(modelfile);
+	if not modelfile then
+		return animIds
+	end
+	local options = OpenAssetFileDialog.GetAnimIdsByFilename(modelfile);
+	
+	if(options) then
+		for i, anim in ipairs(options) do
+			animIds[i] = {value=anim.value.."",text=anim.text}
+			if i==1 then
+				animIds[i].selected = true
+			end
+		end
+	end
+	return animIds
+end
+
+function EditModelProperty.OnClickEmptyRuleSlot(slotNumber)
+	local entity = EditModelProperty.GetEntity()
+	if(entity) then
+		local contView = entity.rulebagView;
+		if(contView and slotNumber) then
+			local slot = contView:GetSlot(slotNumber);
+			entity:OnClickEmptySlot(slot);
 		end
 	end
 end

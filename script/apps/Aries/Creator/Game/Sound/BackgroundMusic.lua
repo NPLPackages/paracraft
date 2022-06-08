@@ -118,7 +118,7 @@ end
 
 -- replace old bg music with the new one. 
 -- @retun true if playing, or false if stopped.
-function BackgroundMusic:PlayBackgroundSound(audio_src, bToggleIfSame)
+function BackgroundMusic:PlayBackgroundSound(audio_src, bToggleIfSame,volume)
 	if(audio_src) then
 		if(last_audio_src ~= audio_src) then
 			if(last_audio_src) then
@@ -126,17 +126,20 @@ function BackgroundMusic:PlayBackgroundSound(audio_src, bToggleIfSame)
 			end
 			last_audio_src = audio_src;
 			-- TODO: shall we fade in and fade out?
-			audio_src:play2d(); -- then play with default. 
+			local volume = type(volume) == "number" and volume or 1
+			audio_src:play2d(volume); -- then play with default. 
 			self:CheckIsSilence()
 			return true;
 		elseif(bToggleIfSame) then
 			self:Stop();
 			return false;
+		else
+			audio_src:SetVolume(volume);
 		end
 	end
 end
 
-function BackgroundMusic:PlayOnChannel(name, audio_src)
+function BackgroundMusic:PlayOnChannel(name, audio_src ,volume)
 	if(audio_src) then
 		if(channels[name] ~= audio_src) then
 			if(channels[name]) then
@@ -144,7 +147,8 @@ function BackgroundMusic:PlayOnChannel(name, audio_src)
 			end
 			channels[name] = audio_src;
 			audio_src.channel = name;
-			audio_src:play2d();
+			local volume = type(volume) == "number" and volume or 1
+			audio_src:play2d(volume);
 			self:CheckIsSilence()
 			return true;
 		end

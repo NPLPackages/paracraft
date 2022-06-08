@@ -57,7 +57,7 @@ function Entity:GetNextNoteCmd()
 		local pre, note = last_cmd:match("^([^%d]*)(%d+)$");
 		if(note) then
 			note = tonumber(note) or 0;
-			if(note <256) then
+			if(note < 256) then
 				local cmd = pre..tostring(note+1);
 				Entity.SetLastCmd(cmd);
 				return cmd;
@@ -112,7 +112,7 @@ end
 -- @param channel: 0-15 channels. default to channel 0
 function Entity.CreateNoteMsg(note, velocity, channel)
 	-- 9n: where n is channel number
-	local status = 9*16 + (channel or 0);
+	local status = 9 * 16 + (channel or 0);
 	return mathlib.bit.lshift(velocity or 64, 16) + mathlib.bit.lshift(note or 60, 8) + status;
 end
 
@@ -146,67 +146,97 @@ local pitch_offset = {
 -- @param cmd: if cmd is a number [1-7], play note in middle c group. [10,127] to play raw note
 -- if cmd is a absolute pitch c' D, play it 
 function Entity.CreateNoteMsgFromCmd(cmd, baseNote, velocity, channel)
-	local note = cmd:match("^%s*(%d+)%s*$")
-	local pitch = cmd:match("([a-gA-G]'*)")
+	local note = cmd:match("^%s*(%d+)%s*$");
+	local pitch = cmd:match("([a-gA-G]'*)");
 
-	if(note) then
-		local note_key = tonumber(note)
-		if(note_key>=1 and note_key<=7) then
-			note = pitch_note["c'"] + (pitch_offset[note] or 0)
-		elseif(note_key<=127) then
-			note = note_key
+	if (not baseNote) then
+		baseNote = 0;
+	end
+
+	if (note) then
+		local note_key = tonumber(note);
+
+		if (note_key >= 1 and note_key <= 7) then
+			note = pitch_note["c'"] + (pitch_offset[note] or 0);
+		elseif (note_key <= 127) then
+			note = note_key;
 		end
 	elseif pitch then
-		local pitch_name = pitch:sub(1, 1)
+		local pitch_name = pitch:sub(1, 1);
+		local pitch_group_name = '';
 
-		local pitch_group_name = ''
 		if pitch_name:match("[a-g]") then
-			pitch_group_name = 'c'
+			pitch_group_name = 'c';
 		else
-			pitch_group_name = 'C'
+			pitch_group_name = 'C';
 		end
-		pitch_group_name = pitch_group_name .. pitch:sub(2)
 
-		local base_note = pitch_note[pitch_group_name]
+		pitch_group_name = pitch_group_name .. pitch:sub(2);
+
+		local base_note = pitch_note[pitch_group_name];
+
 		if base_note ~= nil then
-			note = base_note + pitch_offset[pitch_name]
+			note = base_note + pitch_offset[pitch_name];
 		else
-			return 0
+			return 0;
 		end
 	else
-		return 0
+		return 0;
 	end
 
 	Entity.SetLastCmd(cmd);
-	return Entity.CreateNoteMsg(note, velocity, channel);
+
+	local val = Entity.CreateNoteMsg(note, velocity, channel);
+	val = val + mathlib.bit.lshift(baseNote, 24);
+
+	return val;
 end
 
 -- static function function to play a given command.
-function Entity.PlayCmd(cmd)
-	local note = Entity.CreateNoteMsgFromCmd(cmd);
+function Entity.PlayCmd(cmd, base_note, beat, channel)
+	local note = Entity.CreateNoteMsgFromCmd(cmd, base_note, nil, channel);
 	ParaAudio.PlayMidiMsg(note);
+
+	if (System.os.GetPlatform() == "win32") then
+		commonlib.TimerManager.SetTimeout(function()
+			if (ParaAudio.StopMidiMsg) then
+				ParaAudio.StopMidiMsg(channel or 0);
+			end
+		end, (beat or 1) * 1000);
+	end
 end
 
 function Entity:PlayNote()
 	local x, y, z = self:GetBlockPos();
 
 	-- only play when block above is air.
-	if(BlockEngine:GetBlockMaterial(x, y+1, z) == Materials.air) then
-		local baseMat = BlockEngine:GetBlockMaterial(x, y- 1, z);
-		local baseNote = 56;
+	if (BlockEngine:GetBlockMaterial(x, y + 1, z) == Materials.air) then
+		local baseMat = BlockEngine:GetBlockMaterial(x, y - 1, z);
+		local baseNote = 0;
+		local channel = 0;
+
 		if (baseMat == Materials.rock) then
-            baseNote = 21;
+            baseNote = 0;
+			channel = 9;
         elseif (baseMat == Materials.sand) then
-            baseNote = 28;
+            baseNote = 25;
         elseif (baseMat == Materials.wood) then
-            baseNote = 35;
+            baseNote = 10;
 		elseif (baseMat == Materials.glass) then
-            baseNote = 70;
+            baseNote = 0;
         end
 
-		if(self.cmd) then
-			local note = Entity.CreateNoteMsgFromCmd(self.cmd, baseNote);
+		if (self.cmd) then
+			local note = Entity.CreateNoteMsgFromCmd(self.cmd, baseNote, nil, channel);
 			ParaAudio.PlayMidiMsg(note);
+
+			if (System.os.GetPlatform() == "win32") then
+				commonlib.TimerManager.SetTimeout(function()
+					if (ParaAudio.StopMidiMsg) then
+						ParaAudio.StopMidiMsg(0);
+					end
+				end, 1000);
+			end
 		end
 	end
 end

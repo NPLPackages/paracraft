@@ -13,6 +13,8 @@ MacroPlayer.ShowController(false);
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieUISound.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local MovieUISound = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieUISound");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local Screen = commonlib.gettable("System.Windows.Screen");
@@ -32,6 +34,7 @@ function MacroPlayer.OnInit()
 	page = document:GetPageCtrl();
 	GameLogic.GetFilters():add_filter("Macro_EndPlay", MacroPlayer.OnEndPlay);
 	GameLogic.GetFilters():add_filter("Macro_PlayMacro", MacroPlayer.OnPlayMacro);
+	GameLogic.GetFilters():add_filter("sound_starts_playing", MacroPlayer.OnSoundStartsPlaying);
 	MacroPlayer.isShowDebugWnd = false;
 
 	if System.os.IsTouchMode() then
@@ -209,7 +212,24 @@ function MacroPlayer.HideAll(bSkipTips)
 	MacroPlayer.ShowEditBox(false);
 	MacroPlayer.ShowMouseWheel(false);
 	MacroPlayer.ShowKeyboard(false);
-	
+	MacroPlayer.ShowBlackBg(false)
+end
+
+function MacroPlayer.ShowBlackBg(bShow)
+	if MacroPlayer.blackTimer then
+		MacroPlayer.blackTimer:Change()
+		MacroPlayer.blackTimer = nil
+	end
+	local scene_back = ParaUI.GetUIObject("MacroPlayer.scene")
+	if scene_back and scene_back:IsValid() then
+		scene_back.visible = false
+		if bShow then
+			MacroPlayer.blackTimer = MacroPlayer.blackTimer or commonlib.Timer:new({callbackFunc = function(timer)
+				scene_back.visible = true
+			end})
+			MacroPlayer.blackTimer:Change(5000);	
+		end
+	end
 end
 
 function MacroPlayer.OnPlayMacro(fromLine, macros)
@@ -635,6 +655,13 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
 
 				local mouseBtn = page:FindControl("mouseBtn")
 				mouseBtn.y = offset
+				--把提示鼠标向上移动
+				local x,y,width,height = mouseBtn:GetAbsPosition()
+				local screenHeight = Screen:GetHeight()
+				if y + height >= screenHeight then
+					mouseBtn.y = -offset
+					mouseBtn.x = width/4
+				end
 				if(button:match("left")) then
 					mouseBtn.visible = true;
 					mouseBtn.background = "Texture/Aries/Quest/TutorialMouse_LeftClick_small_32bits.png";
@@ -665,6 +692,7 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
 				end
 			end
 		end
+		MacroPlayer.ShowBlackBg(bShow)
 	end
 end
 
@@ -1214,7 +1242,7 @@ function MacroPlayer.OnMouseWheel()
 			Macros.voice("请向另外一个方向滚动鼠标中间的滚轮")
 			MacroPlayer.ResetTipTime()
 		end
-	end
+	end	
 end
 
 function MacroPlayer.ShowMouseWheel(bShow, mouseX, mouseY)
@@ -1440,4 +1468,47 @@ function MacroPlayer.AutoAdjustControlPosition(x1, y1, x2, y2)
 			end
 		end
 	end
+end
+
+function MacroPlayer.OnSoundStartsPlaying()
+	if not page then
+		return
+	end
+
+	if not SoundManager:IsPlayTextSoundPlaying() then
+		return
+	end
+	
+	local sound_icon = page:FindControl("soundIcon")
+	if sound_icon:IsValid() then
+		if sound_icon.visible then
+			return
+		end
+
+		sound_icon.visible = true
+	end
+
+	local change_index = 1
+	MacroPlayer.SoundIconTimer = MacroPlayer.SoundIconTimer or commonlib.Timer:new({callbackFunc = function(timer)
+		if page then
+			local sound_icon = page:FindControl("soundIcon")
+			if not SoundManager:IsPlayTextSoundPlaying() then
+				MacroPlayer.SoundIconTimer:Change();			
+				if sound_icon:IsValid() then
+					sound_icon.visible = false
+				end
+				return
+			end
+	
+			if sound_icon:IsValid() then
+				change_index = change_index == 1 and 2 or 1
+				local background = string.format("Texture/Aries/Quest/laba%s_48x46_32bits.png;0 0 48 46", change_index)
+				sound_icon.visible = true
+				sound_icon.background = background
+			end
+		else
+			MacroPlayer.SoundIconTimer:Change();	
+		end
+	end})
+	MacroPlayer.SoundIconTimer:Change(0, 300);
 end

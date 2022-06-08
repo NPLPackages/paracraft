@@ -29,6 +29,3 @@ function Entity:SetLastCommandResult(last_result)
 	-- dummy
 end
 
-
-
-

@@ -27,6 +27,11 @@ function DesktopMenuPage.OnInit()
 	DesktopMenu.Init();
 	GameLogic.GetEvents():AddEventListener("game_mode_change", DesktopMenuPage.OnGameModeChanged, DesktopMenuPage, "DesktopMenuPage");
 	GameLogic:Connect("WorldLoaded", DesktopMenuPage, DesktopMenuPage.OnWorldLoaded, "UniqueConnection");
+	GameLogic:Connect("WorldUnloaded", DesktopMenuPage, DesktopMenuPage.OnWorldUnloaded, "UniqueConnection");
+end
+
+function DesktopMenuPage.OnWorldUnloaded()
+	DesktopMenuPage.ActivateMenu(false,true);
 end
 
 function DesktopMenuPage.GetProjectText()
@@ -103,7 +108,7 @@ function DesktopMenuPage.TogglePinned()
 end
 
 -- inventory and esc key will activate/deactivate the menu. 
-function DesktopMenuPage.ActivateMenu(bActivate)
+function DesktopMenuPage.ActivateMenu(bActivate,bForce)
 	if(bActivate == nil) then
 		bActivate = not DesktopMenuPage.IsActivated;
 	end
@@ -116,7 +121,7 @@ function DesktopMenuPage.ActivateMenu(bActivate)
 		end
 		SceneViewport.SetVirtualMarginTop(32)
 	else
-		if(not DesktopMenuPage.IsPinned) then
+		if(not DesktopMenuPage.IsPinned or bForce) then
 			if(page and page:IsVisible()) then
 				DesktopMenuPage.ShowPage(false);
 			end

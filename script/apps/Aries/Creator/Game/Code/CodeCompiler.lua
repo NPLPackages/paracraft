@@ -14,6 +14,7 @@ code_func, errormsg = CodeCompiler:new():SetFilename(virtual_filename):Compile(c
 local CodeCompiler = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler"));
 
 CodeCompiler:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode", auto=true})
+CodeCompiler:Property({"isStepMode", nil, "IsStepMode", "SetStepMode", auto=true})
 
 
 local inject_map = {
@@ -63,11 +64,51 @@ function CodeCompiler:InjectCheckYieldToCode(code)
 	end
 end
 
+local inject_step_map = {
+	{"^(%s*function%A+[^%)]+%)%s*)$", "%1 checkstep();"},
+	{"^(%s*local%s+function%W+[^%)]+%)%s*)$", "%1 checkstep();"}, 
+	{"^(%s*for%s.*%s+do%s*)$", "%1 checkstep();"},
+	{"^(%s*while%A.*%Ado%s*)$", "%1 checkstep();"},
+	{"^(%s*repeat%s*)$", "%1 checkstep();"},
+	{"^(%s*end%s*)$", "%1 --"},
+	{"^(%s*else%s*)$", "%1 --"},
+	{"^(%s*if%(?.*then%s*)$", "%1 checkstep();"},
+	{"^(%s*elseif%(?.*then%s*)$", "%1 checkstep();"},
+	{"^(%s*%-%-.*)$", "%1 --"},
+}
+
+local function injectLineStep_(lastLine)
+	local line = lastLine
+	for i,v in ipairs(inject_step_map) do
+		line = string.gsub(line, v[1], v[2]);
+	end
+	if(line==lastLine and not line:match("^%s*$")) then
+		line = "checkstep();"..line;
+	end
+	return line;
+end
+
+-- TODO: use a more strict way, such as AST tree that preserves line info. 
+function CodeCompiler:InjectLineStepToCode(code)
+	if(code) then
+		local lines = {};
+		local isInLongString
+		for line in string.gmatch(code or "", "([^\r\n]*)\r?\n?") do
+			lines[#lines+1] = injectLineStep_(line);	
+		end
+		code = table.concat(lines, "\n");
+		return code;
+	end
+end
 
 function CodeCompiler:Compile(code)
 	if(code and code~="") then
 		if(not self:IsAllowFastMode()) then
-			code = self:InjectCheckYieldToCode(code)
+			if(self:IsStepMode()) then
+				code = self:InjectLineStepToCode(code)
+			else
+				code = self:InjectCheckYieldToCode(code)
+			end
 		end
 		local code_func, errormsg = loadstring(code, self:GetFilename());
 		if(not code_func and errormsg) then

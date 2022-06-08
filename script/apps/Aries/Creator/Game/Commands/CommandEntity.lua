@@ -77,7 +77,7 @@ e.g.
 			local entity_class = EntityManager[class_name];
 			if(type(entity_class) == "table" and entity_class.Create) then
 				local entity = entity_class:Create({bx=x,by=y,bz=z,});
-				EntityManager.AddObject(entity);
+				entity:Attach();
 			end
 		end
 	end,
@@ -111,7 +111,7 @@ Commands["createmob"] = {
 					if(filename) then
 						entity:SetModelFile(filename);
 					end
-					EntityManager.AddObject(entity);
+					entity:Attach();
 				else
 					GameLogic.AddBBS(nil, "can not create mob here");
 				end

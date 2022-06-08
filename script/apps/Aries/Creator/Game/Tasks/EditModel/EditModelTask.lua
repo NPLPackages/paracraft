@@ -41,6 +41,7 @@ EditModelTask.is_top_level = true;
 function EditModelTask:ctor()
 	self.position = vector3d:new(0,0,0);
 	self.transformMode = false;
+	self.isWorldTransform = true;
 end
 
 local page;
@@ -106,19 +107,32 @@ function EditModelTask:OnExit()
 	self:UnloadSceneContext();
 	self:CloseWindow();
 	curInstance = nil;
+	page = nil;
+end
+
+function EditModelTask:UpdateUIFromModel()
+	if(self.entityModel and page and not self.isChangingFromUI) then
+		page:Refresh(1);
+	end
 end
 
 function EditModelTask:SelectModel(entityModel)
 	if(self.entityModel~=entityModel) then
-		if(self.entityModel and self.entityModel.isLastSkipPicking==false) then
-			self.entityModel:SetSkipPicking(false);
+		self.isWorldTransform = true;
+		if(self.entityModel) then
+			if(self.entityModel.isLastSkipPicking==false) then
+				self.entityModel:SetSkipPicking(false);
+			end
+			self.entityModel:Disconnect("valueChanged", self, self.UpdateUIFromModel)
 		end
+
 		self.entityModel = entityModel;
 		if(entityModel) then
 			entityModel.isLastSkipPicking = entityModel:IsSkipPicking();
 			if(not entityModel.isLastSkipPicking) then
 				entityModel:SetSkipPicking(true);
 			end
+			self.entityModel:Connect("valueChanged", self, self.UpdateUIFromModel, "UniqueConnection")
 		end
 		self:UpdateManipulators();
 	end
@@ -126,11 +140,13 @@ end
 
 function EditModelTask.GetItemID()
 	local self = EditModelTask.GetInstance();
-	if(self:GetSelectedModel()) then
-		return self:GetSelectedModel():GetItemId()
-	else
-		if(self.itemInHand) then
-			return self.itemInHand.id
+	if self then
+		if(self:GetSelectedModel()) then
+			return self:GetSelectedModel():GetItemId()
+		else
+			if(self.itemInHand) then
+				return self.itemInHand.id
+			end
 		end
 	end
 end
@@ -139,15 +155,21 @@ function EditModelTask:GetSelectedModel()
 	return self.entityModel;
 end
 
+-- it will first try to reset only local transform if it is not identity. 
 function EditModelTask.OnResetModel()
 	local self = EditModelTask.GetInstance();
 	if(self) then
 		local entity = self:GetSelectedModel();
 		if(entity) then
-			entity:setYaw(0);
-			entity:setScale(1);
-			if(entity.SetOffsetPos) then
-				entity:SetOffsetPos({0,0,0});
+			local matLocal = entity:GetModelLocalTransform()
+			if(not matLocal or matLocal:isIdentity()) then
+				entity:setYaw(0);
+				entity:setScale(1);
+				if(entity.SetOffsetPos) then
+					entity:SetOffsetPos({0,0,0});
+				end
+			else
+				entity:SetModelLocalTransform(nil);
 			end
 		end
 	end
@@ -157,12 +179,21 @@ function EditModelTask:UpdateManipulators()
 	self:DeleteManipulators();
 
 	if(self.entityModel) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelManipContainer.lua");
-		local EditModelManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.EditModelManipContainer");
-		local manipCont = EditModelManipContainer:new();
-		manipCont:init();
-		self:AddManipulator(manipCont);
-		manipCont:connectToDependNode(self.entityModel);
+		if(self:IsWorldTransformMode()) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelManipContainer.lua");
+			local EditModelManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.EditModelManipContainer");
+			local manipCont = EditModelManipContainer:new();
+			manipCont:init();
+			self:AddManipulator(manipCont);
+			manipCont:connectToDependNode(self:GetSelectedModel());
+		else
+			NPL.load("(gl)script/ide/System/Scene/Manipulators/LocalTransformManipContainer.lua");
+			local LocalTransformManipContainer = commonlib.gettable("System.Scene.Manipulators.LocalTransformManipContainer");
+
+			local manipCont = LocalTransformManipContainer:new():init();
+			self:AddManipulator(manipCont);
+			manipCont:connectToDependNode(self:GetSelectedModel());
+		end
 
 		self:RefreshPage();
 	end
@@ -201,12 +232,23 @@ function EditModelTask:PickModelAtMouse(result)
 end
 
 function EditModelTask:handleLeftClickScene(event, result)
-	local modelEntity = self:PickModelAtMouse();
-	if(modelEntity) then
-		self:SelectModel(modelEntity);
-		self:SetTransformMode(true);
+	if(not event:IsCtrlKeysPressed()) then
+		local modelEntity = self:PickModelAtMouse();
+		if(modelEntity) then
+			self:SelectModel(modelEntity);
+			self:SetTransformMode(true);
+		else
+			self:SetTransformMode(false);
+		end
 	else
-		self:SetTransformMode(false);
+		if(event.alt_pressed and result) then
+			-- alt + left click to get the block in hand without destroying it
+			if(result.block_id and result.block_id~=0 and result.blockX) then
+				GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ);
+			elseif(result.entity) then
+				GameLogic.GetPlayerController():PickItemByEntity(entity);
+			end
+		end
 	end
 	event:accept();
 end
@@ -242,7 +284,8 @@ function EditModelTask:keyPressEvent(event)
 		
 	elseif(dik_key == "DIK_SUBTRACT" or dik_key == "DIK_MINUS") then
 		-- decrease scale
-		
+	elseif(dik_key == "DIK_T")then	
+		self:OnClickToggleTransformMode()
 	elseif(dik_key == "DIK_Z")then
 		UndoManager.Undo();
 	elseif(dik_key == "DIK_Y")then
@@ -278,6 +321,36 @@ function EditModelTask.OnClickChangeModelFile()
 end
 
 function EditModelTask:UpdateValueToPage()
+	local modelEntity = self:GetSelectedModel()
+	if(modelEntity) then
+		local mountPivot = modelEntity:GetTagField("mountPivot")
+		local mountPivot_checked = modelEntity:GetTagField("mountPivot_checked")
+		local mountCount = EditModelTask.GetMountPointCount()
+		if mountPivot and mountPivot_checked and tonumber(mountCount) == 0 then
+			EditModelTask.OnMountPointCountChanged(1)
+			local mountPoint = modelEntity:GetMountPoints():GetMountPoint(1)
+			if mountPoint then
+				mountPoint:SetFacing(modelEntity:GetFacing())
+				local scaling = modelEntity:GetScaling() or 1
+				local aabb = modelEntity:GetInnerObjectAABB()
+				local dx,dy,dz = aabb:GetExtendValues();
+				mountPoint:SetAABBSize((dx * 2)/scaling, (dy*2)/scaling, (dz * 2)/scaling)
+				if mountPivot == "top" then
+					mountPoint:SetPivot({0,(dy * 2)/scaling,0})
+				elseif mountPivot == "mid" then
+					mountPoint:SetPivot({0,dy/scaling,0})
+				elseif mountPivot == "bottom" then
+					mountPoint:SetPivot({0,0,0})
+				end
+			end
+		end
+
+		local needPhysics = modelEntity:GetTagField("needPhysics")
+		local needPhysics_checked = modelEntity:GetTagField("needPhysics_checked")
+		if needPhysics and needPhysics_checked and not modelEntity:HasRealPhysics()then
+			EditModelTask.OnClickTogglePhysics()
+		end
+	end
 	self:RefreshPage()
 end
 
@@ -300,7 +373,9 @@ end
 function EditModelTask.OnFacingDegreeChanged(text)
 	local self = EditModelTask.GetInstance();
 	if(self) then
+		self.isChangingFromUI = true;
 		self:SetFacingDegree(tonumber(text));
+		self.isChangingFromUI = false;
 	end
 end
 
@@ -311,7 +386,9 @@ function EditModelTask.OnScalingChanged(text)
 		if(modelEntity and modelEntity.setScale and text) then
 			local scaling = tonumber(text);
 			if(scaling and scaling >= (modelEntity.minScale or 0.1) and scaling <= (modelEntity.maxScale or 10)) then
+				self.isChangingFromUI = true;
 				modelEntity:setScale(scaling);
+				self.isChangingFromUI = false;
 			end
 		end
 	end
@@ -402,7 +479,9 @@ function EditModelTask.OnChangeSkin()
 		local entity = self:GetSelectedModel()
 		if(entity) then
 			local assetFilename = entity:GetMainAssetPath();
-			local old_value = entity:GetSkin();
+			if entity.GetSkin then
+				local old_value = entity:GetSkin();
+			end
 
 			if(entity.IsCustomModel and entity:IsCustomModel()) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditCCS/EditCCSTask.lua");
@@ -520,5 +599,34 @@ function EditModelTask.OnClickChangeDraggable()
 			end
 			GameLogic.GetPlayerController():SetBlockInRightHand(itemStack, true)
 		end
+	end
+end
+
+-- @param sectionIndex: if nil, we will return full name, otherwise it will break into sections. 
+-- if 1 it will resturn model file, if 2 it will return unique name
+function EditModelTask:GetLongDisplayName(sectionIndex)
+	local model = self:GetSelectedModel()
+	local name;
+	if(model) then
+		if(sectionIndex == 1 and model.GetModelFile) then
+			name = model:GetModelFile() or ""
+		elseif(sectionIndex == 2) then
+			name = model:GetName() or ""
+		else
+			name = model:GetDisplayName();
+		end
+	end
+	return name;
+end
+
+function EditModelTask:IsWorldTransformMode()
+	return self.isWorldTransform;
+end
+
+function EditModelTask.OnClickToggleTransformMode()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		self.isWorldTransform = not self.isWorldTransform;
+		self:UpdateManipulators()
 	end
 end

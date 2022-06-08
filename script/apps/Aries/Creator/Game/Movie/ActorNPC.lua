@@ -1157,9 +1157,11 @@ function Actor:FrameMoveRecording(deltaTime)
 		local gravity = obj:GetField("Gravity", 9.18);
 		self:AutoAddKey("gravity", curTime, gravity);
 
-		local blockinhand = entity:GetBlockInRightHand();
-		self:AutoAddKey("blockinhand", curTime, blockinhand or 0);
-
+		if (entity.GetBlockInRightHand) then
+			local blockinhand = entity:GetBlockInRightHand();
+			self:AutoAddKey("blockinhand", curTime, blockinhand or 0);
+		end
+		
 		local assetfile = obj:GetPrimaryAsset():GetKeyName();
 		self:AutoAddKey("assetfile", curTime, PlayerAssetFile:GetNameByFilename(assetfile));
 	end

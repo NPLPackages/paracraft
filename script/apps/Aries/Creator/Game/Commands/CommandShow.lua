@@ -25,8 +25,8 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 -- show the current player 
 Commands["show"] = {
 	name="show", 
-	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|playertouch
-terrain|mod|physics|vision|quickselectbar|tips|map|camera|anim|paralife|
+	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|playertouch|
+terrain|mod|physics|vision|quickselectbar|tips|map|camera|anim|paralife|axis|
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
@@ -166,6 +166,13 @@ Other show filters:
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 			ParaLife:SetShowPlayer(options.showplayer==true)
 			ParaLife:SetEnabled(true)
+		elseif (name == "esc") then
+			local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
+    		EscDock.ShowView(true)
+		elseif (name == "axis") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InfoWorldAxisWindow.lua");
+			local InfoWorldAxisWindow = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InfoWorldAxisWindow");
+			InfoWorldAxisWindow.GetInstance():Show(true);
 		end
 	end,
 };
@@ -175,7 +182,7 @@ Other show filters:
 Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|mobile|playertouch|
-terrain|vision|ui|keyboard|quickselectbar|tips|map|info|camera|paralife|
+terrain|vision|ui|keyboard|quickselectbar|tips|map|info|camera|paralife|axis|
 dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo
 ]], 
 	desc=[[hide different type of things.e.g.
@@ -269,6 +276,13 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLife.lua");
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 			ParaLife:SetEnabled(false)
+		elseif (name == "esc") then
+			local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
+    		EscDock.ShowView(false)
+		elseif (name == "axis") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InfoWorldAxisWindow.lua");
+			local InfoWorldAxisWindow = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InfoWorldAxisWindow");
+			InfoWorldAxisWindow.GetInstance():Show(false);
 		end
 	end,
 };

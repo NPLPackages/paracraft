@@ -67,6 +67,9 @@ function GetDragOffsetDS()
     };
 end
 function GetIdleAnimDS()
+    if true then
+        return EditModelProperty.GetModelAnimDs()
+    end
     return {
         {value="0", text=L"默认".."(0)", selected=true},
         {value="4", text=L"走路".."(4)"},
@@ -89,8 +92,41 @@ function GetCategoryDS()
         {value="cameraClickSensor", text=L"摄影机点击",},
     };
 end
+
+function GetFrameMoveIntervalDS()
+    return {
+        {value="", text=L"默认", selected=true},
+        {value="0.01"},
+        {value="0.05"},
+        {value="0.2"},
+        {value="0.5"},
+        {value="1"},
+        {value="2"},
+        {value="5"},
+    };
+end
+
+function GetRulebagView()
+    return EditModelProperty.GetEntity().rulebagView;
+end
+function DS_Func_Rulebag(index)
+    return GetRulebagView():GetSlotDS(index);
+end
+function OnClickEmptyRuleSlot(mcmlNode)
+    local item = mcmlNode:GetPreValue("this", true);
+    if(item and item.slotNumber) then
+        EditModelProperty.OnClickEmptyRuleSlot(item.slotNumber);
+    end
+end
 ]]></script>
-<aries:window mode="thin" style="width:640px;" title="模型属性" uiname_onclose="EditModelProperty.OnClose" onclose="EditModelProperty.OnClose">
+<style type="text/mcss">
+{
+    link_button = {
+        float = "left", color = "#656cf6", ["background-color"] = "#656cf6", background = "Texture/Aries/Common/underline_white_32bits.png:3 3 3 3",
+    },
+}
+</style>
+<aries:window mode="thin" style="width:650px;" title='<%=L"模型属性"%>' uiname_onclose="EditModelProperty.OnClose" onclose="EditModelProperty.OnClose">
 <div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
     <div style="">
         <div style="float:left;padding:2px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#308 89 34 34)">
@@ -119,7 +155,7 @@ end
             </select>
         </div>
         <div style="float: left; margin-left: 20px;">
-            <%=L"是否可拖动:"%>
+            <%=L"可拖动:"%>
             <select uiname="EditModelProperty.canDrag" name="canDrag" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetCanDragDS()%>'>
             </select>
         </div>
@@ -130,7 +166,7 @@ end
     </div>
     <div style="margin-top: 5px;">
         <div style="float: left;">
-            <%=L"是否可堆叠:"%>
+            <%=L"可堆叠:"%>
             <select uiname="EditModelProperty.isStackable" name="isStackable" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetIsStackableDS()%>'>
             </select>
         </div>
@@ -139,11 +175,13 @@ end
             <select uiname="EditModelProperty.stackHeight" name="stackHeight" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetStackHeightDS()%>'>
             </select>
         </div>
-        <div style="float: left; margin-left: 20px;">
-            <%=L"待机动画:"%>
-            <select uiname="EditModelProperty.idleAnim" name="idleAnim" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetIdleAnimDS()%>'>
-            </select>
-        </div>
+        <pe:if condition='<%=#GetIdleAnimDS()>0%>'>
+            <div style="float: left; margin-left: 20px;">
+                <%=L"待机动画:"%>
+                <select uiname="EditModelProperty.idleAnim" name="idleAnim" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetIdleAnimDS()%>'>
+                </select>
+            </div>
+        </pe:if>
     </div>
     <div style="margin-top: 5px;">
         <div style="float: left;">
@@ -180,39 +218,61 @@ end
     </div>
     <div style="margin-top: 5px;">
         <div style="float:left;min-width:90px;">
-            <div><%=L"插件点名称:"%></div>
-            <div style="color:#808080">sit,lie,eat</div>
+            <div tooltip='<%=L"sit,lie,eat"%>'><%=L"插件点名称:"%></div>
         </div>
-        <div style="float:left;width:510px;height:50px;">
+        <div style="float:left;width:280px;height:50px;">
             <pe:repeat name="mountpoints" DataSource="<%=GetMountPointDS()%>">
                 <pe:repeatitem style="float:left;width:80px;height:25px;">
                     <input type="text" tooltip='<%=format(L"插件点%d", Eval("index"))%>' uiname='<%=format(L"EditModelProperty.mountpoint%d", Eval("index"))%>' name='<%=format(L"mountpointName%d", Eval("index"))%>' value="<%=Eval('name')%>" style="margin-left:5px;width:70px;height:24px;" onchange="EditModelProperty.OnTextChange"/>
                 </pe:repeatitem>
             </pe:repeat>
         </div>
+        <pe:if condition='<%=EditModelProperty.GetEntity() and EditModelProperty.GetEntity():HasRule()%>'>
+        <div style="float:left;height:50px;">
+            <div style="float:left;padding-left:5px;padding-right:5px;"><%=L"AI物品:"%></div>
+            <div style="float:left;">
+                <pe:gridview name="RuleItems" style="height:50px;" DataSource="<%=DS_Func_Rulebag%>" CellPadding="0" DefaultNodeHeight = "38" ItemsPerLine="4" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="4">
+                    <Columns>
+                        <div style="margin-left: 8px; margin-top: 4px; font-weight: bold;" class="mc_item">
+                            <pe:mc_slot class="mc_slot" uiname='<%="EditModelProperty.RuleItem_"..Eval("slotNumber")%>' onclick_empty="OnClickEmptyRuleSlot" ContainerView='<%=GetRulebagView()%>' DestInventory='<%=GameLogic.EntityManager.GetPlayer().inventory %>' bagpos ='<%=Eval("slotNumber")%>' style="margin:1px;width:32px;height:32px;"></pe:mc_slot>
+                        </div>
+			        </Columns>
+                </pe:gridview>
+            </div>
+        </div>
+        </pe:if>
     </div>
     <div style="margin-top: 5px;">
         <div>
-            <div style="float: left;">
-                <div style="float:left" tooltip="/sendevent __entity_onclick {x,y,z,name,facing}"><%=L"点击事件:"%></div>
+            <div style="float:left;">
+                <div class="link_button" uiname="EditModelProperty.onClickEventMore" name="onClickEventMore" onclick="EditModelProperty.OnClickBuildinFunctions" tooltip='<%=L"点击事件:".."\n".."/sendevent __entity_onclick {x,y,z,name,facing}"%>'><%=L"点击事件:"%></div>
                 <input type="text" uiname="EditModelProperty.onClickEvent" name="onClickEvent" style="width:150px;height:24px;"/>
             </div>
-            <div style="float: left; margin-left: 10px;">
-                <div style="float:left" tooltip="/sendevent __entity_onhover {x,y,z,name, hoverEntityName}"><%=L"悬停事件:"%></div>
+            <div style="float:left; margin-left:10px;">
+                <div class="link_button" uiname="EditModelProperty.onHoverEventMore" name="onHoverEventMore" onclick="EditModelProperty.OnClickBuildinFunctions"  tooltip='<%=L"悬停事件:".."\n".."/sendevent __entity_onhover {x,y,z,name, hoverEntityName}"%>'><%=L"悬停:"%></div>
                 <input type="text" uiname="EditModelProperty.onHoverEvent" name="onHoverEvent" style="width:150px;height:24px;"/>
+            </div>
+            <div style="float:left; margin-left:10px;">
+                <div class="link_button" uiname="EditModelProperty.onTickEventMore" name="onTickEventMore" onclick="EditModelProperty.OnClickBuildinFunctions"  tooltip='<%=L"心跳事件:".."\n".."msg={x,y,z,name}"%>'><%=L"心跳:"%></div>
+                <input type="text" uiname="EditModelProperty.onTickEvent" name="onTickEvent" style="width:100px;height:24px;"/>
+            </div>
+            <div style="float:left;margin-left:2px;">
+                <select tooltip='<%=L"多少秒心跳一次"%>' uiname="EditModelProperty.framemove_interval" name="framemove_interval" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFrameMoveIntervalDS()%>'>
+                </select>
+                <div style="float:left;margin-left:2px;" tooltip='<%=L"多少秒心跳一次"%>'><%=L"秒"%></div>
             </div>
         </div>
         <div>
             <div style="float: left;">
-                <div style="float:left" tooltip="/sendevent __entity_onmount {x,y,z,name, mountname, mountindex, mountedEntityName}"><%=L"插件点事件:"%></div>
+                <div class="link_button" uiname="EditModelProperty.onMountEventMore" name="onMountEventMore" onclick="EditModelProperty.OnClickBuildinFunctions" tooltip='<%=L"插件点事件:".."\n".."/sendevent __entity_onmount {x,y,z,name, mountname, mountindex, mountedEntityName}"%>'><%=L"插件点:"%></div>
                 <input type="text" uiname="EditModelProperty.onMountEvent" name="onMountEvent" style="width:120px;height:24px;"/>
             </div>
             <div style="float: left; margin-left: 10px;">
-                <div style="float:left" tooltip="/sendevent __entity_onbegindrag {x,y,z,name}"><%=L"开始拖动:"%></div>
+                <div class="link_button" uiname="EditModelProperty.onBeginDragEventMore" name="onBeginDragEventMore" onclick="EditModelProperty.OnClickBuildinFunctions"  tooltip='<%=L"开始拖动事件:".."\n".."/sendevent __entity_onbegindrag {x,y,z,name}"%>'><%=L"开始拖动:"%></div>
                 <input type="text" uiname="EditModelProperty.onBeginDragEvent" name="onBeginDragEvent" style="width:120px;height:24px;"/>
             </div>
             <div style="float: left; margin-left: 10px;">
-                <div style="float:left" tooltip="/sendevent __entity_onenddrag {x,y,z,name,targetName}"><%=L"结束拖动:"%></div>
+                <div class="link_button" uiname="EditModelProperty.onEndDragEventMore" name="onEndDragEventMore" onclick="EditModelProperty.OnClickBuildinFunctions" tooltip='<%=L"结束拖动事件:".."\n".."/sendevent __entity_onenddrag {x,y,z,name,targetName}\nreturn true to restore drop location."%>'><%=L"结束拖动:"%></div>
                 <input type="text" uiname="EditModelProperty.onEndDragEvent" name="onEndDragEvent" style="width:120px;height:24px;"/>
             </div>
         </div>

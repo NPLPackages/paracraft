@@ -147,13 +147,15 @@ function EditContext:mousePressEvent(event)
 	local result = self:CheckMousePick();
 	self:UpdateClickStrength(0, result);
 
+	self:SetMouseDownBlock(nil, event)
 	if(event.mouse_button == "left") then
 		-- play touch step sound when left click on an object
 		if(result and result.block_id and result.block_id > 0) then
 			click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
 			local block = block_types.get(result.block_id);
 			if(block and result.blockX) then
-				block:OnMouseDown(result.blockX,result.blockY,result.blockZ, event.mouse_button);
+				self:SetMouseDownBlock({result.blockX,result.blockY,result.blockZ}, event)
+				block:OnMouseDown(event, result.blockX,result.blockY,result.blockZ, result);
 			end
 		end
 	end
@@ -166,6 +168,13 @@ function EditContext:mouseMoveEvent(event)
 		return
 	end
 	local result = self:CheckMousePick();
+	local block = self:GetMouseDownBlock(event)
+	if(block) then
+		local blocktemplate = BlockEngine:GetBlock(block[1], block[2], block[3])
+		if(blocktemplate) then
+			blocktemplate:OnMouseMove(event, block[1], block[2], block[3], result);
+		end
+	end
 end
 
 function EditContext:handleLeftClickScene(event, result)
@@ -270,9 +279,9 @@ function EditContext:mouseReleaseEvent(event)
 	if(event:isAccepted()) then
 		return
 	end
-
+	local result;
 	if(self.is_click) then
-		local result = self:CheckMousePick();
+		result = self:CheckMousePick();
 		local isClickProcessed;
 		
 		-- escape alt key for entity event, since alt key is for picking entity. 
@@ -316,6 +325,16 @@ function EditContext:mouseReleaseEvent(event)
 					self:handleMiddleClickScene(event, result);
 					event:accept();
 				end
+			end
+		end
+	end
+	if(not event:isAccepted()) then
+		result = result or self:CheckMousePick();
+		local block = self:GetMouseDownBlock(event)
+		if(block) then
+			local blocktemplate = BlockEngine:GetBlock(block[1], block[2], block[3])
+			if(blocktemplate) then
+				blocktemplate:OnMouseUp(event, block[1], block[2], block[3], result);
 			end
 		end
 	end
@@ -376,29 +395,16 @@ function EditContext:keyPressEvent(event)
 		return;
 	end
 
-	-- in case there are manipulators, disable all key handlings. 
-	if(self:HasManipulators()) then
-		return;
-	end
-
 	local dik_key = event.keyname;
 	if(dik_key == "DIK_F2") then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TeleportListPage.lua");
-		local TeleportListPage = commonlib.gettable("MyCompany.Aries.Game.GUI.TeleportListPage");
-				
 		if(event.ctrl_pressed and event.shift_pressed) then
-			-- clear all bookmark location
-			TeleportListPage.ClearAll();
+			GameLogic.RunCommand("/menu edit.bookmark.clearall")
 		elseif(event.ctrl_pressed) then
-			-- add current bookmark location
-			TeleportListPage.AddCurrentLocation();
-			--TeleportListPage.ShowPage(nil, true);
+			GameLogic.RunCommand("/menu edit.bookmark.add")
 		elseif(event.shift_pressed) then
-			-- teleport to previous location 
-			TeleportListPage.GotoPreviousLocation();
+			GameLogic.RunCommand("/menu edit.bookmark.previous")
 		else
-			-- teleport to next location. 
-			TeleportListPage.GotoNextLocation();
+			GameLogic.RunCommand("/menu edit.bookmark.next")
 		end
 		event:accept();
 	elseif(dik_key == "DIK_0") then
@@ -409,8 +415,10 @@ function EditContext:keyPressEvent(event)
 			memoryContext:ActivateRecentWorkingMemoryClip();
 		end
 	elseif(event.ctrl_pressed or event.shift_pressed) then
-		-- when ctrl is pressed, enter select block manipulator
-		self:UpdateSelectManipulators(event);
+		if(not self:HasManipulators()) then
+			-- when ctrl is pressed, enter select block manipulator
+			self:UpdateSelectManipulators(event);
+		end
 	end
 end
 

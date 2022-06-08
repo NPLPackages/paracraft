@@ -40,6 +40,8 @@ BlockTemplate.Operations = {
 	AnimLoad = 3,
 	-- remove blocks 
 	Remove = 4,
+	-- According to the tier to load
+	TierLoad = 5,
 }
 -- current operation
 BlockTemplate.operation = BlockTemplate.Operations.Load;
@@ -68,6 +70,8 @@ function BlockTemplate:Run()
 		return self:AnimLoadTemplate();
 	elseif(self.operation == BlockTemplate.Operations.Remove) then
 		return self:RemoveTemplate();
+	elseif(self.operation == BlockTemplate.Operations.TierLoad) then
+		return self:LoadTemplate();
 	end
 end
 
@@ -117,7 +121,7 @@ end
 
 -- return table map {filename=referenceCount} of referenced external files, usually bmax files in the world directory. such as {"abc.bmax", "a.fbx", }
 -- if no external files are referenced, we will return nil.
-function BlockTemplate:GetReferenceFiles(blocks)
+function BlockTemplate:GetReferenceFiles(blocks, liveEntities)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovieClip.lua");
 	local EntityMovieClip = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMovieClip")
 	local movieBlockId = block_types.names.MovieClip;
@@ -146,6 +150,14 @@ function BlockTemplate:GetReferenceFiles(blocks)
 			end
 		end
 	end
+	if(liveEntities) then
+		for _, entityData in ipairs(liveEntities) do
+			if(entityData and entityData.attr.filename and entityData.attr.filename~="") then
+				files[entityData.attr.filename] = (files[entityData.attr.filename] or 0) + 1;
+			end
+		end
+	end
+
 	if(next(files)) then
 		return files;
 	end
@@ -211,8 +223,49 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 				end
 				if((blocks and #blocks > 0) or liveEntities) then
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateBlockTask.lua");
-					local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, liveEntities=liveEntities, bSelect=self.bSelect, nohistory = self.nohistory, isSilent = true})
-					task:Run();
+
+					if self.operation == BlockTemplate.Operations.TierLoad then
+						local layer_blocks = {}
+						local layer_y = blocks[1][2]
+						local layer_index = 1
+						for index, block in ipairs(blocks) do
+							if block[2] ~= layer_y then
+								layer_y = block[2]
+								layer_index = layer_index + 1
+							end
+		
+							if layer_blocks[layer_index] == nil then
+								layer_blocks[layer_index] = {}
+							end
+		
+							local layer = layer_blocks[layer_index]
+							layer[#layer + 1] = block
+						end
+						
+						if #layer_blocks > 0 then
+							local index = 1
+							self.tire_load_timer = self.tire_load_timer or commonlib.Timer:new({callbackFunc = function(timer)
+								local target_layer = layer_blocks[index]
+								if not target_layer then
+									self.tire_load_timer:Change();
+									return 
+								end
+	
+								local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = target_layer, liveEntities=liveEntities, bSelect=self.bSelect, nohistory = self.nohistory, isSilent = true,rename = self.rename})
+								task:Run();
+								index = index + 1
+							end})
+	
+							local interval = math.floor(self.load_anim_duration * 1000/#layer_blocks)
+							self.tire_load_timer:Change(0,interval);
+						else
+							local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, liveEntities=liveEntities, bSelect=self.bSelect, nohistory = self.nohistory, isSilent = true,rename = self.rename})
+							task:Run();
+						end
+					else
+						local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = bx,blockY = by, blockZ = bz, blocks = blocks, liveEntities=liveEntities, bSelect=self.bSelect, nohistory = self.nohistory, isSilent = true,rename = self.rename})
+						task:Run();
+					end
 					
 					if( self.TeleportPlayer and root_node.attr.player_pos) then
 						local x, y, z = root_node.attr.player_pos:match("^(%d+)%D+(%d+)%D+(%d+)");
@@ -408,11 +461,12 @@ function BlockTemplate:SaveTemplateToString()
 	local totalCount = #(self.blocks);
 	o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
 
+	local ref = {name="references", };
 	if(self.liveEntities and (#(self.liveEntities)) > 0) then
-		o[#o+1] = {name="pe:entities", [1]=commonlib.serialize_compact(self.liveEntities, true),};
+		o[#o+1] = {name="pe:entities", attr={count=#(self.liveEntities)}, [1]=commonlib.serialize_compact(self.liveEntities, true),};
 	end
 	if(self.exportReferencedFiles) then
-		local files = self:GetReferenceFiles(self.blocks)
+		local files = self:GetReferenceFiles(self.blocks, self.liveEntities)
 		if(files) then
 			for filename, refCount in pairs(files) do
 				-- only export files in the current world directory. 
@@ -425,14 +479,14 @@ function BlockTemplate:SaveTemplateToString()
 					file:close();
 					if(text and text~="") then
 						NPL.load("(gl)script/ide/System/Encoding/base64.lua");
-
-						o[2] = o[2] or {name="references", };
-						local ref = o[2];
 						ref[#ref+1] = {name="file", attr={filename=filename, encoding="base64"}, [1] = System.Encoding.base64(text)}
 					end
 				end
 			end
 		end
+	end
+	if(#ref > 0) then
+		o[#o+1] = ref;
 	end
 	o.attr.count = totalCount;
 	self.params.count = totalCount;
@@ -566,6 +620,7 @@ function BlockTemplate:RecursiveAddAllConnectedBlocks(x,y,z, count, iter_count)
 	if(idx) then
 		local b = self.blocks[idx];
 		if(b) then
+		
 			iter_count = (iter_count or 0);
 			if(count <= 0 or not x) then
 				self.create_locations[#(self.create_locations)+1] = b;
@@ -618,4 +673,3 @@ function BlockTemplate:FrameMove()
 		self.finished = true;
 	end
 end
-

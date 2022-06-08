@@ -978,8 +978,13 @@ function DefaultTheme:Load()
 	NPL.load("(gl)script/ide/TooltipHelper.lua");
 	local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 	local default_stack = BroadcastHelper.GetSingletonTipsStack();
-	default_stack.background = "Texture/Aries/Common/gradient_white_32bits.png";
-	default_stack.background_color = "#1f3243";
+	if System.options.IsMobilePlatform then
+		default_stack.background = "Texture/Aries/Common/gradient_white_32bits.png";
+		default_stack.background_color = "#1f3243";
+	else
+		default_stack.background = "Texture/Aries/Common/bbs_toast_bg_846x45_32bits.png#0 0 846 45";
+	end
+	
 
 	NPL.load("(gl)script/kids/3DMapSystemApp/Assets/AsyncLoaderProgressBar.lua");
 	local AsyncLoaderProgressBar = commonlib.gettable("Map3DSystem.App.Assets.AsyncLoaderProgressBar");

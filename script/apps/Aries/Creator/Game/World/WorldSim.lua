@@ -230,6 +230,9 @@ end
 
 -- 1FPS
 function WorldSim:TickAmbientEnv()
+	if not GameLogic.options:IsTimesAutoGo() then --关闭了昼夜交替
+		return
+	end
 	self:OnTickDayLight();
 end
 

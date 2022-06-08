@@ -122,6 +122,7 @@ end
 -- @param worldTitle: can be nil
 function LocalLoadWorld.CreateHomeWorld(myHomeWorldName, worldTitle)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/CreateNewWorld.lua");
+
 	local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
 	local worldpath = CreateNewWorld.CreateWorld({
 		worldname = myHomeWorldName, 
@@ -132,6 +133,11 @@ function LocalLoadWorld.CreateHomeWorld(myHomeWorldName, worldTitle)
 		inherit_scene = true,
 		inherit_char = true,
 	})
+
+	if (worldpath and type(worldpath) == "string") then
+		GameLogic.GetFilters():apply_filters("OnCreateHomeWorld", myHomeWorldName);
+	end
+
 	return worldpath;
 end
 

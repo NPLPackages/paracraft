@@ -651,3 +651,7 @@ function RedSummerCampCourseScheduling.ClosePage()
         page = nil
     end
 end
+
+function RedSummerCampCourseScheduling.IsOpen()
+	return page and page:IsVisible()
+end

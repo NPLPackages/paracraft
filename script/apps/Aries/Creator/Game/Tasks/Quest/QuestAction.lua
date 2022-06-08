@@ -1319,6 +1319,9 @@ function QuestAction.ReportEvent(action, data)
     data.userId = Mod.WorldShare.Store:Get('user/userId') or 0
     data.beginAt = data.beginAt or QuestAction.GetServerTime()
     data.traceId = System.Encoding.guid.uuid()
+    if System.options.channelId~="" then
+        data.channelId = System.options.channelId
+    end
     local project_id = GameLogic.options:GetProjectId()
     if project_id and tonumber(project_id) > 0 then
         data.projectId = project_id
@@ -1356,8 +1359,11 @@ function QuestAction.OnLoadedWorldEnd()
         return
     end
     local data = {duration = duration}
-
-    QuestAction.ReportEvent("duration.world_load", data)
+    local project_id = GameLogic.options:GetProjectId()
+    if project_id and tonumber(project_id) > 0 then
+        QuestAction.ReportEvent("duration.world_load", data)
+    end
+   
     -- GameLogic.GetFilters():apply_filters("user_behavior", 1, "duration.world_load", {projectId};
 end
 

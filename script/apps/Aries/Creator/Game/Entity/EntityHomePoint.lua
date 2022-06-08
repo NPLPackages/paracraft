@@ -9,7 +9,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityHomePoint.lua");
 local EntityHomePoint = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityHomePoint")
 local entity = MyCompany.Aries.Game.EntityManager.EntityHomePoint:new({x,y,z,radius});
-EntityManager.AddObject(entity)
+entity:Attach();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCollectable.lua");
@@ -44,6 +44,7 @@ EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 function Entity:ctor()
 	self.inventory = InventoryBase:new():Init();
 	self.inventory:SetClient();
+	self.inventory:SetParentEntity(self);
 
 	self:SetRuleBagSize(16);
 end
@@ -105,8 +106,20 @@ function Entity:ActivateRules()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCommandBlock.lua");
 	local EntityCommandBlock = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCommandBlock")
+	
+	local oldList = self:GetCommandList() or {}
+	local tempList = commonlib.copy(oldList)
+	local dft_cmds = (System.options.world_enter_cmds and commonlib.split(System.options.world_enter_cmds,";")) or {}
+	for i=#dft_cmds,1,-1 do
+		local str = dft_cmds[i]:gsub("^[\"\'%s]+", ""):gsub("[\"\'%s]+$", "") --去掉字符串首尾的空格、引号
+		table.insert(tempList,1,str)
+	end
+	if #tempList>0 then
+		self:SetCommandTable(tempList) --将从渠道配置里读取到的世界参数，添加到起点命令列表开头，以便有冲突时以出生点编辑为准
+	end
 	-- tricky: just emulate the command block. 
 	EntityCommandBlock.ExecuteCommand(self, EntityManager.GetPlayer(), true, true);
+	self:SetCommandTable(oldList)
 end
 
 -- when the body of the player hit this entity. 

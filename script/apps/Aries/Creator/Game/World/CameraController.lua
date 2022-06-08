@@ -542,6 +542,17 @@ function CameraController.UpdateCameraFrameStats()
 	camera.distanceWalkedModified = camera.distanceWalkedModified + dist_walked;
 end
 
+function CameraController.IsMovieOrCameraMode()
+	if(GameLogic.GameMode:IsMovieMode()) then
+		return true;
+	else
+		local entity = EntityManager.GetFocus()
+		if(entity and entity:isa(EntityManager.EntityCamera)) then
+			return true
+		end
+	end
+end
+
 -- same as render frame rate
 function CameraController.OnCameraFrameMove()
 	CameraController.UpdateCameraFrameStats()
@@ -552,7 +563,7 @@ function CameraController.OnCameraFrameMove()
 
 	Cameras:GetCurrent():FrameMoveCameraControl()
 
-	if(not GameLogic.GameMode:IsMovieMode()) then
+	if(not CameraController.IsMovieOrCameraMode()) then
 		local bIsAnimatingView;
 		if(CameraController.IsAutoRoomViewEnabled()) then
 			bIsAnimatingView = not CameraController.ApplyAutoRoomViewCamera();
@@ -579,7 +590,7 @@ end
 function CameraController.ApplyCameraRestrictions()
 	local self = CameraController;
 	--  and not GameLogic.GameMode:IsEditor()
-	if(not GameLogic.GameMode:IsMovieMode()) then
+	if(CameraController.IsMovieOrCameraMode()) then
 		if(not ParaUI.IsMousePressed(0) and not ParaUI.IsMousePressed(1) and not Cameras:GetCurrent():IsDragging()) then
 			-- apply restrictions
 			local att = ParaCamera.GetAttributeObject();

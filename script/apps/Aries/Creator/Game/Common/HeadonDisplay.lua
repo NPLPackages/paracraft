@@ -13,6 +13,8 @@ gui:Show({url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:
 ]]
 NPL.load("(gl)script/ide/System/Core/PainterContext.lua");
 NPL.load("(gl)script/ide/System/Windows/Window.lua");
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+local Screen = commonlib.gettable("System.Windows.Screen");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PainterContext = commonlib.gettable("System.Core.PainterContext");
 local SizeEvent = commonlib.gettable("System.Windows.SizeEvent");
@@ -23,6 +25,7 @@ HeadonDisplay:Property({"bIsBillBoard", false, "IsBillBoarded", "SetBillBoarded"
 HeadonDisplay:Property({"headonIndex", 0, "GetHeadonIndex", "SetHeadonIndex", auto=true});
 
 local template_name = "HeadonDisplay_mcmlv2"
+local template_above3d_name = "HeadonDisplay_above3d_mcmlv2"
 local template_3d_name = "HeadonDisplay_3d_mcmlv2"
 local next_id = 0;
 
@@ -82,6 +85,7 @@ function HeadonDisplay:RefreshShow(parentEntity, params)
 		self.name = params.name;
 		self.pageGlobalTable = params.pageGlobalTable;
 		self.is3D = params.is3D
+		self.bAbove3D = params.bAbove3D
 		self.url = nil;
 
 		local obj = parentEntity:GetInnerObject()
@@ -91,7 +95,7 @@ function HeadonDisplay:RefreshShow(parentEntity, params)
 		end
 
 		if(params.bDelayedRendering ~= false) then
-			self.delayedRenderParams = {url = params.url, left = params.left, top = params.top, width = params.width, height = params.height, alignment = params.alignment};
+			self.delayedRenderParams = {url = params.url, left = params.left, top = params.top, width = params.width, height = params.height, alignment = params.alignment, bAbove3D = params.bAbove3D};
 			return
 		end
 		self:ShowWithParamsImp(params);
@@ -108,6 +112,10 @@ end
 
 function HeadonDisplay:Is3DUI()
 	return self.is3D;
+end
+
+function HeadonDisplay:IsAbove3D()
+	return self.bAbove3D;
 end
 
 function HeadonDisplay:GetParentEntity()
@@ -135,7 +143,7 @@ function HeadonDisplay:SetHeadOn3DScalingEnabled(bEnabled)
 end
 
 -- @param params: {url="", alignment, x,y,width, height, allowDrag,zorder, enable_esc_key, DestroyOnClose, parent, pageGlobalTable, 
---	is3D, offset, facing, bDelayedRendering:bool}
+--	is3D, bAbove3D:boolean, offset, facing, bDelayedRendering:bool}
 -- pageGlobalTable can be a custom page environment table, if nil, it will be the global _G. 
 -- is3D: if true, it is 3d UI, default is false
 -- bDelayedRendering: if true or nil, we will only render the page when the parent entity is visible. 
@@ -143,6 +151,7 @@ function HeadonDisplay:ShowWithParams(params)
 	self.name = params.name;
 	self.pageGlobalTable = params.pageGlobalTable;
 	self.is3D = params.is3D
+	self.bAbove3D = params.bAbove3D
 	self.bReuseWindow = params.bReuseWindow;
 
 	local parentEntity = self:GetParentEntity();
@@ -163,8 +172,13 @@ function HeadonDisplay:ShowWithParams(params)
 			-- setting 3d facing will automatically make the text control to render in 3d. 
 			obj:SetField("HeadOn3DFacing", params.facing or 0);
 		else
-			HeadonDisplay.InitHeadonTemplate();
-			obj:SetHeadOnUITemplateName(template_name, headonIndex);
+			if(not self:IsAbove3D()) then
+				HeadonDisplay.InitHeadonTemplate();
+				obj:SetHeadOnUITemplateName(template_name, headonIndex);
+			else
+				HeadonDisplay.InitHeadonTemplateAbove3D();
+				obj:SetHeadOnUITemplateName(template_above3d_name, headonIndex);
+			end
 		end
 		obj:SetHeadOnText(self.id, headonIndex);
 	end
@@ -205,26 +219,19 @@ function HeadonDisplay:ShowWithParamsImp(params)
 		end
 	end
 	
-	local bShow = true;
-	if(bShow) then
-		local nativeWnd = self:GetNativeWindow();
-		if(nativeWnd) then
-			-- reposition/attach to parent
-			self:SetAlignment(params.alignment or "_lt");
-			self.screen_x, self.screen_y = 0, 0;
-		end
+	local nativeWnd = self:GetNativeWindow();
+	if(nativeWnd) then
+		-- reposition/attach to parent
+		self:SetAlignment(params.alignment or "_lt");
+		self.screen_x, self.screen_y = 0, 0;
 	end
 	
 	-- show the window
 	self:show();
-	if(self:Is3DUI())  then
-		if(HeadonDisplay.ui_3d_obj) then
-			HeadonDisplay.ui_3d_obj.visible = false;
-		end
-	else
-		if(HeadonDisplay.ui_obj) then
-			HeadonDisplay.ui_obj.visible = false;
-		end
+	
+	-- tricky: make the window invisible
+	if(nativeWnd) then
+		nativeWnd.visible = false;
 	end
 end
 
@@ -241,6 +248,21 @@ function HeadonDisplay.InitHeadonTemplate()
 	_this:AttachToRoot();
 	_this:SetScript("ondraw", HeadonDisplay.onDraw);
 	return HeadonDisplay.ui_obj; 
+end
+
+function HeadonDisplay.InitHeadonTemplateAbove3D()
+	if(HeadonDisplay.ui_above3d_obj and HeadonDisplay.ui_above3d_obj:IsValid()) then
+		return HeadonDisplay.ui_above3d_obj
+	end
+	local _this = ParaUI.CreateUIObject("button", template_above3d_name, "_lt",0,0,100,30);
+	HeadonDisplay.ui_above3d_obj = _this;
+	_this.visible = false;
+	_this.enabled = false;
+	_this.zdepth = 0;
+	_this:SetField("OwnerDraw", true); -- enable owner draw paint event
+	_this:AttachToRoot();
+	_this:SetScript("ondraw", HeadonDisplay.onDraw);
+	return HeadonDisplay.ui_above3d_obj; 
 end
 
 function HeadonDisplay.InitHeadonTemplate3D()
@@ -271,7 +293,11 @@ function HeadonDisplay:create_sys(native_window, initializeWindow, destroyOldWin
 		if(self:Is3DUI()) then
 			native_window = HeadonDisplay.InitHeadonTemplate3D()
 		else
-			native_window = HeadonDisplay.InitHeadonTemplate()
+			if(not self:IsAbove3D()) then
+				native_window = HeadonDisplay.InitHeadonTemplate()
+			else
+				native_window = HeadonDisplay.InitHeadonTemplateAbove3D()
+			end
 		end
 	end
 
@@ -290,7 +316,28 @@ function HeadonDisplay:create_sys(native_window, initializeWindow, destroyOldWin
 	end
 
 	-- redirect events from native ParaUI object to this object. 
-	_this:SetScript("ondraw", HeadonDisplay.onDraw);
+	if(self:Is3DUI()) then
+		_this:SetScript("ondraw", HeadonDisplay.onDraw);
+	else
+		_this:SetScript("ondraw", HeadonDisplay.onDraw2D);
+	end
+end
+
+function HeadonDisplay.onDraw2D(obj)
+	local id = obj.text;
+	local self = all_instances[id];
+	if(self) then
+		self:RenderDelayedParams();
+		if(self:IsBillBoarded()) then
+			self.painterContext:LoadBillboardMatrix();
+		end
+		-- we will apply UI scaling for 2D UI 
+		local scaling = Screen:GetUIScaling()
+		if(scaling[1] ~= 1) then
+			self.painterContext:Scale(scaling[1], scaling[2])
+		end
+		self:handleRender()
+	end
 end
 
 function HeadonDisplay.onDraw(obj)

@@ -25,7 +25,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 
 local EditMovieTextPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditMovieTextPage");
-
+local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
 local default_narrator = -1
 local page;
 function EditMovieTextPage.OnInit()
@@ -141,14 +141,18 @@ function EditMovieTextPage.OnClickSelcetNarrator(name, value)
 		return
 	end
 
-	if value >= 0 and not System.User.isVip and not GameLogic.Macros:IsPlaying() then
-		page:SetValue("voicenarrator", default_narrator);
-		GameLogic.IsVip("PlyText", true, function(result)
-			if result then
-				page:SetValue("voicenarrator", value);
-			end
-		end)
-		return
+	if value >= 0 then
+		local has_permission = UserPermission.CheckUserPermission("movie_playText")
+		if not has_permission and not GameLogic.Macros:IsPlaying() then
+			page:SetValue("voicenarrator", default_narrator);
+			GameLogic.IsVip("PlyText", true, function(result)
+				if result then
+					page:SetValue("voicenarrator", value);
+				end
+			end)
+			
+			return
+		end
 	end
 end
 

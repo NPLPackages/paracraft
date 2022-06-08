@@ -33,7 +33,7 @@ function ItemStack:ctor()
 end
 
 -- @param id: the underlying item id. 
--- @param serverdata: this should be xml node table or nil. 
+-- @param serverdata: this should be data table or nil. 
 function ItemStack:Init(id, count, serverdata)
 	self.id = id;
 	self.count = count or 1;

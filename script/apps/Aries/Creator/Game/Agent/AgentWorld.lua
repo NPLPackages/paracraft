@@ -13,6 +13,7 @@ use the lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Agent/AgentWorld.lua");
 local AgentWorld = commonlib.gettable("MyCompany.Aries.Game.Agent.AgentWorld");
 local world = AgentWorld:new():Init("Mod/Agents/MacroPlatform.xml");
+local world = AgentWorld:new():Init();
 world:Run()
 -------------------------------------------------------
 ]]
@@ -33,10 +34,32 @@ AgentWorld:Property({"centerPos", {0,0,0}, "GetCenterPosition", "SetCenterPositi
 function AgentWorld:ctor()
 	self.blocks = {};
 	self.codeblocks = {};
+	self.codeblockNames = {}; -- container of code block entity that does not have coordinates.
+	self:SetCenterPosition({0, 0, 0})
 end
 
+function AgentWorld:Clear()
+	for _, b in ipairs(self.codeblocks) do
+		local entityCode = b.blockEntity;
+		if(entityCode) then
+			entityCode:Stop();
+		end
+	end
+	for _, entity in pairs(self.codeblockNames) do
+		local codeblock = entity:GetCodeBlock()
+		if(codeblock and codeblock:IsLoaded()) then
+			codeblock:Stop();
+		end
+	end
+
+	self.blocks = {};
+	self.codeblocks = {};
+	self.codeblockNames = {};
+end
+
+-- @param filename: block template file name, it can be nil for empty world
 function AgentWorld:Init(filename)
-	GameLogic:Connect("WorldUnloaded", AgentWorld, AgentWorld.OnWorldUnload, "UniqueConnection");
+	GameLogic:Connect("WorldUnloaded", self, self.OnWorldUnload, "UniqueConnection");
 
 	if(filename) then
 		self:LoadFromAgentFile(filename);
@@ -119,18 +142,22 @@ end
 
 
 function AgentWorld:GetBlockId(x, y, z)
-	local index = self:GetSparseIndex(x, y, z)
-	local b = self.blocks[index]
-	if(b) then
-		return b[4];
+	if(x) then
+		local index = self:GetSparseIndex(x, y, z)
+		local b = self.blocks[index]
+		if(b) then
+			return b[4];
+		end
 	end
 end
 
 function AgentWorld:GetBlockData(x, y, z)
-	local index = self:GetSparseIndex(x, y, z)
-	local b = self.blocks[index]
-	if(b) then
-		return b[5];
+	if(x) then
+		local index = self:GetSparseIndex(x, y, z)
+		local b = self.blocks[index]
+		if(b) then
+			return b[5];
+		end
 	end
 end
 
@@ -149,16 +176,12 @@ end
 function AgentWorld:NotifyNeighborBlocksChange(x, y, z, blockId)
 end
 
-function AgentWorld:Clear()
+function AgentWorld:Reset()
+	self:Clear();
 end
 
 function AgentWorld:Destroy()
-	for _, b in ipairs(self.codeblocks) do
-		local entityCode = b.blockEntity;
-		if(entityCode) then
-			entityCode:Stop();
-		end
-	end
+	self:Clear()
 	AgentWorld._super.Destroy(self);
 end
 
@@ -173,5 +196,21 @@ function AgentWorld:Run()
 end
 
 function AgentWorld:OnWorldUnload()
-	-- TODO: unload virtual entities and free memory?
+	-- unload virtual entities and free memory
+	self:Clear()
+end
+
+--@param name: if nil, we will always create an unnamed empty code entity
+function AgentWorld:CreateGetCodeEntity(name)
+	local entity = name and self.codeblockNames[name];
+	
+	if(not entity) then
+		entity = AgentEntityCode:new();
+		entity:SetBlockEngine(self);
+		entity:SetAllowFastMode(true);
+		if(name) then
+			self.codeblockNames[name] = entity;
+		end
+	end
+	return entity;
 end

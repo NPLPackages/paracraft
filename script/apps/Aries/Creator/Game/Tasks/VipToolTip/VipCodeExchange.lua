@@ -9,7 +9,8 @@
 local VipCodeExchangeResult = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchangeResult.lua") 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
-local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
+local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseSchedulingV2.lua") 
 local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/ide/timer.lua");
@@ -23,20 +24,20 @@ function VipCodeExchange.OnInit()
 end
 
 function VipCodeExchange.ShowView()
-    local view_width = 400
-    local view_height = 300
+    local view_width = 0--400
+    local view_height = 0--300
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchange.html",
         name = "VipCodeExchange.ShowView", 
         isShowTitleBar = false,
         DestroyOnClose = true,
         style = CommonCtrl.WindowFrame.ContainerStyle,
-        allowDrag = true,
+        allowDrag = false,
         enable_esc_key = true,
         zorder = 11,
-        --app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key,
+        cancelShowAnimation = true,
         directPosition = true,
-        align = "_ct",
+        align = "_fi",
             x = -view_width/2,
             y = -view_height/2,
             width = view_width,
@@ -58,6 +59,8 @@ function VipCodeExchange.RefreshUserInfo()
             VipPage.ClosePage()
         end)
     end, 3000)
+
+    UserPermission.LoadUserRoles()
 end
 
 function VipCodeExchange.Exchange(code)

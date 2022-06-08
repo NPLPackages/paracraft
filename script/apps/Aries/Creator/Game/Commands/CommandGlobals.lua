@@ -707,7 +707,7 @@ e.g.
 			local category_name
 			category_name, cmd_text = CmdParser.ParseString(cmd_text);
 			local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
-			VipPage.ShowPage();
+			VipPage.ShowPage("vip_command");
 		end
 	end,
 };
@@ -775,5 +775,73 @@ e.g.
 				Files:SafeUnloadAllAssets()
 			end
 		end
+	end,
+};
+
+Commands["input"] = {
+	name="input", 
+	quick_ref="/input [on|off]", 
+	desc=[[enable or disable mouse or keyboard input
+e.g.
+/input on     enable all input
+/input off    disable all iniput
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
+		local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+		local options = {};
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		
+		local enabled;
+		enabled, cmd_text = CmdParser.ParseBool(cmd_text);
+		if(enabled ~= nil) then
+			System.os.options.DisableInput(not enabled);
+		end
+	end,
+};
+
+Commands["deletefile"] = {
+	name="deletefile", 
+	quick_ref="/deletefile [filepath] [-backup]", 
+	desc=[[delete file and backup in temp/trash folder
+e.g.
+/deletefile blocktemplates/abc.bmax -backup
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local filepath;
+		filepath, cmd_text = CmdParser.ParseString(cmd_text);		
+		local options = {};
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		
+		if ParaIO.DoesFileExist(filepath) then
+			if options.backup then
+				local filename = ParaIO.GetFileName(filepath)
+				local trashPath = ParaIO.GetWritablePath().."temp/trash/"
+				ParaIO.CreateDirectory(trashPath)
+				local targetPath = trashPath..filename
+				
+				local success = ParaIO.MoveFile(filepath,targetPath)
+				
+
+				local filesOut = {};
+                commonlib.Files.Find(filesOut, trashPath, 10, 10000, "*");
+				table.sort(filesOut,function (a,b)
+					return a.writedate>b.writedate
+				end)
+                if #filesOut>100 then
+					local deletename = trashPath..filesOut[#filesOut].filename
+					ParaIO.DeleteFile(deletename)
+				end
+
+				if success then
+					return targetPath
+				end
+			else
+				ParaIO.DeleteFile(filepath)
+			end
+		else
+			print("file not exit:",filepath)
+		end
+		return false
 	end,
 };

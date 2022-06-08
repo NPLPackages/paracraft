@@ -221,14 +221,15 @@ end
 
 -- compile code and reload if code is changed. 
 -- @param code: string
+-- @param filename: filename
 -- return error message if any
-function CodeBlock:CompileCode(code)
+function CodeBlock:CompileCode(code, filename)
 	code = code or "";
 	if(self:IsModified() or (self.last_code ~= code or not self.code_func)) then
 		self:Unload();
 		self:SetModified(false);
 		self.last_code = code;
-		self.code_func, self.errormsg = self:CompileCodeImp(code);
+		self.code_func, self.errormsg = self:CompileCodeImp(code, filename);
 		if(not self.code_func and self.errormsg) then
 			LOG.std(nil, "error", "CodeBlock", self.errormsg);
 			local msg = self.errormsg;
@@ -946,21 +947,41 @@ function CodeBlock:RegisterAgentEvent(text, callbackFunc)
 	-- tricky: since we need to return value immediately, like GetIcon, we will disable auto wait feature in agent callback functions.
 	self:SetAutoWait(false);
 
+	local agentName, eventName;
 	if(self.entityCode) then
-		local filename = self.entityCode:GetFilename();
-		if(filename and filename ~= "") then
-			text = format("%s.%s", filename, text);
+		agentName = self.entityCode:GetFilename();
+		if(agentName and agentName ~= "") then
+			eventName = text;
+			text = format("%s.%s", agentName, text);
+		else
+			return
 		end
+	else
+		return
 	end
-
-	local event = self:CreateEvent("onAgent"..text);
+	local hasLastEvent = GameLogic.GetCodeGlobal():GetTextEvent(text)~=nil;
+	local event = self:CreateEvent(text);
 	if(not event) then
 		return
 	end
 	event:SetIsFireForAllActors(false);
 	event:SetFunction(callbackFunc);
 	local function onEvent_(_, msg)
-		return event:Fire(msg and msg.msg, msg and msg.onFinishedCallback, true);
+		if(msg and msg.dest) then
+			local dest = msg.dest
+			if(type(dest) == "table") then
+				return event:FireForEntity(dest, msg.msg, msg.onFinishedCallback, true);
+			else
+				for i, actor in ipairs(self:GetActors()) do
+					if(dest == actor:GetName()) then
+						-- only activate the first matching actor
+						return event:FireForActor(actor, msg.msg, msg.onFinishedCallback, true);
+					end
+				end
+			end
+		else
+			return event:Fire(msg.msg, msg.onFinishedCallback, true);
+		end
 	end
 	
 	event.UnRegisterTextEvent = function()
@@ -970,19 +991,38 @@ function CodeBlock:RegisterAgentEvent(text, callbackFunc)
 	event:Connect("beforeDestroyed", event.UnRegisterTextEvent);
 	GameLogic.GetCodeGlobal():RegisterTextEvent(text, onEvent_);
 
-	local agentName = text:match("^(.+)%.GetIcon$");
-	if(agentName) then
+	local itemDS = ItemClient.GetItemDSByName(agentName)
+	if(not itemDS) then
+		itemDS = ItemClient.AddBlock(block_types.names.AgentItem, nil, "tool", agentName, true);
+		if(itemDS) then
+			itemDS.server_data = {name = agentName};
+			itemDS.tooltip = agentName;
+		end
+	end
+	if(eventName == "GetIcon") then
 		local icon = callbackFunc();
-		icon =  icon and Files.GetWorldFilePath(icon)
+		icon = icon and Files.GetWorldFilePath(icon)
 		if(icon) then
-			local itemDS = ItemClient.AddBlock(block_types.names.AgentItem, nil, "tool", agentName, true);
-			if(itemDS) then
-				itemDS.icon = icon;
-				itemDS.server_data = {name = agentName};
-				itemDS.tooltip = agentName;
-
-				if World2In1.GetIsWorld2In1() then
-					World2In1.AddAgentItem(itemDS)
+			itemDS.icon = icon;
+			if World2In1.GetIsWorld2In1() then
+				World2In1.AddAgentItem(itemDS)
+			end
+		end
+	elseif(eventName == "OnLoadInEntity") then
+		local item = ItemClient.GetItem(block_types.names.AgentItem)
+		if(item) then
+			commonlib.TimerManager.SetTimeout(function()  
+				item:FireLoadEventForAll(agentName);
+			end, 10)
+		end
+	elseif(hasLastEvent and eventName == "CreateAgentFromEntity") then
+		local item = ItemClient.GetItem(block_types.names.AgentItem)
+		if(item) then
+			-- invoke entity:RemoveAgent(agentName) for all referenced entities
+			local entities = item:GetAllReferencedEntities(agentName)
+			if(entities) then
+				for entity, _ in pairs(entities) do
+					entity:RemoveAgent(agentName)
 				end
 			end
 		end
@@ -1007,10 +1047,15 @@ function CodeBlock:RegisterTextEvent(text, callbackFunc)
 	event.tag = text;
 	local function onEvent_(_, msg)
 		if(msg and msg.dest) then
-			for i, actor in ipairs(self:GetActors()) do
-				if(msg.dest == actor:GetName()) then
-					-- only activate the first matching actor
-					return event:FireForActor(actor, msg and msg.msg, msg and msg.onFinishedCallback, msg and msg.bIsImmediate);
+			local dest = msg.dest
+			if(type(dest) == "table") then
+				return event:FireForEntity(dest, msg.msg, msg.onFinishedCallback, msg.bIsImmediate);
+			else
+				for i, actor in ipairs(self:GetActors()) do
+					if(dest == actor:GetName()) then
+						-- only activate the first matching actor
+						return event:FireForActor(actor, msg.msg, msg.onFinishedCallback, msg.bIsImmediate);
+					end
 				end
 			end
 		else
@@ -1096,9 +1141,12 @@ function CodeBlock:BroadcastTextEvent(text, msg, onFinishedCallback)
 	end
 end
 
--- similar to BroadcastTextEvent
--- @paramm dest: dest actor name. 
+-- similar to BroadcastTextEvent, except that it will also dispatch agent events to dest entity
+-- @paramm dest: dest actor name or entity object.  
 function CodeBlock:BroadcastTextEventTo(dest, text, msg)
+	if(type(dest) == "table" and dest.DispatchAgentEvent) then
+		dest:DispatchAgentEvent(text, msg)
+	end
 	GameLogic.GetCodeGlobal():BroadcastTextEventTo(dest, text, msg);
 end
 
@@ -1201,6 +1249,17 @@ function CodeBlock:GetActor()
 	return self:FindNearbyActor();
 end
 
+-- call this function if one wants to run function as if in code block's coroutine. 
+-- the function may contain code API like wait().
+function CodeBlock:RunAsCodeBlockFunction(code_func, msg)
+	local env = self:GetCodeEnv();
+	if(env) then
+		local co = CodeCoroutine:new():Init(self);
+		co:SetFunction(code_func);
+		return co:Run(msg)
+	end
+end
+
 -- usually from help window. There can only be one temp code running. 
 -- @param code: string
 function CodeBlock:RunTempCode(code, filename)
@@ -1297,6 +1356,24 @@ local lastErrorCallstack = "";
 function CodeBlock.handleError(x)
 	lastErrorCallstack = commonlib.debugstack(2, 5, 1);
 	return x;
+end
+
+-- importing a library is the alternative way of placing code blocks in the scene. 
+-- A library is a group of code blocks in the form of files. These files are usually organized in a folder with the same name of the library. 
+-- for example, when import("abc"), we will load all files in ./lib/abc/*.* as code blocks. These code blocks are loaded only once in a given world, 
+-- but can be imported multiple times. When the last code block that is importing a library is stopped, the imported libary will be unloaded. 
+-- This also makes debugging a library easy by just restarting the code block that referenced it. 
+-- When importing a lib, we will first search in the current world directory's ./lib folder for a given library, and then in system library folder, which is ..Game/Code/lib folder.
+-- The advantage of using library is for making the scene cleaner than placing code blocks.
+-- @param libName: import a library by name. loading all files in  "./lib/[libName]/*.*" folder.
+-- @return code library object
+function CodeBlock:ImportCodeLibrary(libName)
+	if(libName) then
+		local library = GameLogic.GetCodeGlobal():GetLibraryManager():CreateGetCodeLibrary(libName)
+		library:AddReference(self)
+		library:Start()
+		return library;
+	end
 end
 
 -- @param filename: include a file relative to current world directory

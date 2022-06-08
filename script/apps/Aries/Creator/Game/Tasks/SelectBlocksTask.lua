@@ -70,6 +70,7 @@ function SelectBlocks:ctor()
 	self.aabb = self.aabb or ShapeAABB:new();
 	-- all blocks that is being selected. 
 	self.blocks = self.blocks or {};
+	self.liveEntities = nil;
 	self.cursor = vector3d:new();
 	self.PivotPoint = vector3d:new(0,0,0);
 	self.PivotPointReal = vector3d:new(0,0,0);
@@ -84,9 +85,33 @@ function SelectBlocks.filter_file_exported(id, filename)
 	if(not self) then
 		return id;
 	end
-	if((id == "bmax" or id == "template") and filename) then
+	if((id == "bmax" or id == "template" or id == "x") and filename) then
+		local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 		filename = Files.GetRelativePath(filename)
-		filename = commonlib.Encoding.DefaultToUtf8(filename)
+		if(xmlRoot) then
+			local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+			if(node and node[1]) then
+				local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
+				if(root_node and root_node[1]) then
+					local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
+					if(node and node[1]) then
+						local blocks = NPL.LoadTableFromString(node[1]);
+						for _, b in ipairs(blocks) do
+							if(b[4]) then
+								local block_template = block_types.get(b[4]);
+								if(block_template) then
+									if b[6] and b[6].attr and b[6].attr.filename then
+										filename = b[6].attr.filename
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+		-- filename = commonlib.Encoding.DefaultToUtf8(filename)
 		GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
 	elseif(id == "STL" and filename) then
 		local output_file_name = filename;
@@ -613,7 +638,35 @@ function SelectBlocks:FrameMove()
 	
 	if(cursor:equals(max)) then
 		self:OnSelectionRefreshed();
-		SelectBlocks.UpdateBlockNumber(#(self.blocks));
+		local liveEntityCount = self:UpdateLiveEntitySelection()
+		SelectBlocks.UpdateBlockNumber(#(self.blocks), liveEntityCount);
+	end
+end
+
+-- return count
+function SelectBlocks:UpdateLiveEntitySelection()
+	local liveEntityCount = 0;
+	self.liveEntities = nil;
+	if(self.aabb and (self.aabb:GetVolume() < 100000)) then
+		local liveEntities = SelectBlocks.GetLiveEntities(self.aabb)
+		if(liveEntities) then
+			self.liveEntities = liveEntities;
+			liveEntityCount = #liveEntities;
+			for _, entity in ipairs(liveEntities) do
+				local x, y, z = entity:GetBlockPos()
+				ParaTerrain.SelectBlock(x,y,z,true);
+			end
+		end
+	end
+	return liveEntityCount;
+end
+
+function SelectBlocks.GetLiveEntities(aabb)
+	if(aabb) then
+		local min_x, min_y, min_z = aabb:GetMinValues()
+		local max_x, max_y, max_z = aabb:GetMaxValues()
+		local entities = EntityManager.GetEntitiesByMinMax(min_x, min_y, min_z, max_x, max_y, max_z, EntityManager.EntityLiveModel)
+		return entities;
 	end
 end
 
@@ -835,16 +888,29 @@ function SelectBlocks.ClosePage()
 	end
 end
 
+function SelectBlocks.GetBlockCountText()
+	local count = SelectBlocks.selected_count or 0;
+	local liveEntityCount = SelectBlocks.liveEntityCount or 0;
+	if(liveEntityCount == 0) then
+		return format(L"选中了%d块",count or 1);
+	elseif(not count or count == 0) then
+		return format(L"选中了%d物体", liveEntityCount);
+	else
+		return format(L"%d块, %d物体", count, liveEntityCount);
+	end
+end
+
 -- update the block number in the left panel page. 
-function SelectBlocks.UpdateBlockNumber(count)
+function SelectBlocks.UpdateBlockNumber(count, liveEntityCount)
+	liveEntityCount = liveEntityCount or 0
 	if(page) then
-		if(SelectBlocks.selected_count ~= count) then
+		if(SelectBlocks.selected_count ~= count or SelectBlocks.liveEntityCount ~= liveEntityCount) then
+			SelectBlocks.selected_count = count;
+			SelectBlocks.liveEntityCount = liveEntityCount;
 			if( not (count > 1 and SelectBlocks.selected_count>1) ) then
-				SelectBlocks.selected_count = count;
 				page:Refresh(0.01);
 			else
-				SelectBlocks.selected_count = count;
-				page:SetUIValue("title", format(L"选中了%d块",count or 1));
+				page:SetUIValue("title", SelectBlocks.GetBlockCountText())
 			end
 		end
 	end
@@ -1143,7 +1209,7 @@ function SelectBlocks.DeleteSelection(bFastDelete)
 	if(bFastDelete) then
 		SelectBlocks.FillSelection(0);
 		SelectBlocks.DeleteLiveEntitiesInAABB(self.aabb)
-	elseif(cur_selection and #cur_selection > 0) then
+	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DestroyNearbyBlocksTask.lua");
 		local task = MyCompany.Aries.Game.Tasks.DestroyNearbyBlocks:new({
 			explode_time=200, 
@@ -1423,10 +1489,15 @@ local function OnTransformSelectionChanged()
 	end
 end
 
+function SelectBlocks:HasSelection()
+	if(self and self.aabb and self.aabb:IsValid() and (#cur_selection > 0 or (self.liveEntities and #(self.liveEntities) > 0)) ) then
+		return true;
+	end
+end
+
 function SelectBlocks.ShowTransformWnd()
-	if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid() and #cur_selection > 0) then
-		local self = cur_instance;
-		
+	local self = cur_instance;
+	if(self and self:HasSelection()) then
 		SelectBlocks.GetEventSystem():AddEventListener("OnSelectionChanged", OnTransformSelectionChanged, nil, "TransformWnd");
 		TransformWnd.ShowPage(cur_selection, {x=0, y=0, z=0,}, function(trans, res)
 			SelectBlocks.GetEventSystem():RemoveEventListener("OnSelectionChanged", OnTransformSelectionChanged);
@@ -1441,8 +1512,8 @@ end
 -- @param trans: {dx,dy,dz, pivot, rot_axis, rot_angle, scalingX, scalingY, scalingZ, method}
 -- method can be nil or "clone" or "extrude"
 function SelectBlocks.TransformSelection(trans)
-	if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid() and #cur_selection > 0) then
-		local self = cur_instance;
+	local self = cur_instance;
+	if(self and self:HasSelection()) then
 		local mExtents = cur_instance.aabb.mExtents;
 
 		local shift_pressed = Keyboard:IsShiftKeyPressed()
@@ -1465,8 +1536,8 @@ function SelectBlocks.TransformSelection(trans)
 end
 
 function SelectBlocks.ConvertBlocksToRealTerrain()
-	if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid() and #cur_selection > 0) then
-		local self = cur_instance;
+	local self = cur_instance;
+	if(self and self:HasSelection()) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateTerrainHoleTask.lua");
 
 		local mExtents = self.aabb.mExtents;
@@ -1498,8 +1569,8 @@ end
 -- @param fill_block_id: if nil, it will be the current block.  if 0, it is fast delete. 
 -- @param fill_block_data: can be nil.
 function SelectBlocks.FillSelection(fill_block_id, fill_block_data)
-	if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid()) then
-		local self = cur_instance;
+	local self = cur_instance;
+	if(self and self:HasSelection()) then
 		local min = self.aabb:GetMin();
 		local max = self.aabb:GetMax();
 
@@ -1519,8 +1590,8 @@ end
 -- TODO: making this function with undo manager
 function SelectBlocks.ReplaceBlocks(from_block_id, to_block_id)
 	if(from_block_id and to_block_id and from_block_id~=to_block_id) then
-		if(cur_instance and cur_instance.aabb and cur_instance.aabb:IsValid() and #cur_selection > 0) then
-			local self = cur_instance;
+		local self = cur_instance;
+		if(self and self:HasSelection()) then
 			local min = self.aabb:GetMin();
 			local max = self.aabb:GetMax();
 

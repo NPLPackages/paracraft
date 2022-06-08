@@ -22,6 +22,8 @@ Entity.class_name = "EntityBlockCodeBase";
 EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 
 Entity:Property("NplBlocklyToolboxXmlText");
+Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
+Entity:Property({"isStepMode", nil, "IsStepMode", "SetStepMode", auto=true})
 Entity:Signal("remotelyUpdated")
 
 function Entity:ctor()
@@ -185,9 +187,10 @@ function Entity:LoadBlocklyFromXMLNode(node)
 	end
 	
 	-- npl blockly should remain default value unless self.blockly_xmlcode has code 
-	if(isUseNplBlockly or (self.blockly_xmlcode or "") ~= "") then
-		self.isUseNplBlockly = isUseNplBlockly;	
-	end
+	self.isUseNplBlockly = isUseNplBlockly;	
+	-- if(isUseNplBlockly or (self.blockly_xmlcode or "") ~= "") then
+		-- self.isUseNplBlockly = isUseNplBlockly;	
+	-- end
 
 	if(not self.isBlocklyEditMode and not self.nplcode) then
 		self.nplcode = self:GetCommand();
@@ -215,9 +218,8 @@ function Entity:IsCodeEmpty()
 	end
 end
 
--- virtual: this should be called when inventory itemstack or its values are changed
--- this function can be called many times per frame, but only one merged inventoryChanged signal is fired.
-function Entity:OnInventoryChanged(slot_index)
+-- virtual
+function Entity:OnInventoryChanged(inventory, slot_index)
 end
 
 -- Overriden to provide the network packet for this entity.

@@ -610,6 +610,10 @@ function FriendsPage.GetAllUnReadMsgNum()
 	if not FriendsPage.UnreadMsg then
 		return 0
 	end
+	
+	if FriendChatPage.IsOpen then
+		return 0
+	end
 
 	local all_num = 0
 	for key, v in pairs(FriendsPage.UnreadMsg) do

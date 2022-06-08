@@ -115,7 +115,7 @@ function ParalifeContext:mousePressEvent(event)
 			click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
 			local block = block_types.get(result.block_id);
 			if(block and result.blockX) then
-				block:OnMouseDown(result.blockX,result.blockY,result.blockZ, event.mouse_button);
+				block:OnMouseDown(event, result.blockX,result.blockY,result.blockZ);
 			end
 		end
 	end
@@ -543,6 +543,7 @@ function ParalifeContext:SetTargetPosition(x, y, z, moveTime)
 	local player = EntityManager.GetPlayer()
 	if(player) then
 		local fromX, fromY, fromZ = player:GetPosition()
+		
 		if(not x or self:CanMovePlayerFromSrcToDest(fromX, fromY, fromZ, x, y, z)) then
 			ParalifeContext._super.SetTargetPosition(self, x, y, z, moveTime)
 		end
@@ -553,7 +554,7 @@ end
 -- @param fromX, fromY, fromZ: real world coordinates
 -- @param toX, toY, toZ: real world coordinates
 function ParalifeContext:CanMovePlayerFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)
-	if(self:HasInvisibleBlockerFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)) then
+	if(self:HasLinePathFromSrcToDest(fromX, fromY, fromZ, toX, toY, toZ)) then
 		return false;
 	end
 	fromX, fromY, fromZ = BlockEngine:block(fromX, fromY, fromZ);

@@ -83,6 +83,19 @@ RedSummerCampCommonPage.pageData = {
 		]]
 	},
 
+	china_story = {
+		title="百年新长征，智造新未来 2021青少年“讲好中国故事”创意编程大赛征集启事",
+		lb_bt_desc = "<<< 家长指南",
+		rb_bt_desc = "立即报名",
+		img = "Texture/Aries/Creator/keepwork/RedSummerCamp/common/xinchangzheng_602x374_32bits.png#0 0 602 374",
+		begain_time = "",
+		end_time = "",
+		content=[[
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;“讲好中国故事”创意传播大赛由国务院新闻办指导，中国外文局主办，华中科技大学学术支持，当代中国与世界研究院、中国互联网新闻中心承办，是以“讲好新时代中国故事”为主旨，面向国内外社会公众公开征集各领域中国故事、传播中国好声音、树立中国良好国际形象的年度官方品牌活动。<br/><div style="height: 10px;"></div>
+			2021青少年“讲好中国故事”创意编程大赛作为本次大赛的专项赛，致力于通过3D创意编程的形式，挖掘青少年对于中国传统文化、红色文化、社会主义先进文化的独特表达，以及关于人工智能时代智能机器人和乡村振兴背景下新民居的创新设计，提升年青一代的“科技童子功”，持续推动3D创意编程与相关产业和百姓生活的密切联结。
+		]]
+	},
+
     main_world = {	
 		title="创意空间",
 		lb_bt_desc = "<<< 家长指南",
@@ -144,13 +157,7 @@ function RedSummerCampCommonPage.ClickLBBt()
 	if RedSummerCampCommonPage.name == "summer_camp" then
         local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
         Page.ShowShenTongBeiPage();
-	elseif RedSummerCampCommonPage.name == "ai_school" then
-		local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
-        RedSummerCampParentsPage.Show();
-	elseif RedSummerCampCommonPage.name == "zhengcheng" then
-        local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
-        RedSummerCampParentsPage.Show();
-	elseif RedSummerCampCommonPage.name == "leyuan" then
+	else
         local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
         RedSummerCampParentsPage.Show();
 	end
@@ -179,6 +186,8 @@ function RedSummerCampCommonPage.ClickRBBt()
 		GameLogic.RunCommand(format('/loadworld -s -force %d', 73139))
 	elseif RedSummerCampCommonPage.name == "leyuan" then
 		GameLogic.RunCommand(format('/loadworld -s -force %d', 79969))
+	elseif RedSummerCampCommonPage.name == "china_story" then
+		GameLogic.RunCommand(format('/open  %s', "https://keepwork.com/cp/csa"))
 	end
 end
 
@@ -188,4 +197,8 @@ end
 
 function RedSummerCampCommonPage.IsMainWorld()
 	return RedSummerCampCommonPage.name == "main_world"
+end
+
+function RedSummerCampCommonPage.IsChinaStory()
+	return RedSummerCampCommonPage.name == "china_story"
 end

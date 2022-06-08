@@ -43,6 +43,7 @@ function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 				if(langConfigFile) then
 					entity:SetLanguageConfigFile(langConfigFile);
 				end
+				if (langConfigFile == "npl_cad" or codeLanguageType == "python") then entity:SetUseNplBlockly(false) end
                 entity:SetCodeLanguageType(codeLanguageType);
 				local nplCode = itemStack:GetDataField("nplCode");
 				if(nplCode) then

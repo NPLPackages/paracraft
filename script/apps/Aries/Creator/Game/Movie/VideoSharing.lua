@@ -135,10 +135,28 @@ function VideoSharing.EndCapture(showUpload)
 	end
 end
 
+--宇哥的需求，录制模式下不显示esc，记录原有的esc状态
+VideoSharing.IsShowEscDock = nil
+function VideoSharing.UpdateEscDock(bShow)
+	local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
+	if VideoSharing.IsShowEscDock  == nil then
+		VideoSharing.IsShowEscDock = EscDock.IsVisible() == true
+	end
+	if bShow then
+		EscDock.ShowView(not bShow)
+	else
+		local isShow = VideoSharing.IsShowEscDock ~= nil and VideoSharing.IsShowEscDock or false
+		EscDock.ShowView(isShow)
+		VideoSharing.IsShowEscDock = nil
+	end
+end
+
+
 function VideoSharing.ShowRecordingArea(bShow)
 	NPL.load("(gl)script/kids/3DMapSystemApp/Assets/AsyncLoaderProgressBar.lua");
 	local AsyncLoaderProgressBar = commonlib.gettable("Map3DSystem.App.Assets.AsyncLoaderProgressBar");
 	if(VideoRecorder.HasFFmpegPlugin()) then
+		VideoSharing.UpdateEscDock(bShow)
 		local _parent = ParaUI.GetUIObject("ShareSafeArea");
 		if(not bShow) then
 			if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then

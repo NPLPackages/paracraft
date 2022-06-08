@@ -19,6 +19,8 @@ local pe_mc_block = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_block");
 NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemStack.lua");
+NPL.load("(gl)script/ide/System/Core/PainterContext.lua");
+local PainterContext = commonlib.gettable("System.Core.PainterContext");
 local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -75,15 +77,24 @@ function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent
 				block_id = names[block_id];
 			end
 		end
-		mcmlNode.item_stack = ItemStack:new():Init(block_id);
+		local server_data;
+		local uid = mcmlNode:GetAttributeWithCode("uid", nil, true);
+		if(uid) then
+			local itemDS = ItemClient.GetItemDSByName(uid)
+			if(itemDS) then
+				server_data = itemDS.server_data
+			end
+		end
+		mcmlNode.item_stack = ItemStack:new():Init(block_id, 1, server_data);
 	end
 	
 	mcmlNode.block_id = block_id;
 	mcmlNode.block_count = block_count or 0;
 
 	local background;
+	local block_item
 	if(block_id) then
-		local block_item = ItemClient.GetItem(block_id);
+		block_item = ItemClient.GetItem(block_id);
 		if(block_item) then
 			local block_data = mcmlNode:GetAttributeWithCode("block_data", nil, true);
 			mcmlNode.block_data = block_data;
@@ -92,10 +103,19 @@ function pe_mc_block.render_callback(mcmlNode, rootName, bindingContext, _parent
 		local icon = mcmlNode:GetAttributeWithCode("icon", nil, true);
 		if(icon and icon ~= "") then
 			background = icon;
+		else
+			-- if no explicit icon is specified and the item is owner draw. 
+			if(block_item and block_item:IsOwnerDrawIcon() and mcmlNode.item_stack and mcmlNode.item_stack.serverdata) then
+				background = nil;
+				_this:SetField("OwnerDraw", true);
+				_this:SetScript("ondraw", function(obj)
+					block_item:DrawIcon(PainterContext, obj.width, obj.height, mcmlNode.item_stack);
+				end);
+			end
 		end
 	end
 	_this.background = background or "";
-
+	
 	_this:GetAttributeObject():SetField("TextOffsetY", 8)
 	_this:GetAttributeObject():SetField("TextShadowQuality", 8);
 	_guihelper.SetFontColor(_this, "#ffffffff");

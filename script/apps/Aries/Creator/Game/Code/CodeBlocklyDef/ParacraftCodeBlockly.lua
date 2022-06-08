@@ -138,8 +138,12 @@ function ParacraftCodeBlockly.CompileCode(code, filename, codeblock)
     local CodeCompiler = commonlib.gettable("MyCompany.Aries.Game.Code.CodeCompiler");
     local entity = codeblock:GetEntity();
     local compiler = CodeCompiler:new():SetFilename(filename)
-	if(codeblock and entity and entity:IsAllowFastMode()) then
-		compiler:SetAllowFastMode(true);
+	if(codeblock and entity) then
+		if(entity:IsAllowFastMode()) then
+			compiler:SetAllowFastMode(true);
+		elseif(entity:IsStepMode()) then
+			compiler:SetStepMode(true);
+		end
 	end
     local codeLanguageType;
     if(entity.GetCodeLanguageType)then

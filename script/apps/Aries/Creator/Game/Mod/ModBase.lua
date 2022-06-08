@@ -143,22 +143,25 @@ function ModBase:SetWorldData(key, data, worldpath)
 		if (GameLogic.IsStarted) then
 			worldpath = GameLogic.GetWorldDirectory();
 		else
-			return false;
+			return;
 		end
+	end
+
+	if (not string.match(worldpath, "/$")) then
+		worldpath = worldpath .. "/";
 	end
 
 	if (self.worldpath ~= worldpath) then
 		self.worldData = nil;
+		self.worldpath = worldpath;
 	end
-
-	self.worldpath = worldpath;
 
 	local modName = self.Name;
 
 	if (not self.worldData) then
-		local filePath = worldpath .. "mod/" .. modName .. ".xml";
+		local filePath = self.worldpath .. "mod/" .. modName .. ".xml";
 		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
-		
+
 		if (not self.worldData) then
 			self.worldData = {{ name = modName }};
 			ParaIO.CreateDirectory(worldpath .. "mod/");
@@ -199,19 +202,22 @@ function ModBase:GetWorldData(key, worldpath)
 		if (GameLogic.IsStarted) then
 			worldpath = GameLogic.GetWorldDirectory();
 		else
-			return false;
+			return;
 		end
+	end
+
+	if (not string.match(worldpath, "/$")) then
+		worldpath = worldpath .. "/";
 	end
 
 	if self.worldpath ~= worldpath then
 		self.worldData = nil;
+		self.worldpath = worldpath;
 	end
-
-	self.worldpath = worldpath;
 
 	if (self.worldData == nil) then
 		local modName = self.Name;
-		local filePath = worldpath .. "mod/" .. modName .. ".xml";
+		local filePath = self.worldpath .. "mod/" .. modName .. ".xml";
 
 		self.worldData = ParaXML.LuaXML_ParseFile(filePath);
 	end
@@ -237,22 +243,18 @@ function ModBase:GetWorldData(key, worldpath)
 	end
 end
 
-function ModBase:SaveWorldData(worldpath)
-	if (not worldpath) then
-		if GameLogic.IsStarted then
-			worldpath = GameLogic.GetWorldDirectory();
-		else
-			return false;
-		end
+function ModBase:SaveWorldData()
+	if (not self.worldpath) then
+		return;
 	end
 
 	local modName = self.Name;
-	local filePath = worldpath .. "mod/" .. modName .. ".xml";
+	local filePath = self.worldpath .. "mod/" .. modName .. ".xml";
 	local saveXml = commonlib.Lua2XmlString(self.worldData, true, true);
 
 	local file = ParaIO.open(filePath, "w");
 
-	file:write(saveXml,#saveXml);
+	file:write(saveXml, #saveXml);
 	file:close();
 end
 	

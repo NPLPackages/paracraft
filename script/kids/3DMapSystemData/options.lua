@@ -58,3 +58,79 @@ Map3DSystem.options = {
 	-- ignore player asset in attribute.db when loading world
 	ignorePlayerAsset = false,
 };
+
+local options = Map3DSystem.options;
+
+--外部渠道参数的本地声明
+local local_statement = {
+	-- the command to execute when entering the world, similar to home point,and if repeated, the home point shall prevail
+	-- ommands are separated by ";",e.g. world_enter_cmds = /paralife show;/shader 1
+	world_enter_cmds = "",
+	-- Whether to allow built-in browsers
+	enable_npl_brower = true,
+	-- Whether to lock the resolution to 1280x720
+	is_resolution_locked = false,
+}
+
+local function _loadChannelOptions(optionPath)
+	if ParaIO.DoesFileExist(optionPath) then 
+		LOG.std(nil, "info", "_loadChannelOptions", "read ini file: %s",optionPath);
+		local file = ParaIO.open(optionPath,"r");
+		if(file:IsValid())then
+			local line = file:readline();
+			while(line) do
+				local arr = commonlib.split(line,"=");
+				if #arr==2 then
+					local key = arr[1]:gsub("^[\"\'%s]+", ""):gsub("[\"\'%s]+$", "") --去掉字符串首尾的空格、引号
+					local val = arr[2]:gsub("^[\"\'%s]+", ""):gsub("[\"\'%s]+$", "")
+					
+					if key~="" and val~="" and local_statement[key]~=nil then  --默认声明不可为nil
+						LOG.std(nil, "info", "_loadChannelOptions", "load option: %s=%s",key,val);
+						local _type = type(local_statement[key])
+						if _type=="number" then
+							options[key] = tonumber(val)
+						elseif _type=="string" then
+							options[key] = val
+						elseif _type=="boolean" then
+							options[key] = val=="true"
+						else
+							print(string.format("-----未声明的渠道参数%s=%s",key,val))
+						end
+					end
+				end
+				line = file:readline();
+			end
+			file:close();
+		else
+			LOG.std(nil, "info", "_loadChannelOptions", "can't open file:%s",optionPath);
+		end
+	end
+end
+
+--[[
+	读取game_iotions参数,先查找config/option.ini，如果是特殊渠道，如chennelId==430，再查找一次config/option_430.ini
+	配置文件格式是 每一行一个参数，以等号("=")隔开，同时必须在上方先声明过的
+	如：
+	world_enter_cmds = /paralife show;/shader 1
+	enable_npl_brower = false
+	is_resolution_locked = true
+]]
+function options.InitChannelOptions()
+	if options._isChannelOptionsLoaded then
+		return
+	end
+	options._isChannelOptionsLoaded = true
+
+	for k,v in pairs(local_statement) do
+		options[k] = v
+	end
+
+	local optionPath = ParaIO.GetWritablePath().."config/channel_option_dft.ini"
+	_loadChannelOptions(optionPath)
+	if System.options.channelId then --参数直接覆盖
+		optionPath = ParaIO.GetWritablePath()..string.format("config/channel_option_%s.ini",System.options.channelId)
+		_loadChannelOptions(optionPath)
+	end
+
+	options.enable_npl_brower = options.enable_npl_brower and System.os.GetPlatform()=="win32"
+end

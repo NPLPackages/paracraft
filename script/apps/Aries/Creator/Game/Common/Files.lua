@@ -18,10 +18,13 @@ Files:GetFileFromCache(filename)
 
 echo(Files.GetRelativePath(GameLogic.GetWorldDirectory().."1.png"));
 echo(Files.GetRelativePath(GameLogic.GetWorldDirectory().."1.png"));
+echo(Files:FindWorldFiles({}, "blocktemplates/", nMaxFileLevels, nMaxFilesNum, filterFunc))
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Network/Packets/PacketGetFile.lua");
 NPL.load("(gl)script/ide/math/StringUtil.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -81,6 +84,14 @@ function Files.CreateGetAdditionalWorldSearchPath()
 		Files.worldSearchPath = ParaIO.GetWritablePath().."temp/paraworld/temp/";
 	end
 	return Files.worldSearchPath;
+end
+
+
+function Files.GetTempPath()
+	if(not Files.projectTempPath) then
+		Files.projectTempPath = ParaIO.GetWritablePath().."temp/";
+	end
+	return Files.projectTempPath;
 end
 
 -- this is called when world exits
@@ -635,4 +646,83 @@ function Files:UnloadFoldAssets(foldpath)
 			end
 		end
 	end
+end
+
+-- find all files in the given world directory. 
+-- @param output: output files, default to a new empty table
+-- @param folder: relative to world folder. default to "", which is root of world. values like "blocktemplates/"
+-- @param nMaxFileLevels: default to 2
+-- @param nMaxFilesNum: default to 500
+-- @param filter: a function({filename, filesize, writedate}) return true or false end. if nil, all files are returned. 
+--  it can also be string like, "model", "bmax", "audio", "texture", "xml", "script"
+-- @return output: a table array containing relative to folder file name, such as below:
+-- {{filename,filesize,createdate,fileattr,accessdate,writedate,},}
+function Files:FindWorldFiles(output, folder, nMaxFileLevels, nMaxFilesNum, filterFunc)
+	local rootPath = GameLogic.GetWorldDirectory()
+	folder = folder or ""
+	rootPath = rootPath..folder;
+	local searchLevel = nMaxFileLevels or 2
+	local nMaxFilesNum = nMaxFilesNum or 500
+	local files = output or {};
+	local duplicates
+	filterFunc = OpenFileDialog.GetFilterFunction(filterFunc) or filterFunc;
+	local result = commonlib.Files.Find(files, rootPath, searchLevel, nMaxFilesNum, filterFunc or "*");
+	
+	if(System.World.worldzipfile) then
+		local filemap = {};
+		for i = 1, #result do
+			filemap[result[i].filename] = true;
+		end
+		local zip_archive = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CFileManager"):GetChild(System.World.worldzipfile);
+		local zipParentDir = zip_archive:GetField("RootDirectory", "");
+		if(zipParentDir~="") then
+			if(rootPath:sub(1, #zipParentDir) == zipParentDir) then
+				rootPath = rootPath:sub(#zipParentDir+1, -1)
+				local result = commonlib.Files.Find({}, rootPath, searchLevel, nMaxFilesNum, ":.", System.World.worldzipfile);
+				for i = 1, #result do
+					-- skip duplicated names
+					if(not filemap[result[i].filename]) then
+						if(filterFunc and filterFunc(result[i])) then
+							files[#files+1] = result[i];
+						end
+					end
+				end
+			end
+		end
+	end
+	return files;
+end
+
+-- find all files in folder relative to the root directory. both disk and zip files are searched. 
+-- @param output: output files, default to a new empty table
+-- @param folder: relative to world folder. default to "", which is root of world. values like "blocktemplates/"
+-- @param nMaxFileLevels: default to 2
+-- @param nMaxFilesNum: default to 500
+-- @param filter: a function({filename, filesize, writedate}) return true or false end. if nil, all files are returned. 
+--  it can also be string like, "model", "bmax", "audio", "texture", "xml", "script"
+-- @return output: a table array containing relative to folder file name, such as below:
+-- {{filename,filesize,createdate,fileattr,accessdate,writedate,},}
+function Files:FindSystemFiles(output, folder, nMaxFileLevels, nMaxFilesNum, filterFunc)
+	local rootPath = folder or ""
+	local searchLevel = nMaxFileLevels or 2
+	local nMaxFilesNum = nMaxFilesNum or 500
+	local files = output or {};
+	local duplicates
+	filterFunc = OpenFileDialog.GetFilterFunction(filterFunc) or filterFunc;
+	local result = commonlib.Files.Find(files, rootPath, searchLevel, nMaxFilesNum, filterFunc or "*");
+	
+	local filemap = {};
+	for i = 1, #result do
+		filemap[result[i].filename] = true;
+	end
+	local result = commonlib.Files.Find({}, rootPath, searchLevel, nMaxFilesNum, ":.", "*.zip");
+	for i = 1, #result do
+		-- skip duplicated names
+		if(not filemap[result[i].filename]) then
+			if(filterFunc and filterFunc(result[i])) then
+				files[#files+1] = result[i];
+			end
+		end
+	end
+	return files;
 end

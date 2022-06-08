@@ -86,6 +86,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "cellar.my_school.after_selected_school": Show my school page and return is selected a school.
   - "cellar.vip_notice.init": Show vip notice page
   - "cellar.vip_notice.close": Close vip notice page
+  - "user_skin_change": User skin changes
 
 - world:
   - "OnWorldInitialRegionsLoaded": called only once after the first world regions are loaded. 
@@ -119,6 +120,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "check_and_updated_before_enter_my_home": Check and updated brefore enter my home
   - "service.local_service_world.set_community_world": set community world enabled.
   - "service.local_service_word.is_community_world": is community world.
+  - "OnCreateHomeWorld": create home world event.
 
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
@@ -168,6 +170,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "entity_player_mp_entity_action_state_updated", entity_player_mp: after every time entity action state get updated for EntityPlayerMP
 - movie: 
   - "pop_movie_mode", lastMode:when the movie mode is popped
+- sound: 
+  - "sound_starts_playing", when the sound starts playing
 - downloadFile: 
   - "downloadFile_notify", downloadState(0:downloading, 1:complete, 2:terminated),text(downloadFile text tips),currentFileSize, totalFileSize
 - urlprotocol:  
@@ -182,6 +186,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "CodeBlockUIUrl": defaultCodeBlockEditorUrl:custom code block default html path
   - "CodeBlockEditorOpened": nil, custom code block editor
   - "CustomCodeBlockClicked": false, determine whether code block can be opened
+  - "OnCodeBlockLineStep": locationInfo: in format of "filename:line:"
 
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 

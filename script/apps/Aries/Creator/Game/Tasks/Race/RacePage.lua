@@ -11,7 +11,6 @@ RacePage.Show()
 
 local RacePage = NPL.export()
 local LanQiaoBeiPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Race/LanQiaoBeiPage.lua")
-local GeneralPage = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua")
 local page
 RacePage.ItemData = {
 	{	
@@ -35,10 +34,32 @@ RacePage.ItemData = {
 		enterPage = {
 			{name = "进入集训营", node_name = "enter_train_world", worldId = 72945}
 		},
-		name = "shen_tong_bei"
+		name = "shen_tong_bei",
+		icon = "tu1_875X255_32bits"
 	},
 	{
 		visible = true,
+		time = "2022年3月-2022年11月",
+		signUpBtnInfo = {tooltip = "",endDay = "",endTime =""},
+		timeRule = {
+			startDay="2022-03-01",
+			startTime="00:00:00",
+			endDay="2022-11-30",
+			endTime="23:59:59"
+		},
+		race="2022年度青少年人工智能综合素质测评",
+		content="为了全面提高中国青少年的人工智能综合素质，北京理工大学和中国关心下一代工作委员会健康体育发展中心共同建立青少年人工智能基础教育人才培养基地，基地负责青少年人工智能综合素质测评的组织与实施工作，联合举办一年2-4次青少年人工智能综合素质测评。<br/>&#10;青少年人工智能综合素质测评内容有以下6个版块，人工智能基础认知能力、人工智能实体模块化编程能力、人工智能可视化编程能力、人工智能代码编程能力、人工智能技术认知及应用能力、人工智能创客素养能力等多个维度对4-18岁的青少年进行专业、多维度的能力测试。通过多维度的能力测试，展示青少年在人工智能基础教育阶段的学习成果，为青少年在人工智能领域的学习提供明确方向，为国家选拔人工智能人才提供重要依据。",
+		ListData = {
+		},
+		leftTopBtnInfo = {btnText = "报名",url = L"http://www.chinaaitest.com/registration/onlinesignup/"},
+		enterPage = {
+			{name = "官网", node_name = "enter_rgzhsz_Official_web",url = L"http://www.chinaaitest.com/"}
+		},
+		name = "ren_gong_zong_he_su_zhi",
+		icon = "zonghesuzhiceping_875X255_32bits"
+	},
+	{
+		visible = false,
 		time = "2021年9月10日-2022年5月",
 		signUpBtnInfo = {tooltip = "报名截止时间：2022年3月",endDay = "2022-2-28",endTime ="23:59:59"},
 		timeRule = {
@@ -55,7 +76,8 @@ RacePage.ItemData = {
 		enterPage = {
 			{name = "大赛详情", node_name = "enter_lqb_Official_web"}
 		},
-		name = "lan_qiao_bei"
+		name = "lan_qiao_bei",
+		icon = "tu2_875X255_32bits"
 	},
 	{
 		visible = true,
@@ -75,7 +97,8 @@ RacePage.ItemData = {
 		enterPage = {
 			{name = "大赛官网", node_name = "enter_jhzggs_Official_web", url = L"https://keepwork.com/cp/csa"}
 		},
-		name = "zhong_guo_gu_shi"
+		name = "zhong_guo_gu_shi",
+		icon = "tu3_875X255_32bits"
 	},
 	{
 		visible = true,
@@ -95,7 +118,8 @@ RacePage.ItemData = {
 		enterPage = {
 			{name = "大赛官网", node_name = "enter_kjcxds_Official_web", url = L"https://castic.cyscc.org/index.aspx"}
 		},
-		name = "ke_ji_da_sai"
+		name = "ke_ji_da_sai",
+		icon = "tu4_875X255_32bits"
 	},
 	{
 		visible = true,
@@ -116,7 +140,8 @@ RacePage.ItemData = {
 		enterPage = {
 			{name = "大赛官网", node_name = "enter_yxj_Official_web", url = L"https://yxj.cyscc.org/ "}
 		},
-		name = "ke_xue_ying_xiang_jie"
+		name = "ke_xue_ying_xiang_jie",
+		icon = "tu5_875X255_32bits"
 	},
 	{
 		visible = true,
@@ -131,11 +156,12 @@ RacePage.ItemData = {
 		race="第二十三届全国中小学生电脑制作活动",
 		content="全国学生信息素养提升实践活动（全国中小学电脑制作活动）由中央电化教育馆主办，旨在促进中国基础教育信息化应用、展示中小学生信息技术实践成果的全国性展示交流活动。活动设置有数字创作、计算思维、科创实践三大类内容，同学们可以使用帕拉卡创作作品报送参加数字创作中的微视频/微动画类别，以及计算思维中的创意编程类别。",
 		ListData = {},
-		leftTopBtnInfo = {btnText = "大赛报名",url = L"http://www.huodong2000.com.cn/files/20210903/%E9%99%84%E4%BB%B6%EF%BC%9A%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%89%E5%B1%8A%E5%85%A8%E5%9B%BD%E5%AD%A6%E7%94%9F%E4%BF%A1%E6%81%AF%E7%B4%A0%E5%85%BB%E6%8F%90%E5%8D%87%E5%AE%9E%E8%B7%B5%E6%B4%BB%E5%8A%A8%E6%8C%87%E5%8D%97.pdf"},
+		leftTopBtnInfo = {btnText = "大赛报名",url = L"http://huodong2000.ncet.edu.cn/news/2021930/n68061253.html"},
 		enterPage = {
-			{name = "大赛官网", node_name = "enter_zxxdnzzhd_Official_web", url = L"http://www.huodong2000.com.cn/index.html#"}
+			{name = "大赛官网", node_name = "enter_zxxdnzzhd_Official_web", url = L"http://huodong2000.ncet.edu.cn/"}
 		},
-		name = "zhong_xiao_xue_dian_nao_zhi_zuo_huo_dong"
+		name = "zhong_xiao_xue_dian_nao_zhi_zuo_huo_dong",
+		icon = "tu6_875X255_32bits"
 	}
 }
 
@@ -263,11 +289,16 @@ end
 function RacePage.ClickCompetition()
 	if RacePage.selectName == "shen_tong_bei" then
 		--神通杯
+		local GeneralPage = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua")
 		GeneralPage.ShowShenTongBeiCompetitionPage()
 	elseif RacePage.selectName == "lan_qiao_bei" then
 		--蓝桥杯
 		LanQiaoBeiPage.SetSelectIndex(1)
         LanQiaoBeiPage.Show()
+	elseif RacePage.selectName == "ren_gong_zong_he_su_zhi" then
+		--2022年度青少年人工智能综合素质测评
+		local url = RacePage.Datas[RacePage.index].leftTopBtnInfo.url
+		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	elseif RacePage.selectName == "zhong_guo_gu_shi"then
 		--讲好中国故事
 		local worldId = RacePage.Datas[RacePage.index].leftTopBtnInfo.worldId
@@ -315,6 +346,7 @@ function RacePage.OnClickRaceItem(index)
 		return
 	end
 	local node_name = ListData[index].node_name
+	local GeneralPage = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua")
 	if node_name == "constitution" then
 		-- 赛事章程
 		GeneralPage.ShowShenTongBeiConstituionPage()
@@ -336,6 +368,9 @@ function RacePage.OnEnterPage(name)
 	if name == "enter_train_world" then
 		local worldId = RacePage.Datas[RacePage.index].enterPage[1].worldId
 		GameLogic.RunCommand(string.format("/loadworld -s -force %d", worldId))
+	elseif name == "enter_rgzhsz_Official_web" then
+		local url = RacePage.Datas[RacePage.index].enterPage[1].url
+		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	elseif name == "enter_lqb_Official_web" then
 		LanQiaoBeiPage.SetSelectIndex(2)
 		LanQiaoBeiPage.Show()

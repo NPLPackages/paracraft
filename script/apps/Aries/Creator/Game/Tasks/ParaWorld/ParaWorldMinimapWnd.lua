@@ -52,6 +52,7 @@ function ParaWorldMinimapWnd:Show()
 		url="script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.html?isSurface=false",
 		alignment="_rt", left=-202, top=10, width = 192, height = 248, zorder = -11
 	});
+	GameLogic.GetFilters():apply_filters("esc_map",true);
 end
 
 function ParaWorldMinimapWnd.OnInit()
@@ -60,6 +61,10 @@ end
 
 function ParaWorldMinimapWnd.OnInitWnd()
 	pageWnd = document:GetPageCtrl();
+end
+
+function ParaWorldMinimapWnd.IsVisible()
+	return page and page:IsVisible() and pageWnd and pageWnd:IsVisible()
 end
 
 -- static function: refresh the map
@@ -99,6 +104,7 @@ end
 
 function ParaWorldMinimapWnd:Close()
 	ParaWorldMinimapWnd.CloseWindow()
+	GameLogic.GetFilters():apply_filters("esc_map",false);
 end
 
 function ParaWorldMinimapWnd.GetWorldName()

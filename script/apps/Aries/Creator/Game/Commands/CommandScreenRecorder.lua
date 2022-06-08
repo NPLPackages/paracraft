@@ -21,7 +21,7 @@ Commands["screenrecorder"] = {
     handler = function(cmd_name, cmd_text, cmd_params)
         local platform = System.os.GetPlatform();
 
-        if (platform ~= "ios") then
+        if (platform ~= "ios" and platform ~= "android") then
             _guihelper.MessageBox(L"此功能暂不支持该操作系统");
             return;
         end

@@ -32,8 +32,12 @@ curGame = Page:GetRequestParam("curGame")
 function OnClickUpdate()
     ClientUpdateDialog.OnClickUpdate()
 end
+
+function GetBtnText()
+    return ClientUpdateDialog._isDownloadFinished and "安装" or L"更新"
+end
 ]]></script>
-<aries:window mode="thin" width="420" title='<%=format(L"关于%s", curGame)%>' onclose="OnClose">
+<aries:window mode="thin" width="420" title='<%=format(L"关于%s", curGame)%>' >
     <div class="default" style="margin:20px">
         <div style="">
             <%=L"最新版本为:"%><%=Eval("latestVersion")%>
@@ -49,8 +53,10 @@ end
     <hr />
     <div style="margin-top:30px;margin-bottom:30px;" class="default">
         <input type="button" value='<%=L"更新日志..." %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:100px;height:28px;" onclick="OnClickChangeLog" />    
-        <input type="button" value='<%=L"退出" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:70px;height:28px;" onclick="OnClickExit" />
-        <input type="button" value='<%=L"更新" %>' class="mc_yellow_button_with_fillet" align="right" style="margin-right:20px;min-width:70px;height:28px;" onclick="OnClickUpdate"/>
+        <pe:if condition='<%= not ClientUpdateDialog._isDownloadFinished %>'>
+            <input type="button" value='<%=L"退出" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:70px;height:28px;" onclick="OnClickExit" />
+        </pe:if>
+        <input type="button" value='<%=GetBtnText() %>' class="mc_yellow_button_with_fillet" align="right" style="margin-right:20px;min-width:70px;height:28px;" onclick="OnClickUpdate"/>
     </div>
 </aries:window>
 </pe:mcml>

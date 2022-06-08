@@ -76,6 +76,13 @@ function DownloadWorld.ShowPage(url)
 	end
 end
 
+function DownloadWorld.SetFromName(name)
+	DownloadWorld.url = name;
+	if(page) then
+		page:Refresh(0)
+	end
+end
+
 function DownloadWorld.UpdateProgressText(text)
 	if(page) then
 		page:SetValue("progressText", text)

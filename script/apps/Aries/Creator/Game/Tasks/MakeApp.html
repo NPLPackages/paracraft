@@ -105,15 +105,15 @@
                         -- check pacakge step
                         local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
 
-                        if (ParaIO.DoesFileExist(MakeApp.androidBuildRoot .. "paracraft_android_ver" .. MakeApp.curAndroidVersion .. "/")) then
+                        if (ParaIO.DoesFileExist(MakeApp.androidBuildRoot .. "paracraft_ver" .. MakeApp.curAndroidVersion .. "/")) then
                             local p_step1_content_controller = page:FindControl("p_step1_content");
                             local p_step2_button_controller = page:FindControl("p_step2_button");
 
                             p_step1_content_controller.visible = true;
                             p_step2_button_controller.visible = true;
 
-                            local world_path = MakeApp.androidBuildRoot .. "paracraft_android_ver" .. MakeApp.curAndroidVersion .. "/assets/worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
-                            local world_zip = MakeApp.androidBuildRoot .. "paracraft_android_ver" .. MakeApp.curAndroidVersion .. "/assets/worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. ".zip";
+                            local world_path = MakeApp.androidBuildRoot .. "paracraft_ver" .. MakeApp.curAndroidVersion .. "/assets/worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
+                            local world_zip = MakeApp.androidBuildRoot .. "paracraft_ver" .. MakeApp.curAndroidVersion .. "/assets/worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. ".zip";
                             local is_world_path_exist = false;
                             local is_world_zip_exist = false;
 
@@ -179,8 +179,8 @@
                     function p_step1(callback)
                         if (build_platform == "android") then
                             MakeApp:AndroidDownloadApk(function()
-                                MakeApp:AndroidUnzipApk(function()
-                                    MakeApp:AndroidDownloadJre(function()
+                                MakeApp:AndroidDownloadTools(function()
+                                    MakeApp:AndroidDecodeApk(function()
                                         local p_step1_content_controller = page:FindControl("p_step1_content");
                                         local p_step2_button_controller = page:FindControl("p_step2_button");
 
@@ -190,7 +190,7 @@
                                         if (callback and type(callback) == "function") then
                                             callback();
                                         end
-                                    end);
+                                    end)
                                 end);
                             end);
                         elseif (build_platform == "ios") then
@@ -268,7 +268,7 @@
                     function p_step3(callback)
                         if (get_build_platform() == "android") then
                             MakeApp:AndroidGenerateApk(function()
-                                MakeApp:AndroidSignApk(function()
+                                MakeApp:AndroidSignApkWrapper(function()
                                     page:SetValue("step3_content", "paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk");
                                     local p_step3_content_controller = page:FindControl("p_step3_content");
                                     p_step3_content_controller.visible = true;

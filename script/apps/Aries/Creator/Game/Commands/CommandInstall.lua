@@ -14,7 +14,7 @@ local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 
 Commands["install"] = {
 	name="install", 
-	quick_ref="/install [-mod|bmax] [-filename str] [-ext str] [url]", 
+	quick_ref="/install [-mod|bmax] [-filename str] [-ext str][-reload bool][url]", 
 	desc=[[install a texture package, mod or bmax file from url
 /install http://cc.paraengine.com/twiki/pub/CCWeb/Installer/blocktexture_FangKuaiGaiNian_16Bits.zip
 /install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12
@@ -44,6 +44,9 @@ Commands["install"] = {
 
 			elseif(option == "md5" or option == "crc32"  or option == "ext" ) then
 				value, cmd_text = CmdParser.ParseString(cmd_text, fromEntity);
+				options[option] = value;
+			elseif(option == "reload")then
+				value, cmd_text = CmdParser.ParseBool(cmd_text);
 				options[option] = value;
 			else
 				options[option] = true;
@@ -79,28 +82,37 @@ Commands["install"] = {
 			if(url:match("^https?://")) then
 				local filename = options["filename"];
 				local ext = options["ext"] or "bmax";
-				if(ext ~= "bmax" and ext ~= "x" and ext ~= "fbx" and ext ~= "blocks") then
+				if(ext ~= "bmax" and ext ~= "x" and ext ~= "fbx" and ext ~= "blocks" and ext ~= "liveModel") then
 					LOG.std(nil, "warn", "CommandInstall", "unknown file extension %s for %s", ext, filename);
 					return;
 				end
-				if((ext == "blocks" or ext == "blocks.xml" or ext == "template") and not filename:match("%.blocks%.xml$")) then
+				if((ext == "blocks" or ext == "blocks.xml" or ext == "template" or ext == "liveModel") and not filename:match("%.blocks%.xml$")) then
 					filename = filename..".blocks.xml";
 				elseif(not filename:match("%."..ext.."$")) then
 					filename = filename.."."..ext;
 				end
-				filename = "blocktemplates/"..filename;
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-				local dest = Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename))
+				local dest = ""
+				if not filename:match("^onlinestore/") then
+					filename = "blocktemplates/"..filename;
+					dest = Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename))
+				else
+					dest = Files.GetTempPath()..commonlib.Encoding.Utf8ToDefault(filename)
+				end
 				local function TakeBlockModel_(filename)
-					GameLogic.AddBBS("install", format(L"模型已经安装到 %s", filename), 5000, "0 255 0");
-					GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
+					GameLogic.AddBBS("install", format(L"模型已经安装到 %s", filename), 3000, "0 255 0");
+					if ext == "liveModel" then
+						GameLogic.RunCommand(string.format("/take LiveModel {tooltip=%q}", filename));
+					else
+						GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
+					end
 				end
 
 				GameLogic.GetFilters():apply_filters("OnInstallModel", filename, url);
 
 
-				if(ParaIO.DoesFileExist(dest, true)) then
+				if(ParaIO.DoesFileExist(dest, true) and not options["reload"]) then
 					TakeBlockModel_(filename)
 				else
 					NPL.load("(gl)script/ide/System/localserver/factory.lua");
@@ -110,7 +122,7 @@ Commands["install"] = {
 						log("error: failed creating local server resource store \n")
 						return
 					end
-					GameLogic.AddBBS("install", L"正在下载请稍后", 5000, "0 255 0");
+					GameLogic.AddBBS("install", L"正在下载请稍后", 3000, "0 255 0");
 					ls:GetFile(cache_policy, url, function(entry)
 						if(entry and entry.entry and entry.entry.url and entry.payload and entry.payload.cached_filepath) then
 							ParaIO.CreateDirectory(dest);

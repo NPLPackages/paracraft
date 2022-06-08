@@ -190,7 +190,7 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         -- set headers
         local headers = raw_input.headers or {};
         if(tokenRequired)then
-            headers["Authorization"] = string.format("Bearer %s",HttpWrapper.GetToken());
+            headers["Authorization"] = string.format("Bearer %s",HttpWrapper.GetToken() or "");
         end
         input.headers = headers;
 

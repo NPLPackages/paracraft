@@ -27,6 +27,8 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
     local close_bg = "Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png;0 0 22 22";
     if(mode == "lite")then
         window_bg = "Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png;0 0 64 69:26 44 24 22";
+	elseif mode=="lite_opaque" then
+		window_bg = "Texture/Aries/Creator/keepwork/Window/dikuang_opaque_64x69_32bits.png;0 0 64 69:26 44 24 22";
     end
 
 	local w = mcmlNode:GetNumber("width") or (width-left);

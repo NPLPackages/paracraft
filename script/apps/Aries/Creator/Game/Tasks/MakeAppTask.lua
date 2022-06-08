@@ -21,18 +21,54 @@ NPL.load("(gl)script/ide/System/Concurrent/rpc.lua")
 local rpc = commonlib.gettable("System.Concurrent.Async.rpc")
 
 rpc:new():init(
-    "MyCompany.Aries.Game.Tasks.MakeAppThread.MakeApk",
+    "MyCompany.Aries.Game.Tasks.MakeAppThread.AndroidSignApk",
     function(self, msg)
         NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
         local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
-        MakeApp:SignApkThread();
+        MakeApp:AndroidSignApkThread();
 
-        return true 
+        return true;
     end,
     "script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua"
 )
 
+rpc:new():init(
+    "MyCompany.Aries.Game.Tasks.MakeAppThread.AndroidZipAlignApk",
+    function(self, msg)
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
+        local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+        MakeApp:AndroidZipAlignApkThread();
 
+        return true;
+    end,
+    "script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua"
+)
+
+rpc:new():init(
+    "MyCompany.Aries.Game.Tasks.MakeAppThread.AndroidDecodeApk",
+    function(self, msg)
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
+        local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+
+        MakeApp:AndroidDecodeApkThread();
+
+        return true;
+    end,
+    "script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua"
+)
+
+rpc:new():init(
+    "MyCompany.Aries.Game.Tasks.MakeAppThread.AndroidGenerateApk",
+    function(self, msg)
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
+        local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+
+        MakeApp:AndroidGenerateApkThread();
+
+        return true;
+    end,
+    "script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua"
+)
 
 --------- thread part end ---------
 
@@ -52,7 +88,7 @@ MakeApp.mode = {
     UI = 1,
 }
 
-MakeApp.curAndroidVersion = "2.0.19";
+MakeApp.curAndroidVersion = "2.0.20";
 MakeApp.androidBuildRoot = "temp/build_android_resource/";
 MakeApp.iOSBuildRoot = "temp/build_ios_resource/";
 MakeApp.iOSResourceBaseCDN = "https://cdn.keepwork.com/paracraft/ios/";
@@ -183,7 +219,7 @@ function MakeApp:MakeStartupExe()
         file:WriteString("@echo off\n");
         file:WriteString("cd bin\n");
         local worldPath = Files.ResolveFilePath(GameLogic.GetWorldDirectory()).relativeToRootPath or GameLogic.GetWorldDirectory()
-        file:WriteString("start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" world=\"%~dp0data/\"");
+        file:WriteString("start ParaEngineClient.exe noupdate=\"true\" IsAppVersion=\"true\" mc=\"true\" bootstrapper=\"script/apps/Aries/main_loop.lua\" world=\"%~dp0data/\"");
         file:close();
         return true;
     end
@@ -281,7 +317,7 @@ function MakeApp:MakeZipInstaller()
         end
         ]]
     end)
-    
+
     local zipfile = self:GetZipFile();
     ParaIO.DeleteFile(zipfile)
     local writer = ParaIO.CreateZip(zipfile,"");
@@ -300,34 +336,34 @@ function MakeApp:MakeZipInstaller()
 end
 
 -- android
-function MakeApp:SignApk(callback)
-    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在签名APK，请稍候...", 120000, nil, 350);
+function MakeApp:AndroidDecodeApk(callback)
+    if not callback or type(callback) ~= "function" then
+        return
+    end
 
-    MyCompany.Aries.Game.Tasks.MakeAppThread.MakeApk(
-        "(worker_sign_apk)",
+    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在解压APK，请稍候...", 120000, nil, 350);
+
+    MyCompany.Aries.Game.Tasks.MakeAppThread.AndroidDecodeApk(
+        "(worker_android_decode_apk)",
         {},
         function(err, msg)
             GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
 
-            _guihelper.MessageBox(L"APK已生成(" .. self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_pack.apk)");
-
-            ParaIO.DeleteFile("temp/worker_sign_apk_temp.bat");
+            ParaIO.DeleteFile("temp/worker_android_decode_apk_temp.bat");
             ParaIO.DeleteFile("temp/main_temp.bat");
 
-            Map3DSystem.App.Commands.Call("File.WinExplorer", {filepath = self.androidBuildRoot, silentmode = true});
-
-            if callback and type(callback) == "function" then
-                callback();
-            end
+            callback()
         end
     )
 end
 
-function MakeApp:SignApkThread()
+function MakeApp:AndroidDecodeApkThread()
     System.os.run(
-        "temp\\build_android_resource\\jre-windows\\bin\\jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore " ..
-        self.androidBuildRoot .. "personal-key.keystore -storepass paracraft " ..
-        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_pack.apk paracraft");
+        "temp\\build_android_resource\\jre-windows\\bin\\java -jar " ..
+        self.androidBuildRoot .. "apktool.jar d " ..
+        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. ".apk -o " ..
+        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion
+    );
 end
 
 function MakeApp:AndroidDownloadApk(callback)
@@ -339,165 +375,140 @@ function MakeApp:AndroidDownloadApk(callback)
     GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在获取基础文件，请稍候...", 120000, nil, 350);
 
     local apkFile = self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. ".apk";
-    local zipFile = self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. ".zip";
 
-    commonlib.TimerManager.SetTimeout(function()
-        fileDownloader:Init("paracraft.apk", apkUrl, apkFile, function(result)
-            if (result) then
-                fileDownloader:DeleteCacheFile();
-                ParaIO.MoveFile(apkFile, zipFile);
-
-                ParaIO.DeleteFile(self.androidBuildRoot .. "version.txt");
-
-                local writeFile = ParaIO.open(self.androidBuildRoot .. "version.txt", "w");
-
-                if (writeFile:IsValid()) then
-                    writeFile:write(self.curAndroidVersion, #self.curAndroidVersion);
-                    writeFile:close();
-                    MakeApp.localAndroidVersion = self.curAndroidVersion;
+    if (not ParaIO.DoesFileExist(apkFile)) then
+        commonlib.TimerManager.SetTimeout(function()
+            fileDownloader:Init("paracraft.apk", apkUrl, apkFile, function(result)
+                if (result) then
+                    fileDownloader:DeleteCacheFile();
+    
+                    ParaIO.DeleteFile(self.androidBuildRoot .. "version.txt");
+    
+                    local writeFile = ParaIO.open(self.androidBuildRoot .. "version.txt", "w");
+    
+                    if (writeFile:IsValid()) then
+                        writeFile:write(self.curAndroidVersion, #self.curAndroidVersion);
+                        writeFile:close();
+                        MakeApp.localAndroidVersion = self.curAndroidVersion;
+                    end
+    
+                    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+    
+                    if (callback and type(callback) == "function") then
+                        callback();
+                    end
                 end
-
-                GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
-
-                if (callback and type(callback) == "function") then
-                    callback();
-                end
-            end
-        end)
-    end, 500);
+            end)
+        end, 500);
+    else
+        callback()
+    end
 end
 
 function MakeApp:AndroidUpdateManifest(callback)
-    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在更新Manifest，请稍候...", 120000, nil, 350);
-    local function handle()
-        System.os.run(
-            "temp\\build_android_resource\\jre-windows\\bin\\java -jar " ..
-            self.androidBuildRoot .. "xml2axml.jar d " ..
-            self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/AndroidManifest.xml " ..
-            self.androidBuildRoot .. "AndroidManifest-decode.xml\n");
-
-        local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
-        local fileRead = ParaIO.open(self.androidBuildRoot .. "AndroidManifest-decode.xml", "r");
-        local content = "";
-        local appName = ""
-
-        if (currentEnterWorld.name and type(currentEnterWorld.name) == "string") then
-            appName = currentEnterWorld.name;
-        else
-            appName = currentEnterWorld.foldername;
-        end
-
-        if (fileRead:IsValid()) then
-            local line = "";
-
-            while (line) do
-                line = fileRead:readline();
-
-                if (line) then
-                    local mLine = string.match(line, "(.+android:label%=)%\"");
-
-                    if (mLine) then
-                        content = content .. mLine .. "\"" .. appName .. "\"\n";
-                    else
-                        local pLine = string.match(line, "(.+package%=)%\"");
-
-                        if (pLine) then
-                            content = content .. pLine .. "\"com.paraengine.paracraft.world.c" .. Encoding.crc32(currentEnterWorld.foldername) .. "\"\n" ;
-                        else
-                            content = content .. line .. "\n";
-                        end
-                    end
-                end
-            end
-
-            fileRead:close();
-        end
-
-        local writeFile = ParaIO.open(self.androidBuildRoot .. "AndroidManifest-decode.xml", "w");
-
-        if (writeFile:IsValid()) then
-            writeFile:write(content, #content);
-            writeFile:close();
-        end
-
-        System.os.run(
-            "temp\\build_android_resource\\jre-windows\\bin\\java -jar " ..
-            self.androidBuildRoot .. "xml2axml.jar e " ..
-            self.androidBuildRoot .. "AndroidManifest-decode.xml " ..
-            self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/AndroidManifest.xml\n");
-
-        ParaIO.DeleteFile(self.androidBuildRoot .. "AndroidManifest-decode.xml");
-
-        GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
-
-        if (callback and type(callback) == "function") then
-            callback();
-        end
+    if (not callback or type(callback) ~= "function") then
+        return
     end
-
-    if (ParaIO.DoesFileExist(self.androidBuildRoot .. "xml2axml.jar")) then
-        handle();
-    else
-        local xml2axmlUrl = "https://cdn.keepwork.com/paracraft/android/xml2axml.jar";
-
-        local fileDownloader = FileDownloader:new();
-        fileDownloader.isSilent = true;
-
-        fileDownloader:Init("xml2axml.jar", xml2axmlUrl, self.androidBuildRoot .. "xml2axml.jar", function(result)
-            if (result) then
-                handle();
-            end
-        end)
-    end
-end
-
-function MakeApp:AndroidUnzipApk(callback)
-    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在解压，请稍候...", 120000, nil, 350);
 
     GameLogic.GetFilters():apply_filters(
-        "service.local_service.move_zip_to_folder",
-        self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/",
-        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. ".zip",
-        function()
-            -- Delete META-INF
-            ParaIO.DeleteFile(self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/META-INF/");
+        "cellar.common.msg_box.show",
+        L"正在更新Manifest，请稍候...",
+        120000,
+        nil,
+        350
+    );
 
-            -- Add bat tools
-            local testAssetsWin32BatPath = self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/assets/test_assets_win32.bat";
-            local removeUserDataBatPath = self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/assets/remove_user_data.bat";
+    local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
+    local fileRead = ParaIO.open(self.androidBuildRoot .. "paracraft_ver2.0.20/AndroidManifest.xml", "r");
+    local content = "";
+    local appName = "";
 
-            local testAssetsWin32BatFile = ParaIO.open(testAssetsWin32BatPath, "w");
+    if (currentEnterWorld.name and type(currentEnterWorld.name) == "string") then
+        appName = currentEnterWorld.name;
+    else
+        appName = currentEnterWorld.foldername;
+    end
 
-            if (testAssetsWin32BatFile:IsValid()) then
-                local content = "@echo off\n" ..
-                                "start %~dp0\\..\\..\\..\\..\\ParaEngineClient.exe single=\"false\" httpdebug=\"true\" debug=\"main\" mc=\"true\" IsTouchDevice=\"true\"";
+    if (fileRead:IsValid()) then
+        local line = "";
 
-                testAssetsWin32BatFile:write(content, #content);
-                testAssetsWin32BatFile:close();
+        while (line) do
+            line = fileRead:readline();
+
+            if (line) then
+                if (string.match(line,  "(.+package%=)%\"")) then
+                    local packageName = string.match(line, ".+package%=%\"([a-z.]+)%\"")
+                    local newPackageName = "com.paraengine.paracraft.world.c" .. Encoding.crc32(currentEnterWorld.foldername)
+
+                    if (packageName) then
+                        line = line:gsub(packageName, newPackageName)
+                    end
+
+                    content = content .. line .. "\n";
+                elseif (string.match(line, "(.+android:label%=)%\"")) then
+                    local labelName = string.match(line, ".+android%:label%=%\"([a-z.@/_]+)%\"")
+                    local newLabelName = appName
+
+                    if (labelName) then
+                        line = line:gsub(labelName, newLabelName)
+                    end
+
+                    content = content .. line .. "\n";
+                else
+                    content = content .. line .. "\n";
+                end
             end
+        end
 
-            local removeUserDataBatFile = ParaIO.open(removeUserDataBatPath, "w");
+        fileRead:close();
+    end
 
-            if (removeUserDataBatFile:IsValid()) then
-                local content = "@echo off\n" ..
-                                "rd /s /q _emptyworld \"temp\tempdatabase\" \"Screen Shots\"\n" ..
-                                "del log.txt Database\\creator_profile.db Database\\localserver.db Database\\localserver.ver Database\\userdata.db";
+    local writeFile = ParaIO.open(self.androidBuildRoot .. "paracraft_ver2.0.20/AndroidManifest.xml", "w");
 
-                removeUserDataBatFile:write(content, #content);
-                removeUserDataBatFile:close();
-            end
+    if (writeFile:IsValid()) then
+        writeFile:write(content, #content);
+        writeFile:close();
+    end
 
+    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+    callback();
+end
+
+function MakeApp:AndroidGenerateApk(callback)
+    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在生成APK，请稍候...", 120000, nil, 350);
+
+    MyCompany.Aries.Game.Tasks.MakeAppThread.AndroidGenerateApk(
+        "(worker_android_generate_apk)",
+        {},
+        function(err, msg)
             GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
 
-            if (callback and type(callback) == "function") then
-                callback();
-            end
+            ParaIO.DeleteFile("temp/worker_android_generate_apk_temp.bat");
+            ParaIO.DeleteFile("temp/main_temp.bat");
+
+            callback();
         end
     )
 end
 
+function MakeApp:AndroidGenerateApkThread()
+    System.os.run(
+        "temp\\build_android_resource\\jre-windows\\bin\\java -jar " ..
+        self.androidBuildRoot .. "apktool.jar b " ..
+        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. " -o " ..
+        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_build_temp.apk"
+    );
+end
+
 function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, beAutoUpdateWorld, loginEnable, callback)
-    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在拷贝世界，请稍候...", 120000, nil, 350);
+    GameLogic.GetFilters():apply_filters(
+        "cellar.common.msg_box.show",
+        L"正在拷贝世界，请稍候...",
+        120000,
+        nil,
+        350
+    );
+
     local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
 
     if (currentEnterWorld and type(currentEnterWorld) == "table") then
@@ -515,49 +526,56 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, beAutoUpdateWorld, log
 
                     ParaIO.CreateDirectory(self.androidBuildRoot .. "backup/");
 
-                    local drawableHdpiV4IconPath = self.androidBuildRoot ..
-                                                   "paracraft_android_ver" .. self.curAndroidVersion ..
-                                                   "/res/drawable-hdpi-v4/ic_launcher.png";
-                    local drawableXhdpiV4IconPath = self.androidBuildRoot ..
-                                                   "paracraft_android_ver" .. self.curAndroidVersion ..
-                                                   "/res/drawable-xhdpi-v4/ic_launcher.png";
-                    local drawableXxhdpiV4IconPath = self.androidBuildRoot ..
-                                                   "paracraft_android_ver" .. self.curAndroidVersion ..
-                                                   "/res/drawable-xxhdpi-v4/ic_launcher.png";
+                    local drawableHdpiIconPath =
+                        self.androidBuildRoot ..
+                        "paracraft_ver" .. self.curAndroidVersion ..
+                        "/res/drawable-hdpi/ic_launcher.png";
+                    local drawableXhdpiIconPath =
+                        self.androidBuildRoot ..
+                        "paracraft_ver" .. self.curAndroidVersion ..
+                        "/res/drawable-xhdpi/ic_launcher.png";
+                    local drawableXxhdpiIconPath =
+                        self.androidBuildRoot ..
+                        "paracraft_ver" .. self.curAndroidVersion ..
+                        "/res/drawable-xxhdpi/ic_launcher.png";
 
-                    local drawableHdpiV4BackupIconPath = self.androidBuildRoot .. "backup/drawable_hdpi_v4_icon.png";
-                    local drawableXhdpiV4BackupIconPath = self.androidBuildRoot .. "backup/drawable_xhdpi_v4_icon.png";
-                    local drawableXxhdpiV4BackupIconPath = self.androidBuildRoot .. "backup/drawable_xxhdpi_v4_icon.png";
+                    local drawableHdpiBackupIconPath = self.androidBuildRoot .. "backup/drawable_hdpi_icon.png";
+                    local drawableXhdpiBackupIconPath = self.androidBuildRoot .. "backup/drawable_xhdpi_icon.png";
+                    local drawableXxhdpiBackupIconPath = self.androidBuildRoot .. "backup/drawable_xxhdpi_icon.png";
 
-                    if (not ParaIO.DoesFileExist(drawableHdpiV4BackupIconPath)) then
-                        ParaIO.CopyFile(drawableHdpiV4IconPath, drawableHdpiV4BackupIconPath, true);
+                    if (not ParaIO.DoesFileExist(drawableHdpiBackupIconPath)) then
+                        ParaIO.CopyFile(drawableHdpiIconPath, drawableHdpiV4BackupIconPath, true);
                     end
 
-                    if (not ParaIO.DoesFileExist(drawableXhdpiV4BackupIconPath)) then
-                        ParaIO.CopyFile(drawableXhdpiV4IconPath, drawableXhdpiV4BackupIconPath, true);
+                    if (not ParaIO.DoesFileExist(drawableXhdpiBackupIconPath)) then
+                        ParaIO.CopyFile(drawableXhdpiIconPath, drawableXhdpiV4BackupIconPath, true);
                     end
 
-                    if (not ParaIO.DoesFileExist(drawableXxhdpiV4BackupIconPath)) then
-                        ParaIO.CopyFile(drawableXxhdpiV4IconPath, drawableXxhdpiV4BackupIconPath, true);
+                    if (not ParaIO.DoesFileExist(drawableXxhdpiBackupIconPath)) then
+                        ParaIO.CopyFile(drawableXxhdpiIconPath, drawableXxhdpiV4BackupIconPath, true);
                     end
 
-                    ParaIO.CopyFile(worldIcon, drawableHdpiV4IconPath, true);
-                    ParaIO.CopyFile(worldIcon, drawableXhdpiV4IconPath, true);
-                    ParaIO.CopyFile(worldIcon, drawableXxhdpiV4IconPath, true);
+                    ParaIO.CopyFile(worldIcon, drawableHdpiIconPath, true);
+                    ParaIO.CopyFile(worldIcon, drawableXhdpiIconPath, true);
+                    ParaIO.CopyFile(worldIcon, drawableXxhdpiIconPath, true);
 
                     break;
                 end
             end
     
-            local apkWorldPath = self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/assets/worlds/DesignHouse/" ..
-                                 commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/" ..
-                                 commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
+            local apkWorldPath =
+                self.androidBuildRoot ..
+                "paracraft_ver" ..
+                self.curAndroidVersion ..
+                "/assets/worlds/DesignHouse/" ..
+                commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/" ..
+                commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
 
             ParaIO.CreateDirectory(apkWorldPath);
 
             for key, item in ipairs(fileList) do
                 local relativePath = commonlib.Encoding.Utf8ToDefault(item.filename);
-    
+
                 if item.filesize == 0 then
                     local folderPath = apkWorldPath .. relativePath .. "/";
     
@@ -569,18 +587,33 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, beAutoUpdateWorld, log
                 end
             end
 
-            local apkWorldPath1 = self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/assets/worlds/DesignHouse/" ..
-                                 commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
+            local apkWorldPath1 =
+                self.androidBuildRoot ..
+                "paracraft_ver" ..
+                self.curAndroidVersion ..
+                "/assets/worlds/DesignHouse/" ..
+                commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
 
             GameLogic.GetFilters():apply_filters(
                 "service.local_service.move_folder_to_zip",
                 apkWorldPath1,
-                self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/assets/worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. ".zip",
+                self.androidBuildRoot ..
+                "paracraft_ver" ..
+                self.curAndroidVersion ..
+                "/assets/worlds/DesignHouse/" ..
+                commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. ".zip",
                 function()
                     GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
 
                     -- update config.txt file
-                    local writeFile = ParaIO.open(self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/assets/config.txt", "w");
+                    local writeFile =
+                        ParaIO.open(
+                            self.androidBuildRoot ..
+                            "paracraft_ver" ..
+                            self.curAndroidVersion ..
+                            "/assets/config.txt",
+                            "w"
+                        );
 
                     if (writeFile:IsValid()) then
                         local content = 
@@ -612,7 +645,13 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, beAutoUpdateWorld, log
             )
         else
             -- copy world
-            local fileList = GameLogic.GetFilters():apply_filters("service.local_service.load_files", currentEnterWorld.worldpath, true, true);
+            local fileList =
+                GameLogic.GetFilters():apply_filters(
+                    "service.local_service.load_files",
+                    currentEnterWorld.worldpath,
+                    true,
+                    true
+                );
     
             if not fileList or type(fileList) ~= "table" or #fileList == 0 then
                 return;
@@ -624,61 +663,70 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, beAutoUpdateWorld, log
 
                     ParaIO.CreateDirectory(self.androidBuildRoot .. "backup/");
 
-                    local drawableHdpiV4IconPath = self.androidBuildRoot ..
-                                                   "paracraft_android_ver" .. self.curAndroidVersion ..
-                                                   "/res/drawable-hdpi-v4/ic_launcher.png";
-                    local drawableXhdpiV4IconPath = self.androidBuildRoot ..
-                                                   "paracraft_android_ver" .. self.curAndroidVersion ..
-                                                   "/res/drawable-xhdpi-v4/ic_launcher.png";
-                    local drawableXxhdpiV4IconPath = self.androidBuildRoot ..
-                                                   "paracraft_android_ver" .. self.curAndroidVersion ..
-                                                   "/res/drawable-xxhdpi-v4/ic_launcher.png";
+                    local drawableHdpiIconPath =
+                        self.androidBuildRoot ..
+                        "paracraft_ver" ..
+                        self.curAndroidVersion ..
+                        "/res/drawable-hdpi/ic_launcher.png";
+                    local drawableXhdpiIconPath =
+                        self.androidBuildRoot ..
+                        "paracraft_ver" .. self.curAndroidVersion ..
+                        "/res/drawable-xhdpi/ic_launcher.png";
+                    local drawableXxhdpiIconPath =
+                        self.androidBuildRoot ..
+                        "paracraft_ver" ..
+                        self.curAndroidVersion ..
+                        "/res/drawable-xxhdpi/ic_launcher.png";
 
-                    local drawableHdpiV4BackupIconPath = self.androidBuildRoot .. "backup/drawable_hdpi_v4_icon.png";
-                    local drawableXhdpiV4BackupIconPath = self.androidBuildRoot .. "backup/drawable_xhdpi_v4_icon.png";
-                    local drawableXxhdpiV4BackupIconPath = self.androidBuildRoot .. "backup/drawable_xxhdpi_v4_icon.png";
+                    local drawableHdpiBackupIconPath = self.androidBuildRoot .. "backup/drawable_hdpi_icon.png";
+                    local drawableXhdpiBackupIconPath = self.androidBuildRoot .. "backup/drawable_xhdpi_icon.png";
+                    local drawableXxhdpiBackupIconPath = self.androidBuildRoot .. "backup/drawable_xxhdpi_icon.png";
 
-                    if (not ParaIO.DoesFileExist(drawableHdpiV4BackupIconPath)) then
-                        ParaIO.CopyFile(drawableHdpiV4IconPath, drawableHdpiV4BackupIconPath, true);
+                    if (not ParaIO.DoesFileExist(drawableHdpiBackupIconPath)) then
+                        ParaIO.CopyFile(drawableHdpiIconPath, drawableHdpiBackupIconPath, true);
                     end
 
-                    if (not ParaIO.DoesFileExist(drawableXhdpiV4BackupIconPath)) then
-                        ParaIO.CopyFile(drawableXhdpiV4IconPath, drawableXhdpiV4BackupIconPath, true);
+                    if (not ParaIO.DoesFileExist(drawableXhdpiBackupIconPath)) then
+                        ParaIO.CopyFile(drawableXhdpiIconPath, drawableXhdpiBackupIconPath, true);
                     end
 
-                    if (not ParaIO.DoesFileExist(drawableXxhdpiV4BackupIconPath)) then
-                        ParaIO.CopyFile(drawableXxhdpiV4IconPath, drawableXxhdpiV4BackupIconPath, true);
+                    if (not ParaIO.DoesFileExist(drawableXxhdpiBackupIconPath)) then
+                        ParaIO.CopyFile(drawableXxhdpiIconPath, drawableXxhdpiBackupIconPath, true);
                     end
 
-                    ParaIO.CopyFile(worldIcon, drawableHdpiV4IconPath, true);
-                    ParaIO.CopyFile(worldIcon, drawableXhdpiV4IconPath, true);
-                    ParaIO.CopyFile(worldIcon, drawableXxhdpiV4IconPath, true);
+                    ParaIO.CopyFile(worldIcon, drawableHdpiIconPath, true);
+                    ParaIO.CopyFile(worldIcon, drawableXhdpiIconPath, true);
+                    ParaIO.CopyFile(worldIcon, drawableXxhdpiIconPath, true);
 
                     break;
                 end
             end
-    
-            local apkWorldPath = self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/assets/worlds/DesignHouse/" ..
-                                 commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
-    
+
+            local apkWorldPath =
+                self.androidBuildRoot ..
+                "paracraft_ver" ..
+                self.curAndroidVersion ..
+                "/assets/worlds/DesignHouse/" ..
+                commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) .. "/";
+
             ParaIO.CreateDirectory(apkWorldPath);
-    
+
             for key, item in ipairs(fileList) do
                 local relativePath = commonlib.Encoding.Utf8ToDefault(item.filename);
-    
+
                 if item.filesize == 0 then
                     local folderPath = apkWorldPath .. relativePath .. "/";
-    
+
                     ParaIO.CreateDirectory(folderPath);
                 else
                     local filePath = apkWorldPath .. relativePath;
-    
+
                     ParaIO.CopyFile(item.file_path, filePath, true);
                 end
             end
     
             -- update config.txt file
-            local writeFile = ParaIO.open(self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .."/assets/config.txt", "w");
+            local writeFile = ParaIO.open(self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .."/assets/config.txt", "w");
     
             if (writeFile:IsValid()) then
                 local content = 
@@ -710,74 +758,126 @@ function MakeApp:AndroidCopyWorld(compress, beAutoUpdate, beAutoUpdateWorld, log
     end
 end
 
-function MakeApp:AndroidGenerateApk(callback)
-    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在打包，请稍候...", 120000, nil, 350);
+function MakeApp:AndroidDownloadTools(callback)
+    if not callback or type(callback) ~= "function" then
+        return;
+    end
 
-    ParaIO.DeleteFile(self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_pack.apk");
+    local host = "https://cdn.keepwork.com/paracraft/android"
 
-    GameLogic.GetFilters():apply_filters(
-        "service.local_service.move_folder_to_zip",
-        self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/",
-        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_pack.apk",
-        function()
-            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
-
-            if (callback and type(callback) == "function") then
-                callback();
-            end
-        end
-    );
-end
-
-function MakeApp:AndroidDownloadJre(callback)
-    if (not ParaIO.DoesFileExist(self.androidBuildRoot .. "jre-windows/")) then
-        local jreTool = "https://cdn.keepwork.com/paracraft/android/jre-windows.zip";
-
-        local fileDownloader = FileDownloader:new();
-        fileDownloader.isSilent = true;
-
-        GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在获取Jre Runtime，请稍候...", 120000, nil, 400)
-        commonlib.TimerManager.SetTimeout(function()
-            fileDownloader:Init("jre-windows.zip", jreTool, self.androidBuildRoot .. "jre-windows.zip", function(result)
-                if (result) then
-                    fileDownloader:DeleteCacheFile();
-
-                    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
-                    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在解压Jre Runtime，请稍候...", 120000, nil, 400);
-
-                    GameLogic.GetFilters():apply_filters(
-                        "service.local_service.move_zip_to_folder",
-                        self.androidBuildRoot .. "jre-windows/",
-                        self.androidBuildRoot .. "jre-windows.zip",
-                        function()
-                            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
-
-                            if callback and type(callback) == "function" then
-                                callback();
+    local function downloadJre(callback)
+        if (not ParaIO.DoesFileExist(self.androidBuildRoot .. "jre-windows/")) then
+            local jreTool = host .. "/jre-windows.zip";
+    
+            local fileDownloader = FileDownloader:new();
+            fileDownloader.isSilent = true;
+    
+            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在获取Jre Runtime，请稍候...", 120000, nil, 400)
+            commonlib.TimerManager.SetTimeout(function()
+                fileDownloader:Init("jre-windows.zip", jreTool, self.androidBuildRoot .. "jre-windows.zip", function(result)
+                    if (result) then
+                        fileDownloader:DeleteCacheFile();
+    
+                        GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+                        GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在解压Jre Runtime，请稍候...", 120000, nil, 400);
+    
+                        GameLogic.GetFilters():apply_filters(
+                            "service.local_service.move_zip_to_folder",
+                            self.androidBuildRoot .. "jre-windows/",
+                            self.androidBuildRoot .. "jre-windows.zip",
+                            function()
+                                GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+    
+                                callback()
                             end
-                        end
-                    )
-                end
-            end)
-        end, 500)
-    else
-        if callback and type(callback) == "function" then
+                        )
+                    end
+                end)
+            end, 500)
+        else
             callback()
         end
     end
-end
-
-function MakeApp:AndroidSignApk(callback)
-    if (not ParaIO.DoesFileExist(self.androidBuildRoot .. "personal-key.keystore")) then
-        local function downloadLicense(downloadCallback)
-            local jreTool = "https://cdn.keepwork.com/paracraft/android/personal-key.keystore";
+    
+    local function downloadApkTool(callback)
+        if (not ParaIO.DoesFileExist(self.androidBuildRoot .. "apktool.jar")) then
+            local apkTool = host .. "/apktool.jar"
 
             local fileDownloader = FileDownloader:new();
             fileDownloader.isSilent = true;
 
-            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在获取Certification，请稍候...", 120000, nil, 400)
+            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在获取ApkTool，请稍候...", 120000, nil, 400)
             commonlib.TimerManager.SetTimeout(function()
-                fileDownloader:Init("personal-key.keystore", jreTool, self.androidBuildRoot .. "personal-key.keystore", function(result)
+                fileDownloader:Init("apktool.jar", apkTool, self.androidBuildRoot .. "apktool.jar", function(result)
+                    if (result) then
+                        fileDownloader:DeleteCacheFile();
+
+                        GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+
+                        callback()
+                    end
+                end)
+            end, 500)
+        else
+            callback()
+        end
+    end
+
+    local function downloadAndroidSDKBuildTool(callback)
+        if (not ParaIO.DoesFileExist(self.androidBuildRoot .. "android-sdk-build-tools-32.0.0/")) then
+            local androidSDKBuildTool = host .. "/android-sdk-build-tools-32.0.0.zip"
+
+            local fileDownloader = FileDownloader:new();
+            fileDownloader.isSilent = true;
+
+            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在获取Android SDK Build Tool，请稍候...", 120000, nil, 400)
+            commonlib.TimerManager.SetTimeout(function()
+                fileDownloader:Init("android-sdk-build-tools-32.0.0.zip", androidSDKBuildTool, self.androidBuildRoot .. "android-sdk-build-tools-32.0.0.zip", function(result)
+                    if (result) then
+                        fileDownloader:DeleteCacheFile();
+    
+                        GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+                        GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在解压Android SDK Build Tool，请稍候...", 120000, nil, 400);
+    
+                        GameLogic.GetFilters():apply_filters(
+                            "service.local_service.move_zip_to_folder",
+                            self.androidBuildRoot .. "android-sdk-build-tools-32.0.0/",
+                            self.androidBuildRoot .. "android-sdk-build-tools-32.0.0.zip",
+                            function()
+                                GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+    
+                                callback()
+                            end
+                        )
+                    end
+                end)
+            end, 500)
+        else
+            callback()
+        end
+    end
+
+    downloadJre(function()
+        downloadApkTool(function()
+            downloadAndroidSDKBuildTool(function()
+                callback()
+            end)
+        end)
+    end)
+end
+
+function MakeApp:AndroidSignApkWrapper(callback)
+    if (not ParaIO.DoesFileExist(self.androidBuildRoot .. "personal-key.keystore")) then
+        local function downloadLicense(downloadCallback)
+            local keystore = "https://cdn.keepwork.com/paracraft/android/personal-key.keystore";
+
+            local fileDownloader = FileDownloader:new();
+            fileDownloader.isSilent = true;
+
+            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在获取Certification，请稍候...", 120000, nil, 400);
+
+            commonlib.TimerManager.SetTimeout(function()
+                fileDownloader:Init("personal-key.keystore", keystore, self.androidBuildRoot .. "personal-key.keystore", function(result)
                     if (result) then
                         fileDownloader:DeleteCacheFile();
     
@@ -792,11 +892,81 @@ function MakeApp:AndroidSignApk(callback)
         end
 
         downloadLicense(function()
-            self:SignApk(callback)
+            self:AndroidZipAlignApk(function()
+                self:AndroidSignApk(callback)
+            end)
         end)
     else
-        self:SignApk(callback)
+        self:AndroidZipAlignApk(function()
+            self:AndroidSignApk(callback)
+        end)
     end
+end
+
+function MakeApp:AndroidZipAlignApk(callback)
+    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在对齐APK，请稍候...", 120000, nil, 350);
+
+    MyCompany.Aries.Game.Tasks.MakeAppThread.AndroidZipAlignApk(
+        "(worker_android_zip_align_apk)",
+        {},
+        function(err, msg)
+            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+
+            ParaIO.DeleteFile("temp/worker_android_zip_align_apk_temp.bat");
+            ParaIO.DeleteFile("temp/main_temp.bat");
+
+            if callback and type(callback) == "function" then
+                callback();
+            end
+        end
+    )
+end
+
+function MakeApp:AndroidZipAlignApkThread()
+    System.os.run(
+        "temp\\build_android_resource\\android-sdk-build-tools-32.0.0\\32.0.0\\zipalign.exe -p -f -v 4 " ..
+        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_build_temp.apk " ..
+        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_align_temp.apk"
+    );
+
+    ParaIO.DeleteFile(self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_build_temp.apk");
+end
+
+function MakeApp:AndroidSignApk(callback)
+    GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在签名APK，请稍候...", 120000, nil, 350);
+
+    MyCompany.Aries.Game.Tasks.MakeAppThread.AndroidSignApk(
+        "(worker_android_sign_apk)",
+        {},
+        function(err, msg)
+            GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
+
+            _guihelper.MessageBox(L"APK已生成(" .. self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_pack.apk)");
+
+            ParaIO.DeleteFile("temp/worker_android_sign_apk_temp.bat");
+            ParaIO.DeleteFile("temp/main_temp.bat");
+
+            Map3DSystem.App.Commands.Call("File.WinExplorer", {filepath = self.androidBuildRoot, silentmode = true});
+
+            if callback and type(callback) == "function" then
+                callback();
+            end
+        end
+    )
+end
+
+function MakeApp:AndroidSignApkThread()
+    System.os.run(
+        "temp\\build_android_resource\\jre-windows\\bin\\java -jar " ..
+        "temp\\build_android_resource\\android-sdk-build-tools-32.0.0\\32.0.0\\lib\\apksigner.jar sign -ks " ..
+        self.androidBuildRoot .. "personal-key.keystore " ..
+        "--ks-key-alias paracraft " ..
+        "--ks-pass pass:paracraft " ..
+        "--out " .. self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_pack.apk " ..
+        self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_align_temp.apk"
+    );
+
+    ParaIO.DeleteFile(self.androidBuildRoot .. "paracraft_ver" .. self.curAndroidVersion .. "_align_temp.apk");
 end
 
 function MakeApp:AndroidClean(callback)
@@ -817,19 +987,21 @@ function MakeApp:AndroidZip()
     ParaIO.CreateDirectory(self.androidBuildRoot);
 
     if ParaIO.DoesFileExist(self.androidBuildRoot .. "paracraft_android_ver" .. self.curAndroidVersion .. "/") then
-        self:AndroidDownloadJre(function()
-            self:AndroidUpdateManifest(function()
-                self:AndroidCopyWorld(false, false, false, false, function()	
-                    self:AndroidGenerateApk(function()
-                        self:AndroidSignApk()
+        self:AndroidDownloadTools(function()
+            self:AndroidDecodeApk(function()
+                self:AndroidUpdateManifest(function()
+                    self:AndroidCopyWorld(false, false, false, false, function()	
+                        self:AndroidGenerateApk(function()
+                            self:AndroidSignApk()
+                        end)
                     end)
                 end)
             end)
         end)
     else
         self:AndroidDownloadApk(function()
-            self:AndroidUnzipApk(function()
-                self:AndroidDownloadJre(function()
+            self:AndroidDownloadTools(function()
+                self:AndroidDecodeApk(function()
                     self:AndroidUpdateManifest(function()
                         self:AndroidCopyWorld(false, false, false, false, function()	
                             self:AndroidGenerateApk(function()

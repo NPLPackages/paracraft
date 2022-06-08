@@ -350,28 +350,10 @@ function TouchMiniKeyboard:OnTouch(touch)
 		if(keydownBtn and touch_session:IsDragging()) then
 			
 			if keydownBtn.name == "W" or keydownBtn.name == "A" or keydownBtn.name == "S" or keydownBtn.name == "D" then
-				if self.cur_move_state == nil then
-					local state = ""
-					for k, v in pairs(TouchMiniKeyboard.DirectionKey) do
-						if #v== 1 and keydownBtn.name == v[1] then
-							state = k
-							break
-						end
-					end
-					self.cur_move_state = state
-					local key_name_list = TouchMiniKeyboard.DirectionKey[self.cur_move_state]
-					self:SetKeyListState(key_name_list, true)
-				else
-					local x = touch.x - self.left;
-					local y = touch.y - self.top;
-					local center_item = self:GetCenterItem()
-					local center_pos = {center_item.pos_x + center_item.width/2, center_item.pos_y + center_item.height/2}
-					self:ChangeMoveState(x, y, center_pos)
-				end
-				self:RefreshRocker(touch.x, touch.y)
-				
+				self:SrtartRockerMove(touch, keydownBtn)
 				return
 			end
+
 			keydownBtn.isDragged = true;
 			local dx, dy = touch_session:GetOffsetFromStartLocation();
 
@@ -1538,4 +1520,36 @@ function TouchMiniKeyboard:SetKeyboardMod()
 	
 	self:HideRockerAndShowKey()
 	TouchMiniRightKeyboard.GetSingleton():Show(true)
+end
+
+function TouchMiniKeyboard:SrtartRockerMove(touch, keydownBtn)
+	local x = touch.x - self.left;
+	local y = touch.y - self.top;
+	local center_item = self:GetCenterItem()
+	local center_pos = {center_item.pos_x + center_item.width/2, center_item.pos_y + center_item.height/2}
+
+	-- 判断距离
+	local target_distance = (x - (center_pos[1] - 12)) ^ 2 + (y - center_pos[2]) ^ 2
+	if target_distance < 52 ^ 2 then
+		self:SetKeyState(keydownBtn, false)
+		self:StopMoveState()
+		self:RefreshRocker(touch.x, touch.y)
+		return
+	end
+
+	if self.cur_move_state == nil then
+		local state = ""
+		for k, v in pairs(TouchMiniKeyboard.DirectionKey) do
+			if #v== 1 and keydownBtn.name == v[1] then
+				state = k
+				break
+			end
+		end
+		self.cur_move_state = state
+		local key_name_list = TouchMiniKeyboard.DirectionKey[self.cur_move_state]
+		self:SetKeyListState(key_name_list, true)
+	else
+		self:ChangeMoveState(x, y, center_pos)
+	end
+	self:RefreshRocker(touch.x, touch.y)
 end

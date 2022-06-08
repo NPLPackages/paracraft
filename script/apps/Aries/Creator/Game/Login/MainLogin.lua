@@ -13,7 +13,8 @@ MyCompany.Aries.Game.MainLogin:start();
 ]]
 
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ParacraftDebug.lua");--收集报错信息，早发现，早治疗
+local ParacraftDebug = commonlib.gettable("MyCompany.Aries.Game.Common.ParacraftDebug");
 -- create class
 local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
 
@@ -122,6 +123,7 @@ function MainLogin:next_step(state_update)
 		end
 		NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 		self:next_step({IsInitFuncCalled = true});
+		ParacraftDebug:CheckSendCrashLog() --去检查有没有之前崩溃时备份的日志文件
 	elseif(not state.IsPackagesLoaded) then
 		self:Invoke_handler("LoadPackages");
 	elseif(not state.CheckGraphicsSettings) then
@@ -160,6 +162,7 @@ function MainLogin:next_step(state_update)
 end
 
 function MainLogin:UpdateCoreClient()
+
 	self:checkAutoConnectTeacher()
 	local platform = System.os.GetPlatform();
 
@@ -167,7 +170,57 @@ function MainLogin:UpdateCoreClient()
 	local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
 
 	local testCoreClient = false;
-	if (not testCoreClient and platform == "win32" and not System.os.IsWindowsXP()) and System.options.channelId~="430" then
+	if (not testCoreClient and platform == "win32" and not System.os.IsWindowsXP()) then
+		if System.options.channelId=="430" then --430windows版，还是下载到本目录
+			local gamename = "Paracraft"
+			gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater430.lua");
+			local ClientUpdater430 = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater430");
+			local _updater = ClientUpdater430:new({gamename=gamename});
+			GameLogic.GetFilters():apply_filters("ShowClientUpdaterNotice");
+			_updater:Check(function(bNeedUpdate, latestVersion,curVersion)
+				GameLogic.GetFilters():apply_filters("HideClientUpdaterNotice");
+				print("-----hyz 181 bNeedUpdate",bNeedUpdate)
+				if bNeedUpdate then
+					--不是是最新版，作为局域网客户端开启，随时准备进行同步
+					GameLogic.GetFilters():apply_filters('start_lan_client',{
+						realLatestVersion=latestVersion,
+						isAutoInstall=not _updater:canAutoSkip(),
+						needShowDownloadWorldUI=not _updater:canAutoSkip(),
+						onUpdateError = function()
+							self:next_step({IsUpdaterStarted = true});
+						end
+					})
+					if _updater:canAutoSkip() then 
+						self:next_step({IsUpdaterStarted = true});
+						_updater:checkNeedSlientDownload(); --局域网内，可以跳过更新的情况下，去看看是否需要静默更新
+					else
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.lua");
+						local ClientUpdateDialog = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdateDialog")
+						
+						ClientUpdateDialog.Show(latestVersion,curVersion,gamename,function()
+							local ret = GameLogic.GetFilters():apply_filters('check_is_downloading_from_lan',{
+								needShowDownloadWorldUI = true,
+								installIfAlldownloaded = true
+							})
+							if ret and ret._hasStartDownloaded then --点击更新按钮后，再查一遍是否已经再局域网开始更新了
+								print("-------已经开始局域网更新了")
+								return
+							end
+							_updater:Download(true);
+						end)
+					end
+				else
+					--已经是最新版了，开启服务器
+					GameLogic.GetFilters():apply_filters('start_lan_server',{
+						realLatestVersion=latestVersion,
+						_updater = _updater
+					})
+					self:next_step({IsUpdaterStarted = true});
+				end
+			end)
+			return
+		end
 		-- For windows10/7/vista we will check for latest version, but will not force update 
 		-- instead it just pops up a dialog and ask user to use launcher Paracraft.exe to update.  
 		self:next_step({IsUpdaterStarted = true});
@@ -268,25 +321,27 @@ function MainLogin:UpdateCoreClient()
 			GameLogic.GetFilters():apply_filters("HideClientUpdaterNotice");
 
 			if (bNeedUpdate) then
-				if System.options.channelId=="430" then --对于windows电脑的430版本特殊处理,允许跳过的更新一律跳过
-					if updater:canAutoSkip() then 
-						self:next_step({IsUpdaterStarted = true});
-					else
-						NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.lua");
-						local ClientUpdateDialog = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdateDialog")
-						local gamename = "Paracraft"
-						gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
-						ClientUpdateDialog.Show(updater.autoUpdater:getLatestVersion(), updater:getCurVersion(),gamename,function()
-							updater:Download(function(bSucceed)
-								if(bSucceed) then
-									updater:Restart();
-								else
-									self:next_step({IsUpdaterStarted = true});
-								end
-							end);
-						end)
-					end
-				else
+				-- if System.options.channelId=="430" then --对于windows电脑的430版本特殊处理,允许跳过的更新一律跳过
+				-- 	if updater:canAutoSkip() then 
+				-- 		self:next_step({IsUpdaterStarted = true});
+				-- 	else
+				-- 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.lua");
+				-- 		local ClientUpdateDialog = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdateDialog")
+				-- 		local gamename = "Paracraft"
+				-- 		gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
+				-- 		ClientUpdateDialog.Show(updater.autoUpdater:getLatestVersion(), updater:getCurVersion(),gamename,function()
+				-- 			print("hyz update log--------MainLogin 281")
+				-- 			updater:Download(function(bSucceed)
+				-- 				print("hyz update log--------MainLogin 283",bSucceed)
+				-- 				if(bSucceed) then
+				-- 					updater:Restart();
+				-- 				else
+				-- 					self:next_step({IsUpdaterStarted = true});
+				-- 				end
+				-- 			end);
+				-- 		end)
+				-- 	end
+				-- else
 					updater:Download(function(bSucceed)
 						if(bSucceed) then
 							updater:Restart();
@@ -294,7 +349,7 @@ function MainLogin:UpdateCoreClient()
 							self:next_step({IsUpdaterStarted = true});
 						end
 					end);
-				end
+				-- end
 			else
 				if (comparedVersion == 100) then
 					self:next_step({IsUpdaterStarted = true});

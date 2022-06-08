@@ -15,9 +15,29 @@ local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 
 -- same as /midi [note]
 -- @param beat: 
-function env_imp:playNote(note, beat)
-	GameLogic.RunCommand("/midi "..tostring(note));
+function env_imp:playNote(note, beat, base_note, channel)
+	local command = "";
+
+	if (not base_note) then
+		command = "/midi ";
+	else
+		if (channel) then
+			command = "/midi -base_note " .. tostring(base_note) .. " -channel " .. channel .. " ";
+		else
+			command = "/midi -base_note " .. tostring(base_note) .. " ";
+		end
+	end
+
 	beat = math.max((beat or 1) * 1, env_imp.GetDefaultTick(self));
+
+	if (beat) then
+		command = command .. "-beat " .. beat .. " ";
+	end
+
+	command = command .. tostring(note);
+
+	GameLogic.RunCommand(command);
+
 	env_imp.wait(self, beat);
 end
 
@@ -51,8 +71,12 @@ function env_imp:stopSound(filename)
 end
 
 -- same as /music [filename]
-function env_imp:playMusic(filename)
-	GameLogic.RunCommand("/music "..(filename or ""));
+function env_imp:playMusic(filename,volume)
+	local commandStr = "/music "..(filename or "")
+	if volume then
+		commandStr = "/music "..(filename or "").. " -volume " ..volume
+	end
+	GameLogic.RunCommand(commandStr);
 	env_imp.checkyield(self);
 end
 

@@ -206,11 +206,11 @@ function Actor:IsTouchingActorByName(actorname)
 
 		-- tricky: we will assume, the size of actorname is smaller than 1 block. 
 		local actorSize = 1;
-		local entities = EntityManager.GetEntitiesByMinMax(min_x-actorSize, min_y-actorSize, min_z-actorSize, max_x+actorSize, max_y+actorSize, max_z+actorSize, EntityManager[self.entityClass])
-		if (entities and #entities > 1) then
+		local entities = EntityManager.GetEntitiesByMinMax(min_x-actorSize, min_y-actorSize, min_z-actorSize, max_x+actorSize, max_y+actorSize, max_z+actorSize, EntityManager[self.entityClass], entity)
+		if (entities and #entities > 0) then
 			for i=1, #entities do
 				local entity2 = entities[i];
-				if(entity2 ~= entity and entity2:GetActor():GetName() == actorname and aabb:Intersect(entity2:GetCollisionAABB())) then
+				if(entity2:GetActor():GetName() == actorname and aabb:Intersect(entity2:GetCollisionAABB())) then
 					return true
 				end
 			end
@@ -285,6 +285,22 @@ function Actor:IsTouchingPlayers()
 	if(listEntities) then
 		for _, entityCollided in ipairs(listEntities) do
 			if(entityCollided:IsPlayer()) then
+				return true;
+			end
+		end
+	end
+end
+
+function Actor:IsTouchingTaggedEntity(tagName)
+	if(not self.entity) then
+		return;
+	end
+	local distExpand = 0.25;
+	local aabb = self.entity:GetCollisionAABB();
+    local listEntities = EntityManager.GetEntitiesByAABBExcept(aabb:clone():Expand(distExpand, distExpand, distExpand), self.entity);
+	if(listEntities) then
+		for _, entityCollided in ipairs(listEntities) do
+			if(entityCollided.tag == tagName) then
 				return true;
 			end
 		end
@@ -591,10 +607,10 @@ function Actor:SetColor(color)
 	end
 end
 
-function Actor:Say(text, duration)
+function Actor:Say(text, duration, bAbove3D)
 	local entity = self:GetEntity();
 	if(entity) then	
-		entity:Say(text, duration)
+		entity:Say(text, duration, bAbove3D)
 	end
 end
 
@@ -1278,6 +1294,7 @@ function Actor:LinkTo(targetActor)
 			targetEntity:Connect("facingChanged", self, self.UpdateActorLink);
 			targetEntity:Connect("scalingChanged", self, self.UpdateActorLink);
 			targetActor:Connect("beforeRemoved", self, self.UnLink);
+			srcEntity:Connect("facingChanged", self, self.OnUpdateLinkFacing);
 
 			self.linkInfo.isLastControlledExternally = srcEntity:IsControlledExternally()
 			if(not self.linkInfo.isLastControlledExternally) then
@@ -1296,6 +1313,7 @@ function Actor:UnLinkActor(actor)
 		entity:Disconnect("facingChanged", self, self.UpdateActorLink);
 		entity:Disconnect("scalingChanged", self, self.UpdateActorLink);
 		actor:Disconnect("beforeRemoved", self, self.UnLink);
+		self:GetEntity():Disconnect("facingChanged", self, self.OnUpdateLinkFacing);
 		if(not self.linkInfo.isLastControlledExternally) then
 			self:GetEntity():SetControlledExternally(false);
 		end
@@ -1325,6 +1343,16 @@ function Actor:UpdateActorLink()
 			end
 			entity:SetPosition(x + rx, y + ry, z + rz)
 			entity:SetFacing(targetEntity:GetFacing() + self.linkInfo.facing);
+		end
+	end
+end
+
+function Actor:OnUpdateLinkFacing()
+	if(self.linkInfo) then
+		local targetEntity = self.linkInfo.actor:GetEntity()
+		if(targetEntity) then
+			local entity = self:GetEntity();
+			self.linkInfo.facing = entity:GetFacing() - targetEntity:GetFacing();
 		end
 	end
 end

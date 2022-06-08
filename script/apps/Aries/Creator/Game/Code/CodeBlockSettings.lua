@@ -51,12 +51,12 @@ function CodeBlockSettings.OnInit()
 		end
 		page:SetValue("allowClientExecution", entity:IsAllowClientExecution() == true);
 		page:SetValue("allowFastMode", entity:IsAllowFastMode() == true);
+		page:SetValue("isStepMode", entity:IsStepMode() == true);
 		page:SetValue("isOpenSource", type(entity.IsOpenSource) == "function" and entity:IsOpenSource() == true);
 		page:SetValue("isUseNplBlockly", type(entity.IsUseNplBlockly) == "function" and entity:IsUseNplBlockly() == true);
 		page:SetValue("isUseCustomBlock", type(entity.IsUseCustomBlock) == "function" and entity:IsUseCustomBlock() == true);
 		page:SetValue("FontSize", tostring(CodeBlockWindow.GetFontSize()));
 		
-
 		local languageFile = entity:GetLanguageConfigFile();
 		if(languageFile == "" or languageFile == "NPL" or languageFile=="npl") then
 			languageFile = ""
@@ -94,6 +94,13 @@ function CodeBlockSettings.OnChangeAllowFastMode(value)
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity) then
 		entity:SetAllowFastMode(value == true);
+	end
+end
+
+function CodeBlockSettings.OnChangeStepMode(value)
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity) then
+		entity:SetStepMode(value == true);
 	end
 end
 

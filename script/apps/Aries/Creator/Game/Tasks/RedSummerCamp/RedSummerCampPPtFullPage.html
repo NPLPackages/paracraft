@@ -37,66 +37,135 @@ end
 function IsPPTCover()
     return RedSummerCampPPtPage.IsPPTCover()
 end
+
+function ToWorld(name, mcmlNode)
+	if RedSummerCampPPtPage.IsLockCourse then
+        local strTip = "你暂时没有该课程的访问权限，请联系客服或使用对应的激活码。"
+        _guihelper.MessageBox(strTip,nil,_guihelper.MessageBoxButtons.OK_CustomLabel,nil,"script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.lesson.html")
+		return
+	end
+
+    local project_id = mcmlNode:GetAttribute("to_world_id")
+    RedSummerCampPPtPage.ToWorld(project_id)
+end
+
+function ClickConverBt(name, mcmlNode)
+	if RedSummerCampPPtPage.IsLockCourse then
+        local strTip = "你暂时没有该课程的访问权限，请联系客服或使用对应的激活码。"
+        _guihelper.MessageBox(strTip,nil,_guihelper.MessageBoxButtons.OK_CustomLabel,nil,"script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.lesson.html")
+		return
+	end
+    
+    local param1 = mcmlNode:GetAttribute("param1")
+    if param1 then
+        if string.find(param1, "http") then
+            ParaGlobal.ShellExecute("open", param1, "", "", 1); 
+        elseif tonumber(param1) then
+            RedSummerCampPPtPage.ToWorld(param1)
+        end
+    end
+end
 ]]>
 </script>
 <style type="text/mcss">
     {
         left = {
-            width = 583,
-            height = 532,
+            width = 540,
+            height = 630,
             float = "left",
             ["margin-left"] = 0,
             ["margin-top"] = 20,
         },
 
         right = {
-            width = 432,
+            width = 441,
             height = 532,
             float = "left",
             ["margin-left"] = 0,
-            ["margin-top"] = -30,
+            ["margin-top"] = -60,
         },        
 
         mainwork = {
-            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj_title2_64X64_32bits.png#0 0 341 64:305 48 16 10",
-            width = 552,
+            background = "",
+            width = 600,
             ["min-height"] = 225,
             float = "left",
             ["margin-left"] = 0,
             ["margin-top"] = 0,
             ["padding-top"] = 75,
-            ["padding-left"] = 65,
             ["padding-bottom"] = 15,
-            padding = 35,
+            padding = 8,
             ["text-align"] = "center",
             ["base-font-size"] = 28,
             ["font-size"] = 28,
         },  
 
+        step_str = {
+            ["margin-left"] = 122,
+            ["margin-top"] = 10,
+            ["text-align"] = "left",
+        },  
+
         F1 = {
-            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/9_32bits.png#0 0 32 32:8 8 8 8",
+            background = "",
             width = 354,
             ["min-height"] = 55,
             color = "#212122",
             padding = 10,
-            ["margin-left"] = 37,
-            ["margin-top"] = 20,
-            ["text-align"] = "center",
+            ["margin-left"] = 116,
+            ["margin-top"] = 5,
+            ["text-align"] = "left",
             ["base-font-size"] = 30,
             ["font-size"] = 30,
         },  
         share = {
             width = 312,
             float = "left",
-            ["margin-left"] = 65,
+            ["margin-left"] = 6,
             ["margin-top"] = 15,
         },  
         ppt_cover = {
-            width = 965,
-            height = 565,
+            width = 1228,
+            height = 614,
             ["margin-left"] = 65,
             ["margin-top"] = 45,
         }, 
+        bg_img = {
+            width = 1228,
+            height = 614,
+            ["margin-left"] = 65,
+            ["margin-top"] = 45,
+        }, 
+        yellon_button = {
+            background = "Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8",
+            ["base-font-size"] = 20,
+            ["font-size"] = 20,
+            ["font-weight"] = "bold",
+            ["margin-left"] = 95,
+            ["margin-top"] = -160,
+            width = 130,
+            height = 53,
+        },
+        gray_button = {
+            background = "Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16",
+            ["base-font-size"] = 20,
+            ["font-size"] = 20,
+            ["font-weight"] = "bold",
+            ["margin-left"] = 95,
+            ["margin-top"] = -160,
+            width = 130,
+            height = 53,
+            ["text-offset-y"] = -2,
+        },
+        step_1_title = {
+            background = "",
+            ["base-font-size"] = 28,
+            ["font-size"] = 28,
+            ["font-weight"] = "bold",
+            ["color"] = "#333333",
+            ["margin-left"] = 105,
+            ["margin-top"] = 14,
+        },        
     }
 </style>
 
@@ -106,7 +175,7 @@ end
     <pe:container name="rt_container" alignment="_rt" style="background:url();">
         <input type="button" value='' onclick="ClosePage" style="width: 112px;height: 52px; margin-right:20px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B2_112X52_32bits.png#0 0 112 52);" />
     </pe:container>
-    <pe:container alignment="_ct" style="margin-left:-532px;margin-top:-326px;width:1024px;height:612px;background:url();">
+    <pe:container alignment="_ct" style="margin-left:-532px;margin-top:-326px;width:1050px;height:640px;background:url();">
         <pe:if condition='<%=IsPPTCover()%>'>
             <div style="position: relative;margin-left: 0px;base-font-size:16px;font-size: 16px;">
                 <%=GetPPtStr()%>
@@ -114,6 +183,8 @@ end
         </pe:if>
         <pe:if condition='<%=not IsPPTCover()%>'>
             <div style="position: relative;margin-left: 0px;base-font-siez:28px;font-size: 28px;">
+                <div name="line" style="position: relative;margin-left: 476px;margin-top: 50px; background-color: #acacac;width: 1px;height: 520px;">
+                </div>
                 <div style="margin-top: 40px;margin-left: 0px; base-font-size:40px; font-size:40px;font-weight:bold;color: #212122; "><%=GetPPtTitle()%></div>
                 <%=GetPPtStr()%>
             </div>       

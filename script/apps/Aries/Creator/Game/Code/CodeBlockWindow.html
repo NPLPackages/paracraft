@@ -23,7 +23,7 @@ end
             <input type="button" uiname="CodeBlockWindow.blockMode" name="blockMode" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用".."\n"..L"Ctrl+左键使用系统浏览器打开"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#808080;font-size:12px;height:25px;background:url(Texture/whitedot.png)"/>
             <input type="button" uiname="CodeBlockWindow.codeMode" name="codeMode" value='<%=L"代码"%>' tooltip='<%=L"NPL代码编辑模式(推荐使用)".."\n"..L"左键选择, 右键可切换代码语言"%>' onclick="OnClickEditMode" style="color:#ffffff;background-color:#0b9b3a;font-size:12px;height:25px;background:url(Texture/whitedot.png)" />
         </div>
-        <input type="button" uiname="CodeBlockWindow.settings" name="settings" tooltip='<%=L"设置"%>' style="margin-left: 0px;margin-top:4px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="CodeBlockWindow.OnClickSettings()"/>
+        <input type="button" uiname="CodeBlockWindow.settings" name="settings" tooltip='<%=L"左键查看设置，右键传送到代码方块"%>' style="margin-left: 0px;margin-top:4px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/set_off.png)" onclick="CodeBlockWindow.OnClickSettings()"/>
         <div style="position:relative;float:left;width:82px;" align="right">
             <input type="button" uiname="CodeBlockWindow.tutorial" tooltip='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-top:7px;color:#ffffff;font-size:12px;width:25px;height:25px;background:url(Texture/Aries/Combat/Battle/teen/help_32bits.png)" />
             <input type="button" uiname="CodeBlockWindow.resizeBtn" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="CodeBlockWindow.ToggleSize()" style="margin-left:2px;margin-top:5px;width:28px;height:28px;background:url(Texture/3DMapSystem/Creator/Objects/Tool_Move.png);" />
@@ -53,6 +53,15 @@ end
     </pe:container>
     <pe:container style="position:relative;vertical-align:bottom;height:54px;background:;">
         <input name="console" value='<%=CodeBlockWindow.GetConsoleText()%>' AlwaysShowCurLineBackground="false" rows="3" height="100%" UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>
+    </pe:container>
+    <pe:container ClickThrough="true" alignment="_rb" style="position:relative;height:54px;background:; padding-right: 25px;">
+        <pe:if condition="<%=not CodeBlockWindow.bShowChatLogWindow %>">
+            <input type="button" tooltip="显示输出窗口" onclick="CodeBlockWindow.OnClickShowConsoleText" style="margin-left:0px;margin-top:8px;color:#ffffff;font-size:12px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/icons/xianshi_16x10_32bits.png#0 0 16 16)" />
+        </pe:if>
+        <pe:if condition="<%=CodeBlockWindow.bShowChatLogWindow%>">
+            <input type="button" tooltip="隐藏输出窗口" onclick="CodeBlockWindow.OnClickHideConsoleText" style="margin-left:0px;margin-top:8px;color:#ffffff;font-size:12px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/icons/yincang_16x16_32bits.png#0 0 16 16)" />
+        </pe:if>
+        <input type="button" tooltip="清空输出" onclick="CodeBlockWindow.OnClickClearConsoleText" style="margin-left:15px;margin-top:8px;color:#ffffff;font-size:12px;width:16px;height:16px;background:url(Texture/Aries/Creator/keepwork/icons/qingkong_12x14_32bits.png#0 0 16 16)" />
     </pe:container>
     <script type="text/npl" refresh="true">CodeBlockWindow.UpdateEditModeUI();</script>
 </div>

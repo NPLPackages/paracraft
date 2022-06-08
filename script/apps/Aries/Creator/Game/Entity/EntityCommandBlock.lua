@@ -50,6 +50,7 @@ Entity.is_regional = true;
 function Entity:ctor()
 	self.inventory = InventoryBase:new():Init();
 	self.inventory:SetClient();
+	self.inventory:SetParentEntity(self);
 	self:SetUseNplBlockly(true);
 end
 

@@ -25,7 +25,7 @@ Commands["music"] = {
 	name="music", 
 	mode_deny = "",
 	mode_allow = "",
-	quick_ref="/music [-channelName] [filename|1~6] [from_time]", 
+	quick_ref="/music [-channelName] [filename|1~6] [from_time] [-volume 0-1]", 
 	desc=[[play or stop background music. 
 @param filename: can be disk or http url file or specify a number for internal music
 /music music.ogg 0	play music.ogg at current world directory from the beginning (0 seconds) 
@@ -36,6 +36,7 @@ Commands["music"] = {
 /music http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&spd=4&text=hello
 /music -c1 music.ogg   play music.ogg on channel "c1"
 /music -c1 stop channel "c1"
+/music 1.mp3 -volume 0.5     play 1.mp3 with volume 0.5
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
@@ -47,7 +48,8 @@ Commands["music"] = {
 		local filename, from_time
 		filename, cmd_text = CmdParser.ParseFormated(cmd_text, "%S+");
 		from_time, cmd_text = CmdParser.ParseInt(cmd_text);
-
+		local option, volume,cmd_text = CmdParser.ParseOption(cmd_text);
+		volume = tonumber(volume)
 		if(not filename or filename=="" or filename=="stop") then
 			if(channelName) then
 				BackgroundMusic:Stop();
@@ -66,9 +68,9 @@ Commands["music"] = {
 						sound:seek(from_time);
 					end
 					if(channelName) then
-						BackgroundMusic:PlayOnChannel(channelName, sound);
+						BackgroundMusic:PlayOnChannel(channelName, sound, volume) 
 					else
-						BackgroundMusic:PlayBackgroundSound(sound);
+						BackgroundMusic:PlayBackgroundSound(sound,nil,volume)
 					end
 				end
 			end
@@ -83,9 +85,10 @@ Commands["voice"] = {
 You must have internet connection to use this.
 0: 女声,1: 男声,3: 逍遥,4: 丫丫,        
 5003: 逍遥2,5118: 小鹿,106: 博文,110: 小童,111: 小萌,103: 米朵,5: 小娇,
-10001: 小燕,10002: 许久,10003: 小萍,10004: 小婧,10005: 许小宝,10006: 万叔,
-10007: 一菲,10008: 小果,10010: 小梅粤语,10011: 千雪,10012: 楠楠,10013: 芳芳,
-10015: 七哥
+10001: 晓萱,10002: 云希,10003: 晓墨,10004: 晓涵,10005: 雲哲,10006: 云野,
+10007: 晓颜,10008: 晓辰,10010: 曉曼,10011: 晓秋,10012: 晓悠,10013: 晓晓,
+10015: 云扬,20007: 晓睿,20008: 晓双,20015: 曉佳,20016: 雲龍,20017: 曉臻,
+20018: 曉雨
 /voice 你好 Paracraft
 /voice -voiceNarrator 2  欢迎使用Paracraft
 ]], 
@@ -179,18 +182,58 @@ Commands["midi"] = {
 -- @param note: 0-127: 128 note keys. where 60 is middle-C key. 
 -- @param velocity: usually how hard a key is pressed. 0-128. default to 64
 -- @param channel: 0-15 channels. default to channel 0
+-- @param base_note: instrument number
 
 /midi 0x00403C90    play a raw note 3C with velocity 40 in channel 0. 
 /midi [1-7]		    start from middle C, do la me fa so la si
 /midi [A-Ga-g]['*]  play absolute note pitch, middle c is c'
+/midi -base_note [21|28|56] c
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		if (not cmd_text) then
+			return;
+		end
+
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityNote.lua");
 		local EntityNote = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityNote");
 
-		if(cmd_text) then
-			EntityNote.PlayCmd(cmd_text);
+		local option;
+		local base_note = 0;
+		local channel;
+		local note = '';
+		local beat;
+		local before_cmd_text;
+
+		before_cmd_text = cmd_text;
+		option, cmd_text = CmdParser.ParseOption(cmd_text)
+
+		if (option == "base_note") then
+			base_note, cmd_text = CmdParser.ParseInt(cmd_text);
+		else
+			cmd_text = before_cmd_text;
 		end
+
+		before_cmd_text = cmd_text;
+		option, cmd_text = CmdParser.ParseOption(cmd_text);
+
+		if (option == "channel") then
+			channel, cmd_text = CmdParser.ParseInt(cmd_text);
+		else
+			cmd_text = before_cmd_text;
+		end
+
+		before_cmd_text = cmd_text;
+		option, cmd_text = CmdParser.ParseOption(cmd_text);
+
+		if (option == "beat") then
+			beat, cmd_text = CmdParser.ParseNumber(cmd_text);
+		else
+			cmd_text = before_cmd_text;
+		end
+
+		note, cmd_text = CmdParser.ParseString(cmd_text);
+
+		EntityNote.PlayCmd(note, base_note, beat, channel);
 	end,
 };
 

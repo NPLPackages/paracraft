@@ -44,6 +44,7 @@ end
 }
 </style>
 <pe:container style="background-color: #00000000;" name = "root" alignment="_fi" ontouch="MacroPlayer.OnTouch" onclick="MacroPlayer.OnClick">
+    <pe:container alignment="_fi" uiname="MacroPlayer.scene" style="position: relative; background-color: #00000088;"></pe:container>
     <pe:container name="debugInfoWnd" alignment="_lt" zorder="-2" style="margin-top:170px;margin-left:10px;width:500px;height:300px;position:relative;background:url();display:none;">
         <input type="text" ReadOnly="true" ShowLineNumber="true" UseSystemControl="true" rows="7" language="npl" height="100%" name="debugText" enabled="false" value="" CaretColor="#000000" style="textcolor:#000000;line-height:17;font-family:Consolas" fontsize="13"/>
     </pe:container>
@@ -111,6 +112,11 @@ end
     <!-- 用于上海那边提出的需求 -->
     <pe:container ClickThrough="true" name="macroController" alignment="_rb" zorder="1" style=" background:;">
         <input type="button" onclick="MacroPlayer.OnClickNext()" name="nextMacro"  width="100%" height="100%" style="base-font-size:32px; background:url(); font-size:32px;color:#ffffff;"/>
+    </pe:container>
+
+    <pe:container ClickThrough="true" alignment="_lb" zorder="1" style="background:;">
+        <pe:container name="soundIcon" visible="false" ClickThrough="true" style="margin-left: 30px;margin-bottom: 20px; width: 48px;height:46px;background:url(Texture/Aries/Quest/laba1_48x46_32bits.png#0 0 48 46) ">
+        </pe:container>
     </pe:container>
 </pe:container>
 

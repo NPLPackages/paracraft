@@ -161,6 +161,10 @@ function open()
 
     if pid then
         GameLogic.RunCommand("/loadworld " .. pid)
+
+        if pid and tonumber(pid) == "number" then
+            GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.main_worldID_open', {useNoId = true})
+        end
     else
         GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.go_to_url', opus_content)
     end

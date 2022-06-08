@@ -82,7 +82,16 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		totalKeyStrokes = tonumber(self.totalKeyStrokes) or 0,--编辑模式下，总打字次数，包括命令，代码方块等一切键盘操作，但Ctrl、shift、alt除外。
 		totalSingleBlocks = tonumber(self.totalSingleBlocks) or 0,--创建的总方块数，只计算单击鼠标创建的方块数。复制粘贴，拉伸等不算。 例外，shift+右键算1个方块。 这里需要在鼠标事件的地方截取数据，程序生成的不算。
 
-		totalWorkScore = self:GetTotalWorkScore()
+		totalWorkScore = self:GetTotalWorkScore(),
+		superrenderdist = self.superrenderdist or "",
+		hide_player = self.hide_player or "", --隐藏角色（设置界面）
+		stereoMode = self.stereoMode or "", --立体输出
+		weather = self.weather or "", --环境设置界面的, sun,cloudy,rain,snow
+		lightcolor = self.lightcolor or "", --光源颜色
+		timesAutoGo = self.timesAutoGo or "true", --自动昼夜交替
+		frozendaytime = self.frozendaytime or "", --关闭自动昼夜交替后，固定在在哪个时间
+		eyeBrightness = self.eyeBrightness or "",--亮度
+		cloudThickness = self.cloudThickness or "",--云量
 	};
 
 	GameLogic.GetFilters():apply_filters("save_world_info", self, node);

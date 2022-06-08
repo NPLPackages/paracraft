@@ -86,7 +86,8 @@ function PlayContext:mousePressEvent(event)
 			click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
 			local block = block_types.get(result.block_id);
 			if(block and result.blockX) then
-				block:OnMouseDown(result.blockX,result.blockY,result.blockZ, event.mouse_button);
+				self:SetMouseDownBlock({result.blockX,result.blockY,result.blockZ}, event)
+				block:OnMouseDown(event, result.blockX, result.blockY, result.blockZ);
 			end
 		end
 	end
@@ -99,6 +100,13 @@ function PlayContext:mouseMoveEvent(event)
 		return
 	end
 	local result = self:CheckMousePick();
+	local block = self:GetMouseDownBlock(event)
+	if(block) then
+		local blocktemplate = BlockEngine:GetBlock(block[1], block[2], block[3])
+		if(blocktemplate) then
+			blocktemplate:OnMouseMove(event, block[1], block[2], block[3], result);
+		end
+	end
 end
 
 function PlayContext:handleLeftClickScene(event, result)
@@ -175,8 +183,9 @@ function PlayContext:mouseReleaseEvent(event)
 		return
 	end
 
+	local result;
 	if(self.is_click) then
-		local result = self:CheckMousePick();
+		result = self:CheckMousePick();
 		local isClickProcessed;
 		
 		-- escape alt key for entity event, since alt key is for picking entity. 
@@ -199,6 +208,16 @@ function PlayContext:mouseReleaseEvent(event)
 		elseif(not event:isAccepted() and self:IsClickToMoveEnabled() and result and result.blockZ and result.side) then
 			self:MovePlayerToBlock(result.blockX, result.blockY, result.blockZ, result.block_id, result.side)
 			event:accept();
+		end
+	end
+	if(not event:isAccepted()) then
+		result = result or self:CheckMousePick();
+		local block = self:GetMouseDownBlock(event)
+		if(block) then
+			local blocktemplate = BlockEngine:GetBlock(block[1], block[2], block[3])
+			if(blocktemplate) then
+				blocktemplate:OnMouseUp(event, block[1], block[2], block[3], result);
+			end
 		end
 	end
 end

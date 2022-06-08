@@ -23,6 +23,8 @@ local s_env_methods = {
 	"resume", 
 	"yield", 
 	"checkyield",
+	"checkstep",
+	"checkstep_nplblockly",
 	"terminate",
 	"restart",
 	"exit",
@@ -40,6 +42,7 @@ local s_env_methods = {
 	"getActorEntityValue",
 	"showVariable",
 	"include",
+	"import",
 	"getActor",
 	"cmd",
 	"getPlayTimer",
@@ -207,6 +210,10 @@ function CodeAPI.InstallMethods(o)
 	end
 end
 
+-- get function by name
+function CodeAPI.GetAPIFunction(func_name)
+	return env_imp[func_name];
+end
 
 -- yield control until all async jobs are completed
 -- @param bExitOnError: if true, this function will handle error 
@@ -257,6 +264,37 @@ function env_imp:checkyield(count)
 		end
 	end
 end
+
+-- @param duration: wait for this seconds. default to 1.
+function env_imp:checkstep(duration)
+	-- 图块模式直接跳过
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	if (CodeBlockWindow.IsSupportNplBlockly()) then return end
+
+	local locationInfo = commonlib.debug.locationinfo(2)
+	if(locationInfo) then
+		GameLogic.GetFilters():apply_filters("OnCodeBlockLineStep", locationInfo);
+	end
+	env_imp.wait(self, 1);
+end
+
+function env_imp:checkstep_nplblockly(blockid, before, duration)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(not entity or not entity:IsStepMode()) then return end 
+	if (not CodeBlockWindow.IsSupportNplBlockly()) then return end
+
+	if (before) then   -- 代码执行前
+		GameLogic.GetFilters():apply_filters("OnCodeBlockNplBlocklyLineStep", blockid);
+		env_imp.wait(self, duration or 0.5);
+	else               -- 代码执行后
+		env_imp.wait(self, duration or 0.5);
+		GameLogic.GetFilters():apply_filters("OnCodeBlockNplBlocklyLineStep", blockid);
+	end
+end
+
 
 -- private: 
 function env_imp:GetDefaultTick()

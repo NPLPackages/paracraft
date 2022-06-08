@@ -76,7 +76,7 @@ function ItemRailcar:OnCreate(result)
 				
 			else
 				local entity = MyCompany.Aries.Game.EntityManager.EntityRailcar:Create({x=x,y=y,z=z, item_id = self.block_id});
-				EntityManager.AddObject(entity);
+				entity:Attach();
 				return true, entity;
 			end
 		end	

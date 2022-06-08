@@ -87,6 +87,7 @@ local screenHalfHeight = 300;
 function Entity:ctor()
 	self.inventory = InventoryBase:new():Init();
 	self.inventory:SetClient();
+	self.inventory:SetParentEntity(self);
 	self:SetDummy(true);
 end
 
@@ -534,4 +535,5 @@ function Entity:mouseReleaseEvent(mouse_event)
 end
 
 function Entity:Say(text, duration, bAbove3D)
+	
 end

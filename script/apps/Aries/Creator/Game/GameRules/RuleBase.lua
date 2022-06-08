@@ -305,12 +305,16 @@ function RuleBase:Print()
 end
 
 -- helper function
-function RuleBase:GetBool(isEnabled)
-	return isEnabled == true or isEnabled=="true" or isEnabled=="on";
+function RuleBase:GetBool(isEnabled, defaultValue)
+	if(isEnabled == true or isEnabled=="true" or isEnabled=="on") then
+		return true;
+	elseif(isEnabled == nil or isEnabled == "") then
+		return defaultValue;
+	end
 end
 
 -- helper function parse number
-function RuleBase:GetNumber(value)
+function RuleBase:GetNumber(value, defaultValue)
 	if(type(value) == "string") then
 		value = value:match("%-?[%d%.]*");
 		if(value) then
@@ -319,6 +323,7 @@ function RuleBase:GetNumber(value)
 	elseif(type(value) == "number") then
 		return value;
 	end
+	return defaultValue;
 end
 
 -- virtual function: when rule is removed from the system. 

@@ -39,6 +39,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"另存为...",name = "file.saveworldas",onclick=nil},
 				{Type = "Separator"},
 				{text = L"分享上传...",name = "file.uploadworld",onclick=nil},
+				{text = L"本地历史版本...",name = "file.openbackupfolder",onclick=nil},
 				{text = L"生成独立应用程序...",name = "file.makeapp", cmd="/makeapp UImode"},
 				{text = L"备份...",name = "file.worldrevision",onclick=nil},
 				{text = L"打开本地目录",name = "file.openworlddir",onclick=nil},
@@ -60,6 +61,16 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"全文搜索...".."  Ctrl+Shift+F",name = "window.findfile", cmd="/findfile", onclick=nil},
 				{text = L"跳到上一层".."  Tab",name = "edit.upstairs",onclick=nil},
 				{text = L"跳到下一层".."  Shift+Tab",name = "edit.downstairs",onclick=nil},
+				{text = L"跳转点",name = "edit.bookmarks", onclick=nil, children = 
+					{
+						{text = L"下一个跳转点".."  F2", name = "edit.bookmark.next", cmd="/menu edit.bookmark.next"},
+						{text = L"前一个跳转点".."  Shift+F2", name = "edit.bookmark.previous", cmd="/menu edit.bookmark.previous"},
+						{text = L"添加跳转点".."  Ctrl+F2", name = "edit.bookmark.add", cmd="/menu edit.bookmark.add"},
+						{text = L"清除全部".."  Ctrl+Shift+F2", name = "edit.bookmark.clearall", cmd="/menu edit.bookmark.clearall"},
+						{text = L"查看全部跳转点...", name = "edit.bookmark.viewall", cmd="/menu edit.bookmark.viewall"},
+					}
+				},
+				{Type = "Separator"},
 				{text = L"录制宏命令...", name = "window.macro", cmd="/macro record -i", onclick=nil},
 				{text = L"分享模型...", name = "window.sharemod", onclick=nil},
 			},
@@ -116,6 +127,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"帮助...".."  F1",name = "help.help", onclick=nil},
 				{text = L"快捷键",name = "help.help.shortcutkey", onclick=nil},
+				{text = L"回到出生点",name = "help.home", onclick=nil},
 				{Type = "Separator"},
 				{text = L"提问",name = "help.ask", onclick=nil},
 				{text = L"提交意见与反馈",name = "help.bug", onclick=nil},
@@ -140,13 +152,10 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		},
 		]]
 	};
-
 	-- apply filter
 	menu_items = GameLogic.GetFilters():apply_filters("desktop_menu", menu_items);
-
 	edit_mode_menu = {};
 	game_mode_menu = {};
-
 	for _, menuItem in ipairs(menu_items) do
 		if(menuItem.children) then
 			menuItem.ctl = CommonCtrl.ContextMenu:new{
@@ -159,6 +168,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 			};
 			menuItem.ctl.RootNode:AddChild(CommonCtrl.TreeNode:new{Text = "", Name = "root_node", Type = "Group", NodeHeight = 0 });
 			DesktopMenu.RebuildMenuItem(menuItem);
+
 			if(menuItem.mode == "edit") then
 				edit_mode_menu[#edit_mode_menu+1] = menuItem;
 			else
@@ -213,8 +223,19 @@ function DesktopMenu.RebuildMenuItem(menuItem)
 				if(item.Type == "Separator") then
 					node:AddChild(CommonCtrl.TreeNode:new({Type = item.Type, }));
 				else
-					node:AddChild(CommonCtrl.TreeNode:new({Text = item.text, uiname=ctl.name..item.name, Name = item.name, Type = "Menuitem", Enable = item.Enable,  onclick = item.onclick, }));
+					local subnode = CommonCtrl.TreeNode:new({Text = item.text, uiname=ctl.name..item.name, Name = item.name, Type = "Menuitem", Enable = item.Enable,  onclick = item.onclick, });
+					node:AddChild(subnode);
 					menu_name_map[item.name] = item;
+					if(item.children) then
+						for index1, item1 in ipairs(item.children) do
+							if(item1.Type == "Separator") then
+								subnode:AddChild(CommonCtrl.TreeNode:new({Type = item1.Type, }));
+							else
+								subnode:AddChild(CommonCtrl.TreeNode:new({Text = item1.text, uiname=ctl.name..item.name..item1.name, Name = item1.name, Type = "Menuitem", Enable = item1.Enable,  onclick = item1.onclick, }));
+							end
+							menu_name_map[item1.name] = item1;
+						end
+					end
 				end
 			end
 			ctl.height = #(menuItem.children) * 26 + 4;

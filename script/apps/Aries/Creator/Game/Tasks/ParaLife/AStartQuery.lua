@@ -20,14 +20,21 @@ local EndPos = nil
 local TargetPath = {}
 
 local IsDebug = true
-function AStartQuery.GetPath(end_pos)
+function AStartQuery.GetPath(start_pos,end_pos,IsDebug)
+    if start_pos == nil then
+        local player = EntityManager.GetFocus();
+        local x, y, z = player:GetBlockPos();
+        StartPos = {x=x, y=y, z=z}
+    else
+        if start_pos[1] and start_pos.x == nil then
+            start_pos = {x = start_pos[1], y = start_pos[2], z = start_pos[3]}
+        end
+        StartPos = start_pos
+    end
+
     if end_pos[1] and end_pos.x == nil then
         end_pos = {x = end_pos[1], y = end_pos[2], z = end_pos[3]}
     end
-
-    local player = EntityManager.GetFocus();
-    local x, y, z = player:GetBlockPos();
-    StartPos = {x=x, y=y, z=z}
     EndPos = end_pos
     EndPos.y = StartPos.y
 

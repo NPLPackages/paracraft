@@ -11,6 +11,7 @@ virtual functions for derived classes:
 	mouseMoveEvent
 	mouseReleaseEvent
 	mouseWheelEvent
+	OnLeaveWorld
 	keyPressEvent
 	keyReleaseEvent : not implemented
 	OnActivate(itemStack, entity)
@@ -492,6 +493,19 @@ function Item:GetDisplayName()
 	end
 end
 
+-- virtual function: this function is called when the containing parentEntity ticks. 
+function Item:OnTickInEntity(parentEntity, itemStack)
+end
+
+-- virtual function: this function is called when the item is placed inside an entity, as one of its bag item(component). 
+-- this function is ALSO called when the parent entity is loaded from disk. 
+function Item:OnLoadInEntity(parentEntity, itemStack)
+end
+
+-- virtual function: this function is called when the item is removed from an entity, as one of its bag item (component). 
+function Item:OnUnloadInEntity(parentEntity, itemStack)
+end
+
 -- virtual function: use the item. 
 function Item:OnUse()
 end
@@ -508,12 +522,6 @@ end
 
 function Item:IsSelected()
 	return self.isSelected;
-end
-
--- virtual function: called when loading world. 
-function Item:OnLoadWorld()
-	-- number of items that has been put into the 3d world. 
-	self.inworld_count = nil;
 end
 
 -- update in world count
@@ -753,3 +761,4 @@ end
 function Item:SerializeServerData(serverdata, bSort)
 	return commonlib.serialize_compact(serverdata, bSort);
 end
+

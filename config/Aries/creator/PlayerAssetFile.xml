@@ -1246,7 +1246,7 @@
   <!-- 2022.3.4 add new effects -->
   <asset filename="character/CC/05effect/V5/fengtong/xiangshui.x" name="xiangshui" displayname="喷香水" physics="false"/>
   <asset filename="character/CC/05effect/V5/wu/wuqi1.x" name="wuqi1" displayname="洗手盆雾气" physics="false"/>
-  
+  <asset filename="character/CC/05effect/V5/weiyan/weiyan.x" name="weiyan" displayname="尾气" physics="false"/>
 
   <asset filename="character/common/headarrow/headarrow.x" displayname="箭头" name="headarrow"/>
 	<asset filename="character/common/headexclaimed/headexclaimed.x" displayname="感叹号" name="headexclaimed"/>

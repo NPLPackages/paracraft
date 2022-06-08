@@ -150,6 +150,12 @@ function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
         QuestProvider:OnInit();
 
 		GameLogic.ResetABPath();
+
+        -- 皮肤检测 检测用户皮肤是否可以继续用
+        local CheckSkin = NPL.load("(gl)Mod/GeneralGameServerMod/UI/Vue/Page/User/CheckSkin.lua");
+        if CheckSkin and CheckSkin.CheckUserSkin then
+            CheckSkin.CheckUserSkin()
+        end
     end)            
     return res;
 end

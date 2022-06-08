@@ -23,6 +23,8 @@ NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/ide/System/Windows/Mouse.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/blocks/block_types.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeLibraryManager.lua");
+local CodeLibraryManager = commonlib.gettable("MyCompany.Aries.Game.Code.CodeLibraryManager");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
@@ -241,9 +243,12 @@ function CodeGlobals:Reset()
 
 	-- world data
 	self.worldData = nil;
+	self.agentWorld = nil;
 
 	-- clear UI if any
 	CodeUI:Clear();
+
+	self.libraryManager = CodeLibraryManager:new();
 
 	-- TODO: 
 	LobbyServer.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
@@ -564,6 +569,24 @@ function CodeGlobals:UnregisterBlockClickEvent(callbackFunc)
 	self:UnregisterTextEvent("onBlockClicked", callbackFunc)
 end
 
+local msgEvent = {type = "msg"}
+local function newMsgEvent(msg, dest, bIsImmediate, onFinishedCallback)
+	if(bIsImmediate) then
+		if(msgEvent.bIsImmediate) then
+			msgEvent = {type = "msg"}
+		end
+		msgEvent.msg = msg;
+		msgEvent.dest = dest;
+		msgEvent.bIsImmediate = bIsImmediate;
+		msgEvent.onFinishedCallback = onFinishedCallback;
+		return msgEvent;
+	else
+		return {type = "msg", msg=msg, dest=dest, onFinishedCallback=onFinishedCallback, bIsImmediate = bIsImmediate}
+	end
+end
+
+
+-- @param event: {dest, msg, cmd_text}, where dest can be actor name or an entity object; cmd_text is used as input msg if available otherwise we will use event.msg.  
 -- @param bIsImmediate: if true, the code block needs to immediately process it. 
 function CodeGlobals:HandleGameEvent(event, bIsImmediate)
 	local textEvent = self:GetTextEvent(event:GetType());
@@ -612,11 +635,11 @@ function CodeGlobals:BroadcastTextEvent(text, msg, onFinishedCallback)
 end
 
 -- similar to BroadcastTextEvent
--- @paramm dest: dest actor name. 
-function CodeGlobals:BroadcastTextEventTo(dest, text, msg)
+-- @paramm dest: dest actor name or entity object or nil
+function CodeGlobals:BroadcastTextEventTo(dest, text, msg, bIsImmediate)
 	local event = self:GetTextEvent(text);
 	if(event) then
-		return event:DispatchEvent({type="msg", dest=dest, msg=msg});
+		return event:DispatchEvent({type="msg", dest=dest, msg=msg, bIsImmediate = bIsImmediate}, nil, bIsImmediate);
 	end
 end
 
@@ -910,5 +933,46 @@ function CodeGlobals:IsKeyPressed(keyname)
 		end
 	end
 	return false;
+end
+
+-- in in-memory agent block world, that only exists in memory and has nothing to do with the actual block world.
+function CodeGlobals:GetAgentWorld()
+	if(not self.agentWorld) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Agent/AgentWorld.lua");
+		local AgentWorld = commonlib.gettable("MyCompany.Aries.Game.Agent.AgentWorld");
+		self.agentWorld = AgentWorld:new():Init();
+	end
+	return self.agentWorld;
+end
+
+-- memory code block has no position and only exists virtualy(not rendered)
+-- @param name: default to "CodeGlobals". 
+function CodeGlobals:CreateGetMemoryCodeBlock(name)
+	name = name or "CodeGlobals"
+	local world = self:GetAgentWorld()
+	local entity = world:CreateGetCodeEntity(name)
+	if(entity) then
+		return entity:GetCodeBlock(true);
+	end
+end
+
+-- call this function if one wants to run function as if in code block's coroutine. 
+-- the function may contain code API like wait().
+function CodeGlobals:RunAsCodeBlockFunction(func, msg)
+	local codeblock = self:CreateGetMemoryCodeBlock()
+	if(codeblock) then
+		return codeblock:RunAsCodeBlockFunction(func, msg);
+	end
+end
+
+function CodeGlobals:GetLibraryManager()
+	return self.libraryManager;
+end
+
+function CodeGlobals:ImportGlobalLibrary(libName)
+	local library = self:GetLibraryManager():CreateGetCodeLibrary(libName)
+	if(library) then
+		library:Start();
+	end
 end
 

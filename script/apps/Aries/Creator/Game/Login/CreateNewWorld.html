@@ -126,15 +126,29 @@ function BtnBeSelected(item_name,index)
     end
 end
 ]]></script>
-<aries:window mode="thin" width="700" height="450" title='<%=L"创建世界" %>'>
-    <div style="margin-top:10px;margin-left:10px;height:350px;width:670px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:4 4 4 4)" >
-        <div style="float:left;margin-left:0px;margin-top:0px;width:256px;height:256px;">
+<kp:window mode="lite" width="700" height="450" title='<%=L"创建世界" %>'>
+    <div style="height: 35px;"></div>
+    <div style="margin-top: 10px;
+                margin-left: 10px;
+                height: 350px;
+                width: 670px;
+                background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#174 346 36 36:4 4 4 4)" >
+        <div style="float: left;
+                    margin-left: 0px;
+                    margin-top: 0px;
+                    width: 256px;
+                    height: 256px;">
             <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" IsInteractive="false"/>
         </div>
-        <div style="float:left;margin-left:30px;">
-            <div style="margin-top:110px;">
-                <div style="float:left;margin-top:3px;color:#ffffffff;font-weight:bold;font-size:14px;">
-                    <%=L"世界名称" %>
+        <div style="float: left;
+                    margin-left: 30px;">
+            <div style="margin-top: 110px;">
+                <div style="float: left;
+                            margin-top: 3px;
+                            color: #FFFFFF;
+                            font-weight: bold;
+                            font-size: 14px;">
+                    <%= L"世界名称" %>
                 </div>
                 <input type="text" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" onkeyup="OnWorldNameChange" style="float:left;margin-top:0px;margin-left:10px;width:150px;height:25px;" class="mc_text"/>
             </div>
@@ -146,7 +160,11 @@ end
                 <input type="button" value='<%=L"生存" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_style",1) %>' onclick="OnClickModify" param1="style" param2="1"/>
             </div>-->
             <div style="margin-top:30px;">
-                <div style="float:left;margin-top:2px;color:#ffffffff;font-weight:bold;font-size:14px;">
+                <div style="float: left;
+                            margin-top: 2px;
+                            color: #FFFFFF;
+                            font-weight: bold;
+                            font-size: 14px;">
                     <%=L"初始地形" %>
                 </div>
                 <input type="button" uiname="CreateNewWorld.terrain_1" value='<%=L"超平坦" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",1) %>' onclick="OnClickModify" param1="terrain" param2="1"/>
@@ -157,11 +175,36 @@ end
             </div>
         </div>
     </div>
-    <div style="height:45px; margin-top:8px;margin-bottom:10px;">
-        <input type="button" uiname="CreateNewWorld.OnClickCreateWorld" value='<%=L"创建新世界" %>' style="spacing:20px;margin-left:180px;height:40px;min-width:120px;font-size:18px;font-weight:bold;color:#ffffff;shadow-quality:8;shadow-color:#80133f48;text-shadow:true;" class="mc_light_orange_button_with_fillet" onclick="MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnClickCreateWorld"/>
-        <input type="button" uiname="CreateNewWorld.ReturnLastStep" value='<%=L"返回" %>' spacing="10" style="margin-left:160px;margin-top:6px;height:32px;min-width:100px;" class="mc_light_grey_button_with_fillet" onclick="ReturnLastStep"/>
+    <div style="height: 45px;
+                margin-top: 8px;
+                margin-bottom: 10px;">
+        <input type="button"
+               uiname="CreateNewWorld.OnClickCreateWorld"
+               value='<%= L"创建新世界" %>'
+               style="spacing: 20px;
+                      margin-left: 180px;
+                      height: 40px;
+                      min-width: 120px;
+                      font-size: 18px;
+                      font-weight: bold;
+                      color: #ffffff;
+                      shadow-quality: 8;
+                      shadow-color: #80133f48;
+                      text-shadow:true;"
+               class="mc_light_orange_button_with_fillet"
+               onclick="MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnClickCreateWorld"/>
+        <input type="button"
+               uiname="CreateNewWorld.ReturnLastStep"
+               value='<%=L"返回" %>'
+               spacing="10"
+               style="margin-left: 160px;
+                      margin-top: 6px;
+                      height: 32px;
+                      min-width: 100px;"
+               class="mc_light_grey_button_with_fillet"
+               onclick="ReturnLastStep"/>
     </div>
-</aries:window>
+</kp:window>
 </pe:mcml>
 </body>
 </html>

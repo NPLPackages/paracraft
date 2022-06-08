@@ -373,11 +373,13 @@ function EditMovieContext:AddKeyFrame()
 	if(movieclip and not movieclip:IsPlayingMode()) then
 		local actor = SelectionManager:GetSelectedActor();
 		if(actor and movieclip:IsPaused()) then
-			if(not actor:IsAllowUserControl()) then
+			if(false and not actor:IsAllowUserControl()) then
+				-- Never called
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.lua");
 				local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
 				MovieClipTimeLine.OnClickAddSubFrameKey();
 			else
+				-- K key is always a silent operation here
 				MovieClipController.OnAddKeyFrame();
 			end
 			return true

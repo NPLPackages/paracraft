@@ -78,31 +78,31 @@ end
 
 -- whether player can jump
 function RulePlayer:SetCanJump(isEnabled)
-	self.isEnabled = self:GetBool(isEnabled);
+	self.isEnabled = self:GetBool(isEnabled, true);
 	GameLogic.options:SetCanJump(self.isEnabled);
 end
 
 -- whether player can run
 function RulePlayer:SetAllowRunning(isEnabled)
-	self.isEnabled = self:GetBool(isEnabled);
+	self.isEnabled = self:GetBool(isEnabled, true);
 	GameLogic.options:SetAllowRunning(self.isEnabled);
 end
 
 -- whether player can jump in air(Can Fly)
 function RulePlayer:SetCanJumpInAir(isEnabled)
-	self.isEnabled = self:GetBool(isEnabled);
+	self.isEnabled = self:GetBool(isEnabled, true);
 	GameLogic.options:SetCanJumpInAir(self.isEnabled);
 end
 
 -- whether player can jump in water
 function RulePlayer:SetCanJumpInWater(isEnabled)
-	self.isEnabled = self:GetBool(isEnabled);
+	self.isEnabled = self:GetBool(isEnabled, true);
 	GameLogic.options:SetCanJumpInWater(self.isEnabled);
 end
 
 
 function RulePlayer:SetAutoWalkupBlock(isEnabled)
-	self.isEnabled = self:GetBool(isEnabled);
+	self.isEnabled = self:GetBool(isEnabled, true);
 	LOG.std(nil, "info", "RulePlayer", "AutoWalkupBlock %s", tostring(self.isEnabled));
 	ParaScene.GetPlayer():SetField("AutoWalkupBlock", self.isEnabled);
 	return true;

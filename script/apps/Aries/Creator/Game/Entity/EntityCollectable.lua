@@ -9,7 +9,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCollectable.lua");
 local EntityCollectable = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCollectable")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local entity = MyCompany.Aries.Game.EntityManager.EntityCollectable:new({x,y,z,radius});
-EntityManager.AddObject(entity)
+entity:Attach();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");

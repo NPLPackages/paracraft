@@ -60,6 +60,17 @@ function InventoryBase:GetParentEntity()
 	return self.entity;
 end
 
+-- @return nil if not item is found. 
+function InventoryBase:GetLastItemIndex()
+	local slots = self.slots;
+	for i = self:GetSlotCount(), 1, -1 do
+		local item = slots[i];
+		if(item and item.count>0) then
+			return i;
+		end
+	end
+end
+
 -- check to see if bag is completely empty
 function InventoryBase:IsEmpty()
 	local slots = self.slots;
@@ -165,6 +176,56 @@ function InventoryBase:IsFull()
 	return true;
 end
 
+function InventoryBase:SetFireLoadEvent(bFireLoadEvent)
+	self.bFireLoadEvent = bFireLoadEvent;
+end
+
+function InventoryBase:IsFireLoadEvent()
+	return self.bFireLoadEvent
+end
+
+function InventoryBase:FireLoadEventForAll()
+	if(self.bFireLoadEvent) then
+		local slots = self.slots;
+		for i=1, self:GetSlotCount() do
+			local itemStack = slots[i];
+			if(itemStack) then
+				self:OnLoadInEntity(itemStack)
+			end
+		end
+	end
+end
+
+function InventoryBase:FireUnloadEventForAll()
+	if(self.bFireLoadEvent) then
+		local slots = self.slots;
+		for i=1, self:GetSlotCount() do
+			local itemStack = slots[i];
+			if(itemStack) then
+				self:OnUnloadInEntity(itemStack)
+			end
+		end
+	end
+end
+
+function InventoryBase:OnLoadInEntity(itemStack)
+	if(self.bFireLoadEvent and itemStack) then
+		local item = itemStack:GetItem();
+		if(item) then
+			item:OnLoadInEntity(self.entity, itemStack);
+		end
+	end
+end
+
+function InventoryBase:OnUnloadInEntity(itemStack)
+	if(self.bFireLoadEvent and itemStack) then
+		local item = itemStack:GetItem();
+		if(item) then
+			item:OnUnloadInEntity(self.entity, itemStack);
+		end
+	end
+end
+
 -- auto add item_stack to a free slot or merge with existing stack.
 -- @param from_slot_id: start from a given slot. if nil, it will search from beginning. 
 -- @param bAlwaysOnEmptySlot: if true, we will always insert to an empty slot
@@ -176,6 +237,7 @@ function InventoryBase:AddItem(item_stack, from_slot_id, to_slot_id, bAlwaysOnEm
 		local item = slots[i];
 		if(not item or item.count == 0) then
 			slots[i] = item_stack:SplitStack(nil);
+			self:OnLoadInEntity(slots[i])
 			self:OnInventoryChanged(i);
 			return true, i;
 		elseif( (not bAlwaysOnEmptySlot and item:IsSameItem(item_stack) and item:IsStackable()) and item.count < self.stackItemCountLimit) then
@@ -294,6 +356,7 @@ function InventoryBase:RemoveItem(slot_index, count)
         if (cur_item_stack.count <= count) then
             item_stack = cur_item_stack;
             self.slots[slot_index] = nil;
+			self:OnUnloadInEntity(cur_item_stack)
             self:OnInventoryChanged(slot_index);
             return item_stack;
         else
@@ -301,6 +364,7 @@ function InventoryBase:RemoveItem(slot_index, count)
 
             if (cur_item_stack.count == 0) then
                 self.slots[slot_index] = nil;
+				self:OnUnloadInEntity(cur_item_stack)
            end
             self:OnInventoryChanged(slot_index);
             return item_stack;
@@ -313,7 +377,10 @@ end
 -- @return original item stack at the given position. 
 function InventoryBase:ReplaceItem(slot_index, item_stack)
 	local cur_item_stack = self.slots[slot_index];
+	self:OnUnloadInEntity(cur_item_stack)
+
 	self.slots[slot_index] = item_stack;
+	self:OnLoadInEntity(item_stack)
 	self:OnInventoryChanged(slot_index);
 	return cur_item_stack;
 end
@@ -334,6 +401,9 @@ function InventoryBase:OnInventoryChanged(slot_index)
 	-- TODO: invoke event listeners
 	if(self.isClient) then
 		pe_mc_slot.RefreshBlockIcons(self);
+	end
+	if(self.entity and self.entity.OnInventoryChanged) then
+		self.entity:OnInventoryChanged(self, slot_index)
 	end
 	if(self.OnChangedCallback) then
 		self.OnChangedCallback(self, slot_index);

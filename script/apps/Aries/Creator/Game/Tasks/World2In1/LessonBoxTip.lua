@@ -27,6 +27,7 @@ local LessonBoxCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Worl
 local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
+local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
@@ -164,7 +165,7 @@ function LessonBoxTip.ShowView()
     commonlib.TimerManager.SetTimeout(function ()
         LessonBoxTip.InitTeacherPlayer()
     end, 100);
-
+    EscDock.ShowView(false)
     MovieClipController.OnClose()
 end
 
@@ -956,6 +957,9 @@ function LessonBoxTip.IsCompareAutoBlock()
 end
 
 function LessonBoxTip.IsShowFollowBt()
+    if not lessonConfig then
+        return false
+    end
     local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     if taskCnf and taskCnf.follow and taskCnf.follow[1] then
         return true
@@ -965,6 +969,9 @@ function LessonBoxTip.IsShowFollowBt()
 end
 
 function LessonBoxTip.IsShowMoviceBt()
+    if not lessonConfig then
+        return false
+    end
     local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
     if taskCnf and taskCnf.moviePos and taskCnf.moviePos[1] then
         return true

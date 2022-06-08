@@ -211,6 +211,7 @@ function CodeLessonTip.ShowView(lesson_config, lesson_index)
     --     enable_esc_key = true,
 	-- 	alignment="_lt", left=0, top=0, width = 600, height = 500, zorder = 0,
 	-- });
+    GameLogic.GetFilters():apply_filters("esc_codelesson",true);
     if not CodeLessonTip.Bind then
         CodeLessonTip.Bind = true
         local viewport = ViewportManager:GetSceneViewport();
@@ -303,7 +304,7 @@ function CodeLessonTip.ClickExit()
         end
         CodeLessonTip.CloseCodeGoodView()
         CodeLessonTip.CloseCodeDiffView()
-    
+        GameLogic.GetFilters():apply_filters("esc_codelesson",false);
         GameLogic.GetCodeGlobal():BroadcastTextEvent("clickCodeExit");
     end)
 end
@@ -463,7 +464,6 @@ function CodeLessonTip.ShowVisible(visible)
     if not page then
         return
     end
-
     local parent = page:GetParentUIObject()
     if parent then
         parent.visible = visible

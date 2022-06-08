@@ -340,17 +340,37 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh, searchText)
 				return true;
 			end
 		end)
+		local onlinestore = commonlib.Files.Find({}, GameLogic.current_worlddir.."onlinestore/", 2, 500, function(item)
+			item.fromMall = true
+			if(item.filename:match("%.bmax$") or item.filename:match("%.x$")or item.filename:match("%.blocks%.xml$")) then
+				return true;
+			end
+		end)
+
+		for key, value in pairs(onlinestore) do
+			table.insert(result,value)
+		end
+
+		table.sort(result,function (a, b)
+			local isABlocks = a.filename:match("([^/\\]+)%.blocks%.xml$")
+			local isBBlocks = b.filename:match("([^/\\]+)%.blocks%.xml$")
+			return not isABlocks and isBBlocks
+		end)
 		
 		for _, file in ipairs(result) do 
 			file.text = file.filename:match("([^/\\]+)%.blocks%.xml$")
 
 			if(not file.text) then
-				file.text = file.filename:match("([^/\\]+%.bmax)$")
+				file.text = file.filename:match("([^/\\]+%.bmax)$") or file.filename:match("([^/\\]+%.x)$")
 			end
 
 			if(file.text) then
 				file.text = commonlib.Encoding.url_decode(commonlib.Encoding.DefaultToUtf8(file.text));
-				file.filename = GameLogic.current_worlddir.."blocktemplates/"..file.filename;
+				if file.fromMall then
+					file.filename = GameLogic.current_worlddir.."onlinestore/"..file.filename;
+				else
+					file.filename = GameLogic.current_worlddir.."blocktemplates/"..file.filename;
+				end
 
 				if(searchText == nil or file.text:find(searchText)) then
 					folder_local[#folder_local+1] = { name="file", attr=file };

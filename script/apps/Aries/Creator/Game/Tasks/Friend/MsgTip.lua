@@ -8,9 +8,11 @@ Use Lib:
 local MsgTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/MsgTip.lua");
 MsgTip.Show();
 --]]
+local msgDockCfg = {name="msg_tip", align="_rt",  width = 100,height = 90,bg="Texture/Aries/Creator/keepwork/dock/xiaoxi_98x93_32bits.png#0 0 100 90"}
 local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
 local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
 local MsgTip = NPL.export();
+MsgTip.IsOpenPage = false
 local page;
 local DateTool = os.date
 MsgTip.Current_Item_DS = {};
@@ -23,13 +25,14 @@ end
 function MsgTip.CloseView()
     page = nil
     MsgTip.un_read_num = 0
+    MsgTip.IsOpenPage = false
 end
 
 function MsgTip.Show(un_read_num)
-    if MsgTip.IsOpen() then
-        MsgTip.UpdateNum(un_read_num)
-        return
-    end
+    -- if MsgTip.IsOpenPage then
+    --     MsgTip.UpdateNum(un_read_num)
+    --     return
+    -- end
 
     if not MsgTip.HasBind then
         MsgTip.HasBind = true
@@ -43,34 +46,32 @@ function MsgTip.Show(un_read_num)
             end
         end);
     end
-
+    MsgTip.IsOpenPage = true
     MsgTip.un_read_num = un_read_num or 0
-    UserData = user_data
+    if MsgTip.un_read_num > 0 then
+        MsgTip.AddMsgDock()
+    end
+end
 
-    local att = ParaEngine.GetAttributeObject();
-    local oldsize = att:GetField("ScreenResolution", {1280,720});
+function MsgTip.AddMsgDock()
+    local dock = GameLogic.DockManager:AddNewDock(msgDockCfg)
+    dock:Connect("onclickEvent",function()
+        local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
+        FriendsPage.Show()
+    end)
+    GameLogic.DockManager:RePosition()
 
-	local params = {
-			url = "script/apps/Aries/Creator/Game/Tasks/Friend/MsgTip.html",
-			name = "MsgTip.Show", 
-			isShowTitleBar = false,
-			DestroyOnClose = true,
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = false,
-			enable_esc_key = false,
-            click_through = true,
-			cancelShowAnimation = true,
-			-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			DesignResolutionWidth = 1280,
-			DesignResolutionHeight = 720,
-			directPosition = true,
-				align = "_fi",
-				x = 0,
-				y = 0,
-				width = 0,
-				height = 0,
-		};
-	System.App.Commands.Call("File.MCMLWindowFrame", params);	
+    if MsgTip.un_read_num > 0 then
+        local redParams = {
+            width = 12,
+            height = 12,
+            x_offset = 70,
+            y_offset = 6,
+        }
+        dock:AddRedTip(redParams)
+    else
+        dock:RemoveRedTip()
+    end
 end
 
 function MsgTip.UpdateNum(num)
@@ -89,13 +90,12 @@ function MsgTip.GetUnReadNum()
 end
 
 function MsgTip.IsOpen()
-    return page and page:IsVisible()
+    return MsgTip.IsOpenPage
 end
 
 function MsgTip.ClosePage()
-    if page then
-        page:CloseWindow(true)
-    end
+    MsgTip.IsOpenPage = false
+    GameLogic.DockManager:RemoveDock("msg_tip")
 end
 
 function MsgTip.Check()

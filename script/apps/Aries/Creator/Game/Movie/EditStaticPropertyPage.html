@@ -14,10 +14,17 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
 MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local names = {};
 for _, name in ipairs(MovieManager:GetActorNames()) do
-    if(name == "player") then
-        names[#names+1] = {value=name, text=L"主角"}
-    else
+    if(name ~= "player") then
         names[#names+1] = {value=name}
+    end
+end
+table.sort(names,function(a,b)
+    return a.value < b.value
+end)
+for _, name in ipairs(MovieManager:GetActorNames()) do
+    if(name == "player") then
+        table.insert(names,1,{value=name, text=L"主角"})
+        break;
     end
 end
 function GetNames()

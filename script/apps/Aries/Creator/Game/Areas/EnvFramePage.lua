@@ -21,7 +21,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 local EnvFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnvFramePage");
 
 local page;
@@ -127,15 +127,14 @@ end
 
 function EnvFramePage.OnBlockColorChanged(r,g,b)
 	if(r and g and b) then
-		r = r/block_light_scale;
-		g = g/block_light_scale;
-		b = b/block_light_scale;
-		ParaTerrain.GetBlockAttributeObject():SetField("BlockLightColor", {r,g,b});
+		EnvFramePage.cmd_light_color = string.format("/worldenv -lightcolor=%s,%s,%s -block_light_scale=%s",r,g,b,block_light_scale)
+		GameLogic.RunCommand(EnvFramePage.cmd_light_color)
 	end
 end
 
 -- from night to noo by sliderbar
 function EnvFramePage.OnTimeSliderChanged(value)
+	local cmdStr = nil
 	if (value) then
 		local time=(value/1000-0.5)*2;
 		time = tostring(time);
@@ -144,7 +143,13 @@ function EnvFramePage.OnTimeSliderChanged(value)
 		if EnvFramePage.changecb then
 			EnvFramePage.changecb("time", time)
 		end
+		cmdStr = "/time "..time
+
+		if not GameLogic.options:IsTimesAutoGo() then
+			GameLogic.options:SetFrozenDayTime(time,true)
+		end
 	end	
+	EnvFramePage.cmd_time = cmdStr
 end
 
 local RGBTable = {
@@ -158,7 +163,8 @@ local RGBTable = {
 	["black"]	   = {red_v = 0,  green_v = 0,  blue_v = 0,  },
 }
 
-function EnvFramePage.SetLightColor(color_name)
+function EnvFramePage.SetLightColor(name)
+	local color_name = string.match(name,"btn_(.*)");
 	local rgb_item = RGBTable[color_name];
 	if(rgb_item) then
 		local red_value = rgb_item.red_v;
@@ -201,3 +207,104 @@ EnvFramePage.category_others = {
 	}
     
 }
+
+function EnvFramePage.OnToggleShader(name, value)
+	local res = GameLogic.options:SetRenderMethod(value,true)
+	if not res then
+		Page:SetValue("comboShader", "1");
+	else
+		if page then
+			if value=="1" then
+			end
+			-- page:Refresh(0)
+		end
+	end
+end
+
+function EnvFramePage.OnRenderDistChanged(value)
+    GameLogic.options:SetRenderDist(value,true);
+end
+
+function EnvFramePage.OnSuperRenderDistChanged(value)
+    GameLogic.options:SetSuperRenderDist(value,true);
+    if(value and value > GameLogic.options:GetRenderDist() and value>64) then
+        GameLogic.options:SetFogEnd(value - 64);
+    end
+end
+
+function EnvFramePage.OnCloudnessChanged(value)
+    GameLogic.options:SetCloudThickness(value,true);
+end
+    
+function EnvFramePage.OnChangeEyeBrightness(value)
+    GameLogic.options:SetEyeBrightness(value,true);
+end
+
+function EnvFramePage.ChangeWeather(name,mcmlNode)
+	local weather = ""
+    if(string.match(name,"sun")) then
+		weather = "sun"
+    elseif(string.match(name,"cloudy")) then
+		weather = "cloudy"
+    elseif(string.match(name,"rain")) then
+		weather = "rain"
+    elseif(string.match(name,"snow")) then
+		weather = "snow"
+    end
+	EnvFramePage.cmd_weather = string.format("/worldenv -weather=%s",weather)
+	
+    if EnvFramePage.changecb then
+        EnvFramePage.changecb("cmd",EnvFramePage.cmd_weather)
+    end
+
+	GameLogic.options:SetWeather(weather,true)
+end
+
+function EnvFramePage.OnToggleAutoTimesGo(bChecked)
+	GameLogic.options:SetTimesAutoGo(bChecked,true)
+end
+
+function EnvFramePage.OnCopyCmd(name)
+	local cmdStr = nil
+	if name=="copy_weather" then
+		local weather = GameLogic.options:GetWeather()
+		cmdStr = string.format("/worldenv -weather=%s",weather)
+	elseif name=="copy_light" then
+		local now = GameLogic.RunCommand("/time now")
+		now = math.floor(now*100)/100
+		cmdStr = string.format("/worldenv -time=%s",now)
+		if not GameLogic.options:IsTimesAutoGo() then
+			cmdStr = cmdStr.." -isFreezetime=true"
+		end
+	elseif name=="copy_light_color" then
+		local color = ParaTerrain.GetBlockAttributeObject():GetField("BlockLightColor");
+
+		local r,g,b = color[1],color[2],color[3]
+		r = math.floor(r*block_light_scale+0.5)
+		g = math.floor(g*block_light_scale+0.5)
+		b = math.floor(b*block_light_scale+0.5)
+		if block_light_scale==172 then
+			cmdStr = string.format("/worldenv -lightcolor=%s,%s,%s",r,g,b)
+		else
+			cmdStr = string.format("/worldenv -lightcolor=%s,%s,%s -block_light_scale=%s",r,g,b,block_light_scale)
+		end
+	elseif name=="copy_shader_effect" then
+		local nRenderMethod = ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1);
+		local cloudThickness = ParaScene.GetAttributeObjectSky():GetField("CloudThickness",1)
+		local eyeBrightness = GameLogic.options:GetEyeBrightness()
+		local renderdist = GameLogic.options:GetRenderDist()
+		local superrenderdist = GameLogic.options:GetSuperRenderDist()
+
+		cloudThickness = math.floor(cloudThickness*100)/100
+		eyeBrightness = math.floor(eyeBrightness*100)/100
+		renderdist = math.floor(renderdist*100)/100
+		superrenderdist = math.floor(superrenderdist*100)/100
+		cmdStr = string.format("/worldenv -shader=%s -cloudThickness=%s -eyeBrightness=%s -renderdist=%s -superrenderdist=%s",nRenderMethod,cloudThickness,eyeBrightness,renderdist,superrenderdist)
+	end
+	if cmdStr and cmdStr~="" then
+		ParaMisc.CopyTextToClipboard(cmdStr)
+		GameLogic.AddBBS(nil,L"命令已复制")
+	else
+
+	end
+end

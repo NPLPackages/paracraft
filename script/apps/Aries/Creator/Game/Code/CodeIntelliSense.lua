@@ -162,6 +162,8 @@ function CodeIntelliSense.GetSharedAPIGlobals()
 			string = globals.string,
 			table = globals.table,
 			GameLogic = globals.GameLogic,
+			System = globals.System,
+			NPL = globals.NPL,
 			getBlockEntity = globals.getBlockEntity,
 			print = dummyFunc,
 			printStack = dummyFunc,
@@ -239,7 +241,21 @@ function CodeIntelliSense.SetWord(word)
 					end
 					AddMemberFunctionsWithMeta(value, items, className, separator, memberName)
 				end
+				if(#items == 0 and word) then
+					local classes, memberName = CodeIntelliSense.ParseIntoClassesAndMember(word)
+					className = classes[#classes];
+					if(className) then
+						local value = CodeIntelliSense.GuessClass(className);
+						if(value) then
+							local className, separator = word:match("^(.*)([%.:])[^%.:]*$")
+							if(className) then
+								AddMemberFunctionsWithMeta(value, items, className, separator, memberName)
+							end
+						end
+					end
+				end
 			end
+			
 		elseif(#items < CodeIntelliSense.maxCandidates) then
 			-- also add globals
 			AddGlobalVariables(globals, items, word)
@@ -258,6 +274,45 @@ function CodeIntelliSense.SetWord(word)
 	CodeIntelliSense.sortAndRemoveDuplicates(items)
 	CodeIntelliSense.items = items;
 	return #items;
+end
+
+-- return array of class names, memberName
+function CodeIntelliSense.ParseIntoClassesAndMember(word)
+	local classes = {};
+	local className, separator, memberName, name;
+	for i=1, 5 do
+		-- "a.b.c.d" is also supported.
+		className, separator, name = word:match("^([%w%_]+)([%.:])(%S*)$")
+		if(className) then
+			classes[#classes+1] = className;
+			memberName = name;
+			word = name;
+		else
+			break;
+		end
+	end
+	return classes, memberName;
+end
+
+-- we will do some guess work here according to the function name
+function CodeIntelliSense.GuessClass(className)
+	local value;
+	if(className) then
+		if(className:match("[Ee]ntity")) then
+			value = GameLogic.EntityManager.EntityLiveModel;
+		elseif(className:match("[Aa]ctor")) then
+			value = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActor");
+		elseif(className:match("[Aa]bb")) then
+			value = commonlib.gettable("mathlib.ShapeAABB");
+		elseif(className == "event") then
+			-- likely to be a mouse event
+			value = commonlib.gettable("System.Windows.MouseEvent");
+		elseif(className == "window" or className == "dialog" or className:match("^wnd")) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeWindow.lua");
+			value = commonlib.gettable("MyCompany.Aries.Game.Code.CodeWindow")
+		end
+	end
+	return value;
 end
 
 function CodeIntelliSense.sortAndRemoveDuplicates(items)
@@ -584,9 +639,99 @@ function CodeIntelliSense.GetCodeItemInText(word, line, from, to)
 	end
 end
 
+function CodeIntelliSense:getfield(f, rootEnv)
+	if(not f) then return end
+	local v = rootEnv or _G    -- start with the table of globals
+	local w;
+	local bFound;
+	for w in string.gfind(f, "[%w_]+") do
+		bFound = true;
+		if(type(v)=="table") then
+			v = v[w]
+		else
+			return
+		end
+	end
+	if(bFound) then
+		return v
+	end
+end
+
+-- static function
+-- @return nil or function pointer 
+function CodeIntelliSense:GetFunctionByCursor(line, to)
+	if(line and to) then
+		local cmdName = self:GetCommmandNameByWord(line, to)
+		if(cmdName) then
+			-- show command help?
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+			local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+			local cmd_class = CommandManager:GetCmdByString(cmdName)
+			if(type(cmd_class) == "table") then
+				return cmd_class.handler
+			end
+		else
+			-- goto function definition
+			local fullFuncName = self:GetFunctionFullNameByWord(line, to)
+			local codeblock = CodeBlockWindow.GetCodeBlock()
+			if(codeblock and fullFuncName and fullFuncName ~= "") then
+				local env = codeblock:GetCodeEnv()
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeAPI.lua");
+				local CodeAPI = commonlib.gettable("MyCompany.Aries.Game.Code.CodeAPI");
+				local func = CodeAPI.GetAPIFunction(fullFuncName) or self:getfield(fullFuncName, env)
+				if(not func) then
+					local classes, memberName = CodeIntelliSense.ParseIntoClassesAndMember(fullFuncName)
+					if(memberName) then
+						local className = classes[#classes];
+						local value = CodeIntelliSense.GuessClass(className);
+						if(type(value) == "table") then
+							func = value[memberName];
+						end
+					end
+				end
+				return func
+			end
+		end
+	end
+end
+
 -- text control callback
+-- mouse over to show function details
 function CodeIntelliSense.OnMouseOverWordChange(word, line, from, to)
 	CodeIntelliSense.curMouseOverCodeItem = CodeIntelliSense.GetCodeItemInText(word, line, from, to)
+	if(not CodeIntelliSense.curMouseOverCodeItem) then
+		local func = CodeIntelliSense:GetFunctionByCursor(line, to)
+		if(func) then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeInspector.lua");
+			local CodeInspector = commonlib.gettable("MyCompany.Aries.Game.Code.CodeInspector");
+			local info = CodeInspector:GetFunctionDefinition(func)
+			if(info and info.source) then
+				CodeIntelliSense.codeItem = CodeIntelliSense.codeItem or CodeHelpItem:new();
+				local codeItem = CodeIntelliSense.codeItem
+				codeItem.type = "__temp_"..math.random(0, 10000);
+				local html = {}
+				if(info.comment) then
+					html[#html+1] = "<div style='color:#00ff00'>"
+					for line in info.comment:gmatch("[^\r\n]+") do
+						html[#html+1] = commonlib.Encoding.EncodeHTMLInnerText(line)
+						html[#html+1] = "<br/>"
+					end
+					html[#html+1] = "</div>"
+				end
+				html[#html+1] = "<div style='color:#ffffff'>"
+				html[#html+1] = "<span style='color:#0000ff'>function</span>("
+				if(info.params) then
+					html[#html+1] = commonlib.Encoding.EncodeHTMLInnerText(table.concat(info.params, ","));
+					
+				end
+				html[#html+1] = ")"
+				html[#html+1] = "</div>"
+				codeItem.html = table.concat(html);
+				CodeHelpWindow.SetTempCodeItem(codeItem)
+				CodeIntelliSense.curMouseOverCodeItem = codeItem;
+			end
+		end
+	end
 	CodeIntelliSense.ShowMouseOverFuncTip(CodeIntelliSense.curMouseOverCodeItem)
 end
 
@@ -626,6 +771,10 @@ function CodeIntelliSense.ShowContextMenuForWord(word, line, from, to)
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"重做" .. "           Ctrl + Y", Name = "Redo", Type = "Menuitem", onclick = nil, }))
 		node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"编辑..." .. "", Name = "EditCode", Type = "Menuitem", onclick = nil, }))
+		if(word) then
+			node:AddChild(CommonCtrl.TreeNode:new({Text = L"查看定义...", tag = word, Name = "GotoDefinition", Type = "Menuitem", onclick = nil, }))
+		end
+		node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"添加断点..." .. "", Name = "AddBreakPointHere", Type = "Menuitem", onclick = nil, }))
 		if(word) then
 			node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
@@ -698,6 +847,8 @@ function CodeIntelliSense.OnClickContextMenuItem(node)
 		end
 	elseif(name == "AddBreakPointHere") then
 		CodeIntelliSense:AddBreakPointHere()
+	elseif(name == "GotoDefinition") then
+		CodeIntelliSense:GotoDefinition()
 	end
 end
 
@@ -735,6 +886,79 @@ function CodeIntelliSense:AddBreakPointHere()
 		local linenumber = ctrl:CursorPos().line
 		local filename = codeblock:GetFilename()
 		self:AddBreakPoint(filename, linenumber)
+	end
+end
+
+function CodeIntelliSense:GetFunctionFullNameByWord(line, endOfWordPos)
+	local fullname = "";
+	for i = endOfWordPos, 1, -1 do
+		local c = line:substr(i, i)
+		if(c == "." or c==":") then
+			fullname = c..fullname;
+		elseif(c:match("[%w_]")) then
+			fullname = c..fullname;
+		else
+			break;
+		end
+	end
+	return fullname;
+end
+
+function CodeIntelliSense:GetCommmandNameByWord(line, endOfWordPos)
+	local fullname = "";
+	for i = endOfWordPos, 1, -1 do
+		local c = line:substr(i, i)
+		if(c == "/") then
+			return fullname;
+		elseif(c:match("%w")) then
+			fullname = c..fullname;
+		else
+			break
+		end
+	end
+end
+
+function CodeIntelliSense:GotoDefinition()
+	local codeblock = CodeBlockWindow.GetCodeBlock()
+	local textCtrl = CodeBlockWindow.GetTextControl()
+	if(codeblock and textCtrl) then
+		local pos = textCtrl:CursorPos()
+		local line = textCtrl:GetLineText(pos.line)
+		if(line) then
+			local from,to = line:wordPosition(pos.pos);
+			if(from and from < to) then
+				local func = self:GetFunctionByCursor(line, to)
+				if(func) then
+					self:GotoFunctionDefinition(func)
+				end
+			end
+		end
+	end
+end
+
+-- static function:
+function CodeIntelliSense:GotoCommandDefinition(cmdName)
+	if(cmdName) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+		local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+		local cmd_class = CommandManager:GetCmdByString(cmdName)
+		if(type(cmd_class) == "table") then
+			return self:GotoFunctionDefinition(cmd_class.handler)
+		end
+	end
+end
+
+-- static function:
+-- open function definition with source code and line number in NPL code wiki. 
+function CodeIntelliSense:GotoFunctionDefinition(func)
+	if(func) then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeInspector.lua");
+		local CodeInspector = commonlib.gettable("MyCompany.Aries.Game.Code.CodeInspector");
+		local info = CodeInspector:GetFunctionDefinition(func)
+		if(info and info.source) then
+			GameLogic.RunCommand("open", string.format("npl://editcode?src=%s&line=%d", info.source, info.linedefined));
+			return true
+		end
 	end
 end
 

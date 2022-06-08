@@ -1455,13 +1455,21 @@ function block:OnEntityCollided(x,y,z, entity, deltaTime)
 	
 end
 
+-- virtual function:
 -- call when use press mouse down button over the block
-function block:OnMouseDown(x,y,z, mouse_button)
-	if(mouse_button == "left") then
-		-- self:play_step_sound();
-	end
+-- @param event: mouse event, one can accept the event in order to prevent further processing. 
+-- @param bx, by, bz: block position
+-- @param pickingResult: last picking result if any. this maybe nil. 
+function block:OnMouseDown(event, bx, by, bz, pickingResult)
 end
 
+-- virtual function:
+function block:OnMouseMove(event, bx, by, bz, pickingResult)
+end
+
+-- virtual function:
+function block:OnMouseUp(event, bx, by, bz, pickingResult)
+end
 
 -- virtual function: some signal is received, such as user click
 -- the default behavior is to activate the neuron block.

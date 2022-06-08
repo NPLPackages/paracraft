@@ -16,6 +16,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeTouchController.lua");
 NPL.load("(gl)script/ide/System/Core/Color.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeBagPage.lua");
 local Color = commonlib.gettable("System.Core.Color");
 local ParaLifeTouchController = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeTouchController")
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
@@ -38,6 +39,7 @@ local page = nil
 local default_model = "character/CC/02human/CustomGeoset/actor.x"
 local default_skin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString)
 local default_data = {assetfile=default_model,skin=default_skin,scaling=1}
+local ParalifeBagPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParalifeBagPage");
 local createdEntity
 local default_role_data = {
 	{
@@ -251,7 +253,7 @@ local default_face_data = {
 	},
 	{
 		icon = face_path.."tou15_64x53_32bits.png",
-		skin = "81032;88013",
+		skin = "81032;88019",
 	},
 	{
 		icon = face_path.."tou16_64x53_32bits.png",
@@ -341,6 +343,8 @@ ParalifeLiveModel.main_ui_mode = "switchmain"
 ParalifeLiveModel.role_data = {}
 ParalifeLiveModel.face_data = _PaginatedData:new({arr = default_face_data,pageLen=11})
 ParalifeLiveModel.movie_entity = nil
+ParalifeLiveModel.progress_angle = 0
+ParalifeLiveModel.IsRecording = false
 function ParalifeLiveModel.OnInit()
     page = document:GetPageCtrl();
 	page.OnCreate = ParalifeLiveModel.OnCreate
@@ -357,6 +361,7 @@ function ParalifeLiveModel.ShowView(entity)
         allowDrag = false,
         click_through = true,
         enable_esc_key = false,
+		cancelShowAnimation = true,
         zorder = -13,
         app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key,
         directPosition = true,
@@ -425,6 +430,10 @@ function ParalifeLiveModel.SetBagDataWithEntity(entity)
 	if entity==nil then
 		return
 	end
+	if ParalifeLiveModel.IsBagTypeGrid~="default" then
+		ParalifeBagPage.SetBagDataWithEntity(entity)
+		return
+	end
 	ParalifeLiveModel.IsInit = true
 	ParalifeLiveModel.role_data = {}
 	if entity:GetType() == EntityManager.EntityMovieClip.class_name then
@@ -440,18 +449,80 @@ function ParalifeLiveModel.SetBagDataWithEntity(entity)
 	ParalifeLiveModel.RefreshPage()
 end
 
-function ParalifeLiveModel.AddBagDataWithEntity(entity)
+function ParalifeLiveModel.AddBagDataWithEntity(entity,param)
 	if entity==nil then
 		return
 	end
-	ParalifeLiveModel.AddRoleData(entity)
+	if ParalifeLiveModel.IsBagTypeGrid~="default" then
+		ParalifeBagPage.AddBagDataWithEntity(entity,param)
+		return
+	end
+	local arr = ParalifeLiveModel.role_data or {}
+	for k,v in ipairs(arr) do
+		if v.xmlnode and v.xmlnode.attr then
+			local attr = v.xmlnode.attr
+			if attr.name==entity:GetName() then
+				print("重复添加背包，过滤",entity:GetName())
+				return
+			end
+		end
+	end
+
+	local temp = ParalifeLiveModel.AddRoleData(entity,nil,nil,true)
 	ParalifeLiveModel.RefreshPage()
+	local _isClone = param and param.clone==true
+	if not _isClone then
+		entity:Destroy()
+	end
 end
 
 
 function ParalifeLiveModel.ClearBag()
+	if ParalifeLiveModel.IsBagTypeGrid~="default" then
+		ParalifeBagPage.ClearBag()
+		return
+	end
+	ParalifeLiveModel.IsInit = true
 	ParalifeLiveModel.role_data = {}
 	ParalifeLiveModel.RefreshPage()
+end
+
+--隐藏背包以及按钮
+function ParalifeLiveModel.SetHideBagBtn(isHide)
+	ParalifeLiveModel.isRoleBtnHide = isHide
+	ParalifeLiveModel.RefreshPage()
+end
+
+--根据模型名或者静态标签获取出背包物品,返回一个函数调用
+function ParalifeLiveModel.PickBagItemByModelNameOrStaticTag(paramStr)
+	if paramStr==nil or paramStr=="" then
+		return
+	end
+	local idx
+	local arr = ParalifeLiveModel.role_data or {}
+	for k,v in ipairs(arr) do
+		if v.xmlnode and v.xmlnode.attr then
+			local attr = v.xmlnode.attr
+			if attr.filename==paramStr or attr.staticTag==paramStr or attr.name==paramStr then
+				idx = k
+				break
+			end
+		else --从电影方块来的，就没有
+			if v.assetfile:match(paramStr) then 
+				idx = k
+				break
+			end
+		end
+	end
+	
+	if idx then
+		return function()
+			local entity = ParalifeLiveModel.CreateEntity(idx,arr[idx])
+			entity:GetItemClass():DropDraggingEntity(entity)
+			ParalifeLiveModel.RemoveRoleData(idx)
+			return entity
+		end
+	end
 end
 
 function ParalifeLiveModel.OnCreate()
@@ -471,33 +542,83 @@ end
 -- Camera Recorder 
 -------------------------
 local touch_time = 0
-local IsRecord = false
 local touch_timer = nil
+local progressName = "timePrgress"
+local normal = 1.0
+local maxScale = 1.25
+local max_touch_time = 150
+local touch_delta = 10
+local curR,curG,curB = 222,242,255
+local penColor = "#def2ff"
+
+function ParalifeLiveModel.IsRecord()
+	return ParalifeLiveModel.IsRecording
+end
+
+function ParalifeLiveModel.StopRecord()
+	if not ParalifeLiveModel.IsRecording then
+		return 
+	end
+	ParalifeLiveModel.IsRecording = false
+	Recording.CancelRecord()
+end
+
 function ParalifeLiveModel.InitCameraButton()
 	local btnCamera = ParaUI.GetUIObject("ui_camera")
 	if btnCamera and btnCamera:IsValid() then
 		btnCamera.visible = false
 		local platform = System.os.GetPlatform()
-		if System.options.isDevMode or platform == "ios" then
+		if System.options.isDevMode or platform == "ios" or platform == 'android' then
 		-- TODO: @pbb, iOS and android should be re-enabled when it is not buggy. 
 		-- if System.options.isDevMode then
 			btnCamera.visible = true
 		end
 		btnCamera:SetScript("onmouseup",function()
-			_guihelper.SetUIColor(btnCamera,"#ffffff")
-			btnCamera.scalingx = 1.0
-			btnCamera.scalingy = 1.0
-			ParalifeLiveModel.OnTouchCamera(false)
-			IsRecord = false
+			local touch = {type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0};
+			ParalifeLiveModel.OnTouch(touch)
 		end)
 		btnCamera:SetScript("onmousedown",function()
-			btnCamera.scalingx = 1.25
-			btnCamera.scalingy = 1.25
-			_guihelper.SetUIColor(btnCamera,"#ffffff")
-			if not IsRecord then
-				ParalifeLiveModel.OnTouchCamera(true)
-			end			
+			local touch = {type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0};
+			ParalifeLiveModel.OnTouch(touch)		
 		end)
+
+		btnCamera:SetScript("ontouch", function()
+			ParalifeLiveModel.OnTouch(msg)
+		end);
+		ParalifeLiveModel.DrawProgressView(btnCamera)
+
+		if ParalifeLiveModel.IsRecording then
+			ParalifeLiveModel.HideCamera(true)
+		end
+	end
+end
+
+function ParalifeLiveModel.OnTouch(touch)
+	-- handle the touch
+	local touch_session = TouchSession.GetTouchSession(touch);
+	local btnItem = ParaUI.GetUIObject("ui_camera")
+	if(touch.type == "WM_POINTERDOWN") then
+		if(btnItem) then
+			touch_session:SetField("keydownBtn", btnItem);
+			btnItem.isDragged = nil;
+			btnItem.scalingx = maxScale
+			btnItem.scalingy = maxScale
+			_guihelper.SetUIColor(btnItem,"#ffffff")
+			if not ParalifeLiveModel.IsRecording then
+				ParalifeLiveModel.OnTouchCamera(true)
+			end	
+		end
+	elseif(touch.type == "WM_POINTERUPDATE") then
+		local keydownBtn = touch_session:GetField("keydownBtn");
+		if(keydownBtn and touch_session:IsDragging()) then
+			
+		end
+		
+	elseif(touch.type == "WM_POINTERUP") then
+		_guihelper.SetUIColor(btnItem,"#ffffff")
+		btnItem.scalingx = normal
+		btnItem.scalingy = normal
+		ParalifeLiveModel.OnTouchCamera(false)
 	end
 end
 
@@ -506,8 +627,13 @@ function ParalifeLiveModel.HideCamera(bHide)
 	if btnCamera then
 		_guihelper.SetUIColor(btnCamera,"#ffffff")
 		btnCamera.visible = not bHide
-		btnCamera.scalingx = 1.0
-		btnCamera.scalingy = 1.0
+		btnCamera.scalingx = normal
+		btnCamera.scalingy = normal
+		if bHide then
+			ParalifeLiveModel.progress_angle = 0
+			curR,curG,curB = 222,242,255
+			penColor = "#def2ff"
+		end
 	end
 end
 
@@ -519,43 +645,91 @@ function ParalifeLiveModel.SetCameraColor(colorStr)
 end
 
 function ParalifeLiveModel.SetRecord(isRecord)
-	IsRecord = isRecord
-	if not IsRecord then
-		touch_time = 0
+	ParalifeLiveModel.IsRecording = isRecord
+end
+
+function ParalifeLiveModel.HideExitButton(bHide)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeHomeButton.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeTipButton.lua");
+	local ParaLifeTipButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeTipButton")
+	local ParaLifeHomeButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeHomeButton")
+	ParaLifeHomeButton.ShowPage(not bHide)
+	ParaLifeTipButton.ShowPage(not bHide)
+	ParalifeLiveModel.ShowView()
+end
+
+function ParalifeLiveModel.DrawProgressView(parent)
+	if not parent then
+		return 
 	end
+    local _ownerDrawBtn = ParaUI.CreateUIObject("container", progressName, "_lt", 36, 36, 150, 150);
+	_ownerDrawBtn:SetField("OwnerDraw", true);
+    local radius = 72
+    local x,y = 20,20
+    local ra = 0
+    local width = 6
+	_ownerDrawBtn:GetAttributeObject():SetField("ClickThrough", true)
+	_ownerDrawBtn:SetScript("ondraw", function()
+        ra = ParalifeLiveModel.progress_angle * 1000
+        ParaPainter.SetPen(penColor)
+        for i=1,ra do
+            local r = i / 1000 
+            local dx = x + radius * math.cos(math.rad(r))
+            local dy = y + radius * math.sin(math.rad(r))
+            local dx1 = x + (radius - width) * math.cos(math.rad(r))
+            local dy2 = y + (radius - width) * math.sin(math.rad(r))
+            ParaPainter.DrawLine(dx1, dy2, dx, dy)
+        end
+    end);
+	parent:AddChild(_ownerDrawBtn);
+end
+
+function ParalifeLiveModel.UpdatePenColor(timer)
+	local disR,disG,disB = ParalifeLiveModel.GetColorDis()
+	curR = curR - disR
+	curG = curG - disG
+	curB = curB - disB
+	penColor = Color.ConvertRGBAStringToColor(string.format("%d %d %d", curR , curG, curB))
+end
+
+local colorDisR,colorDisG,colorDisB
+function ParalifeLiveModel.GetColorDis()
+	if not colorDisR then
+		local startR,startG,satrtB = 222,242,255
+		local endR,endG,endB = 110,194,248
+		colorDisR = math.floor((startR - endR)/math.floor(max_touch_time / touch_delta))
+		colorDisG = math.floor((startG - endG)/math.floor(max_touch_time / touch_delta))
+		colorDisB = math.floor((satrtB - endB)/math.floor(max_touch_time / touch_delta))
+	end
+	return colorDisR,colorDisG,colorDisB
 end
 
 function ParalifeLiveModel.OnTouchCamera(bTouch)
-	if IsRecord and bTouch then
+	if ParalifeLiveModel.IsRecording and bTouch then
 		return 
 	end
-	IsRecord = true
+	ParalifeLiveModel.IsRecording = bTouch
 	touch_time = 0
 	if not bTouch then
 		if touch_timer then
 			touch_timer:Change()
 			touch_timer = nil
 		end
+		curR,curG,curB = 222,242,255
+		penColor = "#def2ff"
 		ParalifeLiveModel.SetCameraColor("#ffffff")
+		ParalifeLiveModel.progress_angle = 0
 		return
 	end
-	local startR,startG,satrtB = 255,255,255
-	local endR,endG,endB = 136,136,136
-	local curR,curG,curB = startR,startG,satrtB
-	local max_touch_time = 600
-	local touch_delta = 10
-	local color_dis = math.floor(startR - endR) / math.floor(max_touch_time / touch_delta)
+	
+	local angle_delta =  (360 / math.floor(max_touch_time / touch_delta))
 	touch_timer = commonlib.Timer:new({callbackFunc = function(timer)
 		touch_time = touch_time + touch_delta
-		curR = curR - color_dis
-		curG = curG - color_dis
-		curB = curB - color_dis
-		if curR >= endR then
-			local color = Color.ConvertRGBAStringToColor(string.format("%d %d %d", curR , curG, curB))
-			ParalifeLiveModel.SetCameraColor(color)
-		end
+		ParalifeLiveModel.progress_angle = ParalifeLiveModel.progress_angle + angle_delta
+		ParalifeLiveModel.UpdatePenColor(timer)
 		if touch_time > max_touch_time then
 			ParalifeLiveModel.HideCamera(true)
+			ParalifeLiveModel.HideExitButton(true)
 			local RecordAnimation = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/RecordAnimation.lua") 
     		RecordAnimation.ShowView(function()
 				Recording.ShowView()
@@ -564,7 +738,7 @@ function ParalifeLiveModel.OnTouchCamera(bTouch)
 			timer:Change()
 		end
 	end})
-	touch_timer:Change(0, 10);
+	touch_timer:Change(0, touch_delta)
 end
 
 function ParalifeLiveModel.ShowShortScreen()
@@ -768,7 +942,15 @@ function ParalifeLiveModel.InitPlayerControl()
 					createdEntity:SetDead(true)
 					ParalifeLiveModel.RefreshPage()
 				else
-					createdEntity:GetItemClass():DropDraggingEntity(createdEntity)
+
+					local temp = createdEntity
+					createdEntity:GetItemClass():DropDraggingEntity(createdEntity,nil,nil,function()
+						commonlib.TimerManager.SetTimeout(function()
+							ParalifeLiveModel.AddRoleData(temp,true,true,true)
+							temp:SetDeadWithAllChildren()
+							ParalifeLiveModel.RefreshPage()
+						end,100)
+					end)
 					local index = createdEntity.remove_index
 					if ParalifeLiveModel.main_ui_mode == "switchrole" then
 						ParalifeLiveModel.RemoveRoleData(index)
@@ -805,7 +987,7 @@ function ParalifeLiveModel.TryDropPlayerEntityToRoleDock(draggingEntity, event)
 	local starty = screen_height - ParalifeLiveModel.GetViewMargin()
 	if mouse_y > starty and ParalifeLiveModel.main_ui_mode == "switchrole" then
 		if (draggingEntity and draggingEntity:isa(EntityManager.EntityLiveModel))  then --只能拖入活动模型
-			ParalifeLiveModel.AddRoleData(draggingEntity,true,true) 
+			ParalifeLiveModel.AddRoleData(draggingEntity,true,true,true) 
 			draggingEntity:SetDead();
 		end
 	end
@@ -890,7 +1072,7 @@ function ParalifeLiveModel.RemoveRoleData(index)
 	ParalifeLiveModel.MoveAction(moveDis,0.1)
 end
 
-function ParalifeLiveModel.AddRoleData(entity,bRefresh,isInsert)
+function ParalifeLiveModel.AddRoleData(entity,bRefresh,isInsert,isDraggedIn)
 	if not entity then
 		return 
 	end
@@ -909,7 +1091,7 @@ function ParalifeLiveModel.AddRoleData(entity,bRefresh,isInsert)
 		skin = nil
 		assetfile = PlayerAssetFile:GetValidAssetByString(entity.filename)
 	end
-	local temp = {assetfile = assetfile,skin = skin,scaling = scaling or 1,xmlnode=xmlnode,isNotHuman=isNotHuman}
+	local temp = {assetfile = assetfile,skin = skin,scaling = scaling or 1,xmlnode=xmlnode,isNotHuman=isNotHuman,isDraggedIn=isDraggedIn}
 	local index = ParalifeLiveModel.GetIndexWithMouse()
 	if curNum < ParalifeLiveModel.GetShowNum() then
 		ParalifeLiveModel.role_data[curNum + 1] = temp
@@ -924,6 +1106,7 @@ function ParalifeLiveModel.AddRoleData(entity,bRefresh,isInsert)
 	if bRefresh then
 		ParalifeLiveModel.RefreshPage()
 	end
+	return temp
 end
 
 function ParalifeLiveModel.MoveRoleData(move_num,ismoveleft)
@@ -1002,7 +1185,12 @@ end
 function ParalifeLiveModel.CreateEntity(index,data) --创建livemodel
 	local event = MouseEvent:init("mousePressEvent")
 	local result, targetEntity = GameLogic.GetSceneContext():CheckMousePick(event);
-	local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+	local bx,by,bz
+	if result then
+		bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+	else
+		bx,by,bz = GameLogic.GetPlayer():GetBlockPos()
+	end
 	local facing = Direction.GetFacingFromCamera()
 	facing = Direction.NormalizeFacing(facing)
 	local filename=data.assetfile or "character/CC/02human/CustomGeoset/actor.x"
@@ -1013,7 +1201,9 @@ function ParalifeLiveModel.CreateEntity(index,data) --创建livemodel
 	end
 	entity:setScale(data.scaling)
 	if (data.xmlnode and data.xmlnode.attr) then
-		data.xmlnode.attr.name = nil;
+		if not data.isDraggedIn then--拖动进来的，不需要防止重名问题
+			data.xmlnode.attr.name = nil;
+		end
 		entity:LoadFromXMLNode(data.xmlnode)
 	end
 	entity:Refresh();
@@ -1022,6 +1212,7 @@ function ParalifeLiveModel.CreateEntity(index,data) --创建livemodel
 	createdEntity.remove_index = index
 	entity:GetItemClass():StartDraggingEntity(createdEntity)
 	entity:GetItemClass():UpdateDraggingEntity(createdEntity)
+	return entity
 end
 
 function ParalifeLiveModel.GetSceneContext()
@@ -1045,12 +1236,25 @@ function ParalifeLiveModel.ClosePage()
 		page = nil
 		ParalifeLiveModel.main_ui_mode = "switchmain"
 		--GameLogic.ActivateDefaultContext()
-		local viewport = ViewportManager:GetSceneViewport();
+		ParalifeLiveModel.SetSceneMarginBottom(false)
+    end
+end
+
+function ParalifeLiveModel.SetSceneMarginBottom(hasMargin)
+	local viewport = ViewportManager:GetSceneViewport();
+	if not hasMargin then
 		if viewport:GetMarginBottomHandler() == ParalifeLiveModel then
 			viewport:SetMarginBottom(0);
 			viewport:SetMarginBottomHandler(nil);
+			ParaLifeTouchController.SetBallMargin(0)
 		end
-    end
+	else
+		if viewport:GetMarginBottomHandler() ~= ParalifeLiveModel then
+			viewport:SetMarginBottom(math.floor(ParalifeLiveModel.GetViewMargin() * (Screen:GetUIScaling()[2]))); 
+			viewport:SetMarginBottomHandler(ParalifeLiveModel);
+			ParaLifeTouchController.SetBallMargin(ParalifeLiveModel.GetViewMargin())
+		end
+	end
 end
 
 function ParalifeLiveModel.SwitchOperateButton(name)
@@ -1059,18 +1263,20 @@ function ParalifeLiveModel.SwitchOperateButton(name)
 	end
 	local viewport = ViewportManager:GetSceneViewport();
 	if name == "switchrole"  then --or name=="switch_expression"
-		if viewport:GetMarginBottomHandler() ~= ParalifeLiveModel then
-			viewport:SetMarginBottom(math.floor(ParalifeLiveModel.GetViewMargin() * (Screen:GetUIScaling()[2]))); 
-			viewport:SetMarginBottomHandler(ParalifeLiveModel);
+
+		if ParalifeLiveModel.IsBagTypeGrid~="default" then
+			ParalifeBagPage.ShowPage(ParalifeLiveModel.IsBagTypeGrid,ParalifeBagPage.PAGE_SIZE,ParalifeBagPage.ITEM_SIZE);
+			return
+		else
+			ParalifeLiveModel.SetSceneMarginBottom(true)
 		end
 	elseif name== "switchmain" then
-		if viewport:GetMarginBottomHandler() == ParalifeLiveModel then
-			viewport:SetMarginBottom(0);
-			viewport:SetMarginBottomHandler(nil);
-		end
+		ParalifeLiveModel.SetSceneMarginBottom(false)
 	elseif name== "next_page_expression" then --表情翻页
 		name = "switch_expression"
 		ParalifeLiveModel.face_data:getNextPage()
+	elseif name=="switch_expression" then
+		ParalifeLiveModel.SetSceneMarginBottom(true)
 	end
 	ParalifeLiveModel.main_ui_mode = name
 	ParalifeLiveModel.RefreshPage()
@@ -1081,10 +1287,42 @@ function ParalifeLiveModel.OnExitWorld()
 	ParalifeLiveModel.main_ui_mode = "switchmain"
 	
 	local viewport = ViewportManager:GetSceneViewport();
-	if viewport:GetMarginBottomHandler() == ParalifeLiveModel then
-		viewport:SetMarginBottom(0);
-		viewport:SetMarginBottomHandler(nil);
-	end
+	ParalifeLiveModel.SetSceneMarginBottom(false)
 	ParalifeLiveModel.IsInit = nil
 	ParalifeLiveModel.ClosePage()
+	ParalifeLiveModel.SetHideBagBtn(false)
+	ParalifeLiveModel.SetBagTypeDefault()
+end
+
+function ParalifeLiveModel.SetBagTypeGird()
+	ParalifeLiveModel.IsBagTypeGrid = "grid"
+end
+
+function ParalifeLiveModel.SetBagTypeBottom(options)
+	ParalifeLiveModel.IsBagTypeGrid = "bottombar"
+	if options then
+		if tonumber(options.count) then
+			ParalifeBagPage.PAGE_SIZE = tonumber(options.count)
+		end
+		if tonumber(options.size) then
+			ParalifeBagPage.ITEM_SIZE = tonumber(options.size)
+		end
+	end
+end
+
+function ParalifeLiveModel.SetBagTypeTop(options)
+	ParalifeLiveModel.IsBagTypeGrid = "topbar"
+	if options then
+		if tonumber(options.count) then
+			ParalifeBagPage.PAGE_SIZE = tonumber(options.count)
+		end
+		if tonumber(options.size) then
+			ParalifeBagPage.ITEM_SIZE = tonumber(options.size)
+		end
+	end
+end
+
+ParalifeLiveModel.IsBagTypeGrid = "default"
+function ParalifeLiveModel.SetBagTypeDefault()
+	ParalifeLiveModel.IsBagTypeGrid = "default"
 end

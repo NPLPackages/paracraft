@@ -20,6 +20,13 @@ local AllContext = commonlib.gettable("MyCompany.Aries.Game.AllContext");
 local ParaLife = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife"));
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeHomeButton.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeFrontPage.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeTipButton.lua");
+local ParaLifeTipButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeTipButton")
+local ParaLifeFrontPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeFrontPage")
+local ParaLifeHomeButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeHomeButton")
+
 ParaLife:Property({"bEnabled", nil, "IsEnabled", "SetEnabled"});
 ParaLife:Property({"isShowPlayer", false, "SetShowPlayer", "IsShowPlayer"});
 
@@ -35,6 +42,10 @@ function ParaLife:Init()
 	GameLogic.GetFilters():add_filter("DesktopModeChanged", function(mode)
 		return self:OnChangeDesktopMode(mode);
 	end);
+
+	GameLogic:Connect("WorldLoaded", ParaLife, function()
+		self:OnWorldLoad()
+	end, "UniqueConnection");
 end
 
 -- virtual: called when a desktop mode is changed such as from game mode to edit mode. 
@@ -72,12 +83,6 @@ end
 
 -- automatically show or hide according to game mode. 
 function ParaLife:SetEnabled(bEnabled)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeHomeButton.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeFrontPage.lua");
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeTipButton.lua");
-	local ParaLifeTipButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeTipButton")
-	local ParaLifeFrontPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeFrontPage")
-	local ParaLifeHomeButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeHomeButton")
 	if(bEnabled) then
 		self:Init();
 		if(GameLogic.IsReadOnly()) then
@@ -93,8 +98,16 @@ function ParaLife:SetEnabled(bEnabled)
 				end
 			end
 		end
-		ParaLifeHomeButton.ShowPage(true)
-		ParaLifeTipButton.ShowPage(true)
+		if not self:IsNoBackBtn() then
+			ParaLifeHomeButton.ShowPage(true)
+		else
+			ParaLifeHomeButton.ShowPage(false)
+		end
+		if not self:IsNoBookBtn() then
+			ParaLifeTipButton.ShowPage(true)
+		else
+			ParaLifeTipButton.ShowPage(false)
+		end
 	else
 		ParaLifeFrontPage.ShowPage(false)
 		ParaLifeHomeButton.ShowPage(false)
@@ -121,8 +134,30 @@ function ParaLife:SetShowPlayer(bIsShowPlayer)
 	self.isShowPlayer = bIsShowPlayer == true;
 end
 
+function ParaLife:SetShowOptions(options)
+	self.isShowPlayer = options.showplayer==true
+	self._isNoEdit = options.noedit == true
+	self._isNoBookBtn = options.nobookbutton == true
+	self._isNoBackBtn = options.nobackbutton == true
+	
+	self:SetEnabled(self.bEnabled)
+	ParaLifeFrontPage.RefreshPage()
+end
+
 function ParaLife:IsShowPlayer()
 	return self.isShowPlayer;
+end
+
+function ParaLife:IsNoEdit()
+	return self._isNoEdit;
+end
+
+function ParaLife:IsNoBookBtn()
+	return self._isNoBookBtn;
+end
+
+function ParaLife:IsNoBackBtn()
+	return self._isNoBackBtn;
 end
 
 function ParaLife:UpdateShowViewStates(isShow)
@@ -152,6 +187,11 @@ function ParaLife:Show()
 		-- GameLogic.RunCommand("/show playertouch")
 	else
 		GameLogic.RunCommand("/hide player")
+	end
+
+	if self:GetLinePathJumpHeightWhileHidden() then
+		local height = self:GetLinePathJumpHeightWhileHidden()
+		self:SetLinePathJumpHeightWhileHidden(height)
 	end
 	GameLogic.RunCommand("/hide touch")
 	GameLogic.RunCommand("/hide keyboard")
@@ -191,6 +231,21 @@ function ParaLife:Hide()
 			GameLogic.options:SetEnableMouseLeftDrag(false)
 		end
 	end
+end
+
+function ParaLife:OnWorldLoad()
+	self:SetLinePathJumpHeightWhileHidden(nil)
+end
+
+function ParaLife:SetLinePathJumpHeightWhileHidden(height)
+	self.jumpHeightWhileHidden = height
+	if self.context then
+		self.context:SetLinePathJumpHeightWhileHidden(height)
+	end
+end
+
+function ParaLife:GetLinePathJumpHeightWhileHidden()
+	return self.jumpHeightWhileHidden
 end
 
 ParaLife:InitSingleton()

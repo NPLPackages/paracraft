@@ -94,7 +94,9 @@ function Entity:PlayMusic()
 end
 
 function Entity:StopMusic()
-	BackgroundMusic:Stop(self.cmd);
+	if self.cmd then
+		BackgroundMusic:Stop(self.cmd);
+	end
 	self.isPlaying = false;
 end
 
@@ -105,7 +107,7 @@ function Entity:ToggleMusic()
 end
 
 function Entity:GetCommandTitle()
-	return L"输入声音文件路径或名字：<div>支持ogg, mp3, wav, mid格式</div><div>内部声音：数字[1-6]</div>"
+	return L"输入声音文件路径或名字：支持ogg, mp3, wav, mid格式 <br/> 内部声音：数字[1-6]"
 end
 
 --  right click to edit and left click to play
@@ -130,24 +132,35 @@ function Entity:OpenEditor(editor_name, entity)
 	end
 	if(editor_name == "entity") then
 		local old_value = self.cmd;
-
-		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-		OpenFileDialog.ShowPage(self:GetCommandTitle(), function(result)
-			if(result and result ~= old_value) then
-				if(result ~= commonlib.Encoding.DefaultToUtf8(result)) then
-					_guihelper.MessageBox(L"文件名必须是英文字母与数字的组合");
-					return 
-				end
-				local filename = result;
+		local title= self:GetCommandTitle()
+		local filename = ""
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAudioFileDialog.lua");
+		local OpenAudioFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAudioFileDialog");
+		local onClose = function(result)
+			if(result) then
+				local cmd_text = result;
+				-- if(result ~= commonlib.Encoding.DefaultToUtf8(result)) then
+				-- 	_guihelper.MessageBox(L"文件名必须是英文字母与数字的组合");
+				-- 	return 
+				-- end	
+				filename = cmd_text or "";
+	
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-				if(filename~="" and not filename:match("^%d+$") and not Files.GetWorldFilePath(filename)) then
+	
+				if(filename~="" and not filename:match("^%d+$") and not Files.GetWorldFilePath(filename) and not ParaIO.DoesFileExist(filename, true)) then
 					_guihelper.MessageBox(format(L"当前世界的目录下没有文件: %s", commonlib.Encoding.DefaultToUtf8(filename)));
 				else
-					self.cmd = filename;
+					if self.cmd ~= filename then
+						self:StopMusic()
+						self.cmd = filename;
+					end
 				end
 			end
-		end,old_value, L"声音文件", "audio")
+		end
+		OpenAudioFileDialog.ShowPage(title, onClose, old_value, L"声音文件", nil, {text = L"录音", callback=function(filename) 
+			OpenAudioFileDialog.OnClose()
+			onClose(filename)
+		end})
 	end
 end

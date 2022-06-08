@@ -14,7 +14,7 @@ entity:SetPersistent(false);
 entity:EnablePhysics(true);
 entity:SetStaticBlocker(true);
 entity:SetCanRandomMove(false);
-EntityManager.AddObject(entity);
+entity:Attach();
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");

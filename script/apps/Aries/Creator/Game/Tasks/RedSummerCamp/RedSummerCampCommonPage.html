@@ -50,6 +50,10 @@ function IsAiSchoolType()
     return RedSummerCampCommonPage.IsAiSchoolType()
 end
 
+function IsChinaStory()
+    return RedSummerCampCommonPage.IsChinaStory()
+end
+
 function ClickCustomerService()
     --GameLogic.AddBBS(nil, L"敬请期待");
     ParaGlobal.ShellExecute('open', L'https://wpa1.qq.com/TxyKupLK?_type=wpa&qidian=true', '', '', 1)
@@ -114,7 +118,7 @@ end
             <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
         </div>
         <div style="width: 1242px; height: 626px;margin-left: 15px;margin-top: 25px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/shentongbei_32bits.png#0 0 512 625:150 145 100 150);">
-            <div name="title" style="margin-top: 25px; text-align: center;font-weight: bold; width: 1242px; height: 60px; font-size: 40px; base-font-size:40px; color: #212122;font-weight: bold;"><%=GetData("title")%></div>
+            <div name="title" style="margin-top: 25px; text-align: center;font-weight: bold; width: 1242px; height: 60px; font-size: 30px; base-font-size:30px; color: #212122;font-weight: bold;"><%=GetData("title")%></div>
             <div name="logo" style="float: left;margin-top: 20px; margin-left: 38px; width: 630px; height: 402px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#157 95 80 80: 30 30 30 30);">
                 <img width="602" height="374" style="margin-left: 14px; margin-top: 14px;" src='<%=GetData("img")%>'/>
             </div>
@@ -156,7 +160,10 @@ end
             <pe:if condition="<%=not IsAiSchoolType()%>">
                 <div style="width: 1242px;">
                     <input type="button" onclick="ClickLBBt" value='<%=GetData("lb_bt_desc")%>' style="position: relative; margin-left: 150px; margin-top: 0px;color: #1335a0;font-weight: bold; font-size: 16px; base-font-size:16px;width: 120px; height: 80px; background:;"/>
-                    <input type="button" value='<%=GetData("rb_bt_desc")%>' onclick="ClickRBBt" class="yellon_button" style="margin-left:1010px;margin-top:15px;" />
+                    <input type="button" value='<%=GetData("rb_bt_desc")%>' onclick="ClickRBBt" class="yellon_button" style="position: relative; margin-left:1010px;margin-top:15px;" />
+                    <pe:if condition="<%=IsChinaStory()%>">
+                        <input type="button" value='大赛详情' onclick="ClickRBBt" class="yellon_button" style="margin-left:830px;margin-top:15px;" />
+                    </pe:if>
                 </div>
             </pe:if>
 

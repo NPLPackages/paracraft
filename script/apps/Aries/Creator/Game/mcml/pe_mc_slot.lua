@@ -42,7 +42,7 @@ local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
 pe_mc_slot.block_icon_instances = {};
 
 function pe_mc_slot.render_callback(mcmlNode, rootName, bindingContext, _parent, left, top, right, bottom, myLayout, css)
-	local contView = mcmlNode:GetAttributeWithCode("ContainerView", nil, true) or EntityManager.GetPlayer():GetInventoryView();
+	local contView = mcmlNode:GetAttributeWithCode("ContainerView", nil, true) or (EntityManager.GetPlayer() and EntityManager.GetPlayer():GetInventoryView());
 	local bagpos = mcmlNode:GetAttributeWithCode("bagpos", nil, true);
 
 	if(bagpos and contView) then
@@ -210,6 +210,7 @@ local function GetGlobalDragContainer()
 	if(_slaveicon:IsValid() ~= true) then
 		_slaveicon = ParaUI.CreateUIObject("button", "_g_drag_cont", "_lt", -1000, -1000, 32, 32);
 		_slaveicon.background = "";
+		_slaveicon.enabled = false;
 		_slaveicon.zorder = 1000;
 		_slaveicon:GetAttributeObject():SetField("TextOffsetY", 8)
 		_slaveicon:GetAttributeObject():SetField("TextShadowQuality", 8);
@@ -448,6 +449,7 @@ function pe_mc_slot.OnClickSlot(ui_obj, mcmlNode)
 	end
 end
 
+local isOwnerDraw_ = nil;
 -- call this to update the dragging icon and count display according to current drag status. 
 function pe_mc_slot.UpdateDraggingDisplay(mcmlNode)
 	local itemStack = EntityManager.GetPlayer():GetDragItem();
@@ -465,18 +467,36 @@ function pe_mc_slot.UpdateDraggingDisplay(mcmlNode)
 		if(_slaveicon:IsValid()) then
 			local _canvas = GetGlobalDragCanvas();
 			_canvas.visible = true;
-			_slaveicon.background = itemStack:GetIcon() or "";
+
+			local item = itemStack:GetItem()
+			if(item and item:IsOwnerDrawIcon() and itemStack.serverdata) then
+				isOwnerDraw_ = true;
+				_slaveicon.background = ""
+				_slaveicon.text = ""
+				_slaveicon:SetField("OwnerDraw", true);
+				_slaveicon:SetScript("ondraw", function(obj)
+					item:DrawIcon(PainterContext, obj.width, obj.height, itemStack);
+				end);
+			else
+				isOwnerDraw_ = false;
+				_slaveicon.x = -1000;
+				_slaveicon.y = -1000;
+				_slaveicon:SetField("OwnerDraw", false);
+				_slaveicon.background = itemStack:GetIcon() or "";
+				_slaveicon.text = itemStack:GetIconText();
+			end
 			if(iconSize) then
 				_slaveicon.width = iconSize;
 				_slaveicon.height = iconSize;
 			end
-
-			_slaveicon.text = itemStack:GetIconText();
 		end
 	else
 		-- make invisible
 		local _slaveicon = GetGlobalDragContainer();
 		if(_slaveicon:IsValid()) then
+			_slaveicon:SetField("OwnerDraw", false);
+			_slaveicon.x = -1000;
+			_slaveicon.y = -1000;
 			_slaveicon.translationx = 0;
 			_slaveicon.translationy = 0;
 			_slaveicon:ApplyAnim();
@@ -489,16 +509,25 @@ end
 -- called every frame move to translate UI to current mouse cursor. 
 -- @param x, y: if nil, the current mouse position is used. 
 function pe_mc_slot.OnDragFrameMove(x, y)
-	if(EntityManager.GetPlayer():GetDragItem()) then
+	if(EntityManager.GetPlayer() and EntityManager.GetPlayer():GetDragItem()) then
 		local _slaveicon = GetGlobalDragContainer();
 		if(_slaveicon:IsValid()) then
 			if(not x or not y) then
 				x, y = ParaUI.GetMousePosition();
 			end
-			_slaveicon.translationx = x + 1000 - _slaveicon.width*0.5 + 1;
-			_slaveicon.translationy = y + 1000 - _slaveicon.height + 1;
-			_slaveicon.colormask = "255 255 255 200";
-			_slaveicon:ApplyAnim();
+			if(isOwnerDraw_) then
+				_slaveicon.x = x - _slaveicon.width*0.5 + 1;
+				_slaveicon.y = y - _slaveicon.height + 1;
+				_slaveicon.translationx = 0;
+				_slaveicon.translationy = 0;
+				_slaveicon.colormask = "255 255 255 200";
+				_slaveicon:ApplyAnim();
+			else
+				_slaveicon.translationx = x + 1000 - _slaveicon.width*0.5 + 1;
+				_slaveicon.translationy = y + 1000 - _slaveicon.height + 1;
+				_slaveicon.colormask = "255 255 255 200";
+				_slaveicon:ApplyAnim();
+			end
 		end
 	end
 end

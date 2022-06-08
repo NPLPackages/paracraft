@@ -84,7 +84,18 @@ function ItemBlockModel:TryCreate(itemStack, entityPlayer, x,y,z, side, data, si
 	local local_filename = itemStack:GetDataField("tooltip");
 	local filename = local_filename;
 	if(filename) then
-		filename = Files.FindFile(commonlib.Encoding.Utf8ToDefault(filename));
+		if filename:match("^onlinestore/") then
+			filename = commonlib.Encoding.Utf8ToDefault(filename)
+			if(ParaIO.DoesFileExist(Files.GetTempPath()..filename, true)) then
+				if ParaIO.CopyFile(Files.GetTempPath()..filename, Files.WorldPathToFullPath(filename), true) then
+					filename = Files.WorldPathToFullPath(filename)
+					GameLogic.GetFilters():apply_filters("bulid_frame_page_refresh")
+				end
+			end
+		else
+			filename = Files.FindFile(commonlib.Encoding.Utf8ToDefault(filename));
+		end
+		
 		if(filename) then
 			filename = commonlib.Encoding.DefaultToUtf8(filename);
 		end
@@ -175,7 +186,9 @@ end
 function ItemBlockModel:OnClickInHand(itemStack, entityPlayer)
 	-- if there is selected blocks, we will replace selection with current block in hand. 
 	if(GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
-		self:SelectModelFile(itemStack);
+		if((self:GetModelFileName(itemStack) or "") == "") then
+			self:SelectModelFile(itemStack);
+		end
 	end
 end
 
@@ -234,7 +247,7 @@ end
 function ItemBlockModel:DrawIcon(painter, width, height, itemStack)
 	local filename = self:GetModelFileName(itemStack);
 	if(filename and filename~="") then
-		itemStack.renderedTexturePath = ModelTextureAtlas:CreateGetModel(filename)
+		itemStack.renderedTexturePath = ModelTextureAtlas:CreateGetModel(commonlib.Encoding.Utf8ToDefault(filename))
 		
 		if(itemStack.renderedTexturePath) then
 			painter:SetPen("#ffffff");
@@ -250,6 +263,16 @@ function ItemBlockModel:DrawIcon(painter, width, height, itemStack)
 		painter:SetPen("#ffffff");
 		painter:SetFont("System;12")
 		painter:DrawText(1,0, filename);
+
+		if(itemStack) then
+			if(itemStack.count>1) then
+				-- draw count at the corner: no clipping, right aligned, single line
+				painter:SetPen("#000000");	
+				painter:DrawText(0, height-15+1, width, 15, tostring(itemStack.count), 0x122);
+				painter:SetPen("#ffffff");	
+				painter:DrawText(0, height-15, width-1, 15, tostring(itemStack.count), 0x122);
+			end
+		end
 	else
 		ItemBlockModel._super.DrawIcon(self, painter, width, height, itemStack);
 	end

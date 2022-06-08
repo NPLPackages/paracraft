@@ -19,6 +19,7 @@ virtual functions related to input/output logics:
 	mousePressEvent(event)
 	mouseMoveEvent(event)
 	mouseReleaseEvent(event)
+	tickEvent(event)
 
 use the lib:
 ------------------------------------------------------------
@@ -59,6 +60,7 @@ local Variables = commonlib.gettable("MyCompany.Aries.Game.Common.Variables");
 local EntityAnimation = commonlib.gettable("MyCompany.Aries.Game.Effects.EntityAnimation");
 local vector3d = commonlib.gettable("mathlib.vector3d");
 local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
+local Quaternion = commonlib.gettable("mathlib.Quaternion");
 local TimedEvent = commonlib.gettable("MyCompany.Aries.Game.TimedEvent")
 local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
 local DataContainer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.DataContainer")
@@ -77,6 +79,7 @@ local Entity = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), com
 Entity:Property({"position", nil, "getPosition", "setPosition"});
 -- max number of collisions to process per frame. too many collisions will lead to HIGH CPU. 
 Entity:Property({"max_collision_count", 10})
+Entity:Property({"LocalTransform", nil, "GetModelLocalTransform", "SetModelLocalTransform"})
 -- globally unique identifier
 Entity:Property({"guid", nil, "GetKey", "SetKey"});
 Entity:Signal("focusIn");
@@ -164,19 +167,22 @@ end
 function Entity:mouseReleaseEvent(event)
 end
 
+function Entity:tickEvent(event)
+end
+
 
 -- all kinds of custom user or game event, that is handled mostly by rule bag items.
 -- Entity event is the only source of inputs to the containing rule bag items, which the user can customize using ItemCommand, ItemScript, etc. 
 -- In the big picture, event forms a dynamic and user configurable network of connections among entities and rule bag items. 
 -- Items in rule bags are executed in sequence, until one of them accept the event. 
--- Some events are system buildin events that is fired automatically by the system like like mousePressEvent, mouseReleaseEvent, worldLoadedEvent, blockTickEvent, timerEvent, etc. 
+-- Some events are system buildin events that is fired automatically by the system like mousePressEvent, mouseReleaseEvent, worldLoadedEvent, blockTickEvent, timerEvent, etc. 
 -- Custom events may be sent to any entity via /sendevent command to achieve any user defined world logics. 
 function Entity:event(event)
 	if(self:IsInputDisabled()) then
 		-- do nothing if not enabled. 
 	else
-		if(self.rulebag) then
-			for i = 1, self.rulebag:GetSlotCount() do
+		if(self:GetLastRuleItemIndex() > 0) then
+			for i = 1, self:GetLastRuleItemIndex() do
 				local itemStack = self.rulebag:GetItem(i);
 				if(itemStack) then
 					if(itemStack:handleEntityEvent(self, event)) then
@@ -184,8 +190,6 @@ function Entity:event(event)
 							return;
 						end
 					end
-				else
-					break;
 				end
 			end
 		end
@@ -253,6 +257,22 @@ function Entity:GetInventoryView()
 		return self.inventoryView;
 	end
 end
+-- virtual function:
+-- @param inventory: inventory object
+-- @param slot_index: if only one slot is changed, this is the index. it could be nil, if index can not be determined. 
+function Entity:OnInventoryChanged(inventory, slot_index)
+	if(self.rulebag) then
+		self.lastRuleItemIndex = self.rulebag:GetLastItemIndex() or -1;
+	end
+end
+
+-- @return -1 if not rule item is found. 
+function Entity:GetLastRuleItemIndex()
+	if(not self.lastRuleItemIndex) then
+		self.lastRuleItemIndex = self.rulebag and self.rulebag:GetLastItemIndex() or -1;
+	end
+	return self.lastRuleItemIndex;
+end
 
 -- whether the entity should be serialized to disk. 
 function Entity:SetPersistent(bIsPersistent)
@@ -268,6 +288,7 @@ function Entity:EnableAnimation(bEnable)
 	end
 end
 
+-- return true if the entity is a movable entity that can be controlled by user or code block or movie block. 
 function Entity:IsBiped()
 end
 
@@ -337,6 +358,8 @@ function Entity:UpdateFromXMLNode(node)
 		local lastX, lastY, lastZ = self:GetPosition();
 		local lastFacing = self:GetFacing();
 		local lastScaling = self:GetScaling();
+		local lastLocalMat = self:GetModelLocalTransform();
+
 		self:LoadFromXMLNode(node);
 		local newX, newY, newZ = self:GetPosition()
 		local newFacing = self:GetFacing();
@@ -348,6 +371,9 @@ function Entity:UpdateFromXMLNode(node)
 		self:SetPosition(newX, newY, newZ);
 		self:SetFacing(newFacing);
 		self:SetScaling(newScaling);
+		if(lastLocalMat ~= self.modelLocalTransform) then
+			self:SetModelLocalTransform(self.modelLocalTransform);
+		end
 	else
 		self:LoadFromXMLNode(node);
 		self:init()
@@ -396,6 +422,10 @@ function Entity:LoadFromXMLNode(node)
 
 			if(attr.displayName) then
 				self.displayName = attr.displayName;
+			end
+
+			if(attr.modelLocalTransform) then
+				self.modelLocalTransform = mathlib.Matrix4:new():fromString(attr.modelLocalTransform);
 			end
 		end
 
@@ -468,6 +498,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	if(self.rulebag and not self.rulebag:IsEmpty()) then
 		node[#node+1] = self.rulebag:SaveToXMLNode({name="rulebag"}, bSort);
+	end
+	if(self.modelLocalTransform and not self.modelLocalTransform:isIdentity()) then
+		attr.modelLocalTransform = self.modelLocalTransform:toString();
 	end
 
 	--if(self.data_container and not self.data_container:IsEmpty()) then
@@ -663,7 +696,6 @@ function Entity:SetAnimation(filenames)
 	elseif(input_type == "number") then
 		anims = filenames;
 	elseif(input_type == "table") then	
-		local _, filename
 		for _, filename in ipairs(filenames) do
 			local nAnimID = EntityAnimation.CreateGetAnimId(filename,self);
 			if(nAnimID and nAnimID>=0) then
@@ -814,6 +846,7 @@ function Entity:CreateInnerObject(filename, isCharacter, offsetY, scaling, skin,
 		z = z,
 		scaling = scaling, 
 		facing = self.facing,
+		localTransform = self.modelLocalTransform,
 		IsPersistent = false,
 		EnablePhysics = false,
 		CustomGeosets = skin,
@@ -1192,6 +1225,7 @@ end
 
 -- detach from entity manager
 function Entity:Detach()
+	self:UnloadRules();
 	if(self:IsAlwaysSentient()) then
 		self:SetAlwaysSentient(nil);
 	end
@@ -1264,7 +1298,7 @@ function Entity:Say(text, duration, bAbove3D)
 						return text;
 					end
 				end,
-				bReuseWindow = true,
+				bReuseWindow = true, bAbove3D = bAbove3D, 
 			}, 1)
 			if(duration > 0) then
 				self.timerSay = self.timerSay or commonlib.Timer:new({callbackFunc = function(timer)
@@ -1308,6 +1342,7 @@ function Entity:Attach()
 		end
 		EntityManager.AddObject(self);
 		self:UpdateBlockContainer();
+		self:LoadRules()
 	end
 end
 
@@ -1901,6 +1936,7 @@ end
 
 -- whether the entity can move to the given side relative to its current location. 
 -- it will automatically climb over one block height unless it is a fence
+-- @param x, y, z: in block position
 function Entity:CanMoveTo(x,y,z)
 	local block = BlockEngine:GetBlock(x,y,z);
 	if(block and block.obstruction) then
@@ -2431,6 +2467,7 @@ function Entity:SetBagSize(size)
 		if(not self.inventory) then
 			self.inventory = InventoryBase:new():Init(size);
 			self.inventory:SetClient();
+			self.inventory:SetParentEntity(self);
 		else
 			self.inventory:SetSlotCount(size);
 		end
@@ -2445,8 +2482,22 @@ function Entity:SetRuleBagSize(size)
 		self.rulebagView = nil;
 	else
 		self.rulebag = InventoryBase:new():Init(size);
+		self.rulebag:SetParentEntity(self);
+		self.rulebag:SetFireLoadEvent(true);
 		self.rulebagView = ContainerView:new():Init(self.rulebag);
 		self.rulebag:SetClient();
+	end
+end
+
+function Entity:LoadRules()
+	if(self.rulebag and not self.rulebag:IsEmpty()) then
+		self.rulebag:FireLoadEventForAll();
+	end
+end
+
+function Entity:UnloadRules()
+	if(self.rulebag and not self.rulebag:IsEmpty()) then
+		self.rulebag:FireUnloadEventForAll();
 	end
 end
 
@@ -2459,6 +2510,25 @@ function Entity:FrameMoveRules(deltaTime)
 	if(not self.m_bRuleLoaded) then
 		self.m_bRuleLoaded = true;
 		self:ActivateRules();
+	end
+end
+
+-- dispatch a text event message to all agent items in the rule bag. 
+function Entity:DispatchAgentEvent(eventName, msg)
+	if(self.rulebag and self:GetLastRuleItemIndex() > 0) then
+		local codeGlobal = GameLogic.GetCodeGlobal()
+		
+		local result;
+		for i = 1, self:GetLastRuleItemIndex() do
+			local itemStack = self.rulebag:GetItem(i);
+			if(itemStack) then
+				local item = itemStack:GetItem()
+				if(item and item.DispatchAgentEvent) then
+					result = item:DispatchAgentEvent(itemStack, self, eventName, msg) or result;
+				end
+			end
+		end
+		return result;
 	end
 end
 
@@ -2627,6 +2697,11 @@ function Entity:CalculatePushOut(dx,dy,dz, entityFilterFunc)
 	return dx+deltaX, dy+deltaY, dz+deltaZ;
 end
 
+-- virtual: if this entity can collide with physical objects during movement. 
+function Entity:CanCollidePhysicalObject()
+	return false;
+end
+
 -- Tries to moves the entity by the passed in displacement. 
 -- this function is usually used by entities which need to process physics all by itself 
 -- (instead of relying on physicsObj or default low level c++). 
@@ -2655,6 +2730,23 @@ function Entity:MoveEntityByDisplacement(dx,dy,dz)
 		local boundingBox = self:GetCollisionAABB();
 		local oldAABB = boundingBox:clone_from_pool();
 		
+		if(self:CanCollidePhysicalObject()) then
+			if(dx~=0 or dz~=0) then
+				local dir = mathlib.vector3d:new_from_pool(dx, 0, dz)
+				dir:normalize()
+				local pt = ParaScene.Pick(lastX, lastY+boundingBox:GetExtendY(), lastZ, dir[1], 0, dir[3], boundingBox:GetMaxExtent()+0.1, "point")
+				if(pt:IsValid())then
+					dx, dz = 0, 0;
+				end
+			end
+			if(dy~=0) then
+				local pt = ParaScene.Pick(lastX, lastY+boundingBox:GetExtendY(), lastZ, 0, dy>0 and 1 or -1, 0, boundingBox:GetExtendY()+0.1, "point")
+				if(pt:IsValid())then
+					dy = 0;
+				end
+			end
+		end
+
 		-- apply motion physics by extending the aabb and checking offsets with all colliding aabb. 
 		local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(boundingBox:clone_from_pool():AddCoord(dx, dy, dz), self, nil, self.max_collision_count);
 
@@ -2689,7 +2781,6 @@ function Entity:MoveEntityByDisplacement(dx,dy,dz)
 			end
 		end
 		
-
         if (self.stepHeight > 0 and bOnGroundOrFallOnGround and (dx1 ~= dx or dz1 ~= dz)) then
 			-- step over block
 			-- algorithm: first move up to the stepHeight, if no collision there, and then move downward until touches the ground. 
@@ -2700,6 +2791,23 @@ function Entity:MoveEntityByDisplacement(dx,dy,dz)
 
 			local newAABB = boundingBox:clone_from_pool();
             boundingBox:SetBB(oldAABB);
+
+			if(self:CanCollidePhysicalObject()) then
+				if(dx~=0 or dz~=0) then
+					local dir = mathlib.vector3d:new_from_pool(dx, 0, dz)
+					dir:normalize()
+					local pt = ParaScene.Pick(lastX, lastY+boundingBox:GetExtendY()+self.stepHeight, lastZ, dir[1], 0, dir[3], boundingBox:GetMaxExtent()+0.1, "point")
+					if(pt:IsValid())then
+						dx, dz = 0, 0;
+					end
+				end
+				if(dy~=0) then
+					local pt = ParaScene.Pick(lastX+dx, lastY+boundingBox:GetExtendY()+self.stepHeight+0.1, lastZ+dz, 0, dy>0 and 1 or -1, 0, boundingBox:GetExtendY()+0.1, "point")
+					if(pt:IsValid())then
+						dy = 0;
+					end
+				end
+			end
 
 			-- pass1: move up to stepheight
 			local listCollisions = PhysicsWorld:GetCollidingBoundingBoxes(boundingBox:clone_from_pool():AddCoord(dx1, dy, dz1), self);
@@ -3179,4 +3287,211 @@ function Entity:CreateBlockPieces(granularity, icon)
 			block_template:CreateBlockPieces(bx, by, bz, granularity, item.icon or icon);
 		end
 	end
+end
+
+
+-- @param bRecompute: default to true
+-- compute and return the entity's local transform based on yaw, roll, pitch. 
+function Entity:GetLocalTransform(bRecompute)
+	if(not self.localTransform) then
+		self.localTransform = Matrix4:new():identity();
+	end
+	if(bRecompute ~= false) then
+		local facing = self:GetFacing();
+		local roll = self:GetRoll();
+		local pitch = self:GetPitch();
+		if(facing ~= 0 or roll~=0 or pitch~=0) then
+			self.localRotQuat = self.localRotQuat or Quaternion:new();
+			self.localRotQuat:FromEulerAnglesSequence(roll, pitch, facing, "zxy")
+			self.localRotQuat:ToRotationMatrix(self.localTransform)
+		else
+			self.localTransform:identity()
+		end
+		local scaling = self:GetScaling()
+		if(scaling ~= 1) then
+			self.matScale = self.matScale or Matrix4:new():identity();
+			self.matScale:setScale(scaling, scaling, scaling);
+			self.localTransform:multiply(self.matScale);
+		end
+	end
+	return self.localTransform;
+end
+
+function Entity:GetLocalRotQuat()
+	local facing = self:GetFacing();
+	local roll = self:GetRoll();
+	local pitch = self:GetPitch();
+	self.localRotQuat = self.localRotQuat or Quaternion:new();
+	self.localRotQuat:FromEulerAnglesSequence(roll, pitch, facing, "zxy")
+	return self.localRotQuat;
+end
+
+-- rotate the entity by modifying position and yaw, roll, pitch value of the object. 
+-- @param angle: radian to rotate. if nil, we will restore yaw, roll, pitch to 0
+-- @param axis: default to {0,1,0}, which is the y axis, rotate left handed, clockwise. 
+-- @param origin: world origin to rotate around. default to current entity's world position. 
+-- @param bIsSet: default to false. if true, we will set the angle instead of adding the angle on old values. 
+function Entity:Rotate(angle, axis, origin, bIsSet)
+	if(angle) then
+		if(not axis) then
+			axis = vector3d.unit_y
+		end
+		local quat = Quaternion:new():FromAngleAxis(angle, axis)
+		if(origin) then
+			local x, y, z = self:GetPosition();
+			local dx, dy, dz = x - origin[1], y - origin[2], z - origin[3];
+			dx, dy, dz = quat:RotateVector3(dx, dy, dz)
+			x, y, z = origin[1] + dx, origin[2] + dy, origin[3] + dz;
+			self:SetPosition(x, y, z);
+		end
+		if(not bIsSet) then
+			quat:multiplyInplace(self:GetLocalRotQuat());
+		end
+		local roll, pitch, yaw = quat:ToEulerAnglesSequence("zxy");
+		self:SetFacing(yaw)
+		self:SetPitch(pitch)
+		self:SetRoll(roll)
+	else
+		self:SetFacing(0)
+		self:SetPitch(0)
+		self:SetRoll(0)
+	end
+end
+
+-- local transform of inner model. If all values are nil or 0, we will reset transform to identity. 
+-- @param roll_or_matTransform, pitch, yaw: applied in this order, please note, roll can also be a Matrix4, where all other params are nil. 
+-- @param dx, dy, dz: 
+function Entity:SetModelLocalTransform(roll_or_matTransform, pitch, yaw, dx, dy, dz)
+	local obj = self:GetInnerObject();
+	if(obj) then
+		local mat, roll;
+		if(type(roll_or_matTransform) == "table") then
+			mat = self.modelLocalTransform or mathlib.Matrix4:new();
+			mat:set(roll_or_matTransform);
+		else
+			roll = roll_or_matTransform or 0;
+			pitch = pitch or 0;
+			yaw = yaw or 0;
+			dx, dy, dz = dx or 0, dy or 0, dz or 0;
+
+			if(roll == 0 and pitch==0 and yaw == 0) then
+				if(self.modelLocalTransform) then
+					mat = self.modelLocalTransform;
+					mat:identity();
+				else
+					if(dx == 0 and dy==0 and dz == 0) then
+						-- do nothing if nothing is applied and local transform is also nil. 
+						return;
+					else
+						mat = mathlib.Matrix4:new();
+						mat:identity();
+					end
+				end
+			else
+				local quatRot = Quaternion:new();
+				quatRot:FromEulerAnglesSequence(roll, pitch, yaw, "zxy")
+				mat = quatRot:ToRotationMatrix(self.modelLocalTransform)
+			end
+			mat:setTrans(dx, dy, dz);
+		end
+		
+		self.modelLocalTransform = mat;
+		obj:SetField("LocalTransform", mat)
+		self:valueChanged();
+	end
+end
+
+-- return nil or model's local transform. 
+function Entity:GetModelLocalTransform()
+	return self.modelLocalTransform
+end
+
+function Entity:GetWorldRotationTransform()
+	if(not self.worldRotTransform) then
+		self.worldRotTransform = mathlib.Matrix4:new():identity();
+	end
+	local quatRot = Quaternion:new();
+	local roll = self:GetRoll();
+	local pitch = self:GetPitch();
+	local yaw = self:GetFacing();
+	quatRot:FromEulerAnglesSequence(roll, pitch, yaw, "zxy")
+	return quatRot:ToRotationMatrix(self.worldRotTransform)
+end
+
+
+-- usually there can only be one coroutine for a single event per entity. 
+-- @param event: CodeEvent object
+-- @param co: the coroutine object that is running for this entity
+function Entity:SetCodeEventCoroutine(event, co)
+	if(event) then
+		if(not self.codeEvents) then
+			self.codeEvents = {};
+		end
+		event:Connect("beforeDestroyed", function()
+			if(self.codeEvents[event]) then
+				self.codeEvents[event] = nil;
+			end
+		end)
+		self.codeEvents[event] = co;
+	end
+end
+
+-- return true, if the currenty entity is still running the given event. 
+-- @param event: CodeEvent object
+function Entity:GetCodeEventCoroutine(event)
+	return self.codeEvents and self.codeEvents[event];
+end
+
+-- @param name: if nil, we will use the default code actor as the agent interface if it exists. 
+function Entity:GetAgent(name)
+	if(name) then
+		local memberName = "m_agent_"..name;
+		local agent = self[memberName]
+		if(not agent) then
+			-- create/get agent from rule bag. 
+			if(self.rulebag and self:GetLastRuleItemIndex() > 0) then
+				for i = 1, self:GetLastRuleItemIndex() do
+					local itemStack = self.rulebag:GetItem(i);
+					if(itemStack) then
+						local item = itemStack:GetItem()
+						if(item and item.GetAgentName and item:GetAgentName(itemStack) == name) then
+							agent = item:CreateAgentFromEntity(self, itemStack)
+							break;
+						end
+					end
+				end
+			end
+			if(agent) then
+				self[memberName] = agent;
+			end
+		end
+		return agent;
+	else
+		return self:GetActor();
+	end
+end
+
+function Entity:RemoveAgent(name)
+	if(name) then
+		local memberName = "m_agent_"..name;
+		local agent = self[memberName]
+		if(agent) then
+			self[memberName] = nil;
+		end
+	end
+end
+
+-- @param actor: the parent ActorNPC
+function Entity:SetActor(actor)
+	self.m_actor = actor;
+end
+
+-- @param actor: the parent ActorNPC
+function Entity:GetActor()
+	return self.m_actor;
+end
+
+-- return true if entity is being dragged. 
+function Entity:IsDragging()
+	return self.isDragging;
 end

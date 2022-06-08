@@ -44,6 +44,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 		langConfig = NPL.load("(gl)Mod/GeneralGameServerMod/GI/Independent/GIBlockly.lua");
 	elseif(filename == "cad") then   -- npl blockly 重新定义的CAD图块类型分类
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
+	elseif(filename == "npl_ppt") then   -- npl blockly 重新定义的CAD图块类型分类
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplPPT/NplPPT.lua");
 	else
 		filename = Files.GetWorldFilePath(filename)
 		if(filename) then

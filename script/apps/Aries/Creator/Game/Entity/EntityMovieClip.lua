@@ -54,14 +54,16 @@ Entity.disable_auto_stop_time = true;
 
 function Entity:ctor()
 	self.movieClip = MovieClip:new():Init(self);
-	self.inventory:SetOnChangedCallback(function(inventory, slot_index)
-		self:OnInventoryChanged(slot_index);
-	end);
 	-- make it bigger than 27(default), so we can have more actors in it. 
 	self.inventory:SetSlotCount(48); 
 end
 
-function Entity:OnInventoryChanged(slot_index)
+-- virtual function:
+-- @param inventory: inventory object
+-- @param slot_index: if only one slot is changed, this is the index. it could be nil, if index can not be determined. 
+function Entity:OnInventoryChanged(inventory, slot_index)
+	Entity._super.OnInventoryChanged(self, inventory, slot_index)
+
 	local movieClip = self:GetMovieClip()
 	if(movieClip and movieClip == MovieManager:GetActiveMovieClip()) then
 		movieClip:RemoveAllActors();

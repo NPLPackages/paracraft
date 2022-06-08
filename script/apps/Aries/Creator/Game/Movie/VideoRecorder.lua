@@ -234,12 +234,29 @@ function VideoRecorder.EndCapture()
 	VideoRecorder.RestoreWindowResolution();
 	VideoRecorder.isRecording = false;
 end
+--宇哥的需求，录制模式下不显示esc，记录原有的esc状态
+VideoRecorder.IsShowEscDock = nil
+function VideoRecorder.UpdateEscDock(bShow)
+	local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
+	if VideoRecorder.IsShowEscDock  == nil then
+		VideoRecorder.IsShowEscDock = EscDock.IsVisible() == true
+	end
+	if bShow then
+		EscDock.ShowView(not bShow)
+	else
+		local isShow = VideoRecorder.IsShowEscDock ~= nil and VideoRecorder.IsShowEscDock or false
+		EscDock.ShowView(isShow)
+		VideoRecorder.IsShowEscDock = nil
+	end
+end
+
 
 function VideoRecorder.ShowRecordingArea(bShow)
 	NPL.load("(gl)script/kids/3DMapSystemApp/Assets/AsyncLoaderProgressBar.lua");
 	local AsyncLoaderProgressBar = commonlib.gettable("Map3DSystem.App.Assets.AsyncLoaderProgressBar");
 	if(VideoRecorder.HasFFmpegPlugin()) then
 		local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
+		VideoRecorder.UpdateEscDock(bShow)
 		local _parent = ParaUI.GetUIObject("RecordSafeArea");
 		if(not bShow) then
 			if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then

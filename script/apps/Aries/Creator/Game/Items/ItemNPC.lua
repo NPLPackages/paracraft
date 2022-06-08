@@ -110,7 +110,7 @@ function ItemNPC:OnCreate(result)
 			-- entity:SetStaticBlocker(true);
 			-- entity:SetDummy(true);
 			-- entity:SetFacing(1.5);
-			EntityManager.AddObject(entity);
+			entity:Attach();
 
 			return true, entity;
 		end

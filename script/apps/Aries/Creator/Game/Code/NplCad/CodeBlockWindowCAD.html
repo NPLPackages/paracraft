@@ -2,6 +2,7 @@
 <pe:mcml>
 <script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
 <![CDATA[
+MyCompany.Aries.Game.Code.NplCad.NplCad.CloseToolMenu()
 CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 function OnClickEditMode(name)
     CodeBlockWindow.OnClickEditMode(name)
@@ -26,7 +27,7 @@ end
         <div style="position:relative;float:left;width:82px;" align="right">
             <input type="button" uiname="CodeBlockWindow.tutorial" tooltip='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-top:7px;color:#ffffff;font-size:12px;width:25px;height:25px;background:url(Texture/Aries/Combat/Battle/teen/help_32bits.png)" />
             <input type="button" uiname="CodeBlockWindow.resizeBtn" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="CodeBlockWindow.ToggleSize()" style="margin-left:2px;margin-top:5px;width:28px;height:28px;background:url(Texture/3DMapSystem/Creator/Objects/Tool_Move.png);" />
-            <input type="button" uiname="CodeBlockWindow.saveAndClose" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_close_button" style="margin-left:2px;margin-top:10px;" />
+            <input type="button" uiname="CodeBlockWindow.saveAndClose" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="MyCompany.Aries.Game.Code.NplCad.NplCad.CloseWindow" class="mc_close_button" style="margin-left:2px;margin-top:10px;" />
         </div>
     </div>
     <pe:if condition='<%=CodeBlockWindow.temp_nplbrowser_reload%>'>
@@ -53,6 +54,7 @@ end
     <pe:container style="position:relative;vertical-align:bottom;height:54px;background:;">
         <input name="console" value='<%=CodeBlockWindow.GetConsoleText()%>' AlwaysShowCurLineBackground="false" rows="3" height="100%" UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>
     </pe:container>
+    <%=MyCompany.Aries.Game.Code.NplCad.NplCad.GetExportContent()%>
     <script type="text/npl" refresh="true">CodeBlockWindow.UpdateEditModeUI();</script>
 </div>
 </pe:mcml>

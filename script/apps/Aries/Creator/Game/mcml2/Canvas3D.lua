@@ -473,7 +473,7 @@ end
 -- @param toTime: default to -1, which is the movie length
 -- @param originX, originY, originZ: origin to play inside the mini scene graph or main 3d scene. default to 0,128,0
 -- @return movieEntity
-function Canvas3D:PlayMovieFile(filename, fromTime, toTime, originX, originY, originZ)
+function Canvas3D:PlayMovieFile(filename, fromTime, toTime, originX, originY, originZ, isLooping)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieManager.lua");
 	local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 	self.movieChannelName = self.resourceName or "default"
@@ -485,7 +485,7 @@ function Canvas3D:PlayMovieFile(filename, fromTime, toTime, originX, originY, or
 	channel:CreateFromTemplateFile(filename, originX or 0, originY or 128, originZ or 0);
 	channel:SetScene(self.resourceName)
 	channel:Stop()
-	channel:Play(fromTime or 0, toTime or -1)
+	channel:Play(fromTime or 0, toTime or -1, isLooping)
 end
 
 function Canvas3D:SetFieldOfView(defaultValue)

@@ -97,7 +97,35 @@ function IsOnlyNumber(desc)
 
     return false
 end
+function getIcon(itemData)
+    return KeepWorkMallPage.GetIcon(itemData)
+end
 
+function CanUseCanvas3dIcon(itemData)
+    return KeepWorkMallPage.CanUseCanvas3dIcon(itemData)
+end
+
+function IsSpecialModel(itemData)
+    return KeepWorkMallPage.IsSpecialModel(itemData)
+end
+
+function GetFileTypeIcon(itemData)
+    local list = {
+        ["bmax"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 116px; margin-top:8px;width: 49px; height:17px;background:url(Texture/Aries/Creator/keepwork/Mall/bmax_49x17_32bits.png#0 0 49 17);"></div>]]},
+        ["blocks"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 116px; margin-top:8px;width: 49px; height:17px;background:url(Texture/Aries/Creator/keepwork/Mall/blocks_49x17_32bits.png#0 0 49 17);"></div>]]},
+        ["x"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 132px; margin-top:8px;width: 39px; height:22px;background:url(Texture/Aries/Creator/keepwork/Mall/X_39x22_32bits.png#0 0 39 22);"></div>]]},
+        ["liveModel"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 116px; margin-top:8px;width: 49px; height:17px;background:url(Texture/Aries/Creator/keepwork/Mall/livemodel_49x17_32bits.png#0 0 49 17);"></div>]]},
+        ["fbx"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 132px; margin-top:8x;width: 39px; height:22px;background:url(Texture/Aries/Creator/keepwork/Mall/fbx_39x22_32bits.png#0 0 39 22);"></div>]]},
+        ["stl"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 132px; margin-top:8px;width: 39px; height:22px;background:url(Texture/Aries/Creator/keepwork/Mall/stl_39x22_32bits.png#0 0 39 22);"></div>]]},
+    }
+    local good_data = itemData.goods_data and itemData.goods_data[1]
+	local fileType = good_data and good_data.fileType or itemData.modelType
+    return fileType and list[fileType] and list[fileType].icon
+end
+
+function LoadModelFile(itemData,index)
+    KeepWorkMallPage.LoadModelFile(itemData,index)
+end
 ]]></script>
 <kp:window name="iframe" width="996" height="613" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_ziyuan_32bits.png" help_type="mall" onclose="ClosePage">
     <div style="color:#ffffff;" class="kp_window_container">
@@ -256,13 +284,13 @@ end
                             <div style="width:170px;height:108px;background:;">
                                 <!-- <pe:item zorder="2" onclick="" isdragable="false" gsid='<%=2408%>' tooltip = '<%=Eval("description")%>' icon = "" showdefaulttooltip="false" background="Texture/Aries/Creator/keepwork/Mall/bg_item_32bits.png#0 0 28 28:5 5 10 10" style="margin-left:0px;width:54px;height:54px;" /> -->
                                 <div style="position:relative;width:123px;">
-                                    <pe:if condition='<%=Eval("use_little_icon")%>'>
+                                    <pe:if condition='<%=Eval("use_little_icon") and Eval("hasIcon") and not CanUseCanvas3dIcon(Eval("this"))%>'>
                                         <div style="position:relative;margin-left:50px;margin-top:36px;">
                                             <img zorder="0" src='<%=Eval("icon")%>'width="64" height="64"/>
                                         </div>
                                     </pe:if>
-                                    <pe:if condition='<%=not Eval("use_little_icon")%>'>
-                                        <div style="position:relative;margin-left:21px;margin-top:18px;">
+                                    <pe:if condition='<%=not Eval("use_little_icon") and Eval("hasIcon") and not CanUseCanvas3dIcon(Eval("this"))%>'>
+                                        <div style="position:relative;margin-left:21px;margin-top:36x;">
                                             <img zorder="0" src='<%=Eval("icon")%>'width="128" height="64"/>
                                         </div>
                                     </pe:if>
@@ -275,9 +303,33 @@ end
                                             <div zorder="1" style="float: left;margin-top:0px;width:28px;height:34px;background:url(Texture/Aries/Creator/keepwork/Mall/icon_hot_28X34_32bits.png#0 0 28 34);"></div>
                                         </pe:if> 
                                     </div>
-                               
+                                    <pe:if condition='<%=LoadModelFile(Eval("this"),Eval("index")) %>'></pe:if>
+                                    <pe:if condition='<%=CanUseCanvas3dIcon(Eval("this")) %>'>
+                                        <pe:if condition='<%=IsSpecialModel(Eval("this"))%>'>
+                                            <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index") % 12) %>'  xmlInfo ='<%= Eval("xmlInfo") %>' DefaultRotY="-0.785"  IsInteractive="false" autoRotateSpeed="0"
+                                                miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 12) %>' RenderTargetSize="128" 
+                                                value='<%=getIcon(Eval("this"))%>' style="position:relative;width:73px;height:73px;margin-top:25px;margin-left:45px;" />
+                                        </pe:if>
+                                        <pe:if condition='<%=not IsSpecialModel(Eval("this"))%>'>
+                                            <pe:if condition='<%=Eval("isLiveModel")%>'>
+                                                <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index") % 12) %>' xmlInfo ='<%= Eval("xmlInfo") %>'  DefaultRotY="1.57" IsInteractive="false" autoRotateSpeed="0"
+                                                    miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 12) %>' RenderTargetSize="128" 
+                                                    value='<%=getIcon(Eval("this"))%>' style="position:relative;width:73px;height:73px;margin-top:25px;margin-left:45px;" />
+                                            </pe:if>
+                                            <pe:if condition='<%=not Eval("isLiveModel")%>'>
+                                                <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index") % 12) %>' xmlInfo ='<%= Eval("xmlInfo") %>'  DefaultRotY="-1.57" IsInteractive="false" autoRotateSpeed="0"
+                                                    miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 12) %>' RenderTargetSize="128" 
+                                                    value='<%=getIcon(Eval("this"))%>' style="position:relative;width:73px;height:73px;margin-top:25px;margin-left:45px;" />
+                                            </pe:if>
+                                        </pe:if> 
+                                    </pe:if>
                                 </div>
-                                
+
+                                <div style="position:absolute;margin-left: 150px; margin-top: -5px;">
+                                    <pe:if condition='<%=not Eval("hasPermission") %>'>
+                                        <div zorder="1" style="margin-left:0px;margin-top:0px;width:28px;height:31px;background:url(Texture/Aries/Creator/keepwork/Mall/suo_28x31_32bits.png#0 0 28 31);"></div>
+                                    </pe:if> 
+                                </div>
                                 <!-- <div style="position:relative;width:123px">
     
                                 </div> -->
@@ -293,19 +345,23 @@ end
                                 <!-- <pe:if condition='<%=not IsRightSchool(Eval("gsid")) %>'></pe:if>
                                 <pe:if condition='<%=not IsRightSchool(Eval("gsid")) %>'></pe:if> -->
                             </div>
-                            <div style="margin-top:0px;width: 163px; height:26px;background:url(Texture/Aries/Creator/keepwork/Mall/zidi_163X26_32bits.png#0 0 163 26);">
-                                <div style="position:relative;margin-top: 3px; width: 163px; height:20px; font-weight:bold;font-size:12;color:#ffffff;text-align: center;">
-                                    <%=Eval("name") %>
-                                </div>
+                            <div style="margin-top:0px;width: 163px; height:26px;background-color: #00000000;">
+                                <%=GetFileTypeIcon(Eval("this"))%>
 
                                 <pe:if condition='<%=not Eval("enabled")%>'>
                                     <div style="margin-left: 3px; margin-top:-105px;width: 164px; height:131px;background:url(Texture/Aries/Creator/keepwork/Mall/yishirongan_64X64_32bits.png#0 0 64 64:16 16 16 16);"></div>
                                 </pe:if>
                             </div>
 
-    
+                            <div style="margin-top:0px;width: 163px; height:26px;background:url();">
+                                <div style="position:relative;margin-left: 5px;margin-top: 3px; width: 163px; height:20px; font-weight:bold;font-size:14;color:#000000;text-align: center;">
+                                    <%=Eval("name") %>
+                                </div>
+                            </div>
+
+                            
                             <pe:if condition='<%=IsShowFlag(XPath("this"))%>'>
-                                <pe:if condition='<%=Eval("show_state") == 4%>'>
+                                <!-- <pe:if condition='<%=Eval("show_state") == 4%>'>
                                     <div style="margin-left: 32px; margin-top:7px;width: 101px; height:19px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_huiyuan_101X19_32bits.png#0 0 101 19);"></div>
                                 </pe:if>
                                 <pe:if condition='<%=Eval("is_sell")%>'>
@@ -319,7 +375,7 @@ end
                                 </pe:if>
                                 <pe:if condition='<%=Eval("is_use")%>'>
                                     <div style="margin-left: 42px; margin-top:9px;width: 87px; height:21px;background:url(Texture/Aries/Creator/keepwork/Mall/btn_yishiyong_87X21_32bits.png#0 0 87 21);"></div>
-                                </pe:if>
+                                </pe:if> -->
                                 <!-- <input type="button" class="button" value='<%=Eval("buy_txt")%>' enabled='true' onclick="OnclickBuy()" param1='<%= XPath("this") %>' style="position:relative;margin-left:105px;margin-top:7px;font-size:12px;width:50px;"/> -->
                             </pe:if>
     
@@ -340,7 +396,7 @@ end
                                     </pe:if>
                                     
                                     <pe:if condition='<%=IsOnlyNumber(Eval("cost_desc")) %>'>
-                                        <pe:textsprite fontName="MallCost" imagePath="Texture/mall_number_119X95_32bits.png" name = "" value = '<%=Eval("cost_desc")%>' style="width:50px;margin-left:5px;margin-top:3px;font-size:17pt;" />
+                                        <!-- <pe:textsprite fontName="MallCost" imagePath="Texture/mall_number_119X95_32bits.png" name = "" value = '<%=Eval("cost_desc")%>' style="width:50px;margin-left:5px;margin-top:3px;font-size:17pt;" /> -->
                                     </pe:if>
 
                                     <pe:if condition='<%=not IsOnlyNumber(Eval("cost_desc")) %>'>

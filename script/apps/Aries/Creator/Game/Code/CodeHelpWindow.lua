@@ -190,6 +190,14 @@ function CodeHelpWindow.AddCodeExample(example)
 	end
 end
 
+function CodeHelpWindow.GetTempCodeItem()
+	return CodeHelpWindow.tempCodeItem;
+end
+
+function CodeHelpWindow.SetTempCodeItem(codeItem)
+	CodeHelpWindow.tempCodeItem = codeItem;
+end
+
 function CodeHelpWindow.GetCodeItemByName(name)
 	return all_command_names[name];
 end

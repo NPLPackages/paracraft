@@ -32,6 +32,8 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local ItemLiveModel = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Items.ItemToolBase"), commonlib.gettable("MyCompany.Aries.Game.Items.ItemLiveModel"));
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 
 ItemLiveModel:Property({"fingerRadius", 16});
 -- if entity's radius is bigger than 0.3, we will not use finger picking
@@ -96,7 +98,18 @@ end
 function ItemLiveModel:SetModelFileName(itemStack, filename)
 	if(itemStack) then
 		itemStack:SetDataField("tooltip", filename);
-		itemStack:SetDataField("xmlNode", nil)
+		local xmlNode = itemStack:GetDataField("xmlNode");
+		local skin = CustomCharItems:GetSkinByAsset(filename)
+		if skin then
+			if not xmlNode or not xmlNode.attr then
+				xmlNode = {name="entity",attr={yawOffset=0,anim=0,facing=3.14,stackHeight=0.2}}
+				itemStack:SetDataField("xmlNode",xmlNode);
+			end
+			xmlNode.attr.skin = skin
+			xmlNode.attr.filename = CustomCharItems.defaultModelFile
+		else
+			itemStack:SetDataField("xmlNode", nil)
+		end
 		local task = self:GetTask();
 		if(task) then
 			task:SetItemInHand(itemStack);
@@ -157,6 +170,15 @@ function ItemLiveModel:DrawIcon(painter, width, height, itemStack)
 		painter:SetPen("#ffffff");
 		painter:SetFont("System;12")
 		painter:DrawText(1,0, filename);
+		if(itemStack) then
+			if(itemStack.count>1) then
+				-- draw count at the corner: no clipping, right aligned, single line
+				painter:SetPen("#000000");	
+				painter:DrawText(0, height-15+1, width, 15, tostring(itemStack.count), 0x122);
+				painter:SetPen("#ffffff");	
+				painter:DrawText(0, height-15, width-1, 15, tostring(itemStack.count), 0x122);
+			end
+		end
 	else
 		ItemLiveModel._super.DrawIcon(self, painter, width, height, itemStack);
 	end
@@ -214,7 +236,9 @@ end
 function ItemLiveModel:OnClickInHand(itemStack, entityPlayer)
 	-- if there is selected blocks, we will replace selection with current block in hand. 
 	if(GameLogic.GameMode:IsEditor() and entityPlayer == EntityManager.GetPlayer()) then
-		self:SelectModelFile(itemStack);
+		if((self:GetModelFileName(itemStack) or "") == "") then
+			self:SelectModelFile(itemStack);
+		end
 	end
 end
 
@@ -1329,9 +1353,9 @@ end
 
 function ItemLiveModel:StopSmoothMoveTo(draggingEntity)
 	if(draggingEntity) then
-		if(draggingEntity.targetFacing) then
-			draggingEntity:SetFacing(draggingEntity.targetFacing)
-			draggingEntity.targetFacing = nil;
+		if(draggingEntity.targetFacing_) then
+			draggingEntity:SetFacing(draggingEntity.targetFacing_)
+			draggingEntity.targetFacing_ = nil;
 		end
 		draggingEntity.motionSpeed = 0;
 		self:SmoothMoveTo(draggingEntity)
@@ -1348,19 +1372,19 @@ function ItemLiveModel:SmoothMoveTo(draggingEntity, facing, newX, newY, newZ)
 	-- turning speed per tick
 	local turningSpeed = 0.1
 	if(facing) then
-		draggingEntity.targetFacing = facing;
+		draggingEntity.targetFacing_ = facing;
 		local newFacing;
 		newFacing, bReached = mathlib.SmoothMoveAngle(draggingEntity:GetFacing(), facing, turningSpeed)
 		draggingEntity:SetFacing(newFacing)
 	end
-	if(draggingEntity.targetFacing or newX) then
+	if(draggingEntity.targetFacing_ or newX) then
 		draggingEntity.smoothAnimTimer = draggingEntity.smoothAnimTimer or commonlib.Timer:new({callbackFunc = function(timer)
 			local bReached = true
-			if(draggingEntity.targetFacing) then
-				local newFacing, bReached1 = mathlib.SmoothMoveAngle(draggingEntity:GetFacing(), draggingEntity.targetFacing, turningSpeed)
+			if(draggingEntity.targetFacing_) then
+				local newFacing, bReached1 = mathlib.SmoothMoveAngle(draggingEntity:GetFacing(), draggingEntity.targetFacing_, turningSpeed)
 				draggingEntity:SetFacing(newFacing)
 				if(bReached1) then
-					draggingEntity.targetFacing = nil;
+					draggingEntity.targetFacing_ = nil;
 				end
 				bReached = bReached and bReached1;
 			end
@@ -1599,17 +1623,18 @@ end
 
 -- drop entity to the 3d scene or on other entity
 -- @param callbackFunc: called when the drop operation ends. 
-function ItemLiveModel:DropEntity(entity, callbackFunc)
+-- @param restoreFunc: called if not nil when restore will happen
+function ItemLiveModel:DropEntity(entity, callbackFunc, restoreFunc)
 	if(entity and entity:IsDropFallEnabled() and entity.dragParams) then
 		local dragParams = entity.dragParams;
 		local dropLocation;
 		local old_x, old_y, old_z, old_facing;
 		local old_linkTo;
-		
+		entity.restoreDragParams = {pos = dragParams.pos, facing = dragParams.facing, linkTo = dragParams.linkTo ,restoreFunc = restoreFunc}
 		if(dragParams.dropLocation and dragParams.dropLocation.x and dragParams.dropLocation.dropX) then
 			dropLocation = dragParams.dropLocation
 		else
-			old_x, old_y, old_z = unpack(entity.dragParams.pos);
+			old_x, old_y, old_z = unpack(dragParams.pos);
 			old_facing = dragParams.facing;
 			old_linkTo = dragParams.linkTo;
 			dropLocation = {x=old_x, y=old_y, z=old_z, facing = old_facing, dropX = old_x, dropY = old_y, dropZ = old_z};
@@ -1714,12 +1739,12 @@ function ItemLiveModel:SendUserStats(entity, dragParams)
 	end
 end
 
-function ItemLiveModel:DropDraggingEntity(draggingEntity, event, callbackFunc)
+function ItemLiveModel:DropDraggingEntity(draggingEntity, event, callbackFunc,restoreFunc)
 	local entity = draggingEntity or self:GetDraggingEntity(event);
 	if(entity) then
 		local dragParams = entity.dragParams
 		if(dragParams) then
-			self:DropEntity(entity, callbackFunc)
+			self:DropEntity(entity, callbackFunc,restoreFunc)
 			entity.dragParams = nil;
 		end
 		self:SetDraggingEntity(nil, event);
@@ -1862,17 +1887,27 @@ function ItemLiveModel:mouseReleaseEvent(event)
 					end
 				end
 				if(not isProcessed) then
-					local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
-					local entity = self:SpawnNewEntityModel(bx, by, bz)
-					if(entity) then
-						-- let it fall down: simulate a drag and drop at click point
-						self:StartDraggingEntity(entity, event)
-						self:UpdateDraggingEntity(entity, result, targetEntity, event)
-						self:DropDraggingEntity(entity, event);
-						if(entity.dragTask) then
-							entity.dragTask:SetCreateMode()
+					local itemStack = EntityManager.GetPlayer().inventory:GetItemInRightHand()
+					if(itemStack and itemStack.id == block_types.names.LiveModel) then
+						local loadPath = itemStack:GetDataField("loadPath");
+						if loadPath and loadPath~= "" then
+							local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+							GameLogic.RunCommand(string.format("/loadtemplate -rename %s %d %d %d %s",true,bx,by,bz,loadPath))
+							event:accept();
+						else
+							local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+							local entity = self:SpawnNewEntityModel(bx, by, bz)
+							if(entity) then
+								-- let it fall down: simulate a drag and drop at click point
+								self:StartDraggingEntity(entity, event)
+								self:UpdateDraggingEntity(entity, result, targetEntity, event)
+								self:DropDraggingEntity(entity, event);
+								if(entity.dragTask) then
+									entity.dragTask:SetCreateMode()
+								end
+								event:accept();
+							end
 						end
-						event:accept();
 					end
 				else
 					event:accept();

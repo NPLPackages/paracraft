@@ -292,10 +292,19 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 	local files = OpenAssetFileDialog.dsExistingFiles;
 	table.resize(OpenAssetFileDialog.dsExistingFiles, 0);
 	local result = commonlib.Files.Find({}, rootPath, searchLevel, 500, filterFunc);
-	for i = 1, #result do
-		files[#files+1] = {name="file", attr=result[i]};
-	end
+
 	if(System.World.worldzipfile) then
+		local localFiles = {};
+		for i = 1, #result do
+			localFiles[#localFiles+1] = {name="file", attr=result[i]};
+		end
+
+		if (localFiles and #localFiles > 0) then
+			for _, item in ipairs(localFiles) do
+				files[#files + 1] = item;
+			end
+		end
+
 		local zip_archive = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CFileManager"):GetChild(System.World.worldzipfile);
 		local zipParentDir = zip_archive:GetField("RootDirectory", "");
 		if(zipParentDir~="") then
@@ -304,10 +313,29 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 				local result = commonlib.Files.Find({}, rootPath, searchLevel, 500, ":.", System.World.worldzipfile);
 				for i = 1, #result do
 					if(type(filterFunc) == "function" and filterFunc(result[i])) then
-						files[#files+1] = {name="file", attr=result[i]};
+						local beExist = false;
+
+						if (localFiles and #localFiles > 0) then
+							for _, item in ipairs(localFiles) do
+								if item and item.attr and item.attr.filename and
+								   result[i] and result[i].filename and
+								   item.attr.filename == result[i].filename then
+									beExist = true;
+									break;
+								end
+							end
+						end
+
+						if (not beExist) then
+							files[#files+1] = {name="file", attr=result[i]};
+						end
 					end
 				end
 			end
+		end
+	else
+		for i = 1, #result do
+			files[#files + 1] = {name="file", attr=result[i]};
 		end
 	end
 	OpenAssetFileDialog.GetAllFiles()[OpenAssetFileDialog.IndexLocal].attr.count = #files;

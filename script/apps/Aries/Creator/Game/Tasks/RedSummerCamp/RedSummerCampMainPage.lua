@@ -14,7 +14,7 @@ local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.C
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/ide/Transitions/Tween.lua");
 local RedSummerCampMainPage = NPL.export();
-local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseScheduling.lua") 
+local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseSchedulingV2.lua") 
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpUserTag.lua");
@@ -29,7 +29,8 @@ RedSummerCampMainPage.UserData = {}
 RedSummerCampMainPage.ItemData = {
 	{name="大赛", is_show_vip=false, is_show_recommend=true, node_name = "shentongbei", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_1_220x220_32bits.png#0 0 220 220"},
 	{name="自学视频", is_show_vip=false, is_show_recommend=false, node_name = "course_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_2_220x220_32bits.png#0 0 220 220"},
-	{name="乐园设计师", is_show_vip=false, is_show_recommend=false, node_name = "leyuan", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/8_219X202_32bits.png#0 0 220 220"},
+	-- {name="乐园设计师", is_show_vip=false, is_show_recommend=false, node_name = "leyuan", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/8_219X202_32bits.png#0 0 220 220"},
+	{name="讲好“中国好故事”", is_show_vip=false, is_show_recommend=false, node_name = "china_story", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/xinchangzheng_220x220_32bits.png#0 0 220 220"},
 	{name="推荐作品", is_show_vip=false, is_show_recommend=false, node_name = "explore", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"},
 	{name="虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
 	{name="家长指南", is_show_vip=false, is_show_recommend=false, node_name = "parent_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_6_220x220_32bits.png#0 0 220 220"},
@@ -40,7 +41,7 @@ local notice_desc = {
 	-- {desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
 	-- {desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
 	-- {desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
-	{desc = [[学3D动画编程，参加全国学生信息素养提升实践活动]], name="zhengcheng"},
+	{desc = [[学3D动画编程，参加青少年 “讲好中国故事“ 创意编程大赛]], name="zhengcheng"},
 	-- {desc = [[全新世界“圣诞树”等你来体验]], name="ai_school"},
 	-- {desc = [[冬令营课程包全新上线]], name="ai_school"},
 }
@@ -64,7 +65,12 @@ function RedSummerCampMainPage.OnInit()
 end
 
 function RedSummerCampMainPage.Show()
-	if System.options.channelId=="430" and System.options.isDevMode then
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/SysInfoStatistics.lua");
+	local SysInfoStatistics = commonlib.gettable("MyCompany.Aries.Game.Common.SysInfoStatistics")
+	SysInfoStatistics.checkGetSysInfoAndUpload()
+	local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
+	EscDock.RegisterViewEvent()
+	if System.options.channelId=="430" then
 		local RedSummerCampSchoolMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampSchoolMainPage.lua");
 		RedSummerCampSchoolMainPage.Show();
 		return 
@@ -113,13 +119,6 @@ function RedSummerCampMainPage.Show()
 
 	RedSummerCampPPtPage.OpenLastPPtPage()
 
-
-	page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
-	RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
-		RedSummerCampMainPage.StartNoticeAnim()
-	end})
-	RedSummerCampMainPage.Timer:Change(notice_time, nil);
-
 	if not RedSummerCampMainPage.BindFilter then
 		GameLogic.GetFilters():add_filter("became_vip", RedSummerCampMainPage.RefreshPage);
 		GameLogic.GetFilters():add_filter("update_msgcenter_unread_num", function(num)
@@ -132,25 +131,13 @@ function RedSummerCampMainPage.Show()
 			
 		end);
 
-		RedSummerCampMainPage.BindFilter = true
-	end
-	
-	local isVerified = GameLogic.GetFilters():apply_filters('store_get', 'user/isVerified');
-	local hasJoinedSchool = GameLogic.GetFilters():apply_filters('store_get', 'user/hasJoinedSchool');
-
-	if not isVerified or not hasJoinedSchool then
-		local username = GameLogic.GetFilters():apply_filters('store_get', 'user/username');
-		local session = GameLogic.GetFilters():apply_filters('database.sessions_data.get_session_by_username', username);
-	
-		if session and type(session) == 'table' and session.doNotNoticeVerify then
-			return
-		end
-
-		GameLogic.GetFilters():apply_filters('cellar.certificate.show_certificate_notice_page', function()
-			KeepWorkItemManager.LoadProfile(false, function()
+		GameLogic.GetFilters():add_filter("user_skin_change", function()
+			commonlib.TimerManager.SetTimeout(function()  
 				RedSummerCampMainPage.RefreshPage()
-			end)
-		end)
+			end, 200);
+		end);
+
+		RedSummerCampMainPage.BindFilter = true
 	end
 
 	RedSummerCampMainPage.HasClickFriend = false
@@ -170,6 +157,57 @@ function RedSummerCampMainPage.Show()
 	if(not KeepWorkItemManager.IsLoaded())then
 		KeepWorkItemManager.GetFilter():add_filter("loaded_all", function ()
 			RedSummerCampMainPage.RefreshPage()
+		end)
+	end
+	
+	if RedSummerCampMainPage.NoticeDesc == nil then
+		keepwork.config.all({},function(err, msg, data)
+			if err == 200 then
+				local configs = data.configs
+				for key, v in pairs(configs) do
+					if v.name == "scrollbar" then
+						RedSummerCampMainPage.NoticeDesc = v.config
+						break
+					end
+				end
+			end
+
+			if RedSummerCampMainPage.NoticeDesc then
+				table.sort(RedSummerCampMainPage.NoticeDesc,function(a,b)
+					local sort_a = a.order and tonumber(a.order) or 999
+					local sort_b = b.order and tonumber(b.order) or 999
+					return sort_a < sort_b;
+				end)
+			end
+			page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
+			-- RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
+			-- 	RedSummerCampMainPage.StartNoticeAnim()
+			-- end})
+			-- RedSummerCampMainPage.Timer:Change(notice_time, nil);
+		end)
+	else
+		page:SetValue("notic_text1", RedSummerCampMainPage.GetAutoNoticeText())
+		RedSummerCampMainPage.Timer = commonlib.Timer:new({callbackFunc = function(timer)
+			RedSummerCampMainPage.StartNoticeAnim()
+		end})
+		RedSummerCampMainPage.Timer:Change(notice_time, nil);
+	end
+
+	local isVerified = GameLogic.GetFilters():apply_filters('store_get', 'user/isVerified');
+	local hasJoinedSchool = GameLogic.GetFilters():apply_filters('store_get', 'user/hasJoinedSchool');
+
+	if not isVerified or not hasJoinedSchool then
+		local username = GameLogic.GetFilters():apply_filters('store_get', 'user/username');
+		local session = GameLogic.GetFilters():apply_filters('database.sessions_data.get_session_by_username', username);
+
+		if session and type(session) == 'table' and session.doNotNoticeVerify then
+			return
+		end
+
+		GameLogic.GetFilters():apply_filters('cellar.certificate.show_certificate_notice_page', function()
+			KeepWorkItemManager.LoadProfile(false, function()
+				RedSummerCampMainPage.RefreshPage()
+			end)
 		end)
 	end
 end
@@ -215,6 +253,11 @@ function RedSummerCampMainPage.OnCreate()
 end
 
 function RedSummerCampMainPage.GetAutoNoticeText()
+	if not RedSummerCampMainPage.NoticeDesc then
+		return ""
+	end
+
+	local notice_desc = RedSummerCampMainPage.NoticeDesc
 	local data = notice_desc[notice_text_index]
 	notice_text_index = notice_text_index + 1
 
@@ -222,13 +265,37 @@ function RedSummerCampMainPage.GetAutoNoticeText()
 		notice_text_index = 1
 	end
 
-	return ">>> " .. data.desc
+	return data.title
 end
 
 function RedSummerCampMainPage.OpenHelpPage(btnId)
 	local btn = page:FindUIControl(btnId);
 	if(btn and btn:IsValid()) then
 		local x,y,width, height = btn:GetAbsPosition();
+
+		if true then
+			local params = {
+				url = string.format("script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampHelperMenu.html?x=%s & y=%s",x,y+70),
+				name = "RedSummerCampHelperMenu.Show", 
+				isShowTitleBar = false,
+				DestroyOnClose = true,
+				style = CommonCtrl.WindowFrame.ContainerStyle,
+				allowDrag = false,
+				enable_esc_key = true,
+				cancelShowAnimation = true,
+				-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+				DesignResolutionWidth = 1280,
+				DesignResolutionHeight = 720,
+				directPosition = true,
+					align = "_fi",
+					x = 0,
+					y = 0,
+					width = 0,
+					height = 0,
+			};
+			System.App.Commands.Call("File.MCMLWindowFrame", params);	
+			return
+		end
 		local KpQuickWord = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpQuickWord.lua");
 		local ctl = CommonCtrl.GetControl("Help_Tree");
 
@@ -519,10 +586,11 @@ end
 
 function RedSummerCampMainPage.OnClickLearn()
 	local dataHistroy = RedSummerCampMainPage.GetLearnHistroy()
+	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.main_world_learn", {useNoId=true});
 	if dataHistroy then
 		RedSummerCampCourseScheduling.AuthLessonV2(function()
 			local course_data = RedSummerCampCourseScheduling.GetCouseDataByName(dataHistroy.key)
-			local data = course_data ~= nil and course_data or dataHistroy.key
+			local data = course_data ~= nil and course_data or dataHistroy.key			
 			local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
 			RedSummerCampPPtPage.Show(data,dataHistroy.pptIndex)
 		end)
@@ -561,24 +629,33 @@ end
 function RedSummerCampMainPage.OnClickNotice(index)
 	local notic_text = "notic_text" .. index
 	local value = page:GetValue(notic_text)
-	-- for k, v in pairs(notice_desc) do
-	-- 	if string.find(value, v.desc) then
-	-- 		RedSummerCampMainPage.OpenPage(v.name)
-	-- 		break
-	-- 	end
-	-- end
-	Notice.Show(1 ,100)
+
+	local click_data
+	if RedSummerCampMainPage.NoticeDesc then
+		for k, v in pairs(RedSummerCampMainPage.NoticeDesc) do
+			if string.find(value, v.title) then
+				click_data = v
+				break
+			end
+		end
+	end
+
+	if click_data and click_data.url and click_data.url ~= "" then
+		ParaGlobal.ShellExecute("open", click_data.url, "", "", 1); 
+	else
+		Notice.Show(1 ,100)
+	end
 end
 
 function RedSummerCampMainPage.OpenPage(name)
     if(name == "course_page")then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.course_page");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.course_page", {useNoId=true});
         local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
         RedSummerCampRecCoursePage.Show();
     elseif(name == "shentongbei")then
         -- local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
         -- Page.ShowShenTongBeiPage();
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.match");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.match", {useNoId=true});
 		local RacePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Race/RacePage.lua");
         RacePage.Show();
     elseif(name == "teacher_day")then
@@ -594,29 +671,34 @@ function RedSummerCampMainPage.OpenPage(name)
         local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("zhengcheng");
     elseif(name == "ai_school")then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.ai_school");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.ai_school", {useNoId=true});
         local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("ai_school");
     elseif(name == "parent_page")then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.parent_page");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.parent_page", {useNoId=true});
         local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");
         RedSummerCampParentsPage.Show();
     elseif(name == "summer_camp")then
         local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("summer_camp");
     elseif(name == "main_world")then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.main_world");
-		local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
-		RedSummerCampMainWorldPage.Show();
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.main_world", {useNoId=true});
+		-- local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
+		-- RedSummerCampMainWorldPage.Show();
+		RedSummerCampCourseScheduling.ShowView()
 	elseif(name == "leyuan")then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.leyuan");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.leyuan", {useNoId=true});
 		local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("leyuan");
+	elseif(name == "china_story")then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.china_story", {useNoId=true});
+		local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
+        RedSummerCampCommonPage.Show("china_story");
     elseif(name == "explore")then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.explore");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.explore", {useNoId=true});
 		GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
 	elseif(name == "superAnimal") then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.super_pet");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.super_pet", {useNoId=true});
 		local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
         RedSummerCampPPtPage.Show("superAnimal");
     end
@@ -625,7 +707,7 @@ end
 function RedSummerCampMainPage.QuickStart()
 	local Opus = NPL.load("(gl)Mod/WorldShare/cellar/Opus/Opus.lua")
 	Opus:Show()
-	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openopus");
+	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openopus", {useNoId=true});
 	-- local last_world_id = GameLogic.GetPlayerController():LoadRemoteData("summer_camp_last_worldid", 0);
 	-- if last_world_id and last_world_id > 0 then
 	-- 	GameLogic.RunCommand(format('/loadworld -s -force %d', last_world_id))
@@ -667,30 +749,30 @@ function RedSummerCampMainPage.OnClickRightBt(name)
 
 
     if name == "skin" then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openuserskin");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openuserskin", {useNoId=true});
 		local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
 		last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="skin", username = System.User.keepworkUsername});
 	elseif name == "certificate" then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openuserhonor");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openuserhonor", {useNoId=true});
 		local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
 		last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="honor", username = System.User.keepworkUsername});
 	elseif name == "friend" then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openfriend");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openfriend", {useNoId=true});
         local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
         FriendsPage.Show();
 		RedSummerCampMainPage.ChangeRedTipState("friend_red_icon", false)
 	elseif name == "email" then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openemail");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openemail", {useNoId=true});
         local Email = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/Email.lua");
         Email.Show();		
 	elseif name == "task" then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.opentask");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.opentask", {useNoId=true});
 		local QuestPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestPage.lua");
 		QuestPage.Show();
 		RedSummerCampMainPage.HasClickQuest = true
 		RedSummerCampMainPage.ChangeRedTipState("task_red_icon", false)
 	elseif name == "rank" then
-		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openrank");
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openrank", {useNoId=true});
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Rank/Rank.lua").Show();
     end
 end
