@@ -196,7 +196,7 @@ function QuestPage.ShowView()
 				y = -view_height/2,
 				width = view_width,
 				height = view_height,
-				-- isTopLevel = true
+				isTopLevel = true,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 

@@ -1,7 +1,8 @@
 --[[
 Title: The Chat Channels 
-Author(s): zrf, refactored by LiXizhi
-Date: 2011/3/8
+Author(s): zrf, refactored by LiXizhi, big
+CreateDate: 2011.3.8
+ModifyDate: 2022.8.19
 Desc:  
 Use Lib:
 -------------------------------------------------------
@@ -279,7 +280,7 @@ end
 -- @param bIgnoreSelf: true if ignore message from self. 
 -- @nid: this is from network message. 
 --]]---------------------------------------------------------------------------------------------------
-function ChatChannel.AppendChat( msgdata, bIgnoreSelf, nid )
+function ChatChannel.AppendChat(msgdata, bIgnoreSelf, nid)
 	ChatChannel.Init();
 	if(type(msgdata) == "string") then
 		LOG.std(nil, "debug", "chat", "received chat:"..msgdata);
@@ -441,39 +442,48 @@ function ChatChannel.ClearChat(ChannelIndex)
 end
 
 
-function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inputType)
+function ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words, inputType, projectId)
     inputType = inputType or ChatChannel.InputTypes.FromEditBox;
+
     NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
     local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+
 	local generatorName = WorldCommon.GetWorldTag("world_generator");
-	if(generatorName == "paraworld")then
+
+	if (generatorName == "paraworld") then
 		local localVersion = ParaEngine.GetAppCommandLineByParam("localVersion", "");
 		localVersion = string.upper(localVersion)
-		if(localVersion == "SCHOOL")then
+
+		if (localVersion == "SCHOOL") then
 			_guihelper.MessageBox(L"很抱歉，现在不能聊天！");
 			return
 		end
 	end
+
 	KpChatChannel = KpChatChannel or NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
-    --if(generatorName == "paraworld" and KpChatChannel.IsBlockedChannel(ChannelIndex))then
-	
-    if(KpChatChannel.IsInWorld() and KpChatChannel.IsBlockedChannel(ChannelIndex))then
-        if(inputType ~= ChatChannel.InputTypes.FromQuickWord)then
+
+    if (KpChatChannel.IsInWorld() and KpChatChannel.IsBlockedChannel(ChannelIndex))then
+        if (inputType ~= ChatChannel.InputTypes.FromQuickWord) then
 			_guihelper.MessageBox(L"这个频道只能发快捷语言！");
             return
         end
     end
-    local msgdata = KpChatChannel.CreateMessage( ChannelIndex, to, toname, words);
-    if(not msgdata)then
+
+    local msgdata = KpChatChannel.CreateMessage(ChannelIndex, to, toname, words, nil, nil, projectId);
+
+    if (not msgdata)then
         return
     end
-    
-	if(ChatChannel.WordsFilter)then
+
+	if (ChatChannel.WordsFilter) then
 		local i;
-		for i=1,#(ChatChannel.WordsFilter) do
+
+		for i = 1, #(ChatChannel.WordsFilter) do
 			local filter_func = ChatChannel.WordsFilter[i];
-			if(filter_func and type(filter_func)=="function")then
+
+			if (filter_func and type(filter_func)=="function") then
 				msgdata = filter_func(msgdata);
+
 				if(msgdata == true) then
 					return true;
 				elseif(msgdata==nil or msgdata.words == nil or msgdata.words == "" )then
@@ -482,48 +492,88 @@ function ChatChannel.SendMessage_Keepwork( ChannelIndex, to, toname, words, inpu
 			end
 		end
 	end
-    if(msgdata.ChannelIndex == EnumChannels.KpBroadCast) then
+
+    if (msgdata.ChannelIndex == EnumChannels.KpBroadCast) then
         local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 		local stone_name = "喇叭";
 		local purchase_exid = 0;
         local stone_gsid = 10001;
         local gsItem = KeepWorkItemManager.GetItemTemplate(stone_gsid);
-		if(gsItem) then
+
+		if (gsItem) then
 			stone_name = gsItem.name;
 		end
+
         gsid_list = {
             { gsid = 10002, },
             { gsid = stone_gsid, },
         }
+
         local copies = KeepWorkItemManager.UnionCopies(gsid_list);
 
-		if(copies == 0) then
-            _guihelper.MessageBox(format("你没有%s，不能广播！", stone_name),nil,nil,nil,nil,nil,nil,{ title = L"温馨提示", });
+		if (copies == 0) then
+            _guihelper.MessageBox(
+				format("你没有%s，不能广播！", stone_name),
+				nil,
+				nil,
+				nil,
+				nil,
+				nil,
+				nil,
+				{
+					title = L"温馨提示",
+				}
+			);
+
 			return;
         else
-            if(copies < 100) then
-				_guihelper.MessageBox(format([[<div style="float:left">发送一条广播消息,需要消耗1个<kp:item gsid="%d" style="float:left;margin-top:-8px;width:64px;height:32px;" />,确定要发送?</div><div style="margin-top:5px;"><div>你现在还有%d个<kp:item gsid="%d" style="float:left;margin-top:-8px;width:64px;height:32px;" /></div></div>
-                ]], stone_gsid, copies or 0, stone_gsid),function(result)
-					if(result == _guihelper.DialogResult.OK)then
-						ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
-					end
-				end,_guihelper.MessageBoxButtons.OKCancel);
+            if (copies < 100) then
+				_guihelper.MessageBox(
+					format(
+						[[
+							<div style="float:left">
+								发送一条广播消息,需要消耗1个
+								<kp:item gsid="%d" style="float:left;margin-top:-8px;width:64px;height:32px;" />
+								,确定要发送?
+							</div>
+							<div style="margin-top:5px;">
+								<div>
+									你现在还有%d个
+									<kp:item gsid="%d" style="float:left;margin-top:-8px;width:64px;height:32px;" />
+								</div>
+							</div>
+                		]],
+						stone_gsid,
+						copies or 0,
+						stone_gsid
+					),
+					function(result)
+						if (result == _guihelper.DialogResult.OK) then
+							ChatChannel.ValidateMsg(msgdata, KpChatChannel.SendToServer);
+						end
+					end,
+					_guihelper.MessageBoxButtons.OKCancel
+				);
 			else
-				ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
+				ChatChannel.ValidateMsg(msgdata, KpChatChannel.SendToServer);
 			end
 		end
-    elseif(msgdata.ChannelIndex == EnumChannels.KpSchool) then
+    elseif (msgdata.ChannelIndex == EnumChannels.KpSchool) then
         local school_room = KpChatChannel.GetSchoolRoom();
-        if(not school_room)then
+
+		if (not school_room) then
             _guihelper.MessageBox(L"你还没有加入学校，不能发送这个频道的消息。")
             return
         end
+
 	    ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
     else
 	    ChatChannel.ValidateMsg(msgdata,KpChatChannel.SendToServer);
     end
+
     return true;
 end
+
 -- send a chat message
 -- @param ChannelIndex	频道索引
 -- @param to				接受者nid
@@ -532,9 +582,9 @@ end
 -- @param bSilentMode
 -- @param inputType{ChatChannel.InputTypes}		文字的输入来源	
 -- @return true if succeed. or false if speaking too fast or does not pass a given filter
-function ChatChannel.SendMessage( ChannelIndex, to, toname, words, bSilentMode, inputType)
+function ChatChannel.SendMessage(ChannelIndex, to, toname, words, bSilentMode, inputType, projectId)
     if(ChatChannel.Is_Keepwork_Channel(ChannelIndex))then
-        return ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words, inputType)
+        return ChatChannel.SendMessage_Keepwork(ChannelIndex, to, toname, words, inputType, projectId)
     end
 	if(not ChatChannel.streamRateCtrler:AddMessage()) then
 		return
@@ -550,7 +600,7 @@ function ChatChannel.SendMessage( ChannelIndex, to, toname, words, bSilentMode, 
 					_guihelper.MessageBox(format("使用全服频道需要消耗500%s, 是否发送？", System.options.haqi_GameCurrency), function(res)
 						if(res and res == _guihelper.DialogResult.Yes) then
 							-- pressed YES
-							ChatChannel.SendMessage( ChannelIndex, to, toname, words, true )
+							ChatChannel.SendMessage( ChannelIndex, to, toname, words, true)
 						end
 					end, _guihelper.MessageBoxButtons.YesNo);
 				end
@@ -592,7 +642,7 @@ function ChatChannel.SendMessage( ChannelIndex, to, toname, words, bSilentMode, 
 			end
 		end
 	end
-	ChatChannel.ValidateMsg(msgdata,ChatChannel.SendToServer);
+	ChatChannel.ValidateMsg(msgdata, ChatChannel.SendToServer);
 	return true;
 end
 
@@ -602,95 +652,121 @@ end
 成功后执行success_callback函数
 -- @param success_callback: function(msgdata) end to be called when data is validated. 
 --]]---------------------------------------------------------------------------------------------------
-function ChatChannel.ValidateMsg(msgdata,success_callback)
-	if(not System.options.mc) then
-		if(msgdata.from)then
-			if(msgdata.fromname == nil)then
-				Map3DSystem.App.profiles.ProfileManager.GetUserInfo(msgdata.from, "ChatChannelValidateMsg", function(msg)
-					if(msg and msg.users and msg.users[1]) then
-						local name = msg.users[1].nickname;
-						if(name)then			
-							msgdata.fromname = name;
-							ChatChannel.ValidateMsg(msgdata,success_callback);
-						end
-					end	
-				end, "access plus 1 hour");
+function ChatChannel.ValidateMsg(msgdata, success_callback)
+	if (not System.options.mc) then
+		if (msgdata.from) then
+			if (msgdata.fromname == nil) then
+				Map3DSystem.App.profiles.ProfileManager.GetUserInfo(
+					msgdata.from,
+					"ChatChannelValidateMsg",
+					function(msg)
+						if (msg and msg.users and msg.users[1]) then
+							local name = msg.users[1].nickname;
+							
+							if (name) then			
+								msgdata.fromname = name;
+								ChatChannel.ValidateMsg(msgdata, success_callback);
+							end
+						end	
+					end,
+					"access plus 1 hour"
+				);
 				return;
-			elseif(not ignore_vip and msgdata.fromisvip == nil)then
-				if(msgdata.from == System.App.profiles.ProfileManager.GetNID())then
+			elseif (not ignore_vip and msgdata.fromisvip == nil) then
+				if (msgdata.from == System.App.profiles.ProfileManager.GetNID()) then
 					msgdata.fromisvip = VIP.IsVIPAndActivated();
-					ChatChannel.ValidateMsg(msgdata,success_callback);
+					ChatChannel.ValidateMsg(msgdata, success_callback);
 					return;
 				else
-					System.App.profiles.ProfileManager.GetUserInfo(msgdata.from, "UpdateUserInfoInMemoryAfterSellItem", 
+					System.App.profiles.ProfileManager.GetUserInfo(
+						msgdata.from,
+						"UpdateUserInfoInMemoryAfterSellItem",
 						function(msg) 
 							local myInfo = ProfileManager.GetUserInfoInMemory(msgdata.from);
-							if(myInfo and myInfo.energy) then
+
+							if (myInfo and myInfo.energy) then
 								msgdata.fromisvip = myInfo.energy > 0;
 							else
 								msgdata.fromisvip = false;
 							end
-							ChatChannel.ValidateMsg(msgdata,success_callback);
-						end, "access plus 1 hour");
+
+							ChatChannel.ValidateMsg(msgdata, success_callback);
+						end,
+						"access plus 1 hour"
+					);
 					return;
 				end
-			elseif(msgdata.fromschool == nil)then
-				if(msgdata.ChannelIndex ~=  EnumChannels.BroadCast) then
-					if(msgdata.from == System.App.profiles.ProfileManager.GetNID())then
+			elseif (msgdata.fromschool == nil) then
+				if (msgdata.ChannelIndex ~= EnumChannels.BroadCast) then
+					if (msgdata.from == System.App.profiles.ProfileManager.GetNID()) then
 						msgdata.fromschool = Combat.GetSchool();
 					else
 						msgdata.fromschool = Combat.GetSchool(msgdata.from);
 					end
-					ChatChannel.ValidateMsg(msgdata,success_callback);
+
+					ChatChannel.ValidateMsg(msgdata, success_callback);
 					return;
 				end
 			end
 		end
 
-		if(msgdata.to)then
-			if(msgdata.toname == nil)then
-				Map3DSystem.App.profiles.ProfileManager.GetUserInfo(msgdata.to, "ChatChannelValidateMsg", function(msg)
-					if(msg and msg.users and msg.users[1]) then
-						local name = msg.users[1].nickname;
-						if(name)then			
-							msgdata.toname = name;
-							ChatChannel.ValidateMsg(msgdata,success_callback);
-						end
-					end	
-				end, "access plus 20 minutes");
+		if (msgdata.to) then
+			if (msgdata.toname == nil) then
+				Map3DSystem.App.profiles.ProfileManager.GetUserInfo(
+					msgdata.to,
+					"ChatChannelValidateMsg",
+					function(msg)
+						if(msg and msg.users and msg.users[1]) then
+							local name = msg.users[1].nickname;
+							if(name)then			
+								msgdata.toname = name;
+								ChatChannel.ValidateMsg(msgdata,success_callback);
+							end
+						end	
+					end,
+					"access plus 20 minutes"
+				);
 
 				return;
-			elseif(not ignore_vip and msgdata.toisvip == nil)then
-				if(msgdata.to == System.App.profiles.ProfileManager.GetNID())then
+			elseif (not ignore_vip and msgdata.toisvip == nil) then
+				if (msgdata.to == System.App.profiles.ProfileManager.GetNID()) then
 					msgdata.toisvip = VIP.IsVIPAndActivated();
-					ChatChannel.ValidateMsg(msgdata,success_callback);
+					ChatChannel.ValidateMsg(msgdata, success_callback);
 					return;
 				else
-					System.App.profiles.ProfileManager.GetUserInfo(msgdata.to, "UpdateUserInfoInMemoryAfterSellItem", 
+					System.App.profiles.ProfileManager.GetUserInfo(
+						msgdata.to,
+						"UpdateUserInfoInMemoryAfterSellItem", 
 						function(msg) 
 							local myInfo = ProfileManager.GetUserInfoInMemory(msgdata.to);
+
 							if(myInfo and myInfo.energy) then
 								msgdata.toisvip = myInfo.energy > 0;
 							else
 								msgdata.toisvip = false;
 							end
-							ChatChannel.ValidateMsg(msgdata,success_callback);
-						end, "access plus 1 hour");
+
+							ChatChannel.ValidateMsg(msgdata, success_callback);
+						end,
+						"access plus 1 hour"
+					);
+
 					return;
 				end
-			elseif(msgdata.toschool == nil)then
-				if(msgdata.to == System.App.profiles.ProfileManager.GetNID())then
+			elseif (msgdata.toschool == nil) then
+				if (msgdata.to == System.App.profiles.ProfileManager.GetNID()) then
 					msgdata.toschool = Combat.GetSchool();
 				else
 					msgdata.toschool = Combat.GetSchool(msgdata.to);
 				end
+
 				ChatChannel.ValidateMsg(msgdata,success_callback);
 				return;
 			end
 		end
 	end
 
-	if(success_callback and type(success_callback)=="function")then
+	if (success_callback and type(success_callback) == "function") then
 		success_callback(msgdata);
 	end
 end
@@ -699,15 +775,17 @@ local apply_msg_template = {
 	ChannelIndex = EnumChannels.Region,
 	words = "申请发送中...",
 }
+
 local msg_send_succeed_template = {
 	ChannelIndex = EnumChannels.Region,
 	words = "发送成功",
 }
+
 --[[---------------------------------------------------------------------------------------------------
 根据消息类型分别发送至服务器
 --]]---------------------------------------------------------------------------------------------------
 function ChatChannel.SendToServer(msgdata)
-	if(System.options.mc) then
+	if (System.options.mc) then
 		-- disable chat in paracraft
 		ChatChannel.AppendChat( msgdata );
 		return

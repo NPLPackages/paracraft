@@ -1,0 +1,162 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Mobile/MobileSelectBlocksTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="SelectBlocksTask.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks")
+SelectBlocks.OnInit()
+
+function OnClose()
+    SelectBlocks.CancelSelection();
+end
+
+function IsMCVersion()
+    return System.options.mc;
+end
+
+]]></script>
+<pe:container style="width:629px;height:104px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/dingbudi_79x104_32bits.png#0 0 79 104:32 32 32 32)">
+    <pe:container alignment="_rt" style="margin-right:40px;margin-top:34px;width:43px;height:43px;background:url()">
+        <input type="button" onclick="OnClose" uiname ="SelectBlocksTask.OnClose" style="width:43px;height:43px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/guanbi_43x43_32bits.png#0 0 43 43)" />
+    </pe:container>
+    <div style="float:left;margin-left:60px;margin-top:11px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/xuangzhongfangkuai_48x48_32bits.png#0 0 48 48#16 16 16 16)">
+        <div style="margin-left:0px;padding:3px;padding-left:4px;padding-right:6px;">
+            <div style="position:relative;margin-left:40px;margin-top:8px;">
+                <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(3) %>' style="float:left;width:24px;height:24px;" />
+            </div>
+            <div style="position:relative;margin-left:24px;margin-top:4px;">
+                <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(2) %>' style="float:left;width:32px;height:32px;" />
+            </div>
+            <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(1) %>' style="float:left;width:40px;height:40px;" />
+        </div>
+        <div style="margin-left:-38px;margin-top:8px;width:123px;height:31px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/wenzidi_54x27_32bits.png#0 0 54 27)">
+            <input type="button" name="title" value='<%=SelectBlocks.GetBlockCountText() %>' style="text-align:left; margin-left:15px;margin-top:4px;background:;font-size:18px;width:120px;color:#ffffff"/>
+        </div>
+    </div>
+    <div style="float:left;margin-left:46px;margin-right:26px;margin-top:14px;width:2px;height:76px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/fengexian_2x128_32bits.png#0 0 2 128)"/>
+    <div style="float:left;width:406px;padding-top:15px;height:200;margin-left: 0px;margin-top:0px;background-color:#00000000;">
+        <div style="float:left;width:82px;height:90px">
+            <input zorder ="-2" type="button" style="margin-left:11px;margin-top:7px;min-width:56px;height:55px;font-weight:bold;color:#ffffff;text-offset-y:23; font-size:18px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/baocun_55x55_32bits.png#0 0 55 55)"  tooltip='<%=L"存为模板"%>' uiname="SelectBlocksTask.btn_template" name="btn_template" onclick="SelectBlocks.DoClick"/>
+            <div zorder = "-1" style="margin-left:12px;margin-top:-10px;width:54px;height:27px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/wenzidi_54x27_32bits.png#0 0 54 27)">
+                <div zorder = "1" style="margin-left:8px;margin-top:-1px;min-width:56px;height:55px;color:#ffffff; font-size:18px;">
+                    <%=L"保存"%>
+                </div>
+            </div>
+        </div>
+        <!-- <div style="float:left;width:82px;">
+            <input type="button" style="margin-left:11px;margin-top:7px;min-width:56px;height:76px;font-weight:bold;color:#ffffff;text-offset-y:23; font-size:18px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/quanxuan_56x76_32bits.png#0 0 56 76)" value='<%=L"全选"%>' tooltip='<%=L"选择上方全部联通的方块. 快捷键Ctrl+A\nCtrl+shift+click切换单选\nCtrl+alt+click过滤同种方块"%>' uiname="SelectBlocksTask.btn_selectall" name="btn_selectall" onclick="SelectBlocks.DoClick"/>
+        </div> -->
+        <div style="float:left;width:82px;">
+            <input zorder ="-2" type="button" style="margin-left:11px;margin-top:7px;min-width:55px;height:55px;font-weight:bold;color:#ffffff;text-offset-y:23; font-size:18px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/bianhuan_55x55_32bits.png#0 0 55 55)" tooltip='<%=L"shift+左键移动到鼠标所在位置\nShift+点击下方箭头拉伸(-/+)\n放大/缩小(Ctrl -/+)"%>' uiname="SelectBlocksTask.btn_transform" name="btn_transform" onclick="SelectBlocks.DoClick" />
+            <div zorder = "-1" style="margin-left:12px;margin-top:-10px;width:54px;height:27px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/wenzidi_54x27_32bits.png#0 0 54 27)">
+                <div zorder = "1" style="margin-left:8px;margin-top:-1px;min-width:56px;height:55px;color:#ffffff; font-size:18px;">
+                    <%=L"变换"%>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;width:82px;">
+            <input zorder ="-2" type="button" style="margin-left:11px;margin-top:7px;min-width:55px;height:55px;font-weight:bold;color:#ffffff;text-offset-y:23; font-size:18px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/jingxiang_55x55_32bits.png#0 0 55 55)" uiname="SelectBlocksTask.btn_mirror" name="btn_mirror" tooltip='<%=L"Alt+左键设定参考点"%>' onclick="SelectBlocks.DoClick" />
+            <div zorder = "-1" style="margin-left:12px;margin-top:-10px;width:54px;height:27px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/wenzidi_54x27_32bits.png#0 0 54 27)">
+                <div zorder = "1" style="margin-left:8px;margin-top:-1px;min-width:56px;height:55px;color:#ffffff; font-size:18px;">
+                    <%=L"镜像"%>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;width:82px;">
+            <input zorder ="-2" type="button" style="margin-left:11px;margin-top:7px;min-width:55px;height:55px;font-weight:bold;color:#ffffff;text-offset-y:23; font-size:18px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/shanchu_55x55_32bits.png#0 0 55 55)" tooltip='<%=L"全部删除(快捷键 Del)"%>' uiname="SelectBlocksTask.delete" name="delete" onclick="SelectBlocks.DoClick" />
+            <div zorder = "-1" style="margin-left:12px;margin-top:-10px;width:54px;height:27px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/wenzidi_54x27_32bits.png#0 0 54 27)">
+                <div zorder = "1" style="margin-left:8px;margin-top:-1px;min-width:56px;height:55px;color:#ffffff; font-size:18px;">
+                    <%=L"删除"%>
+                </div>
+            </div>
+        </div>
+        <!-- <pe:if condition='<%=SelectBlocks.selected_count == 1 %>'>
+            <div style="float:left;width:82px;">
+                <input type="button" style="margin-left:11px;margin-top:7px;min-width:56px;height:76px;font-weight:bold;color:#ffffff;text-offset-y:23; font-size:18px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/biancheng_56x76_32bits.png#0 0 56 76)" value='<%=L"编程"%>' tooltip='<%=L"进入编程模式"%>' name="NeuronMode" uiname="SelectBlocksTask.EnterNeuronEditMode" onclick="SelectBlocks.EnterNeuronEditMode" />
+            </div>
+        </pe:if> -->
+        <pe:if condition='<%=SelectBlocks.selected_count == 1 and GameLogic.options.has_real_terrain==true %>'>
+            <div style="float:left;width:82px;">
+                <input type="button" style="margin-left:11px;margin-top:7px;min-width:56px;height:76px;font-weight:bold;color:#ffffff;text-offset-y:23; font-size:18px;" value='<%=L"地表"%>' tooltip='<%=L"将选中的块变成实数地表"%>' name="RealTerrainToBlocks" uiname="SelectBlocksTask.ConvertBlocksToRealTerrain" onclick="SelectBlocks.ConvertBlocksToRealTerrain" class="mc_light_grey_button_with_fillet"/>    
+            </div>
+        </pe:if>
+        <pe:if condition='<%=SelectBlocks.selected_count > 1 %>'>
+            <div style="float:left;width:82px;">
+                <input type="button" style="margin-left:11px;margin-top:7px;min-width:56px;height:76px;font-weight:bold;color:#ffffff;text-offset-y:23; font-size:18px;" value='<%=L"分享"%>' tooltip='<%=L"点击后分享给好友"%>' uiname="SelectBlocksTask.btn_share" name="btn_share" onclick="SelectBlocks.DoClick" class="mc_light_grey_button_with_fillet"/>
+            </div>
+        </pe:if>
+    </div>
+    <!-- <div style="float:left;margin-left:0px;margin-right:30px;margin-top:40px;width:2px;height:128px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/fengexian_2x128_32bits.png#0 0 2 128)"/>
+    <div style="float:left;margin-left:0px;margin-top:0px;width:200px;height:200px;background-color: #00000000;">
+        <div style="margin-top:56px;width:190px;height:88px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#35 297 95 44)">
+            <input type="button" uiname="MobileSelectBlocksTask.btn_moveto_up" name="btn_moveto_up" 
+                style="position:relative;margin-left:26px;margin-top:0px;width:22px;height:36px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#3 3 4 4:1 1 1 1);" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 13 20" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;341 299 13 20" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;341 299 13 20" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 13 20" 
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" uiname="MobileSelectBlocksTask.btn_moveto_down" name="btn_moveto_down" 
+                style="position:relative;margin-left:26px;margin-top:60px;width:22px;height:28px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#359 305 13 14)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 13 14" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;359 305 13 14" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;359 305 13 14" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 13 14"
+                onclick="SelectBlocks.DoClick"/> 
+            <input type="button" uiname="MobileSelectBlocksTask.btn_moveto_right" name="btn_moveto_right" 
+                style="position:relative;margin-left:0px;margin-top:20px;width:28px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#321 306 15 12)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 15 12" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;321 306 15 12" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;321 306 15 12" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 15 12"
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" uiname="MobileSelectBlocksTask.btn_moveto_left" name="btn_moveto_left" 
+                style="position:relative;margin-left:40px;margin-top:42px;width:34px;height:28px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#297 304 17 14)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 17 14" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;297 304 17 14" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;297 304 17 14" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 17 14"
+                onclick="SelectBlocks.DoClick"/> 
+             <input type="button" uiname="MobileSelectBlocksTask.btn_moveto_front" name="btn_moveto_front" 
+                style="position:relative;margin-left:0px;margin-top:42px;width:36px;height:28px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#397 304 18 14)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 18 14" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;397 304 18 14" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;397 304 18 14" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 18 14"
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" uiname="MobileSelectBlocksTask.btn_moveto_back" name="btn_moveto_back" 
+                style="position:relative;margin-left:48px;margin-top:20px;width:28px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#376 307 14 11)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 14 11" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;376 307 14 11" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;376 307 14 11" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 14 11"
+                onclick="SelectBlocks.DoClick"/>
+
+            <input type="button" uiname="MobileSelectBlocksTask.btn_rotate_right" name="btn_rotate_right" 
+                style="position:relative;margin-left:90px;margin-top:24px;width:42px;height:40px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#239 300 21 20)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 21 20" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;239 300 21 20" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;239 300 21 20" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 21 20"
+                onclick="SelectBlocks.DoClick"/>
+            <input type="button" uiname="MobileSelectBlocksTask.btn_rotate_left" name="btn_rotate_left" 
+                style="position:relative;margin-left:145px;margin-top:26px;width:44px;height:38px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#268 301 22 19)" 
+                Normal_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 22 19" 
+                Pressed_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;268 301 22 19" 
+                MouseOver_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;268 301 22 19" 
+                Disabled_BG="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;0 0 22 19"
+                onclick="SelectBlocks.DoClick"/>
+                
+        </div>
+    </div> -->
+</pe:container>
+
+</pe:mcml> 
+</body>
+</html>

@@ -86,10 +86,16 @@ function Macros.PlayerMove(bx, by, bz, facing)
 						x1 = x2 * r + x1 * (1-r);
 						y1 = y2 * r + y1 * (1-r);
 						z1 = z2 * r + z1 * (1-r);
-						player:SetPosition(x1, y1, z1)
+						if not player:IsMountOnRailCar() then
+							player:SetPosition(x1, y1, z1)
+						end
+						
 						timer:Change(30);
 					else
-						player:SetBlockPos(bx, by, bz)
+						if not player:IsMountOnRailCar() then
+							player:SetBlockPos(bx, by, bz)
+						end
+						
 						if(facing) then
 							player:SetFacing(facing);
 						end
@@ -105,7 +111,10 @@ function Macros.PlayerMove(bx, by, bz, facing)
 			mytimer:Change(30);
 			return callback;
 		else
-			player:SetBlockPos(bx, by, bz)
+			if not player:IsMountOnRailCar() then
+				player:SetBlockPos(bx, by, bz)
+			end
+			
 			if(facing) then
 				player:SetFacing(facing);
 			end

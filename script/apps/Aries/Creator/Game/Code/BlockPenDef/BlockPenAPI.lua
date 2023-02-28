@@ -176,8 +176,13 @@ end
 
 function BlockPenAPI:setCanvasSize(width, height, mode)
 	self.mode = mode or self.mode;
-	local x, y, z = self.codeEnv.actor:GetEntity():GetBlockPos()
-	self.center = {x = x, y = y, z = z};
+	if self.codeEnv~=nil and self.codeEnv.actor~=nil and self.codeEnv.actor:GetEntity()~=nil then
+		local x, y, z = self.codeEnv.actor:GetEntity():GetBlockPos()
+		self.center = {x = x, y = y, z = z};
+	else
+		self.center = {x = 0, y = 0, z = 0};
+	end
+	
 	self.width = width or self.width;
 	self.height = height or self.height;
 	self.halfWidth = math.floor(width / 2 + 0.5);

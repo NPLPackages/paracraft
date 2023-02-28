@@ -118,3 +118,13 @@ end
 function Entity:CanBeCollidedWith(entity)
 	return self:GetActor():CanBeCollidedWith(entity)
 end
+
+-- virtual function: right click to edit. 
+function Entity:OpenEditor(editor_name, entity)
+	-- disable editors
+	if(editor_name == "entity") then
+		--NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EditEntityPage.lua");
+		--local EditEntityPage = commonlib.gettable("MyCompany.Aries.Game.GUI.EditEntityPage");
+		--EditEntityPage.ShowPage(self, entity);
+	end
+end

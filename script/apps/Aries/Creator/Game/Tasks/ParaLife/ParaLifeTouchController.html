@@ -1,0 +1,23 @@
+<pe:mcml>
+<script type="text/npl" refresh="false" src="ParaLifeTouchController.lua"><![CDATA[
+ParaLifeTouchController = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeTouchController")
+ParaLifeTouchController.OnInit()
+local objParams = {
+    name = "model",
+    IsCharacter = true,
+    AssetFile = "model/common/star/star01_an.x", -- earth
+    -- AssetFile = "model/common/star/star04_an.x",  
+    x = 0,
+    y = 0,
+    z = 0,
+}
+function GetModelParams()
+    return objParams;
+end
+]]></script>
+<pe:container name="paralife_touch_scene" style="position:relative;background:;" alignment="_fi" width="100%" height="100%"/>
+<pe:container alignment="_lb" ClickThrough="true" zorder="-1" style="position:relative;margin-left:32px;margin-bottom:32px; background:;">
+    <pe:canvas3d name="touchBall" miniscenegraphname="touchBall" DefaultCameraObjectDist="4.2" IsInteractive="false" RenderTargetSize="128" style="width:196px;height:196px;" value='<%=GetModelParams()%>' />
+</pe:container>
+<% ParaLifeTouchController.OnPageLoaded() %>
+</pe:mcml>

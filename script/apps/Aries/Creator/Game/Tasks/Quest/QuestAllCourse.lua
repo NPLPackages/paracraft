@@ -753,6 +753,9 @@ function QuestAllCourse.CheckTimeRule(timeRules)
     -- timeRules = timeRules[1]
 
     local function check(timeRule)
+        if not timeRule.startDay then
+            return
+        end
         local year,month,day = timeRule.startDay:match("^(%d+)%D(%d+)%D(%d+)") 
         local start_date_timestamp = os.time({day=tonumber(day), month=tonumber(month), year=tonumber(year), hour=0, min=0, sec=0})
 

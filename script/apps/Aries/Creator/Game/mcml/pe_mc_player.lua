@@ -40,6 +40,11 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 		autoRotateSpeed = 0;
 	end
 
+	local fisrtFrameMove = mcmlNode:GetBool("fisrtFrameMove")
+	if(fisrtFrameMove == nil) then
+		fisrtFrameMove = true;
+	end
+
 	local callback = function(ctl)
 		pe_mc_player.OnFrameMove(ctl, mcmlNode);
 	end;
@@ -112,7 +117,9 @@ function pe_mc_player.render_callback(mcmlNode, rootName, bindingContext, _paren
 
 	mcmlNode.obj_params = obj_params;
 	ctl:ShowModel(obj_params);
-	pe_mc_player.OnFrameMove(ctl, mcmlNode);
+	if fisrtFrameMove then
+		pe_mc_player.OnFrameMove(ctl, mcmlNode);
+	end
 end
 
 function pe_mc_player.AutoSetObjectSkin(obj_params)

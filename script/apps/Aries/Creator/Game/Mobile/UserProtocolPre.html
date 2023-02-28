@@ -1,0 +1,126 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/User/UserProtocol.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<style type="text/mcss">
+{
+    text_size_title = {
+        ["base-font-size"] = 32,
+        ["font-size"] = 32,
+        ["font-weight"] = "bold",
+        ["margin-top"] = 20,
+        ["color"] = "#1a1a1a",
+        ["text-align"] = "center",
+    },
+    text_size_big = {
+        ["base-font-size"] = 28,
+        ["font-size"] = 28,
+        ["font-weight"] = "bold",
+        ["margin-top"] = 20,
+        ["color"] = "#1a1a1a",
+    },
+    text_size_content = {
+        ["base-font-size"] = 24,
+        ["font-size"] = 24,
+        ["color"] = "#1a1a1a",
+    },
+    text_protocol_btn = {
+        ["base-font-size"] = 24,
+        ["font-size"] = 24,
+        ["color"] = "#1C90E6",
+    },
+    
+}
+</style>
+<script refresh="false" type="text/npl" src="UserProtocol.lua">
+    <![CDATA[
+        UserProtocolPre = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/UserProtocolPre.lua");
+        UserProtocolPre.OnInit()
+        function ClosePage()
+            UserProtocolPre.onBtn_close()
+        end
+
+        function GridDs(index)
+            if(index == nil) then    
+                return #UserProtocolPre.GridDs
+            else
+                return UserProtocolPre.GridDs[index];
+            end
+        end
+
+        function user_agreement()
+            UserProtocolPre.ShowUserAgreementPage(1)
+        end
+
+        function user_privacy()
+            UserProtocolPre.ShowUserPrivacyPage(2)
+        end
+
+        function GetTitle()
+            return L"信息"
+        end
+
+        function onBtn_agree()
+            UserProtocolPre.onBtn_agree()
+        end
+    ]]>
+</script>
+<mb:window width = "520" height = "570" title_bg_height = "64" title = '<%=GetTitle()%>' onclose="ClosePage">
+    <div style="min-width: 500px;height:540px;position: relative; margin-top: 60px;">
+        <pe:gridview name="user_protocol_page_gridview" uiname="user_protocol_page_gridview.gridview" RememberScrollPos="true" CellPadding="0" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="540" DataSource='<%=GridDs%>' >
+            <Columns>
+                <div style="width:500px;height:540px;">
+                    <div style="margin-left: 27px;">
+                        <div class="text_size_big" style="text-align: center;">
+                            <%= L'用户协议与隐私政策' %>
+                        </div>
+                        <div style="line-height: 32;margin-top: 10;" >
+                            <div class="text_size_content">
+                                <%= L'欢迎使用帕拉卡3D动画编程，在使用之前，' %>
+                            </div>
+                            <div class="text_size_content" style="float:left;">
+                                <%= L'请仔细阅读' %>
+                            </div>
+                            <div class="text_protocol_btn" style="float:left;" onclick="user_agreement()">
+                                <%= L'《用户许可协议》' %>
+                            </div>
+                            <div class="text_size_content" style="float:left;">
+                                <%= L'和' %>
+                            </div>
+                            <div class="text_protocol_btn" style="float:left;" onclick="user_privacy()">
+                                <%= L'《用户隐私' %>
+                            </div>
+                            <div>
+                                <div class="text_protocol_btn" style="float:left;" onclick="user_privacy()">
+                                    <%= L'协议》' %>
+                                </div>
+                                <div class="text_size_content" style="float:left;">
+                                    <%= L"，我们将严格按照经你同意的各项协" %>
+                                </div>
+                            </div>
+                            <div class="text_size_content" >
+                                <%= L"议条款收集和使用你的个人信息，以便为你提供全面完善的服务。" %>
+                            </div>
+                            <div class="text_size_content" style="margin-top: 10;">
+                                <%= L[[如果你清楚并同意以上内容，请点击“同意“，我们将尽力保护你的个人信息安全不被泄露。]] %>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20;">
+                        <input type="button" value='同意并继续' align="center" onclick="onBtn_agree" style="font-size: 22px;font-weight:bold; width: 172px;height: 62px;background:url(Texture/Aries/Creator/keepwork/Mobile/saveworld/bt1_144x52_32bits.png#0 0 144 52)" />
+                    </div>
+                </div>
+            </Columns>
+        </pe:gridview>
+                
+    </div>
+</mb:window>
+</pe:mcml>
+</body>
+</html>
+

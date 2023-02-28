@@ -126,6 +126,9 @@ function CodeGlobals:ctor()
 					return
 				end
 			end
+			if type(x)~="number" or type(y)~="number" or type(z)~="number" then 
+				return
+			end
 			return BlockEngine:SetBlock(math.floor(x), math.floor(y), math.floor(z), blockId, blockData, 3, entity_data);
 		end,
 		-- similar to setBlock, except that we will add to history to allow undo/redo

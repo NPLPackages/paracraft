@@ -1,0 +1,90 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Educate/Project/CurClassPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CurClassPage.lua"><![CDATA[
+local CurClassPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/CurClassPage.lua");
+CurClassPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    CurClassPage.CloseView()
+end
+
+function LessonsData(index)
+    if(index == nil) then
+        return #CurClassPage.LessonsData;
+    else
+        return CurClassPage.LessonsData[index];
+    end
+end
+
+function IsSelect(index)
+    return false    
+end
+
+function GetClassPackageName()
+    return CurClassPage.GetClassPackageName()
+end
+
+function GetLessonName()
+    return CurClassPage.GetLessonName()
+end
+
+function OnOpen(index)
+    CurClassPage.OnOpen(index)
+end
+]]></script>
+
+<div style="width: 640px;height: 393px;">
+    <div style="width: 640px;height: 60px;margin-top: 0px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:20 20 20 20;">
+        <div style="float: left;margin-left: 20px;margin-top: 15px;color: #ffffff;font-size: 18px;font-weight: bold;">当前课堂</div>
+        <div onclick="ClosePage" style="float: left;margin-left: 502px;margin-top: 20px;width: 16px;height: 16px; background: Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14;"></div>
+    </div>
+    <div style="width: 640px;height: 333px; background: Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 54:25 25 25 25;">
+        <div style="color: #000000;margin-top: 10px;margin-left: 20px;font-size: 14px;">
+            <div style="float: left;">课包名：</div><div style="float: left;"><%=GetClassPackageName()%></div>
+        </div>
+
+        <div style="color: #000000;margin-top: 5px;margin-left: 20px;font-size: 14px;">
+            <div style="float: left;">课程名：</div><div style="float: left;"><%=GetLessonName()%></div>
+        </div>
+
+        <div style="color: #000000;margin-top: 10px;margin-left: 20px;font-size: 14px;">
+            <div style="">课程3D内容</div>
+        </div>
+
+        <div type ="box" style="width:600px;height:247px;margin-left:10px;margin-top: 0px;">
+            <pe:gridview style="margin-left:0px" name="slot_gridview" CellPadding="10" VerticalScrollBarStep="42" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" RememberScrollPos="true" DefaultNodeHeight = "36" 
+                DataSource='<%=LessonsData %>'>
+                <Columns>
+                    <div style="width: 563px; height: 42px;">
+                        <div style="position: relative;">
+                            <div style="position: relative;padding-left: 3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 563px; height: 42px;
+                                background:url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/shurukuang_46x46_32bits.png#0 0 46 46:10 10 10 10);background2:url(Texture/Aries/Creator/paracraft/Educate/xiaoquedin_46x46_32bits.png#0 0 46 46:10 10 10 10)">
+                            </div>
+                            <div onclick="OnOpen" name='<%=Eval("index")%>' style="position: relative;padding-left: 3px;padding-right: 3px; margin-left: 0px; margin-top: 2px; width: 563px; height: 42px;
+                                background:;background2:url(Texture/Aries/Creator/paracraft/Educate/xiaoquedin_46x46_32bits.png#0 0 46 46:10 10 10 10)">
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <div style="margin-left: 10px; margin-top: 12px; base-font-size:12px;font-size: 12px;color: #000000;"><%=Eval("index") .. "." .. Eval("name")%></div>
+                        </div>
+                    </div>
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </div>
+</div>
+
+    
+</pe:mcml>
+</body>
+</html>
+

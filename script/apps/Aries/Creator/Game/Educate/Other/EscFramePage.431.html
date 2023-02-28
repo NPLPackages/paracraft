@@ -1,0 +1,218 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/EscFramePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="EscFramePage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldStacks.lua");
+WorldStacks = commonlib.gettable("MyCompany.Aries.Game.WorldStacks");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
+local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+EscFramePage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetCategoryButtons()
+    return EscFramePage.category_ds;
+end
+
+function OnChangeCategory(index)
+    EscFramePage.OnChangeCategory(index);
+end
+
+function OnLeave()
+    GameLogic.RunCommand("/menu file.exit");
+end
+
+function OnSaveAndLeave()
+    GameLogic.QuickSave();
+    GameLogic.RunCommand("/menu file.exit");
+end
+
+function OnHelp()
+    GameLogic.RunCommand("/menu help.help");
+end
+
+function OnGameMarket()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/EnterGamePage.lua");
+	local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
+	EnterGamePage.ShowPage(true)
+end
+
+function OnLoadGame()
+    GameLogic.RunCommand("/menu file.loadworld");
+end
+
+function OnUploadGame()
+    GameLogic.RunCommand("/menu file.uploadworld");
+end
+
+function OnFriendsPage()
+    System.App.Commands.Call("Profile.Aries.FriendsWnd");
+end
+
+function OnTextureModPage()
+    GameLogic.RunCommand("/menu window.texturepack");
+end
+
+function OnSaveGame()
+    GameLogic.RunCommand("/menu file.saveworld");
+end
+
+function OnSettings()
+    GameLogic.RunCommand("/menu file.settings");
+end
+
+function GetCurWorldName()
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local text = WorldCommon.GetWorldTag("name") or ""
+    local width = 0
+    local name = ""
+    if text~= nil and text ~= "" then
+        for uchar in string.gmatch(text, '([%z\1-\127\194-\244][\128-\191]*)') do
+            local w = _guihelper.GetTextWidth(uchar, "System;14");
+            width = width + tonumber(w)
+            if width < 350 then
+                name = name.. uchar
+            end
+        end
+    end
+    return name
+end
+
+function GetVersion()
+    local ver = System.options.ClientVersion;
+    if(ver) then
+        if(ver == "") then
+            ver = nil;
+        else
+            ver = "ver "..ver;
+        end
+    end
+    return ver or "";
+end
+
+function OnOpenWorldDir()
+    GameLogic.RunCommand("/menu file.openworlddir");
+end
+
+function CreateNewWorld()
+    GameLogic.RunCommand("/menu file.createworld");
+end
+
+function OnClickButton(name,mcmlNode)
+    ClosePage();
+    if(name=="shareWorld") then
+        OnUploadGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.share_world");
+    elseif(name=="saveWorld") then
+        OnSaveGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.save_world");
+    elseif(name=="changeTexture") then
+        OnTextureModPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.change_texture");
+    elseif(name=="loadWorld") then
+        OnLoadGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.load_world");
+    elseif(name=="systemSetting") then
+        OnSettings();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.system_setting");
+    elseif(name=="exitWorld") then
+        OnLeave();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.exit_world");
+    elseif(name=="friends") then
+        OnFriendsPage()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.friends");
+    elseif(name=="continueGame") then
+        ClosePage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.continue_game");
+    elseif(name=="createNewWorld") then
+        CreateNewWorld();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.create_new_world");
+    elseif(name=="openServerPage") then
+        ServerPage.ShowPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.open_server_page");
+    end
+end
+
+function Dummy()
+end
+
+function GetServerButtonValue()
+    if(ServerPage.IsServer() or ServerPage.IsClient()) then
+        return L"私服信息";
+    else
+        return L"架设私服";
+    end
+end
+
+function OnClickRevision()
+    GameLogic.RunCommand("/menu file.worldrevision");
+end
+function OnClickViewHistory()
+    GameLogic.RunCommand("/menu file.openbackupfolder");
+end
+    
+function OnReturnLastWorld()
+    ClosePage();
+    WorldStacks:ReturnLastWorld();
+end
+
+function IsHomeWorkWorld()
+    if GameLogic.IsReadOnly() then
+        return false
+    end
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
+    return isHomeWorkWorld
+end
+]]></script>
+<div style="height:64px;width:370px;">
+    <pe:if condition='<%=WorldStacks:GetReturnWorld() ~= nil%>'>
+        <input type="button" value='<%=WorldStacks:GetReturnWorld():GetDisplayName()%>' class="mc_big_button" style="color:#572712;font-size:16px;width:370px;height:52px;" onclick="OnReturnLastWorld" />    
+    </pe:if>
+</div>
+<aries:window mode="thin" style="width:370px;" title='<%=L"系统设置"%>' onclose="ClosePage">
+<div style="padding-bottom:10px;">
+    
+    <div style="margin-top:10px;margin-right:30px;">
+        <div style="text-align:left;float:left;margin-left: 30px; color: #ffffff;"  tooltip='<%=L"点击打开所在目录"%>' onclick="OnOpenWorldDir">
+            <%=format("%s", GetCurWorldName() or "") %>
+            <input type="button" value='...' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_button_blue"/>
+        </div>
+    </div>
+    <div style="margin-left:31px;">
+        <div style="margin-top:13px;">
+            <input type="button" value='<%=L"保存世界"%>' uiname="EscFramePage.shareWorld" name="shareWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=L"新建世界"%>' uiname="EscFramePage.createNewWorld" name="createNewWorld"  style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+        </div>
+        <div style="margin-top:8px;">
+            <input type="button" value='<%=L"加载世界"%>' tooltip="Ctrl+O" uiname="EscFramePage.loadWorld" name= "loadWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=L"更换材质"%>' name="changeTexture" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+        </div>
+        <div style="margin-top:8px;">
+            <input type="button" value='<%=L"系统设置"%>' name= "systemSetting" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=L"退出世界"%>' uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+        </div>
+    </div>
+    <div style="margin-left:41px;margin-top:8px;">
+        <!--<a tooltip='<%=L"打开官网"%>' href='<%=L"http://www.paracraft.cn/"%>' style="color:#CFCFCF;font-size:13px;" onclick='goto_url("http://www.paracraft.cn")'>www.paracraft.cn</a>-->
+        <div style="float:left;align:right;margin-right:-16px;width:130px;color:#CFCFCF;font-size:17px;">
+            <%=GetVersion() %>
+        </div>
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>
+

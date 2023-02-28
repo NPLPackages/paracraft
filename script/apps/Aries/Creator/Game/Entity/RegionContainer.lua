@@ -279,20 +279,30 @@ function RegionContainer:SetRawRegionFileTag(tag)
 	end
 end
 
+
 function RegionContainer:LoadFromFile(filename)
+	local sameRegion = {}
+	local IsSameEntity = function (attr)
+		local bx,by,bz = tonumber(attr.bx),tonumber(attr.by),tonumber(attr.bz)
+		local key = (bx or 0) * 100000000 +  (by or 0) * 1000000 + (bz or 0);
+		if not sameRegion[key] then
+			sameRegion[key] = true
+			return false
+		end
+		return sameRegion[key]
+	end
 	filename = filename or self:GetRegionFileName();
 
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 	local privateKey = WorldCommon.GetWorldTag("privateKey");
 
 	if (xmlRoot and privateKey and type(privateKey) == "string" and privateKey ~= "") then
-		if (xmlRoot[1] and xmlRoot[1].attr and xmlRoot[1].attr.privateKey ~= privateKey) then
+		if (xmlRoot[1] and xmlRoot[1].attr and (xmlRoot[1].attr.privateKey or privateKey) ~= privateKey) then
+			LOG.std(nil, "warn", "RegionContainer", "region file private key mis-matched. We will not load file %s", filename);
 			return;
 		end
 	end
 	local tag = self:GetRawRegionFileTag();
-	-- TODO: check if tag equals private key, here
-	
 
 	if(xmlRoot) then
 		local count = 0;
@@ -317,12 +327,21 @@ function RegionContainer:LoadFromFile(filename)
 				end
 				
 				if(entity_class) then
-					local entity = entity_class:Create({}, node);
-					if(entity) then
-						entity:Attach();
-						count = count + 1;
+					local funcCreate = function ()
+						local entity = entity_class:Create({}, node);
+						if(entity) then
+							entity:Attach();
+							count = count + 1;
+						else
+							LOG.std(nil, "warn", "EntityLoad", "entity is not loaded. ")
+						end
+					end
+					if attr.class == "EntityMovieClip" then
+						if not IsSameEntity(attr) then
+							funcCreate()
+						end
 					else
-						LOG.std(nil, "warn", "EntityLoad", "entity is not loaded. ")
+						funcCreate()
 					end
 				end
 			end

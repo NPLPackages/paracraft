@@ -1,0 +1,55 @@
+﻿<!--script/apps/Aries/Creator/Game/Mobile/MobileMirrorWnd.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="MirrorWnd.lua">
+SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks")
+MirrorWnd = commonlib.gettable("MyCompany.Aries.Game.GUI.MirrorWnd");
+MirrorWnd.Init()
+
+GameLogic.GetFilters():add_filter("UpdateBlockNumber",function()
+    if Page then
+        Page:SetUIValue("title", SelectBlocks.GetBlockCountText())
+    end
+end)
+
+function OnClose()
+    Page:CloseWindow();
+end
+</script>
+<pe:container style="width:760px;height:104px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/erjidi_80x106_32bits.png#0 0 80 106:32 32 32 32)">
+    <div style="float:left;margin-left:60px;margin-top:11px;width:48px;height:48px;background:url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/xuangzhongfangkuai_48x48_32bits.png#0 0 48 48#16 16 16 16)">
+        <div style="margin-left:0px;padding:3px;padding-left:4px;padding-right:6px;">
+            <div style="position:relative;margin-left:40px;margin-top:8px;">
+                <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(3) %>' style="float:left;width:24px;height:24px;" />
+            </div>
+            <div style="position:relative;margin-left:24px;margin-top:4px;">
+                <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(2) %>' style="float:left;width:32px;height:32px;" />
+            </div>
+            <pe:mc_block block_id='<%=SelectBlocks.GetBlockId(1) %>' style="float:left;width:40px;height:40px;" />
+        </div>
+        <div style="margin-left:-38px;margin-top:8px;width:123px;height:31px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/wenzidi_54x27_32bits.png#0 0 54 27)">
+            <input type="button" name="title" value='<%=SelectBlocks.GetBlockCountText() %>' style="text-align:left; margin-left:15px;margin-top:4px;background:;font-size:18px;width:120px;color:#ffffff"/>
+        </div>
+    </div>
+    <div style="float:left;margin-left:46px;margin-right:26px;margin-top:14px;width:2px;height:76px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/fengexian_2x128_32bits.png#0 0 2 128)"/>
+    <div style="float:left;margin-top:10px;color:#ffffff;width:225px">
+        <div style="float: left;width: 75px;"><input type="radio" checked="true" CheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/xuanzhongyuan_32x32_32bits.png; 0 0 32 32" 
+            UncheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/yuandi_32x32_32bits.png; 0 0 32 32" onclick="MirrorWnd.OnChangeAxis" style="margin-top:16px;margin-left:12px;margin:2px;width:32px;height:32px;" uiname="MirrorWnd.x" name="xyz" id="x" value="x"/><div style="font-size: 14px;" uiname="MirrorWnd.x_for" for="x"><%=L"X (YZ面)"%></div></div>
+        <div style="float: left;width: 75px;"><input type="radio" CheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/xuanzhongyuan_32x32_32bits.png; 0 0 32 32" 
+            UncheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/yuandi_32x32_32bits.png; 0 0 32 32" style="margin-top:16px;margin-left:12px;margin:2px;width:32px;height:32px;" onclick="MirrorWnd.OnChangeAxis" uiname="MirrorWnd.y" name="xyz" id="y" value="y"/><div style="font-size: 14px;" uiname="MirrorWnd.y_for" for="y"><%=L"Y (XZ面)"%></div></div>
+        <div style="float: left;width: 75px;"><input type="radio" CheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/xuanzhongyuan_32x32_32bits.png; 0 0 32 32" 
+            UncheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/yuandi_32x32_32bits.png; 0 0 32 32" style="margin-top:16px;margin-left:12px;margin:2px;width:32px;height:32px;" onclick="MirrorWnd.OnChangeAxis" uiname="MirrorWnd.z" name="xyz" id="z" value="z"/><div style="font-size: 14px;" uiname="MirrorWnd.z_for" for="z"><%=L"Z (YX面)"%></div></div>
+    </div>
+    <!-- <%=L"复制方式:"%> -->
+    <div style="float:left;margin-left:16px;margin-right:26px;margin-top:14px;width:2px;height:76px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/fengexian_2x128_32bits.png#0 0 2 128)"/>
+    <div style="float:left;margin-top:10px;color:#ffffff;width:150px">
+        <div style="float:left;width: 75px;"><input type="radio" CheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/xuanzhongyuan_32x32_32bits.png; 0 0 32 32" 
+            UncheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/yuandi_32x32_32bits.png; 0 0 32 32"style="margin-top:16px;margin-left:6px;margin:2px;width:32px;height:32px;" name="method" id="no_clone" uiname="MirrorWnd.no_clone" value="no_clone"/><div style="font-size: 14px;" for="no_clone"><%=L"不复制"%></div></div>
+        <div style="float:left;width: 75px;"><input type="radio" checked="true" CheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/xuanzhongyuan_32x32_32bits.png; 0 0 32 32" 
+            UncheckedBG="Texture/Aries/Creator/keepwork/Mobile/select_block_task/yuandi_32x32_32bits.png; 0 0 32 32" style="margin-top:16px;margin-left:0px;margin:0px;width:32px;height:32px;" name="method" id="clone" uiname="MirrorWnd.clone" value="clone"/><div style="font-size: 14px;" for="clone"><%=L"复制"%></div></div>
+    </div>
+    <div style="float:left;margin-top:35px;width:149px;">
+        <input type="button" name="OK" uiname="MirrorWnd.OK"  style="margin-top:-4px;width:76px;height:48px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/quedin_76x48_32bits.png#0 0 76 48)" onclick="MirrorWnd.OnOK"/>
+        <input type="button" uiname="MirrorWnd.Cancel"  style="margin-left:30px;float:left;width:43px;height:43px;background: url(Texture/Aries/Creator/keepwork/Mobile/select_block_task/guanbi_43x43_32bits.png#0 0 43 43)" onclick="OnClose"/>
+    </div>
+</pe:container>
+</pe:mcml>

@@ -76,14 +76,16 @@ end
 function block:OnMouseUp(event, bx, by, bz, pickingResult)
 	if(pickingResult and event.mouse_button=="left" and GameLogic.GameMode:CanEditBlock()) then
 		local bx1, by1, bz1 = pickingResult.blockX, pickingResult.blockY, pickingResult.blockZ
-		-- at least drag 1 block away to trigger converter dialog
-		if(((bx1-bx)^2 + (by1-by)^2 + (bz1-bz)^2) > 1) then
-			_guihelper.MessageBox(L"是否将静态的方块模型转化为可拖动的活动模型?", function(res)
-				if(res and res == _guihelper.DialogResult.Yes) then
-					self:ConvertToLiveModel(bx, by, bz)
-				end
-			end, _guihelper.MessageBoxButtons.YesNoCancel);
-			event:accept();
+		if(bx1 and bx) then
+			-- at least drag 1 block away to trigger converter dialog
+			if(((bx1-bx)^2 + (by1-by)^2 + (bz1-bz)^2) > 1) then
+				_guihelper.MessageBox(L"是否将静态的方块模型转化为可拖动的活动模型?", function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						self:ConvertToLiveModel(bx, by, bz)
+					end
+				end, _guihelper.MessageBoxButtons.YesNoCancel);
+				event:accept();
+			end
 		end
 	end
 end

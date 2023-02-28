@@ -170,14 +170,32 @@ function BlockTemplatePage.OnClickSave()
 	local bSaveSnapshot = false; -- not isThemedTemplate and not isSaveInLocalWorld;
 
     local filename, taskfilename;
-
+	BlockTemplatePage.use_map = false
+	BlockTemplatePage.filename_map = ""
+	local function handle(file_name)
+		--#region
+		local re = ParaIO.CreateDirectory(file_name);
+		if not re then
+			NPL.load("(gl)script/apps/Aries/Desktop/GameMemoryProtector.lua");
+			local GameMemoryProtector = commonlib.gettable("MyCompany.Aries.Desktop.GameMemoryProtector");
+			local chineseMap = commonlib.LoadTableFromFile(Files.GetWritablePath().."worlds/DesignHouse/blocktemplates/chinese_map.json")
+			local md5 = GameMemoryProtector.hash_func_md5(format("%s.blocks.xml", name_normalized))
+			chineseMap = chineseMap or {}
+			chineseMap[md5] = commonlib.Encoding.DefaultToUtf8(name_normalized);
+			commonlib.SaveTableToFile(chineseMap, "worlds/DesignHouse/blocktemplates/chinese_map.json",true);
+			BlockTemplatePage.filename_map = filename:gsub(name_normalized,md5)
+			BlockTemplatePage.use_map = true
+		end
+		--#endregion
+	end
 	if(isSaveInLocalWorld) then
 		if(BlockTemplatePage.themeKey == "tutorial") then	
 			filename = format("%s%s/%s.blocks.xml", GameLogic.current_worlddir.."blocktemplates/", name_normalized, name_normalized);
 			taskfilename = format("%s%s/%s.xml", GameLogic.current_worlddir.."blocktemplates/", name_normalized, name_normalized);
 			ParaIO.CreateDirectory(filename);
 		else
-			filename = format("%s%s.blocks.xml", GameLogic.current_worlddir.."blocktemplates/", name_normalized);	
+			filename = format("%s%s.blocks.xml", GameLogic.current_worlddir.."blocktemplates/", name_normalized);
+			handle(filename)
 		end
 	elseif(isThemedTemplate) then
 		ParaIO.CreateDirectory(template_base_dir);
@@ -186,6 +204,7 @@ function BlockTemplatePage.OnClickSave()
 		taskfilename = format("%s%s.xml", template_base_dir..subdir.."/"..name_normalized.."/", name_normalized);
 	else
 		filename = format("%s%s.blocks.xml", template_base_dir, name_normalized);
+		handle(filename)
 	end
 
 	local function doSave_()
@@ -239,7 +258,7 @@ function BlockTemplatePage.OnClickSave()
 	if(GameLogic.Macros:IsRecording()) then
 		GameLogic.Macros:AddMacro("ConfirmNextMessageBoxClick");
 	end
-	if(ParaIO.DoesFileExist(filename)) then
+	if(ParaIO.DoesFileExist(BlockTemplatePage.use_map and BlockTemplatePage.filename_map or filename)) then
 		_guihelper.MessageBox(format(L"模板文件%s已经存在, 是否要覆盖之前的文件?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				doSave_();
@@ -269,7 +288,8 @@ function BlockTemplatePage.SaveToTemplate(filename, blocks, params, callbackFunc
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 	local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = filename, 
+	local _filename = BlockTemplatePage.use_map and BlockTemplatePage.filename_map or filename
+	local task = BlockTemplate:new({operation = BlockTemplate.Operations.Save, filename = _filename, 
 		params = params, 
 		blocks = blocks, 
 		liveEntities = liveEntities,
@@ -336,7 +356,7 @@ function BlockTemplatePage.GetAllTemplatesDS(bForceRefresh, searchText)
 
 		-- local dir
 		local result = commonlib.Files.Find({}, GameLogic.current_worlddir.."blocktemplates/", 2, 500, function(item)
-			if(item.filename:match("%.bmax$") or item.filename:match("%.blocks%.xml$")) then
+			if(item.filename:match("%.bmax$") or item.filename:match("%.x$") or item.filename:match("%.blocks%.xml$")) then
 				return true;
 			end
 		end)

@@ -256,7 +256,7 @@ function ActWeek.OpenVipNotice()
     GameLogic.IsVip("VipGoods", true, function(result)
         if result then
             if (KeepWorkItemManager.IsVip()) then
-                local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+                local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
                 KeepWorkMallPage.HandleDataSources()
                 KeepWorkMallPage.FlushView()
             end

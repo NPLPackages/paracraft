@@ -304,6 +304,16 @@ function MovieClip:FindActor(name)
 	end
 end
 
+-- find first NPC actor
+-- @return actor or nil.
+function MovieClip:FindFirstNPCActor()
+	for i, actor in pairs(self.actors) do
+		if(actor.class_name == "ActorNPC") then
+			return actor;
+		end
+	end
+end
+
 function MovieClip:NewActorName()
 	local index = #(self.actors);
 	while (true) do
@@ -462,6 +472,7 @@ function MovieClip:FrameMove(deltaTime)
 		if(deltaTime > 0) then
 			self:UpdateActors(deltaTime);
 		end
+		GameLogic.GetFilters():apply_filters("OnMoviePlayFinish", self)
 	else
 		self:UpdateActors(deltaTime);
 	end

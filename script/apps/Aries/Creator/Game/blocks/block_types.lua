@@ -449,6 +449,14 @@ function block_types.LoadFromFile(filename)
 
 	filename = filename or "config/Aries/creator/block_types.xml";
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
+
+	local ParaBlockWorld_SetTemplatePhysicsPropertytype = ParaBlockWorld.SetTemplatePhysicsProperty;
+	if (type(ParaBlockWorld_SetTemplatePhysicsPropertytype) ~= "function") then
+		ParaBlockWorld_SetTemplatePhysicsPropertytype = function() end 
+	end
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Materials/block_material.lua");
+	local Materials = commonlib.gettable("MyCompany.Aries.Game.Materials");
+	
 	if(xmlRoot) then
 		xmlRoot = GameLogic.GetFilters():apply_filters("block_types", xmlRoot);
 		
@@ -473,6 +481,11 @@ function block_types.LoadFromFile(filename)
 				if(attr.searchkey) then
 					attr.searchkey = string.lower(attr.searchkey);
 				end
+				attr.searchkey2 = L(attr.searchkey2);
+				if(attr.searchkey2) then
+					attr.searchkey2 = string.lower(attr.searchkey2);
+				end
+				attr.hideforSchool = attr.hideforSchool == "true";
 				attr.tooltip = L(attr.tooltip);
 				attr.obstruction = attr.obstruction == "true";
 				attr.solid = attr.solid == "true";
@@ -537,6 +550,14 @@ function block_types.LoadFromFile(filename)
 				end
 
 				attr.texture = LocalTextures:GetBlockTexture(attr.texture);
+
+				-- 方块物理属性
+				if (attr.physicsProperty) then
+					local material = Materials[attr.material or "default"];
+					attr.physicsProperty = material:getPhysicsProperty();
+					commonlib.partialcopy(attr.physicsProperty, NPL.LoadTableFromString(attr.physicsProperty));
+    				ParaBlockWorld_SetTemplatePhysicsPropertytype(GameLogic.GetBlockWorld(), commonlib.serialize_compact(attr.physicsProperty));
+				end
 
 				if (attr.src) then
 					NPL.load("(gl)"..attr.src);

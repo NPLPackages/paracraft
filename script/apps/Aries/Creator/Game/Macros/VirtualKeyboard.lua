@@ -145,14 +145,18 @@ end
 -- @param left: default to one button width
 -- @param top: left, top position where to show. 
 -- @param width: if width is not specified, it will use all the screen space left from x. 
-function VirtualKeyboard:Init(name, left, top, width)
+function VirtualKeyboard:Init(name, left, top, width, root)
+	if root and root:IsValid() then
+		self.root = root
+	end
+
 	self.name = name or self.name;
 	self:SetPosition(left, top, width);
 	return self;
 end
 
 -- @bShow: if nil, it will toggle show and hide. 
-function VirtualKeyboard:Show(bShow, is_key_up_hide)
+function VirtualKeyboard:Show(bShow, is_key_up_hide, is_self_adaption)
 	-- if is_key_up_hide and not bShow then
 	-- 	print("eeeeeeeeeeeeeeeeeeeeeeeeeeeee", is_key_up_hide)
 	-- 	self.is_key_up_hide = is_key_up_hide
@@ -167,11 +171,23 @@ function VirtualKeyboard:Show(bShow, is_key_up_hide)
 
 	if bShow then
 		-- _parent:SetTopLevel(false);
-		_parent:SetTopLevel(true);
+		if not self.root then
+			_parent:SetTopLevel(true);
+		end
+
+		_parent.x = self.left
+		_parent.y = self.top
+		_parent.scalingx = 1
+		_parent.scalingy = 1
+		_parent:ApplyAnim();
+		_parent.enabled = true
+		-- _parent = ParaUI.CreateUIObject("container",self.name, self.alignment,self.left,self.top,self.width,self.height);
 	end
 
+	self.is_self_adaption = is_self_adaption
 	if not bShow then
 		self:StopCtrlDrawAnim()
+		self.is_self_adaption = false
 	end
 end
 
@@ -302,8 +318,14 @@ function VirtualKeyboard:GetUIControl()
 		_parent = ParaUI.CreateUIObject("container",self.name, self.alignment,self.left,self.top,self.width,self.height);
 		_parent.background = "Texture/whitedot.png";
 		_guihelper.SetUIColor(_parent, "#000000");
-		_parent:AttachToRoot();
-		_parent.zorder = self.zorder;
+		if not self.root then
+			_parent:AttachToRoot();
+			_parent.zorder = self.zorder;
+		else
+			self.root:AddChild(_parent)
+			_parent.zorder = 10;
+		end
+
 		_parent:SetScript("ontouch", function() self:OnTouch(msg) end);
 		_parent:SetScript("onmousedown", function() self:OnMouseDown() end);
 		_parent:SetScript("onmouseup", function() self:OnMouseUp() end);
@@ -366,19 +388,6 @@ function VirtualKeyboard:OnTouch(touch)
 				end, 100)
 			else
 				self:SetKeyState(keydownBtn, false);
-			end
-		end
-	end
-end
-
--- get button item by global touch screen position. 
-function VirtualKeyboard:GetButtonItem(x, y)
-	x = x - self.left;
-	y = y - self.top;
-	for row = 1, #self.keylayout do
-		for _, item in ipairs(self.keylayout[row]) do
-			if (item.top and item.top <= y and y<=item.bottom and item.left <=x and x<=item.right) then
-				return item;
 			end
 		end
 	end
@@ -548,6 +557,10 @@ function VirtualKeyboard:ShowButtons(button)
 			end
 		end
 
+		if count > 0 and self.is_self_adaption then
+			self:SelfAdaptionPos()			
+		end
+
 		return count;
 	end
 end
@@ -556,7 +569,7 @@ function VirtualKeyboard:GetButtonByKeyname(keyname)
 	if(keyname and keyname~="") then
 		for row = 1, #self.keylayout do
 			for _, item in ipairs(self.keylayout[row]) do
-				if (DIK_SCANCODE[keyname] == item.vKey) then
+				if (DIK_SCANCODE[keyname] and DIK_SCANCODE[keyname] == item.vKey) then
 					return item;
 				end
 			end
@@ -687,4 +700,32 @@ function VirtualKeyboard:ShowCtrlDrawAnim()
 
 	self.circle_tween_y.func=CommonCtrl.TweenEquations.easeNone;
 	self.circle_tween_y:Start();
+end
+
+function VirtualKeyboard:SelfAdaptionPos()
+	if not GameLogic.Macros:IsPlaying() then
+		return
+	end
+
+	local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
+	local cursor_pos_x, cursor_pos_y = MacroPlayer.GetCursorPos()
+	if cursor_pos_x then
+		local _parent = self:GetUIControl();
+		_parent.scalingx = 0.5
+		_parent.scalingy = 0.5
+		_parent:ApplyAnim();
+		_parent.enabled = false
+		-- _parent:GetAttributeObject():SetField("ClickThrough", true);
+	
+		local width = 1024
+		local maxWidth = math.floor(Screen:GetWidth()*16/17);
+		width = math.min(maxWidth, width or maxWidth);
+		local left = math.floor((Screen:GetWidth() - width) / 2 + 0.5)
+		_parent.x = left;
+
+		local win_height = Screen:GetHeight()
+		local is_top = cursor_pos_y > win_height/2
+		local pos_y = (is_top and 0 or win_height/2)
+		_parent.y = pos_y
+	end
 end

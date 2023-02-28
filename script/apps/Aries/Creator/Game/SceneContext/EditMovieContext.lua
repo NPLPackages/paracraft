@@ -167,6 +167,7 @@ function EditMovieContext:updateManipulators()
 				local manipCont = MoveManipContainer:new();
 				manipCont:SetShowGrid(true);
 				manipCont:SetSnapToGrid(false);
+				manipCont:SetShowGroundSnap(true)
 				manipCont:SetGridSize(BlockEngine.blocksize/2);
 				manipCont:init();
 				self:AddManipulator(manipCont);
@@ -240,6 +241,9 @@ function EditMovieContext:updateManipulators()
 				bUseFreeCamera = true;
 				bRestoreLastActorFreeCameraPos = true;
 				self:OnBoneChanged(nil);
+				if actor and actor.SetBoneManipContainer then
+					actor:SetBoneManipContainer(manipCont)
+				end
 			elseif(var.name == "parent") then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/SceneContext/Manipulators/ParentLinkManipContainer.lua");
 				local ParentLinkManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.ParentLinkManipContainer");
@@ -423,12 +427,20 @@ function EditMovieContext:HandleGlobalKey(event)
 					actor:SetCurrentEditVariableIndex(-1);
 					cmd_actor:SetCurrentEditVariableIndex(1);
 				else
-					-- bones tools
-					local index = actor:FindEditVariableByName("bones");
+					-- -- bones tools
+					-- local index = actor:FindEditVariableByName("bones");
+					-- if(index and index~=actor:GetCurrentEditVariableIndex()) then
+					-- 	actor:SetCurrentEditVariableIndex(index);
+					-- else
+					-- 	actor:SetCurrentEditVariableIndex(1);
+					-- end
+						
+					-- anim
+					local index = actor:FindEditVariableByName("anim");
 					if(index and index~=actor:GetCurrentEditVariableIndex()) then
 						actor:SetCurrentEditVariableIndex(index);
 					else
-						actor:SetCurrentEditVariableIndex(1);
+						actor:SetCurrentEditVariableIndex(2);
 					end	
 				end
 

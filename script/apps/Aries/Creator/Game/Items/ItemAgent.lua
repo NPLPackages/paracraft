@@ -294,7 +294,7 @@ function ItemAgent:CheckGetAgentClass(name)
 end
 
 -- virtual function: create agent controller interface for the parentEntity. 
--- this function is called when entity:GetAgent(agentName) is called for the first matching agent in rule bag. 
+-- this function is called only once when entity:GetAgent(agentName) is called for the first matching agent in rule bag. 
 function ItemAgent:CreateAgentFromEntity(parentEntity, itemStack)
 	local name = self:GetAgentName(itemStack)
 	if(name and name~="") then
@@ -385,7 +385,8 @@ function ItemAgent:handleEntityEvent(itemStack, entity, event)
 				end
 			else
 				local codeGlobal = GameLogic.GetCodeGlobal()
-				-- "OnEntityEvent" will receive all mouse related events except "ontick", including "mousePressedEvent", "onclick", etc. 
+				-- "OnEntityEvent" will receive all mouse related events except "ontick", 
+				-- including "mousePressedEvent", "onclick", "onhover", "onmount", etc. 
 				local fullname = name..".OnEntityEvent"
 				if(codeGlobal:GetTextEvent(fullname)) then
 					codeGlobal:BroadcastTextEventTo(entity, fullname, {entity=entity, itemStack = itemStack, event = event}, true)

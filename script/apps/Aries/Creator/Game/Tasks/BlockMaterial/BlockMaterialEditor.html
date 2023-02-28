@@ -1,0 +1,479 @@
+﻿<template style="width: 100%; height: 100%;">
+    <div style="width: 100%; height: 100%;" onclick="ClickBackgroundBtn">
+        <div style="margin-left: 20px; margin-top: 20px; width: 500px; height: 610px; background-color: #cccccc;">
+            <WindowTitleBar title="材质编辑器" style="color: #000000;"></WindowTitleBar>
+            <div class="container">
+                <div style="position: absolute; top: 0px; bottom: 0px; left: 0px; width: 150px; border-right: 1px solid #cccccc; overflow-y: scroll;">
+                    <div v-for="materialItem in Materials" style="height: 30px; width: 100%;">
+                        <div class="icon" v-bind:style="GetIconStyle(materialItem)"></div>
+                        <div v-bind:class="GetNavItemClass(materialItem.ID)" onclick="SelectedMaterial(materialItem.ID)">
+                            {{tostring(materialItem.ID) .. "." .. (materialItem.MaterialName or "")}}
+                        </div>
+                    </div>
+                </div>
+                <div style="position: absolute; top: 0px; bottom: 0px; left: 160px; right: 0px;">
+                    <div class="form-item">
+                        <div class="form-label">名称</div>
+                        <input class="form-input" placeholder="材质名" v-model="Material.MaterialName" onblur="OnMaterialInputBlur"></input>
+                    </div>
+                    <div class="form-item"  style="height: 152px; border-right: 1px solid #cccccc;">
+                        <div class="form-label">UV</div>
+                        <input class="form-input" placeholder="向量值 1.0, 1.0, 1.0, 1.0" v-model="Material.MaterialUV" onblur="OnMaterialInputBlur"></input>
+                        <div style="position: absolute; left: 0px; top: 32px; height: 120px; width: 160px;">
+                            <div style="width: 100%; height: 30px">
+                                <div style="position: absolute; left: 0px; top: 0px; height: 30px; width: 100px; line-height: 30px; text-align: right; padding-right: 10px; font-size: 12px;">TilingU</div>
+                                <div style="position: absolute; left: 100px; top: 0px; height: 30px; width: 160px;">
+                                    <Slider IsRealTimeUpdate="true" v-bind:onchange="OnTilingUChange" v-bind:value="TilingU" MaxValue="10" MinValue="1" StepValue="1"></Slider>
+                                </div>
+                            </div>
+                            <div style="width: 100%; height: 30px">
+                                <div style="position: absolute; left: 0px; top: 0px; height: 30px; width: 100px; line-height: 30px; text-align: right; padding-right: 10px; font-size: 12px;">TilingV</div>
+                                <div style="position: absolute; left: 100px; top: 0px; height: 30px; width: 160px;">
+                                    <Slider IsRealTimeUpdate="true" v-bind:onchange="OnTilingVChange" v-bind:value="TilingV" MaxValue="10" MinValue="1" StepValue="1"></Slider>
+                                </div>
+                            </div>
+                            <div style="width: 100%; height: 30px">
+                                <div style="position: absolute; left: 0px; top: 0px; height: 30px; width: 100px; line-height: 30px; text-align: right; padding-right: 10px; font-size: 12px;">OffsetX</div>
+                                <div style="position: absolute; left: 100px; top: 0px; height: 30px; width: 160px;">
+                                    <Slider IsRealTimeUpdate="true" v-bind:onchange="OnOffsetXChange" v-bind:value="OffsetX" MaxValue="10" MinValue="0" StepValue="0.2"></Slider>
+                                </div>
+                            </div>
+                            <div style="width: 100%; height: 30px">
+                                <div style="position: absolute; left: 0px; top: 0px; height: 30px; width: 100px; line-height: 30px; text-align: right; padding-right: 10px; font-size: 12px;">OffsetY</div>
+                                <div style="position: absolute; left: 100px; top: 0px; height: 30px; width: 160px;">
+                                    <Slider IsRealTimeUpdate="true" v-bind:onchange="OnOffsetYChange" v-bind:value="OffsetY" MaxValue="10" MinValue="0" StepValue="0.2"></Slider>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-label">颜色</div>
+                        <input class="form-input" placeholder="颜色值 #ffffff" v-model="Material.BaseColor" onblur="OnMaterialInputBlur"></input>
+                        <div class="icon" v-bind:style="'background-color: ' .. Material.BaseColor" onclick="OnClickColorIcon('BaseColor')"></div>
+                        <ColorPicker ref="BaseColorPickerRef"  style="position: absolute; top: 0px; left: 310px;  z-index: 20;" v-bind:value="Material.BaseColor" onchange="OnBaseColorChange" v-if="IsShowBaseColorPicker" onclick="OnClickPickerMouseDown"></ColorPicker>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-label">漫反射贴图</div>
+                        <input class="form-input" placeholder="纹理路径" v-model="Material.Diffuse" onblur="OnMaterialInputBlur"></input>
+                        <div class="icon" v-bind:style="CurrentDiffuseIconStyle" onclick="ClickTextureIcon('Diffuse')"></div>
+                    </div>
+                    <!-- <div class="form-item">
+                        <div class="form-label">金属</div>
+                        <input class="form-input" placeholder="浮点数 0.5" v-model="Material.Metallic" onblur="OnMaterialInputBlur"></input>
+                    </div> -->
+                    <div class="form-item" style="height: 62px; border-right: 1px solid #cccccc;">
+                        <div class="form-label">反射</div>
+                        <input class="form-input" placeholder="浮点数 0.5" v-model="Material.Specular" onblur="OnMaterialInputBlur"></input>
+                        <div style="position: absolute; left: 100px; top: 32px; height: 30px; width: 160px; z-index: 1;">
+                            <div style="position: absolute; left: -100px; top: 0px; height: 30px; width: 100px; line-height: 30px; text-align: right; padding-right: 10px; font-size: 12px;"></div>
+                            <Slider IsRealTimeUpdate="true" v-bind:onchange="OnSpecularChange" v-bind:value="Material.Specular"  MaxValue="1" MinValue="0" StepValue="0.01"></Slider>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-label">法线贴图</div>
+                        <input class="form-input" placeholder="纹理路径" v-model="Material.Normal" onblur="OnMaterialInputBlur"></input>
+                        <div class="icon" v-bind:style="CurrentNormalIconStyle" onclick="ClickTextureIcon('Normal')"></div>
+                    </div>
+                    <!-- <div class="form-item">
+                        <div class="form-label">粗糙度</div>
+                        <input class="form-input" placeholder="浮点数 0.5" v-model="Material.Roughness" onblur="OnMaterialInputBlur"></input>
+                    </div> -->
+                    
+                    <div class="form-item" style="height: 62px; border-right: 1px solid #cccccc;">
+                        <div class="form-label">自发光颜色</div>
+                        <input class="form-input" placeholder="颜色值 #000000" v-model="EmissiveColorRGB" onblur="OnEmissiveColorRGBInputBlur"></input>
+                        <div class="icon" v-bind:style="'background-color: ' .. EmissiveColorRGB" onclick="OnClickColorIcon('EmissiveColor')"></div>
+                        <ColorPicker ref="EmissiveColorRGBColorPickerRef" style="position: absolute; top: 0px; left: 310px; z-index: 10;" v-bind:value="EmissiveColorRGB" onchange="OnEmissiveColorRGBChange" v-if="IsShowEmissiveColorPicker" onclick="OnClickPickerMouseDown"></ColorPicker>
+                        <div style="position: absolute; left: 100px; top: 32px; height: 30px; width: 160px; z-index: 1;">
+                            <div style="position: absolute; left: -100px; top: 0px; height: 30px; width: 100px; line-height: 30px; text-align: right; padding-right: 10px; font-size: 12px;">Alpha</div>
+                            <Slider IsRealTimeUpdate="true" v-bind:onchange="OnEmissiveAlphaChange" v-bind:value="EmissiveColorAlpha"  MaxValue="255" MinValue="0" StepValue="1"></Slider>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <div class="form-label">自发光贴图</div>
+                        <input class="form-input" placeholder="纹理路径" v-model="Material.Emissive" onblur="OnMaterialInputBlur"></input>
+                        <div class="icon" v-bind:style="CurrentEmissiveIconStyle" onclick="ClickTextureIcon('Emissive')"></div>
+                    </div>
+                    <!-- <div class="form-item">
+                        <div class="form-label">半透明</div>
+                        <input class="form-input" placeholder="浮点数 0.5" v-model="Material.Opacity" onblur="OnMaterialInputBlur"></input>
+                    </div> -->
+                    <div class="form-item" style="display: flex; justify-content: center;">
+                        <div class="btn" onclick="ClickNewBtn">新增</div>
+                        <div class="btn" onclick="ClickDeleteBtn">删除</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+<script type="text/lua">
+RegisterComponent("WindowTitleBar", "%vue%/Components/WindowTitleBar.html");
+RegisterComponent("Slider", "script/apps/Aries/Creator/Game/Tasks/BlockMaterial/BlockMaterialEditorSlider.html");
+local BlockMaterialEditor = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockMaterial/BlockMaterialEditor.lua");
+local BaseColorPickerRef = nil;
+local EmissiveColorRGBColorPickerRef = nil;
+Material = {};
+Materials = {};
+Material.ID=MaterialId or 0;
+Material.MaterialName = "";
+Material.BaseColor = "#ffffff";
+Material.Metallic = "0"
+Material.Specular = "0.2"
+Material.Roughness = "0"
+Material.EmissiveColor = "#00000000"
+Material.Opacity = "1"
+Material.Normal = ""
+Material.Emissive = ""
+Material.Diffuse = ""
+Material.NormalFullPath = ""
+Material.DiffuseFullPath = ""
+Material.EmissiveFullPath = ""
+Material.MaterialUV = "1.0, 1.0, 0.0, 0.0"
+CurrentDiffuseIconStyle = "";
+CurrentNormalIconStyle = "";
+CurrentEmissiveIconStyle = "";
+IsShowBaseColorPicker = false;
+IsShowEmissiveColorPicker = false;
+EmissiveColorRGB = "#000000"
+EmissiveColorAlpha = 0;
+TilingU = 1;
+TilingV = 1;
+OffsetX = 0;
+OffsetY = 0;
+
+function ClickBackgroundBtn()
+    IsShowEmissiveColorPicker = false;
+    IsShowBaseColorPicker = false;
+end
+
+function OnClickColorIcon(iconName)
+    if (iconName == "BaseColor") then
+        IsShowBaseColorPicker = not IsShowBaseColorPicker;
+        IsShowEmissiveColorPicker = false;
+        Material.EmissiveColor = PackEmissiveColor();
+        BaseColorPickerRef:CaptureMouse();
+    elseif (iconName == "EmissiveColor") then
+        IsShowBaseColorPicker = false;
+        IsShowEmissiveColorPicker = not IsShowEmissiveColorPicker;  
+        EmissiveColorRGBColorPickerRef:CaptureMouse();
+    else
+        IsShowBaseColorPicker = false;
+        IsShowEmissiveColorPicker = false;
+        Material.EmissiveColor = PackEmissiveColor();
+    end
+    StopPropagation();
+end
+
+function UnpackEmissiveColor(color)
+    EmissiveColorRGB = BlockMaterialEditor:Color4ToColor3(Material.EmissiveColor);
+    EmissiveColorAlpha = ((BlockMaterialEditor:ColorToVector4(Material.EmissiveColor))[4] or 0) * 255;
+end
+
+function PackEmissiveColor()
+    return BlockMaterialEditor:Color3ToColor4(EmissiveColorRGB, EmissiveColorAlpha);
+end
+
+function OnBaseColorChange(value)
+    Material.BaseColor = value;
+    ClickUpdateBtn();
+end 
+
+function OnEmissiveColorRGBChange(value)
+    EmissiveColorRGB = value;
+    Material.EmissiveColor = PackEmissiveColor();
+    ClickUpdateBtn();
+end 
+
+function OnEmissiveColorRGBInputBlur()
+    Material.EmissiveColor = PackEmissiveColor();
+    ClickUpdateBtn();
+end
+
+function OnClickPickerMouseDown()
+    local event = GetEvent();
+    local element = event and event:GetElement();
+    element:CaptureMouse();
+    if (not element:IsContainPoint(event:GetScreenXY())) then
+        element:ReleaseMouseCapture();
+        ClickBackgroundBtn();
+    end
+end
+
+function UnpackUV(uv)
+    local vs = BlockMaterialEditor:StringToVector4(uv);
+    TilingU = vs[1] or 1;
+    TilingV = vs[2] or 1;
+    OffsetX = vs[3] or 0;
+    OffsetY = vs[4] or 0;
+end 
+
+function PackUV()
+    return BlockMaterialEditor:Vector4ToString({TilingU, TilingV, OffsetX, OffsetY});
+end 
+
+function OnEmissiveAlphaChange(value)
+    EmissiveColorAlpha = math.floor(value);
+    Material.EmissiveColor = PackEmissiveColor();
+    ClickUpdateBtn();
+end 
+
+function OnTilingUChange(value)
+    TilingU = math.floor(value * 10) * 0.1;
+    Material.MaterialUV = PackUV();
+    ClickUpdateBtn();
+end
+function OnTilingVChange(value)
+    TilingV = math.floor(value * 10) * 0.1;
+    Material.MaterialUV = PackUV();
+    ClickUpdateBtn();
+end
+function OnOffsetXChange(value)
+    OffsetX = math.floor(value * 20) * 0.05;
+    Material.MaterialUV = PackUV();
+    ClickUpdateBtn();
+end
+function OnOffsetYChange(value)
+    OffsetY = math.floor(value * 20) * 0.05;
+    Material.MaterialUV = PackUV();
+    ClickUpdateBtn();
+end
+
+function OnSpecularChange(value)
+    Material.Specular = math.floor(value * 100) * 0.01;
+    ClickUpdateBtn();
+end
+
+_G.RefreshMaterialList = function(MaterialList)
+    <!-- local curSize = #Materials
+    local newSize = #MaterialList
+    for i = 1, newSize do 
+        Materials[i] = MaterialList[i];
+    end
+    for i = newSize + 1, curSize do
+        Materials[i] = 0;
+    end  -->
+end
+
+function GetMaterialById(materialId)
+    for i = 1, #Materials do 
+        if (Materials[i].ID == materialId) then return Materials[i] end 
+    end
+end 
+
+function GetNavItemClass(materialId)
+    return materialId == Material.ID and "nav-item selected" or "nav-item";
+end
+
+function GetIconStyle(material)
+    material = material or Material;
+    if (material.DiffuseFullPath == "" or not material.DiffuseFullPath) then
+        return string.format([[background-color: %s; border: 1px solid #000000;]], material.BaseColor);
+    else
+        return string.format([[border: 1px solid #000000; background-color: %s; background: url(%s)]], material.BaseColor, material.DiffuseFullPath);
+    end
+end
+
+function OnMaterialInputBlur()
+    ClickUpdateBtn();
+end
+
+function ClickUpdateBtn()
+    local bChange = false;
+    local obj = GetMaterialById(Material.ID);
+    if (not obj) then return end 
+    Material.DiffuseFullPath = BlockMaterialEditor:GetTextureDiskFilePath(Material.Diffuse);
+    Material.NormalFullPath = BlockMaterialEditor:GetTextureDiskFilePath(Material.Normal);
+    Material.EmissiveFullPath = BlockMaterialEditor:GetTextureDiskFilePath(Material.Emissive);
+    for key, value in pairs(Material) do
+        if (obj[key] ~= Material[key]) then
+            print("FieldName:", key, " OldValue: ", obj[key], " NewValue: ", Material[key]);
+            obj[key] = Material[key];
+            bChange = true;
+        end
+    end
+    if (bChange) then
+        UpdateMaterial(Material);
+        SelectedMaterial();
+    end
+end
+
+function ClickNewBtn()
+    Material.ID = 0;
+    CreateMaterial(Material);
+    local index = #Materials + 1;
+    Materials[index] = {};
+    for key, val in pairs(Material) do
+        Materials[index][key] = val;
+    end 
+    SelectedMaterial();
+end
+
+
+function ClickDeleteBtn()
+    if (Material.ID <= 18) then return end 
+
+    DeleteMaterial(Material);
+    for i = 1, #Materials do 
+        if (Materials[i].ID == Material.ID) then
+            table.remove(Materials, i);
+            break;
+        end
+    end
+    SelectedMaterial(Materials[1] and Materials[1].ID or 0);
+end
+
+function ClickTextureIcon(fieldname)
+    local defaultValue = Material[fieldname];
+    OpenImageDialog(function(filename)
+        if (filename ~= nil and filename ~= "") then
+            filename = commonlib.Encoding.DefaultToUtf8(filename);
+        else
+            filename = defaultValue
+        end
+        Material[fieldname] = filename;
+        ClickUpdateBtn();
+    end, defaultValue)
+end
+
+function SelectedMaterial(materialId)
+    materialId = materialId or Material.ID;
+    local bIDChange = materialId ~= Material.ID;
+    obj = GetMaterialById(materialId)
+    if (not obj) then 
+        Material.ID = 0;
+        return false;
+    end
+    Material.ID = materialId;
+    Material.MaterialName = obj.MaterialName
+    Material.BaseColor = obj.BaseColor
+    Material.Metallic = obj.Metallic
+    Material.Specular = obj.Specular
+    Material.Roughness = obj.Roughness
+    Material.Emissive = obj.Emissive
+    Material.EmissiveFullPath = obj.EmissiveFullPath
+    Material.EmissiveColor = obj.EmissiveColor
+    Material.Opacity =  obj.Opacity
+    Material.Normal = obj.Normal
+    Material.Diffuse = obj.Diffuse
+    Material.MaterialUV = BlockMaterialEditor:FormatUV(obj.MaterialUV)
+    Material.DiffuseFullPath = obj.DiffuseFullPath
+    Material.NormalFullPath = obj.NormalFullPath
+
+    if (Material.DiffuseFullPath == "" or not Material.DiffuseFullPath) then
+        CurrentDiffuseIconStyle = string.format([[background-color: %s;]], Material.BaseColor);
+    else
+        CurrentDiffuseIconStyle = string.format([[background-color: %s; background: url(%s)]], Material.BaseColor, Material.DiffuseFullPath);
+    end
+
+    if (Material.NormalFullPath == "" or not Material.NormalFullPath) then
+        CurrentNormalIconStyle = string.format([[background-color: %s;]], "#000000");
+    else
+        CurrentNormalIconStyle = string.format([[background-color: %s; background: url(%s)]], "#ffffff", Material.NormalFullPath);
+    end
+
+    if (Material.EmissiveFullPath == "" or not Material.EmissiveFullPath) then
+        CurrentEmissiveIconStyle = string.format([[background-color: %s;]], "#000000");
+    else
+        CurrentEmissiveIconStyle = string.format([[background-color: %s; background: url(%s)]], "#ffffff", Material.EmissiveFullPath);
+    end
+
+    UnpackEmissiveColor(Material.EmissiveColor);
+    UnpackUV(Material.MaterialUV);
+
+    if (bIDChange) then
+        OnClickColorIcon();
+    end
+    _G.SelectMaterial(Material);
+    return true;
+end
+
+_G.OnMaterialIDChange = function(materialID)
+    SelectedMaterial(materialID);
+end 
+
+function OnReady()
+    for i = 1, #MaterialList do 
+        Materials[i] = MaterialList[i];
+    end
+
+    if (not SelectedMaterial(MaterialId or 0)) then
+        SelectedMaterial(Materials[1] and Materials[1].ID or 0);
+    end
+
+    BaseColorPickerRef = GetRef("BaseColorPickerRef");
+    EmissiveColorRGBColorPickerRef = GetRef("EmissiveColorRGBColorPickerRef");
+end
+</script>
+
+<style scoped="true">
+.container 
+{
+    position: absolute;
+    top: 40px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    background-color: #ffffff;
+}
+
+.btn 
+{
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    display: inline-block;
+    text-align: center;
+    border: 1px solid #cccccc;
+    margin-right: 10px;
+}
+
+.btn:hover
+{
+    background-color: #cccccc;
+}
+
+.selected 
+{
+    background-color: #cccccc;
+}
+.nav-item 
+{
+    position: absolute;
+    left: 30px;
+    right: 0px;
+    top: 4px;
+    bottom: 4px;
+    line-height: 22px;
+    padding-left: 4px;
+}
+.icon 
+{
+    display: inline-block;
+    margin: 4px;
+    height: 22px;
+    width: 22px;
+    border: 1px solid #000000;
+}
+.form-item
+{
+    margin-top: 10px;
+    width: 300px;
+}
+
+.form-label
+{
+    display: inline-block;
+    width: 100px;
+    height: 32px;
+    line-height: 32px;
+    text-align: right;
+    padding-right: 10px;
+}
+.form-input
+{
+    width: 160px;
+}
+</style>

@@ -28,6 +28,10 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local SystemSettingsPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.SystemSettingsPage");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
+local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/ODSStereoEffect.lua");
+local ODSStereoEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.ODSStereoEffect");
 
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
 
@@ -127,7 +131,6 @@ function SystemSettingsPage.OnInit()
 	page = document:GetPageCtrl();
 	page.OnClose = SystemSettingsPage.OnClose;
 	SystemSettingsPage.setting_ds = {};
-	SystemSettingsPage.InitPageParams();
 
 	--
 	local nRenderMethod = ParaTerrain.GetBlockAttributeObject():GetField("BlockRenderMethod", 1);
@@ -143,9 +146,10 @@ function SystemSettingsPage.OnInit()
 	page:SetValue("comboShader",  tostring(math.min(math.max(1, nRenderMethod), 4)) );
 
 	SystemSettingsPage.stereoMode_ds = {
-		{value="0", text=L"Off"},
-		{value="2", text=L"Left/Right"},
-		{value="5", text=L"Red/Blue"},
+		{value="0",idx=1, text=L"Off"},
+		{value="2",idx=2, text=L"Left/Right"},
+		{value="5",idx=3, text=L"Red/Blue"},
+		{value="8",idx=4, text=L"ODS SingleEye"},
 	}
 	
 	local stereoMode = GameLogic.options:GetStereoMode() or 0
@@ -157,6 +161,8 @@ function SystemSettingsPage.OnInit()
 		end
 	end
 	page:SetValue("stereomode",  tostring(stereoMode) );
+
+	SystemSettingsPage.InitPageParams();
 
 	Screen:Connect("sizeChanged", SystemSettingsPage, SystemSettingsPage.OnResize, "UniqueConnection")
 end
@@ -266,8 +272,17 @@ end
 
 function SystemSettingsPage.OnToggleShader(name, value)
 	local res = GameLogic.options:SetRenderMethod(value,true)
+	for k,v in pairs(SystemSettingsPage.shader_ds) do 
+		if v.value==value.."" then
+			v.selected = true 
+		else
+			v.selected = nil
+		end
+	end
 	if not res then
-		Page:SetValue("comboShader", "1");
+		if page then
+			page:SetValue("comboShader", "1");
+		end
 	else
 		if page then
 			if value=="1" then
@@ -278,6 +293,27 @@ function SystemSettingsPage.OnToggleShader(name, value)
 			end
 			page:Refresh(0)
 		end
+	end
+
+	SystemSettingsPage.SetShaderSelectText()
+end
+
+function SystemSettingsPage.onClickShowShaderContainer()
+	local uiobj = ParaUI.GetUIObject("real_shader_container")
+	if uiobj and uiobj:IsValid() then
+		uiobj.visible = not uiobj.visible
+	end
+end
+
+function SystemSettingsPage.SetShaderSelectText()
+	local str = ""
+	for k,v in pairs(SystemSettingsPage.shader_ds) do 
+		if v.selected then
+			str = v.text
+		end
+	end
+	if page then
+		page:SetValue("CurShadetText", str);
 	end
 end
 
@@ -304,6 +340,9 @@ function SystemSettingsPage.GetDftSuperRenderDist()
 end
 
 function SystemSettingsPage.InitPageParams()
+	if(page==nil) then
+		return
+	end
 	local ds = SystemSettingsPage.setting_ds;
 	-- load the current settings. 
 	local att = ParaEngine.GetAttributeObject();
@@ -417,6 +456,28 @@ function SystemSettingsPage.InitPageParams()
 	local is_on = SystemSettingsPage.mouse_select_list["DeleteBlock"] == "right"
 	-- UpdateCheckBox("btn_MouseChange", is_on);
 	page:SetNodeValue("ChangeMouseLeftRight", is_on);
+
+	SystemSettingsPage.SetShaderSelectText()
+	SystemSettingsPage.SetStereoModeSelectText()
+
+	local attrViewportManager = ParaEngine.GetAttributeObject():GetChild("ViewportManager")
+	page:SetNodeValue("isLockCameraUpDir",attrViewportManager:GetField("OmniAlwaysUseUpFrontCamera",true))
+	page:SetValue("isIgnoreUI",ODSStereoEffect.isIgnoreUI)
+	if page then
+		page:SetValue("lockCameraDist", SystemSettingsPage.GetDefaultLockCameraDist().."");
+	end
+end
+
+function SystemSettingsPage.GetDefaultLockCameraUpDir()
+	local isLockCameraUpDir = ParaEngine.GetAttributeObject():GetChild("ViewportManager"):GetField("OmniAlwaysUseUpFrontCamera",true)
+	--GameLogic.AddBBS(3,"isLockCameraUpDir："..tostring(isLockCameraUpDir))
+	return isLockCameraUpDir
+end
+
+function SystemSettingsPage.GetDefaultLockCameraDist()
+	local lockCameraDist = ParaEngine.GetAttributeObject():GetChild("ViewportManager"):GetField("OmniForceLookatDistance",20)
+	--GameLogic.AddBBS(3,"lockCameraDist："..tostring(lockCameraDist))
+	return lockCameraDist
 end
 
 function SystemSettingsPage.OnClose()
@@ -1234,9 +1295,21 @@ function SystemSettingsPage.OnOK()
 
 	if(bNeedUpdateScreen) then
 		_guihelper.MessageBox(L"您的显示设备即将改变:如果您的显卡不支持, 需要您重新登录。是否继续?", function ()
+			local oldStereoMode = nil
+			if GameLogic.options:IsSingleEyeOdsStereo() then
+				oldStereoMode = GameLogic.options.stereoMode
+				SystemSettingsPage.OnChangeStereoMode(nil, "0")
+			end
 			ParaEngine.GetAttributeObject():CallField("UpdateScreenMode");
 			-- we will save to "config.new.txt", so the next time the game engine is started, it will ask the user to preserve or not. 
 			ParaEngine.WriteConfigFile("config/config.new.txt");
+			commonlib.TimerManager.SetTimeout(function()
+				local att = ParaEngine.GetAttributeObject();
+				local oldsize = att:GetField("ScreenResolution", {1280,720});
+				if oldStereoMode and oldsize[2] - oldsize[1]/2>200 then
+					SystemSettingsPage.OnChangeStereoMode(nil, oldStereoMode)
+				end
+			end,200)
 		end)
 	else
 		ParaEngine.WriteConfigFile("config/config.new.txt");
@@ -1423,11 +1496,11 @@ function SystemSettingsPage.ShowPage()
 		DestroyOnClose = true,
 		bToggleShowHide=true, 
 		style = CommonCtrl.WindowFrame.ContainerStyle,
-		allowDrag = true,
+		allowDrag = false,
 		enable_esc_key = true,
 		--bShow = bShow,
 		click_through = false, 
-		zorder = 2,
+		-- zorder = 1,
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 			align = "_ct",
@@ -1436,6 +1509,7 @@ function SystemSettingsPage.ShowPage()
 			width = 360,
 			height = 530,
 	};
+	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"SystemSettingsPage");
 	--CreatorDesktop.params.bShow = bShow;
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	--SystemSettingsPage.InitPageParams()
@@ -1462,11 +1536,62 @@ function SystemSettingsPage.OnToggleViewBobbing()
 end
 
 function SystemSettingsPage.OnChangeStereoMode(name, value)
+	for k,v in pairs(SystemSettingsPage.stereoMode_ds) do 
+		if v.idx==value then
+			value = v.value
+			break
+		end
+	end
+	if value=="8" then 
+		local att = ParaEngine.GetAttributeObject();
+		local oldsize = att:GetField("ScreenResolution", {1280,720});
+		if oldsize[2] - oldsize[1]/2<200 then
+			GameLogic.options:EnableStereoMode(0);
+			
+			att:SetField("ScreenResolution", {oldsize[1],oldsize[1]}); 
+			att:CallField("UpdateScreenMode");
+
+			local screen_resolution =  string.format("%d × %d", oldsize[1],oldsize[1])
+			page:SetNodeValue("ScreenResolution", screen_resolution) -- 分辨率	
+			SystemSettingsPage.setting_ds["screen_resolution"] = screen_resolution;
+			commonlib.TimerManager.SetTimeout(function()
+				SystemSettingsPage.OnChangeStereoMode(name, value)
+			end,200)
+			return
+		end
+	end
 	GameLogic.options:EnableStereoMode(value);
 	WorldCommon.GetWorldInfo().stereoMode = tostring(value)
 	WorldCommon.SaveWorldTag()
 	if page then
 		page:Refresh(0)
+	end
+	for k,v in pairs(SystemSettingsPage.stereoMode_ds) do 
+		if v.value==value.."" then
+			v.selected = true 
+		else
+			v.selected = nil
+		end
+	end
+	SystemSettingsPage.SetStereoModeSelectText()
+end
+
+function SystemSettingsPage.onClickShowStereoModeContainer()
+	local uiobj = ParaUI.GetUIObject("stereoMode_container")
+	if uiobj and uiobj:IsValid() then
+		uiobj.visible = not uiobj.visible
+	end
+end
+
+function SystemSettingsPage.SetStereoModeSelectText()
+	local str = ""
+	for k,v in pairs(SystemSettingsPage.stereoMode_ds) do 
+		if v.selected then
+			str = v.text
+		end
+	end
+	if page then
+		page:SetValue("CurStereoModeText", str);
 	end
 end
 
@@ -1600,4 +1725,37 @@ function SystemSettingsPage.OnClickEnableMouseChange(value)
 
 	local change_event = value and "right" or "left"
 	SystemSettingsPage.OnChangeMouseSetting("DeleteBlock", change_event)
+end
+
+function SystemSettingsPage.OnClickEnableLockCameraUpDir(value)
+	local isLockCameraUpDir = value==true
+	--GameLogic.AddBBS(1,"isLockCameraUpDir："..tostring(isLockCameraUpDir))
+	
+	GameLogic.options:EnableStereoMode(0);
+	commonlib.TimerManager.SetTimeout(function()
+		ParaEngine.GetAttributeObject():GetChild("ViewportManager"):SetField("OmniAlwaysUseUpFrontCamera",isLockCameraUpDir)
+		GameLogic.options:EnableStereoMode(8);
+	end,200)
+end
+
+function SystemSettingsPage.OnClickEnableHideUI(value)
+	local isIgnoreUI = value==true
+
+	
+	if not ODSStereoEffect.SetIsIgnoreUI(isIgnoreUI) and isIgnoreUI then
+		GameLogic.AddBBS(1,"请重设分辨率增加窗口高度")
+		page:SetValue("isIgnoreUI",false)
+	end
+end
+
+function SystemSettingsPage.OnChangeLockCameraDist(value)
+	local lockCameraDist = tonumber(page:GetValue("lockCameraDist", nil))
+	-- GameLogic.AddBBS(1,"lockCameraDist："..tostring(lockCameraDist))
+	
+	GameLogic.options:EnableStereoMode(0);
+	
+	commonlib.TimerManager.SetTimeout(function()
+		ParaEngine.GetAttributeObject():GetChild("ViewportManager"):SetField("OmniForceLookatDistance",lockCameraDist)
+		GameLogic.options:EnableStereoMode(8);
+	end,200)
 end

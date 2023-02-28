@@ -45,10 +45,9 @@ FriendChatPage.Current_Item_DS = {};
 FriendChatPage.index = 1;
 function FriendChatPage.OnInit()
 	page = document:GetPageCtrl();
-	page.OnClose = FriendChatPage.CloseView
 end
 
-function FriendChatPage.Show(user_data, chat_user_data, auto_msg)
+function FriendChatPage.Show(user_data, chat_user_data, auto_msg,bIsTopLevel)
 
 	if not FriendChatPage.has_bind then
 		GameLogic.GetFilters():add_filter("KeyPressEvent",function(callbackVal, event)
@@ -80,6 +79,7 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg)
 					event:accept()
 				end
 			end
+			return callbackVal, event
 		end)
 
 		FriendChatPage.has_bind = true
@@ -162,6 +162,7 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg)
 					allowDrag = true,
 					enable_esc_key = true,
 					zorder = 1,
+					isTopLevel = bIsTopLevel or false,
 					--app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 					directPosition = true,
 						align = "_ct",
@@ -171,7 +172,9 @@ function FriendChatPage.Show(user_data, chat_user_data, auto_msg)
 						height = 583,
 				};
 				System.App.Commands.Call("File.MCMLWindowFrame", params);
-
+				if(params._page)then
+					page = params._page
+				end
 				-- 
 				for k, v in pairs(data.rows) do
 					FriendList[v.id] = v
@@ -663,12 +666,14 @@ function FriendChatPage.OnMsg(payload, full_msg)
 
 	-- 通知服务器已读
 	local connection = FriendManager.connections[ChatUserData.id]
-	keepwork.friends.updateLastMsgTagInRoom({
-		roomId = connection.roomId,
-		msgKey = payload.msgKey,
-	},function(err, msg, data)
-		ChatContent[#ChatContent + 1] = {id = payload.id, content = payload.content, createdAt="", iat = chat_data.time, msg_type=payload.contentType}
-	end)
+	if connection then
+		keepwork.friends.updateLastMsgTagInRoom({
+			roomId = connection.roomId,
+			msgKey = payload.msgKey,
+		},function(err, msg, data)
+			ChatContent[#ChatContent + 1] = {id = payload.id, content = payload.content, createdAt="", iat = chat_data.time, msg_type=payload.contentType}
+		end)
+	end
 end
 
 function FriendChatPage.GetIcon(data)
@@ -695,8 +700,11 @@ function FriendChatPage.CloseView()
 	FriendChatPage.IsOpen = false
 	FriendChatPage.ClearData()
 	FriendManager:ClearAllConnections()
-
 	FriendManager:SaveLastChatMsg()
+	if page then
+		page:CloseWindow()
+		page = nil
+	end
 end
 
 function FriendChatPage.GetChatName()
@@ -749,6 +757,9 @@ end
 
 function FriendChatPage.CreateChatContentView()
 	local name = "chat_content";
+	if not page then
+		return
+	end
 	local chat_content = page:FindUIControl(name);
 	local ctl = CommonCtrl.TreeView:new{
 		name = "chat_TreeView",
@@ -920,6 +931,9 @@ end
 
 function FriendChatPage.FreshFriendGridView()
 	local gvw_name = "item_gridview";
+	if not page then
+		return
+	end
 	local node = page:GetNode(gvw_name);
 	pe_gridview.DataBind(node, gvw_name, false);
 end

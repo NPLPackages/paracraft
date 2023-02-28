@@ -983,8 +983,8 @@ function PackageMakerPage.GenerateGreaterCFByField(fieldName)
 	end
 end
 
-function PackageMakerPage.GenerateFileList(list, filterStr)
-	
+function PackageMakerPage.GenerateFileList(list, filterStr,rootPath)
+	rootPath = rootPath or ""
 	if(PackageMakerPage.enable_exclude_option) then
 		NPL.load("(gl)script/ide/Files.lua");
 		local output = {};
@@ -993,6 +993,7 @@ function PackageMakerPage.GenerateFileList(list, filterStr)
 			if(not exclude_option) then
 				local parent_dir, file_pattern = searchpath:match("^(.*)/([^/]+)$");
 				if(parent_dir and file_pattern) then
+					parent_dir = rootPath..parent_dir
 					local result = commonlib.Files.Find({}, parent_dir, 20, 50000, file_pattern)
 					for _, item in ipairs(result) do
 						local filename = parent_dir.."/"..item.filename;
@@ -1007,6 +1008,7 @@ function PackageMakerPage.GenerateFileList(list, filterStr)
 			if(exclude_option) then
 				local parent_dir, file_pattern = searchpath:match("^(.*)/([^/]+)$");
 				if(parent_dir and file_pattern) then
+					parent_dir = rootPath..parent_dir
 					local result = commonlib.Files.Find({}, parent_dir, if_else(exclude_option=="exclude1", 0, 20), 50000, file_pattern)
 					for _, item in ipairs(result) do
 						local filename = parent_dir.."/"..item.filename;
@@ -1036,14 +1038,13 @@ local zipPath = "packages/redist/test.zip";
 local PackageMakerPage = Map3DSystem.App.Assets.PackageMakerPage;
 PackageMakerPage.BuildPackageByGroupPath(txtPathList,zipPath)
 --]]
-function PackageMakerPage.BuildPackageByGroupPath(txtPathList,zipPath)
+function PackageMakerPage.BuildPackageByGroupPath(txtPathList,zipPath,rootPath)
 	if(type(txtPathList)~="table") then return ; end;
 	local allPathList = {list = nil,filterList = nil};
 	local k,v;
 	for k,path in ipairs(txtPathList) do
-		
-		local list,filterStr = PackageMakerPage.GetPathFromTxtFile(path)
-		list, filterStr = PackageMakerPage.GenerateFileList(list, filterStr);
+		local list,filterStr = PackageMakerPage.GetPathFromTxtFile(path,rootPath)
+		list, filterStr = PackageMakerPage.GenerateFileList(list, filterStr,rootPath);
 
 		if(not list ) then
 			log("load "..path.."失败！\n");
@@ -1063,9 +1064,9 @@ function PackageMakerPage.BuildPackageByGroupPath(txtPathList,zipPath)
 	if(#allPathList > 0) then
 		NPL.load("(gl)script/installer/BuildParaWorld.lua");
 		if(commonlib.BuildParaWorld.BUILD_FROM_MAC)then
-			PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile_temp(allPathList,zipPath)	
+			PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile_temp(allPathList,zipPath,rootPath)	
 		else
-			PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile(allPathList,zipPath)	
+			PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile(allPathList,zipPath,rootPath)	
 		end
 	end
 end
@@ -1080,11 +1081,13 @@ function PackageMakerPage.BuildPackageByGroupPath_OnEndEvent()
 	--commonlib.echo("PackageMakerPage.BuildPackageByGroupPath_OnEndEvent()");
 end
 -- return: 路径列表 和 通配符
-function PackageMakerPage.GetPathFromTxtFile(txtPath)
+function PackageMakerPage.GetPathFromTxtFile(txtPath,rootPath)
 	local path = txtPath;
 	if(string.find(path,"(.+).txt$"))then
+		if rootPath then 
+			path = rootPath..path
+		end
 		PackageMakerPage.txtFilePath =path;
-		
 		local line;
 		local file = ParaIO.open(path, "r");
 		local filterStr;
@@ -1121,7 +1124,7 @@ function PackageMakerPage.GetPathFromTxtFile(txtPath)
 	end
 end
 
-function PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile(allPathList,zipPath)
+function PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile(allPathList,zipPath,rootPath)
 	if(not allPathList)then 
 		log("PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile 出错！数据为空\n");
 		return ; 
@@ -1129,7 +1132,7 @@ function PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile(allPathList,zipP
 	--"开始";
 	PackageMakerPage.BuildPackageByGroupPath_OnStartEvent()
 	
-	local rootPath = ParaIO.GetCurDirectory(0);
+	rootPath = rootPath or ParaIO.GetCurDirectory(0);
 	local fullPath = rootPath..zipPath
 	fullPath = string.gsub(fullPath, "/", "\\");
 	local writer = ParaIO.CreateZip(fullPath,"");
@@ -1164,8 +1167,12 @@ function PackageMakerPage.BuildPackageByGroupPath_writer(writer,namelist,filterL
 			if(temp_path)then
 				writer:AddDirectory(temp_path,v,300);
 			else
-				local path = rootPath..v;
-				
+				local path = v;
+				if commonlib.Files.IsAbsolutePath(path) then
+					v = string.gsub(v,rootPath,"")
+				end
+				path = rootPath..v
+				--print("--------hyzzz  zip add",path)
 				local search_result = ParaIO.SearchFiles(path.."/","*", "", 0, 1, 0);
 				local nCount = search_result:GetNumOfResult();
 				if(nCount>0) then
@@ -1199,7 +1206,7 @@ function PackageMakerPage.BuildPackageByGroupPath_writer(writer,namelist,filterL
 		PackageMakerPage.BuildPackageByGroupPath_writer(writer,list,filterList,allPathList,rootPath)
 	end
 end
-function PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile_temp(allPathList,zipPath)
+function PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile_temp(allPathList,zipPath,rootPath)
 	if(not allPathList)then 
 		log("PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile 出错！数据为空\n");
 		return ; 
@@ -1207,7 +1214,7 @@ function PackageMakerPage.BuildPackageByGroupPath_DoMakeZipFile_temp(allPathList
 	--"开始";
 	PackageMakerPage.BuildPackageByGroupPath_OnStartEvent()
 	
-	local rootPath = ParaIO.GetCurDirectory(0);
+	rootPath = rootPath or ParaIO.GetCurDirectory(0);
 	local fullPath = rootPath..zipPath
 	fullPath = string.gsub(fullPath, "/", "\\");
 	local writer = {};

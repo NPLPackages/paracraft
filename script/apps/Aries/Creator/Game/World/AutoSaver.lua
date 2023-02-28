@@ -26,7 +26,7 @@ AutoSaver.autosave_operation_count = 15;
 AutoSaver.mode = "tip";
 AutoSaver.operation_count = 0;
 AutoSaver.timeout = false;
-
+AutoSaver.isCheckModified = false
 function AutoSaver:ctor()
 	GameLogic:Connect("WorldLoaded", self, self.OnEnterWorld, "UniqueConnection");
 	GameLogic:Connect("WorldUnloaded", self, self.OnLeaveWorld, "UniqueConnection");
@@ -86,6 +86,11 @@ end
 
 function AutoSaver:DoAutoSave()
 	if(GameLogic.GameMode:IsEditor()) then
+		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+		if self.isCheckModified and not WorldCommon.IsModified() then
+			return
+		end
 		if(self.autosave_operation_count > 0 and self.operation_count > self.autosave_operation_count) then
 			self.timeout = false;
 			self.operation_count = 1;
@@ -96,7 +101,7 @@ function AutoSaver:DoAutoSave()
 			else
 				-- tip mode
 				if(not GameLogic.IsRemoteWorld() and not ParaMovie.IsRecording()) then
-					if(System.options.IsMobilePlatform) then
+					if(System.os.IsMobilePlatform()) then
 						GameLogic.AddBBS("UndoManager", L"记得保存你的世界～", 5000, "0 255 0");
 					else
 						GameLogic.AddBBS("UndoManager", L"记得保存你的世界哦～(Ctrl+S)", 5000, "0 255 0");
@@ -125,6 +130,7 @@ function AutoSaver:OnLeaveWorld()
 	end
 	-- always revert to tip mode, this is safer
 	self:SetTipMode(); 
+	self:SetCheckModified()
 end
 
 -- when the user manually saved the world, we should reset timer. 
@@ -132,4 +138,8 @@ function AutoSaver:ResetTimer()
 	if (self.timer) then
 		self.timer:Change(self.interval, self.interval);
 	end
+end
+
+function AutoSaver:SetCheckModified(bCheck)
+	self.isCheckModified = bCheck == true
 end

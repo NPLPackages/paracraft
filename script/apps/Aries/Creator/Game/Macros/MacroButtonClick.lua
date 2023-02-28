@@ -15,7 +15,9 @@ local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer")
 local Application = commonlib.gettable("System.Windows.Application");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local MouseEvent = commonlib.gettable("System.Windows.MouseEvent");
-local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros");
+
+local ConvertToWebMode = NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/ConvertToWebMode/ConvertToWebMode.lua");
 
 local function SetKeyboardFromButtonText(emulatedKeys, button)
 	-- mouse_button is a global variable
@@ -162,24 +164,65 @@ function Macros.WindowClick(btnName, button, localX, localY)
 end
 
 function Macros.ButtonClickTriggerNoWait(btnName, button, eventName, offsetX, offsetY)
-	local obj = ParaUI.GetUIObject(btnName)
-	if(obj and obj:IsValid()) then
+	local obj = ParaUI.GetUIObject(btnName);
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if (obj and obj:IsValid()) then
 		local x, y, width, height = obj:GetAbsPosition();
 		local mouseX = math.floor(x + width /2)
 		local mouseY = math.floor(y + height /2)
 
-		if offsetX and offsetX < width then
-			mouseX = x + offsetX
+		if not IsMobileUIEnabled then
+			if offsetX and offsetX < width then
+				mouseX = x + offsetX
+			end
+
+			if offsetY and offsetY < height then
+				mouseY = y + offsetY
+			end
 		end
 
-		if offsetY and offsetY < height then
-			mouseY = y + offsetY
+		if (Macros.GetHelpLevel() == -2) then
+			ConvertToWebMode:StopComputeRecordTime();
+			local macro = Macros.macros[Macros.curLine];
+
+			if (macro) then
+				macro.mousePosition = { mouseX = mouseX, mouseY = mouseY };
+				macro.processTime = ConvertToWebMode.processTime;
+			end
 		end
 
 		local callback = {};
 		MacroPlayer.SetClickTrigger(mouseX, mouseY, button, function()
-			if(callback.OnFinish) then
-				callback.OnFinish();
+			if (callback.OnFinish) then
+				if (Macros.GetHelpLevel() == -2) then
+					local nextNextLine = Macros.macros[Macros.curLine + 2];
+
+					if (nextNextLine and
+						nextNextLine.name ~= "Broadcast" and
+						nextNextLine.params ~= "macroFinished") then
+						commonlib.TimerManager.SetTimeout(function()
+							ConvertToWebMode:StopCapture();
+							ConvertToWebMode:StopComputeDuringTime();
+
+							local macro = Macros.macros[Macros.curLine];
+
+							if (macro) then
+								macro.duringTime = ConvertToWebMode.duringTime;
+							end
+
+							ConvertToWebMode.isEditboxTriggerStarted = false;
+
+							ConvertToWebMode:StartComputeRecordTime();
+							ConvertToWebMode:BeginCapture(function()
+								callback.OnFinish();
+							end);
+						end, 8000);
+					else
+						callback.OnFinish();
+					end
+				else
+					callback.OnFinish();
+				end
 			end
 		end);
 		return callback;
@@ -235,14 +278,48 @@ function Macros.ContainerDragEndTrigger(btnName, offsetX, offsetY)
 	local obj = ParaUI.GetUIObject(btnName)
 	if(obj and obj:IsValid()) then
 		local x, y, width, height = obj:GetAbsPosition();
-		local startX = math.floor(x + width / 2 + 0.5)
-		local startY = math.floor(y + height / 2 + 0.5)
-		local endX, endY = x + offsetX, y + offsetY
+		local startX = math.floor(x + width / 2 + 0.5);
+		local startY = math.floor(y + height / 2 + 0.5);
+		local endX, endY = x + offsetX, y + offsetY;
+
+		if (Macros.GetHelpLevel() == -2) then
+			ConvertToWebMode:StopComputeRecordTime();
+	
+			local macro = Macros.macros[Macros.curLine];
+
+			if (macro) then
+				macro.processTime = ConvertToWebMode.processTime;
+				macro.dragPosition = {
+					startX = startX,
+					startY = startY,
+					endX = endX,
+					endY = endY,
+				}
+			end
+		end
 
 		local callback = {};
 		MacroPlayer.SetDragTrigger(startX, startY, endX, endY, "left", function()
 			if(callback.OnFinish) then
-				callback.OnFinish();
+				if (Macros.GetHelpLevel() == -2) then
+					local nextNextLine = Macros.macros[Macros.curLine + 2];
+	
+					if (nextNextLine and
+						nextNextLine.name ~= "Broadcast" and
+						nextNextLine.params ~= "macroFinished") then
+						commonlib.TimerManager.SetTimeout(function()
+							ConvertToWebMode:StopCapture();
+							ConvertToWebMode:StartComputeRecordTime();
+							ConvertToWebMode:BeginCapture(function()
+								callback.OnFinish();
+							end);
+						end, 3000);
+					else
+						callback.OnFinish();
+					end
+				else
+					callback.OnFinish();
+				end
 			end
 		end);
 		return callback;
@@ -269,28 +346,60 @@ end
 -- @param localX, localY: local mouse click position relative to the control
 function Macros.WindowClickTrigger(btnName, button, localX, localY)
 	local obj = Application.GetUIObject(btnName);
-	if(obj) then
-		local window = obj:GetWindow()
-		if(window and window:testAttribute("WA_WState_Created")) then
-			local x, y, width, height = obj:GetAbsPosition()
-			
-			if( not localX or (localX + 6) > width) then
-				localX = math.floor(width/2+0.5)
+	if (obj) then
+		local window = obj:GetWindow();
+
+		if (window and window:testAttribute("WA_WState_Created")) then
+			local x, y, width, height = obj:GetAbsPosition();
+
+			if (not localX or (localX + 6) > width) then
+				localX = math.floor(width / 2 + 0.5);
 			end
 
-			if( not localY or (localY + 6) > height) then
-				localY =  math.floor(height/2+0.5)
+			if (not localY or (localY + 6) > height) then
+				localY =  math.floor(height / 2 + 0.5);
 			end
 
-			local mouseX = x + localX
-			local mouseY = y + localY
+			local mouseX = x + localX;
+			local mouseY = y + localY;
 			
 			local callback = {};
+
+			if (Macros.GetHelpLevel() == -2) then
+				ConvertToWebMode:StopComputeRecordTime();
+
+				local macro = Macros.macros[Macros.curLine];
+
+				if (macro) then
+					macro.processTime = ConvertToWebMode.processTime;
+					macro.mousePosition = { mouseX = mouseX, mouseY = mouseY };
+				end
+			end
+
 			MacroPlayer.SetClickTrigger(mouseX, mouseY, button, function()
-				if(callback.OnFinish) then
-					callback.OnFinish();
+				if (callback.OnFinish) then
+					if (Macros.GetHelpLevel() == -2) then
+						local nextNextLine = Macros.macros[Macros.curLine + 2];
+
+						if (nextNextLine and
+							nextNextLine.name ~= "Broadcast" and
+							nextNextLine.params ~= "macroFinished") then
+							commonlib.TimerManager.SetTimeout(function()
+								ConvertToWebMode:StopCapture();
+								ConvertToWebMode:StartComputeRecordTime();
+								ConvertToWebMode:BeginCapture(function()
+									callback.OnFinish();
+								end);
+							end, 3000);
+						else
+							callback.OnFinish();
+						end
+					else
+						callback.OnFinish();
+					end
 				end
 			end);
+
 			return callback;
 		end
 	end

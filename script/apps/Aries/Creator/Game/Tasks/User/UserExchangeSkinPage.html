@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    UserExchangeSkinPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserExchangeSkinPage.lua")
+    UserExchangeSkinPage.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetBigIconStyle()
+        return string.format("margin-left:32px;margin-top:16px;width:64px;height:64px;background:url(%s);", UserExchangeSkinPage.data and UserExchangeSkinPage.data.icon or "");
+    end
+
+    function ShowVip()
+        local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+        VipPage.ShowPage("ChangeAvatarSkin", "尽享精彩形象");
+    end 
+
+    function OnExchange()
+        ClosePage()
+        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+        UserInfoPage.Purchase(UserExchangeSkinPage.data.id)
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000088"  > 
+    <div zorder="-3" align="center" valign="center" style=" width: 488px; height: 240px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
+        <div style="position: relative; width: 480px; height: 30px;">
+            <input type="button" style="margin-left: 460px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        </div>
+        <div style="position: relative; margin-top: 45px; margin-left: 82px; width:146px;height:140px;">
+            <div style="width:146px;height:140px;background:url(Texture/Aries/Creator/keepwork/ggs/user/renwuqiehuan/wupingbj_146X140_32bits.png#0 0 146 140);">
+                <div style="margin-left:9px;margin-top:8px;width:128px;height:96px;">
+                    <div style='<%=GetBigIconStyle(Eval("icon"))%>'></div>
+                </div>
+                <div style="margin-top:2px;width:146px;text-align:center;">
+                    <%=UserExchangeSkinPage.data and UserExchangeSkinPage.data.name or ""%>
+                </div>
+            </div>
+        </div>
+        <div style="position: relative; margin-top: 55px; margin-left: 252px; width:200px;height:130px;">
+            <div style="margin-top:2px;margin-left: 10px; font-size: 18px; base-font-size: 18px;">
+                <%=UserExchangeSkinPage.data and UserExchangeSkinPage.data.name or ""%>
+            </div>
+            <div style="margin-top:2px;margin-left: 10px; font-size: 18px; base-font-size: 18px;">
+                有效期：10天
+            </div>
+
+            <div style="float: left; margin-top: 40px; margin-left: 10px; width: 19px;height: 18px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/xiaodouzi_19x18_32bits.png#0 0 19 18);"></div>
+            <div style="float: left; margin-top: 36px; margin-left: 10px; font-size: 18px; base-font-size: 18px;">
+                <%=UserExchangeSkinPage.data and UserExchangeSkinPage.data.price or ""%>
+            </div>
+        </div>
+        <div style="position: relative; margin-top: 190px; margin-left: 40px; width:480px;height:46px;">
+            <pe:if condition='<%= not System.options.isHideVip %>'>
+                <input type="button" onclick="ShowVip()" icon_width = "24" icon_height="22" icon_off_x="-34" icon_off_y="0"  value="<%=L'会员免费'%>" icon="Texture/Aries/Creator/keepwork/UserInfo/page/huiyuan_33x30_32bits.png;0 0 33 30" style="float: left; text-offset-x:10;width: 126px; height: 42px; background: url(Texture/Aries/Creator/keepwork/Window/button/huanganniu_32x32_32bits.png#0 0 32 32:14 14 14 14);"/>
+            </pe:if>
+            <pe:if condition='<%= System.options.isHideVip %>'>
+                <div style="float: left; text-offset-x:10;width: 126px; height: 42px; background: url();"/>
+            </pe:if>
+            <input type="button" onclick="OnExchange()" value="<%=L'立即兑换'%>" style="float: left; margin-left: 19px; width: 126px; height: 42px; background: url(Texture/Aries/Creator/keepwork/Window/button/huanganniu_32x32_32bits.png#0 0 32 32:14 14 14 14);"/>
+            <input type="button" onclick="ClosePage()" value="<%=L'取消'%>" style="float: left; margin-left: 19px; width: 126px; height: 42px; background: url(Texture/Aries/Creator/keepwork/Window/button/huianniu_32x32_32bits.png#0 0 32 32:14 14 14 14);"/>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

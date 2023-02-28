@@ -46,27 +46,6 @@ function ParacraftDebug.OnNPLErrorCallBack(errorMessage)
 	})
 end
 
---获取路径下，version.txt的版本号
-local function getVersionByPath(parentPath)
-    if not ParaIO.DoesFileExist(parentPath) then
-        print(string.format("path:%s 不存在,set ver=0.0.0",parentPath))
-        return "0.0.0"
-    end
-	if CommonLib==nil then
-		return nil
-	end
-    local version_filename = CommonLib.ToCanonicalFilePath(parentPath .. "/version.txt");
-    -- print("_versionByPath :",version_filename)
-    if not ParaIO.DoesFileExist(version_filename) then
-        print(string.format("txt:%s 不存在,set ver=0.0.0",version_filename))
-        return "0.0.0"
-    end
-    local version = CommonLib.GetFileText(version_filename) or "ver=0.0.0";
-    version = string.gsub(version,"[%s\r\n]","");
-    local __,v = string.match(version,"(.+)=(.+)");
-    return v;
-end
-
 --检查有没有错误日志文件（crash时会复制一份到temp/log.crash.txt），有的话读取最后面的200行，上报
 function ParacraftDebug:CheckSendCrashLog()
 	if not (keepwork and keepwork.burieddata and keepwork.burieddata.uploadLog) then
@@ -116,6 +95,7 @@ function ParacraftDebug:CheckSendCrashLog()
 	end
 end
 
+local _errorMessageSet = {}
 -- send runtime error log to our log service
 function ParacraftDebug:SendErrorLog(logType,obj)
 	if type(obj)~="table" then
@@ -124,7 +104,20 @@ function ParacraftDebug:SendErrorLog(logType,obj)
 	if not (keepwork and keepwork.burieddata and keepwork.burieddata.uploadLog) then
 		return
 	end
-	if System.options.isDevMode then
+	if obj.errorMessage and obj.errorMessage:match("bad allocation") then
+		collectgarbage("collect");
+	end
+	local recordKey = string.gsub(obj.stackInfo or "","[^0-9a-zA-Z]+","")
+	if _errorMessageSet[recordKey] then
+		if System.options.isDevMode then
+			print("------重复的报错不上传",recordKey)
+			echo(obj,true)
+		end
+		return
+	end
+	_errorMessageSet[recordKey] = true
+
+	if System.options.isDevMode and logType~="DevDebugLog" then
 		print("-------isDevMode不发送错误日志:",logType)
 		echo(obj,true)
 		return
@@ -132,12 +125,36 @@ function ParacraftDebug:SendErrorLog(logType,obj)
 
 	obj.ip = NPL.GetExternalIP()
     obj.machineID = ParaEngine.GetAttributeObject():GetField('MachineID', '')
-    obj.version = getVersionByPath(ParaIO.GetWritablePath())
+    obj.version = GameLogic.options.GetClientVersion()
     obj.channelId = System.options.channelId
     obj.commandLine = ParaEngine.GetAppCommandLine()
     obj.isDevEnv = System.options.isDevEnv
     obj.isDevMode = System.options.isDevMode
     obj.mc = System.options.mc
+	obj.platform = System.os.GetPlatform()
+
+	obj.cur_worldPath = GameLogic.GetWorldDirectory()
+
+	local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
+	local curProjectId = world_data and world_data.kpProjectId
+	obj.cur_worldId = curProjectId
+
+	if obj.platform=="android" or obj.platform=="ios" or obj.platform=="mac" then
+        local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
+        local sysInfo = PlatformBridge.getDeviceInfo() 
+        local appInfo = PlatformBridge.getAppInfo()
+
+        for k,v in pairs(appInfo) do
+			if obj[k]==nil then
+            	obj[k] = v
+			end
+        end
+		for k,v in pairs(sysInfo) do
+			if obj[k]==nil then
+            	obj[k] = v
+			end
+        end
+    end
 
 	local SessionsData = NPL.load('(gl)Mod/WorldShare/database/SessionsData.lua')
 	if SessionsData then
@@ -159,3 +176,54 @@ function ParacraftDebug:SendErrorLog(logType,obj)
 end
 
 ParacraftDebug:InitSingleton();
+
+-- if System.options.isDevMode and _G.__DebugParaIODebug==nil then
+-- 	_G.__DebugParaIODebug = true
+-- 	local _DeleteFile = ParaIO.DeleteFile;
+-- 	ParaIO.DeleteFile = function(path)
+-- 		print("------deletefile test file:",path)
+-- 		if GameLogic and GameLogic.IsStarted then
+-- 			local xxpath = GameLogic.GetWorldDirectory().."blocktemplates/"
+-- 			local isExist_1 = ParaIO.DoesFileExist(xxpath)
+-- 			local ret = _DeleteFile(path);
+-- 			local isExist_2 = ParaIO.DoesFileExist(xxpath)
+-- 			print("isExist_1 and not isExist_2",isExist_1 and not isExist_2)
+-- 			if isExist_1 and not isExist_2 then
+-- 				ParacraftDebug:SendErrorLog("DevDebugLog", {
+-- 					desc = "blocktemplates/ is deleted",
+-- 					debugTag = "ParaIO.DeleteFile",
+-- 					stackInfo = commonlib.debugstack()
+-- 				})
+-- 				_guihelper.MessageBox("blocktemplates已经被删除，请保存log.txt，并联系开发或测试");
+-- 				print(commonlib.debugstack())
+-- 			end
+-- 			return ret;
+-- 		else
+-- 			return _DeleteFile(path);
+-- 		end
+-- 	end
+
+-- 	local _MoveFile = ParaIO.MoveFile;
+-- 	ParaIO.MoveFile = function(src,dest)
+-- 		print("------movefile test file:",src,dest)
+-- 		if GameLogic and GameLogic.IsStarted then
+-- 			local xxpath =GameLogic.GetWorldDirectory().."blocktemplates/"
+-- 			local isExist_1 = ParaIO.DoesFileExist(xxpath)
+-- 			local ret = _MoveFile(src,dest);
+-- 			local isExist_2 = ParaIO.DoesFileExist(xxpath)
+-- 			if isExist_1 and not isExist_2 then
+-- 				ParacraftDebug:SendErrorLog("DevDebugLog", {
+-- 					desc = "blocktemplates/ is deleted",
+-- 					debugTag = "ParaIO.MoveFile",
+-- 					stackInfo = commonlib.debugstack(),
+-- 				})
+-- 				_guihelper.MessageBox("blocktemplates已经被删除，请保存log.txt，并联系开发或测试");
+-- 				print(commonlib.debugstack())
+-- 			end
+-- 			return ret;
+-- 		else
+-- 			return _MoveFile(src,dest);
+-- 		end
+-- 	end
+	
+-- end

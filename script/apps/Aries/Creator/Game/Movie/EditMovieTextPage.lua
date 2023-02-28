@@ -20,7 +20,6 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MovieClip = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClip");
-local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 
@@ -38,6 +37,7 @@ function EditMovieTextPage.ShowPage(title, OnClose, last_values)
 	EditMovieTextPage.result = last_values;
 	EditMovieTextPage.title = title;
 	default_narrator = -1
+	EditMovieTextPage.ActorNpcNameList = nil
 	
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Movie/EditMovieTextPage.html", 
@@ -95,6 +95,8 @@ function EditMovieTextPage.OnOK()
 			bganim = page:GetValue("bganim"),
 			textbg = page:GetValue("textbg"),
 			voicenarrator = page:GetValue("voicenarrator"),
+			voicebelongto = page:GetValue("voicebelongto"),
+			use3dvoice = page:GetValue("use3dvoice"),
 			bgcolor = bgcolor,
 		};
 		page:CloseWindow();
@@ -132,7 +134,12 @@ function EditMovieTextPage.UpdateUIFromValue(values)
 			default_narrator = values.voicenarrator
 			EditMovieTextPage.UpdateSoundDesc()
 		end
-		
+		if(values.voicebelongto) then
+			page:SetValue("voicebelongto", values.voicebelongto);
+		end
+		if(values.use3dvoice) then
+			page:SetValue("use3dvoice", values.use3dvoice);
+		end
 	end
 end
 
@@ -156,6 +163,15 @@ function EditMovieTextPage.OnClickSelcetNarrator(name, value)
 	end
 end
 
+function EditMovieTextPage.PreparePlayTextResultCb(result, channel_name)
+	if not result then
+		GameLogic.AddBBS(nil, L"合成声音超时，请重新尝试", 15000, "255 0 0");
+		return
+	end
+
+	EditMovieTextPage.UpdateSoundDesc(channel_name)
+end
+
 function EditMovieTextPage.OnListeningTest()
 	local text = page:GetValue("text") or "";
 	text = text:gsub("\r?\n", "#");
@@ -174,20 +190,16 @@ function EditMovieTextPage.OnListeningTest()
 		return
 	end
 
-	local nTimeoutMS = 7
-	local start_timestamp = os.time()
-	SoundManager:PrepareText(text,  voicenarrator, function(file_path)
-		if os.time() - start_timestamp > nTimeoutMS then
-			GameLogic.AddBBS(nil, L"合成声音超时，请重新尝试", 15000, "255 0 0");
-			return
-		end
-		
-		SoundManager:StopPlayText()
-		local channel = "playtext" .. voicenarrator
-		SoundManager:SetPlayTextChannel(channel)
-		SoundManager:PlaySound(channel, file_path)
-		EditMovieTextPage.UpdateSoundDesc()
-	end)
+
+	local voicebelongto = page:GetValue("voicebelongto")
+	if voicebelongto and voicebelongto ~= "" then
+		local movie_clip = MovieManager:GetActiveMovieClip();
+		local voice_actor = movie_clip:FindActor(voicebelongto)
+		local use3dvoice = page:GetValue("use3dvoice")
+		SoundManager:PlayActorText(text, voicenarrator, voice_actor, EditMovieTextPage.PreparePlayTextResultCb, use3dvoice)
+	else
+		SoundManager:PlayText(text, voicenarrator, nil, nil, nil, nil, EditMovieTextPage.PreparePlayTextResultCb)
+	end
 end
 
 function EditMovieTextPage.OnTextChange()
@@ -196,7 +208,7 @@ function EditMovieTextPage.OnTextChange()
 	end
 end
 
-function EditMovieTextPage.UpdateSoundDesc()
+function EditMovieTextPage.UpdateSoundDesc(channel_name)
 	local text = page:GetValue("text") or "";
 	text = text:gsub("\r?\n", "#")
 
@@ -212,7 +224,7 @@ function EditMovieTextPage.UpdateSoundDesc()
 		return
 	end
 
-	local channel_name = "playtext" .. voicenarrator
+	channel_name = channel_name or "playtext" .. voicenarrator
 
 	local md5_value = SoundManager:GetPlayTextMd5(text, voiceNarrator)
 	local filename = md5_value .. ".mp3"
@@ -233,4 +245,20 @@ end
 
 function EditMovieTextPage.OnClose()
 	page:CloseWindow();
+end
+
+function EditMovieTextPage.GetActorNames()
+	if not EditMovieTextPage.ActorNpcNameList then
+		EditMovieTextPage.ActorNpcNameList = {{value = "", text="无", selected=true}}
+		local movie_clip = MovieManager:GetActiveMovieClip();
+		local actors = movie_clip.actors
+		for index = 1, #actors do
+			local actor = actors[index]
+			if actor.class_name == "ActorNPC" then
+				EditMovieTextPage.ActorNpcNameList[#EditMovieTextPage.ActorNpcNameList + 1] = {value = actor:GetDisplayName()}
+			end
+		end
+	end
+
+	return EditMovieTextPage.ActorNpcNameList
 end

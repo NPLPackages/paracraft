@@ -22,7 +22,6 @@ local SearchIdList = {}
 
 function FriendsProjectPage.OnInit()
     page = document:GetPageCtrl();
-    page.OnClose = FriendsProjectPage.CloseView
 end
 
 -- choicenessNo=0,
@@ -89,7 +88,7 @@ function FriendsProjectPage.Show(UserData, userId)
                 style = CommonCtrl.WindowFrame.ContainerStyle,
                 allowDrag = true,
                 enable_esc_key = true,
-                zorder = -1,
+                zorder = 1,
                 app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
                 directPosition = true,
                 
@@ -193,8 +192,11 @@ function FriendsProjectPage.UpdataFoucsList(updata_cb)
 end
 
 function FriendsProjectPage.CloseView()
-    print("FriendsProjectPage.CloseView()")
     FriendsProjectPage.ClearData()
+    if page then
+       page:CloseWindow()
+       page = nil 
+    end
 end
 
 function FriendsProjectPage.ClearData()

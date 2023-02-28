@@ -506,7 +506,7 @@ function ItemLiveModel:mousePressEvent(event)
 				GameLogic.GetPlayerController():PickItemByEntity(entity);
 			end
 		elseif(result.block_id) then
-			GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ);
+			GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ, result.side);
 		end
 		event:accept();
 	elseif(self:CanDragDropEntity(entity, true) and (event:button() == "left")) then
@@ -1838,7 +1838,7 @@ function ItemLiveModel:mouseReleaseEvent(event)
 	else
 		if(event.ctrl_pressed and not event.shift_pressed and event:isClick() and GameLogic.GameMode:IsEditor()) then
 			-- ctrl + left click to select block in edit mode
-			 if(event:button() == "left") then
+			if(event:button() == "left") then
 				Game.SelectionManager:SetEntityFilterFunction(nil)
 
 				local result = self:MousePickBlock(event)
@@ -1857,7 +1857,7 @@ function ItemLiveModel:mouseReleaseEvent(event)
 					end
 					event:accept();
 				end
-			 end
+			end
 		elseif(not event.ctrl_pressed and event.shift_pressed and event:isClick()) then
 			-- Do nothing to allow leaking to default context
 		elseif(not event.ctrl_pressed and event:isClick()) then
@@ -1875,7 +1875,7 @@ function ItemLiveModel:mouseReleaseEvent(event)
 				if(clickEntity:OnClick(result.blockX, result.blockY, result.blockZ, event.mouse_button, EntityManager.GetPlayer(), result.side)) then
 					event:accept();
 				end
-			elseif(event:button() == "right") then
+			elseif(event:button() == "right" or (event:button() == "left" and GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false))) then
 				if(result.block_id and result.block_id>0) then
 					-- if it is a right click, first try the game logics if it is processed. such as an action neuron block.
 					if(result.entity and result.entity:IsBlockEntity() and result.entity:GetBlockId() == result.block_id) then
@@ -1887,25 +1887,27 @@ function ItemLiveModel:mouseReleaseEvent(event)
 					end
 				end
 				if(not isProcessed) then
-					local itemStack = EntityManager.GetPlayer().inventory:GetItemInRightHand()
-					if(itemStack and itemStack.id == block_types.names.LiveModel) then
-						local loadPath = itemStack:GetDataField("loadPath");
-						if loadPath and loadPath~= "" then
-							local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
-							GameLogic.RunCommand(string.format("/loadtemplate -rename %s %d %d %d %s",true,bx,by,bz,loadPath))
-							event:accept();
-						else
-							local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
-							local entity = self:SpawnNewEntityModel(bx, by, bz)
-							if(entity) then
-								-- let it fall down: simulate a drag and drop at click point
-								self:StartDraggingEntity(entity, event)
-								self:UpdateDraggingEntity(entity, result, targetEntity, event)
-								self:DropDraggingEntity(entity, event);
-								if(entity.dragTask) then
-									entity.dragTask:SetCreateMode()
-								end
+					if(result.blockX and result.side) then
+						local itemStack = EntityManager.GetPlayer().inventory:GetItemInRightHand()
+						if(itemStack and itemStack.id == block_types.names.LiveModel) then
+							local loadPath = itemStack:GetDataField("loadPath");
+							if loadPath and loadPath~= "" then
+								local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+								GameLogic.RunCommand(string.format("/loadtemplate -rename %s %d %d %d %s",true,bx,by,bz,loadPath))
 								event:accept();
+							else
+								local bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+								local entity = self:SpawnNewEntityModel(bx, by, bz)
+								if(entity) then
+									-- let it fall down: simulate a drag and drop at click point
+									self:StartDraggingEntity(entity, event)
+									self:UpdateDraggingEntity(entity, result, targetEntity, event)
+									self:DropDraggingEntity(entity, event);
+									if(entity.dragTask) then
+										entity.dragTask:SetCreateMode()
+									end
+									event:accept();
+								end
 							end
 						end
 					end

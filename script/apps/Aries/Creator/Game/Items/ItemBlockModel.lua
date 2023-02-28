@@ -13,6 +13,8 @@ local item = ItemBlockModel:new({icon,});
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemToolBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ModelTextureAtlas.lua");
+NPL.load("(gl)script/apps/Aries/Desktop/GameMemoryProtector.lua");
+local GameMemoryProtector = commonlib.gettable("MyCompany.Aries.Desktop.GameMemoryProtector");
 local ModelTextureAtlas = commonlib.gettable("MyCompany.Aries.Game.Common.ModelTextureAtlas");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -84,15 +86,29 @@ function ItemBlockModel:TryCreate(itemStack, entityPlayer, x,y,z, side, data, si
 	local local_filename = itemStack:GetDataField("tooltip");
 	local filename = local_filename;
 	if(filename) then
-		if filename:match("^onlinestore/") then
+		if (not self:IsBlockTemplate(filename) and filename:match("^temp/onlinestore/")) then
 			filename = commonlib.Encoding.Utf8ToDefault(filename)
-			if(ParaIO.DoesFileExist(Files.GetTempPath()..filename, true)) then
-				if ParaIO.CopyFile(Files.GetTempPath()..filename, Files.WorldPathToFullPath(filename), true) then
+			local _filename = "onlinestore/"..filename:match("[^/\\]+$")
+			if(ParaIO.DoesFileExist(Files.GetWritablePath()..filename, true)) then
+				if ParaIO.CopyFile(Files.GetWritablePath()..filename, Files.WorldPathToFullPath(_filename), true) then
+					itemStack:SetTooltip(commonlib.Encoding.DefaultToUtf8(_filename))
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
+					local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+					if(EditModelTask.GetInstance()) then
+						EditModelTask.GetInstance():RefreshPage()
+					end
+					filename = _filename
+					local_filename = commonlib.Encoding.DefaultToUtf8(_filename)
+					Files.FindFile(filename);
 					filename = Files.WorldPathToFullPath(filename)
-					GameLogic.GetFilters():apply_filters("bulid_frame_page_refresh")
 				end
 			end
 		else
+			local name_map,name = self:GetFilenameMap(filename)
+			if name_map then
+				filename = name_map
+				local_filename = commonlib.Encoding.DefaultToUtf8(filename)
+			end
 			filename = Files.FindFile(commonlib.Encoding.Utf8ToDefault(filename));
 		end
 		
@@ -241,12 +257,27 @@ function ItemBlockModel:SetModelFileName(itemStack, filename)
 	end
 end
 
+function ItemBlockModel:GetFilenameMap(filename)
+	local name = filename:match("[^/]+$")
+	local md5 = GameMemoryProtector.hash_func_md5(commonlib.Encoding.Utf8ToDefault(name))
+	local chineseMap = commonlib.LoadTableFromFile(Files.GetWritablePath().."worlds/DesignHouse/blocktemplates/chinese_map.json")
+	chineseMap = chineseMap or {}
+	if chineseMap[md5] ~= nil then
+		name = name:gsub("%..*$", "")
+		return filename:gsub(name, md5),name
+	end
+end
+
 -- virtual: draw icon with given size at current position (0,0)
 -- @param width, height: size of the icon
 -- @param itemStack: this may be nil. or itemStack instance. 
 function ItemBlockModel:DrawIcon(painter, width, height, itemStack)
 	local filename = self:GetModelFileName(itemStack);
 	if(filename and filename~="") then
+		local name_map,name = self:GetFilenameMap(filename)
+		if name_map then
+			filename = name_map
+		end
 		itemStack.renderedTexturePath = ModelTextureAtlas:CreateGetModel(commonlib.Encoding.Utf8ToDefault(filename))
 		
 		if(itemStack.renderedTexturePath) then
@@ -262,7 +293,7 @@ function ItemBlockModel:DrawIcon(painter, width, height, itemStack)
 		painter:DrawRect(0,0, width, 14);
 		painter:SetPen("#ffffff");
 		painter:SetFont("System;12")
-		painter:DrawText(1,0, filename);
+		painter:DrawText(1,0,name or filename);
 
 		if(itemStack) then
 			if(itemStack.count>1) then

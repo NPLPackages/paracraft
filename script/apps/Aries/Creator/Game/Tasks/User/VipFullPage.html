@@ -1,0 +1,747 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/User/VipFullPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <style type="text/mcss">
+            {
+                text_size_14= {
+                    ["base-font-size"] = 14,
+                    ["font-size"] = 14,
+                    ["font-weight"] = "bold",
+                },
+                text_size_18 = {
+                    ["base-font-size"] = 18,
+                    ["font-size"] = 18,
+                    ["font-weight"] = "bold",
+                },
+                text_size_16 = {
+                    ["base-font-size"] = 18,
+                    ["font-size"] = 18,
+                    ["font-weight"] = "bold",
+                },
+                text_size_22 = {
+                    ["base-font-size"] = 22,
+                    ["font-size"] = 22,
+                    ["font-weight"] = "bold",
+                },
+                text_size_24 = {
+                    ["base-font-size"] = 24,
+                    ["font-size"] = 24,
+                    ["font-weight"] = "bold",
+                },
+                text_size_26 = {
+                    ["base-font-size"] = 26,
+                    ["font-size"] = 26,
+                    ["font-weight"] = "bold",
+                },
+                text_size_32 = {
+                    ["base-font-size"] = 32,
+                    ["font-size"] = 32,
+                    ["font-weight"] = "bold",
+                },
+                text_size_36 = {
+                    ["base-font-size"] = 36,
+                    ["font-size"] = 36,
+                    ["font-weight"] = "bold",
+                },
+                text_size_16 = {
+                    ["base-font-size"] = 18,
+                    ["font-size"] = 18,
+                    ["font-weight"] = "bold",
+                },
+                opus_bar_button = {
+                    background = 'Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#205 112 86 46',
+                },
+                theme1_text_editor = {
+                    background = 'Texture/Aries/Creator/keepwork/Certification/RealName/shurukuang_26x24_32bits.png#0 0 26 24:8 8 8 8',
+                    textcolor = '#000000',
+                    ["font-size"] = 14,
+                },
+                theme1_myhome_green_bt = {
+                    background = 'Texture/Aries/Creator/keepwork/Certification/RealName/yanzhengma_28x28_32bits.png#0 0 28 28:12 12 12 12',
+                    textcolor = '#000000',
+                    ["font-size"] = 14,
+                },
+                theme1_myhome_blue_bt = {
+                    background = 'Texture/Aries/Creator/keepwork/Certification/RealName/xiayibu_28x28_32bits.png#0 0 28 28:12 12 12 12',
+                    width = 221,
+                    height = 55,
+                    folat = "left",
+                    textcolor = '#000000',
+                    ["font-size"] = 14,
+                }
+            }
+        </style>
+        <script type="text/npl" src="VipPageScript.lua">
+            local VipFullPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipFullPage.lua");
+            VipFullPage.OnInit()
+        </script>
+        <pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+            <div>
+                <div style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+                <div style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" />
+            </div>
+            <pe:container alignment="_lt" onclick="ClosePage" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+                <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+                <div style="margin-left: 94px; margin-top: -51px; width: 294px; height: 64px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/shentongbei_32bits.png#15 790 294 64);">
+                    <!-- <div style="margin-top: 22px; margin-left: 100px; width: 79px; height: 20px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/zi1_79X20_32bits.png#0 0 79 20);"></div> -->
+                    <div style="margin-top: 10px; margin-left: 90px;width: 114px;height: 55px; background: Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/huiyuan_114x52_32bits.png;#0 0 114 52"></div>
+                </div>
+            </pe:container>
+            <pe:if condition='<%= not CanShowVip() %>'>
+                <pe:container alignment="_ct" style="margin-left:-345px;margin-top:-265px;width:690px;height:530px;background:url();">
+                    <div style="position:relative;color:#000000;font-size: 20px;margin-top:70px;">
+                        <div><%= L"苹果系统暂时不支持开通会员。" %></div>
+                        <div><%= L"请下载Windows版本体验会员功能或关注“帕拉卡”微信小程序了解更多。" %></div>
+                    </div>
+                    <pe:if condition = '<%=not ShowRealNameGift()%>'>
+                        <div style="position:absolute;margin-left:0px;margin-top:450px;">
+                            <div style="float:left;color:#000000;" class="text_size_18">
+                                <%= L"成为VIP会员，可享受帕拉卡的所有尊贵服务。" %>
+                            </div>
+                            <div style="float:left;margin-left:0px;margin-top:2px;font-size: 20px;">
+                                <input type="button"
+                                       value="<%= L'了解更多...' %>"
+                                       onclick="OpenParentsPage()"
+                                       style="color: #955a42;
+                                              font-size: 18px;
+                                              base-font-size: 18px;
+                                              font-weight: bold;
+                                              background: url();" />
+                            </div>
+                        </div>
+                    </pe:if>
+                </pe:container>
+            </pe:if>
+            <pe:if condition='<%= CanShowVip() %>'>
+                <pe:if condition = '<%= ShowRealNameGift()%>'>
+                    <pe:container alignment="_ct"
+                                  style="margin-left: -345px;
+                                         margin-top: -265px;
+                                         width: 690px;
+                                         height: 530px;
+                                         background:url();">
+                        <div style="position: relative;
+                                    margin-left: 200px;
+                                    margin-top: 45px;
+                                    color: #000000;"
+                             class="text_size_14">
+                            <%= L"恭喜你！已完成实名认证，获得会员礼包。" %>
+                        </div>
+                        <img style="margin-left: 90px;
+                                    margin-top: 90px;
+                                    width: 510px;
+                                    height: 38px;"
+                             src="Texture/Aries/Creator/keepwork/Certification/RealName/goumaihuiyuan_510x38_32bits.png#0 0 510 38" />
+                        <img style="margin-left: 157px;
+                                    margin-top: 0px;
+                                    width: 376px;
+                                    height: 229px;"
+                             src="Texture/Aries/Creator/keepwork/Certification/RealName/jianglifafang_376x229_32bits.png#0 0 376 229" />
+                        <div style="position: relative;
+                                    margin-left: 180px;
+                                    margin-top: 20px;
+                                    color: #000000;"
+                             class="text_size_14">
+                            <%= L"请前往“装扮”中查看皮肤，前往“荣誉”中查看奖状。" %>
+                        </div>
+                        <div style="float: left;
+                                    width: 200px;
+                                    height: 44px;
+                                    margin-left: 240px;
+                                    margin-top:60px;">
+                            <input type="button"
+                                   style="position: relative;
+                                          width: 195px;
+                                          height: 36px;"
+                                   class="theme1_myhome_blue_bt"
+                                   value="<%= L'知道了' %>"
+                                   onclick="OnClickIKnow" />
+                        </div>
+                    </pe:container>
+                </pe:if>
+                <pe:if condition='<%=not ShowRealNameGift()%>'>
+                    <!-- 连接了教师服务器 -->
+                    <pe:if condition='<%= IsConnectTeacherSever()%>'>
+                        <pe:container alignment="_ct"
+                                      style="margin-left: -345px;
+                                             margin-top: -265px;
+                                             width: 690px;
+                                             height: 530px;
+                                             background:url();">
+                            <pe:if condition="<%=not HasDesc()%>" >
+                                <div style="position: relative;
+                                            margin-left: 16px;
+                                            margin-top: 15px;
+                                            color:#000000;"
+                                     class="text_size_18">
+                                    <%= GetVipStateDesc() %>
+                                </div>
+                            </pe:if>
+                            <pe:if condition="<%= HasDesc() %>" >
+                                <div style="position: relative;
+                                            margin-left: 16px;
+                                            margin-top: 15px;
+                                            color:#000000;"
+                                     class="text_size_18">
+                                    <%= L"成为VIP会员可以使用该功能" %></div>
+                                <div style="position: relative;
+                                            margin-left: 267px;
+                                            margin-top: 15px;
+                                            color: #86513c;"
+                                     class="text_size_18">
+                                    <%= GetDesc() %>
+                                </div>
+                            </pe:if>
+                            <div style="position: relative;
+                                        margin-left: 16px;
+                                        margin-top: 43px;
+                                        font-size: 14px;
+                                        color: #000000;">
+                                <%= GetDesc2() %>
+                            </div>
+                            <pe:container alignment="_rt"
+                                          style="margin-right: 20px;
+                                                 margin-top: 30px;
+                                                 background: url();">
+                                <input type="button"
+                                       value=""
+                                       onclick="OnOpenVipCode"
+                                       style="width: 71px;
+                                              height: 16px;
+                                              background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/active_code_btn_32bits.png#0 0 71 16)" />
+                            </pe:container>
+                            <pe:container alignment="_rt"
+                                          style="background-color: #aa2f2f00;
+                                                 width: 680px;
+                                                 height: 400px;
+                                                 margin-right: 5px;
+                                                 margin-top: 45px;">
+                                <div style="font-size: 16px;
+                                            overflow-y: auto;
+                                            margin-left: 150px;
+                                            margin-top: 40px;
+                                            color: #000000;">
+                                    <%= L"在纸上记下网址,回家后让家长安装帕拉卡Paracraft,自愿激活会员。" %>
+                                    <br/>
+                                    <%= L"网址：paracraft.cn" %>
+                                    <br/>
+                                    <%= L"推荐安装Windows版本，参加全国大赛。" %>
+                                </div>
+                                <img style="margin-left: 40px;
+                                            margin-top: 0px;
+                                            width: 611px;
+                                            height: 241px;"
+                                     src="Texture/Aries/Creator/keepwork/Certification/RealName/anzhuangtishi_611x241_32bits.png#0 0 611 241" />
+                            </pe:container>
+                            <div style="position: absolute;
+                                        margin-left: 16px;
+                                        margin-top:455px;">
+                                <div style="float: left;
+                                            color:#000000;"
+                                     class="text_size_18">
+                                     <%= L"成为VIP会员，可享受帕拉卡的所有尊贵服务。" %>
+                                </div>
+                                <div style="float: left;
+                                            margin-left: 0px;
+                                            margin-top: 2px;">
+                                    <input type="button"
+                                           value="<%= L'了解更多...' %>"
+                                           onclick="OpenParentsPage()"
+                                           style="color: #955a42;
+                                                  font-size: 18px;
+                                                  font-weight: bold;
+                                                  background: url();" />
+                                </div>
+                            </div>
+                        </pe:container>
+                    </pe:if>
+                    <!-- 未连接教师服务器 -->
+                    <pe:if condition = '<%= not IsConnectTeacherSever()%>'>
+                            <!-- 离线模式 -->
+                            <pe:if condition = '<%=IsOfflineMode()%>'>
+                                <pe:container alignment="_ct"
+                                              style="margin-left:-345px;margin-top:-265px;width:690px;height:530px;background:url();">
+                                    <pe:if condition="<%=not HasDesc()%>" >
+                                        <div style="position:relative;margin-left:16px;margin-top:15px;color:#000000;" class="text_size_18">
+                                            <%=GetVipStateDesc()%>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition="<%=HasDesc()%>" >
+                                        <div style="position:relative;margin-left:16px;margin-top:15px;color:#000000;" class="text_size_18">成为VIP会员可以使用该功能</div>
+                                        <div style="position:relative;margin-left:267px;margin-top:15px;color:#86513c;" class="text_size_18">
+                                            <%=GetDesc()%>
+                                        </div>
+                                    </pe:if>
+                                    <div style="position:relative;margin-left:16px;margin-top:43px;font-size:14px;color:#000000;">
+                                        <%= GetDesc2() %>
+                                    </div>
+                                    <pe:container alignment="_rt" style="margin-right:20px;margin-top:30px;background:url();">
+                                        <input type="button" value="" onclick="OnOpenVipCode" style="width:71px;height:16px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/active_code_btn_32bits.png#0 0 71 16)" />
+                                    </pe:container>
+            
+                                    <pe:container alignment="_rt" style="background-color: #aa2f2f00;width: 680px; height:400px;margin-right: 5px;margin-top: 45px;">
+                                        <img style="margin-left:160px;margin-top:80px;width:370px;height: 38px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/lixianmoshi_370x38_32bits.png#0 0 370 38" />
+                                        <img style="margin-left:207px;margin-top:40px;width: 276px;height: 149px;" src="Texture/Aries/Creator/keepwork/Certification/RealName/wangluolianjie_276149_32bits.png#0 0 276 149" />
+                                        <div style="float: left; width: 200px;height: 44px;margin-left: 247px;margin-top: 30px;">
+                                            <input type="button" style="position: relative;width: 195px;height: 36px;" class="theme1_myhome_blue_bt" value="登录" onclick="OnLogin"/>
+                                        </div>
+                                    </pe:container>
+            
+                                    <div style="position:absolute;margin-left:16px;margin-top:455px;">
+                                        <div style="float:left;color:#000000;" class="text_size_18">
+                                            成为VIP会员，可享受帕拉卡的所有尊贵服务。
+                                        </div>
+                                        <div style="float:left;margin-left:0px;margin-top:2px;">
+                                            <input type="button" value="了解更多..." onclick="OpenParentsPage()" style="color:#955a42;font-size:18px;font-weight:bold;background:url();" />
+                                        </div>
+                                    </div>
+                                </pe:container>
+                            </pe:if>
+                            <!-- 非离线模式 -->
+                            <pe:if condition='<%= not IsOfflineMode() %>'>
+                                <!--需要实名认证-->
+                                <pe:if condition='<%= need_certificate() %>'>
+                                    <pe:container alignment="_ct"
+                                                  style="margin-left: -345px;
+                                                         margin-top: -265px;
+                                                         width: 690px;
+                                                         height: 530px;
+                                                         background: url();">
+                                        <pe:if condition="<%= not HasDesc()%>" >
+                                            <div style="position: relative;
+                                                        margin-left: 16px;
+                                                        margin-top: 15px;
+                                                        color: #000000;"
+                                                 class="text_size_18">
+                                                <%= GetVipStateDesc() %>
+                                            </div>
+                                        </pe:if>
+                                        <pe:if condition="<%= HasDesc() %>" >
+                                            <div style="position: relative;
+                                                        margin-left: 16px;
+                                                        margin-top: 15px;
+                                                        color: #000000;"
+                                                 class="text_size_18">
+                                                <%= L"成为VIP会员可以使用该功能" %>
+                                            </div>
+                                            <div style="position: relative;
+                                                        margin-left: 267px;
+                                                        margin-top: 15px;
+                                                        color: #86513c;"
+                                                 class="text_size_18">
+                                                <%= GetDesc() %>
+                                            </div>
+                                        </pe:if>
+                                        <div style="position: relative;
+                                                    margin-left: 16px;
+                                                    margin-top: 43px;
+                                                    font-size: 14px;
+                                                    color: #000000;">
+                                            <%= GetDesc2() %>
+                                        </div>
+                                        <pe:container alignment="_rt"
+                                                      style="margin-right: 20px;
+                                                             margin-top: 30px;
+                                                             background: url();">
+                                            <input type="button"
+                                                   value=""
+                                                   onclick="OnOpenVipCode"
+                                                   style="width: 71px;
+                                                          height: 16px;
+                                                          background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/active_code_btn_32bits.png#0 0 71 16)" />
+                                        </pe:container>
+                                        <div style="position: relative;
+                                                    margin-left: 0px;
+                                                    margin-top: 75px;
+                                                    width: 686px;
+                                                    height: 365px;
+                                                    background: url(Texture/Aries/Creator/keepwork/Certification/RealName/huisebeijing_24x24_32bits.png#0 0 24 24:8 8 8 8);">
+                                            <div align="center"
+                                                 style="width: 452px;">
+                                                <img style="margin-top: 11px;
+                                                            width: 452px;
+                                                            height: 29px;"
+                                                     src="Texture/Aries/Creator/keepwork/Certification/diyibu_452x29_32bits.png#0 0 452 29" />
+                                            </div>
+                                            <div align='center'
+                                                 style='width: 525px;
+                                                        height: 40px;
+                                                        padding-top: 8px;
+                                                        text-align: center;'>
+                                                <%= L'输入家长手机号发送认证短信，并提醒家长点击认证链接，即可完成实名认证。' %>
+                                            </div>
+                                            <pe:container width="660"
+                                                          height="140"
+                                                          style="margin-top: 10px;
+                                                                 background-color: #00000000;">
+                                                <div style="font-size: 18px;
+                                                            base-font-size: 18px;
+                                                            margin-left: 100px;
+                                                            margin-top: 0px;">
+                                                    <img style="width: 68px;
+                                                                height: 19px;
+                                                                margin-left: 0px;
+                                                                margin-top: 12px;"
+                                                         src="Texture/Aries/Creator/keepwork/Certification/RealName/shoujihao_85x25_32bits.png#0 0 85 25" />
+                                                    <img style="width: 364px;
+                                                                height: 40px;
+                                                                margin-left: 15px;
+                                                                margin-top: 0px;"
+                                                         src="Texture/Aries/Creator/keepwork/Certification/RealName/shurukuang_32x32_32bits.png#0 0 32 32:8 8 8 8"/>
+                                                    <input type="text"
+                                                           style="width: 352px;
+                                                                  height: 30px;
+                                                                  color:#333333;
+                                                                  font-size: 18px;
+                                                                  margin-left: -356px;
+                                                                  margin-top: 5px;
+                                                                  background:url();"
+                                                           class=""
+                                                           onfocusin="ClearNumberErrorTip"
+                                                           name="phonenumber" />
+                                                </div>
+                                                <!-- 下一步 -->
+                                                <div style="margin-left: 185px;margin-top: 16px;">
+                                                    <input type="button" 
+                                                           name="send_button"
+                                                           class="theme1_myhome_blue_bt"
+                                                           style="font-size: 20px;
+                                                                  base-font-size: 20px;"
+                                                           value="<%= L'发送短信' %>"
+                                                           onclick="send()" />
+                                                    <div style="float: left;
+                                                                font-size: 16px;
+                                                                margin-left: 36px;
+                                                                margin-top: 6px;">
+                                                        <div style="font-weight: bold;">
+                                                            <%= L'我要回家安装' %>
+                                                        </div>
+                                                        <div style='float: left;
+                                                                    margin-left: 15px;
+                                                                    margin-top: 5px;
+                                                                    font-weight: bold;
+                                                                    color: #1ca3d7;
+                                                                    margin-top: 0px;'
+                                                             onclick='home_install'>
+                                                            <%= L'点击这里' %>
+                                                            <div style='height: 1px;
+                                                                        width: 68px;
+                                                                        margin-top: 3px;
+                                                                        background-color: #09abe7'></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </pe:container>
+                                            <div align='center'
+                                                 style='width: 294px;
+                                                        height: 130.2px;'>
+                                                <img style='width: 294px;
+                                                            height: 130.2px;'
+                                                    src='Texture/Aries/Creator/paracraft/jiangli_436x186_32bits.png#0 0 420 186' />
+                                            </div>
+                                        </div>
+                                        <div style="position:absolute;margin-left:16px;margin-top:455px;">
+                                            <div style="float:left;color:#000000;" class="text_size_18">
+                                                成为VIP会员，可享受帕拉卡的所有尊贵服务。
+                                            </div>
+                                            <div style="float:left;margin-left:0px;margin-top:2px;">
+                                                <input type="button" value="了解更多..." onclick="OpenParentsPage()" style="color:#955a42;font-size:18px;font-weight:bold;background:url();" />
+                                            </div>
+                                        </div>
+                                    </pe:container>
+                                </pe:if>
+                                <!-- 不需要实名认证 -->
+                                <pe:if condition = '<%= not need_certificate()%>'>
+                                    <div style="min-width: 1280px;
+                                                min-height: 663px;">
+                                        <pe:gridview name="vip_full_page_gridview"
+                                                     uiname="vip_full_page_gridview.gridview"
+                                                     RememberScrollPos="true"
+                                                     CellPadding="0"
+                                                     AllowPaging="false"
+                                                     ItemsPerLine="1"
+                                                     DefaultNodeHeight="1950"
+                                                     DataSource='<%= GridDs %>' >
+                                            <Columns>
+                                                <div style="width:1160px;
+                                                            height:1950px">
+                                                    <div style="height: 150px;">
+                                                        <pe:container alignment="_rt"
+                                                                      style="margin-right: 90px;
+                                                                             margin-top: 33px;
+                                                                             background: url();">
+                                                            <input type="button"
+                                                                   value=""
+                                                                   onclick="OnOpenVipCode"
+                                                                   style="width: 121px;
+                                                                          height: 27px;
+                                                                          background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/jihuoma_121x27_32bits.png#0 0 121 27)" />
+                                                        </pe:container>
+                                                        <pe:if condition="<%=not HasDesc()%>" >
+                                                            <div style="margin-left: 33px;
+                                                                        margin-top: 30px;
+                                                                        color: #000000;"
+                                                                        class="text_size_26">
+                                                                <%= GetVipStateDesc() %>
+                                                            </div>
+                                                        </pe:if>
+                                                        <pe:if condition="<%= HasDesc() %>" >
+                                                            <div>
+                                                                <div style="float: left;
+                                                                            margin-left: 33px;
+                                                                            margin-top: 30px;
+                                                                            color: #000000;"
+                                                                     class="text_size_26">
+                                                                    <%= L"成为VIP会员可以使用该功能" %>
+                                                                </div>
+                                                                <div style="float: left;
+                                                                            margin-left: 10px;
+                                                                            margin-top: 30px;
+                                                                            color: #86513c;"
+                                                                     class="text_size_26">
+                                                                    <%= GetDesc() %>
+                                                                </div>
+                                                            </div>
+                                                        </pe:if>
+                                                        <div style="margin-left: 33px;
+                                                                    margin-top: 4px;
+                                                                    font-size: 26px;
+                                                                    base-font-size: 26px;
+                                                                    color: #000000;">
+                                                            <%= GetDesc2() %>
+                                                        </div>
+                                                    </div>
+                                                    <div style="margin-left: 179px;
+                                                                width: 917px;
+                                                                height: 1201px;
+                                                                background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/huiyuanbiao_917x1201_32bits.png#0 0 917 1201)"></div>
+                                                    <div style="margin-left: 179px;
+                                                                width: 917px;
+                                                                text-align: center;
+                                                                margin-top: 33px;"
+                                                         class="text_size_32">
+                                                        <%= L"立即成为帕拉卡会员" %>
+                                                    </div>
+                                                    <div style="margin-top: 23px;">                           
+                                                        <!--twelve_month_vip-->
+                                                        <div style="float: left;
+                                                                    width: 378px;
+                                                                    height: 244px;
+                                                                    margin-left: 208px;">
+                                                            <div style="float: left;
+                                                                        width: 179px;
+                                                                        height:244px;">
+                                                                <input zorder="10"
+                                                                       name="twelve_month_vip"
+                                                                       onclick="OnSelected"
+                                                                       type="button"
+                                                                       value=""
+                                                                       style="position: relative;
+                                                                              margin-left: 0px;
+                                                                              margin-top: 0px;
+                                                                              width: 179px;
+                                                                              height: 244px;
+                                                                              background:;" />
+                                                                <pe:if condition='<%= IsSelected("twelve_month_vip") %>'>
+                                                                    <div style="position: relative;
+                                                                                margin-left: 0px;
+                                                                                margin-top: 0px;
+                                                                                width: 179px;
+                                                                                height: 244px;
+                                                                                background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/xuanzhong_179x244_32bits.png#0 0 179 244)">
+                                                                    </div>
+                                                                </pe:if>
+                                                                <pe:if condition='<%= not IsSelected("twelve_month_vip")%>'>
+                                                                    <div style="position: relative;
+                                                                                margin-left: 0px;
+                                                                                margin-top: 0px;
+                                                                                width: 179px;
+                                                                                height: 244px;
+                                                                                background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/weixuanzhong_179x244_32bits.png#0 0 179 244)">
+                                                                    </div>
+                                                                </pe:if>
+                                                                <div style="width: 179px;
+                                                                            margin-left: 0px;
+                                                                            margin-top: 40px;
+                                                                            color: #b7795e;
+                                                                            text-align: center;"
+                                                                     class="text_size_32">
+                                                                    <%= L"1年" %>
+                                                                </div>
+                                                                <div style="width: 179px;
+                                                                            margin-left: 0px;
+                                                                            margin-top: 16px;
+                                                                            color: #b7795e;
+                                                                            text-align: center;"
+                                                                     class="text_size_40">
+                                                                    <%= L"880元" %>
+                                                                </div>
+                                                                <div style="width: 179px;
+                                                                            margin-top: 20px;
+                                                                            color: #b7795e;
+                                                                            text-align: center;
+                                                                            font-size: 24px;
+                                                                            base-font-size: 24px;">
+                                                                    <%= L"73元/月" %>
+                                                                </div>
+                                                            </div>
+                                                            <div style="float: left;
+                                                                        width: 179px;
+                                                                        height: 244px;
+                                                                        margin-left: 15px;">
+                                                                <input zorder="10"
+                                                                       name="six_month_vip"
+                                                                       onclick="OnSelected"
+                                                                       type="button"
+                                                                       value=""
+                                                                       style="position: relative;
+                                                                              margin-left: 0px;
+                                                                              margin-top: 0px;
+                                                                              width: 179px;
+                                                                              height: 244px;
+                                                                              background:;" />
+                                                                <pe:if condition='<%= IsSelected("six_month_vip") %>'>
+                                                                    <div style="position: relative;
+                                                                                margin-left: 0px;
+                                                                                margin-top: 0px;
+                                                                                width: 179px;
+                                                                                height: 244px;
+                                                                                background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/xuanzhong_179x244_32bits.png#0 0 179 244)">
+                                                                    </div>
+                                                                </pe:if>
+                                                                <pe:if condition='<%=not IsSelected("six_month_vip") %>'>
+                                                                    <div style="position: relative;
+                                                                                margin-left: 0px;
+                                                                                margin-top: 0px;
+                                                                                width: 179px;
+                                                                                height: 244px;
+                                                                                background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/weixuanzhong_179x244_32bits.png#0 0 179 244)">
+                                                                    </div>
+                                                                </pe:if>
+                                                                <div style="width: 179px;
+                                                                            margin-left: 0px;
+                                                                            margin-top: 40px;
+                                                                            color: #b7795e;
+                                                                            text-align: center;"
+                                                                     class="text_size_32">
+                                                                    <%= L"6个月" %>
+                                                                </div>
+                                                                <div style="width: 179px;
+                                                                            margin-left: 0px;
+                                                                            margin-top: 16px;
+                                                                            color: #b7795e;
+                                                                            text-align: center;"
+                                                                     class="text_size_40">
+                                                                    <%= L"498元" %>
+                                                                </div>
+                                                                <div style="width: 179px;
+                                                                            margin-top: 20px;
+                                                                            color: #b7795e;
+                                                                            text-align: center;
+                                                                            font-size: 24px;">
+                                                                    <%= L"83元/月" %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div style="width: 474px;
+                                                                    height: 244px;
+                                                                    margin-left: 10px;
+                                                                    float: left;
+                                                                    background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/weixuanzhong_179x244_32bits.png#0 0 179 244:50 50 50 50)">
+                                                            <div style="float: left;
+                                                                        width: 260px;">
+                                                                <div style="margin-top: 32px;
+                                                                            color: #845c53;
+                                                                            text-align: center;"
+                                                                     class="text_size_40">
+                                                                    <%= GetPrice() %>
+                                                                </div>
+                                                                <div style="margin-left: 0px;
+                                                                            margin-top: 10px;
+                                                                            color: #d28f75;
+                                                                            text-align: center;"
+                                                                     class="text_size_24">
+                                                                    <%= GetPriceDesc() %>
+                                                                </div>
+                                                                <div style="margin-left: 0px;
+                                                                            margin-top: 10px;
+                                                                            color: #666666;
+                                                                            text-align: center;
+                                                                            font-size: 14px;">
+                                                                    <%= L"支持微信、支付宝" %>
+                                                                </div>
+                                                                <div style="margin-left: 0px;
+                                                                            margin-top: 14px">
+                                                                    <div style="width: 42px;
+                                                                                height: 42px;
+                                                                                margin-left: 74px;
+                                                                                float: left;
+                                                                                background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/weixin_42x42_32bits.png#0 0 42 42)">
+                                                                    </div>
+                                                                    <div style="width: 42px;
+                                                                                height: 42px;
+                                                                                margin-left: 28px;
+                                                                                float: left;
+                                                                                background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/zhifubao_42x42_32bits.png#0 0 42 42)">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div style="float: left;
+                                                                        margin-left: -14px;
+                                                                        margin-top: 31px;
+                                                                        width: 190px;
+                                                                        height: 190px;">
+                                                                <img src='<%= GetQR() %>'
+                                                                     style="position: relative;
+                                                                            margin-left: 0px;
+                                                                            margin-top: 0px;
+                                                                            width: 190px;
+                                                                            height: 190px;" />       
+                                                            </div>
+                                                        </div>
+                                                        <div style="margin-left: 179px;
+                                                                    width: 917px;
+                                                                    text-align: center;
+                                                                    margin-top: 28px;"
+                                                             class="text_size_32">
+                                                            <%= L"更多3D动画编程课程学习" %>
+                                                        </div>
+                                                        <div style="margin-left: 179px;
+                                                                    width: 917px;
+                                                                    margin-top: 12px;
+                                                                    font-size: 24px;
+                                                                    base-font-size: 24px;">
+                                                            <%= L"如果您的孩子想要学习更多帕拉卡3D动画编程课程内容请与您所在地的帕拉卡3D动画编程授权合作学校及校外培训机构联系，查找所在地授权合作学校及校外教培机构老师联系方式，请联系童老师：13058184926（微信同号）。" %>
+                                                        </div>
+                                                        <input type="button"
+                                                               value=""
+                                                               onclick="OnOpenVipQuestionPage"
+                                                               style="margin-left: 177px;
+                                                                      margin-top: 15px;
+                                                                      width: 100px;
+                                                                      height: 27px;
+                                                                      background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/changjianwenti_97x27_32bits.png#0 0 100 27)" />
+                                                    </div>
+                                                </div>
+                                            </Columns>
+                                        </pe:gridview>                
+                                    </div>
+                                </pe:if>
+                            </pe:if>
+                    </pe:if>
+                </pe:if>
+            </pe:if>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>
+

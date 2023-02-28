@@ -1,0 +1,57 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Mobile/ExportTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+    <style type="text/mcss">
+        {
+            gridview_bg = {
+                background = "Texture/Aries/Creator/keepwork/Mobile/common/neirondi_32x32_32bits.png#0 0 32 32:8 8 8 8",
+            },
+        }
+    </style>
+<script refresh="true" type="text/npl" src="ExportTask.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+Export = commonlib.gettable("MyCompany.Aries.Game.Tasks.Export")
+Export.OnInit();
+function OnClose()
+    Page:CloseWindow();
+end
+
+function GetBgStyle(id)
+    local view_height = id == "template" and 120 or 88
+    return string.format([[margin-left:25px;margin-bottom:14px;width:957px;height:%spx;]], view_height)
+end
+]]></script>
+<mb:window width = "1072" height = "680" title = '<%=L"导出"%>' bg_color = "black" onclose = "OnClose">
+    <div style="width:1040px;height:478px;margin-left:16px;margin-top:96px;background:url(Texture/Aries/Creator/keepwork/Mobile/common/meibaibian_32x32_32bits.png#0 0 32 32:8 8 8 8)">
+        <div style="width:1040px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/common/youbaibian_32x32_32bits.png#0 0 32 32:8 8 8 8)">
+            <div style="margin-top:16px;color:#ffffff;font-size:24px;text-align: center">
+                <%=L"请选择你希望导出的文件类型"%>
+            </div>
+        </div>
+        <div style="height: 16px;"/>
+        <pe:treeview style="background:;height:398px;" ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="false" DefaultIndentation="0" VerticalScrollBarOffsetX="26" VerticalScrollBarStep = "120">
+            <pe:repeat DataSource="<%=Export.GetExporterDB()%>">
+                <pe:repeatitem>
+                    <div name='<%=Eval("id")%>' uiname='<%="ExportTask.OnClick_"..Eval("id")%>' onclick="Export.OnSelectExporter" style ="<%=GetBgStyle(Eval('id'))%>" class="gridview_bg">
+                        <pe:container zorder="1" style="background:;margin:15px;" enabled="false">
+                            <div style="font-size:20px;color:#ffffff;font-weight;:bold"><%=Eval("title")%></div>
+                            <div style="font-size:20px;color:#ffffffcc;margin-top:4px;"><%=Eval("desc") or ""%></div>
+                        </pe:container>
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>
+        </pe:treeview>
+        <div style="margin:20px;">
+            <input type="button" align="right" uiname="ExportTask.Cancel" name="cancel" value='<%=L"取消"%>' onclick="OnClose" style="color:#1a1a1a;font-size:28px;min-width:160px;height:60px;margin-left:0px;background: url(Texture/Aries/Creator/keepwork/Mobile/SystemsSetting/btn_close_160x64_32bits.png#0 0 160 64);" />
+        </div>
+    </div>
+</mb:window>
+</pe:mcml> 
+</body>
+</html>

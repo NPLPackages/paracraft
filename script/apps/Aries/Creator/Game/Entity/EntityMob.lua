@@ -216,19 +216,6 @@ function Entity:SetCanRandomMove(bCanRandomMove)
 	self.can_random_move = bCanRandomMove;
 end
 
--- @param filename: can be relative to current world.
-function Entity:SetModelFile(filename)
-	if(self.model_filename ~= filename) then
-		self.model_filename = filename;
-		filename = Files.GetWorldFilePath(filename);
-		self:SetMainAssetPath(filename);
-	end
-end
-
-function Entity:GetModelFile()
-	return self.model_filename;
-end
-
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 
@@ -348,6 +335,11 @@ function Entity:SetScaling(v)
 			dataWatcher:SetField(self.dataFieldScale, v);
 		end
 	end
+end
+
+-- whether it can be searched via Ctrl+F FindBlockTask
+function Entity:IsSearchable()
+	return true
 end
 
 -- called every frame

@@ -46,6 +46,9 @@ Commands["save"] = {
 						if result then
 							GameLogic.QuickSave();
 						else
+							if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip')==true then
+								return
+							end
 							_guihelper.MessageBox(L'操作被禁止了，免费用户最多只能拥有家园+1个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。')
 						end
 					end,
@@ -65,7 +68,7 @@ Commands["save"] = {
 
 Commands["autosave"] = {
 	name="autosave", 
-	quick_ref="/autosave [on|off] [mins]", 
+	quick_ref="/autosave [-checkModified] [on|off] [mins]", 
 	desc=[[automatically save the world every few mins. 
 @param interval: how many minutes to auto save the world. 
 e.g.
@@ -73,11 +76,17 @@ e.g.
 /autosave on     :enable auto save
 /autosave off    :disable autosave
 /autosave on 10  :enable auto save every 10 minutes
+/autosave -checkModified on :enable auto save with world modified
+/autosave -checkModified on 10:enable auto save with world modified every 10 minutes
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldRevision.lua");
 		local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision");
-		local interval, bEnabled;
+		local interval, bEnabled,options;
+		options,cmd_text = CmdParser.ParseOptions(cmd_text);
+		if options and options.checkModified then
+			GameLogic.CreateGetAutoSaver():SetCheckModified(options.checkModified)
+		end
 		bEnabled, cmd_text = CmdParser.ParseBool(cmd_text);
 		if(bEnabled == false) then
 			GameLogic.CreateGetAutoSaver():SetTipMode();
@@ -130,7 +139,8 @@ e.g.
 	end,
 };
 
-
+-- @param -fork [pid] [newWorldName]: fork a project id and save to a new local world.
+-- /loadworld -s -fork 530 new_world_name
 Commands["loadworld"] = {
 	name="loadworld", 
 	quick_ref="/loadworld [-i|e|force|personal|d] [worldname|url|filepath|projectId|home|back]", 
@@ -144,7 +154,6 @@ Commands["loadworld"] = {
 @param -auto|-force: it will check local world revision with remote world, and download ONLY-if remote world is newer. 
 @param -inplace: if the entered world is equal to the current world, the subsequent /sendevent command will be executed directly. otherwise, the command will be executed after entering the world. For security reasons, only event that begins with "global" can be sent
 @param -personal: login required. always sync online world to local folder, then enter.
-@param -fork [pid] [newWorldName]: fork a project id and save to a new local world.
 e.g.
 /loadworld 530
 /loadworld https://github.com/xxx/xxx.zip
@@ -155,7 +164,6 @@ e.g.
 /loadworld home
 /loadworld back
 /loadworld -s -inplace 530 | /sendevent globalSetPos  {x, y, z}
-/loadworld -s -fork 530 new_world_name
 /loadworld -d 530
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
@@ -687,7 +695,23 @@ Commands["loadregionex"] = {
 		if(world_name and x and y) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/World/ExternalRegion.lua");
 			local ExternalRegion = commonlib.gettable("MyCompany.Aries.Game.World.ExternalRegion");
-			local worldpath = ParaIO.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(world_name);
+
+			local worldpath;
+
+			if (GameLogic.GetFilters():apply_filters('is_signed_in')) then
+				worldpath =
+					GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path') ..
+					"/" ..
+					commonlib.Encoding.Utf8ToDefault(world_name) ..
+					"/";
+
+				if not ParaIO.DoesFileExist(worldpath) then
+					worldpath = "worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(world_name);
+				end
+			else
+				worldpath = "worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(world_name);
+			end
+
 			local region = ExternalRegion:new():Init(worldpath, x, y);
 			region:Load();
 		end
@@ -710,9 +734,135 @@ Commands["saveregionex"] = {
 		if(world_name and x and y) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/World/ExternalRegion.lua");
 			local ExternalRegion = commonlib.gettable("MyCompany.Aries.Game.World.ExternalRegion");
-			local worldpath = ParaIO.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(world_name);
+
+			local worldpath;
+
+			if (GameLogic.GetFilters():apply_filters('is_signed_in')) then
+				worldpath =
+					GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path') ..
+					"/" ..
+					commonlib.Encoding.Utf8ToDefault(world_name) ..
+					"/";
+
+				if not ParaIO.DoesFileExist(worldpath) then
+					worldpath = "worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(world_name);
+				end
+			else
+				worldpath = "worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(world_name);
+			end
+
 			local region = ExternalRegion:new():Init(worldpath, x, y);
 			region:Save();
 		end
+	end,
+};
+
+Commands["loadlevel"] = {
+	name="loadlevel", 
+	quick_ref="/loadlevel [levelname] [-callback  OnLoadLevel]", 
+	desc=[[load the game level from "levelname",returns true if the load succeeds
+@param -callback the callback after loading the game level
+/loadlevel level1 -callback  OnLoadLevel
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local level_name;
+		level_name, cmd_text = CmdParser.ParseFilename(cmd_text);
+		level_name = level_name or "lastsave"
+
+		local LevelManager = NPL.load("(gl)script/apps/Aries/Creator/Game/World/LevelManager.lua");
+		local result = LevelManager.Load(level_name)
+
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+		if options.callback then
+			commonlib.TimerManager.SetTimeout(function()  
+				GameLogic.RunCommand(string.format("/sendevent %s", cmd_text));
+			end, 100);
+		end
+
+		return result
+	end,
+};
+
+Commands["savelevel"] = {
+	name="savelevel", 
+	quick_ref="/savelevel [levelname] [-region x y] [-exclude_region x y][-with camera|time|sky|bag|pos|] [-check]", 
+	desc=[[save game level to "levelname".
+@param -region: save all blocks in region(x,y) of current world, if not, save the entire region.
+@param -exclude_region: regions to ignore when saving all regions
+@param -with: decide which elements to save,if not,save all elements.(bag,pos,camera,time,sky)
+@param -check: check that the level exists
+/savelevel level1 -check
+/savelevel level1 -region 37 37
+/savelevel level1 -exclude_region 37 37
+/savelevel level1 -region 37 37 -with camera|time|sky|bag|pos|
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local level_name, cmd_text = CmdParser.ParseFilename(cmd_text);
+		level_name = level_name or "lastsave"
+		-- 处理参数
+		local options_cmd_text = commonlib.split(cmd_text,"-")
+		local options = {}
+		if #options_cmd_text > 0 then
+			local cmd_text = options_cmd_text[index]
+			for index = 1, #options_cmd_text do
+				local cmd_text = "-" .. options_cmd_text[index]
+				local option;
+				option, cmd_text = CmdParser.ParseOption(cmd_text, true);
+				if option then
+					options[option] = {}
+					if option == "region" or option == "exclude_region" then
+						options[option].x = CmdParser.ParseInt(cmd_text)
+						options[option].y = CmdParser.ParseInt(cmd_text)
+					elseif option == "with" then
+						options[option] = commonlib.split(cmd_text,"|")
+						-- CmdParser.ParseStringList(cmd_text, options[option])
+					end	
+				end
+			end
+		end
+
+		local LevelManager = NPL.load("(gl)script/apps/Aries/Creator/Game/World/LevelManager.lua");
+		LevelManager.Save(level_name, options)
+	end,
+};
+
+Commands["getlevels"] = {
+	name="getlevels", 
+	quick_ref="/getlevels", 
+	desc=[[get all levelNames 
+/getlevels
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local LevelManager = NPL.load("(gl)script/apps/Aries/Creator/Game/World/LevelManager.lua");
+		local levels = LevelManager.GetLevels()
+		local str = ""
+		for index = 1, #levels do
+			local name = levels[index]
+			str = str .. name .. ";"
+		end
+
+		return str
+	end,
+};
+
+Commands["setloginworld"] = {
+	name="setloginworld", 
+	quick_ref="/setloginworld [projectID]", 
+	desc=[[Set up a parent world. Users can then explore and create new worlds, but after all worlds exit, need to return to the parent world
+@param self: Indicates the current world id
+@param project_id: The parent id
+/setloginworld [project_id | self | ]
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local param1;
+		param1, cmd_text = CmdParser.ParseFilename(cmd_text);
+		if param1 == "self" then
+			param1 = GameLogic.options:GetProjectId()
+		end
+
+		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+		WorldCommon.SetParentProjectId(param1)
 	end,
 };

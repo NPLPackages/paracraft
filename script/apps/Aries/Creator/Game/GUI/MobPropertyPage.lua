@@ -39,9 +39,8 @@ function MobPropertyPage.OnInit()
 	
 	local params = entity:GetPortaitObjectParams(true);
 
-	if(entity.GetModelFile) then
-		params.AssetFile = entity:GetModelFile() or params.AssetFile;
-	end
+	params.AssetFile = entity:GetModelFile() or params.AssetFile;
+	
 	-- change character name directly. 
 	page:SetNodeValue("name", entity:GetDisplayName() or "");
 	page:SetNodeValue("showHeadonName", entity:IsShowHeadOnDisplay());
@@ -181,6 +180,16 @@ function MobPropertyPage.GetAssetFileDS()
 	return asset_file_ds;
 end
 
+function MobPropertyPage.OnSelectItem(name)
+	local assetfile = page:GetValue("assetfile")
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+	local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
+	local skin = CustomCharItems:GetSkinByAsset(assetfile)
+	if skin then
+		MobPropertyPage.skin = skin
+	end
+	MobPropertyPage.UpdateAssetFile(nil, nil, assetfile, skin);
+end
 
 function MobPropertyPage.OnChangeAssetFile(skin)
 	MobPropertyPage.UpdateAssetFile(nil, nil, page:GetValue("assetfile"), skin);
@@ -198,13 +207,10 @@ function MobPropertyPage.UpdateAssetFile(entity, obj, assetfile, skin)
 		if(assetfile) then
 			assetfile = assetfile:gsub("^%s+",""):gsub("%s+$","");
 		end
-		local old_filename = assetfile;
+		local filenameUtf8 = assetfile;
+		entity:SetModelFile(filenameUtf8);
 		assetfile = EntityManager.PlayerAssetFile:GetValidAssetByString(commonlib.Encoding.Utf8ToDefault(assetfile));
-		if(entity.SetModelFile) then
-			entity:SetModelFile(commonlib.Encoding.Utf8ToDefault(old_filename));
-		else
-			entity:SetMainAssetPath(assetfile);
-		end
+		
 			
 		if (PlayerAssetFile:HasCustomGeosets(assetfile) and skin) then
 			entity:SetSkin(skin);
@@ -286,10 +292,17 @@ function MobPropertyPage.OnOpenAssetFile()
 
 				-- set default skin
 				local skin = CustomCharItems:ChangeSkinStringToItems(CustomCharItems.defaultSkinString)
+				MobPropertyPage.skin = skin
 				MobPropertyPage.OnChangeAssetFile(skin);
 			elseif(filepath) then
 				page:SetValue("assetfile", commonlib.Encoding.DefaultToUtf8(filename));
-				MobPropertyPage.OnChangeAssetFile();
+				local skin = CustomCharItems:GetSkinByAsset(filename)
+				if skin then
+					MobPropertyPage.OnChangeAssetFile(skin);
+					MobPropertyPage.skin = skin
+				else
+					MobPropertyPage.OnChangeAssetFile();
+				end
 			end
 		end
 	end, commonlib.Encoding.Utf8ToDefault(lastFilename), L"选择模型文件", "model");

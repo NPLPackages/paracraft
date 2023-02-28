@@ -16,6 +16,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/World/generators/ParaWorldMiniChunk
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.world.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldRevision.lua");
+local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision");
 local BackgroundMusic = commonlib.gettable("MyCompany.Aries.Game.Sound.BackgroundMusic");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local CreateRewardManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/CreateRewardManager.lua") 
@@ -62,17 +64,27 @@ end
 
 function World2In1.Init()
 	World2In1.SetIsWorld2In1(true)
-
+	World2In1.is_dirctly_to_create = nil
 	-- 绑定上传世界完成事件
 	GameLogic.GetFilters():add_filter("SyncWorldFinish", World2In1.OnSyncWorldFinish);
 end
 
-function World2In1.ShowPage(offset, reload)
+function World2In1.IsShow()
+	return page and page:IsVisible()
+end
+
+function World2In1.ShowPage(offset, reload, is_teacher_page)
 	offset = offset or 0;
 
+	local url = "script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.html"
+	local width = 370
+	if is_teacher_page then
+		url = "script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1TeacherPage.html"
+		width = 420
+	end
 	World2In1.Init()
 	local params = {
-		url = "script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.html",
+		url = url,
 		name = "World2In1.ShowPage", 
 		isShowTitleBar = false,
 		DestroyOnClose = true,
@@ -82,9 +94,9 @@ function World2In1.ShowPage(offset, reload)
 		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 		directPosition = true,
 		align = "_rt",
-		x = -370 - offset,
+		x = -width - offset,
 		y = 0,
-		width = 370,
+		width = width,
 		zorder = -13,
 		height = 260,		
 	};
@@ -100,7 +112,12 @@ function World2In1.ShowPage(offset, reload)
 		
 	end
 	hidePage = false;
-	World2In1.OnMouseChangeEx()
+
+	World2In1.is_teacher_page = is_teacher_page
+	if not is_teacher_page then
+		World2In1.OnMouseChangeEx()
+	end
+	
 	-- commonlib.TimerManager.SetTimeout(function()  
 	-- 	World2In1.OnMouseChangeEx()
 	-- end, 500);
@@ -119,7 +136,13 @@ function World2In1.OnMouseChangeEx()
 		for i = 1,#name_list do
 			local name = name_list[i]
 			local img_Bg = page:GetNode(name);  
+			if not img_Bg then
+				return
+			end
 			local img_BgObj = ParaUI.GetUIObject(img_Bg.uiobject_id)
+			if not img_BgObj then
+				return
+			end
 			
 			img_BgObj:SetScript("onmouseenter",function()
 				World2In1.ShowImageSel(true)
@@ -184,9 +207,9 @@ function World2In1:MoveLeft(event)
 		page:CloseWindow();
 	end
 	if (event.bShow) then
-		World2In1.ShowPage(event.width, true);
+		World2In1.ShowPage(event.width, true, World2In1.is_teacher_page);
 	else
-		World2In1.ShowPage(0, true);
+		World2In1.ShowPage(0, true, World2In1.is_teacher_page);
 	end
 end
 
@@ -209,6 +232,7 @@ function World2In1.OnWorldUnload()
 	courcePosition = {18542,43,19197}
 	hidePage = false;
 	page_root = nil
+	World2In1.is_dirctly_to_create = nil
 	VideoSharingUpload.ChangeRegionType(nil)
 	World2In1.SetIsWorld2In1(false)
 	World2In1.CelarToolData()
@@ -256,7 +280,7 @@ function World2In1.BroadcastTypeChanged()
 	end
 	VideoSharingUpload.ChangeRegionType(currentType)
 	-- World2In1.UnLoadcurrentWorldList()
-	GameLogic.GetCodeGlobal():BroadcastTextEvent("changeRegionType")
+	GameLogic.GetCodeGlobal():BroadcastTextEvent("changeRegionType", {last_region_type = last_region_type})
 
 	if last_region_type == "creator" then
 		World2In1.ChangeSkyBox("")
@@ -710,7 +734,7 @@ function World2In1.GotoCreateRegion(pos)
 		World2In1.enter_create_region_cb = nil
 	end	
 
-	local path = World2In1.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(creatorWorldName)
+	local path = World2In1.GetLoadMiniWorldPath(creatorWorldName)
 	local tag_xml_data = World2In1.LoadWorldTageXml(path)      
 	if tag_xml_data and tag_xml_data.attr and tag_xml_data.attr.fromProjects then
 		local form_project_list = commonlib.split(tag_xml_data.attr.fromProjects,",") or {};
@@ -718,6 +742,7 @@ function World2In1.GotoCreateRegion(pos)
 		
 		if form_project_id and tonumber(form_project_id) then
 			local module_data = CreateModulPage.GetOneProjectData(tonumber(form_project_id))
+
 			if module_data and module_data.pos then
 				local default_pos = module_data.pos
 				GameLogic.RunCommand(format("/goto %d %d %d", default_pos[1], default_pos[2], default_pos[3]))
@@ -755,6 +780,14 @@ function World2In1.GotoCreateRegion(pos)
 		end
 	end})
 	lock_timer:Change(1000, 1000);
+
+	if page then
+		page:Refresh(0)
+	end
+end
+
+function World2In1.SetDirectlyToCreateRegion(flag)
+	World2In1.is_dirctly_to_create = flag
 end
 
 function World2In1.OnEnterCreatorRegion()	
@@ -770,7 +803,7 @@ function World2In1.OnEnterCreatorRegion()
 		[132939] = 1,
 		
 	}
-	if id_list[project_id] then
+	if id_list[project_id] or World2In1.is_dirctly_to_create then
 		GameLogic.RunCommand("/sendevent gotoCreate")
 		return 
 	end
@@ -781,7 +814,7 @@ function World2In1.ShowCreateReward(isCreateRegion)
 	if not page_root then
 		return 
 	end	
-	CreateRewardManager.ShowGiftBtn(page_root,isCreateRegion)
+	CreateRewardManager.ShowGiftBtn(page_root,isCreateRegion,50)
 end
 
 function World2In1.HideCreateReward()
@@ -845,7 +878,6 @@ function World2In1.OnSaveWorld()
 	if (creatorWorldName and creatorWorldName ~= "") then
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.macro.task", { from = "macrosave",  name = "clicksave",});
 		GameLogic.RunCommand(string.format("/saveregionex %s 37 37",creatorWorldName))   
-
 		if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
 			--GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.macro.task", { from = "macrosave",  name = "clicksave",});
 			local RealNameTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RealNameTip/RealNameTip.lua")
@@ -856,8 +888,18 @@ function World2In1.OnSaveWorld()
 		local blocks = ParaWorldMiniChunkGenerator:GetAllBlocks();
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 		local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
-		local filename = World2In1.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(creatorWorldName).."/miniworld.template.xml";
+		local worldDir= World2In1.GetLoadMiniWorldPath(creatorWorldName)
+		local filename = worldDir .. "/miniworld.template.xml";
 		
+		--增加世界版本号
+		local world_revision = WorldRevision:new():init(worldDir.."/");
+		world_revision:Checkout()
+		if(not world_revision:Commit()) then
+			world_revision:Backup();
+			world_revision:Commit(true);
+		elseif(world_revision:GetNonBackupTime() > GameLogic.autoBackupInterval) then
+			world_revision:Backup();
+		end
 		local x, y, z = ParaWorldMiniChunkGenerator:GetPivot();
 		local params = {};
 		params.pivot = string.format("%d,%d,%d", x, y, z)
@@ -873,33 +915,30 @@ function World2In1.OnSaveWorld()
 			exportReferencedFiles = true,
 			blocks = blocks})
 		task:Run();
-		
-		
-		World2In1.UpLoadWorld()
-		-- GameLogic.GetFilters():apply_filters("cellar.sync.sync_main.sync_to_data_source_by_world_name", creatorWorldName, function(res)
-		-- 	if (res) then
-		-- 	end
-		-- end);	
+		World2In1.UpLoadWorld(world_revision:GetRevision())
 	end
 end
 
-function World2In1.UpLoadWorld()
+function World2In1.UpLoadWorld(version)
 	local curProjectId = World2In1.GetProjectIdByWorldName(creatorWorldName)
 	if curProjectId <= 0 then
 		GameLogic.GetFilters():apply_filters("service.local_service_world.set_world_instance_by_foldername", creatorWorldName);	
 		local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
 		if world_data and world_data.kpProjectId then
+			GameLogic.GetFilters():apply_filters('store_set', "world/currentRevision",version or 1);
 			-- curProjectId = world_data.kpProjectId
 			GameLogic.GetFilters():apply_filters(
 			'service.sync_to_data_source.init',
 			function(result, option)
 				if option.method == 'UPDATE-PROGRESS-FINISH' then
 					GameLogic.AddBBS(nil,"上传创作区成功")
+					GameLogic.RunCommand("/sendevent on_sync_success")
 				end
 			end)
 			return
 		end
 	end
+	GameLogic.GetFilters():apply_filters('store_set', "world/currentRevision",version or 1);
 	GameLogic.GetFilters():apply_filters(
 		'service.keepwork_service_world.set_world_instance_by_pid',
 		tonumber(curProjectId),
@@ -909,18 +948,18 @@ function World2In1.UpLoadWorld()
 				function(result, option)
 					if option.method == 'UPDATE-PROGRESS-FINISH' then
 						GameLogic.AddBBS(nil,"上传创作区成功")
+						GameLogic.RunCommand("/sendevent on_sync_success")
 					end
 				end)
 		end
 	)
 end
 
-function World2In1.GetProjectIdByWorldName(worldName)
-	local worldName = worldName or creatorWorldName	
-	local targetFolder = World2In1.GetWritablePath().."worlds/DesignHouse/"..commonlib.Encoding.Utf8ToDefault(worldName).."/"
+function World2In1.GetProjectIdByWorldName(world_name)
+	world_name = world_name or creatorWorldName	
+	local targetFolder = World2In1.GetLoadMiniWorldPath(world_name) .. "/"
 	if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
 		local tag_xml_data = World2In1.LoadWorldTageXml(targetFolder) 
-		echo(tag_xml_data)
 		if tag_xml_data and tag_xml_data.attr and tag_xml_data.attr.kpProjectId then
 			return tonumber(tag_xml_data.attr.kpProjectId)
 		end 
@@ -1157,6 +1196,7 @@ end
 
 function World2In1.SetCurrentType(type)
 	last_region_type = currentType
+	
 	currentType = type;
 end
 
@@ -1165,6 +1205,7 @@ function World2In1.GetCurrentType()
 end
 
 function World2In1.LoadWorldTageXml(world_path)
+	world_path = commonlib.Encoding.Utf8ToDefault(world_path)
 	world_path = string.gsub(world_path, "[/\\]$", "");
 
 	local xmlRoot = ParaXML.LuaXML_ParseFile(world_path.."/tag.xml");
@@ -1407,25 +1448,24 @@ function World2In1.GetToolItems()
 end
 
 function World2In1.GetCreateWorldServerData(cb)
-    local world_data = Mod.WorldShare.Store:Get('world/currentWorld')
+    local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
 	if world_data == nil or world_data.kpProjectId == nil then
 		World2In1.create_world_server_data = nil
 		return
 	end
 
-	local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
-	KeepworkServiceProject:GetProject(world_data.kpProjectId, function(data, err)
-        if type(data) == 'table' then
+	GameLogic.GetFilters():apply_filters("service.keepwork_service_project.get_project",world_data.kpProjectId,function(data,err)
+		if type(data) == 'table' then
 			World2In1.create_world_server_data = data
 			if cb then
 				cb()
 			end
         end
-    end)
+	end);
 end
 
 function World2In1.OnSyncWorldFinish()
-    local world_data = Mod.WorldShare.Store:Get('world/currentWorld')
+    local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
 	if world_data == nil then
 		return
 	end
@@ -1639,4 +1679,37 @@ function World2In1.RunCode(item_data)
 
 	-- BlockEngine:SetBlock(19200,250,19200, 0);
 	-- BlockEngine:SetBlock(19200,250,19201, 0);
+end
+
+function World2In1.GetLoadMiniWorldPath(world_name)
+	local worldpath;
+
+	if (GameLogic.GetFilters():apply_filters('is_signed_in')) then
+		worldpath =
+			GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path') ..
+			"/" ..
+			commonlib.Encoding.Utf8ToDefault(world_name)
+
+		if not ParaIO.DoesFileExist(worldpath) then
+			worldpath = "worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(world_name);
+		end
+	else
+		worldpath = "worlds/DesignHouse/" .. commonlib.Encoding.Utf8ToDefault(world_name);
+	end
+	
+	local targetFolder = World2In1.GetWritablePath().. worldpath
+	return targetFolder
+end
+
+function World2In1.GetParaUiObject(uiname)
+	return ParaUI.GetUIObject(uiname)
+end
+
+function World2In1.ClickThemeBt()
+	GameLogic.GetCodeGlobal():BroadcastTextEvent("ShowThemePage")
+end
+
+function World2In1.OpenStudentsWork()
+	local Students2In1WorksPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/Students2In1WorksPage.lua");
+	Students2In1WorksPage.Show()
 end

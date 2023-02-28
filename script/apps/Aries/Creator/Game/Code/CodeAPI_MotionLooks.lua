@@ -29,8 +29,8 @@ local env_imp = commonlib.gettable("MyCompany.Aries.Game.Code.env_imp");
 -- @param duration: in seconds. if nil, it means forever
 -- @param bAbove3D: true to display above all 3d objects
 function env_imp:say(text, duration, bAbove3D)
-	if(duration) then
-		env_imp.say(self, text);
+	if(duration and (duration ~= -1)) then
+		env_imp.say(self, text, nil, bAbove3D);
 		env_imp.wait(self, duration);
 		env_imp.say(self, nil);
 	else
@@ -146,6 +146,9 @@ function env_imp:move(dx,dy,dz, duration)
 	local actor = self.actor;
 	if(actor) then
 		local x,y,z = actor:GetPosition();
+		if x==nil then
+			return
+		end
 		dx = (dx or 0)*BlockEngine.blocksize
 		dy = (dy or 0)*BlockEngine.blocksize
 		dz = (dz or 0)*BlockEngine.blocksize
@@ -300,7 +303,7 @@ function env_imp:moveForward(dist, duration)
 			local dx, dy, dz = Direction.GetOffsetBySide(dir);
 			env_imp.move(self, -dx*dist, -dy*dist, -dz*dist, duration);
 		else
-			local facing = actor:GetFacing()
+			local facing = actor:GetFacing() or 0
 			env_imp.move(self, math.cos(facing)*dist, 0, -math.sin(facing)*dist, duration);
 		end
 	end
@@ -960,7 +963,7 @@ function env_imp:setMovieProperty(name, key, value)
 	end
 end
 
-function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
+function env_imp:playMovie(name, timeFrom, timeTo, bLoop, callback)
 	name = GetMovieChannelName_(name, self.codeblock)
 	local channel = MovieManager:CreateGetMovieChannel(name);
 	
@@ -1011,6 +1014,9 @@ function env_imp:playMovie(name, timeFrom, timeTo, bLoop)
 		callbackFunc = self.co:MakeCallbackFuncAsync(function()
 			channel:Disconnect("finished", callbackFunc)
 			env_imp.resume(self);
+			if callback then
+				callback()
+			end
 		end);
 		channel:Connect("finished", callbackFunc);
 
@@ -1029,7 +1035,7 @@ local lastWinId = 0;
 -- it can also be "global_lt", which will attach to root gui object, 
 -- instead of scene viewport window, whose zorder is always -5. 
 -- @return the window object itself
-function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, envTable)
+function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, envTable, wndParent)
 	if(mcmlCode) then
 		if(not mcmlCode:match("<pe:mcml")) then
 			mcmlCode = "<pe:mcml>"..mcmlCode.."</pe:mcml>"
@@ -1084,6 +1090,10 @@ function env_imp:window(mcmlCode, alignment, left, top, width, height, zorder, e
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Common/SceneViewport.lua");
 					local SceneViewport = commonlib.gettable("MyCompany.Aries.Game.Common.SceneViewport")
 					parent = SceneViewport.GetUIObject();
+				end
+
+				if wndParent then
+					parent = wndParent
 				end
 
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeWindow.lua");

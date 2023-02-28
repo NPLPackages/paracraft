@@ -135,6 +135,9 @@ function ParaWorldMinimapSurface:SetMapCenter(x, y)
 	if(not x or not y) then
 		local _;
 		local gridSize = self.GridSize;
+		if EntityManager.GetPlayer()==nil then
+			return
+		end
 		x, _, y = EntityManager.GetPlayer():GetBlockPos();
 		x, y = math.floor(x / gridSize)*gridSize+gridSize/2, math.floor(y / gridSize)*gridSize+gridSize/2;
 	end
@@ -291,6 +294,9 @@ end
 
 -- return true, if some part of the map is locked. we will redraw when map is loaded
 function ParaWorldMinimapSurface:IsMapLocked()
+	if self.map_left==nil then
+		return false
+	end
 	local attWorld = ParaTerrain.GetBlockAttributeObject()
 	local from_x, from_y = self.map_left, self.map_top;
 	for x = self.map_left, self.map_left +self.map_width, 512 do

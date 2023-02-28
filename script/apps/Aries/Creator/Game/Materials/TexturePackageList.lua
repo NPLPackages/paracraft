@@ -166,9 +166,9 @@ end
 function TexturePackageList.GetOfficialTexturePackDS(ds,callbackfun)
 	local url = wiki_url;
 	
-	NPL.load("(gl)script/ide/System/localserver/URLResourceStore.lua");
-
-	local ls = System.localserver.CreateStore(nil, 3, "userdata");
+	NPL.load("(gl)script/ide/System/localserver/LocalStorageUtil.lua");
+	local LocalStorageUtil = commonlib.gettable("System.localserver.LocalStorageUtil");
+	local ls = LocalStorageUtil.CreateUserDataStore()
 	if(ls) then
 		local mytimer;
 		local function get_url_(retry_count)

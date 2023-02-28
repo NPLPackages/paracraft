@@ -280,12 +280,21 @@ function TerrainBrushTask:ShowPage()
 	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 	local viewport = ViewportManager:GetSceneViewport();
 	local parent = viewport:GetUIObject(true)
-
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
 	local window = self:CreateGetToolWindow();
+	if IsMobileUIEnabled then
+		window:Show({
+			name="TerrainBrushTask", 
+			url="script/apps/Aries/Creator/Game/Tasks/TerrainBrush/TerrainBrushTask.html",
+			alignment="_ctb", left=64, top=-110, width = 384, height = 96, parent = parent
+		});
+		window:SetUIScaling(1.5,1.5)
+		return 
+	end
 	window:Show({
 		name="TerrainBrushTask", 
 		url="script/apps/Aries/Creator/Game/Tasks/TerrainBrush/TerrainBrushTask.html",
-		alignment="_ctb", left=0, top=-55, width = 256, height = 64, parent = parent
+		alignment="_ctb", left=0, top= -55, width = 256, height = 64, parent = parent
 	});
 end
 

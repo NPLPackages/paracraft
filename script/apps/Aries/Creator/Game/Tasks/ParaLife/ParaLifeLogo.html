@@ -1,0 +1,19 @@
+<!--script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeLogo.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="ParaLifeLogo.lua"><![CDATA[
+ParaLifeLogo = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeLogo")
+]]></script>
+<pe:container alignment="_fi" style="position:relative;background-color:#ffffff" />
+<pe:container alignment="_fi" zorder="1" style="position:relative;background:;" onclick="ParaLifeLogo.OnClickClose"/>
+<pe:container alignment="_ct" style="margin-left:-360px;margin-top:-360px;width:720px;height:720px;background:">
+    <pe:canvas3d name="ParaLifeLogoCanvas" miniscenegraphname="ParaLifeLogo"
+                DefaultCameraObjectDist="3.4"
+                RenderTargetSize="512"
+                IsInteractive ="false"
+                style="width: 720px;height: 720px;"
+                value="" />
+</pe:container>
+<script type="text/npl" refresh="false" src="ParaLifeLogo.lua"><![CDATA[
+ParaLifeLogo.OnInit()
+]]></script>
+</pe:mcml>

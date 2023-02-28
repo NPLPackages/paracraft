@@ -189,10 +189,10 @@ function MovieClipController.OnClosePage()
 	if(self.activeClip and self.activeClip:GetEntity()) then
 		self.activeClip:GetEntity():MarkForUpdate();
 	end
-
+	GameLogic.GetFilters():apply_filters("OnCloseMovieController",MovieClipController.GetMovieClip())	
 	MovieClipController:OnActiveMovieClipChange(nil);
-
 	MovieClipController.ClearUiAnim()
+	
 end
 
 function MovieClipController:OnSelectedActorChange(actor)
@@ -255,7 +255,7 @@ function MovieClipController.OnClickActorContextMenuItem(node)
 				if(result and result ~= oldValue) then
 					actor:SetDisplayName(result);
 				end
-			end, oldValue)
+			end, oldValue, nil, nil, {auto_virtual_keyboard=false})
 		end
 	elseif(name == "delete") then
 		MovieClipController.DeleteSelectedActor()
@@ -305,7 +305,7 @@ function MovieClipController.OnShowActorContextMenu(x,y, width, height)
 					text = nil;
 				end
 			elseif(item.name == "rename") then
-				if(actor.class_name == "ActorNPC" or actor.class_name == "ActorOverlay") then
+				if(actor and (actor.class_name == "ActorNPC" or actor.class_name == "ActorOverlay")) then
 					
 				else
 					text = nil;
@@ -411,14 +411,6 @@ function MovieClipController.SetCode(code)
 	end
 end
 
-function MovieClipController.GetMarginBottom()
-	if(System.options.IsTouchDevice) then
-		return 270;
-	else
-		return 40+12;
-	end
-end
-
 -- @param bShow:true to refresh or show
 function MovieClipController.ShowPage(bShow, OnClose)
 
@@ -445,10 +437,11 @@ function MovieClipController.ShowPage(bShow, OnClose)
 				directPosition = true,
 					align = "_rb",
 					x = -width-20,
-					y = -height - MovieClipController.GetMarginBottom(),
+					y = -height - 52,
 					width = 200,
 					height = height,
 			};
+		params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"MovieClipController");
 		System.App.Commands.Call("File.MCMLWindowFrame", params);
 		if(params._page) then
 			params._page.OnClose = function()
@@ -570,7 +563,8 @@ function MovieClipController.OnClickAddNPC()
 					NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/MobPropertyPage.lua");
 					local MobPropertyPage = commonlib.gettable("MyCompany.Aries.Game.GUI.MobPropertyPage");
 					MobPropertyPage.ShowPage(entity, nil, function(assetfile,skin)
-						actor:SetMovieAppearance(commonlib.Encoding.Utf8ToDefault(assetfile),skin)
+						-- assetfile is utf8 encoded string
+						actor:SetMovieAppearance(assetfile,skin)
 					end,"movie");
 				end
 			end
@@ -651,6 +645,8 @@ local off_maps = {
 	["Texture/Aries/Creator/player/play_off.png"] = "Texture/Aries/Creator/player/suspend_off.png",
 	["Texture/Aries/Creator/player/god_off.png"] = "Texture/Aries/Creator/player/god_on.png",
 	["Texture/blocks/items/ts_char_off.png"] = "Texture/blocks/items/ts_char_on.png",
+	["Texture/Aries/Creator/keepwork/Mobile/MovieClip/dongzuo_40x40_32bits.png"] = "Texture/Aries/Creator/keepwork/Mobile/MovieClip/dongzuo2_40x40_32bits.png;0 0 40 40",
+	["Texture/Aries/Creator/keepwork/Mobile/MovieClip/bofang_40x40_32bits.png"] = "Texture/Aries/Creator/keepwork/Mobile/MovieClip/bofang2_40x40_32bits.png;0 0 40 40",
 }
 
 local on_maps = {
@@ -659,6 +655,8 @@ local on_maps = {
 	["Texture/Aries/Creator/player/suspend_off.png"] = "Texture/Aries/Creator/player/play_off.png",
 	["Texture/Aries/Creator/player/god_on.png"] = "Texture/Aries/Creator/player/god_off.png",
 	["Texture/blocks/items/ts_char_on.png"] = "Texture/blocks/items/ts_char_off.png",
+	["Texture/Aries/Creator/keepwork/Mobile/MovieClip/dongzuo2_40x40_32bits.png"] = "Texture/Aries/Creator/keepwork/Mobile/MovieClip/dongzuo_40x40_32bits.png;0 0 40 40",
+	["Texture/Aries/Creator/keepwork/Mobile/MovieClip/bofang2_40x40_32bits.png"] = "Texture/Aries/Creator/keepwork/Mobile/MovieClip/bofang_40x40_32bits.png;0 0 40 40",
 }
 	
 function MovieClipController.ToggleButtonBg(uiobj, bIsOn)

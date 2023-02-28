@@ -1,0 +1,19 @@
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
+<![CDATA[
+CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+local MobileCodeLogPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/CodeBlockWindow/MobileCodeLogPage.lua");
+MobileCodeLogPage.OnInit()
+
+
+function GetLogDiv()
+    return MobileCodeLogPage.GetLogDiv()
+end
+]]></script>
+<pe:container name="pageNode" SelfPaint="true" ClickThrough="true" style="min-width: 50px;max-width: 300px; min-height: 30px;background-color:#000000b4;padding: 5px;">
+    <pe:container name="logContentNode" ClickThrough="true" style="min-width: 50px;max-width: 300px; min-height: 30px;padding: 5px;background:;color: #ffffff;font-size: 12px;font-weight: bold;">
+        <%=GetLogDiv()%>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+

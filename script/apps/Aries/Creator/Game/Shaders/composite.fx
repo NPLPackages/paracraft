@@ -619,6 +619,14 @@ void CalculateSpecularReflections(inout SurfaceStruct2 surface)
 		float4 reflection = ComputeRayTraceReflection(surface.cameraSpacePos, cameraSpaceNormal);
 		float4 fakeSkyReflection = ComputeFakeSkyReflection(surface);
 		reflection.a = reflection.a * fakeSkyReflection.a * specularity;
+
+#define USE_WATER_REFLECTION_FRESNEL_EFFECT
+#ifdef USE_WATER_REFLECTION_FRESNEL_EFFECT
+		float3 cameraSpaceViewDir = -normalize(surface.cameraSpacePos);
+		const float fresnelPower = 3.0;
+		float fresnel = pow(saturate(1.0 - dot(cameraSpaceViewDir, cameraSpaceNormal)), fresnelPower) * 0.98 + 0.02;
+		reflection.a *= fresnel;
+#endif
 		surface.color.xyz = lerp(surface.color.xyz, reflection.rgb, reflection.a);
 	}
 }
@@ -629,10 +637,8 @@ void CalculateSpecularHighlight(inout SurfaceStruct2 surface)
 {
 	if (!surface.mask_sky && !surface.mask_water)
 	{
-		// everything has some specular light, metal block has more
-		// float roughness = lerp(1, 0.5, surface.mask_metal);
-		// float gloss = pow(1.01f - roughness, 4.5f);
-		float gloss = lerp(0, surface.specularity*0.05, surface.mask_metal);
+		// everything has some specular light, surface.mask_metal has more
+		float gloss = surface.specularity + 0.02; // 0.02 is base specular for all blocks.
 
 		float3 cameraSpaceViewDir = -normalize(surface.cameraSpacePos);
 		float3 cameraSpaceNormal = mul(surface.normal, (float3x3)matView);
@@ -641,20 +647,25 @@ void CalculateSpecularHighlight(inout SurfaceStruct2 surface)
 
 		const float fresnelPower = 6.0;
 		float fresnel = pow(saturate(1.0 - dot(cameraSpaceViewDir, cameraSpaceNormal)), fresnelPower) * 0.98 + 0.02;
-		float spec = pow(HdotN, gloss * 5000 + 10.0);
-		spec *= fresnel;
-		spec *= gloss * 600 + 0.02; // 0.02 is base specular for all blocks.
-		spec *= surface.sunlightVisibility;
-		spec *= 1.0 - rainStrength;
+		// 30 is a magic number, that is making the sun specular lighting size proper. The bigger the value, the smaller the specular region. 
+		float spec = pow(HdotN, gloss * 30); 
+		spec *= fresnel * gloss * surface.sunlightVisibility * (1.0 - rainStrength);
 		float3 specularHighlight = spec * SunColor;
 
 		// For fake torch specular light, we will assume torch light and eye are on the same point, so half vector is actually viewDir.
-		if (surface.mask_metal)
+		if (surface.mask_metal || surface.specularity > 0.01)
 		{
+			// 60 is a magic number, that is making the torch specular lighting at proper size. 
 			float spec = pow(saturate(dot(cameraSpaceViewDir, cameraSpaceNormal)), 60.0);
 			specularHighlight += (TorchLightColor.rgb*pow(surface.torch_light_strength*spec, 3.0));
 		}
 		surface.color.xyz += specularHighlight;
+		
+		// uncomment to test (show) just specular component
+		// #define TEST_SHOW_SPECULAR_COMPNENT
+#ifdef TEST_SHOW_SPECULAR_COMPNENT
+		surface.color.xyz = specularHighlight;
+#endif
 	}
 }
 
@@ -662,27 +673,27 @@ void CalculateSpecularHighlight(inout SurfaceStruct2 surface)
 float4 CompositePS1(VSOutput input) :COLOR
 {
 	SurfaceStruct2 surface = (SurfaceStruct2)0;
-float2 texCoord = input.texCoord;
-surface.texCoord = texCoord;
-surface.color = GetAlbedoLinear(texCoord);
-surface.sunlightVisibility = GetSunlightVisibility(texCoord);
-// get world space normal
-float4 normal_ = GetNormal(texCoord);
-surface.normal = normal_.xyz;
-surface.specularity = 1.0 - normal_.w;
-surface.depth = GetDepth(texCoord);
-surface.CameraEye = input.CameraEye;
-surface.cameraSpacePos = input.CameraEye * surface.depth;
-// r:category id,  g: sun light value, b: torch light value
-float4 block_info = tex2D(matInfoSampler, texCoord);
-surface.category_id = (int)(block_info.r * 255.0 + 0.4);
-// float sun_light_strength = block_info.g;
-surface.torch_light_strength = block_info.b;
+	float2 texCoord = input.texCoord;
+	surface.texCoord = texCoord;
+	surface.color = GetAlbedoLinear(texCoord);
+	surface.sunlightVisibility = GetSunlightVisibility(texCoord);
+	// get world space normal
+	float4 normal_ = GetNormal(texCoord);
+	surface.normal = normal_.xyz;
+	surface.specularity = 1.0 - normal_.w;
+	surface.depth = GetDepth(texCoord);
+	surface.CameraEye = input.CameraEye;
+	surface.cameraSpacePos = input.CameraEye * surface.depth;
+	// r:category id,  g: sun light value, b: torch light value
+	float4 block_info = tex2D(matInfoSampler, texCoord);
+	surface.category_id = (int)(block_info.r * 255.0 + 0.4);
+	// float sun_light_strength = block_info.g;
+	surface.torch_light_strength = block_info.b;
 
-CalculateSpecularReflections(surface);
-CalculateSpecularHighlight(surface);
+	CalculateSpecularReflections(surface);
+	CalculateSpecularHighlight(surface);
 
-return float4(surface.color.rgb, 1.0);
+	return float4(surface.color.rgb, 1.0);
 }
 
 // calculate bloom at given level of detail and write it to a given offset position

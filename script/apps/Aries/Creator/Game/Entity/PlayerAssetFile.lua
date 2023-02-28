@@ -126,6 +126,10 @@ function PlayerAssetFile:GetAssetByID(id)
 	end
 end
 
+function PlayerAssetFile:GetBuildInFilenameByName(name)
+	return name_to_filename_map[name] or name
+end
+
 function PlayerAssetFile:GetFilenameByName(name)
 	return name_to_filename_map[name] or Files.GetFilePath(name) or name;
 end

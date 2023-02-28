@@ -55,6 +55,7 @@ function TextureModPage.ShowPage(bShow)
 		name = "ChangeTexturePage.ShowPage", 
 		isShowTitleBar = false,
 		DestroyOnClose = true,
+		allowDrag = false,
 		enable_esc_key = true,
 		style = CommonCtrl.WindowFrame.ContainerStyle,
 		bShow = bShow,
@@ -66,12 +67,20 @@ function TextureModPage.ShowPage(bShow)
 			width = 860,
 			height = 500,
 	};
+	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"ChangeTexturePage");
 	TextureModPage.OnInitDS(function (msg)
 		if(msg) then
 			System.App.Commands.Call("File.MCMLWindowFrame", params);
 			TextureModPage.ScrollToSelection();	
 		end
 	end);
+end
+
+function TextureModPage.ClosePage()
+	if TextureModPage.page then
+		TextureModPage.page:CloseWindow()
+		TextureModPage.page = nil 
+	end
 end
 
 -- show the selection. 

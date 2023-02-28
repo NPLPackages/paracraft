@@ -92,6 +92,7 @@ function CommandManager:Init(bRefresh)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandParalife.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMake430App.lua");
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandEnvironment.lua");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandSubtitles.lua");
 		
 		-- TODO: add more system command here
 	end

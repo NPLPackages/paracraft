@@ -89,7 +89,7 @@
                             if(result) then
                                 build_platform = "android";
                                 page:SetValue("build_title", L"准备安卓开发环境");
-                                page:SetValue("step2_notice", get_build_folder());
+                                page:SetValue("step2_notice", L"高级功能：打开ApkTool目录");
                                 android_exec();
                             end
                         end);
@@ -139,7 +139,7 @@
                                 end
 
                                 if (ParaIO.DoesFileExist(MakeApp.androidBuildRoot .. "paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk")) then
-                                    page:SetValue("step3_content", "paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk");
+                                    page:SetValue("step3_content", L"已生成：paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk");
                                     local p_step3_content_controller = page:FindControl("p_step3_content");
 
                                     p_step3_content_controller.visible = true;
@@ -173,7 +173,7 @@
                     end
 
                     function get_notice()
-                        return L"你可以在这一步编辑文件，在本地下载离线资源到temp/cache，改APP的图标等";
+                        return L"你可以在这一步编辑文件，在本地下载离线资源到temp/cache等";
                     end
 
                     function p_step1(callback)
@@ -269,7 +269,7 @@
                         if (get_build_platform() == "android") then
                             MakeApp:AndroidGenerateApk(function()
                                 MakeApp:AndroidSignApkWrapper(function()
-                                    page:SetValue("step3_content", "paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk");
+                                    page:SetValue("step3_content", L"已生成：paracraft_ver" .. MakeApp.curAndroidVersion .. "_pack.apk");
                                     local p_step3_content_controller = page:FindControl("p_step3_content");
                                     p_step3_content_controller.visible = true;
                                 end)
@@ -297,33 +297,12 @@
 
                     function open_build_world_folder()
                         if (get_build_platform() == "android") then
-                            local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
-                            local world_path = MakeApp.androidBuildRoot ..
-                                            "paracraft_android_ver" ..
-                                            MakeApp.curAndroidVersion ..
-                                            "/assets/worlds/DesignHouse/" ..
-                                            commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) ..
-                                            "/";
-                            local world_zip = MakeApp.androidBuildRoot ..
-                                            "paracraft_android_ver" ..
-                                            MakeApp.curAndroidVersion ..
-                                            "/assets/worlds/DesignHouse/" ..
-                                            commonlib.Encoding.Utf8ToDefault(currentEnterWorld.foldername) ..
-                                            ".zip";
+                            local path = MakeApp.androidBuildRoot ..
+                                         "paracraft_ver" ..
+                                         MakeApp.curAndroidVersion ..
+                                         "/"
 
-                            if (ParaIO.DoesFileExist(world_path)) then
-                                System.App.Commands.Call("File.WinExplorer", world_path);
-                            else
-                                if (ParaIO.DoesFileExist(world_zip)) then
-                                    System.App.Commands.Call(
-                                        "File.WinExplorer",
-                                        MakeApp.androidBuildRoot ..
-                                        "paracraft_android_ver" ..
-                                        MakeApp.curAndroidVersion ..
-                                        "/assets/worlds/DesignHouse/"
-                                    );
-                                end
-                            end
+                            System.App.Commands.Call("File.WinExplorer", path);
                         elseif (get_build_platform() == "ios") then
                             local currentEnterWorld = GameLogic.GetFilters():apply_filters("store_get", "world/currentEnterWorld");
                             local world_path = ParaIO.GetWritablePath() ..
@@ -517,6 +496,16 @@
                                             line-height: 36px;">
                                     <%= format(L"《%s》", get_world_name()) %>
                                 </div>
+                                <div style="float: left;">
+                                    <input type="button"
+                                           class="mc_button_blue"
+                                           onclick="OnClickOpenIconFolder"
+                                           style="color: #FFFFFF;
+                                                  margin-top: 10px;
+                                                  margin-left: 6px;"
+                                           tooltip="打开世界目录，您可以在这一步修改icon等"
+                                           value="..." />
+                                </div>
                             </div>
                         </pe:container>
                         <pe:container name="p_step2_button"
@@ -614,8 +603,7 @@
                                             margin-left:5px;">
                                     <input type="button"
                                            name="app_icon"
-                                           tooltip="<%= '自动读取世界目录下的icon.png作为应用图标, 点击打开打包用的世界目录添加Icon' %>"
-                                           onclick="OnClickOpenIconFolder"
+                                           tooltip="<%= '自动读取世界目录下的icon.png作为应用图标' %>"
                                            style="width: 64px;
                                                   height: 64px;" />
                                 </div>
@@ -645,6 +633,7 @@
                                            style="color: #FFFFFF;
                                                   margin-top: 0px;
                                                   margin-left: 6px;"
+                                           tooltip="打开APK所在目录"
                                            value="..." />
                                 </div>
                             </div>

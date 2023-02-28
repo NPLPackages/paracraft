@@ -13,7 +13,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
 local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local server_time = 0
 local page
 
@@ -267,22 +266,44 @@ function WorldCreatePage.OnClickDelete(index)
     project_name = commonlib.Encoding.Utf8ToDefault(project_name)
     local worldpath = WorldCreatePage.project_file_path .. project_name
     _guihelper.MessageBox(string.format("是否要删除《%s》迷你地块", world_data.name), function()	
-        KeepworkServiceProject:RemoveProject(
-            world_data.id,
-            function(data, err)
-                if err == 200 then
-                    if ParaIO.DoesFileExist(worldpath, true) then
-                        commonlib.Files.DeleteFolder(worldpath)
+        WorldCreatePage.ShowDeleteAuth(function(pwd)
+            if type(pwd) == "string" and pwd ~= "" then
+                GameLogic.GetFilters():apply_filters("service.keepwork_service_project.remove_project",world_data.kpProjectId,pwd,function(data,err)
+                    if err == 200 then
+                        if ParaIO.DoesFileExist(worldpath, true) then
+                            commonlib.Files.DeleteFolder(worldpath)
+                        end
+                        WorldCreatePage.FlushProjectList(function()
+                            WorldCreatePage.OnRefresh()
+                        end)
                     end
-
-                    WorldCreatePage.FlushProjectList(function()
-                        -- World2In1.UnLoadcurrentWorldListByName(project_name)
-                        WorldCreatePage.OnRefresh()
-                    end)
-                end
+                end);
             end
-        )
+        end)
+
+        
     end)
+end
+
+function WorldCreatePage.ShowDeleteAuth(callback)
+    local params = {
+        url = "script/apps/Aries/Creator/Game/Tasks/World2In1/PasswordAuthOnDeletion.html",
+        name = "WorldCreatePage.ShowDeleteAuth", 
+        isShowTitleBar = false,
+        DestroyOnClose = true,
+        style = CommonCtrl.WindowFrame.ContainerStyle,
+        allowDrag = false,
+        enable_esc_key = true,
+        zorder = 0,
+        directPosition = true,
+        align = "_fi",
+            x = 0,
+            y = 0,
+            width = 0,
+            height = 0,
+    };
+    System.App.Commands.Call("File.MCMLWindowFrame", params);
+    params._page.callback = callback
 end
 
 function WorldCreatePage.JoinVip()

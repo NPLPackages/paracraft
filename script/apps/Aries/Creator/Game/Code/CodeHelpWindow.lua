@@ -332,10 +332,13 @@ function CodeHelpWindow.OnCreateVariable()
 end
 
 function CodeHelpWindow.OnDragEnd(name)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	if CodeBlockWindow.IsCodeReadOnly() then
+		return
+	end
 	local item = CodeHelpWindow.GetCodeItemByName(name);
 	if(item) then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
-		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 		if(CodeBlockWindow.IsMousePointerInCodeEditor()) then
 			if(CodeBlockWindow.IsBlocklyEditMode()) then
 				_guihelper.MessageBox(L"图块模式下不能直接编辑代码, 请用图块编辑器");
@@ -452,10 +455,6 @@ end
 
 function CodeHelpWindow.OnClickRunExample()
     CodeHelpWindow.RunSampleCodeExampleByName(CodeHelpWindow.GetSelectionName());
-end
-
-function CodeHelpWindow.OnClickDataItem(name)
-    CodeHelpWindow.OnClickDataItem(name)
 end
 
 CodeHelpWindow:InitSingleton();

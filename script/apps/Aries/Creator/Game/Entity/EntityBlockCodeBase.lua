@@ -24,9 +24,18 @@ EntityManager.RegisterEntityClass(Entity.class_name, Entity);
 Entity:Property("NplBlocklyToolboxXmlText");
 Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"})
 Entity:Property({"isStepMode", nil, "IsStepMode", "SetStepMode", auto=true})
+Entity:Property({"lastEditTime", false, "GetLastEditTime", "SetLastEditTime"})
 Entity:Signal("remotelyUpdated")
 
 function Entity:ctor()
+end
+
+function Entity:SetLastEditTime(edit_time)
+	self.m_EditTime = edit_time
+end
+
+function Entity:GetLastEditTime()
+	return self.m_EditTime
 end
 
 function Entity:IsUseNplBlockly()
@@ -91,6 +100,18 @@ function Entity:IsBlocklyEditMode()
 	return self.isBlocklyEditMode;
 end
 
+function Entity:GetLanguageVersion()
+	if (not self.languageVersion) then
+		local LanguageConfig = NPL.load("script/ide/System/UI/Blockly/Blocks/LanguageConfig.lua");
+		return LanguageConfig.GetVersion(self.languageConfigFile);  -- 初始版本使用最新版本
+	end
+	return self.languageVersion;
+end
+
+function Entity:SetLanguageVersion(version)
+	self.languageVersion = version;
+end
+
 function Entity:SetBlocklyEditMode(bEnabled)
 	if(self.isBlocklyEditMode~=bEnabled) then
 		self.isBlocklyEditMode = bEnabled;
@@ -121,6 +142,8 @@ function Entity:SaveBlocklyToXMLNode(node)
 	if(self:IsUseCustomBlock()) then
 		node.attr.isUseCustomBlock = true;
 	end
+	node.attr.languageVersion = self:GetLanguageVersion();
+
 	if(self:GetBlocklyXMLCode() ~= "" or self:GetNPLBlocklyXMLCode() ~= "") then
 		local blocklyNode = {name="blockly"};
 		node[#node+1] = blocklyNode;
@@ -146,6 +169,9 @@ function Entity:LoadBlocklyFromXMLNode(node)
 	self.isBlocklyEditMode = (node.attr.isBlocklyEditMode == "true" or node.attr.isBlocklyEditMode == true);
 	local isUseNplBlockly = (node.attr.isUseNplBlockly == "true" or node.attr.isUseNplBlockly == true); 
     self.isUseCustomBlock = (node.attr.isUseCustomBlock == "true" or node.attr.isUseCustomBlock == true);
+
+	-- 设置当前方块使用的语言版本 若无设置则使用0.0.0(加载使用最旧版本)
+	self:SetLanguageVersion(node.attr.languageVersion or "0.0.0");
 
 	for i=1, #node do
 		if(node[i].name == "blockly") then
@@ -200,6 +226,8 @@ function Entity:LoadBlocklyFromXMLNode(node)
 	else
 		self:SetCommand(self:GetNPLCode());
 	end
+
+
 end
 
 function Entity:SetNPLCode(nplcode)

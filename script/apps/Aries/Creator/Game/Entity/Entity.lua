@@ -63,6 +63,7 @@ local ShapeAABB = commonlib.gettable("mathlib.ShapeAABB");
 local Quaternion = commonlib.gettable("mathlib.Quaternion");
 local TimedEvent = commonlib.gettable("MyCompany.Aries.Game.TimedEvent")
 local PhysicsWorld = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld");
+local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local DataContainer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.DataContainer")
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
@@ -79,6 +80,8 @@ local Entity = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), com
 Entity:Property({"position", nil, "getPosition", "setPosition"});
 -- max number of collisions to process per frame. too many collisions will lead to HIGH CPU. 
 Entity:Property({"max_collision_count", 10})
+Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
+Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
 Entity:Property({"LocalTransform", nil, "GetModelLocalTransform", "SetModelLocalTransform"})
 -- globally unique identifier
 Entity:Property({"guid", nil, "GetKey", "SetKey"});
@@ -88,6 +91,7 @@ Entity:Signal("focusOut");
 Entity:Signal("valueChanged");
 Entity:Signal("facingChanged");
 Entity:Signal("scalingChanged");
+-- Entity:Signal("forceAutoSyncChanged");  -- ggs force auto sync
 
 local math_abs = math.abs;
 
@@ -387,6 +391,8 @@ function Entity:LoadFromXMLNode(node)
 		local attr = node.attr;
 		if(attr) then
 			self.guid = attr.guid
+			self.forceAutoSync = attr.forceAutoSync;
+
 			if(attr.bx) then
 				self.bx = validateNumber(self.bx or tonumber(attr.bx));
 				self.by = validateNumber(self.by or tonumber(attr.by));
@@ -398,9 +404,11 @@ function Entity:LoadFromXMLNode(node)
 				self.y = validateNumber(tonumber(attr.y));
 				self.z = validateNumber(tonumber(attr.z));
 			end
+			
 			if(attr.name) then
 				self.name = attr.name;
 			end
+
 			if(attr.facing) then
 				self.facing = tonumber(attr.facing) or self.facing;
 			else
@@ -408,6 +416,12 @@ function Entity:LoadFromXMLNode(node)
 			end
 			if(attr.anim and attr.anim~="") then
 				self.anim = attr.anim;
+			end
+			if(attr.tag) then
+				self:SetTag(attr.tag);
+			end
+			if(attr.staticTag) then
+				self.staticTag = attr.staticTag;
 			end
 
 			local item_id = tonumber(attr.item_id);
@@ -426,6 +440,9 @@ function Entity:LoadFromXMLNode(node)
 
 			if(attr.modelLocalTransform) then
 				self.modelLocalTransform = mathlib.Matrix4:new():fromString(attr.modelLocalTransform);
+			end
+			if(attr.materialId) then
+				self.materialId = tonumber(attr.materialId);
 			end
 		end
 
@@ -473,6 +490,7 @@ function Entity:SaveToXMLNode(node, bSort)
 	attr.item_id = self.item_id;
 	attr.bx, attr.by, attr.bz  = self.bx, self.by, self.bz;
 	attr.name = self.name;
+	attr.forceAutoSync = self.forceAutoSync;
 	if(self.guid ~= self.name) then
 		attr.guid = self.guid;
 	end
@@ -483,8 +501,17 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.displayName and self.displayName~="") then
 		attr.displayName = self.displayName;
 	end
+	if(self.tag and self.tag~="") then
+		attr.tag = self.tag
+	end
+	if(self.staticTag and self.staticTag~="") then
+		attr.staticTag = self.staticTag
+	end
 	if(self.anim) then
 		attr.anim = self.anim;
+	end
+	if(self.materialId and self.materialId > 0) then
+		attr.materialId = self.materialId;
 	end
 	if(self.memory and next(self.memory)) then
 		node[#node+1] = {name="mem", [1]=commonlib.serialize_compact(self.memory, bSort)};
@@ -499,10 +526,11 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.rulebag and not self.rulebag:IsEmpty()) then
 		node[#node+1] = self.rulebag:SaveToXMLNode({name="rulebag"}, bSort);
 	end
-	if(self.modelLocalTransform and not self.modelLocalTransform:isIdentity()) then
-		attr.modelLocalTransform = self.modelLocalTransform:toString();
+	local mat = self:GetModelLocalTransform();
+	if(mat and not mat:isIdentity()) then
+		attr.modelLocalTransform = mat:toString();
 	end
-
+	
 	--if(self.data_container and not self.data_container:IsEmpty()) then
 		--local data_node = {name="data",};
 		--node[#node+1] = data_node;
@@ -1374,6 +1402,24 @@ function Entity:UnloadPet()
 	end
 end
 
+-- 实体自动同步 sync = true 强制同步  sysn = nil 根据全局属性自动识别  sync = false 自动不同步
+function Entity:SetForceAutoSync(sync)
+	self.forceAutoSync = sync;
+	local AppGeneralGameClient = commonlib.gettable("Mod.GeneralGameServerMod.App.Client.AppGeneralGameClient");
+	if (type(AppGeneralGameClient.SyncEntityLiveModel) == "function" and type(AppGeneralGameClient.UnsyncEntityLiveModel) == "function") then
+		if (sync == false) then 
+			AppGeneralGameClient:UnsyncEntityLiveModel(self);
+		else
+			AppGeneralGameClient:SyncEntityLiveModel(self);
+		end
+	end
+	-- self:forceAutoSyncChanged();
+end
+
+function Entity:IsForceAutoSync()
+	return self.forceAutoSync;
+end
+
 --virtual function:
 function Entity:SetScaling(v)
 	local obj = self:GetInnerObject();
@@ -1416,6 +1462,7 @@ function Entity:SetFacing(facing)
 	if(self.facing ~= facing) then
 		self.facing = facing;
 		self:facingChanged();
+		return true
 	end
 end
 
@@ -1460,6 +1507,10 @@ function Entity:OpenEditor(editor_name, entity)
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/MobPropertyPage.lua");
 		local MobPropertyPage = commonlib.gettable("MyCompany.Aries.Game.GUI.MobPropertyPage");
 		MobPropertyPage.ShowPage(self, entity);
+	elseif(editor_name == "SelectModel") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectModelTask.lua");
+		local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=self:GetInnerObject()})
+		task:Run();
 	end
 end
 
@@ -1506,6 +1557,7 @@ function Entity:doesEntityTriggerPressurePlate()
 end
 
 -- update block position according to the associated object. 
+-- return true if position is changed
 function Entity:SetBlockPos(bx, by, bz)
 	if(not bx) then 
 		return;
@@ -1522,7 +1574,8 @@ function Entity:SetBlockPos(bx, by, bz)
 			obj:SetPosition(x,y,z);
 			obj:UpdateTileContainer();
 		end
-		self:valueChanged();
+		self:valueChanged(self);
+		return true;
 	end
 end
 
@@ -1597,6 +1650,7 @@ function Entity:SetPositionAndRotation2(x,y,z,yaw, pitch, posRotIncrements)
 end
 
 -- set real world position for the object. 
+-- return true if position is changed
 function Entity:SetPosition(x, y, z)
 	if(not x) then
 		return;
@@ -1615,7 +1669,26 @@ function Entity:SetPosition(x, y, z)
 			obj:SetPosition(x,y,z);
 			obj:UpdateTileContainer();
 		end
-		self:valueChanged();
+		self:valueChanged(self);
+		return true
+	end
+end
+
+-- this does not update inner C++ object's position. 
+function Entity:SetPositionEntityOnly(x, y, z)
+	if(not x) then
+		return;
+	end
+	if(self.x~=x or self.y~=y or self.z~=z ) then
+		self.x, self.y, self.z = x, y, z;
+
+		local bx, by, bz = BlockEngine:block(x, y+0.1, z);
+		if(self.bx~=bx or self.by~=by or self.bz~=bz ) then
+			self.bx, self.by, self.bz = bx, by, bz;
+			self:UpdateBlockContainer();
+		end
+		self:valueChanged(self);
+		return true
 	end
 end
 
@@ -1627,7 +1700,7 @@ end
 -- @param pos: {x,y,z}
 function Entity:setPosition(pos)
 	if(pos and type(pos) == "table") then
-		self:SetPosition(pos[1], pos[2], pos[3]);
+		return self:SetPosition(pos[1], pos[2], pos[3]);
 	end
 end
 
@@ -1698,7 +1771,7 @@ function Entity:UpdatePosition(x,y,z)
 			self:UpdateBlockContainer();
 		end
 
-		self:valueChanged();
+		self:valueChanged(self);
 	end
 	return obj;
 end
@@ -1764,6 +1837,15 @@ end
 -- virtual function: return true if the object has real physics with C++ physics engine. 
 function Entity:HasRealPhysics()
 	return false
+end
+
+-- virtual function: return true if the object has static or dynamic physics with C++ physics engine. 
+function Entity:HasPhysics()
+	return false
+end
+
+function Entity:IsDynamicPhysicsEnabled()
+	return false;
 end
 
 function Entity:GetPhysicsRadius()
@@ -2377,6 +2459,7 @@ function Entity:SetControlledExternally(bEnable)
 	end
 end
 
+-- this is the disk filepath name. This may not be utf8 encoded. 
 function Entity:GetMainAssetPath()
 	if(self.mainAssetPath) then
 		return self.mainAssetPath;
@@ -2390,12 +2473,49 @@ function Entity:GetMainAssetPath()
 	end
 end
 
--- set main model
+-- set main model. 
+-- @param name: usually in default encoding, may not be utf8. SetModelFile is usually the prefered way. 
+-- @return true if file is changed
 function Entity:SetMainAssetPath(name)
 	if(self:GetMainAssetPath() ~= name) then
 		self.mainAssetPath = name;
 		return true;
 	end
+end
+
+-- @param filename: if nil, self:GetModelFile() is used
+function Entity:GetModelDiskFilePath(filename)
+	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile()))
+end
+
+-- @param filename: can be relative to current world. usually UTF8 string.
+-- @return true if file is changed
+function Entity:SetModelFile(filename)
+	if(self.model_filename ~= filename) then
+		local distFilename = self:GetModelDiskFilePath(filename);
+		if(not distFilename) then
+			-- we will try non-utf8, just in case filename is in default encoding. 
+			local utf8Filename = commonlib.Encoding.DefaultToUtf8(filename)
+			if(utf8Filename ~= filename) then
+				distFilename = self:GetModelDiskFilePath(utf8Filename);
+				if(distFilename) then
+					filename = utf8Filename
+					if(self.model_filename == filename) then
+						return 
+					end
+				end
+			else
+				distFilename = nil;
+			end
+		end
+		self.model_filename = filename;
+		self:SetMainAssetPath(distFilename or filename);
+		return true;
+	end
+end
+
+function Entity:GetModelFile()
+	return self.model_filename;
 end
 
 function Entity:GetBoundRadius()
@@ -2646,10 +2766,12 @@ end
 
 -- if true, this entity can not be pushed by other movable entities
 function Entity:SetStaticBlocker(bIsBlocker)
+	self.isBlocker = bIsBlocker;
 end
 
 -- return true if this entity can not be pushed by other movable entities
 function Entity:IsStaticBlocker()
+	return self.isBlocker;
 end
 
 -- @param dx,dy,dz: if nil, they default to 0. 
@@ -3397,7 +3519,7 @@ function Entity:SetModelLocalTransform(roll_or_matTransform, pitch, yaw, dx, dy,
 		
 		self.modelLocalTransform = mat;
 		obj:SetField("LocalTransform", mat)
-		self:valueChanged();
+		self:valueChanged(self);
 	end
 end
 
@@ -3442,8 +3564,31 @@ function Entity:GetCodeEventCoroutine(event)
 	return self.codeEvents and self.codeEvents[event];
 end
 
+-- add a given agent item to rule bag if any
+function Entity:AddAgent(name, itemStack)
+	local item = ItemClient.GetItem(block_types.names.AgentItem)
+	if(item and self.rulebag) then
+		local hasItem;
+		local itemDS = ItemClient.GetItemDSByName(name)
+		if(itemDS and itemDS.block_id == block_types.names.AgentItem) then
+			 hasItem = true;
+		end
+		local agentClass = item:CheckGetAgentClass(name)
+		if(agentClass) then
+			hasItem = true
+		end
+		if(hasItem) then
+			itemStack = itemStack or ItemStack:new():Init(block_types.names.AgentItem, 1, {name=name});
+			if(self.rulebag:AddItemToInventory(itemStack)) then
+				return true;
+			end
+		end
+	end
+end
+
 -- @param name: if nil, we will use the default code actor as the agent interface if it exists. 
-function Entity:GetAgent(name)
+-- @param bCreateIfNotExist: true to create or get. 
+function Entity:GetAgent(name, bCreateIfNotExist)
 	if(name) then
 		local memberName = "m_agent_"..name;
 		local agent = self[memberName]
@@ -3465,6 +3610,11 @@ function Entity:GetAgent(name)
 				self[memberName] = agent;
 			end
 		end
+		if(not agent and bCreateIfNotExist) then
+			if(self:AddAgent(name)) then
+				return self:GetAgent(name)
+			end
+		end
 		return agent;
 	else
 		return self:GetActor();
@@ -3481,6 +3631,11 @@ function Entity:RemoveAgent(name)
 	end
 end
 
+-- return true if we can take control of this entity by external agent like movie or code block.
+function Entity:CanBeAgent()
+	return false;
+end
+
 -- @param actor: the parent ActorNPC
 function Entity:SetActor(actor)
 	self.m_actor = actor;
@@ -3494,4 +3649,94 @@ end
 -- return true if entity is being dragged. 
 function Entity:IsDragging()
 	return self.isDragging;
+end
+
+-- @param value: if value is nil, name is used as string value
+function Entity:SetStaticTag(name, value)
+	if(value==nil) then
+		self.staticTag = name;
+		self.tagFields = nil;
+	elseif(name) then
+		self:SetTagField(name, value);
+	end
+end
+
+-- @param name: if nil, the raw tag string is returned, otherwise we will treat tag as a key, value table
+function Entity:GetStaticTag(name)
+	if(name==nil) then
+		return self.staticTag;
+	else
+		return self:GetTagField(name);
+	end
+end
+
+function Entity:SetTagField(name, value)
+	if(name) then
+		local t = self.tagFields;
+		if(not t) then
+			t = {};
+			self.tagFields = t;
+		end
+		if(t[name] ~= value) then
+			t[name] = value
+			if(value==nil and not next(t)) then
+				self.staticTag = ""
+			else
+				self.staticTag = commonlib.serialize_compact(t);
+			end
+		end
+	end
+end
+
+function Entity:GetTagField(name)
+	if(name) then
+		if(not self.tagFields) then
+			if(self.staticTag and self.staticTag~="") then
+				self.tagFields = commonlib.totable(self.staticTag);
+			else
+				self.tagFields = {};
+			end
+		end
+		return self.tagFields[name]
+	end
+end
+
+-- @param value: if value is nil, name is used as string value
+function Entity:SetTag(name, value)
+	if(value==nil) then
+		self.tag = name;
+	elseif(name) then
+		local t = commonlib.totable(self.tag)
+		t[name] = value;
+		self.tag = commonlib.serialize_compact(t);
+	end
+end
+
+-- @param name: if nil, the raw tag string is returned, otherwise we will treat tag as a key, value table
+function Entity:GetTag(name)
+	if(name==nil) then
+		return self.tag;
+	elseif(self.tag) then
+		return commonlib.totable(self.tag)[name];
+	end
+end
+
+-- virtual function:
+function Entity:OnBeginDrag()
+end
+
+-- virtual function:
+function Entity:OnEndDrag()
+end
+
+function Entity:SetMaterialId(id)
+	self.materialId = id;
+	local obj = self:GetInnerObject()
+	if(obj) then
+		obj:SetField("MaterialID", id or -1);
+	end
+end
+
+function Entity:GetMaterialId()
+	return self.materialId or -1;
 end

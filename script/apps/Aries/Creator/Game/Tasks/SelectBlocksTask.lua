@@ -47,6 +47,8 @@ SelectBlocks:Property({"roll", 0, "GetRoll", "SetRoll", auto=true})
 SelectBlocks:Property({"PivotPointColor", "#00ffff",})
 
 SelectBlocks:Signal("valueChanged");
+SelectBlocks:Signal("selectionCanceled");
+SelectBlocks:Signal("sceneRightClicked");
 
 local groupindex_hint = 6; 
 
@@ -86,32 +88,8 @@ function SelectBlocks.filter_file_exported(id, filename)
 		return id;
 	end
 	if((id == "bmax" or id == "template" or id == "x") and filename) then
-		local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
 		filename = Files.GetRelativePath(filename)
-		if(xmlRoot) then
-			local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
-			local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
-			if(node and node[1]) then
-				local root_node = commonlib.XPath.selectNode(xmlRoot, "/pe:blocktemplate");
-				if(root_node and root_node[1]) then
-					local node = commonlib.XPath.selectNode(root_node, "/pe:blocks");
-					if(node and node[1]) then
-						local blocks = NPL.LoadTableFromString(node[1]);
-						for _, b in ipairs(blocks) do
-							if(b[4]) then
-								local block_template = block_types.get(b[4]);
-								if(block_template) then
-									if b[6] and b[6].attr and b[6].attr.filename then
-										filename = b[6].attr.filename
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-		end
-		-- filename = commonlib.Encoding.DefaultToUtf8(filename)
+		filename = commonlib.Encoding.DefaultToUtf8(filename)
 		GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
 	elseif(id == "STL" and filename) then
 		local output_file_name = filename;
@@ -342,11 +320,9 @@ function SelectBlocks:PrepareData()
 			self.need_refresh = false;
 			ParaTerrain.DeselectAllBlock();
 
-			local _, b;
-			b = self.blocks[1];
+			local b = self.blocks[1];
 			local min_x, min_y, min_z = b[1], b[2], b[3];
 			local max_x, max_y, max_z = min_x, min_y, min_z;
-
 			
 			for _, b in ipairs(self.blocks) do
 				local x, y, z = b[1], b[2], b[3]
@@ -424,11 +400,14 @@ function SelectBlocks.CancelSelection()
 	SelectBlocks.UnregisterHooks();
 	SelectBlocks.ClosePage();
 	SelectBlocks.selected_count = 0
+	
 	-- canceled the selection. 	
 	cur_selection = nil;
 
 	if(cur_instance) then
 		local self = cur_instance;
+		self:selectionCanceled();
+
 		cur_instance = nil;
 	end
 
@@ -500,6 +479,7 @@ function SelectBlocks.SelectAll(bImmediateUpdate, max_new_count)
 			local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 			if(block_id > 0) then
 				local block = block_types.get(block_id);
+				self.aabb:Extend(x,y,z)
 				if(block) then
 					local block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
 					self:SelectSingleBlock(x,y,z, block_id, block_data);
@@ -573,7 +553,7 @@ function SelectBlocks:SelectSingleBlock(x,y,z, block_id, block_data)
 	ParaTerrain.SelectBlock(x,y,z,true);
 end
 
--- highligh all blocks that are selected. Each frame we will only select a limited number of blocks for framerate. 
+-- highlight all blocks that are selected. Each frame we will only select a limited number of blocks for framerate. 
 function SelectBlocks:FrameMove()
 	local min, max, cursor = self.min, self.max, self.cursor;
 	if(not self.need_refresh or not min or not cursor) then
@@ -588,7 +568,7 @@ function SelectBlocks:FrameMove()
 	local x,y,z = cursor[1], cursor[2], cursor[3];
 
 	local count = 0;
-	local max_block_per_frame = 500;
+	local max_block_per_frame = 20000;
 
 	local function TryAddBlock(x,y,z)
 		cursor[1], cursor[2], cursor[3] = x,y,z
@@ -709,6 +689,37 @@ function SelectBlocks:mouseWheelEvent(event)
 	end
 end
 
+function SelectBlocks:handleRightClickScene(event)
+	if(self:sceneRightClicked(event)) then
+		return
+	end
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled then
+		local self = cur_instance;
+		local ctrl_pressed = event.ctrl_pressed;
+		if ctrl_pressed then
+			local result = {};
+			result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, self.filter);
+			
+			if(result.blockX) then
+				local block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
+				if(block_id and block_id > 0) then
+					local block = block_types.get(block_id);
+					if(block) then
+						if(block.invisible and not block.solid) then
+							-- we will skip picking for invisible non solid block. instead we will only pick solid or customModel object.
+							result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, mathlib.bit.band(0x84, self.filter));
+						end
+					end
+				end
+			end
+			SelectBlocks.ExtendAABB(result.blockX,result.blockY,result.blockZ)
+			self:SetManipulatorPosition({result.blockX,result.blockY,result.blockZ});
+		end
+		return 
+	end
+end
+
 function SelectBlocks:handleLeftClickScene(event)
 	local self = cur_instance;
 	local ctrl_pressed = event.ctrl_pressed;
@@ -720,6 +731,19 @@ function SelectBlocks:handleLeftClickScene(event)
 		local result = {};
 		result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, self.filter);
 		
+		if(result.blockX) then
+			local block_id = ParaTerrain.GetBlockTemplateByIdx(result.blockX,result.blockY,result.blockZ);
+			if(block_id and block_id > 0) then
+				local block = block_types.get(block_id);
+				if(block) then
+					if(block.invisible and not block.solid) then
+						-- we will skip picking for invisible non solid block. instead we will only pick solid or customModel object.
+						result = ParaTerrain.MousePick(GameLogic.GetPickingDist(), result, mathlib.bit.band(0x84, self.filter));
+					end
+				end
+			end
+		end
+
 		if(result.blockX) then
 			if(shift_pressed) then
 				-- ctrl+shift+ left click to toggle a single block's selection state
@@ -841,23 +865,25 @@ function SelectBlocks.ShowPage(bShow)
 	SelectBlocks.selected_count = 0;
 	-- display a page containing all operations that can apply to current selection, like deletion, extruding, coloring, etc. 
 	local x, y, width, height = 0, 160, 120, 330;
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-			url = "script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.html", 
-			name = "SelectBlocksTask.ShowPage", 
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			isShowTitleBar = false,
-			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			zorder = 1,
-			allowDrag = true,
-			click_through = true,
-			directPosition = true,
-				align = "_lt",
-				x = x,
-				y = y,
-				width = width,
-				height = height,
-		});
+	params = {
+		url = "script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.html", 
+		name = "SelectBlocksTask.ShowPage", 
+		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+		isShowTitleBar = false,
+		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		zorder = 1,
+		allowDrag = true,
+		click_through = true,
+		directPosition = true,
+			align = "_lt",
+			x = x,
+			y = y,
+			width = width,
+			height = height,
+	}
+	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"SelectBlocksTask");
+	System.App.Commands.Call("File.MCMLWindowFrame",params);
 	MyCompany.Aries.Creator.ToolTipsPage.ShowPage(false);
 	GameLogic:UserAction("select blocks");
 end
@@ -912,6 +938,8 @@ function SelectBlocks.UpdateBlockNumber(count, liveEntityCount)
 			else
 				page:SetUIValue("title", SelectBlocks.GetBlockCountText())
 			end
+
+			GameLogic.GetFilters():apply_filters('UpdateBlockNumber');
 		end
 	end
 
@@ -1083,6 +1111,14 @@ function SelectBlocks:PopAABB()
 	end
 end
 
+function SelectBlocks:IsBlockSelected(x,y,z)
+	for i, block in pairs(self.blocks) do
+		if(block[1] == x and block[2] == y and block[3] == z) then
+			return true;
+		end
+	end
+end
+
 -- toggle block selection. 
 function SelectBlocks.ToggleBlockSelection(x,y,z)
 	local self = cur_instance;
@@ -1196,6 +1232,28 @@ function SelectBlocks.DeleteLiveEntitiesInAABB(aabb)
 	end
 end
 
+-- delete entity without saving to history
+function SelectBlocks.DeleteEntitiesInAABB(aabb)
+	if(aabb) then
+		local min_x, min_y, min_z = aabb:GetMinValues()
+		local max_x, max_y, max_z = aabb:GetMaxValues()
+		for x = min_x, max_x do
+			for y = min_y, max_y do
+				for z = min_z, max_z do
+					local entities = EntityManager.GetEntitiesInBlock(x, y, z);
+					if(entities) then
+						for entity,_ in pairs(entities) do
+							if entity and (entity:isa(EntityManager.EntityLiveModel) or entity:isa(EntityManager.EntityRailcar)) then
+								entity:Destroy();
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 -- global function to delete a group of blocks. 
 -- @param bFastDelete: if true, we will delete blocks without generating new undergound blocks. 
 function SelectBlocks.DeleteSelection(bFastDelete)
@@ -1208,7 +1266,8 @@ function SelectBlocks.DeleteSelection(bFastDelete)
 	
 	if(bFastDelete) then
 		SelectBlocks.FillSelection(0);
-		SelectBlocks.DeleteLiveEntitiesInAABB(self.aabb)
+		-- SelectBlocks.DeleteLiveEntitiesInAABB(self.aabb)
+		SelectBlocks.DeleteEntitiesInAABB(self.aabb)
 	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DestroyNearbyBlocksTask.lua");
 		local task = MyCompany.Aries.Game.Tasks.DestroyNearbyBlocks:new({
@@ -1326,12 +1385,16 @@ end
 -- static public function: clipboard
 function SelectBlocks.PasteFromClipboard(bx, by, bz)
 	local bHasSpecifiedPasteLocation;
+	local x, y, z;
 	if(bx) then
 		bHasSpecifiedPasteLocation = true;
 	else
 		local result = Game.SelectionManager:MousePickBlock();
 		if(result and result.blockX and result.side) then
 			bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+		end
+		if(result and result.physicalX) then
+			x, y, z = result.physicalX, result.physicalY, result.physicalZ
 		end
 	end
 	if(bx) then
@@ -1368,7 +1431,10 @@ function SelectBlocks.PasteFromClipboard(bx, by, bz)
 					entityClass = EntityManager.GetEntityClass(attr.class)
 				end
 				entityClass = entityClass or EntityManager.EntityLiveModel
-				local entity = entityClass:Create({bx=bx,by=by,bz=bz}, xmlNode);
+				if(x) then
+					bx, by, bz = nil, nil, nil;
+				end
+				local entity = entityClass:Create({bx=bx,by=by,bz=bz, x=x, y=y, z=z}, xmlNode);
 				entity:Attach();
 
 				if(GameLogic.GameMode:IsEditor()) then

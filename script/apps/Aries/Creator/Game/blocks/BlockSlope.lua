@@ -46,6 +46,46 @@ function block:ctor()
 		{id_data=11, assetfile="7", facing=4.71, },
 		{id_data=15, assetfile="7", facing=3.14, },
 		{id_data=10, assetfile="7", facing=1.57, },
+
+		{id_data=100+0, assetfile="shape_1", facing=0, },
+		{id_data=100+1, assetfile="shape_1", facing=1.57, },
+		{id_data=100+2, assetfile="shape_1", facing=3.14, },
+		{id_data=100+3, assetfile="shape_1", facing=4.71, },
+
+		{id_data=100+4, assetfile="shape_2", facing=0, },
+		{id_data=100+5, assetfile="shape_2", facing=4.71, },
+		{id_data=100+6, assetfile="shape_2", facing=3.14, },
+		{id_data=100+7, assetfile="shape_2", facing=1.57, },
+
+		{id_data=100+8, assetfile="shape_3", facing=0, },
+		{id_data=100+16, assetfile="shape_3", facing=4.71, },
+		{id_data=100+14, assetfile="shape_3", facing=3.14, },
+		{id_data=100+22, assetfile="shape_3", facing=1.57, },
+
+		{id_data=100+9, assetfile="shape_4", facing=0, },
+		{id_data=100+17, assetfile="shape_4", facing=4.71, },
+		{id_data=100+15, assetfile="shape_4", facing=3.14, },
+		{id_data=100+23, assetfile="shape_4", facing=1.57, },
+
+		{id_data=100+10, assetfile="shape_5", facing=0, },
+		{id_data=100+18, assetfile="shape_5", facing=4.71, },
+		{id_data=100+12, assetfile="shape_5", facing=3.14, },
+		{id_data=100+20, assetfile="shape_5", facing=1.57, },
+
+		{id_data=100+11, assetfile="shape_6", facing=0, },
+		{id_data=100+19, assetfile="shape_6", facing=4.71, },
+		{id_data=100+13, assetfile="shape_6", facing=3.14, },
+		{id_data=100+21, assetfile="shape_6", facing=1.57, },
+
+		{id_data=124+0, assetfile="shape_7", facing=0, },
+		{id_data=124+1, assetfile="shape_7", facing=1.57, },
+		{id_data=124+2, assetfile="shape_7", facing=3.14, },
+		{id_data=124+3, assetfile="shape_7", facing=4.71, },
+
+		{id_data=124+4, assetfile="shape_8", facing=0, },
+		{id_data=124+5, assetfile="shape_8", facing=1.57, },
+		{id_data=124+6, assetfile="shape_8", facing=3.14, },
+		{id_data=124+7, assetfile="shape_8", facing=4.71, },
 	}
 	models.id_model_map = {};
 	for i, model in ipairs(models) do
@@ -111,6 +151,12 @@ local function _isMatch(blockIndex, blockX, blockY, blockZ)
 			return false;
 		end
 	elseif 2==blockIndex then
+		if block_neg_x~=nil and block_pos_y~=nil and block_index_neg_x==nil and block_index_pos_y==nil and 
+			block_pos_x==nil and block_neg_y==nil
+		then
+			return true
+		end
+
 		if block_index_neg_x
 		or block_index_pos_x
 		or(block_index_pos_y and block_index_pos_y~=1)
@@ -121,6 +167,11 @@ local function _isMatch(blockIndex, blockX, blockY, blockZ)
 			return false;
 		end
 	elseif 3==blockIndex then
+		if block_pos_x~=nil and block_pos_y~=nil and block_index_pos_x==nil and block_index_pos_y==nil and 
+			block_neg_x==nil and block_neg_y==nil
+		then
+			return true
+		end
 		if block_index_pos_x
 		or block_index_neg_x
 		or(block_index_pos_y and block_index_pos_y~=0)
@@ -234,10 +285,204 @@ local function _isMatch(blockIndex, blockX, blockY, blockZ)
 		if block_index_pos_x~=4 or block_index_pos_z~=2 then
 			return false;
 		end
+	elseif 24==blockIndex then
+		if block_pos_x==nil or block_neg_z==nil or block_index_pos_x~=nil or block_index_neg_z~=nil then
+			return false
+		end
+	elseif 25==blockIndex then
+		if block_neg_x==nil or block_neg_z==nil or block_index_neg_x~=nil or block_index_neg_z~=nil then
+			return false
+		end
+	elseif 26==blockIndex then
+		if block_neg_x==nil or block_pos_z==nil or block_index_neg_x~=nil or block_index_pos_z~=nil then
+			return false
+		end
+	elseif 27==blockIndex then
+		if block_pos_x==nil or block_pos_z==nil or block_index_pos_x~=nil or block_index_pos_z~=nil then
+			return false
+		end
+	elseif 28==blockIndex then
+		if block_pos_y==nil or block_neg_z==nil or block_index_pos_y~=nil or block_index_neg_z~=nil then
+			return false
+		end
+	elseif 29==blockIndex then
+		if block_pos_y==nil or block_pos_z==nil or block_index_pos_y~=nil or block_index_pos_z~=nil then
+			return false
+		end
 	else
 		return false;
 	end
 	return true;
+end
+
+
+local function isMatch_outCornerModels(blockIndex, blockX, blockY, blockZ)
+	local block_pos_x = BlockEngine:GetBlock(blockX + 1, blockY, blockZ);
+	local block_neg_x = BlockEngine:GetBlock(blockX-1, blockY, blockZ);
+	local block_pos_y = BlockEngine:GetBlock(blockX, blockY + 1, blockZ);
+	local block_neg_y = BlockEngine:GetBlock(blockX, blockY-1, blockZ);
+	local block_pos_z = BlockEngine:GetBlock(blockX, blockY, blockZ + 1);
+	local block_neg_z = BlockEngine:GetBlock(blockX, blockY, blockZ-1);
+	local block_index_pos_x = nil;
+	local block_index_neg_x = nil;
+	local block_index_pos_y = nil;
+	local block_index_neg_y = nil;
+	local block_index_pos_z = nil;
+	local block_index_neg_z = nil;
+	if block_pos_x and block_pos_x.modelName == "slope" then
+		block_index_pos_x = band(BlockEngine:GetBlockData(blockX + 1, blockY, blockZ), 0xff);
+	end
+	if block_neg_x and block_neg_x.modelName == "slope" then
+		block_index_neg_x = band(BlockEngine:GetBlockData(blockX-1, blockY, blockZ), 0xff);
+	end
+	if block_pos_y and block_pos_y.modelName == "slope" then
+		block_index_pos_y = band(BlockEngine:GetBlockData(blockX, blockY + 1, blockZ), 0xff);
+	end
+	if block_neg_y and block_neg_y.modelName == "slope" then
+		block_index_neg_y = band(BlockEngine:GetBlockData(blockX, blockY-1, blockZ), 0xff);
+	end
+	if block_pos_z and block_pos_z.modelName == "slope" then
+		block_index_pos_z = band(BlockEngine:GetBlockData(blockX, blockY, blockZ + 1), 0xff);
+	end
+	if block_neg_z and block_neg_z.modelName == "slope" then
+		block_index_neg_z = band(BlockEngine:GetBlockData(blockX, blockY, blockZ-1), 0xff);
+	end
+
+	--锥形，直角可以指向8个顶点 https://i.bmp.ovh/imgs/2022/08/25/16c1e6198ea3c3c1.png
+	if 124==blockIndex then
+		if (block_index_neg_x==7 or block_index_neg_x==31) and block_index_neg_y==25 and block_index_neg_z==1 then
+			return true;
+		end
+	elseif 125==blockIndex then
+		if (block_index_neg_x==6 or block_index_neg_x==30) and block_index_neg_y==26 and block_index_pos_z==1 then
+			return true;
+		end
+	elseif 126==blockIndex then
+		if (block_index_pos_x==6 or block_index_pos_x==30) and block_index_neg_y==27 and block_index_pos_z==0 then
+			return true;
+		end
+	elseif 127==blockIndex then
+		if (block_index_pos_x==7 or block_index_pos_x==31) and block_index_neg_y==24 and block_index_neg_z==0 then
+			return true;
+		end
+	elseif 128==blockIndex then
+		if (block_index_neg_x==5 or block_index_neg_x==29) and block_index_pos_y==26 and block_index_pos_z==2 then
+			return true;
+		end
+	elseif 129==blockIndex then
+		if (block_index_pos_x==5 or block_index_pos_x==29) and block_index_pos_y==27 and block_index_pos_z==3 then
+			return true;
+		end
+	elseif 130==blockIndex then
+		if (block_index_pos_x==4 or block_index_pos_x==28) and block_index_pos_y==24 and block_index_neg_z==3 then
+			return true;
+		end
+	elseif 131==blockIndex then
+		if (block_index_neg_x==4 or block_index_neg_x==28) and block_index_pos_y==25 and block_index_neg_z==2 then
+			return true;
+		end
+	end
+
+
+	--锥形，6个方向各有4个翻滚角，共24个(包含上面的mOuterCornerBlockModels) https://i.bmp.ovh/imgs/2022/08/25/42439e0218bc849d.png
+	if 100==blockIndex then
+		if block_index_neg_z==0 and (block_index_pos_x==7 or block_index_pos_x==31) then
+			return true;
+		end
+	elseif 101==blockIndex then
+		if block_index_neg_z==1 and (block_index_neg_x==7 or block_index_pos_x==31) then
+			return true;
+		end
+	elseif 102==blockIndex then
+		if block_index_pos_z==1 and (block_index_neg_x==6 or block_index_pos_x==30) then
+			return true;
+		end
+	elseif 103==blockIndex then
+		if block_index_pos_z==0 and (block_index_pos_x==6 or block_index_pos_x==30) then
+			return true;
+		end
+	elseif 104==blockIndex then
+		if (block_index_neg_x==4 or block_index_neg_x==28) and block_index_neg_z==2 then
+			return true;
+		end
+	elseif 105==blockIndex then
+		if (block_index_pos_x==4 or block_index_pos_x==28) and block_index_neg_z==3 then
+			return true;
+		end
+	elseif 106==blockIndex then
+		if (block_index_pos_x==5 or block_index_pos_x==29) and block_index_pos_z==3 then
+			return true;
+		end
+	elseif 107==blockIndex then
+		if (block_index_neg_x==5 or block_index_neg_x==29) and block_index_pos_z==2 then
+			return true;
+		end
+	elseif 108==blockIndex then
+		if block_index_neg_z==1 and block_index_neg_y==25 then
+			return true;
+		end
+	elseif 109==blockIndex then
+		if block_index_neg_z==2 and block_index_pos_y==25 then
+			return true;
+		end
+	elseif 110==blockIndex then
+		if block_index_pos_z==2 and block_index_pos_y==26 then
+			return true;
+		end
+	elseif 111==blockIndex then
+		if block_index_pos_z==1 and block_index_neg_y==26 then
+			return true;
+		end
+	elseif 112==blockIndex then
+		if block_index_neg_z==3 and block_index_pos_y==24 then
+			return true;
+		end
+	elseif 113==blockIndex then
+		if block_index_neg_z==0 and block_index_neg_y==24 then
+			return true;
+		end
+	elseif 114==blockIndex then
+		if block_index_pos_z==0 and block_index_neg_y==27 then
+			return true;
+		end
+	elseif 115==blockIndex then
+		if block_index_pos_z==3 and block_index_pos_y==27 then
+			return true;
+		end
+	elseif 116==blockIndex then
+		if (block_index_pos_x==7 or block_index_pos_x==31) and block_index_neg_y==24 then
+			return true;
+		end
+	elseif 117==blockIndex then
+		if (block_index_pos_x==4 or block_index_pos_x==28) and block_index_pos_y==24 then
+			return true;
+		end
+	elseif 118==blockIndex then
+		if (block_index_neg_x==4 or block_index_neg_x==28) and block_index_pos_y==25 then
+			return true;
+		end
+	elseif 119==blockIndex then
+		if (block_index_neg_x==7 or block_index_neg_x==31) and block_index_neg_y==25 then
+			return true;
+		end
+	elseif 120==blockIndex then
+		if (block_index_pos_x==5 or block_index_pos_x==29) and block_index_pos_y==27 then
+			return true;
+		end
+	elseif 121==blockIndex then
+		if (block_index_pos_x==6 or block_index_pos_x==30) and block_index_neg_y==27 then
+			return true;
+		end
+	elseif 122==blockIndex then
+		if (block_index_neg_x==6 or block_index_neg_x==30) and block_index_neg_y==26 then
+			return true;
+		end
+	elseif 123==blockIndex then
+		if (block_index_neg_x==5 or block_index_neg_x==29) and block_index_pos_y==26 then
+			return true;
+		end
+	end
+
 end
 
 local dir_side_to_data = {
@@ -248,8 +493,22 @@ local dir_side_to_data = {
 };
 
 function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, camx, camy, camz, lookat_x, lookat_y, lookat_z)
+	for i=0,7 do 
+		local idx = 124 + i
+		if isMatch_outCornerModels(idx,blockX, blockY, blockZ) then
+			return idx 
+		end
+	end
+
+	for i=0,24 do 
+		local idx = 100 + i
+		if isMatch_outCornerModels(idx,blockX, blockY, blockZ) then
+			return idx
+		end
+	end
+	
 	local data = nil;
-	for i = 0, 23 do
+	for i = 0, 31 do
 		if _isMatch(i, blockX, blockY, blockZ) then
 			data = i;
 			break;
@@ -331,98 +590,112 @@ end
 -- @param axis: "x|y|z", if nil, it should default to "y" axis
 -- @return the mirrored block data. 
 function block:MirrorBlockData(blockData, axis)
-	function block:MirrorBlockData(blockData, axis)
 	local highColorData = band(blockData, 0xff00)
 	blockData = band(blockData, 0xff);
+	local arr
 	if(axis == "x") then
-		if(blockData == 1) then
-			blockData = 0;
-		elseif(blockData == 0) then
-			blockData = 1;
-		elseif(blockData == 9) then
-			blockData = 12;
-		elseif(blockData == 12) then
-			blockData = 9;
-		elseif(blockData == 13) then
-			blockData = 8;
-		elseif(blockData == 8) then
-			blockData = 13;
-		elseif(blockData == 2) then
-			blockData = 3;
-		elseif(blockData == 3) then
-			blockData = 2;
-		elseif(blockData == 14) then
-			blockData = 11;
-		elseif(blockData == 11) then
-			blockData = 14;
-		elseif(blockData == 15) then
-			blockData = 10
-		elseif(blockData == 10) then
-			blockData = 15;
-		end
+		arr = {
+			[1] = 0,
+			[9] = 12,
+			[8] = 13,
+			[2] = 3,
+			[14] = 11,
+			[15] = 10,
+
+
+			[100] = 101,
+			[102] = 103,
+			[104] = 105,
+			[106] = 107,
+
+			[108] = 113,
+			[109] = 112,
+			[110] = 115,
+			[111] = 114,
+
+			[116] = 119,
+			[117] = 118,
+			[120] = 123,
+			[121] = 122,
+
+			[124] = 127,
+			[125] = 126,
+			[128] = 129,
+			[130] = 131,
+		}
+		
 	elseif(axis == "z") then
-		if(blockData == 7) then
-			blockData = 6;
-		elseif(blockData == 6) then
-			blockData = 7;
-		elseif(blockData == 9) then
-			blockData = 13;
-		elseif(blockData == 13) then
-			blockData = 9;
-		elseif(blockData == 12) then
-			blockData = 8;
-		elseif(blockData == 8) then
-			blockData = 12;
-		elseif(blockData == 11) then
-			blockData = 15;
-		elseif(blockData == 15) then
-			blockData = 11;
-		elseif(blockData == 14) then
-			blockData = 10;
-		elseif(blockData == 10) then
-			blockData = 14;
-		elseif(blockData == 4) then
-			blockData = 5;
-		elseif(blockData == 5) then
-			blockData = 4;
-		end
+		arr = {
+			[7] = 6,
+			[9] = 13,
+			[8] = 12,
+			[11] = 15,
+			[14] = 10,
+			[4] = 5,
+
+			[100] = 103,
+			[101] = 102,
+			[104] = 107,
+			[105] = 105,
+
+			[108] = 111,
+			[109] = 110,
+			[112] = 115,
+			[113] = 114,
+
+			[116] = 121,
+			[117] = 120,
+			[118] = 123,
+			[119] = 122,
+
+			[124] = 125,
+			[126] = 127,
+			[128] = 131,
+			[130] = 129,
+		}
 	else -- "y"
-		if(blockData == 7) then
-			blockData = 4;
-		elseif(blockData == 4) then
-			blockData = 7;
-		elseif(blockData == 12) then
-			blockData = 11;
-		elseif(blockData == 11) then
-			blockData = 12;
-		elseif(blockData == 0) then
-			blockData = 3;
-		elseif(blockData == 3) then
-			blockData = 0;
-		elseif(blockData == 15) then
-			blockData = 8;
-		elseif(blockData == 8) then
-			blockData = 15;
-		elseif(blockData == 6) then
-			blockData = 5;
-		elseif(blockData == 5) then
-			blockData = 6;
-		elseif(blockData == 13) then
-			blockData = 10;
-		elseif(blockData == 10) then
-			blockData = 13;
-		elseif(blockData == 2) then
-			blockData = 1;
-		elseif(blockData == 1) then
-			blockData = 2;
-		elseif(blockData == 14) then
-			blockData = 9;
-		elseif(blockData == 9) then
-			blockData = 14;
+		arr = {
+			[7] = 4,
+			[11] = 12,
+			[0] = 3,
+			[8] = 15,
+			[6] = 5,
+			[13] = 10,
+			[1] = 2,
+			[9] = 14,
+
+			[100] = 105,
+			[101] = 104,
+			[102] = 107,
+			[103] = 106,
+
+			[108] = 109,
+			[110] = 111,
+			[112] = 113,
+			[114] = 115,
+
+			[116] = 117,
+			[118] = 119,
+			[120] = 121,
+			[122] = 123,
+
+			[124] = 131,
+			[125] = 128,
+			[126] = 129,
+			[127] = 130,
+		}
+		
+	end
+	for k,v in pairs(arr) do 
+		if k==blockData then
+			blockData = v 
+			break
+		elseif v==blockData then
+			blockData = k
+			break
 		end
 	end
 	return blockData + highColorData;
-end
 end
 
 function block:GetModelByBlockData2(blockData)

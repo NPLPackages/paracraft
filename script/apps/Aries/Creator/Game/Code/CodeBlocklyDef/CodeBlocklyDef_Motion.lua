@@ -688,7 +688,7 @@ setPos(x, y+0.5, z, "actorName")
 	end,
 	examples = {{desc = "", canRun = true, code = [[
 while(true) do
-    say(getFacing())
+    say(getFacing(1))
 end
 ]]},
 {desc = "", canRun = true, code = [[
@@ -697,6 +697,110 @@ say(getFacing("someActorName"))
 },
 },
 
+{
+	type = "getPlayerPos", 
+	message0 = L"主角 %1 坐标",
+	arg0 = {
+		{
+			type = "field_dropdown",
+			name = "value",
+			text = "x",
+			options = {
+				{ L"x", "x" },
+				{ L"y", "y" },
+				{ L"z", "z" },
+			},
+		}
+	},
+	output = {type = "field_number",},
+	category = "Motion", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "getPlayerPos",
+	func_description = 'getPlayerPos("%s")',
+	ToNPL = function(self)
+		return string.format('getPlayerPos("%s")', self:getFieldAsString('value'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+say(getPlayerPos("x"));
+say(getPlayerPos("y"));
+say(getPlayerPos("z"));
+]]},
+},
+},
+
+
+{
+	type = "rotate", 
+	message0 = L"旋转 X %1 Y %2 Z %3 度",
+	arg0 = {
+		{
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = "0"
+		},
+		{
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = "90"
+		},
+		{
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = "0"
+		},
+	},
+	previousStatement = true,
+	nextStatement = true,
+	category = "Motion", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "rotate",
+	func_description = 'rotate(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('rotate(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
+	end,
+	examples = {},
+},
+
+{
+	type = "rotateTo", 
+	message0 = L"旋转到 X %1 Y %2 Z %3 方向",
+	arg0 = {
+		{
+			name = "x",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = "0"
+		},
+		{
+			name = "y",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = "90"
+		},
+		{
+			name = "z",
+			type = "input_value",
+            shadow = { type = "math_number", value = 0,},
+			text = "0"
+		},
+	},
+	previousStatement = true,
+	nextStatement = true,
+	category = "Motion", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "rotateTo",
+	func_description = 'rotateTo(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('rotateTo(%s, %s, %s)\n', self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
+	end,
+	examples = {},
+},
 };
 function CodeBlocklyDef_Motion.GetCmds()
 	return cmds;

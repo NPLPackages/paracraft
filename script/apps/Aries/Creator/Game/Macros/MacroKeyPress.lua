@@ -15,7 +15,9 @@ local MouseEvent = commonlib.gettable("System.Windows.MouseEvent");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local KeyEvent = commonlib.gettable("System.Windows.KeyEvent");
 local InputMethodEvent = commonlib.gettable("System.Windows.InputMethodEvent");
-local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros");
+
+local ConvertToWebMode = NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/ConvertToWebMode/ConvertToWebMode.lua");
 
 -- @param event: key press event object
 -- @return string like "ctrl+DIK_C", ""
@@ -147,37 +149,121 @@ end
 
 --@param button: string like "C" or "ctrl+C"
 function Macros.KeyPressTrigger(button)
-	if(button and button ~= "") then
+	if (button and button ~= "") then
 		local callback = {};
+
+		if (Macros.GetHelpLevel() == -2) then
+			ConvertToWebMode:StopComputeRecordTime();
+
+			local macro = Macros.macros[Macros.curLine];
+
+			if (macro) then
+				macro.processTime = ConvertToWebMode.processTime;
+			end
+        end
+
 		MacroPlayer.SetKeyPressTrigger(button, nil, function()
-			if(callback.OnFinish) then
-				callback.OnFinish();
+			if (callback.OnFinish) then
+				if (Macros.GetHelpLevel() == -2) then
+					local nextNextLine = Macros.macros[Macros.curLine + 2];
+
+					if (nextNextLine and
+						nextNextLine.name ~= "Broadcast" and
+						nextNextLine.params ~= "macroFinished") then
+						commonlib.TimerManager.SetTimeout(function()
+							ConvertToWebMode:StopCapture();
+
+							MacroPlayer.ShowKeyboard(true, button);
+
+							if (MacroPlayer.page.keyboardWnd and
+								MacroPlayer.page.keyboardWnd.keylayout) then
+								for key, item in ipairs(MacroPlayer.page.keyboardWnd.keylayout) do
+									for keyI, itemI in ipairs(item) do
+										if (itemI and
+										    type(itemI) == "table" and
+										    itemI.name) then
+											local keyName;
+											
+											if (itemI.char) then
+												keyName = Macros.TextToKeyName(itemI.char);
+											end
+
+											if (not keyName) then
+												local keyUpperName = itemI.name:upper();
+
+												if (keyUpperName == "TAB") then
+													keyName = "DIK_TAB";
+												elseif (keyUpperName == "ENTER") then
+													keyName = "DIK_RETURN";
+												end
+											end
+	
+											if (keyName == button) then
+												local macro = Macros.macros[Macros.curLine];
+
+												if (macro) then
+													macro.mousePosition = {
+														posX = itemI.pos_x,
+														posY = itemI.pos_y
+													};
+												end
+
+												break;
+											end
+										end
+									end
+								end
+							end
+
+							MacroPlayer.ShowKeyboard(false);
+
+							ConvertToWebMode:StartComputeRecordTime();
+							ConvertToWebMode:BeginCapture(function()
+								callback.OnFinish();
+							end);
+						end, 3000);
+					else
+						callback.OnFinish();
+					end
+				else
+					callback.OnFinish();
+				end
 			end
 		end);
+
 		return callback;
 	end
 end
 
 function Macros.WindowKeyPressTrigger(ctrlName, button)
-	if(button and button ~= "") then
+	if (button and button ~= "") then
 		-- get final text in editbox
 		local nOffset = 0;
 		local targetText = "";
-		while(true) do
+
+		while (true) do
 			nOffset = nOffset + 1;
-			local nextMacro = Macros:PeekNextMacro(nOffset)
-			if(nextMacro and (nextMacro.name == "Idle" or nextMacro.name == "WindowKeyPressTrigger" or nextMacro.name == "WindowInputMethod" or nextMacro.name == "WindowKeyPress")) then
-				if(nextMacro.name ~= "Idle") then
+			local nextMacro = Macros:PeekNextMacro(nOffset);
+
+			if (nextMacro and
+			    (nextMacro.name == "Idle" or
+				 nextMacro.name == "WindowKeyPressTrigger" or
+				 nextMacro.name == "WindowInputMethod" or
+				 nextMacro.name == "WindowKeyPress")) then
+				if (nextMacro.name ~= "Idle") then
 					local nextUIName = nextMacro:GetParams()[1];
-					if(nextUIName == ctrlName) then
-						if(nextMacro.name == "WindowKeyPress") then
+
+					if (nextUIName == ctrlName) then
+						if (nextMacro.name == "WindowKeyPress") then
 							local text = nextMacro:GetParams()[2];
-							if(not text or not Macros.IsButtonLetter(text)) then
+
+							if (not text or not Macros.IsButtonLetter(text)) then
 								break;
 							end
-						elseif(nextMacro.name == "WindowInputMethod") then
+						elseif (nextMacro.name == "WindowInputMethod") then
 							local text = nextMacro:GetParams()[2];
-							if(text) then
+
+							if (text) then
 								targetText = targetText..text;
 							else
 								break;
@@ -191,23 +277,33 @@ function Macros.WindowKeyPressTrigger(ctrlName, button)
 				break;
 			end
 		end
-		if(targetText and targetText ~= "") then
+
+		if (targetText and targetText ~= "") then
 			local nOffset = 0;
-			while(true) do
+
+			while (true) do
 				nOffset = nOffset - 1;
-				local nextMacro = Macros:PeekNextMacro(nOffset)
-				if(nextMacro and (nextMacro.name == "Idle" or nextMacro.name == "WindowKeyPressTrigger" or nextMacro.name == "WindowInputMethod" or nextMacro.name == "WindowKeyPress")) then
-					if(nextMacro.name ~= "Idle") then
+				local nextMacro = Macros:PeekNextMacro(nOffset);
+
+				if (nextMacro and
+					(nextMacro.name == "Idle" or
+					 nextMacro.name == "WindowKeyPressTrigger" or
+					 nextMacro.name == "WindowInputMethod" or
+					 nextMacro.name == "WindowKeyPress")) then
+					if (nextMacro.name ~= "Idle") then
 						local nextUIName = nextMacro:GetParams()[1];
-						if(nextUIName == ctrlName) then
-							if(nextMacro.name == "WindowKeyPress") then
+
+						if (nextUIName == ctrlName) then
+							if (nextMacro.name == "WindowKeyPress") then
 								local text = nextMacro:GetParams()[2];
-								if(not text or not Macros.IsButtonLetter(text)) then
+
+								if (not text or not Macros.IsButtonLetter(text)) then
 									break;
 								end
-							elseif(nextMacro.name == "WindowInputMethod") then
+							elseif (nextMacro.name == "WindowInputMethod") then
 								local text = nextMacro:GetParams()[2];
-								if(text) then
+
+								if (text) then
 									targetText = text..targetText;
 								else
 									break;
@@ -223,13 +319,87 @@ function Macros.WindowKeyPressTrigger(ctrlName, button)
 			end
 		end
 
+		if (Macros.GetHelpLevel() == -2) then
+			ConvertToWebMode:StopComputeRecordTime();
+
+			local macro = Macros.macros[Macros.curLine];
+
+			if (macro) then
+				macro.processTime = ConvertToWebMode.processTime;
+			end
+        end
 
 		local callback = {};
+
 		MacroPlayer.SetKeyPressTrigger(button, targetText, function()
-			if(callback.OnFinish) then
-				callback.OnFinish();
+			if (callback.OnFinish) then
+				if (Macros.GetHelpLevel() == -2) then
+					local nextNextLine = Macros.macros[Macros.curLine + 2];
+
+					if (nextNextLine and
+						nextNextLine.name ~= "Broadcast" and
+						nextNextLine.params ~= "macroFinished") then
+						commonlib.TimerManager.SetTimeout(function()
+							ConvertToWebMode:StopCapture();
+
+							MacroPlayer.ShowKeyboard(true, button);
+
+							if (MacroPlayer.page.keyboardWnd and
+								MacroPlayer.page.keyboardWnd.keylayout) then
+								for key, item in ipairs(MacroPlayer.page.keyboardWnd.keylayout) do
+									for keyI, itemI in ipairs(item) do
+										if (itemI and
+										    type(itemI) == "table" and
+										    itemI.name) then
+											local keyName;
+											
+											if (itemI.char) then
+												keyName = Macros.TextToKeyName(itemI.char);
+											end
+
+											if (not keyName) then
+												local keyUpperName = itemI.name:upper();
+
+												if (keyUpperName == "TAB") then
+													keyName = "DIK_TAB";
+												elseif (keyUpperName == "ENTER") then
+													keyName = "DIK_RETURN";
+												end
+											end
+	
+											if (keyName == button) then
+												local macro = Macros.macros[Macros.curLine];
+
+												if (macro) then
+													macro.mousePosition = {
+														posX = itemI.pos_x,
+														posY = itemI.pos_y
+													};
+												end
+
+												break;
+											end
+										end
+									end
+								end
+							end
+
+							MacroPlayer.ShowKeyboard(false);
+
+							ConvertToWebMode:StartComputeRecordTime();
+							ConvertToWebMode:BeginCapture(function()
+								callback.OnFinish();
+							end);
+						end, 3000);
+					else
+						callback.OnFinish();
+					end
+				else 
+					callback.OnFinish();
+				end
 			end
 		end);
+
 		return callback;
 	end
 end

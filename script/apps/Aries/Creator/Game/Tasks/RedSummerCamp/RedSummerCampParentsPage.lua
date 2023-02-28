@@ -14,7 +14,7 @@ local RedSummerCampParentsPage = NPL.export();
 local page
 RedSummerCampParentsPage.ItemData={
 	{name="非网络游戏",node_name="network",content="全球领先的三维虚拟校园理念，让孩子通过编程、动画，构建人工智能的世界。"},
-	{name="费用详情",node_name="charge",content="成为帕拉卡会员，畅享全部课程和软件1对1服务，绝无其他任何内置的付费项目。"},
+	{name="费用详情",node_name="charge",content="成为帕拉卡会员，畅享3D动画、编程创作。"},
 	{name="教育部门认证",node_name="certificate",content="中国自主研发计算机学习软件，多省市教育局指定计算机校本课配套学习软件。"}
 }
 
@@ -23,6 +23,13 @@ function RedSummerCampParentsPage.OnInit()
 end
 
 function RedSummerCampParentsPage.Show()
+	if RedSummerCampParentsPage.IsHideCharge() then
+		RedSummerCampParentsPage.ItemData={
+			{name="非网络游戏",node_name="network",content="全球领先的三维虚拟校园理念，让孩子通过编程、动画，构建人工智能的世界。"},
+			-- {name="费用详情",node_name="charge",content="成为帕拉卡会员，畅享3D动画、编程创作。"},
+			{name="教育部门认证",node_name="certificate",content="中国自主研发计算机学习软件，多省市教育局指定计算机校本课配套学习软件。"}
+		}
+	end
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.html",
 			name = "RedSummerCampParentsPage.Show", 
@@ -41,4 +48,10 @@ function RedSummerCampParentsPage.Show()
 				height = 0,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
+end
+
+
+function RedSummerCampParentsPage.IsHideCharge()
+	local isHide= System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios'
+	return isHide
 end

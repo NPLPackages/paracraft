@@ -18,6 +18,8 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Translation = commonlib.gettable("MyCompany.Aries.Game.Common.Translation")
 local SentientGroupIDs = commonlib.gettable("MyCompany.Aries.Game.GameLogic.SentientGroupIDs");
 local Screen = commonlib.gettable("System.Windows.Screen");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
+local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
 
 local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", {
 	jump_up_speed = 5,
@@ -140,6 +142,8 @@ local options = commonlib.createtable("MyCompany.Aries.Game.GameLogic.options", 
 	mainPlayerAssetPath = nil,
 	-- lower movie frame rate, when actors are far from current camera, only affect those without camera actor
 	isAutoMovieFPS = true,
+	-- show chat wondow
+	bIsShowChatWnd = true,
 });
 
 -- load default setting on application start. 
@@ -183,6 +187,12 @@ function options:OneTimeInit()
 		NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 		local Screen = commonlib.gettable("System.Windows.Screen");
 		Screen:ChangeUIDesignResolution(1280, 720)
+	end
+
+	if System.options.FPS then
+		local fps = tonumber(System.options.FPS)
+		fps = mathlib.clamp(fps,10,60)
+		self:SetFramePerSecond(fps)
 	end
 end
 
@@ -332,7 +342,6 @@ function options:OnLoadWorld()
 	
 	GameLogic.RunCommand("language");
 	-- restore to default player mode, just in case the user has changed it. 
-	GameLogic.RunCommand("/hide playertouch");
 	GameLogic.RunCommand("/hide paralife");
 	-- no restrictions and no grid on camera by default
 	GameLogic.RunCommand("/camera -norestrict -nogrid");
@@ -452,7 +461,18 @@ function options:OnLoadWorld()
 	self.world_start_time = commonlib.TimerManager.GetCurrentTime();
 	self:SetLastSaveTime();
 	self:ShowMenuPage();
-	self:ShowTouchPad();
+	if MobileUIRegister.GetIsDevMode() then
+		local IsTouchDevice = self:HasTouchDevice()
+		if IsTouchDevice then
+			MobileUIRegister.SetMobileUIEnable(true)
+		else
+			MobileUIRegister.SetMobileUIEnable(false)
+		end
+	else
+		self:ShowTouchPad();
+	end
+	GameLogic.RunCommand("/hide playertouch");
+	
 	self:ShowSkyBox();
 	self:ResetWindowTitle();
 	WorldCommon.SetModified(false);
@@ -491,14 +511,15 @@ function options:OnLoadWorld()
 	self:SetShowMainPlayer(hide_player~="true")
 
 	local stereoMode = WorldCommon.GetWorldTag("stereoMode")
-	self:EnableStereoMode(tonumber(stereoMode))
+	-- self:EnableStereoMode(tonumber(stereoMode))
 
-	self:SetWeather(WorldCommon.GetWorldTag("weather"))
-
+	-- options:SetWeather(WorldCommon.GetWorldTag("weather"))
 	local timesAutoGo = WorldCommon.GetWorldTag("timesAutoGo")~="false"
-	self:SetTimesAutoGo(timesAutoGo)
+	options:SetTimesAutoGo(timesAutoGo)
 	if not timesAutoGo then
-		self:SetFrozenDayTime(WorldCommon.GetWorldTag("frozendaytime"))
+		options:SetFrozenDayTime(WorldCommon.GetWorldTag("frozendaytime"))
+	else
+		options:RecoverLastTime(WorldCommon.GetWorldTag("lastdaytime"))--关闭的时候保存的世界时间
 	end
 
 	local lightcolor = WorldCommon.GetWorldTag("lightcolor")
@@ -552,13 +573,23 @@ function options:SetWeather(weather,bSave)
 
 	if bSave and WorldCommon.GetWorldTag("weather")~=weather then
 		WorldCommon.SetWorldTag("weather",weather)		
-		WorldCommon.SaveWorldTag()
+		-- WorldCommon.SaveWorldTag()
 	end
 end
 
 function options:GetWeather()
 	return self.weather or "sun"
 end
+
+-- @param fps: default to 60FPS
+function options:SetFramePerSecond(fps)
+	fps = math.floor(fps)
+	if(self.FPS ~= fps) then
+		self.FPS = fps;
+		ParaEngine.GetAttributeObject():SetField("RefreshTimer", 1/self.FPS);
+	end
+end
+
 
 --/shader命令
 function options:SetRenderMethod(shaderIdx,bSave)
@@ -572,7 +603,7 @@ function options:SetRenderMethod(shaderIdx,bSave)
     else
 		if bSave then
 			WorldCommon.GetWorldInfo().rendermethod = shaderIdx;
-			WorldCommon.SaveWorldTag()
+			-- WorldCommon.SaveWorldTag()
 		end
 		return true
     end
@@ -588,7 +619,7 @@ function options:SetTimesAutoGo(bool,bSave)
 	self.isTimesAutoGo = bool~=false
 	if bSave and WorldCommon.GetWorldTag("timesAutoGo") ~=tostring(bool) then
 		WorldCommon.SetWorldTag("timesAutoGo",tostring(bool))
-		WorldCommon.SaveWorldTag()
+		-- WorldCommon.SaveWorldTag()
 	end
 end
 
@@ -598,7 +629,15 @@ function options:SetFrozenDayTime(time,bSave)
 	GameLogic.RunCommand(string.format("/time %s",self.frozendaytime))
 	if bSave and WorldCommon.GetWorldTag("frozendaytime")~=time then
 		WorldCommon.SetWorldTag("frozendaytime",time)
-		WorldCommon.SaveWorldTag()
+		-- WorldCommon.SaveWorldTag()
+	end
+end
+
+--启动世界时恢复上次的时间
+function options:RecoverLastTime(time)
+	time = tonumber(time)
+	if time then
+		GameLogic.RunCommand(string.format("/time %s",time))
 	end
 end
 
@@ -608,7 +647,7 @@ end
 
 function options:SetLightColor(r,g,b,block_light_scale)
 	WorldCommon.SetWorldTag("lightcolor",string.format("%s,%s,%s",r,g,b))
-	WorldCommon.SaveWorldTag()
+	-- WorldCommon.SaveWorldTag()
 
 	r,g,b = tonumber(r) or 204,tonumber(g) or 204,tonumber(b) or 204
 	self.lightcolor = {r,g,b}
@@ -715,6 +754,8 @@ function options:OnLeaveWorld()
 	TexturePackage.CloseLastPackageZip();
 
 	Screen:Disconnect("sizeChanged", options, options.OnResize, "UniqueConnection")
+
+	self:SetShowChatWnd(true)
 end
 
 function options:SetLastSaveTime()
@@ -833,7 +874,7 @@ function options:SetRenderDist(dist,bSave)
 
 	if bSave and WorldCommon.GetWorldTag("renderdist")~=tostring(dist) then
 		WorldCommon.SetWorldTag("renderdist",tostring(dist));
-		WorldCommon.SaveWorldTag()
+		-- WorldCommon.SaveWorldTag()
 	end
 end
 
@@ -902,9 +943,7 @@ end
 
 -- get the current npl runtime version
 function options.GetBaseVersion()
-	local baseVersion = ParaEngine.GetAppCommandLineByParam("base_version", "2.0.0")
-	
-	return baseVersion
+	return System.os.GetParaEngineVersion();
 end
 
 -- the version file should contain a single line of text such as "1.0.0"
@@ -1147,14 +1186,22 @@ local MOVIE_CAPTURE_MODE = {
 	MOVIE_CAPTURE_MODE_STEREO_ABOVE_BELOW = 3,
 	MOVIE_CAPTURE_MODE_STEREO_FRAME_INTERLACED = 4,
 	MOVIE_CAPTURE_MODE_STEREO_RED_BLUE = 5, 
+	MOVIE_CAPTURE_MODE_STEREO_ODS = 6, 
+	MOVIE_CAPTURE_MODE_STEREO_ODS_SINGLE_EYE = 7, 
+	MOVIE_CAPTURE_MODE_STEREO_ODS_SINGLE_EYE_1 = 8, 
 };
 
+options._stereoLockWindowSize = nil
 -- @param value: 0 or false is disable, 2 or true is left/right, 5 is red/blue
 function options:EnableStereoMode(value)
 	if(value == true) then
 		value = 2; -- default to left/right
 	elseif(not value) then
 		value = 0;
+	end
+	if options._stereoLockWindowSize~=nil then
+		ParaEngine.GetAttributeObject():SetField("LockWindowSize", options._stereoLockWindowSize);
+		options._stereoLockWindowSize = nil
 	end
 	self.stereoMode = tonumber(value) or 0;
 	if(ParaMovie and ParaMovie.GetAttributeObject) then
@@ -1169,8 +1216,19 @@ function options:EnableStereoMode(value)
 			if(effect) then
 				effect:SetEnabled(true);
 			end
+		elseif(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_ODS_SINGLE_EYE_1) then
+			local effect = GameLogic.GetShaderManager():GetEffect("ODSStereo");
+			if(effect) then
+				effect:SetEnabled(true);
+			end
+			options._stereoLockWindowSize = ParaEngine.GetAttributeObject():GetField("LockWindowSize", false);
+			ParaEngine.GetAttributeObject():SetField("LockWindowSize", true);
 		end
 	end
+end
+
+function options:IsSingleEyeOdsStereo()
+	return ParaMovie.GetAttributeObject():GetField("StereoCaptureMode", 0) == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_ODS_SINGLE_EYE_1
 end
 
 function options:SetDisableShaderCommand(value)
@@ -1287,7 +1345,7 @@ function options:SetCloudThickness(cloud,bSave)
 
 	if bSave then
 		WorldCommon.SetWorldTag("cloudThickness",tostring(cloud));
-		WorldCommon.SaveWorldTag()
+		--WorldCommon.SaveWorldTag()
 	end
 end
 
@@ -1368,7 +1426,7 @@ function options:SetEyeBrightness(factor,bSave)
 
 		if bSave and WorldCommon.GetWorldTag("eyeBrightness")~=tostring(factor) then
 			WorldCommon.SetWorldTag("eyeBrightness",tostring(factor))
-			WorldCommon.SaveWorldTag()
+			-- WorldCommon.SaveWorldTag()
 		end
 	end
 end
@@ -1402,7 +1460,7 @@ function options:SetSuperRenderDist(dist,bSave)
 	end
 	if bSave then
 		WorldCommon.SetWorldTag("superrenderdist",tostring(dist));
-		WorldCommon.SaveWorldTag()
+		-- WorldCommon.SaveWorldTag()
 	end
 end
 
@@ -1471,7 +1529,14 @@ function options:IsCommunityWorld()
 	return GameLogic.GetFilters():apply_filters('service.local_service_world.is_community_world', false)
 end
 
-function options:SetCommunityWorld(bValue)
+function options:SetCommunityWorld(bValue, bNotExecGGSCmd)
+	if (not bNotExecGGSCmd) then
+		if (bValue) then
+			GameLogic.RunCommand("/ggs connect"); 
+		else
+			GameLogic.RunCommand("/ggs disconnect"); 
+		end
+	end
 	GameLogic.GetFilters():apply_filters('service.local_service_world.set_community_world', bValue)
 end
 
@@ -1572,4 +1637,12 @@ end
 
 function options:IsOfflineMode()
 	return self.isOfflineMode;
+end
+
+function options:IsShowChatWnd()
+	return self.bIsShowChatWnd
+end
+
+function options:SetShowChatWnd(bShow)
+	self.bIsShowChatWnd = bShow == true
 end

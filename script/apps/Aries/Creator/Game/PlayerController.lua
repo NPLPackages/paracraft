@@ -18,6 +18,7 @@ NPL.load("(gl)script/ide/mathlib.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/BlockInEntityHand.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/TouchMiniKeyboard.lua");
+NPL.load("(gl)script/ide/System/localserver/LocalStorageUtil.lua");
 local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
@@ -32,7 +33,7 @@ local BlockInEntityHand = commonlib.gettable("MyCompany.Aries.Game.EntityManager
 local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction");
 local TouchMiniKeyboard = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchMiniKeyboard");
-
+local LocalStorageUtil = commonlib.gettable("System.localserver.LocalStorageUtil");
 -- create class
 local PlayerController = commonlib.inherit(nil, commonlib.gettable("MyCompany.Aries.Game.PlayerController"));
 
@@ -103,12 +104,12 @@ function PlayerController:GetSkinTexture()
 	return skin;
 end
 
-function PlayerController:PickBlockAt(x, y, z)
+function PlayerController:PickBlockAt(x, y, z, side)
 	local block_template = BlockEngine:GetBlock(x, y, z);
 	if(block_template) then
 		local item = ItemClient.GetItem(block_template.id);
 		if(item) then
-			local item_stack = item:PickItemFromPosition(x, y, z);
+			local item_stack = item:PickItemFromPosition(x, y, z, side);
 			self:SetBlockInRightHand(item_stack);
 		end
 	end
@@ -277,7 +278,6 @@ end
 function PlayerController:GetItemStackInRightHand()
 	local player = EntityManager.GetPlayer();
 	if(player) then
-		local res = player:SetHandToolIndex(nIndex, true);
 		local itemStack = player:GetItemInRightHand();
 		if(itemStack) then
 			return itemStack;
@@ -393,36 +393,7 @@ function PlayerController:SaveLocalUserWorldData(name, value, bIsGlobal, bDeferS
 end
 
 function PlayerController:SaveLocalData(name, value, bIsGlobal, bDeferSave)
-	local ls = System.localserver.CreateStore(nil, 3, if_else(System.options.version == "teen", "userdata.teen", "userdata"));
-	if(not ls) then
-		return;
-	end
-	-- make url
-	local url;
-	if(not bIsGlobal) then
-		url = NPL.EncodeURLQuery(name, {"nid", System.User.nid})
-	else
-		url = name;
-	end
-	
-	-- make entry
-	local item = {
-		entry = System.localserver.WebCacheDB.EntryInfo:new({
-			url = url,
-		}),
-		payload = System.localserver.WebCacheDB.PayloadInfo:new({
-			status_code = System.localserver.HttpConstants.HTTP_OK,
-			data = {value = value},
-		}),
-	}
-	-- save to database entry
-	local res = ls:PutItem(item, not bDeferSave);
-	if(res) then 
-		LOG.std("", "debug","Player", "Local user data %s is saved to local server", tostring(url));
-		return true;
-	else	
-		LOG.std("", "warn","Player", "failed saving local user data %s to local server", tostring(url))
-	end
+	LocalStorageUtil.Save_userdata(name, value, bIsGlobal, bDeferSave)
 end
 
 -- load local user data for a given world
@@ -432,28 +403,7 @@ function PlayerController:LoadLocalUserWorldData(name, default_value, bIsGlobal)
 end
 
 function PlayerController:LoadLocalData(name, default_value, bIsGlobal)
-	local ls = System.localserver.CreateStore(nil, 3, if_else(System.options.version == "teen", "userdata.teen", "userdata"));
-	if(not ls) then
-		LOG.std(nil, "warn", "Player", "Player.LoadLocalData %s failed because userdata db is not valid", name)
-		return default_value;
-	end
-	local url;
-	-- make url
-	if(not bIsGlobal) then
-		url = NPL.EncodeURLQuery(name, {"nid", System.User.nid})
-	else
-		url = name;
-	end
-	
-	local item = ls:GetItem(url)
-			
-	if(item and item.entry and item.payload) then
-		local output_msg = commonlib.LoadTableFromString(item.payload.data);
-		if(output_msg) then
-			return output_msg.value;
-		end
-	end
-	return default_value;
+	return LocalStorageUtil.Load_userdata(name, default_value, bIsGlobal)
 end
 
 function PlayerController:LoadRemoteData(name, default_value)
@@ -481,10 +431,7 @@ end
 
 
 function PlayerController:FlushLocalData()
-	local ls = System.localserver.CreateStore(nil, 3, if_else(System.options.version == "teen", "userdata.teen", "userdata"));
-	if(ls) then
-		return ls:Flush();
-	end
+	LocalStorageUtil.Flush_userdata()
 end
 
 function PlayerController:CreateNewClientPlayerMP(world, entityId, netClientHandler)

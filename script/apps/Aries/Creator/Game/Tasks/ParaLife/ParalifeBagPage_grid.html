@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ParalifeBagPage.lua"><![CDATA[
+ParalifeBagPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParalifeBagPage");
+ParalifeBagPage.OnInit()
+local pageCtrl = document:GetPageCtrl();
+pageSize = ParalifeBagPage.PAGE_SIZE
+function ClosePage()
+    Page:CloseWindow();
+end
+function getIdxInPage()
+    return (Eval("index")-1) % pageSize + 1
+end
+function ds() --只取前面ParalifeBagPage.PAGE_SIZE个
+    local _itemList = ParalifeBagPage.GetDataSource()
+    if #_itemList>ParalifeBagPage.PAGE_SIZE then
+    _itemList = {}
+    for i=1,ParalifeBagPage.PAGE_SIZE do
+        _itemList[i] = ParalifeBagPage._itemList[i]
+    end
+    end
+    return _itemList
+end
+
+function getCanvas3dContainerXmlStrs()
+    local str = ""
+    for i=1,ParalifeBagPage.PAGE_SIZE do
+        local xml = [[
+        <pe:container visible='false' ClickThrough="true" style="width: 73px; height: 73px;margin-top: 4;margin-left: 4;background:url();">
+            <pe:canvas3d name='item_canvas3d_%s' DefaultRotY='-1.57' IsInteractive="false" autoRotateSpeed="0" 
+                        miniscenegraphname='item_canvas3d_%s' RenderTargetSize="128" 
+                        value='<%%= nil %%>' style="position:relative;width:73px;height:73px;margin-top: 0px;" />
+        </pe:container>
+        ]]
+        xml = string.format(xml,i,i)
+        str = str..xml
+    end
+    return str
+end
+]]></script>
+<pe:container uiname="paralife_back" ClickThrough="true" alignment="_fi" width="100%" height="100%" style="background:;">
+    <pe:container alignment="_fi" zorder="-10" name="screen_bg" uiname="ui_screen_bg" width="100%" height="100%" style="position: relative; background:url()" >
+    <pe:container uiname="page_bg" width="362px" height="720" alignment="_rt" style="background: url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/dikuang_157x197_32bits.png#0 0 157 197:60 100 65 65);">
+        <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 10px; margin-left:308px;width:34px;height:34px;background: url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/guanbi_34x34_32bits.png#0 0 34 34);"/>
+        
+        <div style="width:324px;margin-top: 72px;margin-left:18px;background:url();">
+            <pe:repeat DataSource='<%= ds()%>'>
+                <pe:repeatitem>
+                    <pe:container ClickThrough="true" style="float:left;width:108px;height:94px;padding-left:0px;background:url();">
+                        <pe:container ClickThrough="true" style="width: 81px; height: 81px;margin-top: 4;margin-left: 14; background:url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/weixuanzhong_81x81_32bits.png#0 0 81 81)">
+                            <pe:container ClickThrough="true" uiname='<%= "item_"..(getIdxInPage())%>' name='<%= "item_"..(getIdxInPage())%>' realIdx='<%=Eval("index")%>' style="width: 73px; height: 73px;margin-top: 4;margin-left: 4;background:url();">
+                                
+                            </pe:container>
+                        </pe:container>
+                    </pe:container>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+        <div style="margin-left: 22px;margin-top: 8px;">
+            <input type="button" name="btn_page_pre" onclick="ParalifeBagPage.onPageBtnClick" zorder="2" style="width:30px;height:41px;margin-left:25px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/zuojiantou_30x41_32bits.png#0 0 30 41);"/>
+            <div style="float:left;margin-top:0px;text-singleline:true;">
+                <label name="text_page" style="base-font-size:22px;font-size: 22px;color:#000000;text-align:center;width:200px;height:30px;margin:4px"/>
+            </div>
+            <input type="button" name="btn_page_next" onclick="ParalifeBagPage.onPageBtnClick" zorder=2 style="width:30px;height:41px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/youjiantou_30x41_32bits.png#0 0 30 41)"/>
+        </div>
+        
+    </pe:container>
+    <pe:container alignment="_fi" zorder="1" ClickThrough="true" width="100%" height="100%" style="position: relative; background:url()" >
+        <pe:container visible="false" zorder="1" style="width: 128px; height: 128px;margin-top: 0;margin-left: 0;background:url()">
+            <pe:canvas3d name='draged_canvas3d' DefaultRotY="-1.57" IsInteractive="true" autoRotateSpeed="0" miniscenegraphname='draged_canvas3d' RenderTargetSize="128" 
+                value='<%= nil %>'  style="position:relative;width:128px;height:128px;margin-top: 0px;" />
+        </pe:container>
+        
+        <%= getCanvas3dContainerXmlStrs()%>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

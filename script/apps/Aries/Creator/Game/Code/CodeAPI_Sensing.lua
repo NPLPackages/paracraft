@@ -256,7 +256,9 @@ function env_imp:ask(text, buttons, cb)
 
 	height = 220;
 	if(buttons) then
-		height = math.max(height, 140 + (#buttons)*36);
+		if(type(buttons) == "table") then
+			height = math.max(height, 140 + (#buttons)*36);			
+		end
 	end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/EnterTextDialog.lua");

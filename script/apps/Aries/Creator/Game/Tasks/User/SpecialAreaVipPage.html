@@ -1,0 +1,76 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/User/SpecialAreaVipPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="SpecialAreaVipPage.lua">
+<![CDATA[
+local SpecialAreaVipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/SpecialAreaVipPage.lua");
+SpecialAreaVipPage.OnInit()
+
+local clickConcealPayButtonTimes = 1
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnOpenVipCode()
+    local VipCodeExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchange.lua")
+    VipCodeExchange.ShowView();
+end
+]]>
+</script>
+<kp:window class="default" mode="lite" width="488" height="344" icon="Texture/Aries/Creator/keepwork/Window/title/biaoti_vip_32bits.png" onclose="ClosePage">
+    <pe:container alignment="_rt" style="margin-right:10px;margin-top:54px;background:url();">
+        <div onclick="OnOpenVipCode" style="width: 71px; height: 26px; font-size: 11px;font-weight: bold; color: #63aceb;">使用激活码</div>
+        <div onclick="OnOpenVipCode" style="width: 65px; height: 1px;margin-top: -8px; background-color: #63aceb;"></div>
+        <!-- <input type="button" value="" onclick="OnOpenVipCode" style="width:71px;height:16px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/active_code_btn_32bits.png#0 0 71 16)" /> -->
+    </pe:container>
+    <div style="font-size: 14px;margin-left: 32px; margin-top: 52px;color: #e08708;">
+        请联系经销商购买课程及软件服务
+    </div>
+
+    <div style="color: #000000; margin-top: 20px;margin-left: 32px;">
+        <div style="float: left;width: 227px;">
+            <img style="margin-left:0px;margin-top: 3px; float:left;width:17px; height:16px;" src="Texture/Aries/Creator/keepwork/vip/yunnan/dayi_17x16_32bits.png#0 0 17 16"/>
+            <div style="margin-left:4px;margin-top: 0px; float:left; font-size: 14px;">售后答疑：</div>
+            <div style="margin-left:0px;margin-top: 2px; float:left; font-size: 12px;">邓志-13577052767</div>
+        </div>
+
+        <div style="float: left;margin-left: 0px;">
+            <img style="margin-left:0px;margin-top: 3px; float:left;width:17px; height:17px;" src="Texture/Aries/Creator/keepwork/vip/yunnan/zixun_17x17_32bits.png#0 0 17 17"/>
+            <div style="margin-left:4px;margin-top: 0px; float:left; font-size: 14px;">咨询电话：</div>
+            <div style="margin-left:0px;margin-top: 2px; float:left; font-size: 12px;">闫丽华-18388094122</div>
+        </div>
+    </div>
+
+    <div style="color: #000000; margin-top: 15px;margin-left: 32px;">
+        <div style="float: left;width: 227px;">
+            <img style="margin-left:0px;margin-top: 3px; float:left; width:17px; height:16px;" src="Texture/Aries/Creator/keepwork/vip/yunnan/shouhoui_17x16_32bits.png#0 0 17 16"/>
+            <div style="margin-left:4px;margin-top: 0px; float:left; font-size: 14px;">售后服务：</div>
+            <div style="margin-left:0px;margin-top: 2px; float:left; font-size: 12px;">
+                <div>孙艳坤-13888138794</div>
+                <div style="margin-top: 2px;">杨璐-15808707729</div>
+            </div>
+        </div>
+
+        <div style="float: left;margin-left: 0px;">
+            <img style="margin-left:0px;margin-top: 5px; float:left;width:16px; height:13px;" src="Texture/Aries/Creator/keepwork/vip/yunnan/youxiang_16x13_32bits.png#0 0 16 13"/>
+            <div style="margin-left:6px;margin-top: 0px; float:left; font-size: 14px;">邮箱：</div>
+            <div style="margin-left:0px;margin-top: 2px; float:left; font-size: 12px;">38112799@qq.com</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <img style="margin-left:84px;margin-top: 3px; float:left;width:119px; height:140px;" src="Texture/Aries/Creator/keepwork/vip/yunnan/erweima_119x140_32bits.png#0 0 119 140"/>
+        <img style="margin-left:84px;margin-top: 3px; float:left;width:122px; height:138px;" src="Texture/Aries/Creator/keepwork/vip/yunnan/xiaochengxu_122x138_32bits.png#0 0 122 138"/>
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

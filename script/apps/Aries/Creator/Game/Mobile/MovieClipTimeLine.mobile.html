@@ -1,0 +1,70 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="MovieClipTimeLine.lua"><![CDATA[
+MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
+
+function OnCreateKeyFrameCtrl(params,node)
+    local _this = ParaUI.CreateUIObject("container", MovieClipTimeLine.keyframes_parent_name,
+    params.alignment, params.left, params.top, params.width, params.height);
+    _this.background = "";
+    params.parent:AddChild(_this);
+end
+
+function OnCreateSubFrameCtrl(params,node)
+    local _this = ParaUI.CreateUIObject("container", MovieClipTimeLine.subframes_parent_name,
+    params.alignment, params.left, params.top, params.width, params.height);
+    _this.background = "";
+    params.parent:AddChild(_this);
+end
+]]>
+        </script>
+        <div width="100%" style='<%=format("height:%d", MovieClipTimeLine.height)%>'>
+            <div style="background:url(Texture/whitedot.png);background-color:#D3D6FF">
+                <div style='<%=format("position: relative; background:; margin-left: 150px; margin-top: -%dpx; height: %dpx; width: 150px", 16, 16)%>'>
+                    <input type="button" uiname="MovieClipTimeLine.actorname" name="actorname" value='<%=L"全局"%>' style="font-size: 11px; margin-top:0px;margin-left: 0px; background-color: #097c04; background:url(Texture/whitedot.png); text-align:center; color: #ffffff; height: 16px; width: 150px" />
+                </div>
+                <div style='<%=format("position: relative; background: url(Texture/Aries/Creator/keepwork/Mobile/MovieClip/jindutiao1_50x50_32bits.png#0 0 50 50:10 10 10 10); margin-left: 0px; margin-top: 0px; height: %dpx; width: 150px", MovieClipTimeLine.timelineHeight)%>'>
+                    <input type="button" zorder="1" uiname="MovieClipTimeLine.varname" name="varname" tooltip='<%=L"点击切换"%>' spacing="0" 
+                    style='<%=format("font-size:18px;text-align:center;color:#ffffff; background:;margin-left:0px;margin-top:-1px;height:%dpx;width:150px;text-offset-y:0;", MovieClipTimeLine.timelineHeight)%>' 
+                    value='<%=L"文字"%>' onclick="MovieClipTimeLine.OnClickToggleSubVariable" />
+                </div>
+                <div align="right" style='<%=format("position: relative; background: url(Texture/Aries/Creator/keepwork/Mobile/MovieClip/jindutiao1_50x50_32bits.png#0 0 50 50:10 10 10 10); margin-left: 0px; margin-top: 0px; height: %dpx; width: 150px", MovieClipTimeLine.timelineHeight)%>'>
+                    <input type="button" zorder="1" uiname="MovieClipTimeLine.addOrUpdateKeyFrame" name="addOrUpdateKeyFrame" spacing="0" 
+                    style='<%=format("font-size:42px;text-align:center;color:#ffffff; background:;margin-left:0px;margin-top:-1px;height:%dpx;width:150px", MovieClipTimeLine.timelineHeight)%>' value="+" tooltip='<%=L"添加/修改关键帧"%>' onclick="MovieClipTimeLine.OnClickAddSubFrameKey" />
+                </div>
+                <pe:custom name="subFrames" width="100%" oncreate="OnCreateSubFrameCtrl" style='<%=format("margin-left:150px;margin-right:150px;height:%dpx;", MovieClipTimeLine.timelineHeight)%>'></pe:custom>
+            </div>
+            <div style="background:url(Texture/whitedot.png);background-color:#4E5463">
+                <div style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #db6517; margin-left: 0px; margin-top: 0px; height: %dpx; width: 150px", MovieClipTimeLine.timelineHeight)%>'>
+                    <input type="text" auto_virtual_keyboard="true" uiname="MovieClipTimeLine.starttime" name="starttime" tooltip='<%=L"开始时间(秒)"%>' enable_ime="false" spacing="0" 
+                    style='<%=format("background:;margin-left:0px;margin-top:10px;height:%dpx;width:150px;text-align:center;textcolor:#ffffff;font-size:18px", MovieClipTimeLine.timelineHeight-20)%>' value="0" onchange="MovieClipTimeLine.OnChangeStartTime" />
+                </div>
+                <div align="right" style='<%=format("position: relative; background: url(Texture/whitedot.png); background-color: #db6517; margin-left: 0px; margin-top: 0px; height: %dpx; width: 150px", MovieClipTimeLine.timelineHeight)%>'>
+                    <pe:if condition='<%=MovieClipTimeLine.ShowCompareEndTimeBg()%>'>
+                        <pe:container uiname='<%="MovieClipTimeLine_end_time_compare"%>' zorder="0" style='<%=format("position: relative; margin-left: 0px; background-color: #00ff00;height:%dpx;width:150px", MovieClipTimeLine.timelineHeight+2)%>'>
+                        </pe:container>
+                    </pe:if>
+                    <input type="text" auto_virtual_keyboard="true" uiname="MovieClipTimeLine.endtime" name="endtime" tooltip='<%=L"结束时间(秒)"%>' enable_ime="false" spacing="0" 
+                    style='<%=format("background:;margin-left:0px;margin-top:10px;height:%dpx;width:150px;text-align:center;textcolor:#ffffff;font-size:18px", MovieClipTimeLine.timelineHeight-20)%>' value='10' onchange="MovieClipTimeLine.OnChangeEndTime" />
+                </div>
+                <pe:custom name="keyframes" width="100%" oncreate="OnCreateKeyFrameCtrl" style='<%=format("margin-left:150px;margin-right:150px;height:%dpx;", MovieClipTimeLine.timelineHeight)%>'></pe:custom>
+            </div>
+            <div>
+                <pe:sliderbar uiname="MovieClipTimeLine.timeline" name="timeline" show_step_button="true" step_left_button_bg="Texture/Aries/Creator/keepwork/Mobile/MovieClip/jindutiaobofang1_50x50_32bits.png;0 0 50 50" step_right_button_bg="Texture/Aries/Creator/keepwork/Mobile/MovieClip/jindutiaobofang_50x50_32bits.png;0 0 50 50"
+                              onchange="MovieClipTimeLine.OnTimeChanged()" onclick="MovieClipTimeLine.OnClickTimeButton()" min="0" max="30000" min_step="1" value="0" style='<%=format("background:;height:%dpx;", MovieClipTimeLine.timeSliderHeight)%>' button_bg="Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;310 401 26 11:3 3 3 3"
+                              gridsize="50" buttontext_color="#cccccc" buttontext_format="%d / %d" button_width="150" button_height='<%=MovieClipTimeLine.timeSliderHeight%>' EditorWidth="90" EditorFormat="%d" IsShowEditor="false" direction="horizontal" />
+            </div>
+        </div>
+        <script refresh="true" type="text/npl" src="MovieClipTimeLine.lua">
+            MovieClipTimeLine:UpdateUI();
+        </script>
+    </pe:mcml>
+</body>
+</html>

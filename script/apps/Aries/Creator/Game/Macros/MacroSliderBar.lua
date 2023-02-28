@@ -13,8 +13,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local MouseEvent = commonlib.gettable("System.Windows.MouseEvent");
-local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros");
 
+local ConvertToWebMode = NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/ConvertToWebMode/ConvertToWebMode.lua");
 
 -- native ParaUIObject's onclick event
 --@param btnName: button name
@@ -59,16 +60,46 @@ end
 
 function Macros.SliderBarMouseUpTrigger(name, value)
 	local ctl = CommonCtrl.GetControl(name)
-	if(ctl and ctl.handleEvent) then
-		if(ctl:GetValue() ~= value) then
+	if (ctl and ctl.handleEvent) then
+		if (ctl:GetValue() ~= value) then
 			local startX, startY = ctl:GetButtonCenterByValue(ctl:GetValue())
 			local endX, endY = ctl:GetButtonCenterByValue(value)
 
-			if(startX and endX) then
+			if (Macros.GetHelpLevel() == -2) then
+				ConvertToWebMode:StopComputeRecordTime();
+
+				local macro = Macros.macros[Macros.curLine];
+
+				if (macro) then
+					macro.processTime = ConvertToWebMode.processTime;
+					macro.mousePosition = { startX = startX, startY = startY, endX = endX, endY = endY };
+				end
+			end
+
+			if (startX and endX) then
 				local callback = {};
+
 				MacroPlayer.SetDragTrigger(startX, startY, endX, endY, "left", function()
-					if(callback.OnFinish) then
-						callback.OnFinish();
+					if (callback.OnFinish) then
+						if (Macros.GetHelpLevel() == -2) then
+							local nextNextLine = Macros.macros[Macros.curLine + 2];
+	
+							if (nextNextLine and
+								nextNextLine.name ~= "Broadcast" and
+								nextNextLine.params ~= "macroFinished") then
+								commonlib.TimerManager.SetTimeout(function()
+									ConvertToWebMode:StopCapture();
+									ConvertToWebMode:StartComputeRecordTime();
+									ConvertToWebMode:BeginCapture(function()
+										callback.OnFinish();
+									end);
+								end, 3000);
+							else
+								callback.OnFinish();
+							end
+						else
+							callback.OnFinish();
+						end
 					end
 				end);
 				return callback;

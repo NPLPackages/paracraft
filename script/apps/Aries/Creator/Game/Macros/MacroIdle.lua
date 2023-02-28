@@ -19,6 +19,32 @@ local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 -- milliseconds between triggers
 local DefaultTriggerInterval = 200;
 
+function Macros.IsSkipIdle()
+	local offset = 1;
+	repeat 
+		local offsetMacro = Macros:PeekNextMacro(offset);
+		if (not offsetMacro) then return false end 
+		offset = offset + 1;
+		-- 如果下一个宏为按键宏则无需等待, 不检测上一个宏是否为按键宏(输入通常会有个点击聚焦事件中断)
+		if (offsetMacro.name == "Idle") then
+			-- 忽略
+		elseif (offsetMacro.name == "WindowKeyPressTrigger" or offsetMacro.name == "EditBoxTrigger") then
+			return true;
+		elseif (offsetMacro.name == "UIWindowEventTrigger") then 
+			local params = offsetMacro:GetParams();
+			if (type(params) == "table" and type(params[1]) == "table" and params[1].virtual_event_type == "UIWindowKeyBoardEvent") then 
+				return true;
+			else 
+				return false;
+			end
+		else 
+			return false;
+		end
+	until(false);  -- 死循环
+
+	return false;
+end
+
 -- @param timeMs: milliseconds or nil. 
 -- @param bForceWait: if true, we will not skip even if there is trigger in the next macro. 
 -- @return nil or {OnFinish=function() end}
@@ -26,6 +52,8 @@ function Macros.Idle(timeMs, bForceWait)
 	if(timeMs and timeMs > 0 and not bForceWait) then
 		local nextMacro = Macros:PeekNextMacro(1)
 		if(nextMacro) then
+			if (Macros.IsSkipIdle()) then return end 
+
 			local nextNextMacro = Macros:PeekNextMacro(2)
 			
 			if(nextMacro.name == "WindowKeyPressTrigger") then

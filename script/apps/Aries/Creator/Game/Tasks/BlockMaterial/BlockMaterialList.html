@@ -1,0 +1,108 @@
+﻿<template style="width: 100%; height: 100%; background-color: #cccccc;">
+    <WindowTitleBar title="材质库" style="color: #000000;"></WindowTitleBar>
+    <div class="container">
+        <div style="position: absolute; top: 0px; bottom: 0px; left: 0px; width: 150px; border-right: 1px solid #cccccc; overflow-y: scroll;">
+            <div v-for="categoryItem in CategoryList" style="height: 30px; width: 100%;">
+                <div v-bind:class="GetNavItemClass(categoryItem.CategoryName)" onclick="SelectedCategory(categoryItem.CategoryName)">
+                    {{(categoryItem.CategoryName or "") .. (string.format("(%d)", (#categoryItem.MaterialIDList)))}}
+                </div>
+            </div>
+        </div>
+        <div style="position: absolute; top: 0px; bottom: 0px; left: 160px; right: 0px; overflow-y: scroll;">
+            <div v-for="materialItem in MaterialList" style="width: 64px; height: 64px; background-color: #cccccc; display: inline-block; margin: 5px;">
+                <div v-bind:style="GetMaterialItemStyle(materialItem)" class="material" onclick="ClickMaterialItem(materialItem)">
+                    <div v-if="CurMaterialID == materialItem.ID" class="action" style="position: absolute; left: 0px; width: 64px; bottom: 0px; height: 24px;">
+                        <div onclick="ClickReplateMaterialBtn(materialItem)" class="action-btn" style="width: 32px; height: 24px; line-height: 24px; color: #ffffff; font-size: 12px; display: inline-block; text-align: center;">替换</div>
+                        <div onclick="ClickNewMaterialBtn(materialItem)" class="action-btn" style="width: 32px; height: 24px; line-height: 24px; color: #ffffff; font-size: 12px; display: inline-block; text-align: center;">添加</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script type="text/lua">
+RegisterComponent("WindowTitleBar", "%vue%/Components/WindowTitleBar.html");
+local BlockMaterialEditor = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockMaterial/BlockMaterialEditor.lua");
+
+local CategoryMap = {};
+local MaterialMap = {};
+MaterialList = {};
+CategoryList = {};
+CurCategoryName = "";
+CurMaterialID = 0;
+
+function ClickMaterialItem(material)
+    CurMaterialID = material.ID;
+end
+
+function GetNavItemClass(CategoryName)
+    return CurCategoryName == CategoryName and "nav-item selected" or "nav-item";
+end
+
+function GetMaterialItemStyle(material)
+    return string.format("width: 100%%; height: 100%%; background-color: %s; background: url(%s);", material.BaseColor, material.Diffuse);
+end 
+
+function ClickReplateMaterialBtn(material)
+    BlockMaterialEditor:ReplateCurrentMaterial(material);
+end 
+
+function ClickNewMaterialBtn(material)
+    BlockMaterialEditor:AddMaterial(material);
+end 
+
+function SelectedCategory(CategoryName)
+    CurCategoryName = CategoryName;
+    MaterialList = {};
+    MaterialIDList = CategoryMap[CurCategoryName];
+    for i, ID in ipairs(MaterialIDList) do
+        MaterialList[i] = MaterialMap[ID];
+    end 
+end 
+
+function OnReady()
+    MaterialMap = BlockMaterialEditor:GetDefaultMaterialMap();
+    CategoryMap = BlockMaterialEditor:GetDefaultCategoryMap();
+    CategoryList = {};
+    for CategoryName, MaterialIDList in pairs(CategoryMap) do 
+
+        CategoryList[#CategoryList + 1] = {
+            CategoryName = CategoryName,
+            MaterialIDList = MaterialIDList,
+        }
+    end
+    SelectedCategory(CategoryList[1].CategoryName);
+end
+</script>
+<style scoped="true">
+.container 
+{
+    position: absolute;
+    top: 40px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    background-color: #ffffff;
+}
+
+.action-btn:hover
+{
+    color: #cccccc;
+}
+
+.selected 
+{
+    background-color: #cccccc;
+}
+.nav-item 
+{
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    top: 4px;
+    bottom: 4px;
+    line-height: 22px;
+    padding-left: 4px;
+}
+
+</style>

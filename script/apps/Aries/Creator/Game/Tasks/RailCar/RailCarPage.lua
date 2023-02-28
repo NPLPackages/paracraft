@@ -33,6 +33,10 @@ function RailCarPage.Show()
 end
 
 function RailCarPage.ShowView()
+    if GameLogic.Macros:IsRecording() or GameLogic.Macros:IsPlaying() then
+        return
+    end
+
     if page and page:IsVisible() then
         return
     end
@@ -44,6 +48,8 @@ function RailCarPage.ShowView()
 
                 CameraController.SetRailCarCameraMod(nil)
             end
+
+            return player_entity, target_entity
         end);
 
         RailCarPage.has_bind = true

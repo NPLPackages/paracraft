@@ -43,7 +43,14 @@ function ItemCodeBlock:TryCreate(itemStack, entityPlayer, x,y,z, side, data, sid
 				if(langConfigFile) then
 					entity:SetLanguageConfigFile(langConfigFile);
 				end
-				if (langConfigFile == "npl_cad" or codeLanguageType == "python") then entity:SetUseNplBlockly(false) end
+				local editmode = itemStack:GetDataField("editmode");
+				if (editmode == "blockmode" ) then
+					entity:SetBlocklyEditMode(true);
+				end
+				-- if (langConfigFile == "npl_cad" or codeLanguageType == "python") then entity:SetUseNplBlockly(false) end
+				if  langConfigFile == "npl_junior" then 
+					entity:SetOpenSource(true)
+				end
                 entity:SetCodeLanguageType(codeLanguageType);
 				local nplCode = itemStack:GetDataField("nplCode");
 				if(nplCode) then
@@ -116,9 +123,18 @@ local tooltipMap = {
 	npl_python = L"Python",
 	npl_teacher = L"教师",
 	npl_camera = L"摄影机",
+	npl_junior = L"代码方块初级版",
 }
+
 function ItemCodeBlock:GetLangTooltipText(langName)
 	return tooltipMap[langName or ""] or langName;
+end
+
+local iconMap = {
+	npl_junior = "Texture/blocks/codeblockjunior_cover.png",
+}
+function ItemCodeBlock:GetLangIconFile(langName)
+	return iconMap[langName or ""];
 end
 
 
@@ -127,9 +143,21 @@ end
 -- @param width, height: size of the icon
 -- @param itemStack: this may be nil. or itemStack instance. 
 function ItemCodeBlock:DrawIcon(painter, width, height, itemStack)
-	ItemCodeBlock._super.DrawIcon(self, painter, width, height, itemStack)
+	local iconFile, lang
 	if(itemStack) then
-		local lang = itemStack:GetDataField("langConfigFile")
+		iconFile = itemStack:GetDataField("iconFile")
+		lang = itemStack:GetDataField("langConfigFile")
+		if(lang) then
+			iconFile = iconFile or self:GetLangIconFile(lang)
+		end
+	end
+	if(iconFile) then
+		painter:SetPen(self:GetIconColor());
+		painter:DrawRectTexture(0, 0, width, height, iconFile);
+	else
+		ItemCodeBlock._super.DrawIcon(self, painter, width, height, itemStack)
+	end
+	if(lang) then
 		local text = self:GetLangIconDisplayText(lang)
 		if(text) then
 			painter:DrawText(0, height-15, width-1, 15, text, 0x122);

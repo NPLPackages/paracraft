@@ -44,6 +44,14 @@
             function OpenLink()
                 ParaGlobal.ShellExecute("open", "https://keepwork.com/official/successful_cases/index", "", "", 1); 
             end
+
+            function GetDivStyle()
+                local style= [[margin-left: 84px;margin-top: 10px; width:1100px; height: 200px;]]
+                if RedSummerCampParentsPage.IsHideCharge() then
+                    style= [[margin-left: 260px;margin-top: 10px; width:1100px; height: 200px;]]
+                end
+                return style
+            end
             ]]>
         </script>
         <pe:container alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc">
@@ -51,9 +59,10 @@
         <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
             <!--Vip-->
             <pe:container alignment="_rt" style="background:url();">
-                <input type="button" value='' onclick="OpenLink" style="margin-right:20px;margin-top:5px; width: 70px; height: 72px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/chengonganli_70x72_32bits.png#0 0 70 72)" />
+                <!-- <input type="button" value='' onclick="OpenLink" style="margin-right:20px;margin-top:5px; width: 70px; height: 72px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/chengonganli_70x72_32bits.png#0 0 70 72)" /> -->
                 <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 7, "ShowVip")%>
-                <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
+                <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:20px;margin-top:5px;","2D_parent")%>
+                <!-- <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" /> -->
             </pe:container>
             <!--Close-->
             <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
@@ -68,7 +77,7 @@
                     <div style="margin-top: 9px; margin-left: 9px; width: 1060px; height: 332px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/parent_logo_32bits.png#0 0 1024 322);"></div>
                 </div>
 
-                <div name="content" style="margin-left: 84px;margin-top: 10px; width:1100px; height: 200px; ">
+                <div name="content" style="<%=GetDivStyle()%>">
                     <pe:repeat DataSource="<%=GetItemData()%>">
                         <pe:repeatitem>
                             <div zorder="-2" style="float: left; margin-left: 15px; margin-top: 0px; width: 350px; height: 186px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#157 95 80 80: 30 30 30 30);">

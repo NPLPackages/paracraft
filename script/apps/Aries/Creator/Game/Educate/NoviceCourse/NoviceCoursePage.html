@@ -1,0 +1,194 @@
+<!-- "script/apps/Aries/Creator/Game/Educate/NoviceCourse/NoviceCoursePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl">
+        <![CDATA[
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+        local VipToolNew = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipToolNew.lua")
+        local EducateMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/EducateMainPage.lua")
+        local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+        local courses = {
+            { id = 29477, label = L"基础操作",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/xinrenzhiyin_210x140_32bits.png;0 0 210 140",  },
+            { id = 42701, label = L"建模入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/lala_210x140_32bits.png;0 0 210 140",  },
+            { id = 42457, label = L"编程入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/papa_210x140_32bits.png;0 0 210 140",  },
+        
+            { id = 42670, label = L"动画入门",  icon = "Texture/Aries/Creator/paracraft/Educate/NoviceCourse/kaka_210x140_32bits.png;0 0 210 140",  },
+            -- { id = 455, label = L"有了想法怎么做",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/idea_32bits.png;0 0 195 100",  },
+            -- { id = 113, label = L"肇庆市第一中学",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke1_195x100_32bits.png;0 0 195 100",  },
+        
+            
+            -- { id = 2769, label = L"象形之美",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke2_195x100_32bits.png;0 0 195 100",  },
+            -- { id = 1082, label = L"火星探险",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke3_195x100_32bits.png;0 0 195 100",  },
+            -- { id = 475, label = L"男孩与苹果树",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/ke4_195x100_32bits.png;0 0 195 100",  },
+        }
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+        local pageCtrl = document:GetPageCtrl();
+        local total_papge = math.ceil(#courses / 4)
+        
+        function ClosePage()
+            pageCtrl:CloseWindow(true)
+        end
+        function SetControlVisible(name, v)
+            local control = pageCtrl:FindControl(name)
+            if control then
+                control.visible = v
+            end
+        end
+        function on_mouse_enter(index)
+            local name = "img_" .. index
+            SetControlVisible(name, true)
+        end
+
+        function on_mouse_leave(index)
+            local name = "img_" .. index
+            SetControlVisible(name, false)
+        end
+
+        function goto_world(item)
+            if(not item or not item.id)then
+                return
+            end
+            if item.name == "codewar" then
+                local Course = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Course/Course.lua");
+                Course.Show();
+                return
+            end
+
+            local id = item.id;
+            if(id == "all")then
+                local QuestAllCourse = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua")
+                QuestAllCourse.Show();
+                return
+            elseif(id == 70351)then
+                local SummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SummerCamp/SummerCampMainPage.lua")
+                SummerCampMainPage.ShowView(2);
+                return
+            end
+                    
+            local command = string.format("/loadworld -s -auto %s", id)
+            CommandManager:RunCommand(command)
+        end
+
+        function OnOpenCourse(index)
+            local list = GetItemListData()
+            goto_world(list[index])
+        end
+
+        function GetLabel_courses(index)
+            local list = GetItemListData()
+            local item = list[index]
+            if(item)then
+                return item.label;
+            end
+        end
+        
+        function OpenLink(name)
+            local url = name == "open_word" and "https://keepwork.com/official/docs/index" or "https://keepwork.com/official/docs/teach/lessons/small_proj_list"
+            ParaGlobal.ShellExecute("open", url, "", "", 1); 
+        end
+
+        function GetItemListData()
+            local re = {}
+            local start_index = (EducateMainPage.curr_course_page - 1) * 4 + 1
+            local end_index = EducateMainPage.curr_course_page * 4
+            for k,v in pairs(courses)do
+                if start_index <= k and k <= end_index then
+                    table.insert(re,v)
+                end
+            end
+            return re
+        end
+
+        function OnClicLastPage()
+            if EducateMainPage.curr_course_page > 1 then
+                EducateMainPage.curr_course_page = EducateMainPage.curr_course_page - 1
+                pageCtrl:Refresh(0)
+            end
+        end
+
+        function OnClicNextPage()
+            if EducateMainPage.curr_course_page < total_papge then
+                EducateMainPage.curr_course_page = EducateMainPage.curr_course_page + 1
+                pageCtrl:Refresh(0)
+            end
+        end
+        
+        function GetShowLeft()
+            return 1 < tonumber(EducateMainPage.curr_course_page)
+        end
+
+        function GetShowRight()
+            return tonumber(EducateMainPage.curr_course_page) < tonumber(total_papge)
+        end
+
+        ]]>
+        </script>
+        <style type="text/mcss">
+            {
+                opus_bar_button = {
+                    background = 'Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#205 112 86 46',
+                },
+            }
+        </style>
+
+        <pe:container style="margin-top:-60px;width:1280px;height:720px;background-color:#00000000;">
+            <div style="margin-left:0px;margin-top:0px;width:1132px;height:672px;background-color:#00ff0000;">
+                <div style="position:relative;margin-top: 80px;width:300px;height:30px;text-align:left;margin-left: 30px;color: #0e1627;font-weight: bold;font-size: 20px;"><%=L"新手入门"%>
+                </div>
+                <div style="margin-left:56px;margin-top:144px;width:302;height:39px;background: url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/tishidi_54x30_32bits.png#0 0 54 30:12 12 12 12);">
+                    <div style="float:left;margin-left:13px;margin-top:5px;width:30px;height:38px;background: url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/tishi_30x38_32bits.png#0 0 30 38);"/>
+                    <div style="float:left;margin-top:10px;font-weight: bold;text-align:left;font-size:14px;color: #82B0FF;">
+                        开启学习探索之旅吧！
+                    </div>
+                </div>
+                <div style = "width:1132px;background-color:#fff60000">
+                    <div style = "float:left;margin-left:56px;height:377px;margin-top:25px;background-color:#00000000;">
+                        <pe:repeat DataSource="<%=GetItemListData()%>">
+                            <pe:repeatitem>
+                                <div style="float:left;width: 260px;margin-left: 0px;margin-top: 0px; background:url()">
+                                    <div name ='<%=Eval("index")%>' style="margin-left: 0px;margin-top: 0px; background:url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/xinshoujiaoxue_34x35_32bits.png#0 0 34 35:16 16 16 16);width: 240px; height: 377px;">
+                                    <pe:container zorder = "2" style = "background: ;">
+                                            <div style="margin-left:10px;margin-top:15px;width:220px;height:150px;;background:url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/tupiandi_64x39_32bits.png#0 0 64 39:24 16 24 16);">
+                                                <img style="margin-left:5px;margin-top:5px;width:210px;height:140px;" src='<%= Eval("icon")%>' />
+                                            </div>
+                                            <div style="margin-top:26px;width:240px;height:24px;font-weight:bold;text-align:center;font-size:16px;color:#0E1627">
+                                                <%= GetLabel_courses(Eval("index"))%>
+                                            </div>
+                                            <input type="button" style="font-size:16px;color:#ffffff;;margin-left:45px;margin-top:70px;font-weight:bold;width:150px;height:44px;background:url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/anniu_80x44_32bits.png#0 0 80 44:28 28 28 44);" tooltip="点击打开"  value = "进入教学" name='<%= Eval("index")%>' onclick="OnOpenCourse"  onmouseenter='on_mouse_enter' onmouseleave='on_mouse_leave'/>
+                                        </pe:container>
+                                    </div>
+                                </div>
+                            </pe:repeatitem>
+                        </pe:repeat>
+                    </div>
+                </div>
+                <div valign = "bottom" style="width:1132px;height:252px;background: url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/tupian_1132x252_32bits.png#0 0 1132 252);">
+                    <pe:if condition ="<%=GetShowLeft()%>">
+                        <pe:container onclick = "OnClicLastPage" style="float:left;margin-left:56px;margin-top:169px;width:100px;height:52px;background:url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/xinshoujiaoxue_34x35_32bits.png#0 0 34 35:16 16 16 16);">
+                            <div  style="margin-left:38px;margin-top:12px;font-weight:bold;width:32px;height:28px;background:url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/shangyiye_32x28_32bits.png#0 0 32 28);"/>
+                        </pe:container>
+                    </pe:if>
+                    <pe:if condition ="<%=not GetShowLeft()%>">
+                        <pe:container style="float:left;margin-left:56px;margin-top:169px;width:100px;height:52px;background:url();">
+                        </pe:container>
+                    </pe:if>
+                    <pe:if condition ="<%=GetShowRight()%>">
+                        <div style = "float:left;width: 920px;background-color: #00000000;">
+                            <pe:container onclick = "OnClicNextPage" style="margin-left:820px;margin-top:169px;width:100px;height:52px;background:url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/xinshoujiaoxue_34x35_32bits.png#0 0 34 35:16 16 16 16);">
+                                <div  style="margin-left:38px;margin-top:12px;font-weight:bold;width:32px;height:28px;background:url(Texture/Aries/Creator/paracraft/Educate/NoviceCourse/xiayiye_32x28_32bits.png#0 0 32 28);"/>
+                            </pe:container>
+                        </div>
+                    </pe:if>
+                </div>
+            </div>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>
+

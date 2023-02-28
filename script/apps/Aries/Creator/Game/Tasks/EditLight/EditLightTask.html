@@ -8,14 +8,13 @@ EditLightTask.InitPage(Page);
 task = EditLightTask.GetInstance();
 ]]>
 </script>
-<aries:window mode="thin" style="width:200px;padding-bottom:5px;height:600px" title='<%=L"调整光源"%>' uiname_onclose="EditLightTask.CancelSelection" onclose="EditLightTask.CancelSelection">
-    <div style="float:left;margin-left:3px;margin-bottom:10px;margin-right:10px;" class="default">
+<aries:window mode="thin" style="width:200px;padding-bottom:5px;height:430px;" title='<%=L"光源属性"%>' uiname_onclose="EditLightTask.CancelSelection" onclose="EditLightTask.CancelSelection">
+    <div style="float:left;margin-left:3px;margin-top:5px;margin-bottom:10px;margin-right:10px;" class="default">
         <div>
             <div style="float:left;min-width:60px;"><%=L"模型"%></div>
-            <input class="mc_input" uiname="EditLightTask.text" name="modelFilepath" type="text" style="width:100px;height:22px;" value=''/>
-            <input value='<%=L"..."%>' type="button" style="width:20px;" uiname="EditLightTask.ChangeLightModel" onclick="EditLightTask.ChangeLightModel"/>
+            <input class="mc_input" onfocusout="EditLightTask.OnLightModelFileChange" uiname="EditLightTask.text" name="modelFilepath" type="text" style="width:100px;height:22px;" value=''/>
+            <input value='<%=L"..."%>' type="button" style="width:20px;color:#ffffff" uiname="EditLightTask.ChangeLightModel" onclick="EditLightTask.ChangeLightModel"/>
         </div>
-
         <div>
             <div style="float:left;min-width:60px;"><%=L"类型"%></div>
             <input type="radio" style="margin:2px" uiname="EditLightTask.SetLightType1" name="LightType" id="1" value="1" onclick="EditLightTask.ChangeLightType"/><div style="float:left;" for="1"><%=L"点光源"%></div>
@@ -29,19 +28,18 @@ task = EditLightTask.GetInstance();
             <input type="radio" style="margin:2px" uiname="EditLightTask.SetLightType3" name="LightType" id="3" value="3" onclick="EditLightTask.ChangeLightType"/><div style="float:left;" for="3"><%=L"平行光"%></div>
         </div>
 
-        <div>
+        <div style="margin-bottom:10px;">
             <div style="float:left;min-width:60px;"><%=L"漫反射"%></div>
             <pe:colorpicker uiname="EditLightTask.Diffuse" name="Diffuse" onchange="EditLightTask.ChangeDiffuseColor"/>
         </div>
-        <div>
+        <!--<div>
             <div style="float:left;min-width:60px;"><%=L"镜面光"%></div>
             <pe:colorpicker uiname="EditLightTask.Specular" name="Specular" onchange="EditLightTask.ChangeSpecularColor"/>
         </div>
         <div>
             <div style="float:left;min-width:60px;"><%=L"环境光"%></div>
             <pe:colorpicker uiname="EditLightTask.Ambient" name="Ambient" onchange="EditLightTask.ChangeAmbientColor"/>
-        </div>
-
+        </div>-->
         <div><div style="float:left;min-width:60px;"><%=L"位置"%></div><input class="mc_input" uiname="EditLightTask.Position" name="Position" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
 
         <pe:if condition='<%=task:GetSelectedLight() ~= nil and (task:GetSelectedLight():isSpotLight() or task:GetSelectedLight():isDirectionalLight())%>'>
@@ -60,6 +58,7 @@ task = EditLightTask.GetInstance();
             <div><div style="float:left;min-width:60px;"><%=L"聚光外角"%></div><input class="mc_input" uiname="EditLightTask.Phi" name="Phi" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
             <div><div style="float:left;min-width:60px;"><%=L"内外角衰减系数"%></div><input class="mc_input" uiname="EditLightTask.Falloff" name="Falloff" type="text" style="margin-left:2px;height:22px;" value='' onchange="EditLightTask.UpdateLightFromPage" width="100%"/></div>
         </pe:if>
+    </div>
 </aries:window>
 </pe:mcml>
 </html>

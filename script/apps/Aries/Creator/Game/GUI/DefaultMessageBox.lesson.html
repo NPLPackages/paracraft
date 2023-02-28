@@ -1,0 +1,91 @@
+﻿<!-- "script/apps/Aries/Creator/Game/GUI/DefaultMessageBox.lesson.html" -->
+<html>
+<body>
+<pe:mcml>
+<script type="text/npl" src="script/ide/MessageBox.lua" refresh="false"><![CDATA[
+function ClosePage()
+    -- _guihelper.CloseMessageBox();
+    if _guihelper.values and _guihelper.values.options and _guihelper.values.options.closeNoCancel then
+        _guihelper.CloseMessageBox()
+    else
+        _guihelper.OnMessageBoxClick("Cancel");
+    end
+    
+end
+]]></script>
+<div style="width: 630px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
+    <div style="width: 630; height: 10px;">
+        <input type="button" style="margin-left: 600px; margin-top: 10x; width:20px;height:20px;background: url(Texture/Aries/Creator/keepwork/ActRedhat/tipX_19X20_32bits.png#0 0 20 20);" onclick="ClosePage()"/>
+        <div style="margin-top: -50px; margin-left: 10px; width: 127px; height: 55px; background: url(Texture/Aries/Creator/keepwork/macro/kechengneirong_127x55_32bits.png#0 0 127 55);"></div>
+    </div>
+    <div style="padding-left:5px;padding-top:15px;padding-right:5px;padding-bottom:0px;width:620px;color:#101010">
+        <pe:if condition='<%=type(_guihelper.values.icon)=="string"%>'>
+            <img style="margin-right:5px;width:24px;height:24px;" src='<%=_guihelper.values.icon%>'/>
+        </pe:if>
+        <pe:if condition='<%=type(_guihelper.values.icon)=="table"%>'>
+            <img style="margin-right:5px;width:24px;height:24px;" src='<%=_guihelper.values.icon.src%>'animstyle='<%=_guihelper.values.icon.animstyle%>'/>
+        </pe:if>
+        <pe:if condition='<%=type(_guihelper.values.icon)=="number"%>'>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Asterisk%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/ChatWnd_Smiley.png# 0 0 24 24);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Error%>'><img style="margin-right:5px;background:url(Texture/3DMapSystem/Creator/Objects/error.png);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Exclamation%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/FriendsWnd_BuddyIcon_Online.png);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Warning%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/ChatWnd_Smiley.png# 0 0 24 24);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Information%>'><img style="margin-right:5px;background:url(Texture/3DMapSystem/common/info.png);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Stop%>'><img style="margin-right:5px;background:url(Texture/Aries/Friends/ChatWnd_Smiley.png# 0 0 24 24);width:24px;height:24px;" /></pe:if>
+            <pe:if condition='<%=_guihelper.values.icon==_guihelper.MessageBoxIcon.Question%>'><img style="margin-right:5px;background:url(Texture/3DMapSystem/common/Help.png);width:24px;height:24px;" /></pe:if>
+        </pe:if>    
+        <div style="float:left;padding:30px;min-height:120px;max-height:400px;font-size:16px;">
+            <script refresh="false" IsInitialized='<%=_guihelper.values.IsInitialized%>'>
+                document.write(_guihelper.values.content);
+            </script>
+        </div>
+    </div>
+  <pe:if condition='<%=_guihelper.values.buttons~=_guihelper.MessageBoxButtons.Nothing%>'>
+    <div style="padding:5px;padding-bottom:10px;">
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel%>'>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%=L"确定"%>' style="margin-left:113px;margin-top:5px;width:180px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OK%>'>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%=L"确定"%>' style="margin-left:220px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.YesNo%>'>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.Yes" name="Yes" value='<%=L"是"%>' style="margin-left:113px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.No" name="No" value='<%=L"否"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.YesNoCancel%>'>
+            <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.Yes" name="Yes" value='<%=L"是"%>' style="margin-left:6px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.No" name="No" value='<%=L"否"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+            <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.AbortRetryIgnore%>'>
+        <input type="button" class="kp_yellow_button" uiname="DefaultMessageBox.Abort" name="Abort" value='<%=L"终止"%>' style="margin-left:6px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.Retry" name="Retry" value='<%=L"重试"%>' style="margin-left:34px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.Ignore" name="Ignore" value='<%=L"忽略"%>' style="margin-left:34px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.RetryCancel%>'>
+        <input type="button" class="kp_yellow_button" uiname="DefaultMessageBox.Retry" name="Retry" value='<%=L"重试"%>' style="margin-left:113px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+        <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%=L"取消"%>' style="margin-left:34px;margin-top:5px;width:180px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel_CustomLabel%>'>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:113px;margin-top:5px;width:180px;height:64px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:34px;margin-top:5px;width:180px;height:64px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right%>'>
+          <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:113px;margin-top:5px;width:180px;height:64px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:34px;margin-top:5px;width:180px;height:64px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OKCancel_CustomLabel_Gray_All%>'>
+          <input type="button" class="kp_gray_button" uiname="DefaultMessageBox.Cancel" name="Cancel" value='<%= (_guihelper.values.options.cancel or L"取消") %>' style="margin-left:113px;margin-top:5px;width:180px;height:64px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+          <input type="button" class="kp_gray_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:34px;margin-top:5px;width:180px;height:64px;font-size:16px;" onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+      <pe:if condition='<%=_guihelper.values.buttons==_guihelper.MessageBoxButtons.OK_CustomLabel%>'>
+          <input type="button" class="kp_yellow_button" hotkey="DIK_RETURN" uiname="DefaultMessageBox.OK" name="OK" value='<%= (_guihelper.values.options.ok or L"确定") %>' style="margin-left:220px;margin-top:5px;width:180px;height:64px;font-size:16px;"  onclick="_guihelper.OnMessageBoxClick()"/>
+      </pe:if>
+    </div>
+  </pe:if>
+</div>
+
+</pe:mcml> 
+</body>
+</html>

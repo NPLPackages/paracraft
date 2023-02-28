@@ -73,6 +73,7 @@ function UndoManager.Undo()
 				cmd2 = undo_list:last();
 			end
 		end
+		return true
 	end
 end
 
@@ -103,6 +104,7 @@ function UndoManager.Redo()
 				cmd2 = redo_list:last();
 			end
 		end
+		return true
 	end
 end
 

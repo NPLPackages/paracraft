@@ -1,7 +1,8 @@
 --[[
 Title: keepwork channel for chat
-Author(s): leio
-Date: 2020/5/6
+Author(s): leio, big
+CreateDate: 2020.5.6
+ModifyDate: 2022.8.19
 Desc:  
 Use Lib:
 -------------------------------------------------------
@@ -30,6 +31,8 @@ NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatChannel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatHelper.lua");
 NPL.load("(gl)script/ide/timer.lua");
+NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
+local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
 local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local ChatChannel = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatChannel");
@@ -100,6 +103,7 @@ function KpChatChannel.StaticInit()
     KpChatChannel.try_connect_cnt = 0;
 
 	GameLogic:Connect("WorldLoaded", KpChatChannel, KpChatChannel.OnWorldLoaded, "UniqueConnection");
+    GameLogic:Connect("WorldUnloaded", KpChatChannel, KpChatChannel.OnWorldUnloaded, "UniqueConnection");
 
     GameLogic.GetFilters():remove_filter("OnKeepWorkLogin", KpChatChannel.OnKeepWorkLogin_Callback);
     GameLogic.GetFilters():remove_filter("OnKeepWorkLogout", KpChatChannel.OnKeepWorkLogout_Callback);
@@ -117,6 +121,16 @@ function KpChatChannel.OnWorldLoaded()
         KpChatChannel.Clear();
     end
 end
+
+function KpChatChannel.OnWorldUnloaded()
+    local id = WorldCommon.GetWorldTag("kpProjectId");
+	LOG.std(nil, "info", "KpChatChannel", "OnWorldUnloaded: %s",tostring(id));
+
+    if (id) then
+        KpChatChannel.LeaveWorld(id)
+    end
+end
+
 function KpChatChannel.OnKeepWorkLogin_Callback()
     KpChatChannel.TryToConnect();
 end
@@ -157,6 +171,7 @@ function KpChatChannel.GetRoom()
 end
 
 function KpChatChannel.Connect(url,options,onopen_callback)
+    LOG.std("", "info", "KpChatChannel", "connect:%s", tostring(url));
     if(not KeepWorkItemManager.GetToken())then
         return
     end
@@ -279,16 +294,19 @@ function KpChatChannel.HasUserName(usernames_str, name)
 	end
 end
 function KpChatChannel.OnMsg(self, msg)
-	--LOG.std("", "debug", "KpChatChannel OnMsg", msg);
-    if(not msg or not msg.data)then
+	LOG.std("KpChatChannel", "debug", "KpChatChannel OnMsg", msg);
+
+    if (not msg or not msg.data) then
         return
     end
+
     msg = msg.data;
 
     -- see: script/apps/GameServer/socketio/packet.lua
     local eio_pkt_name = msg.eio_pkt_name;
     local sio_pkt_name = msg.sio_pkt_name;
-    if(eio_pkt_name == "message" and sio_pkt_name =="event")then
+
+    if (eio_pkt_name == "message" and sio_pkt_name =="event") then
         local body = msg.body or {};
         local key = body[1] or {};
         local info = body[2] or {};
@@ -296,10 +314,9 @@ function KpChatChannel.OnMsg(self, msg)
         local meta = info.meta;
         local action = info.action;
         local userInfo = info.userInfo;
-        if(key == "app/msg" or key == "paracraftGlobal" )then
-            if(payload and userInfo)then
 
-
+        if (key == "app/msg" or key == "paracraftGlobal") then
+            if (payload) then
                 local ChannelIndex = payload.ChannelIndex;
                 local worldId = payload.worldId;
                 local type = payload.type;
@@ -309,57 +326,84 @@ function KpChatChannel.OnMsg(self, msg)
                 local username = payload.username;
                 local nickname = payload.nickname;
                 local kp_from_name = nickname;
-                if(not kp_from_name or kp_from_name == "")then
+
+                if (not kp_from_name or kp_from_name == "") then
                     kp_from_name = username;
                 end
+
                 local vip = payload.vip;
                 local student = payload.student;
                 local orgAdmin = payload.orgAdmin;
                 local tLevel = payload.tLevel;
 
-                if(not KpChatChannel.IsInWorld())then
+                if (not KpChatChannel.IsInWorld()) then
                     return
                 end
 
                 -- check if it is in the same world
-                if(ChannelIndex == ChatChannel.EnumChannels.KpNearBy)then
-                    if(meta.target ~= KpChatChannel.GetRoom())then
+                if (ChannelIndex == ChatChannel.EnumChannels.KpNearBy) then
+                    if (meta.target ~= KpChatChannel.GetRoom()) then
                         return
-                    end    
+                    end
                 end
 
                 -- check if it is in the same school
-                if(ChannelIndex == ChatChannel.EnumChannels.KpSchool)then
-                    if(meta.target ~= KpChatChannel.GetSchoolRoom())then
+                if (ChannelIndex == ChatChannel.EnumChannels.KpSchool) then
+                    if (meta.target ~= KpChatChannel.GetSchoolRoom()) then
                         return
-                    end    
+                    end
                 end
-                if(ChannelIndex == ChatChannel.EnumChannels.KpFriend)then
+
+                if (ChannelIndex == ChatChannel.EnumChannels.KpFriend) then
                     local FriendManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendManager.lua");
                     FriendManager:OnMsg(payload, msg);
                     return
                 end
-                local timestamp = KpChatChannel.GetTimeStamp(meta.timestamp);
-       
 
+                local timestamp = KpChatChannel.GetTimeStamp(meta.timestamp);
                 local channelname = ChatChannel.channels[ChannelIndex];
-                if(not channelname)then
+
+                if (not channelname)then
                     return
                 end
-                local msgdata = { ChannelIndex = ChannelIndex, words = content, channelname = channelname, 
-                vip = vip, student = student, orgAdmin = orgAdmin, tLevel = tLevel, 
-                timestamp = timestamp, kp_from_name = kp_from_name, kp_from_id = userId, kp_username = username,  kp_id = KpChatChannel.GetUserId(), is_keepwork = true, }
-                ChatChannel.AppendChat( msgdata)
 
-                
-                if(KpChatChannel.BulletScreenIsOpened() and KpChatChannel.IsInWorld())then
+                local msgdata = {
+                    ChannelIndex = ChannelIndex,
+                    words = content,
+                    channelname = channelname, 
+                    vip = vip,
+                    student = student,
+                    orgAdmin = orgAdmin,
+                    tLevel = tLevel, 
+                    timestamp = timestamp,
+                    kp_from_name = kp_from_name,
+                    kp_from_id = userId,
+                    kp_username = username,
+                    kp_id = KpChatChannel.GetUserId(),
+                    is_keepwork = true,
+                }
+
+                if (ChannelIndex == ChatChannel.EnumChannels.KpBroadCast) then
+                    msgdata.sourceProjectId = payload.sourceProjectId;
+                    msgdata.supportJumpWorld = payload.supportJumpWorld;
+                end
+
+                ChatChannel.AppendChat(msgdata);
+
+                if (KpChatChannel.BulletScreenIsOpened() and KpChatChannel.IsInWorld()) then
                     local mcmlStr = KpChatChannel.CreateMcmlStrToTipRoad(msgdata);
-                    TipRoadManager:PushNode(mcmlStr);
+
+                    if msgdata.supportJumpWorld then
+                        TipRoadManager:PushNode(mcmlStr, msgdata.sourceProjectId);
+                    else
+                        TipRoadManager:PushNode(mcmlStr);
+                    end
                 end
 
                 local profile = KeepWorkItemManager.GetProfile()
+
                 -- 消耗喇叭，在这里同步数据
-                if(userId == profile.id and ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
+                if (userId == profile.id and ChannelIndex == ChatChannel.EnumChannels.KpBroadCast) then
                     KeepWorkItemManager.ReLoadItems({10002,10001});
                 end
             end
@@ -438,6 +482,12 @@ function KpChatChannel.OnMsg(self, msg)
                 end
             end
 
+            if payload and payload.yellowRecordLimit==1 then
+                NPL.load("(gl)script/apps/Aries/Creator/Game/Login/YellowCodeLimitPage.lua",true);
+	            local YellowCodeLimitPage = commonlib.gettable("MyCompany.Aries.Game.YellowCodeLimitPage");
+                YellowCodeLimitPage.ShowPage(payload.deadline)
+            end
+
             -- 消息中心
             if payload and (payload.msgType =="interactionMsg" 
                 or payload.msgType =="orgMsg" 
@@ -446,6 +496,13 @@ function KpChatChannel.OnMsg(self, msg)
                 local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
                 if DockPage then
                     DockPage.HandMsgCenterMsgData(payload.msgType)
+                end
+            end
+
+            if payload then 
+                if payload.action=="schedule_start" or payload.action=="schedule_start_pre" or payload.action=="schedule_finish" then
+                    local ClassSchedule = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/ClassSchedule/ClassSchedule.lua") 
+                    ClassSchedule.OnSocketPush(payload)
                 end
             end
         end
@@ -460,7 +517,7 @@ function KpChatChannel.CreateMcmlStrToTipRoad(chatdata)
     local mcmlStr = "";
     local words = chatdata.words or "";
     local color = chatdata.color or "ffffff";
-    local kp_from_name = chatdata.kp_from_name or "";
+    local kp_from_name = KpChatChannel.FilterString(chatdata.kp_from_name or "");
     
     local vip = chatdata.vip;
     local student = chatdata.student;
@@ -495,9 +552,9 @@ function KpChatChannel.CreateMcmlStrToChatWindow(chatdata)
     local mcmlStr = "";
     local words = chatdata.words or "";
     local color = chatdata.color or "ffffff";
-    local kp_from_name = chatdata.kp_from_name or "";
+    local kp_from_name = KpChatChannel.FilterString(chatdata.kp_from_name or "");
     local kp_from_id = chatdata.kp_from_id;
-    local kp_username = chatdata.kp_username or "";
+    local kp_username =  KpChatChannel.FilterString(chatdata.kp_username or "");
 
     local vip = chatdata.vip;
     local student = chatdata.student;
@@ -528,6 +585,11 @@ function KpChatChannel.CreateMcmlStrToChatWindow(chatdata)
     end
     return mcmlStr;
 end
+
+function KpChatChannel.FilterString(str)
+    return BadWordFilter.FilterString(str)
+end
+
 function KpChatChannel.GetTempChatContent(id)
     if(id and KpChatChannel.temp_chat_content)then
         return KpChatChannel.temp_chat_content[id];
@@ -539,7 +601,7 @@ function KpChatChannel.SetTempChatContent(chatdata)
     end
     KpChatChannel.temp_chat_content = KpChatChannel.temp_chat_content or {};
     local words = chatdata.words or "";
-    local kp_username = chatdata.kp_username or "";
+    local kp_username = KpChatChannel.FilterString(chatdata.kp_username or "");
     local kp_from_id = chatdata.kp_from_id;
     local timestamp = chatdata.timestamp;
     local msg = {
@@ -651,33 +713,72 @@ end
 -- @param words			消息内容
 -- @param roomName		房间ID
 -- http://yapi.kp-para.cn/project/60/interface/api/1952
-function KpChatChannel.CreateMessage( ChannelIndex, toid, toname, words, roomName)
+function KpChatChannel.CreateMessage(ChannelIndex, toid, toname, words, roomName, isSystem, sourceProjectId)
 	local msgdata;
+
     if ChannelIndex == ChatChannel.EnumChannels.KpFriend then
         if not KpChatChannel.worldId then
-            KpChatChannel.worldId = 0
+            KpChatChannel.worldId = 0;
         end
     end
 
-    local worldId = KpChatChannel.worldId;
-    if(not worldId)then
+    local projectId = sourceProjectId or KpChatChannel.worldId;
+
+    if (not projectId) then
 		LOG.std(nil, "warn", "KpChatChannel", "world id is required");
-        return
+        return;
     end
-    if(ChannelIndex == ChatChannel.EnumChannels.KpNearBy)then
-	    msgdata = { ChannelIndex = ChannelIndex, target = KpChatChannel.GetRoom(), worldId = worldId, words = words, type = 2, is_keepwork = true, };
 
-    elseif(ChannelIndex == ChatChannel.EnumChannels.KpSchool)then
-	    msgdata = { ChannelIndex = ChannelIndex, target = KpChatChannel.GetSchoolRoom(), worldId = worldId, words = words, type = 2, is_keepwork = true, };
+    if (ChannelIndex == ChatChannel.EnumChannels.KpNearBy) then
+	    msgdata = {
+            ChannelIndex = ChannelIndex,
+            target = KpChatChannel.GetRoom(),
+            worldId = projectId,
+            words = words,
+            type = 2,
+            is_keepwork = true,
+        };
+    elseif (ChannelIndex == ChatChannel.EnumChannels.KpSchool) then
+	    msgdata = {
+            ChannelIndex = ChannelIndex,
+            target = KpChatChannel.GetSchoolRoom(),
+            worldId = projectId,
+            words = words,
+            type = 2,
+            is_keepwork = true,
+        };
+    elseif (ChannelIndex == ChatChannel.EnumChannels.KpBroadCast) then
+        local username = isSystem and "official" or nil;
 
-    elseif(ChannelIndex == ChatChannel.EnumChannels.KpBroadCast)then
-	    msgdata = { ChannelIndex = ChannelIndex, target = "paracraftGlobal", worldId = worldId, words = words, type = 3, is_keepwork = true, };
+	    msgdata = {
+            ChannelIndex = ChannelIndex,
+            target = "paracraftGlobal",
+            worldId = projectId,
+            words = words,
+            type = 3,
+            is_keepwork = true,
+            isSystem = isSystem,
+            username = username
+        };
 
-    elseif(ChannelIndex == ChatChannel.EnumChannels.KpFriend)then
-	    msgdata = { ChannelIndex = ChannelIndex, target = roomName, worldId = worldId, words = words, type = 4, is_keepwork = true, toid = toid, };
+        if (projectId > 0) then
+            msgdata.sourceProjectId = projectId;
+            msgdata.supportJumpWorld = true;
+        end
+    elseif (ChannelIndex == ChatChannel.EnumChannels.KpFriend) then
+	    msgdata = {
+            ChannelIndex = ChannelIndex,
+            target = roomName,
+            worldId = projectId,
+            words = words,
+            type = 4,
+            is_keepwork = true,
+            toid = toid,
+        };
     else
 		LOG.std(nil, "warn", "KpChatChannel", "[%s] unsupported channel index in KpChatChannel.SendMessage", tostring(ChannelIndex));
     end
+
 	return msgdata;
 end
 
@@ -692,22 +793,23 @@ function KpChatChannel.IsBlockedChannel(ChannelIndex)
         end
     end
 end
+
 --[[---------------------------------------------------------------------------------------------------
 根据消息类型分别发送至服务器
 --]]---------------------------------------------------------------------------------------------------
 function KpChatChannel.SendToServer(msgdata)
-    if(not msgdata)then
+    if (not msgdata or type(msgdata) ~= "table") then
         return
     end
-    if(type(msgdata) ~= "table")then
-        return
-    end
+
     local user_info = KeepWorkItemManager.GetProfile();
     local muting_info = KeepWorkItemManager.GetMutingInfo();
-    if(muting_info and muting_info.isMuted)then
+
+    if (muting_info and muting_info.isMuted) then
         _guihelper.MessageBox(L"很抱歉，你被禁言了！");
         return
     end
+
     local kp_msg = {
         target = msgdata.target,
         payload = {
@@ -716,21 +818,21 @@ function KpChatChannel.SendToServer(msgdata)
             contentType = msgdata.msg_type or 1,
             worldId = msgdata.worldId,
             type = msgdata.type,
-            
             toid = msgdata.toid,
-
             id = user_info.id,
-            username = user_info.username,
-            nickname = user_info.nickname,
+            username = msgdata.isSystem and msgdata.username or user_info.username,
+            nickname = msgdata.isSystem and msgdata.username or user_info.nickname,
             vip = user_info.vip,
             student = user_info.student,
             orgAdmin = user_info.orgAdmin,
             tLevel = user_info.tLevel,
             tLevel = user_info.tLevel,
+            isSystem = msgdata.isSystem,
+            supportJumpWorld = msgdata.supportJumpWorld,
+            sourceProjectId = msgdata.sourceProjectId,
         },
     }
 
-    KpChatChannel.client:Send("app/msg",kp_msg);
-   
+    KpChatChannel.client:Send("app/msg", kp_msg);
 end
 

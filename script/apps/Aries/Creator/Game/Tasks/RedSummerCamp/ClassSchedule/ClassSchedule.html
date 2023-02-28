@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ClassSimpleTip.lua"><![CDATA[
+ClassSchedule = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/ClassSchedule/ClassSchedule.lua") 
+KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+page = document:GetPageCtrl();
+
+local _weekDays = {
+    L"星期一",
+    L"星期二",
+    L"星期三",
+    L"星期四",
+    L"星期五",
+    L"星期六",
+    L"星期日",
+}
+
+function _getMaxNum()
+    return math.max(#ClassSchedule.GetAllCourseTime(),2)
+end
+
+function GetLineDs()
+    local ret = {}
+    local num = _getMaxNum()
+    for i=1,num do 
+        ret[#ret+1] = {}
+    end
+    return ret
+end
+
+--获取这天是周几字符串
+function _GetWeekDay(index)
+    local info = _GetWeek7Days()[index]
+    return info or {}
+end
+
+function _GetWeekDayDiv(day)
+    local info = _GetWeek7Days()[index] or {}
+    
+    local str = [[
+        <div width="140px" height="88px" style="float:left;">
+            %s
+            <div style="margin-top: 16%%;font-size: 18px;base-font-size: 18px; text-align: center;">%s</div>
+            <div style="margin-top: 0px;font-size: 16px;base-font-size: 16px; text-align: center; font-weight: bold;">%s</div>
+        </div>
+    ]]
+    local back = ""
+    if info.date == os.date("%Y.%m.%d") then
+        --back = '<div width="138" height="84" style="position:relative; margin-left:2px;margin-top:1px; background-color:#FEDB0130"></div>'
+    end
+    str = string.format(str,back,info.weekDayStr or "",info.date or "")
+    return str
+end
+
+function _getHeight()
+    local num = _getMaxNum()
+    local height = 124*num + 84 +2
+    return height
+end
+
+--课程表
+function _getGridDiv()
+    local height = _getHeight()
+
+    local str = [[
+    <div width="1129" height='%s' style="margin-top: 16px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/kebiao_1129x193_32bits.png#0 0 1129 193:450 100 679 92 );">
+        <div style="position: relative;float: left; font-size: 15px; margin-top: 52px; margin-left: 16px;"><%%= L"上课时间" %%></div>
+        <div style="position: relative;float: left; font-size: 15px; margin-top: 16px; margin-left: 95px;"><%%= L"日期" %%></div>
+        <!-- 星期一到星期天，横向抬头 -->
+        <div width="980" height="84" style="margin-left: 148px;">
+            <pe:repeat name="weekdays" DataSource="<%%= _GetWeek7Days() %%>">
+                <pe:repeatitem>
+                    <%%= _GetWeekDayDiv(Eval("index")) %%>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+        <!-- 横线 -->
+        <div style="position: relative;">
+            <pe:repeat name="weekdays" DataSource="<%%= GetLineDs() %%>">
+                <pe:repeatitem >
+                    <div width="1129" height='2' style='<%%= string.format("margin-top: %%s;position:relative;  background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/hengxian_16x1_32bits.png#0 0 16 1);",Eval("index")*124) %%>'></div>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+
+        <!-- 第一纵列，课程时间 -->
+        <div width="149" height="%s" style="float: left;">
+            <pe:repeat DataSource="<%%= ClassSchedule.GetAllCourseTime() %%>">
+                <pe:repeatitem>
+                    <div width="149" height="124" >
+                        <label value='<%%= _GetCourseTime(Eval("index")) %%>' style="height: 124px; font-size: 16px;base-font-size: 16px; text-align: center;text-valign: center; font-weight: bold;" />
+                    </div>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+
+        <%%= _GetDayCourseDiv() %%>
+    </div>
+    ]]
+    str = string.format(str,height,height)
+    --echo(str,true)
+    return str
+end
+
+function _GetCourseTime(index)
+    local ds = ClassSchedule.GetAllCourseTime()
+    local times = ds[index]
+    if times then
+        return times[1].."-"..times[2]
+    end
+    return "00:00-00:00"
+end
+
+function _GetCourse(day,index)
+    day = tonumber(day)
+    local ds = ClassSchedule.GetCourseOfDay(day)
+    local info = ds[index]
+    return info
+end
+
+--7天的课程
+function _GetDayCourseDiv()
+    local height = _getHeight()
+    local ret = ""
+    for i=1,7 do
+        local arr = ClassSchedule.GetCourseOfDay(i)
+        local courseStr = ""
+        for j=1,#arr do 
+            local tempStr = [[
+                <div width="140" height="124" style="background-color: #00ff0000;">
+                    %s
+                </div>
+            ]]
+            local div = _GetCourseDiv(_GetCourse(i,j))
+            tempStr = string.format(tempStr,div)
+            courseStr = courseStr..tempStr.."\n"
+        end
+        --一天的课程
+        local dayStr = [[
+            <div width="140" height="%s" style="float: left;">
+                %s
+            </div>
+        ]]
+        dayStr = string.format(dayStr,height,courseStr)
+        ret = ret..dayStr
+    end
+    return ret
+end
+
+--一节课的排版
+function _GetCourseDiv(info)
+    if info==nil or info=="" then
+        return ""
+    end
+
+    local arr = {info.course.name}
+    for k,v in ipairs(info.sections) do
+        arr[#arr+1] = v.name
+    end
+    table.insert(arr,1,info and info.class.name or "")
+    local tipStr = table.concat(arr,"=")
+    local tmpTipStr = _guihelper.TrimUtf8TextByWidth(tipStr,500,"System;14")
+    tmpTipStr = string.gsub(tipStr,"=","<br/>")
+    local divStr = string.format([[
+        <div style="margin-top: 10px;margin-left: 10px; font-size: 14px;base-font-size: 14px; text-align: left;"> %s </div>
+    ]],tmpTipStr)
+    
+    local ret = [[
+        <pe:container width="140" height="124" name="%s" style="%s" tooltip="%s" onclick="ClassSchedule.OnClickCourse">
+            <pe:container width="140" height="118" SelfPaint="true" style="background:url();margin-bottom:6px">
+                %%s
+            </pe:container>
+            
+        </pe:container>
+    ]]
+    local back = "background:url()"
+
+    local _status = info.status
+    local _isTeacher = KeepWorkItemManager.IsTeacher()
+    if not _isTeacher then --学生
+        if info.studentStatus==1 then --已考勤
+        elseif info.studentStatus==0 then --缺勤
+            _status = 2
+        end
+    else --老师
+        
+    end
+
+    local isTimeNow = false
+    local now = os.time()
+    if info.startAt_stamp<now and info.endAt_stamp>now then
+        isTimeNow = true
+    end
+    
+    if _status==0 then --待上课
+        
+    elseif _status==1 then --已上课
+        back = "background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/yishangke_32x32_32bits.png#0 0 32 32:10 10 10 10)"
+    elseif _status==2 then --缺课
+        back = "background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/weishangke_32x32_32bits.png#0 0 32 32:10 10 10 10)"
+    elseif _status==3 then --正在教学
+        back = "background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/daishangke_32x32_32bits.png#0 0 32 32:10 10 10 10)"
+    end
+
+    if _status~=3 and isTimeNow then --到了上课时间，但是还没有上课
+        if _isTeacher then 
+        else
+        end
+    end
+
+    ret = string.format(ret,info.id,back,tipStr:gsub("=","\n"):gsub("\""," "))
+    ret = string.format(ret,divStr)
+    return ret
+end
+
+function _GetWeek7Days()
+    if ClassSchedule.curSelectedWeek == nil then
+        ClassSchedule.curSelectedWeek = os.time()
+    end
+    local mondayStamp = ClassSchedule.GetMondayOfStamp(ClassSchedule.curSelectedWeek)
+    local ret = {}
+    for i=1,7 do 
+        local stamp = mondayStamp+(i-1)*24*3600
+        ret[i] = {
+            weekDayStr = _weekDays[i],
+            date = os.date("%Y.%m.%d",stamp),
+        }
+    end
+    return ret
+end
+
+function _GetDateDiv()
+    local str = [[
+    <input type="button" width="196px" height="32px" value='<%= ClassSchedule.GetCurDateDesc() %>' onclick="open_calendar" style="float: left;margin-left: 8px;margin-right: 8px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/baitiao_32x32_32bits.png#0 0 32 32:10 10 10 10);" />
+    ]]
+    return str
+end
+
+]]></script>
+<div width="100%" height="100%" style="background-color: #00ff0000;">
+    <pe:treeview style="margin-left: 0px; background:url();" VerticalScrollBarStep="30" VerticalScrollBarOffsetX="-2">
+        <div height="40" style="margin-top: 14px; background-color: #ff000000;">
+            <input type="button" width="17px" height="24px" onclick="ClassSchedule.on_pre_week" style="float: left;margin-left: -5;padding: 5px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/riqiwanghou_17x24_32bits.png#0 0 17 24);" />
+            <%= _GetDateDiv() %>
+            <input type="button" width="17px" height="24px" onclick="ClassSchedule.on_next_week" style="float: left;padding: 5px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/riqiwangqian_17x24_32bits.png#0 0 17 24);" />
+            
+            <img  style="float: left;margin-top: 10px;margin-left: 45px; width: 17px;height: 17px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/yishangke_17x17_32bits.png#0 0 17 17);"></img>
+            <div style="position: relative; float: left;margin-top: 8px;margin-left: 5px;"><%= L"已上课"%></div>
+            <img  style="float: left;margin-top: 10px;margin-left: 68px; width: 17px;height: 17px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/weishangke_17x17_32bits.png#0 0 17 17);"></img>
+            <div style="position: relative;float: left;margin-top: 8px;margin-left: 5px;"><%= L"缺课"%></div>
+            <img  style="float: left;margin-top: 10px;margin-left: 68px; width: 17px;height: 17px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/zhunbeishangke_17x17_32bits.png#0 0 17 17);"></img>
+            <div style="position: relative;float: left;margin-top: 8px;margin-left: 5px;"><%= L"上课中"%></div>
+        </div>
+
+        <%= _getGridDiv()%>
+
+    </pe:treeview>
+</div>
+
+</pe:mcml>
+</body>
+</html>

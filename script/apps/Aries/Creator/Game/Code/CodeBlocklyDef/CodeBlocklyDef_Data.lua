@@ -356,7 +356,7 @@ end
 				{ L"名字", "name" },
 				{ L"物理半径", "physicsRadius" },
 				{ L"物理高度", "physicsHeight" },
-				{ L"是否有物理", "isBlocker" },
+				{ L"是否有阻挡", "isBlocker" },
 				{ L"开启LOD", "isLodEnabled" },
 				{ L"组Id", "groupId" },
 				{ L"感知半径", "sentientRadius" },
@@ -1522,6 +1522,369 @@ print ("hello world")
 	end,
 	examples = {{desc = L"", canRun = true, code = [[
 ]]}},
+},
+
+
+{
+	type = "getActorEntityValue", 
+	message0 = L"获取%1的%2", 
+	arg0 = {
+		{
+			name = "name",
+			type = "input_value",
+			text = "player", 
+			shadow = { type = "text", value = "player",},
+
+		},
+		{
+			name = "key",
+			type = "input_value",
+			text = "x", 
+			shadow = { type = "text", value = "x",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_number",},
+	funcName = "getActorEntityValue",
+	func_description = 'getActorEntityValue(%s, %s)',
+	ToNPL = function(self)
+		return string.format('getActorEntityValue("%s", "%s")', self:getFieldAsString('name'), self:getFieldAsString('key'));
+	end,
+	examples = {},
+},
+
+
+{
+	type = "getMultiLineString", 
+	message0 = L"[[%1]]", 
+	arg0 = {
+		{
+			name = "value",
+			type = "field_input",
+			text = "string", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_number",},
+	funcName = "getMultiLineString",
+	func_description = '[[%s]]',
+	ToNPL = function(self)
+		return string.format('[[%s]]', self:getFieldAsString('value'));
+	end,
+	examples = {{desc = L"", canRun = true, code = [=[
+local str = [[
+	hello 
+	world
+]]		
+		]=]}},
+},
+
+
+{
+	type = "List_Create", 
+	message0 = L"创建 列表 %1", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "List_Create",
+	func_description = 'local %s = {}',
+	ToNPL = function(self)
+		return string.format('local %s = {}\n', self:getFieldAsString('LIST'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_Insert", 
+	message0 = L"列表 %1 尾部插入 %2", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+		{
+			name = "ITEM",
+			type = "input_value",
+			text = "item", 
+			shadow = { type = "text", value = "item",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "List_Insert",
+	func_description = 'List_Insert(%s, %s)',
+	ToNPL = function(self)
+		return string.format('List_Insert(%s, "%s")\n', self:getFieldAsString('LIST'), self:getFieldAsString('ITEM'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_DeleteByIndex", 
+	message0 = L"删除 列表 %1 的第 %2 项", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+		{
+			name = "ITEM",
+			type = "input_value",
+			text = "1", 
+			shadow = { type = "math_number", value = "1",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "List_Remove",
+	func_description = 'List_Remove(%s, %s)',
+	ToNPL = function(self)
+		return string.format('List_Remove(%s, %s)\n', self:getFieldAsString('LIST'), self:getFieldAsString('ITEM'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_DeleteAll", 
+	message0 = L"删除 列表 %1 的全部项目", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "List_DeleteAll",
+	func_description = '%s = {}',
+	ToNPL = function(self)
+		return string.format('%s = {}\n', self:getFieldAsString('LIST'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_InsertByIndex", 
+	message0 = L"列表 %1 的第 %2 项前插入 %3", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+		{
+			name = "INDEX",
+			type = "input_value",
+			text = "1", 
+			shadow = { type = "math_number", value = "1",},
+		},
+		{
+			name = "ITEM",
+			type = "input_value",
+			text = "item", 
+			shadow = { type = "text", value = "item",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "List_Insert",
+	func_description = 'List_Insert(%s, %s, %s)',
+	ToNPL = function(self)
+		return string.format('List_Insert(%s, %s, "%s")\n', self:getFieldAsString('LIST'), self:getFieldAsString('INDEX'), self:getFieldAsString('ITEM'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_ReplaceByIndex", 
+	message0 = L"列表 %1 的第 %2 项替换为 %3", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+		{
+			name = "INDEX",
+			type = "input_value",
+			text = "1", 
+			shadow = { type = "math_number", value = "1",},
+		},
+		{
+			name = "ITEM",
+			type = "input_value",
+			text = "item", 
+			shadow = { type = "text", value = "item",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "List_ReplaceByIndex",
+	func_description = '%s[%s] = %s',
+	ToNPL = function(self)
+		return string.format('%s[%s] = "%s"\n', self:getFieldAsString('LIST'), self:getFieldAsString('INDEX'), self:getFieldAsString('ITEM'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_GetByIndex", 
+	message0 = L"获取 列表 %1 的第 %2 项", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+		{
+			name = "INDEX",
+			type = "input_value",
+			text = "1", 
+			shadow = { type = "math_number", value = "1",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_number",},
+	funcName = "List_GetByIndex",
+	func_description = '%s[%s]',
+	ToNPL = function(self)
+		return string.format('%s[%s]', self:getFieldAsString('LIST'), self:getFieldAsString('INDEX'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_GetIndexByItem", 
+	message0 = L"获取 列表 %1 中第一个 %2 的编号", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+		{
+			name = "ITEM",
+			type = "input_value",
+			text = "item", 
+			shadow = { type = "text", value = "item",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_number",},
+	funcName = "List_GetIndexByItem",
+	func_description = 'List_GetIndexByItem(%s, %s)',
+	ToNPL = function(self)
+		return string.format('List_GetIndexByItem(%s, "%s")', self:getFieldAsString('LIST'), self:getFieldAsString('ITEM'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_GetSize", 
+	message0 = L"获取 列表 %1 的项目数", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_number",},
+	funcName = "List_GetSize",
+	func_description = 'List_Length(%s)',
+	ToNPL = function(self)
+		return string.format('List_Length(%s)', self:getFieldAsString('LIST'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_ContainItem", 
+	message0 = L"列表 %1 包含 %2?", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+		{
+			name = "ITEM",
+			type = "input_value",
+			text = "item", 
+			shadow = { type = "text", value = "item",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_number",},
+	funcName = "List_IsExistItem",
+	func_description = 'List_IsExistItem(%s, %s)',
+	ToNPL = function(self)
+		return string.format('List_IsExistItem(%s, "%s")', self:getFieldAsString('LIST'), self:getFieldAsString('ITEM'));
+	end,
+	examples = {},
+},
+
+{
+	type = "List_Get", 
+	message0 = L"获取 列表 %1", 
+	arg0 = {
+		{
+			name = "LIST",
+			type = "field_input",
+			text = "list", 
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_number",},
+	funcName = "List_Get",
+	func_description = '%s',
+	ToNPL = function(self)
+		return string.format('%s', self:getFieldAsString('LIST'));
+	end,
+	examples = {},
 },
 
 };

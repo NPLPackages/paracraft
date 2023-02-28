@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ExamTimeoutTip.lua"><![CDATA[
+local WorldExitDialog = NPL.load('(gl)Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
+NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+local LocalService = NPL.load('(gl)Mod/WorldShare/service/LocalService.lua')
+
+VideoSharingPage = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingPage");
+VideoSharingPage.OnInit()
+
+
+local page = document:GetPageCtrl();
+
+page:SetNodeValue('ShareWorldImage', VideoSharingPage.GetPreviewImagePath())
+
+function ClosePage()
+    page:CloseWindow();
+end
+
+function get_project_id()
+    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+
+    if currentWorld and
+        currentWorld.kpProjectId and
+        currentWorld.kpProjectId ~= 0 then
+        return tostring(currentWorld.kpProjectId)
+    end
+
+    return L'上传世界后获得'
+end
+
+function get_project_name()
+print('WorldCommon.GetWorldTag("name") ',WorldCommon.GetWorldTag("name") )
+    return WorldCommon.GetWorldTag("name") or L"未命名"
+end
+
+function get_current_revision()
+    return Mod.WorldShare.Store:Get('world/currentRevision') or L'无'
+end
+
+function get_open_desc()
+    return string.format("点击打开本地目录:%s" , ParaWorld.GetWorldDirectory())
+end
+
+function get_world_size()
+    local filesTotal = LocalService:GetWorldSize(ParaWorld.GetWorldDirectory())
+    local size = math.floor(filesTotal/1024/1024*100)/100;
+    return size.."M"
+end
+
+
+
+]]></script>
+<style type="text/mcss">
+    {
+        theme1_gray_image_mask = {
+            position = 'relative',
+            background = 'Texture/Aries/Creator/keepwork/worldshare_32bits.png#614 273 32 32:8 8 8 8',
+        },
+        list_search_bar = {
+            float = 'left',
+            ['margin-left'] = 10,
+            ['margin-top'] = 0,
+            width = 316,
+            height = 30,
+        },
+        list_search_textfield = {
+            width = 266,
+            height = 30,
+            background = ''
+        },
+        list_search_button = {
+            position = 'relative',
+            align = 'right',
+            color = '#000000',
+            height = 30,
+            width = 57,
+            ['text-align'] = 'center',
+            ['margin-top'] = -32
+        },
+        list_search_button_click = {
+            postion = 'relative',
+            height = 30,
+            width = 57
+        },
+        theme1_gray2_button = {
+            background = 'Texture/Aries/Creator/keepwork/explorer_32bits.png#225 127 36 28:6 5 7 6',
+            ['text-offset-y'] = -2,
+        },
+    }
+</style>
+<kp:window name="iframe" width="648" height="438" title='<%=L"分享视频或全景图"%>' onclose="ClosePage">
+    <div style='padding: 20px; padding-top: 5px; padding-bottom: 5px; color:#ffffff;'>
+        <div align="center" style='margin-top: 62px;margin-left: 20px; background: url();'>
+            <div style='float:left; width: 258px; height: 142px;'>
+                <div zorder='2' class='theme1_gray_image_mask' style='width: 258px; height: 142px;'></div>
+                <img name='ShareWorldImage' zorder='1' width='258' height='142' onclick='VideoSharingPage.Snapshot()' tooltip='<%= L"重新截图" %>' />
+            </div>
+            <div style='float: left; base-font-size: 18px; font-size: 18px; margin-left: 15px;margin-top: 3px;'>
+                <div style='margin-top: 0px;position: relative;'>
+                    <pe:if condition='<%= not VideoSharingPage.is_name_modified() %>'>
+                        <div style='float: left;color: #181818'><%= get_project_name() %></div>
+                        <div onclick='VideoSharingPage.on_click_modify_name' style='float: left;margin-top: 0px;margin-left: 4px;width: 28;height: 28;z-index: 10;
+                                    background: url(Texture/Aries/Creator/keepwork/VideoShare/gaimin_28x28_32bits.png#0 0 28 28);' >
+                        </div>
+                    </pe:if>
+                    <pe:if condition='<%= VideoSharingPage.is_name_modified() %>'>
+                        <div class='list_search_bar' style='float: left; margin-left: 0px; width: 180px; height: 26px;'>
+                            <div style="float: left;width: 160px; height: 26px;background: url(Texture/Aries/Creator/keepwork/VideoShare/shurukuang_30x30_32bits.png#0 0 30 30:10 10 10 10);">
+                                <input type='text' name="input_name" SkipAutoBadWordFilter="true" value='<%= get_project_name() %>' spacing='4' 
+                                    style='width: 160px; height: 30px;background:url()'/>
+                            </div>
+                            <div class='list_search_button' style='float: left; height: 25px; width: 40px; font-size: 12px; base-font-size: 12px; '>
+                                <input type='button' class='list_search_button_click theme1_gray2_button' style='height: 30px;margin-left: 25px;margin-top: 4px;' DefaultButton='true' value='<%=L"保存"%>' onclick='VideoSharingPage.on_click_save_name' />
+                            </div>
+                        </div>
+                    </pe:if>
+                </div>
+                <div style="base-font-size: 14px;font-size: 14px;margin-top: 26px;">
+                    <div style='min-width: 110px;margin-top: 8px;'>
+                        <div style='color: #181818'>
+                            <%= L'大小'%>：<%= get_world_size() %>
+                        </div>
+                    </div>
+                    <div style='min-width: 110px;margin-top: 2px;'>
+                        <div style='margin-top: 3px;'>
+                            <label name="text_localVersion" style='color: #181818' value='<%= L"本地版本："..get_current_revision() %>'/>
+                        </div>
+                    </div>
+                    <div style='position: relative;min-width: 110px;margin-top: 2px;'>
+                        <label name="text_remoteVersion" value='<%=L"在线版本:" .. L"无" %>' style=' color: #181818'>
+                        </label>
+                    </div>
+                    <div onclick='VideoSharingPage.Snapshot()' style="margin-top: 41px;font-size: 15px;base-font-size:15px;color: #44C1EF;" tooltip='<%= L"重新截图" %>' >
+                        重新截图
+                        <div style="margin-top: -3px;margin-left: 2px; width:60px;height: 2px;background-color: #44C1EF;"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="position: relative;">
+                <div style="background-color: #ff000000;margin-top: 20px;" width="350" height="50">
+                    <div valign="center" height="50" style='float:left;min-width: 90px;font-size: 19px;base-font-size:19px; color: #181818;font-weight: bold; margin-top: 11px;'>
+                        <%= L'短视频' %>
+                    </div>
+                    <input type='button' uiname="btn_record_1" name="btn_record_1" onclick='VideoSharingPage.on_btn_click()' value='<%= L"开始录制" %>' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45);
+                                            float:left; width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
+                    <pe:if condition='<%= VideoSharingPage.hasVideo %>'>
+                        <input type='button' uiname="btn_download_1" name="btn_download_1" onclick='VideoSharingPage.on_btn_click()' value='<%= L"下载" %>' style='margin-left: 20px; background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45);
+                                            float:left; width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
+                    </pe:if>
+                    <pe:if condition='<%= not VideoSharingPage.hasVideo %>'>
+                        <div tooltip='<%=L"视频未生成，无法下载"%>'  style='background: url(); float:left; width: 102px;height: 45px;margin-left: 20px; ' >
+                            <div style="width: 102px;height: 45px;background: url(Texture/Aries/Creator/keepwork/VideoShare/anniuhui_102x45_32bits.png#0 0 102 45);">
+                               
+                                <label style="font-weight: bold;font-size: 15px;base-font-size:15px;color:#000000;text-align: center;margin-top: 10px;" value='<%= L"下载" %>'></label>
+                            </div>
+                        </div>
+                    </pe:if>
+                    
+                </div>
+                <div style="background-color: #ff000000;margin-top: 0px;" width="350" height="50">
+                    <div valign="center" height="50" style='float:left;min-width: 90px;font-size: 19px;base-font-size:19px; color: #181818;font-weight: bold; margin-top: 11px;'>
+                        <%= L'全景图' %>
+                    </div>
+                    <input type='button' uiname="btn_record_2" name="btn_record_2" onclick='VideoSharingPage.on_btn_click()' value='<%= L"开始录制" %>' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45);
+                                            float:left; width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
+                </div>
+                <div style="background-color: #ff000000;margin-top: 0px;" width="350" height="50">
+                    <div valign="center" height="50" style='float:left;min-width: 90px;font-size: 19px;base-font-size:19px; color: #181818;font-weight: bold; margin-top: 11px;'>
+                        <%= L'精彩回放' %>
+                    </div>
+                    <pe:if condition='<%= VideoSharingPage.hasAutoVideo %>'>
+                        <input type='button' uiname="btn_download_3" name="btn_download_3" onclick='VideoSharingPage.on_btn_click()'  value='<%= L"下载" %>' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45);
+                                            float:left; width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
+                    </pe:if>
+                    <pe:if condition='<%= not VideoSharingPage.hasAutoVideo %>'>
+                        <div tooltip='<%=L"视频未生成，无法下载"%>'  style='background: url(); float:left; width: 102px;height: 45px;' >
+                            <div style="width: 102px;height: 45px;background: url(Texture/Aries/Creator/keepwork/VideoShare/anniuhui_102x45_32bits.png#0 0 102 45);">
+                               
+                                <label style="font-weight: bold;font-size: 15px;base-font-size:15px;color:#000000;text-align: center;margin-top: 10px;" value='<%= L"下载" %>'></label>
+                            </div>
+                        </div>
+                    </pe:if>
+                    
+                    <div style="float:left;margin-top: 10px;margin-left: 26px;">                
+                        <input type="checkbox" name = "check_autovideo" onclick="VideoSharingPage.on_check_autovideo()" style="float: left; margin-top: 4px; width:14px;height:14px;" UncheckedBG="Texture/Aries/Creator/keepwork/VideoShare/gouxuan_15x15_32bits.png#0 0 15 15" CheckedBG="Texture/Aries/Creator/keepwork/VideoShare/duigou_15x15_32bits.png#0 0 15 15"/>
+                        <div onclick="VideoSharingPage.on_check_autovideo()" style="float: left;margin-left: 5px;margin-top: 0px;width: 100px;height: 30px; color: #676767;" >
+                            <%=L"自动生成回放"%>
+                        </div>
+                    </div>
+                </div>
+    
+                <div>
+                    <div style="float: left;width: 356px; height: 30px;">
+                        <input type='text' name="share_text_url" value=''
+                            style='width: 356px; height: 30px; background: url(Texture/Aries/Creator/keepwork/VideoShare/shurukuang_30x30_32bits.png#0 0 30 30:10 10 10 10);' spacing='4' />
+                    </div>
+    
+                    <input type='button' uiname="btn_copy_link" name="btn_copy_link" onclick='VideoSharingPage.on_btn_click()' value='<%= L"复制链接" %>' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/xiaoanniu_73x32_32bits.png#0 0 73 32);
+                            float:left;margin-left:10px; width: 73px;height: 32px;font-weight: bold;font-size: 10px;base-font-size:10px;' />
+    
+                    <input type='button' uiname="btn_wechat" name="btn_wechat" onclick='VideoSharingPage.on_btn_click()' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/weixin_29x29_32bits.png#0 0 29 29);
+                            float:left;margin-left:38px; width: 29x;height: 29px;font-weight: bold;font-size: 10px;base-font-size:10px;' />
+                    <input type='button' uiname="btn_qq" name="btn_qq" onclick='VideoSharingPage.on_btn_click()' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/QQ_29x29_32bits.png#0 0 29 29);
+                            float:left;margin-left:20px; width: 29x;height: 29px;font-weight: bold;font-size: 10px;base-font-size:10px;' />
+                </div>
+            </div>
+            <div style="float: right;">
+                <div width="122" height="122" align="right" style="margin-right: 16px;margin-top: 20px; background: url();">
+                    <div zorder="2" uiname="img_qrcode" style="position: relative;background: url(Texture/Aries/Creator/keepwork/VideoShare/erweimadi_122x122_32bits.png#0 0 122 122);" width="122" height="122"></div>
+                    <img zorder="1" name="img_qrcode" uiname="img_qrcode" style="margin-top: 3px;margin-left: 3px;" width="116" height="116" src="Texture/Aries/Creator/keepwork/VideoShare/erweima_122x138_32bits.png#0 0 116 116"/>
+                </div>
+                <div align="right" width="190" style="text-align: center;font-size: 12px; margin-right: -18px;margin-top: 2px; color:#181818;">
+                    <%=L"进入微信小程序快速观看" %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%=VideoSharingPage.refreshRemoteInfo()%>
+</kp:window>
+
+</pe:mcml>
+</body>
+</html>

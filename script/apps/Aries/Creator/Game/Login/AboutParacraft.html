@@ -62,9 +62,31 @@ function GetModelParams()
     return objParams;
 end
 
-ClientVersion = string.format(L"Paracraft帕拉卡 v%s", GameLogic.options.GetClientVersion());
+if System.options.channelId_431 then
+    ClientVersion = string.format(L"帕拉卡客户端 v%s", GameLogic.options.GetClientVersion());
+    CompanyName = L"深圳市帕拉卡科技有限公司"
+else
+    ClientVersion = string.format(L"Paracraft帕拉卡 v%s", GameLogic.options.GetClientVersion());
+    CompanyName = L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"
+end
+
+function GetTitle()
+    if System.options.channelId_431 then
+       return L"关于帕拉卡客户端"
+    else
+        return L"关于Paracraft"
+    end
+end
+
+function GetOfficalNet()
+    if System.options.channelId_431 then
+        return L"https://edu.palaka.cn"
+    else
+        return L"https://paracraft.cn/"
+    end
+end
 ]]></script>
-<aries:window mode="thin" width="600" title='<%=L"关于Paracraft" %>' onclose="OnClose">
+<aries:window mode="thin" width="600" title='<%=GetTitle() %>' onclose="OnClose">
     <div class="default">
         <div style="float:left;">
             <pe:canvas3d miniscenegraphname="DownloadWorld128" autoRotateSpeed="1.5" DefaultCameraObjectDist="3.4" IsInteractive="false" RenderTargetSize="128" style="width:128px;height:128px;" value='<%=GetModelParams()%>' />
@@ -72,19 +94,25 @@ ClientVersion = string.format(L"Paracraft帕拉卡 v%s", GameLogic.options.GetCl
         <div style="float:left;min-height:150px;">
             <div style="margin:10px;">
                 <div style="margin-top:5px"><%=Eval("ClientVersion")%></div>
-                <div style="margin-top:5px;"><%=L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"%></div>
-                <div style="margin-top:5px;"><%=L"官网:"%><input type="button" value='<%=L"http://paracraft.cn/"%>' class="linkbutton_yellow" style="" onclick="OnClickOfficialSite" /></div>
-                <div style="margin-top:5px;"><%=L"协议:"%><input type="button" value='<%="License"%>' class="linkbutton_yellow" style="" onclick="OnClickLicenseSite" /></div>
-                <div style="margin-top:5px;"><%=L"隐私:"%><input type="button" value='<%="Privacy"%>' class="linkbutton_yellow" style="" onclick="OnClickPrivacySite" /></div>
+                <div style="margin-top:5px;"><%=Eval("CompanyName")%></div>
+                <div style="margin-top:5px;"><%=L"官网:"%><input type="button" value='<%=GetOfficalNet()%>' class="linkbutton_yellow" style="" onclick="OnClickOfficialSite" /></div>
+                <pe:if  condition='<%= not System.options.isChannel_430%>'>
+                    <pe:if  condition='<%= not System.options.channelId_431%>'>
+                        <div style="margin-top:5px;"><%=L"协议:"%><input type="button" value='<%="License"%>' class="linkbutton_yellow" style="" onclick="OnClickLicenseSite" /></div>
+                        <div style="margin-top:5px;"><%=L"隐私:"%><input type="button" value='<%="Privacy"%>' class="linkbutton_yellow" style="" onclick="OnClickPrivacySite" /></div>
+                    </pe:if>
+                </pe:if>
                 
             </div>
         </div>
     </div>
     <hr />
     <div style="margin-top:30px;margin-bottom:30px;" class="default">
-        <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnOpenModulePage" />    
-        <!-- <input type="button" value='<%=L"捐赠" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnClickDonate" /> -->
-        <input type="button" value='<%=L"致谢"%>'  class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnClickCredits" />
+        <pe:if  condition='<%= not System.options.channelId_431%>'>
+            <input type="button" value='<%=L"MOD加载..."..GetModCountAsString() %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnOpenModulePage" />    
+            <!-- <input type="button" value='<%=L"捐赠" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnClickDonate" /> -->
+            <input type="button" value='<%=L"致谢"%>'  class="mc_light_grey_button_with_fillet" style="margin-left:20px;height:28px;" onclick="OnClickCredits" />
+        </pe:if>
         <input type="button" value='<%=L"确定" %>' class="mc_yellow_button_with_fillet" align="right" style="margin-right:20px;min-width:120px;height:28px;" onclick="OnClose"/>
     </div>
 </aries:window>

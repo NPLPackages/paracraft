@@ -57,8 +57,21 @@ end
                 color:#ffffff;font-size:14px;width:43px; height:22px;
                 background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8);" />
     </pe:if>   
+
+    <pe:if condition='<%=OpenAudioFileDialog.category_index == 3%>' >
+        <input uiname="OpenAudioFileDialog.OnChangeCategory5" type="button" value='自定义' name="3" onclick="OnChangeCategory" 
+            style="font-weight:bold;margin-right:8px;margin-top:9px;float: left;
+                    color:#ffffff;font-size:14px;width:55px; height:26px;
+                    background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#236 89 26 26:8 8 8 8);" />
+    </pe:if>
+    <pe:if condition='<%=OpenAudioFileDialog.category_index ~= 3%>' >
+        <input uiname="OpenAudioFileDialog.OnChangeCategory6" type="button" value='自定义' name="3" onclick="OnChangeCategory" 
+            style="font-weight:bold;margin-right:7px;margin-top:12px;float: left;
+                color:#ffffff;font-size:14px;width:53px; height:22px;
+                background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#179 89 21 21:8 8 8 8);" />
+    </pe:if>
     <div class="mc_paper_panel" style="padding-top:3px;padding-bottom:3px">
-        <pe:treeview uiname="OpenAudioFileDialog.filelist"  ShowIcon="false" name="tvwExistingFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAudioFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">
+        <pe:treeview uiname="OpenAudioFileDialog.filelist"  ShowIcon="true" name="tvwExistingFiles" VerticalScrollBarStep="20" DataSource='<%=OpenAudioFileDialog.GetExistingFiles()%>' DefaultNodeHeight="20" style="height:200px;background:;">
             <NodeTemplates>
                 <NodeTemplate DataType="file">
                     <pe:treenode style="height:20px;" uiname='<%="OpenAudioFileDialog.file_"..commonlib.Encoding.DefaultToUtf8(XPath("this|filename"))%>' OnClick="OnSelectFile" can_select="true" text='<%=GetTreeNodeText(XPath("this"))%>'></pe:treenode>
@@ -71,12 +84,18 @@ end
         <%=OpenAudioFileDialog.GetText()%>
     </div>
     <div>
-        <input type="text" SkipAutoBadWordFilter="true" uiname="OpenAudioFileDialog.text" onchange="dummy" name="text" enable_ime="false" style="height:24px;width:320px"/>
-        <input type="button" class="mc_light_grey_button_with_fillet" uiname="OpenAudioFileDialog.openfile"  name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenAudioFileDialog.OnOpenAudioFileDialog"/>
+        <input type="text" auto_virtual_keyboard="true" SkipAutoBadWordFilter="true" uiname="OpenAudioFileDialog.text" onchange="dummy" name="text" enable_ime="false" style="height:24px;width:320px"/>
+        <pe:if condition='<%=OpenAudioFileDialog.category_index ~= 3%>' >
+            <input type="button" class="mc_light_grey_button_with_fillet" uiname="OpenAudioFileDialog.openfile"  name="openfile" value='...' style="min-width:30px;height:24px;margin-left:3px;" onclick="OpenAudioFileDialog.OnOpenAudioFileDialog"/>
+        </pe:if>
     </div>
     <div style="margin-top:5px;">
-        <input type="button" uiname="OpenAudioFileDialog.OK" name="OK" DefaultButton="true" align="left" style="margin-left:323px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OpenAudioFileDialog.OnOK" value='<%=L"确定"%>' />
+        <input type="button" uiname="OpenAudioFileDialog.Cancel" name="Cancel" DefaultButton="true" align="left" style="position: relative; margin-left:283px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OpenAudioFileDialog.OnClose" value='<%=L"取消"%>' />
+        <input type="button" uiname="OpenAudioFileDialog.OK" name="OK" DefaultButton="true" align="left" style="margin-left:363px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OpenAudioFileDialog.OnOK" value='<%=L"确定"%>' />
     </div>
+    <pe:if condition='<%=OpenAudioFileDialog.category_index == 3%>' >
+        <input type="button" uiname="OpenAudioFileDialog.Record" name="Record" DefaultButton="true" align="left" style="margin-top: -52px; margin-left:330px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OpenAudioFileDialog.OnRecord" value='<%=L"录音"%>' />
+    </pe:if>
 </div>
 <%
     function SetFocus()
@@ -95,3 +114,6 @@ end
 </pe:mcml>
 </body>
 </html>
+
+<!-- <input style="margin:2px;margin-right:10px; width: 100px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Window/button/huianniu_32x32_32bits.png#0 0 32 32:14 14 14 14);" onclick="OnClose"  type="button" value='<%=L"关闭"%>' />
+    <input style="margin:2px;margin-right:10px; width: 100px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Window/button/huanganniu_32x32_32bits.png#0 0 32 32:14 14 14 14);" onclick="OnClose"  type="button" value='<%=L"关闭"%>' /> -->

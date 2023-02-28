@@ -23,3 +23,36 @@ HttpWrapper.Create("keepwork.project.favorite_search", "%MAIN%/core/v0/favorites
 --http://yapi.kp-para.cn/project/32/interface/api/2767
 --更新项目
 HttpWrapper.Create("keepwork.project.update", "%MAIN%/core/v0/projects/:id", "PUT", true);
+
+
+--世界相关
+--http://yapi.kp-para.cn/project/32/interface/api/1217
+--获取所有参与的世界
+HttpWrapper.Create("keepwork.project.worldlist", "%MAIN%/core/v0/joinedWorlds", "GET", true);
+
+--http://yapi.kp-para.cn/project/32/interface/api/1082
+--获取world列表，自己创建的世界 只包含自己创建的世界，供旧的paracraft客户端使用
+HttpWrapper.Create("keepwork.project.authworlds", "%MAIN%/core/v0/worlds", "GET", true);
+
+--http://yapi.kp-para.cn/project/32/interface/api/2512
+--获取world列表_internal
+HttpWrapper.Create("keepwork.project.internalworlds", "%MAIN%/core/v0/internal/worlds", "GET", true);
+
+--http://yapi.kp-para.cn/project/655/interface/api/5642
+--上传世界后上报课堂小节内容记录
+--[[Body: 数据存在tag.xml中
+classroomId	number	必须 课堂id
+sectionContentId	number	必须 小节内容id
+status	number	非必须 完成状态: 1.完成	
+projectId	number	非必须 世界id]]
+HttpWrapper.Create("keepwork.edu.updateSectionContents", "%MAIN%/edu/v0/classroomStudents/sectionContents", "POST", true);
+
+
+--获取可用容量
+--http://yapi.kp-para.cn/project/655/interface/api/5823
+HttpWrapper.Create("keepwork.world.gettotalsize", "%MAIN%/edu/v0/users/onlineDisks", "GET", true);
+
+--可用容量-检查是否可以上传
+--http://yapi.kp-para.cn/project/655/interface/api/5824
+--[[projectId	无projectId则为创建新世界 fileSize]]
+HttpWrapper.Create("keepwork.world.checkupload", "%MAIN%/edu/v0/users/onlineDisks/check", "GET", true);

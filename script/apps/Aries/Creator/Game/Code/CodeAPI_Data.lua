@@ -82,7 +82,50 @@ function env_imp:getActorValue(name)
 	end
 end
 
+local actor_value_type = {
+	["name"] = "string",
+	["physicsRadius"] = "number",
+	["physicsHeight"] = "number",
+	["isBlocker"] = "boolean",
+	["isLodEnabled"] = "boolean",
+	["groupId"] = "number",
+	["sentientRadius"] = "number",
+	["x"] = "number",
+	["y"] = "number",
+	["z"] = "number",
+	["time"] = "number",
+	["facing"] = "number",
+	["walkSpeed"] = "number",
+	["pitch"] = "number",
+	["roll"] = "number",
+	-- ["color"] = "string",
+	["opacity"] = "number",
+	-- ["selectionEffect"] = "string or number",
+	["isAgent"] = "boolean",
+	["zorder"] = "number",
+	["movieactor"] = "number",
+	["playSpeed"] = "number",
+	-- ["billboarded"] = "table",
+	["shadowCaster"] = "boolean",
+	["isServerEntity"] = "boolean",
+	["dummy"] = "boolean",
+	["gravity"] = "number",
+	["velocity"] = "number",
+	["addVelocity"] = "number",
+	["surfaceDecay"] = "number",
+	["airDecay"] = "number",
+	["isRelativePlay"] = "boolean",
+	["isIgnoreSkinAnim"] = "boolean",
+	-- ["parent"] = "string",
+	["parentOffset"] = "number",
+	["parentRot"] = "number",
+}
+
 function env_imp:setActorValue(name, value, v2, v3)
+	if (actor_value_type[name] == "number") then
+		value = tonumber(value);
+		if (value == nil) then return print("setActorValue 设置无效值:", value) end 
+	end
 	if(self.actor) then
 		self.actor:SetActorValue(name, value, v2, v3)
 	end
@@ -169,4 +212,52 @@ end
 function env_imp:string_contain(str, substr)
 	local pos = string.find(str, substr, 1, true);
 	return pos and true or false;
+end
+
+function env_imp:List_GetIndexByItem(list, item)
+    if (type(list) ~= "table") then
+        return nil
+    end
+    for index, val in ipairs(list) do
+        if (val == item) then
+            return index
+        end
+    end
+    return nil;
+end
+
+function env_imp:List_IsExistItem(list, item)
+    if (type(list) ~= "table") then
+        return false
+    end
+    for index, val in ipairs(list) do
+        if (val == item) then
+            return true
+        end
+    end
+    return false;
+end
+
+function env_imp:List_Insert(list, index, item)
+    if (type(list) ~= "table") then
+        return nil
+    end
+    if (index ~= nil and item == nil) then
+        item, index = index, #list + 1
+    end
+    return table.insert(list, index, item);
+end
+
+function env_imp:List_Remove(list, index)
+    if (type(list) ~= "table") then
+        return nil
+    end
+    return table.remove(list, index);
+end
+
+function env_imp:List_Length(list)
+    if (type(list) ~= "table") then
+        return 0
+    end
+    return #(list);
 end

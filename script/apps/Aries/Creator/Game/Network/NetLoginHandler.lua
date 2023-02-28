@@ -97,6 +97,9 @@ function NetLoginHandler:handleAuthUser(packet_AuthUser)
 		self:SendPacketToPlayer(Packets.PacketAuthUser:new():Init(self.clientUsername, nil, "failed", info));
 		return
 	end
+	if self:GetServerManager()==nil then 
+		return
+	end
 	info.BasicAuthMethod = self:GetServerManager():GetBasicAuthMethod();
 
 	local errMsg = self:GetServerManager():IsUserAllowedToConnect(self.playerConnection:GetIPAddress(), self.clientUsername);

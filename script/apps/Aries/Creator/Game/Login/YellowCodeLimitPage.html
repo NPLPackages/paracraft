@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ExamResultPage.lua"><![CDATA[
+YellowCodeLimitPage = commonlib.gettable("MyCompany.Aries.Game.YellowCodeLimitPage");
+YellowCodeLimitPage.OnInit()
+local page = document:GetPageCtrl();
+
+
+function OnExit()
+    
+end
+
+
+]]></script>
+    <pe:container width="100%" height="100%" style="background: url(Texture/Aries/Creator/keepwork/Window/dikuang_opaque_64x69_32bits.png#0 0 64 69:26 44 24 22);">
+        <div style="position: relative; width: 48px;height: 25px;margin-top: 8px;margin-left: 16px; background: url(Texture/Aries/Creator/paracraft/login/tongzhi_48x25_32bits.png#0 0 48 25);"></div>
+        <div style="width: 154px;height: 211px;margin-top: 76px;margin-left: 34px; background: url(Texture/Aries/Creator/paracraft/login/ren_154x211_32bits.png#0 0 154 211);"></div>
+
+        <div width="350" height="242" style="position: relative; margin-top: -220px;margin-left: 210px; background-color: #ff000000;font-size: 18px;base-font-size: 18px;">
+            <label value='<%= L"亲爱的用户: " %>' style="font-size: 20px;base-font-size: 20px; height: 30px;  font-weight: bold;"></label>
+            <div style="margin-top: 10px;">
+                <%= L"系统检测到您的账号存在非授权教学行为，暂时予以冻结。" %>
+            </div>
+            <div style="margin-top: 5px;">
+                <%=L"冻结到期时间:" %>
+                <label value='<%= YellowCodeLimitPage.deadlineDesc %>' name="text_date" style="float: left;margin-left: 5px; color: #ff0000;height: 30px;"></label>
+            </div>
+            
+            <div style=" margin-top: 20px;font-weight: bold;">
+                <%= L"学校或教培机构获得帕拉卡官方授权，" %>
+            </div>
+            <div style="float:left;margin-top: 1px;font-weight: bold;">
+                <%=L"请联系:" %>
+                <label value='<%= (YellowCodeLimitPage.phoneNumber or "")..L"（童老师）" %>' name="text_phone" style="float: left;margin-left: 5px; height: 30px;"></label>
+            </div>
+        </div>
+        <div style="margin-bottom: 42px;margin-left: 8px;font-size: 14px;base-font-size: 14px;" height="10" valign="bottom" >
+            <div zorder="10" value='<%= L"使用激活码" %>' name="confirm" onclick="YellowCodeLimitPage.OnClickExchange()" align="left" style="position: relative;color: #1AA6E7; margin-left:120px;width:100px;height:50px;background: url();">
+                <%= L"使用激活码" %>
+                <div style="background-color: #1AA6E7;" width="70" height="1"></div>
+            </div>
+            
+            <div zorder="10" value='<%= L"退出软件" %>' name="confirm" onclick="YellowCodeLimitPage.OnExit" align="right" style="position: relative; margin-right:120px;width:100px;height:50px;background: url();">
+                <%= L"退出软件" %>
+                <div style="background-color: #000000;" width="54" height="1"></div>
+            </div>
+        </div>
+
+    </pe:container>
+
+</pe:mcml>
+</body>
+</html>

@@ -55,6 +55,14 @@ local presets = {
 		margin = 16,
 		stereo = 0,
 	},
+	["auto video share"] = {
+		Codec="mp4",
+		VideoResolution={960, 720},
+		VideoBitRate = 5120000, 
+		FPS = 60, 
+		margin = 0,
+		stereo = 0,
+	},
 	-- there must be a space after mp4, since codec extension is deduced from key name. 
 	["mp4 1080p"] = {
 		Codec="mp4",
@@ -71,6 +79,49 @@ local presets = {
 		FPS = 25, 
 		margin = 0,
 		stereo = 2, -- stereo mode:left and right eye
+	},
+	-- ["mp4 ODS 2k"] = {
+	-- 	Codec="mp4",
+	-- 	VideoResolution={2048, 2048},
+	-- 	VideoBitRate = 51608000, 
+	-- 	FPS = 60, 
+	-- 	margin = 0,
+	-- 	stereo = 6,
+	-- 	preset_stereo = 6,
+	-- 	widthPerDegree = 2,
+	-- },
+	-- ["mp4 ODS 1280P"] = {
+	-- 	Codec="mp4",
+	-- 	VideoResolution={1280, 1280},
+	-- 	VideoBitRate = 51608000, 
+	-- 	FPS = 60, 
+	-- 	margin = 0,
+	-- 	stereo = 6,
+	-- 	preset_stereo = 6,
+	-- 	widthPerDegree = 2,
+	-- 	checkboxShader = false,
+	-- },
+	["mp4 ODS single eye"] = {
+		Codec="mp4",
+		VideoResolution={2160, 1080},
+		VideoBitRate = 51608000, 
+		FPS = 60, 
+		margin = 0,
+		stereo = 8,
+		preset_stereo = 8,
+		widthPerDegree = 540,
+		checkboxShader = false,
+	},
+	["mp4 ODS single eye macro"] = {
+		Codec="mp4",
+		VideoResolution={1280, 1280},
+		VideoBitRate = 51608000, 
+		FPS = 60, 
+		margin = 0,
+		stereo = 8,
+		preset_stereo = 8,
+		widthPerDegree = 2,--横向，每个角度2像素
+		checkboxShader = false,
 	},
 	["flv"]	= {
 		Codec="flv",
@@ -142,7 +193,7 @@ function VideoRecorderSettings.ShowPage(OnClose)
 			x = -200,
 			y = -170,
 			width = 400,
-			height = 320,
+			height = 360,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 
@@ -156,6 +207,10 @@ function VideoRecorderSettings.ShowPage(OnClose)
 			OnClose(VideoRecorderSettings.result, settings);
 		end
 	end
+end
+
+function VideoRecorderSettings.SetFPS(fps)
+	settings.FPS = fps or 25;
 end
 
 function VideoRecorderSettings.GetFPS()
@@ -186,11 +241,34 @@ function VideoRecorderSettings.GetStereoMode()
 	return settings.stereo or 0;
 end
 
+function VideoRecorderSettings.GetOdsWidthPerDegree()
+	return settings.widthPerDegree or nil;
+end
+
+function VideoRecorderSettings.SetOutputFloder(folder)
+	if folder==nil then
+		return
+	end
+	if ParaIO.DoesFileExist(folder) then
+		settings.folder = folder
+	end
+end
+
 function VideoRecorderSettings.GetOutputFilepath()
+	local path = format("%s%s.%s", settings.folder, VideoRecorderSettings.GetOutputFilename(), VideoRecorderSettings.GetCodecExtension())
+	print("GetOutputFilepath",path)
+	echo(settings,true)
 	return format("%s%s.%s", settings.folder, VideoRecorderSettings.GetOutputFilename(), VideoRecorderSettings.GetCodecExtension());
 end
 
+function VideoRecorderSettings.SetOutputFilename(filename)
+	VideoRecorderSettings.filename = filename
+end
+
 function VideoRecorderSettings.GetOutputFilename()
+	if VideoRecorderSettings.filename then
+		return VideoRecorderSettings.filename
+	end
 	local dir = ParaWorld.GetWorldDirectory();
 	local folder_name = dir:match("([^\\/]+)[\\/]$");
 	folder_name = folder_name or "movie";
@@ -209,8 +287,30 @@ function VideoRecorderSettings.OnReset()
 	VideoRecorderSettings.SetPreset("mp4");
 end
 
+function VideoRecorderSettings.SetMargin(margin)
+	if (not margin or type(margin) ~= "number") then
+		return;
+	end
+
+	settings.margin = margin;
+end
+
 function VideoRecorderSettings.GetMargin()
 	return settings.margin or 16;
+end
+
+function VideoRecorderSettings.SetMarginRect(margin)
+	if (not margin or type(margin) ~= "table") then
+		return;
+	end
+
+	settings.marginRect = margin;
+end
+
+function VideoRecorderSettings.GetMarginRect()
+	local ret = settings.marginRect;
+	settings.marginRect = nil
+	return  ret;
 end
 
 function VideoRecorderSettings.UpdateUIFromSettings()
@@ -229,6 +329,12 @@ function VideoRecorderSettings.UpdateUIFromSettings()
 		page:SetValue("IsShowLogo", VideoRecorderSettings.IsShowLogo());
 		page:SetValue("safemargin", tostring(VideoRecorderSettings.GetMargin()));
 		page:SetValue("stereomode", VideoRecorderSettings.GetStereoMode()~=0);
+		page:SetValue("lockCameraDist", tostring(VideoRecorderSettings.GetLockCameraDist()));
+		page:SetValue("isLockCameraUpDir", VideoRecorderSettings.GetIsLockCameraUpDir());
+		page:SetValue("isIgnoreUI", VideoRecorderSettings.GetIsIgnoreUI());
+		if settings.checkboxShader==false then
+			page:SetValue("checkboxShader", false);
+		end
 	end
 end
 
@@ -275,7 +381,11 @@ function VideoRecorderSettings.UpdateUIToSettings()
 			settings.margin = tonumber(margin);
 		end
 
-		settings.stereo = if_else(page:GetValue("stereomode", nil), 2,0);
+		settings.stereo = if_else(page:GetValue("stereomode", nil), settings.preset_stereo,0);
+
+		settings.isLockCameraUpDir = page:GetUIValue("isLockCameraUpDir", true)
+		settings.isIgnoreUI = page:GetUIValue("isIgnoreUI", false)
+		settings.lockCameraDist = tonumber(page:GetValue("lockCameraDist", nil))
 	end
 end
 
@@ -290,8 +400,30 @@ function VideoRecorderSettings.SetPreset(value)
 	end
 end
 
+function VideoRecorderSettings.IsOdsStereo()
+    return VideoRecorderSettings.last_preset=="mp4 ODS single eye" or VideoRecorderSettings.last_preset=="mp4 ODS single eye macro"
+end
+
+--全景模式下，是否锁死摄像机俯仰角为0
+function VideoRecorderSettings.GetIsLockCameraUpDir()
+	return settings.isLockCameraUpDir or true
+end
+
+--全景模式下，录屏时是否忽略UI
+function VideoRecorderSettings.GetIsIgnoreUI()
+	return settings.isIgnoreUI or false
+end
+
+--全景模式下，是否锁死摄像机距离，0表示不锁死
+function VideoRecorderSettings.GetLockCameraDist()
+	return tonumber(settings.lockCameraDist) or 20
+end
+
 function VideoRecorderSettings.OnSelectPreset(name, value)
 	VideoRecorderSettings.last_preset = value;
+	if page then
+		page:Refresh(0)
+	end
 	VideoRecorderSettings.SetPreset(value);
 end
 
@@ -327,13 +459,15 @@ function VideoRecorderSettings.OnClickSelectOutputFolder()
 	
 	ParaEngine.GetAttributeObject():SetField("OpenFileFolder", VideoRecorderSettings.GetAbsoluteOutputFolder());
 	local folder = ParaEngine.GetAttributeObject():GetField("OpenFileFolder", "");
-	
 	if(folder and folder~="" ) then
 		if(not folder:match("/\\$")) then
 			folder = folder.."\\";
 		end
 		if(settings.folder ~= folder) then
 			settings.folder = folder;
+			if page then
+				page:Refresh(0)
+			end
 			VideoRecorderSettings.UpdateUIFromSettings();
 		end
 	end

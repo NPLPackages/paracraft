@@ -487,12 +487,6 @@ function ParalifeLiveModel.ClearBag()
 	ParalifeLiveModel.RefreshPage()
 end
 
---隐藏背包以及按钮
-function ParalifeLiveModel.SetHideBagBtn(isHide)
-	ParalifeLiveModel.isRoleBtnHide = isHide
-	ParalifeLiveModel.RefreshPage()
-end
-
 --根据模型名或者静态标签获取出背包物品,返回一个函数调用
 function ParalifeLiveModel.PickBagItemByModelNameOrStaticTag(paramStr)
 	if paramStr==nil or paramStr=="" then
@@ -811,15 +805,16 @@ end
 function ParalifeLiveModel.CreateRoleView()
 	local _parent = ParaUI.GetUIObject("paralife_role")
 	local screen_width,screen_height = Screen:GetWidth(),Screen:GetHeight()
-	local startx = screen_width/2 - 640
+	local startx = 0
 	local starty = screen_height - ParalifeLiveModel.GetRoleViewHeight() + 0
 	local data_num = #(ParalifeLiveModel.role_data)
 	local showNum = data_num <= ParalifeLiveModel.GetShowNum() and data_num or ParalifeLiveModel.GetShowNum()
 	local cell_w,cell_h = ParalifeLiveModel.GetRoleViewWidth(), ParalifeLiveModel.GetRoleViewHeight()
 	local _w,_h = 132,166 --实际容器大小
 	if  _parent and _parent:IsValid() then
+		startx = screen_width/2 - showNum *cell_w / 2
 		for i=1,showNum do
-			local _this = ParaUI.CreateUIObject("container", "main_user_player_parent"..i, "_lt", (i-1) * cell_w+(cell_w-_w)*0.5, (cell_h-_h)*1, _w,_h);
+			local _this = ParaUI.CreateUIObject("container", "main_user_player_parent"..i, "_lt", startx+(i-1) * cell_w+(cell_w-_w)*0.5, (cell_h-_h)*1, _w,_h);
 			_this.background = ""
 			-- _guihelper.SetUIColor(_this, "#00ff00");
 			_parent:AddChild(_this)
@@ -905,12 +900,17 @@ function ParalifeLiveModel.CreateRoleView()
 end
 
 function ParalifeLiveModel.GetRoleItemByMouse()
+	local cell_w,cell_h = ParalifeLiveModel.GetRoleViewWidth(), ParalifeLiveModel.GetRoleViewHeight()
+	local data_num = #(ParalifeLiveModel.role_data)
+	local showNum = data_num <= ParalifeLiveModel.GetShowNum() and data_num or ParalifeLiveModel.GetShowNum()
+	local screen_width,screen_height = Screen:GetWidth(),Screen:GetHeight()
+	local startx = screen_width/2 - showNum *cell_w / 2
 	local _parent = ParaUI.GetUIObject("paralife_role")
 	local mouse_x, mouse_y = ParaUI.GetMousePosition();
 	local x = mouse_x - _parent.x
-	local y = mouse_y - (Screen:GetHeight() - ParalifeLiveModel.GetRoleViewHeight())
+	local y = mouse_y - (screen_height - cell_h)
 
-	local index = math.floor(x / ParalifeLiveModel.GetRoleViewWidth()) + 1
+	local index = math.floor((x - startx) / cell_w) + 1
 	local item = ParaUI.GetUIObject("main_user_player_parent"..index)
 	if item then 
 		if x>item.x and x<item.x+item.width and y>item.y and y<item.y+item.height then 
@@ -1055,6 +1055,11 @@ function ParalifeLiveModel.CreateCanvasNode(parent,index,pWidth,pHeight)
 			name = "test_player"..index,
 			CustomGeosets = data.skin
 		};
+		if data.xmlnode and data.xmlnode.attr then
+			params.pitch = data.xmlnode.attr.pitch
+			params.facing = data.xmlnode.attr.facing
+			params.roll = data.xmlnode.attr.roll
+		end
 		ctl:Show(true);
 		ctl:ShowModel(params)
 	end
@@ -1076,7 +1081,9 @@ function ParalifeLiveModel.AddRoleData(entity,bRefresh,isInsert,isDraggedIn)
 	if not entity then
 		return 
 	end
-
+	if not entity:GetInnerObject() then
+		return
+	end
 	local isHuman = entity:HasCustomGeosets()
 	
 	local xmlnode = entity:SaveToXMLNode()
@@ -1252,7 +1259,7 @@ function ParalifeLiveModel.SetSceneMarginBottom(hasMargin)
 		if viewport:GetMarginBottomHandler() ~= ParalifeLiveModel then
 			viewport:SetMarginBottom(math.floor(ParalifeLiveModel.GetViewMargin() * (Screen:GetUIScaling()[2]))); 
 			viewport:SetMarginBottomHandler(ParalifeLiveModel);
-			ParaLifeTouchController.SetBallMargin(ParalifeLiveModel.GetViewMargin())
+			ParaLifeTouchController.SetBallMargin(ParalifeLiveModel.GetViewMargin() + 50)
 		end
 	end
 end
@@ -1290,7 +1297,6 @@ function ParalifeLiveModel.OnExitWorld()
 	ParalifeLiveModel.SetSceneMarginBottom(false)
 	ParalifeLiveModel.IsInit = nil
 	ParalifeLiveModel.ClosePage()
-	ParalifeLiveModel.SetHideBagBtn(false)
 	ParalifeLiveModel.SetBagTypeDefault()
 end
 

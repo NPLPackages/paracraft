@@ -480,6 +480,20 @@ function Item:GetSearchKey()
 	return self.searchkey;
 end
 
+function Item:GetSearchKey2()
+	if(self.searchkey2) then
+		return self.searchkey2;
+	else
+		local block_template = block_types.get(self.block_id);
+		if(block_template and block_template.searchkey2) then
+			self.searchkey2 = block_template.searchkey2;
+		else
+			self.searchkey2 = self:GetSearchKey()
+		end
+	end
+	return self.searchkey2;
+end
+
 function Item:GetDisplayName()
 	if(self.displayname) then
 		return self.displayname;
@@ -626,20 +640,29 @@ end
 
 -- virtual:
 -- when alt key is pressed to pick a block in edit mode. 
-function Item:PickItemFromPosition(x,y,z)
+function Item:PickItemFromPosition(x,y,z, side)
+	if(side) then
+		local matId = BlockEngine:GetBlockExternalMaterial(x, y, z, side)
+		if(matId and matId>0) then
+			local itemStack = ItemStack:new():Init(block_types.names.Material, 1)
+			if(itemStack) then
+				local item = itemStack:GetItem();
+				item:SetMaterialIdToItemStack(itemStack, matId);
+				return itemStack;
+			end
+		end
+	end
 	local itemStack = ItemStack:new():Init(self.id, 1)
 	if(self:HasColorData()) then
 		local block_data = BlockEngine:GetBlockData(x,y,z);
-		if(block_data and block_data~=0) then
+		if(block_data) then
 			local block_template = BlockEngine:GetBlock(x,y,z);
 			if(block_template) then
 				if(block_template.color8_data) then
 					block_data = band(block_data, 0xff00);
 				end
 			end
-			if(block_data ~= 0) then
-				itemStack:SetPreferredBlockData(block_data);
-			end
+			itemStack:SetPreferredBlockData(block_data);
 		end
 	end
 	return itemStack;

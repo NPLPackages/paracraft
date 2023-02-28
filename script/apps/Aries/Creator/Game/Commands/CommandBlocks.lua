@@ -308,6 +308,7 @@ Commands["setblock"] = {
 Examples:
 /setblock ~-1 ~0 ~-2 254 0 {attr={filename="blocktemplates/111.bmax", scale=2, facing=3.14}}
 /setblock ~-1 ~0 ~-2 105:5
+/setblock ~ ~ ~ 211:3 {attr={}, {name="cmd", "sign block"}}
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local blockid, data, method, dataTag, dx, dy, dz;

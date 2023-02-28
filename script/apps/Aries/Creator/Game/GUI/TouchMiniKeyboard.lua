@@ -279,10 +279,20 @@ function TouchMiniKeyboard:GetUIControl()
 	local _parent = ParaUI.GetUIObject(self.id or self.name);
 	
 	if(not _parent:IsValid()) then
-		_parent = ParaUI.CreateUIObject("container",self.name, self.alignment,self.left,self.top,self.width,self.height);
+		_parent =
+			ParaUI.CreateUIObject(
+				"container",
+				self.name,
+				self.alignment,
+				self.left,
+				self.top,
+				self.width,
+				self.height
+			);
+
 		_parent.background = "";
 		_parent:AttachToRoot();
-		_parent.zorder = self.zorder;
+		_parent.zorder = 1001;-- _parent.zorder;
 		_parent:SetScript("ontouch", function() self:OnTouch(msg) end);
 		_parent:SetScript("onmousedown", function() self:OnMouseDown() end);
 		_parent:SetScript("onmouseup", function() self:OnMouseUp() end);

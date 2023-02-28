@@ -1,0 +1,64 @@
+<body>
+    <pe:mcml>
+        <script type='text/npl' refresh='false'>
+            <![CDATA[
+                local ConvertToWebMode = NPL.load('./ConvertToWebMode.lua');
+                local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros");
+
+                local page = document:GetPageCtrl();
+
+                function close()
+                    page:CloseWindow();
+
+                    if (not ConvertToWebMode.isUnlock) then
+                        Macros.SetRecordMode(false);
+                    end
+                end
+
+                function confirm()
+                    local val = page:GetValue("pwd");
+
+                    if (val == page.c) then
+                        page.callbackFunc(true);
+                        close();
+                    else
+                        page.callbackFunc(false);
+                    end
+                end
+            ]]>
+        </script>
+        <pe:container
+            style='width: 300px;
+                   height: 150px;
+                   background: url();'>
+            <kp:window
+                mode='lite'
+                width='300'
+                height='150'
+                icon='Texture/Aries/Creator/keepwork/Window/title/biaoti_tishi_32bits.png'
+                title='<%= L"提示" %>'
+                onclose='close()'>
+                <div style='height: 38px;'></div>
+                <div style='padding: 20px;'>
+                    <div>
+                        <%= "请输入密码" %>
+                    </div>
+                    <div style="color: #FFFFFF;">
+                        <input type="text"
+                               name="pwd"
+                               PasswordChar="*"
+                               value="" />
+                        <input type="button"
+                               style="color: #ffffff;
+                                      textcolor: #ffffff;
+                                      background: url(Texture/whitedot.png);
+                                      background-color: #4e4e4e;"
+                               onclick="confirm"
+                               value="confirm" />
+                    </div>
+                </div>
+            </kp:window>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

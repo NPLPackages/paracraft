@@ -23,9 +23,9 @@ local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 
+local ConvertToWebMode = NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/ConvertToWebMode/ConvertToWebMode.lua");
 
 local playSpeed = 1;
-
 
 function Macros.GetPlaySpeed()
 	return playSpeed
@@ -38,18 +38,43 @@ function Macros.SetPlaySpeed(speed)
 end
 
 local nHelpLevel = 1;
+local nRecordMode = false;
 
 -- @param nLevel: 1 (default) to show all tips
 -- 1 (default) to show all possible tips
--- -1 to display key and mouse tips
 -- 0 to disable mouse tips
+-- -1 to display key and mouse tips
+-- -2 to convert to webmode
 function Macros.SetHelpLevel(nLevel)
-	nHelpLevel = nLevel
+	local previousHelpLevel = nHelpLevel;
+
+	if (nRecordMode) then
+		nHelpLevel = -2;
+	else
+		nHelpLevel = nLevel;
+	end
+
+	if (nHelpLevel == -2) then
+		ConvertToWebMode:Locker(function(isCorrent)
+			if (isCorrent) then
+				nHelpLevel = -2;
+			else
+				nHelpLevel = previousHelpLevel;
+				nRecordMode = false;
+			end
+		end);
+
+		nHelpLevel = previousHelpLevel;
+	end
 end
 
 -- @return default to 1
 function Macros.GetHelpLevel()
-	return nHelpLevel
+	return nHelpLevel;
+end
+
+function Macros.SetRecordMode(recordMode)
+	nRecordMode = recordMode;
 end
 
 function Macros.IsShowButtonTip()
@@ -58,6 +83,10 @@ end
 
 function Macros.IsShowKeyButtonTip()
 	return nHelpLevel >= 0
+end
+
+function Macros.IsShowCursor()
+	return nHelpLevel > -2
 end
 
 local isAutoPlay = false;
@@ -82,6 +111,16 @@ end
 
 function Macros.SetTextManualPlay(bManualPlay)
 	isTextManualPlay = bManualPlay
+end
+
+--是否不显示trigger
+local isShowMacroTrigger = true
+function Macros.SetShowTrigger(bShow)
+	isShowMacroTrigger = bShow
+end
+
+function Macros.IsShowMacroTrigger()
+	return isShowMacroTrigger
 end
 
 local blockOrigin = {0,0,0};

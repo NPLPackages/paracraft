@@ -1,0 +1,95 @@
+<!--script/apps/Aries/Creator/Game/Code/CodeBlockWindow.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
+<![CDATA[
+CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+local data_test = {
+    {text = "tooltip", value = 1},
+    {text = "tooltip", value = 2},
+    {text = "tooltip", value = 3},
+    {text = "tooltip", value = 4},
+}
+
+function Run()
+    RedSummerCampPPtPage.CloseInDebug()
+
+    if Page.IsPreview then
+        RedSummerCampPPtPage.SetIsPreview(true)
+    end
+
+    CodeBlockWindow.OnClickCompileAndRun()
+    Page:Refresh(0.1)
+end
+
+function Stop()
+    RedSummerCampPPtPage.CloseInDebug()
+end
+
+function OnClickEditMode(name)
+    CodeBlockWindow.OnClickEditMode(name)
+end
+
+function ClosePPtPage(name)
+    RedSummerCampPPtPage.CloseInDebug()
+end
+
+function OnSelectLevel(mcmlName, value)
+    if RedSummerCampPPtPage.IsOpen() then
+        RedSummerCampPPtPage.SelectLesson(value)
+    else
+        RedSummerCampPPtPage.SetDefaulIndex(value)
+    end
+end
+
+function GetPageDataaSource()
+    return RedSummerCampPPtPage.GetDebugData()
+end
+
+function ClickPreview(value)
+    Page.IsPreview = value
+end
+
+function IsInPreview()
+    return Page.IsPreview
+end
+
+
+]]></script>
+<div width="100%" height="100%" style="background-color:#292929;" class="default">
+    <div style="margin:5px;height:37px;">
+        <div style="float:left;margin-left:2px;margin-top:3px">
+            <input type="button" uiname="CodeBlockWindowPPT.run" name="run" tooltip='<%=L"编译并运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/play_off.png); " onclick="Run" />
+            <input type="button" uiname="CodeBlockWindowPPT.pause" name="pause" tooltip='<%=L"终止运行"%>' style="margin-left: 0px; width: 32px; height: 32px; background: url(Texture/Aries/Creator/player/suspend_off.png); " onclick="Stop" />
+        </div>
+        <div style="float:left;margin-left:20px;margin-top:9px">
+            <input type="checkbox" uiname="CodeBlockWindowPPT.allowClientExecution" checked='<%=IsInPreview()%>' name="allowClientExecution" style="margin-top:2px" onclick="ClickPreview"/>
+            <div uiname="CodeBlockWindowPPT.allowClientExecutionFor"  for="allowClientExecution" style="float:left;margin-left:5px;" >
+                <%=L"预览模式"%>
+            </div>
+        </div>
+
+        <div style="float:left;margin-left:20px;margin-top:9px">
+            <%=L"页数: "%>
+            <select uiname="CodeBlockWindowPPT.FontSize" name="FontSize" style="height:25px;margin-top:-1px;" AllowUserEdit="false" onselect="OnSelectLevel" DataSource='<%=GetPageDataaSource() %>'/>
+        </div>
+
+        <div style="position:relative;float:left;width:82px;" align="right">
+            <input type="button" uiname="CodeBlockWindowPPT.tutorial" tooltip='<%=L"教程"%>' onclick="CodeBlockWindow.OnOpenTutorials" style="margin-top:7px;color:#ffffff;font-size:12px;width:25px;height:25px;background:url(Texture/Aries/Combat/Battle/teen/help_32bits.png)" />
+            <input type="button" uiname="CodeBlockWindowPPT.resizeBtn" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="CodeBlockWindow.ToggleSize()" style="margin-left:2px;margin-top:5px;width:28px;height:28px;background:url(Texture/3DMapSystem/Creator/Objects/Tool_Move.png);" />
+            <input type="button" uiname="CodeBlockWindowPPT.saveAndClose" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" class="mc_close_button" style="margin-left:2px;margin-top:10px;" />
+        </div>
+    </div>
+    <pe:container alignment="_fi" name="codeContainer" class="mc_paper_panel" style="position:relative;margin-bottom:54px;margin-left:5px;">
+            <pe:hotkey name="helpCodeHotkey" hotkey="DIK_F1" onclick="CodeBlockWindow.OnLearnMore"/>
+            <input uiname="CodeBlockWindowPPT.code" name="code" rows="20" language="npl" height="100%" value='<%=CodeBlockWindow.GetCodeFromEntity() or ""%>' 
+                ReadOnly="<%=CodeBlockWindow.IsBlocklyEditMode()%>" OnMouseOverWordChange="CodeBlockWindow.OnMouseOverWordChange" OnRightClick="CodeBlockWindow.OnRightClick"
+                ShowLineNumber="true" UseSystemControl="true" enable_ime="false" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;font-family:Consolas" lineheight="<%=CodeBlockWindow.GetFontSize()+4%>" fontsize="<%=CodeBlockWindow.GetFontSize()%>"/>
+    </pe:container>
+    <pe:container style="position:relative;vertical-align:bottom;height:54px;background:;">
+        <input name="console" value='<%=CodeBlockWindow.GetConsoleText()%>' AlwaysShowCurLineBackground="false" rows="3" height="100%" UseSystemControl="true" style="textcolor:#ffffff;line-height:16" fontsize="12"/>
+    </pe:container>
+    <script type="text/npl" refresh="true"></script>
+</div>
+</pe:mcml>
+

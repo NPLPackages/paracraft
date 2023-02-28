@@ -112,7 +112,7 @@ function CommandHelpPage.ShowPage()
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = false,
 			--bShow = bShow,
-			zorder = 2,
+			-- zorder = 2,
 			click_through = false,
 			directPosition = true,
 				align = "_lt",

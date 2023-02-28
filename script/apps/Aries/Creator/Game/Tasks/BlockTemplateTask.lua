@@ -182,7 +182,13 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 			if(node) then
 				for _, fileNode in ipairs(node) do
 					local filename = fileNode.attr.filename
-					local filepath = GameLogic.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(filename);
+					local filepath 
+					if self.write_reference_from_path then
+						filename = filename:match("[^/\\]+$")
+						filepath = Files.GetTempPath().."createPlatform/"..commonlib.Encoding.Utf8ToDefault(filename);
+					else
+						filepath = GameLogic.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(filename);
+					end
 					if(not ParaIO.DoesFileExist(filepath, true)) then
 						local text = fileNode[1];
 						NPL.load("(gl)script/ide/System/Encoding/base64.lua");
@@ -207,6 +213,14 @@ function BlockTemplate:LoadTemplateFromXmlNode(xmlRoot, filename)
 				local entities = NPL.LoadTableFromString(node[1]);
 				if(entities and #entities > 0) then
 					liveEntities = entities;
+				end
+			end
+			
+			if liveEntities and self.write_reference_from_path then
+				for k,v in pairs(liveEntities) do
+					if v.attr and v.attr.filename and v.attr.filename ~= "" then
+						v.attr.filename = "createPlatform/"..v.attr.filename:match("[^/\\]+$")
+					end
 				end
 			end
 
@@ -459,8 +473,20 @@ function BlockTemplate:SaveTemplateToString()
 		self:MakeHollow()
 	end
 	local totalCount = #(self.blocks);
-	o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
 
+	--保存bmax嵌套
+	for i=1,totalCount do
+		local block = self.blocks[i]
+		local attr = block[6] and block[6].attr or nil
+		if  attr and attr.item_id == 254 then
+			local modelFile = attr.filename
+			if type(modelFile) == "string" and string.len(modelFile) ~= ParaMisc.GetUnicodeCharNum(modelFile) then --存在中文
+				self.blocks[i][6].attr.filename = commonlib.Encoding.Utf8ToDefault(modelFile)
+			end
+		end
+	end
+
+	o[1] = {name="pe:blocks", [1]=commonlib.serialize_compact(self.blocks, true),};
 	local ref = {name="references", };
 	if(self.liveEntities and (#(self.liveEntities)) > 0) then
 		o[#o+1] = {name="pe:entities", attr={count=#(self.liveEntities)}, [1]=commonlib.serialize_compact(self.liveEntities, true),};
@@ -470,7 +496,7 @@ function BlockTemplate:SaveTemplateToString()
 		if(files) then
 			for filename, refCount in pairs(files) do
 				-- only export files in the current world directory. 
-				local filepath = GameLogic.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(filename);
+				local filepath = self.write_reference_from_path and  commonlib.Encoding.Utf8ToDefault(filename) or GameLogic.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(filename);
 				local file = ParaIO.open(filepath, "r")
 				if(file:IsValid()) then
 					local text = file:GetText(0, -1);
@@ -548,6 +574,10 @@ function BlockTemplate:Undo()
 	end
 end
 
+function BlockTemplate:IsAnimloadFinished()
+	return self.finished
+end
+
 -- Anim Load template
 -- self.load_anim_duration: number of seconds to load the block
 function BlockTemplate:AnimLoadTemplate()
@@ -559,7 +589,9 @@ function BlockTemplate:AnimLoadTemplate()
 			local blocks = NPL.LoadTableFromString(node[1]);
 			if(blocks and #blocks > 0) then
 				self.blocks = blocks;
-				self.blocks_per_tick = math.floor((#blocks) / ((self.load_anim_duration or 5) * 20)+1);
+				if self.blocks_per_tick==nil then
+					self.blocks_per_tick = math.floor((#blocks) / ((self.load_anim_duration or 5) * 20)+1);
+				end
 
 				local unfinished_blocks = {};
 				for index, b in ipairs(blocks) do

@@ -99,6 +99,10 @@ function MirrorBlocks:MirrorWithAxis(pivot_x, pivot_y,pivot_z, mirror_axis)
 			self.history[#(self.history)+1] = {x,y,z, block_id, block_data, entity_data};
 			
 			BlockEngine:SetBlock(x,y,z, b[4] or 0, blockData, flag, b[6]);
+			if self:IsForceBlock(b[4]) then
+				BlockEngine:SetBlockData(x,y,z, blockData, flag);
+			end
+			
 			if(method == "no_clone") then
 				-- remove source block
 				block_id, block_data, entity_data = BlockEngine:GetBlockFull(b[1], b[2], b[3]);
@@ -136,4 +140,14 @@ function MirrorBlocks:Undo()
 			BlockEngine:SetBlock(b[1],b[2],b[3], b[4] or 0, b[5], nil, b[6]);
 		end
 	end
+end
+
+-- 一些方块会内部自己计算blockdata（例如铁轨） 但镜像的处理方式是计算好后设置blockdata
+-- 所以这个函数用来决定哪些方块需要强制使用镜像计算好的blockdata
+function MirrorBlocks:IsForceBlock(block_id)
+	if block_id == 103 or block_id == 250 or block_id == 251 then
+		return true
+	end
+
+	return false
 end

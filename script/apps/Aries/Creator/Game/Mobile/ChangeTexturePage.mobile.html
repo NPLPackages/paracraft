@@ -1,0 +1,169 @@
+
+
+<!-- "script/apps/Aries/Creator/Game/Areas/ChangeTexturePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="TextureModPage.lua"><![CDATA[
+TextureModPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TextureModPage");
+TextureModPage.OnInit();
+
+--local ds = TextureModPage.GetTexturePackDS();
+
+function GetOfficialTextureDS()
+    local ds = TextureModPage.GetOfficialTexturePackDS();
+    return ds;
+end
+
+function GetLocalTextureDS()
+    return TextureModPage.GetLocalTexturePackDS();
+end
+
+function GetCurrentTextureDS()
+    return TextureModPage.GetCurrentTexturePackDS();
+end
+
+
+function SelectTexture(name,mcmlNode)
+    TextureModPage.SelectTexture(name,mcmlNode);
+end
+
+function GetCurTextureName()
+    return L"默认材质名字";
+end
+
+function OpenTextureFolder()
+    ParaIO.CreateDirectory(TextureModPage.texture_pack_path);
+    Map3DSystem.App.Commands.Call("File.WinExplorer", TextureModPage.texture_pack_path);
+end
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function CurrentTextureDSIsOfficial()
+    if(TextureModPage.tex_type == "official") then
+        return true;
+    end
+    return false;
+end
+
+function CurrentTextureDSIsLocal()
+    if(TextureModPage.tex_type == "local") then
+        return true;
+    end
+    return false;
+end
+
+function GetImageSrc(value,default)
+    if(ParaIO.DoesFileExist(value, true)) then
+        return value
+    else
+        return default;
+    end
+end
+
+function OnRefreshFolder()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Materials/TexturePackageList.lua");
+    local TexturePackageList = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.TexturePackageList");
+    TexturePackageList.LoadTexturePackagesInfo(true);
+    Page:Rebuild();
+end
+
+]]></script>
+<!-- <pe:container style="background-color: #000000aa;" width="1280" height="720"> -->
+<mb:window width="1080" height="694" title='<%= L"更换材质"%>' bg_color="gray" onclose="ClosePage">
+    
+    <div style="float:left;margin-left:19px;margin-top:94px;width:516px;height:516px;background: url(Texture/Aries/Creator/keepwork/Mobile/ChangeTexture/contentBg_32x128_32bits.png#0 0 32 96:10 80 10 10);">
+        <div style="margin-left:0px;margin-top:8px;color:#ffffff;font-size:24px;text-align:center;font-weight:bold;height: 60px;padding-top: 10px;">
+            <%=L"官方推荐材质" %>
+        </div>
+        <!-- <div style="background-color: #ffffff;height:1px;width: 516px;"></div> -->
+        <pe:gridview name="gvwOfficialTexturePackage"  VerticalScrollBarOffsetX="5" style="margin-top:2px;margin-bottom:8px;margin-left: 5px;" VerticalScrollBarStep="102" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "102" 
+            DataSource='<%=GetOfficialTextureDS()%>'>
+            <Columns>
+                <pe:if condition='<%=TextureModPage.texture_index == Eval("index") and CurrentTextureDSIsOfficial()%>'>
+                    <div style="margin-top:10px;margin-left:10px;width:474px;height:86px;" class="mc_blue_button_with_fillet">
+                        <div style="position:relative">
+                            <img name="WorldImage" style="float:left;margin-top:15px;margin-left:13px;width:56px;height:56px;" src='<%=GetImageSrc(Eval("previewImage"),Eval("defaultimgage"))%>' enabled="false" />    
+                            <div style="float:left;margin-left:5px;">
+                                <div style="margin-top:14px;font-size:24px;height:24px;color:#ffffff;"><%=Eval("text")%></div>
+                                <div style="float:left;font-size:14px;color:#91BBEA;margin-top: 10px;"><%=Eval("name")%></div>
+                                <div style="float:left;margin-right:10px;text-align:right;font-size:14px;color:#91BBEA;margin-top: 10px;"><%=Eval("author")%></div>
+                            </div>
+                        </div>
+                    </div>       
+                </pe:if>
+                <pe:if condition='<%=TextureModPage.texture_index ~= Eval("index") or (not CurrentTextureDSIsOfficial())%>'>
+                    <div style="margin-top:10px;margin-left:10px;width:474px;height:86px;" class="mc_dark_grey_button_with_fillet">
+                        <div style="position:relative">
+                            <img name="WorldImage" style="float:left;margin-top:15px;margin-left:13px;width:56px;height:56px;" src='<%=GetImageSrc(Eval("previewImage"),Eval("defaultimgage"))%>' enabled="false" />    
+                            <div style="float:left;margin-left:5px;">
+                                <div style="margin-top:14px;font-size:24px;height:24px;color:#ffffff;"><%=Eval("text")%></div>
+                                <div style="float:left;font-size:14px;color:#939393;margin-top: 10px;"><%=Eval("name")%></div>
+                                <div style="float:left;margin-right:10px;text-align:right;font-size:14px;color:#939393;margin-top: 10px;"><%=Eval("author")%></div>
+                            </div>
+                        </div>
+                        <div name='<%=Eval("packagepath")%>' onclick="SelectTexture" param1="official" width="100%" height="100%"></div>
+                    </div>                       
+                </pe:if>                       
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>    
+    </div>
+    <div style="float:left;margin-left:10px;margin-top:94px;width:516px;height:516px;background: url(Texture/Aries/Creator/keepwork/Mobile/ChangeTexture/contentBg_32x128_32bits.png#0 0 32 96:10 80 10 10);">
+        <div style="margin-left:0px;margin-top:8px;color:#ffffff;font-size:24px;text-align:center;font-weight:bold;height: 60px;padding-top: 10px;">
+            <%=L"本地材质" %>
+        </div>
+        <!-- <div style="background-color: #ffffff;height:1px;width: 516px;"></div> -->
+        <pe:gridview name="gvwLocalTexturePackage"  VerticalScrollBarOffsetX="5" style="margin-top:2px;margin-bottom:8px;" VerticalScrollBarStep="102" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "102" 
+            DataSource='<%=GetLocalTextureDS()%>'>
+            <Columns>
+                <pe:if condition='<%=TextureModPage.texture_index == Eval("index") and CurrentTextureDSIsLocal()%>'>
+                    <div style="margin-top:10px;margin-left:10px;width: 474px; height:86px;" class="mc_blue_button_with_fillet">
+                        <img name="WorldImage" zorder="1" style="float:left;margin-top:15px;margin-left:13px;width:56px;height:56px;" src='<%=GetImageSrc(Eval("previewImage"),Eval("defaultimgage"))%>' enabled="false" />    
+                        <input type="button" zorder="1" style="float:left;margin-left:5px;margin-top:14px;font-size:24px;width:320px;height:24px;color:#ffffff;text-align:left;background:" value='<%=Eval("text")%>' enabled="false"  />
+                    </div>       
+                </pe:if>
+                <pe:if condition='<%=TextureModPage.texture_index ~= Eval("index") or (not CurrentTextureDSIsLocal())%>'>
+                    <div name='<%=Eval("packagepath")%>' onclick="SelectTexture" param1="local" style="margin-top:10px;margin-left:10px;width: 474px; height:86px;" class="mc_dark_grey_button_with_fillet">
+                        <img name="WorldImage" zorder="1" style="float:left;margin-top:15px;margin-left:13px;width:56px;height:56px;" src='<%=GetImageSrc(Eval("previewImage"),Eval("defaultimgage"))%>' enabled="false" />
+                        <input type="button" zorder="1" style="float:left;margin-left:5px;margin-top:14px;font-size:24px;width:320px;height:24px;color:#ffffff;text-align:left;background:" value='<%=Eval("text")%>' enabled="false" />
+                    </div>                       
+                </pe:if>                       
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>    
+    </div>
+    <!--<input type="button" style="float:left;margin-left:48px;margin-top:-20px;width:60px;color:#ffffff" value="切换材质" class="mc_light_grey_button_with_fillet" onclick="OnSelectTexturePack"/>-->
+    <div style="margin-top:8px;margin-bottom:8px;height:30px;color:#ffffff">
+        <div style="position:relative;margin-left:20px;color:#ffffff;font-size: 20px;margin-top: 10px;">
+            <%=L"将.zip材质包拖入游戏窗口可以直接替换材质" %>
+        </div>
+        <div style="position:relative;height: 32px; margin-top:10px;margin-left:836px;">
+            <div style="float: left;width: 100px;" tooltip='<%=L"点击刷新目录" %>' onclick="OnRefreshFolder">
+                <div style="position: relative; background: url(Texture/Aries/Creator/keepwork/Mobile/ChangeTexture/icon_fresh_32x32_32bits.png#0 0 32 32);width:32px;height:32px"></div>
+                <label type="button" value='<%=L"刷新" %>' style="float:left;margin-top:1px;margin-left:38px;min-width:88px;height:32px;font-size:20px;color:#ffffff; background:url()" />
+            </div>
+            <pe:if condition='<%=not System.os.IsTouchMode()%>'>
+                <div style="float: left;" tooltip='<%=L"点击打开材质文件夹" %>' onclick="OpenTextureFolder">
+                    <div style="position: relative; background: url(Texture/Aries/Creator/keepwork/Mobile/ChangeTexture/icon_floder_32x32_32bits.png#0 0 32 32);width:32px;height:32px"></div>
+                    <label type="button" value='<%=L"文件目录" %>' style="float:left;margin-top:1px;margin-left:38px;min-width:88px;height:32px;font-size:20px;color:#ffffff; background:url()" />
+                </div>
+            </pe:if>
+            
+        </div>
+    </div>
+</aries:window>
+<!-- </pe:container> -->
+</pe:mcml>
+</body>
+</html>
+

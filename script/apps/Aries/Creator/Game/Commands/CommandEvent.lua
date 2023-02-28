@@ -27,19 +27,40 @@ Examples:
 ]], 
 	category="logic",
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local option, isConvertToTable;
+		option, cmd_text = CmdParser.ParseOption(cmd_text);
+
+		if (option == "table") then
+			isConvertToTable = true;
+		end
 		local targetEntity, eventname, _, playerName;
 		targetEntity, cmd_text, _, playerName = CmdParser.ParsePlayer(cmd_text, fromEntity);
 		eventname, cmd_text = CmdParser.ParseString(cmd_text);
-		if(eventname) then
-			local event = Event:new():init(eventname);	
-			event.cmd_text = cmd_text;
-			if(targetEntity) then
+
+		if (eventname) then
+			local event = Event:new():init(eventname);
+
+			if (isConvertToTable) then
+				event.cmd_text = loadstring("return " .. cmd_text)();
+			else
+				event.cmd_text = cmd_text;
+			end
+
+			if eventname == "createworld_callback" then
+				if GameLogic.events == nil then
+					GameLogic.events = GameLogic.events or commonlib.EventSystem:new();
+				end
+				GameLogic.events:DispatchEvent({type = "createworld_callback" , world_path = cmd_text}, world_path);	
+			end
+
+			if (targetEntity) then
 				return targetEntity:event(event);
 			else
-				if(playerName and playerName ~= "") then
+				if (playerName and playerName ~= "") then
 					-- try sending to code block actor with the exact name
-					event.dest = playerName
+					event.dest = playerName;
 				end
+
 				return GameLogic:event(event);
 			end
 		end

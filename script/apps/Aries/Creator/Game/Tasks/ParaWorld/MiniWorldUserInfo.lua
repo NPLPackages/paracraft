@@ -72,7 +72,7 @@ function MiniWorldUserInfo.ShowPage(world)
 		align = "_lt",
 		x = 20,
 		y = 10,
-		width = 305,
+		width = 200,
 		height = 70,
 	};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
@@ -233,4 +233,8 @@ function MiniWorldUserInfo.ShowTemporaryHide()
 		parent.visible = true
 		MiniWorldUserInfo.is_temporary_hide = false
 	end
+end
+
+function MiniWorldUserInfo.OnClickShare()
+	GameLogic.RunCommand("/menu share.video_or_panorama")
 end

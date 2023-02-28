@@ -197,7 +197,7 @@ function Entity.PlayCmd(cmd, base_note, beat, channel)
 	local note = Entity.CreateNoteMsgFromCmd(cmd, base_note, nil, channel);
 	ParaAudio.PlayMidiMsg(note);
 
-	if (System.os.GetPlatform() == "win32") then
+	if (System.os.GetPlatform() == "win32" and beat~=-1) then
 		commonlib.TimerManager.SetTimeout(function()
 			if (ParaAudio.StopMidiMsg) then
 				ParaAudio.StopMidiMsg(channel or 0);

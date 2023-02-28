@@ -26,7 +26,6 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
-local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
 -- this should be the same as the items per line. 
 QuickSelectBar.static_view_len = 9;
 QuickSelectBar.static_view_page_index = 1;
@@ -50,6 +49,7 @@ local custombtn_editor_nodes = {}
 
 -- whether the data is modified. 
 QuickSelectBar.IsModified = false;
+QuickSelectBar.IsMobile = false
 local page;
 
 local max_item_count = 32;
@@ -61,9 +61,9 @@ end
 
 function QuickSelectBar.OnInit()
 	page = document:GetPageCtrl();
-	if(System.options.IsMobilePlatform) then
+	if(QuickSelectBar.IsMobile) then
 		QuickSelectBar.custombtn_nodes = {
-			{},{},{},{},{},
+			{},{},{},{},{},{},{},{},{},
 		};
 	end
 	GameLogic.events:AddEventListener("OnHandToolIndexChanged", QuickSelectBar.OnHandToolIndexChanged, QuickSelectBar, "QuickSelectBar");
@@ -72,6 +72,13 @@ function QuickSelectBar.OnInit()
 	GameLogic.events:AddEventListener("game_mode_change", QuickSelectBar.OnGameModeChanged, QuickSelectBar, "QuickSelectBar");
 	GameLogic.events:AddEventListener("OnHintSelectBlock", QuickSelectBar.OnHintSelectBlock, QuickSelectBar, "QuickSelectBar");
 	GameLogic.events:AddEventListener("OnPlayerReplaced", QuickSelectBar.OnPlayerReplaced, QuickSelectBar, "QuickSelectBar");
+end
+
+function QuickSelectBar.IsVisible()
+	if page then
+		return page:IsVisible()
+	end
+	return false
 end
 
 ------------------------
@@ -128,7 +135,7 @@ function QuickSelectBar:AnimateBlockHint(index)
 	if(page) then
 		local ctl = page:FindControl("handtool_highlight_bg");
 		if(ctl) then
-			if(System.options.IsMobilePlatform) then
+			if(QuickSelectBar.IsMobile) then
 				local x, y = ctl:GetAbsPosition();
 				x = x + ((index or 1)-GameLogic.GetPlayerController():GetHandToolIndex())*76;
 				local m_x, m_y = ParaUI.GetMousePosition();
@@ -163,7 +170,7 @@ function QuickSelectBar:OnSetBlockInRightHand(event)
 		if(ctl) then
 			local block_id = GameLogic.GetPlayerController():GetBlockInRightHand();
 			if(block_id and block_id>0) then
-				if(System.options.IsMobilePlatform) then
+				if(QuickSelectBar.IsMobile) then
 					ctl.x = (GameLogic.GetPlayerController():GetHandToolIndex()-1)*76;
 				else
 					ctl.x = (GameLogic.GetPlayerController():GetHandToolIndex()-1)*41;
@@ -181,7 +188,7 @@ function QuickSelectBar:OnSetBlockInRightHand(event)
 				else
 					text = tostring(block_id);
 				end
-				if(System.options.IsMobilePlatform) then
+				if(QuickSelectBar.IsMobile) then
 					ctl.width =  _guihelper.GetTextWidth(text)*1.7+5;
 				else
 					ctl.width = _guihelper.GetTextWidth(text)*1.2+5;
@@ -214,14 +221,32 @@ function QuickSelectBar:OnHandToolIndexChanged(event)
 		if(ctl) then
 			local index = GameLogic.GetPlayerController():GetHandToolIndex()
 			if(index) then
-				if(System.options.IsMobilePlatform) then
-					ctl.x = (index-1)*77 + 1;
+				if(QuickSelectBar.IsMobile) then
+					ctl.x = (index-1)*80 + 12;
 				else
 					ctl.x = (index-1)*41;
 				end
 			end
 		end
 	end
+end
+
+function QuickSelectBar.GetSelectControlPos()
+	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+	local Screen = commonlib.gettable("System.Windows.Screen");
+	local viewport = ViewportManager:GetSceneViewport();
+	local width ,height = Screen:GetWidth(),Screen:GetHeight()
+	local x_offset = -math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
+	local y_offset = -math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
+	local index = GameLogic.GetPlayerController():GetHandToolIndex()
+	if(page) then
+		local ctl = page:FindUIControl("handtool_highlight_bg");
+		if ctl then
+			local x,y,width, height = ctl:GetAbsPosition();
+			return x,y,width, height
+		end
+	end
+	return (width+x_offset)/2,height+y_offset  
 end
 
 function QuickSelectBar.ShowPage(bShow)
@@ -236,22 +261,16 @@ function QuickSelectBar.ShowPage(bShow)
 
 	local url;
 	local width,height;
-	if(System.options.IsMobilePlatform) then
-		width = 400;
-		height = 78;
-		url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.mobile.html"; 
-	else
-		--[[
-		if (QuickSelectBar.ShowTemplate()) then
-			width = 500;
-		else
-			width = 455;
-		end
-		]]
+	local params = {
 		width = 455;
 		height = 96;
 		url = "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html";
-	end
+	}
+	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"QuickSelectBar");
+	QuickSelectBar.IsMobile = params.isMobile == true
+	width = params.width;
+	height = params.height;
+	url = params.url 
 
 	local viewport = ViewportManager:GetSceneViewport();
 	local viewport_margin_bottom = viewport:GetMarginBottom();
@@ -294,7 +313,6 @@ function QuickSelectBar.ShowPage(bShow)
 				width = width,
 				height = height,
 		});
-    EscDock.ShowView(bShow)
 end
 
 function QuickSelectBar.Refresh(nDelayTime)
@@ -444,7 +462,7 @@ function QuickSelectBar.OnClickOnlineStore()
 end
 
 function QuickSelectBar.OnClickMall()
-	local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+	local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
 	if not KeepWorkMallPage.isOpen then
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.resource.button", {useNoId=true});
 		KeepWorkMallPage.Show();

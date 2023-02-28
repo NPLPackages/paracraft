@@ -43,6 +43,12 @@ function OnOpen(name)
 end
 
 function OnClickRightBt(name)
+    if (System.options.isHideVip) then
+        if (name == "skin" or name == "certificate") then
+            return;
+        end
+    end
+
     RedSummerCampMainPage.OnClickRightBt(name)    
 end
 
@@ -191,6 +197,10 @@ function create_new_world()
 end
 
 function OpenRole()
+    if (System.options.isHideVip) then
+        return;
+    end
+
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
         GameLogic.GetFilters():apply_filters('check_signed_in', "请先登录", function(result)
             if result == true then
@@ -199,8 +209,14 @@ function OpenRole()
                         return
                     end
                     RedSummerCampMainPage.RefreshPage()
-                    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-                    page.ShowUserInfoPage({username = System.User.keepworkUsername});
+                    if true then
+                        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+                        UserInfoPage.ShowPage(System.User.keepworkUsername)
+                    else
+                        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+                        page.ShowUserInfoPage({username = System.User.keepworkUsername});
+                    end
+                    
                 end, 500)
             end
         end)
@@ -208,8 +224,13 @@ function OpenRole()
         return
     end
 
-    local role_page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-    role_page.ShowUserInfoPage({username = System.User.keepworkUsername});
+    if true then
+        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+        UserInfoPage.ShowPage(System.User.keepworkUsername)
+    else
+        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+        page.ShowUserInfoPage({username = System.User.keepworkUsername});
+    end
 end
 
 function GetHeadBgStyle()
@@ -250,6 +271,25 @@ end
 
 function OnClickLaba()
     NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notice.lua").Show(1,100)
+end
+
+function CheckHasPermission()
+    if System.options.isChannel_430 then
+        return false
+    else
+        local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+        local enabled = UserPermission.CheckUserPermission("open_for_createplayer")
+        return enabled ~= nil and enabled or false
+    end
+end
+
+function CreateMatch()
+    local worldId = 1049714
+    GameLogic.RunCommand(string.format("/loadworld -s -force %d", worldId))
+end
+
+function IsCourseNode(name)
+    return name and name == "course_page" and not RedSummerCampMainPage.IsFinishVideo()
 end
 
 ]]>
@@ -297,7 +337,8 @@ end
     <pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
         <pe:container alignment="_rt" style="background:;">
             <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div')%>
-            <input type="button" value='' onclick="OpenVip" class="red_summer_camp_open_vip_btn" style="margin-right:15px;margin-top:15px;" />
+            <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:15px;margin-top:15px;","2D_main")%>
+            <!-- <input type="button" value='' onclick="OpenVip" class="red_summer_camp_open_vip_btn" style="margin-right:15px;margin-top:15px;" /> -->
             <input name="helpBtn" type="button" value='' onclick="OpenHelpPage" style="margin-right:15px;margin-top:15px; width: 64px;height: 97px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bangzhu_97X27_32bits.png#0 0 64 97);" />
             <input type="button" value='' onclick="ClosePage" style="margin-right:15px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn3_64X70_32bits.png#0 0 64 70);" />
         </pe:container>
@@ -468,6 +509,9 @@ end
                                 <pe:if condition='<%=Eval("is_show_vip")%>'>
                                     <div style="position: relative;margin-left: -2px;margin-top: -11px; width: 48px;height: 53px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zi2_48X53_32bits.png#0 0 48 53)"></div>
                                 </pe:if>
+                                <pe:if condition='<%=IsCourseNode(Eval("node_name"))%>'>
+                                    <pe:container uiname="red_tip" style="position: relative;margin-left: 212px; margin-top: 18px; width: 13px; height: 13px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/hongdian_13x13_32bits.png#0 0 13 13)"></pe:container>
+                                </pe:if>
                                 <div style="margin-left: 14px;margin-top: 169px; position: relative;width: 220px;height:41px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                                     <div style="margin-top: 10px; text-align: center;base-font-size:18px;font-size: 18px;color: #ffffff;font-weight: bold;">
                                         <%=Eval("name")%>
@@ -485,13 +529,24 @@ end
                 <pe:repeat DataSource="<%=GetRightBtData()%>">
                     <pe:repeatitem>
                         <div onclick="OnClickRightBt" name='<%=Eval("node_name")%>' style='<%=GetBtIconStyle(Eval("img"))%>'></div>
+                        <pe:if condition='<%=not System.os.IsTouchMode()%>'>
+                            <pe:container   onclick="OnClickNotice1"
+                                            visible=false
+                                            uiname='<%=Eval("red_icon_name")%>' 
+                                            style="width: 10px;height: 10px; position:relative;margin-left: -5px; margin-top:-66px;
+                                                    background: url(Texture/Aries/Creator/keepwork/LearningDailyCheck/red_tip_32bits.png#0 0 10 10);">
+                            </pe:container>
+                        </pe:if>
+                        <pe:if condition='<%=System.os.IsTouchMode()%>'>
+                            <pe:container   onclick="OnClickRightBt" 
+                                            name='<%=Eval("node_name")%>'
+                                            visible=false
+                                            uiname='<%=Eval("red_icon_name")%>' 
+                                            style="width: 10px;height: 10px; position:relative;margin-left: -5px; margin-top:-66px;
+                                                    background: url(Texture/Aries/Creator/keepwork/LearningDailyCheck/red_tip_32bits.png#0 0 10 10);">
+                            </pe:container>
+                        </pe:if>
                         <!-- <kp:redtip value="true" name='<%=Eval("node_name") .. "_red_icon"%>' style="position:relative;margin-left: -5px; margin-top:-66px;"></kp:redtip> -->
-                        <pe:container onclick="OnClickNotice1" 
-                                        visible=false
-                                        uiname='<%=Eval("red_icon_name")%>' 
-                                        style="width: 10px;height: 10px; position:relative;margin-left: -5px; margin-top:-66px;
-                                                background: url(Texture/Aries/Creator/keepwork/LearningDailyCheck/red_tip_32bits.png#0 0 10 10);">
-                        </pe:container>
                         <!-- <div name='<%=Eval("red_icon_name")%>' style="width: 10px;height: 10px; position:relative;margin-left: -5px; margin-top:-66px;background: url(Texture/Aries/Creator/keepwork/LearningDailyCheck/red_tip_32bits.png#0 0 10 10);"></div> -->
                     </pe:repeatitem>
                 </pe:repeat>
@@ -511,9 +566,12 @@ end
             <div onclick="OnClickLaba" style="margin-top: -50px; margin-left: 10px; width: 44px; height: 41px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/laba_44x41_32bits.png#0 0 44 41);"></div>
         </pe:container>
 
-        <pe:container alignment="_rb" width="465" height="102" style="margin-right: 98px;margin-bottom: 26px;background:;">
+        <pe:container alignment="_rb" width="600" height="102" style="margin-right: 98px;margin-bottom: 26px;background:;">
             <!-- <input type="button" value='' uiname="RedSummerCampMainPage.create_new_world" onclick="create_new_world" style="width: 156px;height: 56px; margin-left:0px;margin-top:26px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b3_156X56_32bits.png#0 0 156 56)" /> -->
-            <input type="button" value='' uiname="RedSummerCampMainPage.QuickStart" onclick="QuickStart" style="margin-left:181px;margin-top:0px; width: 279px;height: 110px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b4_279X110_32bits.png#0 0 279 110)" />
+            <pe:if condition="<%=CheckHasPermission()%>">
+                <input type="button" value='' uiname="RedSummerCampMainPage.CreateMatch" onclick="CreateMatch" style="position: relative;margin-left:170px;margin-top:10px; width: 102px;height: 82px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/chuangzuoguangchang_102x82_32bits.png#0 0 102 82)" />
+            </pe:if>
+            <input type="button" value='' uiname="RedSummerCampMainPage.QuickStart" onclick="QuickStart" style="position: relative;margin-left:315px;margin-top:0px; width: 279px;height: 110px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b4_279X110_32bits.png#0 0 279 110)" />
         </pe:container>
             <!-- <input type="button" value='打开 神通杯' name="shentongbei" />
             <input type="button" value='打开 推荐课程' name="RedSummerCampRecCoursePage" onclick="OnOpen" />

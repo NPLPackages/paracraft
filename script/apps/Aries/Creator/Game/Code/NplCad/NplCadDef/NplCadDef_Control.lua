@@ -21,7 +21,7 @@ local cmds = {
 			type = "field_variable",
 			variable = "i",
 			variableTypes = {""},
-			text = "key",
+			text = "i",
 		},
         {
 			name = "start_index",

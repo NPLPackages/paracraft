@@ -155,6 +155,7 @@ function RedSummerCampMainWorldPage.BindEvent()
 					event:accept()
 				end
 			end
+			return callbackVal,event
 		end)
 
 		RedSummerCampMainWorldPage.has_bind = true

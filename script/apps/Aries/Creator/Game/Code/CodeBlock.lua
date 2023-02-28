@@ -281,7 +281,6 @@ function CodeBlock:RestartAll()
 	end
 end
 
-
 -- remove everything to unloaded state. 
 function CodeBlock:Stop()
 	self:beforeStopped();
@@ -1187,16 +1186,36 @@ function CodeBlock:SendNetworkEvent(username, event_name, msg)
 	GameLogic.GetCodeGlobal():SendNetworkEvent(username, event_name, msg);
 end
 
--- create a clone of some code block's actor
+-- create a clone of some code block's actor or scene entity, such as live entity
 -- @param name: if nil or "myself", it means clone myself
 -- @param msg: any mesage that is forwarded to clone event
+-- @return actor entity if any. 
 function CodeBlock:CreateClone(name, msg)
 	if(not name or name == "myself") then
-		self:CloneMyself(msg);
+		return self:CloneMyself(msg);
 	else
 		local codeBlock = self:GetCodeBlockByName(name);
 		if(codeBlock) then
-			codeBlock:CloneMyself(msg);
+			return codeBlock:CloneMyself(msg);
+		end
+		local fromEntity = EntityManager.GetEntity(name);
+		if(fromEntity) then
+			local entity = fromEntity:CloneMe()
+			if(entity) then
+				entity:SetPersistent(false);
+				local actor = self:CreateActor();
+				if(actor) then
+					actor:BecomeAgent(entity);
+					-- tricky: we will let the actor to take full control of the entity's life span. 
+					-- i.e. the entity will be destroyed when actor or code block is finished. 
+					actor:SetIsAgent(false); 
+					self:GetReferencedCodeBlock():OnCloneActor(actor, msg);
+					return actor;
+				else
+					LOG.std(nil, "warn", "CreateClone", "code block must have a movie block to use clone() method");
+					entity:Destroy();
+				end
+			end
 		end
 	end
 end

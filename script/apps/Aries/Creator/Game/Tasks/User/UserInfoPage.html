@@ -8,18 +8,731 @@
 <body>
 <pe:mcml>
 <script refresh="false" type="text/npl" src="UserInfoPage.lua"><![CDATA[
-local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+local BadWordFilter = commonlib.gettable("MyCompany.Aries.Chat.BadWordFilter");
+UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
 UserInfoPage.OnInit()
 function ClosePage()
-    Page:CloseWindow();
+    UserInfoPage.ClosePage()
 end
-]]></script>
-<kp:window width="600" height="500" title='<%= L"人物信息"%>' icon="Texture/Aries/Creator/keepwork/UserInfo/renwu_biaoti_32bits.png" onclose="ClosePage">
-    <div style="background-color:#ffffff;margin-top:39px;">
-        aaaaaaaaaaaaaaaaaaa
-    </div>
+
+function GoHomeWorld()
+    if UserInfoPage.IsAuthUser() then
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.home");
+        local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
+        local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
+        LocalLoadWorld.CreateGetHomeWorld();
+
+        GameLogic.GetFilters():apply_filters('check_and_updated_before_enter_my_home', function()
+            GameLogic.RunCommand("/loadworld home");
+        end)
+    else
+        
+    end
+end
+
+function OpenMainPage()
+    ParaGlobal.ShellExecute("open", "https://keepwork.com/u/" .. UserInfoPage.GetUserName(), "", "", 1);
+end
+
+function IsWrapNickName(name)
+    local name = name or ""
+    return _guihelper.GetTextWidth(name,"System;18;bold") > 110
+end
+
+function IsWrapSchoolName(name)
+    local name = name or ""
+    return _guihelper.GetTextWidth(name,"System;14;bold") > 180
+end
+
+function DS_Icons(index)
+    if(index == nil) then
+        return #UserInfoPage.Current_Icon_DS
+    else
+        return UserInfoPage.Current_Icon_DS[index];
+    end
+end
+
+function GetCategoryStyle(tex)
+    return string.format("margin-left:14px;margin-top:10px;width:28px;height:14px;background:url(Texture/Aries/Creator/keepwork/Avatar/%s.png#0 0 28 14);", tex);
+end
+
+function GetBigIconStyle(tex)
+    return string.format("margin-left:32px;margin-top:16px;width:64px;height:64px;background:url(%s);", tex or "");
+end
+
+function GetSmallIconStyle1(tex)
+    return string.format("float:left;margin:5px;width:40px;height:40px;background:url(%s);", tex or "");
+end
+
+function GetSmallIconStyle2(tex)
+    return string.format("float:left;margin:5px;width:40px;height:40px;background:url(%s);", tex or "");
+end
+
+function IsOdd(index)
+    return (index % 2) ~= 0;
+end
+
+function OnScaleChange(value)
+    --GameLogic.AddBBS(nil,"aaaaaa"..value)
+    UserInfoPage.userScale = value
+    UserInfoPage.SetUserScale()
+end
+
+function OnClickAdd()
+    local value = tonumber(Page:GetValue("Role_Scaling"));
+    if value and value > 0 then
+        value = value + 0.02
+        if value > 1.2 then
+            value = 1.2
+        end
+        UserInfoPage.userScale = value
+        UserInfoPage.SetUserScale()
+        Page:SetValue("Role_Scaling", tostring(value));
+    end
+end
+
+function OnClickReduce()
+    local value = tonumber(Page:GetValue("Role_Scaling"));
+    if value and value > 0 then
+        value = value - 0.02
+        if value < 1 then
+            value = 1
+        end
+        UserInfoPage.userScale = value
+        UserInfoPage.SetUserScale()
+        Page:SetValue("Role_Scaling", tostring(value));
+    end
+end
+
+function GetGoodsData(index)
+    if index == nil then
+        return #UserInfoPage.CurBagItem_DS
+    else
+        return UserInfoPage.CurBagItem_DS[index]
+    end
+end
+
+function GetItemTip(gsid)
+    return string.format("page://script/apps/Aries/Creator/Game/mcml/keepwork/KpItemToolTip.html?gsid=%s",tostring(gsid))
+end
+
+function GetSkinTip(skinId)
+    return string.format("page://script/apps/Aries/Creator/Game/Tasks/User/SkinToolTip.html?s=%s",tostring(skinId))
+end
+
+function GetItemStyle(icon)
+    return string.format([[margin-top: 24px;margin-left: 12px; position: relative; width:128px;height:64px;background: url(%s)]],icon)
+end
+
+function GetHonorData(index)
+    if index == nil then
+        return #UserInfoPage.CurHonor_DS
+    else
+        return UserInfoPage.CurHonor_DS[index]
+    end
+end
+
+function OnClickHonor(name,mcmlNode)
+    local param1 = mcmlNode:GetAttribute("param1")
+    UserInfoPage.OnClickHonor(param1)
+end
+
+function GetProjectData(index)
+    if index == nil then
+        return #UserInfoPage.CurProject_DS
+    else
+        return UserInfoPage.CurProject_DS[index]
+    end
+end
+
+function GetCreateTime(datetime)
+    local datestr, timestr = string.match(datetime, "(%d+%D%d+%D%d+)%D*(%d+%D%d+)");
+    return datestr .. "      " .. timestr;
+end
+
+function GetUpdatedTime(datetime)
+    local time_stamp = commonlib.timehelp.GetTimeStampByDateTime(datetime)
+    local year = os.date("%Y", time_stamp)	
+    local month = os.date("%m", time_stamp)
+    local day = os.date("%d", time_stamp)
+    local hour = os.date("%H", time_stamp)
+    local min = os.date("%M", time_stamp)
+    local sec = os.date("%S", time_stamp)
+    local dateTime = string.format("%s-%s-%s %s:%s:%s", year,month,day,hour,min,sec);
+    local date,time = commonlib.timehelp.GetLocalTime();
+    local curDateTime = string.format("%s %s", date, string.gsub(time, "-", ":"));
+    local day,hours,minutes,seconds,time_str = commonlib.GetTimeStr_BetweenToDate(curDateTime, dateTime);
+    local year = math.floor(day / 365);
+    local month = math.floor(day / 30);
+    if (year > 0) then return tostring(year) .. " 年前更新" end
+    if (month > 0) then return tostring(month) .. " 月前更新" end
+    if (day > 0) then return tostring(day) .. " 天前更新" end
+    if (hours > 0) then return tostring(hours) .. " 小时前更新" end 
+    if (minutes > 0) then return tostring(minutes) .. " 分钟前更新" end 
+    if (seconds > 0) then return tostring(seconds) .. " 秒前更新" end 
+    return time_str;
+end
+
+function OnClickGotoWorld(name,mcmlNode)
+    local param1 = mcmlNode:GetAttribute("param1")
+    UserInfoPage.OnClickGotoWorld(param1)
+end
+
+function OnClickShareWorld(name,mcmlNode)
+    local param1 = mcmlNode:GetAttribute("param1")
+    UserInfoPage.OnClickShareWorld(param1)
+end
+
+function OnClickFavoriteWorld(name)
+    UserInfoPage.OnClickFavoriteWorld(true,tonumber(name))
+end
+
+function OnClickUnFavoriteWorld(name)
+    UserInfoPage.OnClickFavoriteWorld(false,tonumber(name))
+end
+
+function OnClickProjectBack(name)
+    UserInfoPage.OnClickBack(name)
+end
+
+function IsWrapWorldName(name)
+    local name = name or ""
+    return _guihelper.GetTextWidth(name,"System;18;norm") > 150
+end
+
+--人物
+function DS_Items(index)
+    if index == nil then
+        return #UserInfoPage.Current_SkinItem_DS
+    else
+        return UserInfoPage.Current_SkinItem_DS[index]
+    end
+end
+
+function RenderButtonInfo(type,price,gsid,id)
+    if type == SKIN_ITEM_TYPE.FREE then
+        return [[<div style="text-align:center; margin-top:5px; font-size:15px;base-font-size:15px;color: #ffffff;">使用</div>]]
+    end
+    if type == SKIN_ITEM_TYPE.VIP then
+        if not GameLogic.IsVip() then
+            return [[<div style="text-align:center; margin-top:5px; font-size:15px;base-font-size:15px;color: #ffffff;">会员专享</div>]]
+        end
+        return [[<div style="text-align:center; margin-top:5px; font-size:15px;base-font-size:15px;color: #ffffff;">使用</div>]]
+    end
+    if type == SKIN_ITEM_TYPE.ONLY_BEANS_CAN_PURCHASE then
+        if GameLogic.IsVip() or UserInfoPage.CheckSkinIsValid(id) then
+            return [[<div style="text-align:center; margin-top:5px; font-size:15px;base-font-size:15px;color: #ffffff;">使用</div>]]
+        end
+        return string.format([[<div style="width:19px;height:18px; margin-top:8px; margin-left:40px; font-size:15px;base-font-size:15px;color: #ffffff;background:url(Texture/Aries/Creator/keepwork/UserInfo/page/xiaodouzi_19x18_32bits.png#0 0 19 18);">
+            <div style="width:80px;margin-left:20px;margin-top:-2px;">%s</div></div>]],price or "100000")
+    end
+    if type == SKIN_ITEM_TYPE.ACTIVITY_GOOD then
+        if UserInfoPage.CheckSkinIsValid(id) then
+            return [[<div style="text-align:center; margin-top:5px; font-size:15px;base-font-size:15px;color: #ffffff;">使用</div>]]
+        end
+        local activityName = "活动专属"
+        if gsid and gsid ~= "" then
+            activityName = UserInfoPage.GetActivityName(gsid)
+        end
+        return string.format([[<div style="text-align:center; margin-top:5px; font-size:15px;base-font-size:15px;color: #ffffff;">%s</div>]],activityName)
+    end
     
-</kp:window>
+end
+
+function OnClickExchangeSkin(name,mcmlNode)
+    local param1 = mcmlNode:GetAttribute("param1")
+    UserInfoPage.OnClickExchangeSkin(param1)
+end
+
+function OnClickShowHased()
+    UserInfoPage.OnClickShowHased()
+end
+
+function GetNickName()
+    return BadWordFilter.FilterString(UserInfoPage.GetNickName())
+end
+
+function OnClickExpand()
+    UserInfoPage.isExpland_Follow = not UserInfoPage.isExpland_Follow
+    UserInfoPage.RefreshPage()
+end
+
+function GetTabStyle(text,name)
+    if not text or text == "" then
+        return
+    end
+    if commonlib.GetUnicodeCharNum(text) == 2 then
+        if UserInfoPage.category_name == name then
+            return [[position: relative; color: #000000; font-size: 18px; base-font-size: 18px; margin-top: 40px;line-height: 16px; font-weight: bold; width: 46px; height: 106; text-align: center;text-valign:center;]]
+        else
+            return [[position: relative; color: #ffffff; font-size: 18px; base-font-size: 18px; margin-top: 40px;line-height: 16px; font-weight: bold; width: 46px; height: 106; text-align: center;text-valign:center;]]
+        end
+    else
+        if UserInfoPage.category_name == name then
+            return [[position: relative; color: #000000; font-size: 18px; base-font-size: 18px; margin-top: 18px;line-height: 16px; font-weight: bold; width: 46px; height: 106; text-align: center;text-valign:center;]]
+        else
+            return [[position: relative; color: #ffffff; font-size: 18px; base-font-size: 18px; margin-top: 18px;line-height: 16px; font-weight: bold; width: 46px; height: 106; text-align: center;text-valign:center;]]
+        end
+    end
+end
+
+]]></script>
+<pe:container ClickThrough = "false" alignment="_fi" width="100%" height="100%" style="background-color:#000000;">
+    <pe:container ClickThrough = "false" alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+        <pe:container ClickThrough = "true" alignment="_lt" style="position: relative; width: 400px; height: 60px; background:url();">
+            <div style="position: relative; width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+                <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+            </div>
+            <!-- LOGO -->
+            <div style="margin-left: 94px; margin-top: -3px; width: 294px; height: 64px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/shentongbei_32bits.png#15 790 294 64);">
+                <div style="margin-top: 8px; margin-left: 70px; width: 168px; height: 48px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/gerenzhongxin_168x48_32bits.png#0 0 168 48);"></div>
+            </div>
+        </pe:container>            
+
+        <pe:container ClickThrough = "true" alignment="_rt" style="background:url();">
+            <input type="button" onclick="GoHomeWorld" style="margin-right:24px;margin-top:15px; width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/jiayuan_64x70_32bits.png#0 0 64 70);" />
+            <input type="button" onclick="OpenMainPage" style="margin-right:34px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/zhuye_64x70_32bits.png#0 0 64 70);" />
+        </pe:container>
+        
+        <pe:container ClickThrough = "true" alignment="_ct" zorder="-1" style="margin-left:-640px;margin-top:-360px;background: url();">
+           <!--背景水印-->
+            <div zorder="-1" style="position: relative; margin-top: -20px;">
+                <div zorder="-1" style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                <div zorder="-1" style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                <div zorder="-1" style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                <div zorder="-1" style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                <div zorder="-1" style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            </div>
+
+            <!-- 用户属性 -->
+            <div style="position: relative; margin-top: 92px; margin-left: 100px; width: 338px; height: 574px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/rengwudiban_338x569_32bits.png#0 0 338 569);">
+                <!-- 用户名字 -->
+                <div style="position: relative; margin-top: 15px;">
+                    <pe:container ClickThrough = "true" zorder="2"  visible="true" uiname="UserInfo.nickName" style="position: relative; margin-top: 0px; margin-left: 80px;  width: 270px; height: 100px;  background: url()">
+                        <pe:if condition="<%=UserInfoPage.IsVipTeacher() %>">
+                            <div style="float: left;margin-left: 0px; margin-top: 4px;width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/UserInfo/blue_v_32bits.png#0 0 18 18);"></div>
+                        </pe:if>
+                        <pe:if condition="<%=UserInfoPage.IsVip() %>">
+                            <div style="float: left;margin-left: 2px; margin-top: 4px;width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/UserInfo/crown_32bits.png#0 0 18 18);"></div>
+                        </pe:if>
+                        <div tooltip="<%=GetNickName()%>" style="float: left; margin-left: 4px; height:30px;color: #ffffff;shadow-color:#333333;text-shadow:true; min-width: 100px; shadow-quality:8;  font-size: 18px; base-font-size:18px;font-weight: bold;">
+                            <%= IsWrapNickName(GetNickName()) and _guihelper.TrimUtf8TextByWidth(GetNickName(), 110, "System;18;bold") .. "..." or GetNickName() %>
+                        </div>
+                        <pe:if condition="<%=UserInfoPage.IsAuthUser()%>">
+                            <input type="button" name="class" onclick="UserInfoPage.OnClickEditNickName" style="float: left; margin-left: 4px; width: 28px; height: 28px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/xiugai_28x28_32bits.png#0 0 28 28);" />
+                        </pe:if>
+                        <pe:if condition="<%=not UserInfoPage.IsAuthUser()%>">
+                            <pe:if condition="<%=UserInfoPage.CurFriendType == FRIEND_TYPE.NORMAL%>">
+                                <input type="button" onclick="UserInfoPage.OnClickFollow"  style="float: left;width: 55px; height: 32px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/jiaguanzhu_55x32_32bits.png#0 0 55 32);"/>
+                            </pe:if>
+                            <pe:if condition="<%=UserInfoPage.CurFriendType == FRIEND_TYPE.FOLLOW%>">
+                                <pe:if condition="<%=UserInfoPage.isExpland_Follow == true%>">
+                                    <div style="float: left; width: 100px;">
+                                        <input type="button" onclick="OnClickExpand" icon_width = "8" icon_height="6" icon_off_x="22" icon_off_y="0"  icon="Texture/Aries/Creator/keepwork/UserInfo/page/shangjiantou_8x6_32bits.png;0 0 8 6" style="width: 70px; height: 32px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/yiguanzhu_70x32_32bits.png#0 0 70 32);"/>
+                                        <div style="margin-top: -10px; margin-left: 4px; width: 62px; height: 48px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/kuozhandi_62x48_32bits.png#0 0 62 48);">
+                                            <input type="button" style="margin-top: 10px;width:62px; height:20px; font-size: 10px; background: url()" value='<%=L"取消关注" %>' onclick="UserInfoPage.OnClickCancelFollow()" />
+                                        </div>
+                                    </div>
+                                    
+                                </pe:if>
+                                <pe:if condition="<%=UserInfoPage.isExpland_Follow == false%>">
+                                    <input type="button" onclick="OnClickExpand" icon_width = "8" icon_height="6" icon_off_x="22" icon_off_y="0"  icon="Texture/Aries/Creator/keepwork/UserInfo/page/xiajiantou_8x6_32bits.png;0 0 8 6" style="float: left;width: 70px; height: 32px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/yiguanzhu_70x32_32bits.png#0 0 70 32);"/>
+                                </pe:if>
+                            </pe:if>
+                            <pe:if condition="<%=UserInfoPage.CurFriendType == FRIEND_TYPE.FRIEND%>">
+                                <pe:if condition="<%=UserInfoPage.isExpland_Follow == true%>">
+                                    <div style="float: left; width: 100px;">
+                                        <input type="button" onclick="OnClickExpand" icon_width = "8" icon_height="6" icon_off_x="22" icon_off_y="0"  icon="Texture/Aries/Creator/keepwork/UserInfo/page/shangjiantou_8x6_32bits.png;0 0 8 6" style="width: 70px; height: 32px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/huxiangguanzhu_70x32_32bits.png#0 0 70 32);"/>
+                                        <div style="margin-top: -10px; margin-left: 4px; width: 62px; height: 48px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/kuozhandi_62x48_32bits.png#0 0 62 48);">
+                                            <input type="button" style="margin-top: 10px; width:62px;height:20px;font-size: 10px;   background: url()" value='<%=L"发消息" %>' onclick="UserInfoPage.OnClickChat()" />
+                                            <input type="button" style="width:62px; height:20px; font-size: 10px;  background: url()" value='<%=L"取消关注" %>' onclick="UserInfoPage.OnClickCancelFollow()" />
+                                        </div>
+                                    </div>
+                                    
+                                </pe:if>
+                                <pe:if condition="<%=UserInfoPage.isExpland_Follow == false%>">
+                                    <input type="button" onclick="OnClickExpand" icon_width = "8" icon_height="6" icon_off_x="22" icon_off_y="0"  icon="Texture/Aries/Creator/keepwork/UserInfo/page/xiajiantou_8x6_32bits.png;0 0 8 6" style="float: left;width: 70px; height: 32px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/huxiangguanzhu_70x32_32bits.png#0 0 70 32);"/>
+                                </pe:if>
+                            </pe:if>
+                        </pe:if>
+                    </pe:container>
+                    <pe:container ClickThrough = "true"  visible="false" uiname="UserInfo.nickNameEdit" style="position: relative; margin-top: 10px;  width: 320px; height: 32px; background: url()">
+                        <div style="width:334px;height:30px;">
+                            <input uiname="UserInfoPage.EditModelName" type="text" name="nick_name_edit" SkipAutoBadWordFilter="true" value="<%=GetNickName()%>" style="width:160px;height:28px;margin-left:60px;background:url(Texture/Aquarius/Login/TextBox_32bits.png: 8 8 5 5)" />
+                            <input uiname="UserInfoPage.FinishEditing" type="button" style="width:40px;height:28px;margin-left:10px;background: url(Texture/Aries/Creator/keepwork/ggs/user/btn_confirm_16X16_32bits.png#0 0 16 16: 5 5 5 5)" value='<%=L"确定" %>' onclick="UserInfoPage.FinishEdit()" />
+                            <input uiname="UserInfoPage.CancelEditing" type="button" style="width:40px;height:28px;margin-left:5px;background: url(Texture/Aries/Creator/keepwork/ggs/user/btn_cancel_16X16_32bits.png#0 0 16 16: 5 5 5 5);" value='<%=L"取消" %>' onclick="UserInfoPage.CancelEdit()" />
+                        </div>
+                    </pe:container>
+                </div>
+                <!-- 角色挂件底 -->
+                <div style="position: relative; margin-top:50px; margin-left: 6px; width:334px;height:300px;">
+                    <div style="width:334px;height:50px;margin-top:10px;">
+                        <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                            <div style="margin-left:6px;margin-top:16px;width:37px;height:18px;background:url(Texture/Aries/Creator/keepwork/Avatar/10yanjing_37X18_32bits.png#0 0 37 18);"></div>
+                        </div>
+                        <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                            <div style="margin-left:9px;margin-top:17px;width:32px;height:15px;background:url(Texture/Aries/Creator/keepwork/Avatar/9zuiba_32X15_32bits.png#0 0 32 15);"></div>
+                        </div>
+                    </div>
+                    <div style="width:334px;height:50px;margin-top:10px;">
+                        <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                            <div style="margin-left:9px;margin-top:12px;width:32px;height:26px;background:url(Texture/Aries/Creator/keepwork/Avatar/3yifu_32X26_32bits.png#0 0 32 26);"></div>
+                        </div>
+                        <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                            <div style="margin-left:9px;margin-top:11px;width:31px;height:27px;background:url(Texture/Aries/Creator/keepwork/Avatar/2kuzi_31X27_32bits.png#0 0 31 27);"></div>
+                        </div>
+                    </div>
+                    <div style="width:334px;height:50px;margin-top:10px;">
+                        <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                            <div style="margin-left:12px;margin-top:10px;width:30px;height:30px;background:url(Texture/Aries/Creator/keepwork/Avatar/4beibu_30X30_32bits.png#0 0 30 30);"></div>
+                        </div>
+                        <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                            <div style="margin-left:8px;margin-top:7px;width:33px;height:35px;background:url(Texture/Aries/Creator/keepwork/Avatar/8shouchi_33X35_32bits.png#0 0 33 35);"></div>
+                        </div>
+                    </div>
+                    <div style="width:334px;height:50px;margin-top:10px;">
+                        <div style="float:left;margin-left:10px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                            <div style="margin-left:7px;margin-top:13px;width:36px;height:24px;background:url(Texture/Aries/Creator/keepwork/Avatar/6toushi_36X24_32bits.png#0 0 36 24);"></div>
+                        </div>
+                        <div style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang_50X50_32bits.png#0 0 50 50);">
+                            <div style="margin-left:8px;margin-top:7px;width:36px;height:35px;background:url(Texture/Aries/Creator/keepwork/Avatar/11zuoqi_36X35_32bits.png#0 0 36 35);"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 角色挂件显示位置 -->
+                <div style="position: relative; margin-left: 6px; margin-top:50px;width:334px;height:300px;background-color: #ef870c00;">
+                    <pe:gridview uiname="UserInfoPage.ItemGridview" style="margin-left:10px;margin-top:10px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="2" DefaultNodeHeight="60"
+                                 DataSource='<%=DS_Icons%>'>
+                        <Columns>
+                            <pe:if condition='<%=Eval("icon") ~= ""%>'>
+                                <pe:if condition='<%=IsOdd(Eval("index"))%>'>
+                                    <div tooltip="<%=UserInfoPage.GetToolTipBySkinId(Eval('id'))%>" name='<%= Eval("index")%>' onclick="UserInfoPage.RemoveSkin" style=" float:left;margin-left:0px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
+                                        <div zorder="100"  style='<%=GetSmallIconStyle1(Eval("icon"))%>'>
+                                        </div>
+                                    </div>
+                                </pe:if>
+                                <pe:if condition='<%=not IsOdd(Eval("index"))%>'>
+                                    <div tooltip="<%=UserInfoPage.GetToolTipBySkinId(Eval('id'))%>" name='<%= Eval("index")%>' onclick="UserInfoPage.RemoveSkin" style="float:left;margin-left:208px;width:50px;height:50px;background:url(Texture/Aries/Creator/keepwork/Avatar/kuang2_50X50_32bits.png#0 0 50 50);">
+                                        <div zorder="100" style='<%=GetSmallIconStyle2(Eval("icon"))%>'>
+                                        </div>
+                                    </div>
+                                </pe:if>
+                            </pe:if>
+                            <pe:if condition='<%=Eval("icon") == ""%>'>
+                                <pe:if condition='<%=IsOdd(Eval("index"))%>'>
+                                    <div style=" float:left;margin-left:0px;width:50px;height:50px;background-color: #ffffff00;">
+                                    </div>
+                                </pe:if>
+                                <pe:if condition='<%=not IsOdd(Eval("index"))%>'>
+                                    <div style="float:left;margin-left:208px;width:50px;height:50px;background-color: #ffffff00;">
+                                    </div>
+                                </pe:if>
+                            </pe:if>
+                        </Columns>
+                        <EmptyDataTemplate>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </div>
+                <div zorder = "2" style="position: relative; margin-left:103px;margin-top:86px;width:128px;height:128px;background-color: #00000000;">
+                     <pe:mc_player name="UserInfoMyPlayer" miniscenegraphname="UserInfoCharacterScene" style="margin-left:-40px;margin-top:-14px;width:210px;height:210px;" IsInteractive="true" NoFrameMove="true" DefaultCameraObjectDist="4" LookAtHeight="1.1" CameraObjectDist="5"/>
+                </div>
+                <!-- 角色缩放 -->
+                <div style="position:relative; margin-top: 296px; margin-left: 87px;">
+                    <pe:if condition="<%=UserInfoPage.IsAuthUser()%>">
+                        <input type="button" style="margin-left:5px;width:12px; height: 12px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/suoxiao_12x12_32bits.png#0 0 12 12);" name="reducescale" onclick='OnClickReduce()' />
+                        <pe:sliderbar name="Role_Scaling" 
+                            min="1" 
+                            max='1.2' 
+                            min_step="0.02" 
+                            value="<%=UserInfoPage.userScale%>" 
+                            button_bg="Texture/Aries/Creator/keepwork/UserInfo/page/huakuai_11x13_32bits.png#0 0 11 13"  
+                            background="Texture/Aries/Creator/keepwork/UserInfo/page/fangdasuoxiao_131x3_32bits.png#0 0 131 3" 
+                            style="margin: 20px; margin-top: -12px; height:10px;width:131px;" 
+                            onchange="OnScaleChange" />
+                        <input type="button" style="margin-left:-16px;margin-top: -12px; width:12px; height: 12px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/fangda_12x12_32bits.png#0 0 12 12);" name="addscale" onclick='OnClickAdd()' />
+                    </pe:if>
+                </div>
+                <!-- 角色属性信息 -->
+                <div style="position: relative; margin-top: 336px; width: 334px; height: 250px;">
+                    <div style="position: relative; margin-left: 8px; width: 155px; height: 48px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/guanzhudi_155x48_32bits.png#0 0 155 48);">
+                        <div style="margin-top: 15px; margin-left: 26px; width: 42px; height: 16px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/guanzhu_42x16_32bits.png#0 0 42 16)"></div>
+                        <div style="margin-left: 73px; margin-top: -19px; font-size: 14px; base-font-size: 14px; color: #333333;"><%=UserInfoPage.GetFollowNum()%></div>
+                    </div>
+                    <div style="position: relative; margin-left: 175px; width: 155px; height: 48px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/guanzhudi_155x48_32bits.png#0 0 155 48);">
+                        <div style="margin-top: 15px; margin-left: 26px; width: 42px; height: 16px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/fengsi_42x15_32bits.png#0 0 42 15)"></div>
+                        <div style="margin-left: 73px; margin-top: -19px; font-size: 14px; base-font-size: 14px; color: #333333;"><%=UserInfoPage.GetFansNum()%></div>
+                    </div>
+                    <div style="position: relative; margin-left: 9px; margin-top: 52px; width: 320px; height: 225px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/xinxidi_320x225_32bits.png#0 0 320 225);">
+                        <!-- 账号 -->
+                        <div style="margin-top: 28px; margin-left: 16px; width: 250px; height: 30px;">
+                            <div style="width: 70px; height: 26px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/biaotidi_38x24_32bits.png#0 0 38 24:16 10 16 10);">
+                                <div align="center" style="margin-top: 5px; width: 34px; height: 17px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/zhanghao_34x17_32bits.png#0 0 34 17)"></div>
+                            </div>
+                            <div style="margin-left: 83px; margin-top: -24px; font-size: 14px; base-font-size: 14px; color: #333333;"><%=UserInfoPage.GetUserName()%></div>
+                        </div>
+                        <!-- 注册时间 -->
+                        <div style="margin-top: 8px; margin-left: 16px; width: 250px; height: 30px;">
+                            <div style="width: 100px; height: 26px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/biaotidi_38x24_32bits.png#0 0 38 24:16 10 16 10);">
+                                <div align="center" style="margin-top: 5px; width: 70px; height: 17px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/zhuceshijian_70x17_32bits.png#0 0 70 17)"></div>
+                            </div>
+                            <div style="margin-left: 113px; margin-top: -24px; font-size: 14px; base-font-size: 14px; color: #333333;"><%=UserInfoPage.GetRegisterTimeStr()%></div>
+                        </div>
+                        <!-- 学校 -->
+                        <div style="margin-top: 8px; margin-left: 16px; width: 250px; height: 30px;">
+                            <div style="position: relative; width: 70px; height: 26px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/biaotidi_38x24_32bits.png#0 0 38 24:16 10 16 10);">
+                                <div align="center" style="margin-top: 5px; width: 34px; height: 17px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/xuexiao_34x17_32bits.png#0 0 34 17)"></div>
+                            </div>
+                            <pe:label name="UserInfoPage.schoolname" value="<%=IsWrapSchoolName(UserInfoPage.GetSchoolName()) and _guihelper.TrimUtf8TextByWidth(UserInfoPage.GetSchoolName(), 180, 'System;18;bold') .. '...' or UserInfoPage.GetSchoolName()  %>" style="position: relative; margin-left: 83px; margin-top: 2px; font-size: 14px; base-font-size: 14px; color: #333333;"></pe:label>
+                            <pe:if condition="<%=UserInfoPage.IsAuthUser()%>">
+                                <input type="button" name="school" onclick="UserInfoPage.OnClickEditInfo" style="margin-left: 230px; margin-top: -16px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/bianji_20x20_32bits.png#0 0 20 20);" />
+                            </pe:if>
+                        </div>
+                        <!-- 班级 -->
+                        <div style="margin-top: 8px; margin-left: 16px; width: 250px; height: 30px;">
+                            <div style="position: relative; width: 70px; height: 26px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/biaotidi_38x24_32bits.png#0 0 38 24:16 10 16 10);">
+                                <div align="center" style="margin-top: 5px; width: 34px; height: 17px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/banji_34x17_32bits.png#0 0 34 17)"></div>
+                            </div>
+                            <pe:label name="UserInfoPage.classname" value="<%=UserInfoPage.GetClassName()%>" style="position: relative; margin-left: 83px; margin-top: 2px; font-size: 14px; base-font-size: 14px; color: #333333;"></pe:label>
+                            <pe:if condition="<%=UserInfoPage.IsAuthUser()%>">
+                                <input type="button" name="class" onclick="UserInfoPage.OnClickEditInfo" style="margin-left: 230px; margin-top: -16px; width: 20px; height: 20px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/bianji_20x20_32bits.png#0 0 20 20);" />
+                            </pe:if>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 具体面板 -->
+            <div style="position: relative; width: 656px; margin-top: 92px; margin-left: 451px; height: 574px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/di_49x43_32bits.png#0 0 49 43:24 20 24 20);">
+                <pe:if condition='<%=UserInfoPage.category_name == "works"%>' >
+                    <div style="position: relative; width: 654px;height: 548px;">
+                        <pe:gridview RememberScrollPos="true" AllowPaging="false" style="margin-left:24px;margin-top: 24px;" name="UserInfoPage.slot_gridview1" CellPadding="8" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="10" ItemsPerLine="2" DefaultNodeHeight = "274" 
+                            DataSource='<%=GetProjectData%>'>
+                            <Columns>
+                                <div zorder="-3"  style="width: 286px; height: 274px; background: url(Texture/Aries/Creator/keepwork/ggs/user/zuopkuang_32X32_32bits.png#0 0 32 32:14 14 14 14);">
+                                    <img zorder="-1" src="<%=Eval('imageUrl')%>" style="position: relative; margin-left: 11px; margin-top: 8px; width: 264px; height: 134px;"/>
+                                    <pe:if condition='<%=Eval("index") == UserInfoPage.select_project_index%>'>
+                                        <div zorder="-2" style="position: relative; width: 286px; height: 274px; background: url(Texture/Aries/Creator/keepwork/ggs/user/zuopkuang_selected_32X32_32bits.png#0 0 32 32:14 14 14 14);"></div>
+                                    </pe:if>
+                                    <div name='<%=Eval("index")%>'  onclick="OnClickProjectBack" style="position: relative; width: 286px; height: 274px;"></div>
+                                    <pe:if condition='<%=Eval("rate") and Eval("rate") > 0%>'>
+                                        <div style="position: relative; width: 76px; height: 40px; background: url(Texture/Aries/Creator/keepwork/ggs/user/fenshudi_76X41_32bits.png#0 0 76 40);">
+                                            <pe:textsprite ClickThrough="true" name="ProjectRateNum" fontName="ProjectRate" value ='<%="0"..Eval("rate")%>' style="margin-left: -6px; margin-top: 4px; font-size:18;" />
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition='<%=Eval("visibility") and Eval("visibility") == 1%>'>
+                                        <div style="position: relative; width: 28px; height: 31px; margin-left: 260px; background: url(Texture/Aries/Creator/keepwork/ggs/user/suosi_28X31_32bits.png#0 0 28 31);"></div>
+                                    </pe:if>
+                                    <div style="position: relative; width: 264px; height: 32px; margin-left: 11px;margin-top: 110px; background-color: #00000090;">
+                                        <div style="margin-left: 30px;">
+                                            <pe:if condition="<%= Eval('isVip') == 1 and System.options.channelId~='430' %>">
+                                                <div style="float: left;width: 16px; margin-top: 8px; height: 16px; background: url(Texture/Aries/Creator/keepwork/UserInfo/crown_32bits.png#0 0 18 18);"></div>
+                                            </pe:if>
+                                            <pe:if condition="<%=Eval('isVipTeacher') == 1 and System.options.channelId~='430' %>">
+                                                <div style="float: left; width: 16px; margin-left: 2px; margin-top: 8px; height: 16px; background: url(Texture/Aries/Creator/keepwork/UserInfo/blue_v_32bits.png#0 0 18 18);"></div>
+                                            </pe:if>
+                                            <div style="float: left; color: #ffffff; margin-top: 4px; margin-left: 6px;"><%=Eval("userName")%></div>
+                                        </div>
+                                    </div>
+                                    <div style="width: 264px; height: 120px; margin-top: 146px; margin-left: 20px;">
+                                        <div style="position: relative;width: 164px; height: 20px; font-size: 18px;">
+                                            <pe:if condition='<%=IsWrapWorldName(Eval("worldName"))%>'>
+                                                <div tooltip="<%=Eval('worldName')%>" style="position: relative;"><%=_guihelper.TrimUtf8TextByWidth(Eval("worldName"), 150, "System;18;norm") .. "..."%></div>
+                                            </pe:if>
+                                            <pe:if condition='<%=not IsWrapWorldName(Eval("worldName"))%>'>
+                                                <div style="position: relative;"><%=Eval("worldName")%></div>
+                                            </pe:if>
+                                            <div style="position: relative;margin-left: 170px; color: #999999"><%="#"..tostring(Eval("projectId"))%></div>
+                                        </div>
+                                        <div style="position: relative;width: 164px; margin-top: 30px; height: 20px; font-size: 12px;">
+                                            <div style="position: relative;color: #999999"><%=GetCreateTime(Eval("createdAt"))%></div>
+                                            <div style="position: relative;margin-left: 170px; color: #999999"><%=GetUpdatedTime(Eval("updatedAt"))%></div>
+                                        </div>
+                                        <div style="position: relative;width: 164px; margin-top: 48px; height: 20px; font-size: 12px; color: #999999">
+                                            <div tooltip="<%=L'访问数'%>" style="float: left; margin-top: 12px; width:16px;height:13px;margin-left:0px;background: url(Texture/Aries/Creator/keepwork/ggs/user/icon_liulan_16X12_32bits.png#0 0 16 13)"></div>
+                                            <div style="float: left; margin-top: 10px; margin-left: 4px; color: #999999"><%=Eval("visitNum")%></div>
+                                            <div tooltip="<%=L'点赞数'%>" style="float: left; margin-top: 8px; margin-left: 5px; width: 16px; height: 16px;background: url(Texture/Aries/Creator/keepwork/ggs/user/icon_dianzan_16X16_32bits.png#0 0 16 16)"></div>
+                                            <div style="float: left; margin-top: 10px; margin-left: 4px; color: #999999"><%=Eval("starNum")%></div>
+                                            <div tooltip="<%=L'评论数'%>" style="float: left; margin-top: 11px; margin-left:5px; width: 18px; height: 16px;background: url(Texture/Aries/Creator/keepwork/ggs/user/icon_xinxi_18X16_32bits.png#0 0 16 16)"></div>
+                                            <div style="float: left; margin-top: 10px; margin-left: 5px; color: #999999"><%=Eval("comment")%></div>
+                                        </div>
+                                        <div style="position: relative;width: 260px; margin-top: 80px; height: 50px;">
+                                            <div style="position: relative; margin-left: 124px; width: 40px; height: 40px;">
+                                                <pe:if condition="<%=UserInfoPage.GetSystemUserId() > 0 and Eval('userId') ~= UserInfoPage.GetSystemUserId()%>">
+                                                    <pe:if condition="<%=Eval('isFavorite') == true%>">
+                                                        <input type="button" name="<%=Eval('projectId')%>" onclick="OnClickUnFavoriteWorld()" style="width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/ggs/user/renwuqiehuan/btn_yishoucang_40X40_32bits.png#0 0 40 40);" />
+                                                    </pe:if>
+                                                    <pe:if condition="<%=Eval('isFavorite') ~= true%>">
+                                                        <input type="button" name="<%=Eval('projectId')%>" onclick="OnClickFavoriteWorld()" style="width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/ggs/user/renwuqiehuan/btn_shoucang_40X40_32bits.png#0 0 40 40);" />
+                                                    </pe:if>
+                                                </pe:if>
+                                            </div>
+                                            <div style="position: relative; margin-left: 170px;">
+                                                <input type="button" onclick="OnClickShareWorld" param1='<%= XPath("this") %>' style="margin-left: 0px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#109 459 40 40);" />
+                                                <input type="button" onclick="OnClickGotoWorld" param1='<%= XPath("this") %>' style="margin-left: 6px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/ggs/user/btn_jingru_40X40_32bits.png#0 0 40 40);" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Columns>
+                            <EmptyDataTemplate>
+                                <div style="margin-top: 230px; margin-left: 130px; width: 332px; height: 50px; background: url(Texture/Aries/Creator/keepwork/ggs/user/tixingzi_332X50_32bits.png#0 0 332 50);"></div>
+                            </EmptyDataTemplate>
+                        </pe:gridview>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=UserInfoPage.category_name == "skin"%>' >
+                    <div style="position: relative; width: 654px;height: 548px;">
+                        <div style="position: relative; margin-top: 15xp; margin-left: 15px; width: 650px; height: 48px;">
+                            <pe:repeat DataSource="<%=UserInfoPage.skin_category_ds%>">
+                                <pe:repeatitem style="float:left;width:52px;">
+                                    <pe:if condition='<%=UserInfoPage.skin_category_index == Eval("index") %>'>
+                                        <div style="float:left;margin-left:12px;margin-top:0px;width:55px;height:32px;background:url(Texture/Aries/Creator/keepwork/UserInfo/page/xiaohei_55x32_32bits.png#0 0 55 32);">
+                                            <div style='<%=GetCategoryStyle(Eval("tex2"))%>'></div>
+                                        </div>
+                                    </pe:if>
+                                    <pe:if condition='<%=UserInfoPage.skin_category_index ~= Eval("index") %>'>
+                                        <div name='<%=Eval("index")%>' onclick="UserInfoPage.OnChangeSkinCategory" style="float:left;margin-left:12px;margin-top:0px;width:55px;height:32px;background:url(Texture/Aries/Creator/keepwork/UserInfo/page/xiaobai_55x32_32bits.png#0 0 55 32);">
+                                            <div zorder="1" name='<%=Eval("index")%>' onclick="UserInfoPage.OnChangeSkinCategory" style='<%=GetCategoryStyle(Eval("tex1"))%>'></div>
+                                        </div>
+                                    </pe:if>
+                                </pe:repeatitem>
+                            </pe:repeat>
+                        </div>
+                        <div style="position: relative; width: 650px; height: 480px; margin-top: 55px;">
+                            <pe:gridview uiname="UserInfoPage.slot_gridview1" name="gvSkinGridView" style="margin-left:20px;" CellPadding="1" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="18" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight="170" RememberScrollPos="true" RememberLastPage="true"
+                                DataSource='<%=DS_Items%>'>
+                                <Columns>
+                                    <div style="float:left;width:146px;height:170px;">
+                                        <div style="width:146px;height:140px;background:url(Texture/Aries/Creator/keepwork/ggs/user/renwuqiehuan/wupingbj_146X140_32bits.png#0 0 146 140);">
+                                            <div tooltip='<%=GetSkinTip(Eval("id"))%>' name='<%= Eval("index")%>' onclick="UserInfoPage.UpdateCustomGeosets" style="margin-left:9px;margin-top:8px;width:128px;height:96px;">
+                                                <div style='<%=GetBigIconStyle(Eval("icon"))%>'></div>
+                                            </div>
+                                            <div style="margin-top:2px;width:146px;text-align:center;">
+                                                <%=Eval("name")%>
+                                            </div>
+                                        </div>
+                                        <div onclick="OnClickExchangeSkin" param1='<%= XPath("this") %>' align="center" style="margin-top: -4px; width: 121px; height: 32px;">
+                                            <div style="width: 121px; height: 32px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/wupinanniu_121x32_32bits.png#0 0 121 32);">
+                                                <%=RenderButtonInfo(Eval("type"),Eval("price"),Eval("gsid"),Eval("id"))%>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <div style="margin-left: 150px; margin-top: 140px; width: 322px; height: 177px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/zanwuziyuan_326x177_32bits.png#0 0 326 177);"></div>
+                                </EmptyDataTemplate>
+                            </pe:gridview>
+                        </div>
+                    </div>
+                    <!-- 知识豆 -->
+                    <div style="position: relative; margin-top: 532px; width: 656px;height: 40px;">
+                        <div style="position: relative; margin-top: 12px; margin-left: 24px; width: 71px; height: 24px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/douzishuliang_71x24_32bits.png#0 0 71 24);">
+                            <div style="margin-left: 20px; font-size:14px;color:#ef870c; text-align: center; base-font-size:14px; width: 50px; height: 20px;"><%=UserInfoPage.GetBeanNum()%></div>
+                        </div>
+                        <div style="position: relative; margin-left: 520px; margin-top: 12px;"> 
+                            <input type="checkbox" name = "checkShow" checked='<%=UserInfoPage.isOnlyShowHave%>' onclick="OnClickShowHased" style="float: left; margin-top: 4px; width:14px;height:14px;" UncheckedBG="Texture/Aries/Creator/keepwork/UserInfo/page/xianshiyonyou_14x14_32bits.png#0 0 14 14" CheckedBG="Texture/Aries/Creator/keepwork/UserInfo/page/xuanzhon_14x14_32bits.png#0 0 14 14"/>
+                            <div onclick="OnClickShowHased" style="float: left;margin-left: 5px;margin-top: -1px;width: 100px;height: 20px;" >仅显示已获得</div>
+                        </div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=UserInfoPage.category_name == "honor"%>' >
+                    <div style="position: relative; width: 654px;height: 548px;">
+                        <pe:gridview style="margin-left:25px;margin-top: 25px;" name="UserInfoPage.slot_gridview3" CellPadding="2" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="16" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight = "0" 
+                            DataSource='<%=GetHonorData%>'>
+                            <Columns>
+                                <div  style="width: 146px; height: 140px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/wupingbj_146X140_32bits.png#0 0 146 140);">
+                                    <div tooltip='<%= Eval("has") == false and Eval("desc") or "" %>' style="<%=GetItemStyle(Eval('icon'))%>"></div>
+                                    <div style="margin-top: 108px; width: 146px; font-size: 12px; text-align: center;"><%= Eval("name")%></div>
+                                    <pe:if condition="<%=Eval('has') == true%>">
+                                        <div onclick="OnClickHonor" param1='<%= XPath("this") %>' style="margin-top: -140px; width: 146px; height: 140px; "></div>
+                                    </pe:if>
+                                </div>
+                            </Columns>
+                            <EmptyDataTemplate>
+                                <div style="margin-left: 150px; margin-top: 140px; width: 322px; height: 177px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/zanwushuju_322x177_32bits.png#0 0 322 177);"></div>
+                            </EmptyDataTemplate>
+                        </pe:gridview>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=UserInfoPage.category_name == "bags" %>' >
+                    <div style="position: relative; width: 656px;height: 574px;">
+                        <pe:gridview style="margin-left:10px" name="UserInfoPage.slot_gridview4" CellPadding="10" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="4" DefaultNodeHeight = "0" 
+                            DataSource='<%=GetGoodsData%>'>
+                            <Columns>
+                                <div style="width: 146px; height: 140px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/wupingbj_146X140_32bits.png#0 0 146 140);">
+                                    <div  style="<%=GetItemStyle(Eval('icon'))%>"></div>
+                                    <div style="margin-top: 108px; width: 146px; text-align: center;"><%= Eval("copies")%></div>
+                                    <div tooltip='<%=GetItemTip(Eval("goodId"))%>' style="margin-top: -140px; width: 146px; height: 140px; "></div>
+                                </div>
+                            </Columns>
+                            <EmptyDataTemplate>
+                                <div style="margin-left: 150px; margin-top: 140px; width: 322px; height: 177px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/zanwushuju_322x177_32bits.png#0 0 322 177);"></div>
+                            </EmptyDataTemplate>
+                        </pe:gridview>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=UserInfoPage.category_name == "security" %>' >
+                    <div style="position: relative; margin-top: 24px; margin-left: 33px; width: 584px; height: 490px;">
+                        <div style="width: 94px; height: 21px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/xiugaimima_94x21_32bits.png#0 0 94 21)"></div>
+                        <input type="button" onclick="UserInfoPage.UpdatePassworld()" value="<%=L'修改密码'%>" style="margin-top: 10px; width: 83px; height: 32px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/baianniu_83x32_32bits.png#0 0 83 32);" />
+                        <div style="margin-top: 20px; width: 93px; height: 21px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/shimingrengzheng_93x21_32bits.png#0 0 93 21)"></div>
+                        <pe:if condition="<%=UserInfoPage.IsRealName()%>">
+                            <div style="margin-top: 13px; width: 220px; height: 46px;">
+                                <div style="font-size: 16px; base-font-size: 16px;">
+                                    <%=L"认证状态:"%>
+                                    <div style="margin-left: 127px; margin-top: -22px;"><%="已认证"%></div>
+                                    <div style="margin-left: 178px; margin-top: -17px; width: 14px; height: 14px; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/renzhengwancheng_14x14_32bits.png#0 0 14 14)"></div>
+                                </div>
+                                <div style="font-size: 16px; base-font-size: 16px; width: 240px;">
+                                    <%=L"认证手机:"%>
+                                    <div style="margin-left: 127px; margin-top: -22px;"><%=UserInfoPage.GetRealNameCellPhone()%></div>
+                                </div>
+                            </div>
+                        </pe:if>
+                        <pe:if condition="<%=not UserInfoPage.IsRealName()%>">
+                            <input type="button" value="<%=L'马上认证'%>" style="margin-top: 10px; width: 83px; height: 32px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/baianniu_83x32_32bits.png#0 0 83 32);" />
+                        </pe:if>
+                        <div style="margin-top: 28px; width: 117px; height: 21px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/disanfang_117x21_32bits.png#0 0 117 21)"></div>
+                        <div style="width: 440px; height: 210px; margin-top: 13px;">
+                            <pe:repeat DataSource="<%=UserInfoPage.GetBindInfoData()%>">
+                                <pe:repeatitem style="width: 400px; height: 36px;">
+                                    <div style="width: 400px; height: 36px; margin-top: -2px;">
+                                        <div style="position: relative;"><%=Eval("key")%></div>
+                                        <div style="position: relative; margin-left: 130px; margin-top: 0px;"><%=Eval("name")%></div>
+                                        <pe:if condition="<%= Eval('buttonName') == '1' %>"> 
+                                            <input type="button" onclick="UserInfoPage.OnClickGotoBind()" value="<%=Eval('buttonValue')%>" name="<%=Eval('buttonName')%>" style="margin-top: -8px; margin-left:300px ; width: 83px; height: 32px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/baianniu_83x32_32bits.png#0 0 83 32);" />
+                                        </pe:if>
+                                        <pe:if condition="<%= Eval('buttonName') == '2' %>"> 
+                                            <input type="button" onclick="UserInfoPage.OnClickGotoBind()" value="<%=Eval('buttonValue')%>" name="<%=Eval('buttonName')%>" style="margin-top: -8px; margin-left:300px ; color: #ffffff; width: 83px; height: 32px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/heianniu_83x32_32bits.png#0 0 83 32);" />
+                                        </pe:if>
+                                    </div>
+                                </pe:repeatitem>
+                            </pe:repeat>
+                        </div>
+                        <div style="width: 94px; height: 21px; background: url(Texture/Aries/Creator/keepwork/UserInfo/font/zhuxiaozhanghao_93x21_32bits.png#0 0 94 21)"></div>
+                        <input type="button" onclick="UserInfoPage.RemoveAccount" value="<%=L'注销'%>" style="margin-top: 10px; width: 83px; height: 32px; font-size: 14px; base-font-size: 14px; font-weight: bold; background: url(Texture/Aries/Creator/keepwork/UserInfo/page/baianniu_83x32_32bits.png#0 0 83 32);" />
+                    </div>
+                </pe:if>
+            </div>
+            <!-- tab按钮 -->
+            <div style="margin-left: 1104px; width: 46px; height: 574px; margin-top: 88px;">
+                <pe:repeat DataSource="<%=UserInfoPage.GetMenuDatas()%>">
+                    <pe:repeatitem style="float:left;width: 46px; height: 106;">
+                        <pe:if condition='<%=UserInfoPage.category_name == Eval("name") %>' >
+                            <div style='<%=GetTabStyle(Eval("text"),Eval("name"))%>'><%=Eval("title")%></div>
+                            <input zorder="-1" type="button" name='<%=Eval("name")%>' onclick="UserInfoPage.OnChangeCategory" style="width: 46px; height: 111px; margin-top: 4px; background:url(Texture/Aries/Creator/keepwork/UserInfo/page/youceanniu1_46x111_32bits.png#0 0 46 111);" />
+                        </pe:if>
+                        <pe:if condition='<%=UserInfoPage.category_name ~= Eval("name") %>' >
+                            <div style='<%=GetTabStyle(Eval("text"),Eval("name"))%>'><%=Eval("title")%></div>
+                            <input zorder="-1" type="button" name='<%=Eval("name")%>' onclick="UserInfoPage.OnChangeCategory" style="width: 46px; height: 111px; margin-top: 5px; background:url(Texture/Aries/Creator/keepwork/UserInfo/page/youceanniu_46x111_32bits.png#0 0 46 111);" />
+                        </pe:if>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+        </pe:container>      
+    </pe:container>
+</pe:container>
 </pe:mcml>
 </body>
 </html>

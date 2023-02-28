@@ -1,7 +1,8 @@
 --[[
 Title: Macro Scene Click
-Author(s): LiXizhi
-Date: 2021/1/4
+Author(s): LiXizhi, big
+CreateDate: 2021.1.4
+ModifyDate: 2022.9.16
 Desc: a macro for the clicking and draging in the 3d scene context. 
 
 Use Lib:
@@ -20,6 +21,7 @@ NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 NPL.load("(gl)script/ide/System/Windows/MouseEvent.lua");
 NPL.load("(gl)script/ide/System/Scene/Cameras/Cameras.lua");
+
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Cameras = commonlib.gettable("System.Scene.Cameras");
 local MouseEvent = commonlib.gettable("System.Windows.MouseEvent");
@@ -27,8 +29,9 @@ local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Mouse = commonlib.gettable("System.Windows.Mouse");
-local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
+local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros");
 
+local ConvertToWebMode = NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/ConvertToWebMode/ConvertToWebMode.lua");
 
 -- @return angleX, angleY: angle offset from the center
 function Macros.GetSceneClickParams(mouse_x, mouse_y)
@@ -122,12 +125,43 @@ function Macros.SceneMouseMove(angleX, angleY)
 	return Macros.Idle(1);
 end
 
+--mobile button mapping
+function Macros.GetButtonByContext(button)
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if not IsMobileUIEnabled then
+		return button
+	end
+	local ctxName = ""
+	local ctx = GameLogic.GetSceneContext()
+	if ctx then
+		ctxName = ctx.Name
+	end
+	if button == "shift+alt+right" then
+		return "shift+alt+left"
+	end
+	if button == "alt+right" then
+		return "ctrl+alt+left"
+	end
+
+	if string.find(button,"left") and button ~= "ctrl+left" and button ~= "alt+left" and button ~= "shift+ctrl+left" and string.find(ctxName,"Mobile") then
+		button = string.gsub(button,"left","right")
+		return button
+	end
+
+	if string.find(button,"right") then
+		button = string.gsub(button,"right","left")
+		return button
+	end
+	return button
+end
 
 --@param mouse_button: "left", "right", default to "left", such as "ctrl+left"
 --@param angleX, angleY
 function Macros.SceneClick(button, angleX, angleY)
 	Macros.PrepareLastCameraView()
 	-- mouse_x, mouse_y, mouse_button are global variables
+	button = Macros.GetButtonByContext(button)
+	-- print("button===========",button)
 	mouse_x, mouse_y, mouse_button = Macros.MouseAngleToScreenPos(angleX, angleY, button)
 	ParaUI.SetMousePosition(mouse_x, mouse_y);
 
@@ -143,7 +177,6 @@ function Macros.SceneClick(button, angleX, angleY)
 	event.dragDist = 0;
 	SetMouseEventFromButtonText(event, button)
 	ctx:handleMouseEvent(event);
-	
 	-- clear all keyboard emulations
 	SetKeyboardFromButtonText(emulatedKeys, "")
 
@@ -219,13 +252,51 @@ end
 --@param angleX, angleY
 -- @return nil or {OnFinish=function() end}
 function Macros.SceneClickTrigger(button, angleX, angleY)
-	Macros.PrepareLastCameraView()
-	local mouseX, mouseY = Macros.MouseAngleToScreenPos(angleX, angleY, button)
+	Macros.PrepareLastCameraView();
+	local mouseX, mouseY = Macros.MouseAngleToScreenPos(angleX, angleY, button);
+
+	if (Macros.GetHelpLevel() == -2) then
+		ConvertToWebMode:StopComputeRecordTime();
+
+		local macro = Macros.macros[Macros.curLine];
+
+		if (macro) then
+			local viewport = ViewportManager:GetSceneViewport();
+			local curScreenWidth = Screen:GetWidth() - math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
+			local curScreenHeight = Screen:GetHeight() - math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
+			local curFov = Cameras:GetCurrent():GetFieldOfView();
+			local curAspectRatio = Cameras:GetCurrent():GetAspectRatio();
+
+			macro.processTime = ConvertToWebMode.processTime;
+			macro.curFov = curFov;
+			macro.curAspectRatio = curAspectRatio;
+			macro.curScreenWidth = curScreenWidth;
+			macro.curScreenHeight = curScreenHeight;
+		end
+	end
 
 	local callback = {};
 	MacroPlayer.SetClickTrigger(mouseX, mouseY, button, function()
-		if(callback.OnFinish) then
-			callback.OnFinish();
+		if (callback.OnFinish) then
+			if (Macros.GetHelpLevel() == -2) then
+				local nextNextLine = Macros.macros[Macros.curLine + 2];
+
+				if (nextNextLine and
+					nextNextLine.name ~= "Broadcast" and
+					nextNextLine.params ~= "macroFinished") then
+					commonlib.TimerManager.SetTimeout(function()
+						ConvertToWebMode:StopCapture();
+						ConvertToWebMode:StartComputeRecordTime();
+						ConvertToWebMode:BeginCapture(function()
+							callback.OnFinish();
+						end);
+					end, 3000);
+				else
+					callback.OnFinish();
+				end
+			else
+				callback.OnFinish();
+			end
 		end
 	end);
 	return callback;
@@ -236,10 +307,48 @@ function Macros.SceneDragTrigger(button, startAngleX, startAngleY, endAngleX, en
 	local startX, startY = Macros.MouseAngleToScreenPos(startAngleX, startAngleY)
 	local endX, endY = Macros.MouseAngleToScreenPos(endAngleX, endAngleY)
 
+	if (Macros.GetHelpLevel() == -2) then
+		ConvertToWebMode:StopComputeRecordTime();
+
+		local macro = Macros.macros[Macros.curLine];
+
+		if (macro) then
+			local viewport = ViewportManager:GetSceneViewport();
+			local curScreenWidth = Screen:GetWidth() - math.floor(viewport:GetMarginRight() / Screen:GetUIScaling()[1]);
+			local curScreenHeight = Screen:GetHeight() - math.floor(viewport:GetMarginBottom() / Screen:GetUIScaling()[2]);
+			local curFov = Cameras:GetCurrent():GetFieldOfView();
+			local curAspectRatio = Cameras:GetCurrent():GetAspectRatio();
+
+			macro.processTime = ConvertToWebMode.processTime;
+			macro.curFov = curFov;
+			macro.curAspectRatio = curAspectRatio;
+			macro.curScreenWidth = curScreenWidth;
+			macro.curScreenHeight = curScreenHeight;
+		end
+	end
+
 	local callback = {};
 	MacroPlayer.SetDragTrigger(startX, startY, endX, endY, button, function()
-		if(callback.OnFinish) then
-			callback.OnFinish();
+		if (callback.OnFinish) then
+			if (Macros.GetHelpLevel() == -2) then
+				local nextNextLine = Macros.macros[Macros.curLine + 2];
+
+				if (nextNextLine and
+					nextNextLine.name ~= "Broadcast" and
+					nextNextLine.params ~= "macroFinished") then
+					commonlib.TimerManager.SetTimeout(function()
+						ConvertToWebMode:StopCapture();
+						ConvertToWebMode:StartComputeRecordTime();
+						ConvertToWebMode:BeginCapture(function()
+							callback.OnFinish();
+						end);
+					end, 3000);
+				else
+					callback.OnFinish();
+				end
+			else
+				callback.OnFinish();
+			end
 		end
 	end);
 	return callback;

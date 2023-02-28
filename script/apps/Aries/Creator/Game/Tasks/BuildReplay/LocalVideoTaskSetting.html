@@ -1,0 +1,71 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/BuildReplay/LocalVideoTaskSetting.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="LocalVideoTaskSetting.lua"><![CDATA[
+
+    LocalVideoTaskSetting = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildReplay.LocalVideoTaskSetting");
+    LocalVideoTaskSetting.OnInit();
+
+    function OnClose()
+        LocalVideoTaskSetting.ClosePage()
+    end
+
+    function OnBtnStartTask()
+        LocalVideoTaskSetting.OnBtnStartTask()
+    end
+
+    function OnEditValueChange()
+        LocalVideoTaskSetting.OnEditValueChange()
+    end
+
+    function GetVideoFloder()
+        return commonlib.Encoding.DefaultToUtf8(ParaIO.GetWritablePath()).."temp/video/"
+    end
+
+    function OpenFloder()
+        local absPath = GetVideoFloder()
+        absPath = absPath:gsub("/","\\")
+        _guihelper.MessageBox(string.format(L"您确定要使用Windows浏览器打开文件 %s?", commonlib.Encoding.DefaultToUtf8(absPath)), function()
+            ParaGlobal.ShellExecute("open", "explorer.exe", absPath, "", 1); 
+        end);
+    end
+
+]]></script>
+<aries:window mode="thin" style="width:400px;" title='<%=L"生成作品集锦视频"%>' onclose="OnClose">
+    <div style="margin: 10px; margin-top: 10px;margin-bottom: 0px; color: #ffffff;font-size: 12px;">
+        1.请输入作品的ID，多个世界ID以空格、换行、逗号或分号隔开
+    </div>
+    <div style="margin: 10px; margin-top: 0px;margin-bottom: 5px; color: #ffffff;font-size: 12px;">
+        2.点击开始任务后会自动录制，录制完自动上传到云端，云端视频地址可在日志文件查看
+    </div>
+    <div style="min-height: 160px;">
+        <div style="width:380px;height:144px;margin-left: 5px;margin-top: 5px;background:url(Texture/Aries/Creator/keepwork/Mobile/common/input_bg1_64x64_32bits.png#0 0 64 64:25 25 25 25)">
+            <textarea MoveViewWhenAttachWithIME="true" onfocusin="OnFocuseIn" name="worldId_groups" EmptyText='<%=L"请输入一组世界ID"%>' onchange="OnEditValueChange()" EmptyTextColor="#FFFFFF" AlwaysShowCurLineBackground="false" style="width:370px;height: 120px; margin-left: 4px;margin-top: 8px;" fontsize="18" lineheight="24" rows="3"/>
+        </div>
+    </div>
+    
+    
+    <div style="margin-top:10px;">
+        <input type="button" name="OK" DefaultButton="true" align="center" style="margin-left:20px;min-width:120px;height:48px;margin-top:-1px" class="mc_yellow_button_with_fillet" onclick="OnBtnStartTask" value='<%=L"开始任务"%>' />
+        <input type="button" name="OK" DefaultButton="true" align="right" style="margin-right:20px;min-width:60px;height:24px;margin-top:20px;font-size: 12px;color: #ffffff;"  onclick="OpenFloder" value='<%=L"打开目录"%>' />
+    </div>
+    <div style="margin-top: 2px; margin-bottom: 0px; color: #ffffff;font-size: 12px;">
+        输出视频目录： <%= GetVideoFloder()%>
+    </div>
+    <div style="margin-top: 2px; margin-bottom: 0px;width:600px; color: #ffffff;font-size: 12px;">
+        日志： <%= LocalVideoTaskSetting.GetOutputLogPath(true)%>
+    </div>
+    <div style="margin-top:0px;margin-bottom:10px;color:#ffffff;font-size: 12px;">
+        <%=L"(录制过程中可能会自动重启，是正常现象，请勿担心)"%>
+    </div>
+</div>
+</aries:window>
+</pe:mcml>
+</body>
+</html>

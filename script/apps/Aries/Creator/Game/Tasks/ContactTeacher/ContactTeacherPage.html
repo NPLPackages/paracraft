@@ -1,0 +1,74 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ContactTeacher/ContactTeacherPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ContactTeacherPage.lua"><![CDATA[
+local ContactTeacherPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ContactTeacher/ContactTeacherPage.lua");
+ContactTeacherPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+end
+
+function OnClickLink()
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.contact_teacher.contact_customer");
+    ParaGlobal.ShellExecute('open', L'https://wpa1.qq.com/TxyKupLK?_type=wpa&qidian=true', '', '', 1)
+end
+
+function GetSchoolDesc()
+    return ContactTeacherPage.GetSchoolDesc()
+end
+
+function GetUserDesc()
+    return ContactTeacherPage.GetUserDesc()
+end
+
+function GetFunctionDesc()
+    return ContactTeacherPage.GetFunctionDesc()
+end
+
+function OnClickCopy()
+    ContactTeacherPage.OnClickCopy()
+end
+]]></script>
+<kp:window name="iframe" width="488" height="385" icon_x="5" icon_y="-12" icon="Texture/Aries/Creator/keepwork/ContactTeacher/xiaoxizhongxing_104x46_32bits.png"   onclose="ClosePage">
+    <div style="margin-left: 30px;margin-top: 52px; width: 380px;font-size: 14px;color: #333333;">
+        请复制下面这段话，并使用手机短信或者QQ、微信等方式发送给老师，让老师给你开通此功能：
+    </div>
+
+    <div style="margin-left: 19px;margin-top: 19px;width: 448px;height: 138px;font-size: 12px; background: url(Texture/Aries/Creator/keepwork/ContactTeacher/huidi_105x32_32bits.png#0 0 105 32:14 14 14 14)">
+        <div style="margin-top: 4px;margin-left: 14px">尊敬的老师，您好！</div>
+        <div style="margin-top: 0px;margin-left: 36px"><%=GetSchoolDesc()%></div>
+        <div style="margin-top: 0px;margin-left: 36px"><%=GetUserDesc()%></div>
+        <div style="margin-top: 0px;margin-left: 36px"><%=GetFunctionDesc()%></div>
+        <div style="margin-top: 0px;margin-left: 36px">
+            <div style="float: left;">请点击这里联系客服申请开通：</div> 
+            <div style='float: left; margin-left: 5px; font-weight: bold; color: #1ca3d7; margin-top: 0px;'
+                onclick='OnClickLink'>
+                <%= L'联系客服' %>
+                <div style='height: 1px;
+                            width: 53px;
+                            background-color: #1ca3d7'></div>
+            </div>
+        </div>
+        <input type="button" align="center" onclick="OnClickCopy" value="复制" style="margin-left:0px;margin-top:10px;width: 78px;height: 27px;background: url(Texture/Aries/Creator/keepwork/ContactTeacher/anniucaise_71x25_32bits.png#0 0 71 25:20 3 20 3);" />
+    </div>
+    <div style="">
+        <div style="float: left; width: 165px;margin-left: 90px;margin-top: 44px;font-size: 13px;color: #333333;">
+            <div>或使用微信扫描右侧</div>
+            <div>二维码后转发给老师：</div>
+        </div>
+
+        <div style="float: left;margin-left: 40px;margin-top: 5px;width: 120px;height: 120px; background: url(Texture/Aries/Creator/keepwork/ContactTeacher/code_430x430_32bits.jpg)"></div>
+    </div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

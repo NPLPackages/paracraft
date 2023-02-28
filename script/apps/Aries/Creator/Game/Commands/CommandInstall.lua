@@ -14,7 +14,7 @@ local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 
 Commands["install"] = {
 	name="install", 
-	quick_ref="/install [-mod|bmax] [-filename str] [-ext str][-reload bool][url]", 
+	quick_ref="/install [-mod|bmax] [-filename str] [-ext str][-reload bool][-hidetip][-hideinhand][url]", 
 	desc=[[install a texture package, mod or bmax file from url
 /install http://cc.paraengine.com/twiki/pub/CCWeb/Installer/blocktexture_FangKuaiGaiNian_16Bits.zip
 /install -mod https://keepwork.com/wiki/mod/packages/packages_install/paracraft?id=12
@@ -82,7 +82,7 @@ Commands["install"] = {
 			if(url:match("^https?://")) then
 				local filename = options["filename"];
 				local ext = options["ext"] or "bmax";
-				if(ext ~= "bmax" and ext ~= "x" and ext ~= "fbx" and ext ~= "blocks" and ext ~= "liveModel") then
+				if(ext ~= "bmax" and ext ~= "x" and ext ~= "fbx" and ext ~= "glb" and ext ~= "gltf" and ext ~= "glb" and ext ~= "gltf" and ext ~= "blocks" and ext ~= "liveModel") then
 					LOG.std(nil, "warn", "CommandInstall", "unknown file extension %s for %s", ext, filename);
 					return;
 				end
@@ -94,18 +94,22 @@ Commands["install"] = {
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 				local dest = ""
-				if not filename:match("^onlinestore/") then
+				if not filename:match("^temp/onlinestore/") then
 					filename = "blocktemplates/"..filename;
 					dest = Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename))
 				else
-					dest = Files.GetTempPath()..commonlib.Encoding.Utf8ToDefault(filename)
+					dest = Files.GetWritablePath()..commonlib.Encoding.Utf8ToDefault(filename)
 				end
 				local function TakeBlockModel_(filename)
-					GameLogic.AddBBS("install", format(L"模型已经安装到 %s", filename), 3000, "0 255 0");
-					if ext == "liveModel" then
-						GameLogic.RunCommand(string.format("/take LiveModel {tooltip=%q}", filename));
-					else
-						GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
+					if not options.hidetip then
+						GameLogic.AddBBS("install", format(L"模型已经安装到 %s", filename), 3000, "0 255 0");
+					end
+					if  not options.hideinhand then
+						if ext == "liveModel" then
+							GameLogic.RunCommand(string.format("/take LiveModel {tooltip=%q}", filename));
+						else
+							GameLogic.RunCommand(string.format("/take BlockModel {tooltip=%q}", filename));
+						end
 					end
 				end
 
@@ -122,7 +126,9 @@ Commands["install"] = {
 						log("error: failed creating local server resource store \n")
 						return
 					end
-					GameLogic.AddBBS("install", L"正在下载请稍后", 3000, "0 255 0");
+					if not options.hidetip then
+						GameLogic.AddBBS("install", L"正在下载请稍后", 3000, "0 255 0");
+					end
 					ls:GetFile(cache_policy, url, function(entry)
 						if(entry and entry.entry and entry.entry.url and entry.payload and entry.payload.cached_filepath) then
 							ParaIO.CreateDirectory(dest);

@@ -1327,7 +1327,49 @@ function block:play_create_sound(x,y,z)
 	end
 end
 
+function block:DeleteBlockSound()
+	if not self.delete_sound then
+		local func;
+		func = function()
+			self:ResetBlockSound();
+			GameLogic.GetFilters():remove_filter("OnWorldUnloaded", func);
+		end
+		GameLogic.GetFilters():add_filter("OnWorldUnloaded", func);
+	end
+	self.delete_sound =  true;
+end
+
+function block:ResetBlockSound()
+	self.delete_sound = nil;
+end
+
+function block:SetBlockSound(sound)
+	if not self.set_block_sound then
+		local func;
+		func = function()
+			if self.step_sound then
+				self.step_sound:recoverySoundFiles()
+			end
+			self.set_block_sound = nil
+			GameLogic.GetFilters():remove_filter("OnWorldUnloaded", func);
+		end
+		GameLogic.GetFilters():add_filter("OnWorldUnloaded", func);
+
+		if self.step_sound then
+			self.step_sound:saveSoundFiles()
+		end
+	end
+	self:ResetBlockSound();
+	self.set_block_sound = true
+	if self.step_sound then
+		self.step_sound:setSound(sound)
+	end
+end
+
 function block:play_step_sound(volume)
+	if self.delete_sound then
+		 return
+	end
 	if(self.step_sound) then
 		self.step_sound:play2d(volume);
 	end
@@ -1507,6 +1549,10 @@ end
 -- whether block is normal solid cube model that can not provide power. 
 function block:isNormalCube()
 	return (self.cubeMode and self.solid and not self.ProvidePower);
+end
+
+function block:canPaintMaterial()
+	return (self.cubeMode or self.solid);
 end
 
 local offsets_map = {

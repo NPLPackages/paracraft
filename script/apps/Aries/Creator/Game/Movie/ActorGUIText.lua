@@ -29,12 +29,13 @@ local default_values = {
 	text = "", 
 	fontsize = 25,
 	fontcolor = "#ffffff",
-	textpos = "bottom",
+	textpos = "bottom", -- center|bottom|headon
 	bganim = "",
 	textanim = "",
 	textbg = nil,
 	bgcolor = "",
 	voicenarrator = -1,
+	voicebelongto = "",
 }
 Actor.default_values = default_values;
 
@@ -147,6 +148,9 @@ function Actor:AddKeyFrameOfText(values)
 		if(values.voicenarrator == default_values.voicenarrator) then
 			values.voicenarrator = nil;
 		end
+		if(values.voicebelongto == default_values.voicebelongto) then
+			values.voicebelongto = nil;
+		end
 	end
 	self:AddKeyFrameByName("text", nil, values);
 end
@@ -165,6 +169,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			self:FrameMovePlaying(0);
 			if(callbackFunc) then
 				callbackFunc(true);
+
 			end
 		end
 	end, old_value);
@@ -270,24 +275,59 @@ function Actor:GetTextImagePathByName(filename)
 end
 
 -- update UI text with given values. 
-function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha, textalpha, bgcolor, voicenarrator)
+function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha, textalpha, bgcolor, values)
 	local obj = self:GetTextObj(true);
 	if(not obj) then
 		return
 	end
 	local bg_obj = obj.parent;
 
+	local voicenarrator = values.voicenarrator
+	local voicebelongto = values.voicebelongto
 	if(text and text~="" ) then
+		GameLogic.GetFilters():apply_filters("OnPlayMovieText")
 		local play_text = GameLogic:GetText(text)
 		if voicenarrator and voicenarrator >= 0 then
-			if obj.text ~= play_text or not obj.visible or self.voicenarrator ~= voicenarrator then
-				SoundManager:PlayText(play_text, voicenarrator)
+			if obj.text ~= text or not obj.visible or self.voicenarrator ~= voicenarrator then
+				if voicebelongto and voicebelongto ~= "" then
+					local movie_clip = self:GetMovieClip()
+					local voice_actor = movie_clip:FindActor(voicebelongto)
+					local use3dvoice = values.use3dvoice
+					if self.last_voicebelongto and self.last_voicebelongto ~= "" then
+						self:SetActorLipSync(self.last_voicebelongto, false)
+					end
+
+					SoundManager:PlayActorText(play_text, voicenarrator, voice_actor, nil, use3dvoice)
+				else
+					SoundManager:PlayText(play_text, voicenarrator)
+				end
+				
 			end
 			self.voicenarrator = voicenarrator
+		else
+			if obj.text ~= text then
+				local movie_clip = self:GetMovieClip()
+				if self.last_voicebelongto and self.last_voicebelongto ~= "" and voicebelongto ~= self.last_voicebelongto then
+					self:SetActorLipSync(self.last_voicebelongto, false)
+				end
+	
+				if voicebelongto then
+					self:SetActorLipSync(voicebelongto, true)
+				end
+			else
+				if self.last_voicebelongto ~= voicebelongto then
+					if voicebelongto and voicebelongto ~= "" then
+						self:SetActorLipSync(voicebelongto, true)
+					end
+					if self.last_voicebelongto and self.last_voicebelongto ~= "" then
+						self:SetActorLipSync(self.last_voicebelongto, false)
+					end
+				end
+			end
 		end
-
+		
 		obj.visible = true;
-		obj.text = play_text;
+		
 		_guihelper.SetFontColor(obj, fontcolor or default_values.fontcolor);
 		
 		if(textalpha and textalpha~=1) then
@@ -297,13 +337,54 @@ function Actor:UpdateTextUI(text, fontsize, fontcolor, textpos, textbg, bgalpha,
 		end
 	else
 		obj.visible = false;
+		if not voicebelongto and self.last_voicebelongto then
+			voicebelongto = self.last_voicebelongto
+		end
+		
+		if text ~= obj.text and (not voicenarrator or voicenarrator == 0) and voicebelongto and voicebelongto ~= "" then
+			local movie_clip = self:GetMovieClip()
+			local voice_actor = movie_clip:FindActor(voicebelongto)
+			if voice_actor and voice_actor.SetVoiceMouthSkin then
+				voice_actor:SetVoiceMouthSkin()
+			end
+		end
 	end
 	
+	obj.text = text;
+	self.last_voicebelongto = voicebelongto
 	Actor.textpos = textpos;
 	if(textpos == "center") then
 		obj:Reposition("_ct", -480, -100, 960, 200);
 	else
 		obj:Reposition("_mb", 0, 45 * (Actor.textScaling or 1), 0, 50 * (Actor.textScaling or 1));
+	end
+
+	-- for headon display. use the first NPC actor or the specified voice narrator. 
+	if(textpos == "headon") then
+		local headon_actor
+		local movie_clip = self:GetMovieClip()
+		if (voicebelongto and voicebelongto ~= "") then
+			headon_actor = movie_clip:FindActor(voicebelongto)
+		end
+		headon_actor = headon_actor or movie_clip:FindFirstNPCActor()
+		
+		if(headon_actor) then
+			local entity = headon_actor:GetEntity()
+			if(entity) then
+				entity:Say(text, -1, true)
+				if(self.last_headon_entity ~= entity) then
+					if(self.last_headon_entity) then
+						self.last_headon_entity:Say();
+						self.last_headon_entity = nil;
+					end
+					self.last_headon_entity = entity
+				end
+			end
+		end
+		
+	elseif(self.last_headon_entity) then
+		self.last_headon_entity:Say();
+		self.last_headon_entity = nil;
 	end
 
 	if(fontsize and fontsize~=default_values.fontsize) then
@@ -394,7 +475,7 @@ function Actor:FrameMovePlaying(deltaTime)
 			
 			text, fontsize, fontcolor, textpos, bgcolor = self:ReplaceVariablesInText(values.text), values.fontsize, values.fontcolor, values.textpos, values.bgcolor;
 		end
-		self:UpdateTextUI(text, fontsize, fontcolor, textpos, values.textbg, bgalpha, textalpha, bgcolor, values.voicenarrator);
+		self:UpdateTextUI(text, fontsize, fontcolor, textpos, values.textbg, bgalpha, textalpha, bgcolor, values);
 	end
 end
 
@@ -411,5 +492,14 @@ function Actor:PrePlayText()
 			end
 		end
 	end
+end
 
+function Actor:SetActorLipSync(voicebelongto, flag)
+	local movie_clip = self:GetMovieClip()
+	local voice_actor = movie_clip:FindActor(voicebelongto)
+
+	local mouse_id = flag and "88009" or nil
+	if voice_actor and voice_actor.SetVoiceMouthSkin then
+		voice_actor:SetVoiceMouthSkin(mouse_id)
+	end
 end

@@ -246,12 +246,12 @@ e.g
 			
 			-- start server
 			local function startserver_()
+				NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 				if(WebServer:Start(doc_root_dir, host, port)) then
 					CommandManager:RunCommand("/clicktocontinue off");
 					local addr = WebServer:site_url();
 					if(addr) then
 						-- change windows title
-						NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 						local wnd_title = ParaEngine.GetAttributeObject():GetField("WindowText", "")
 						wnd_title = wnd_title:gsub("%sport:%d+", "");
 						wnd_title = wnd_title .. format(" port:%d", port);
@@ -410,7 +410,7 @@ e.g
 
 Commands["webserver"] = {
 	name="webserver", 
-	quick_ref="/webserver [doc_root_dir] [ip_host] [port]", 
+	quick_ref="/webserver [-silent] [doc_root_dir] [ip_host] [port]", 
 	desc=[[start web server at given directory:
 @param ip_host: default to all ip addresses. 
 @param port: default to 8099
@@ -427,6 +427,9 @@ e.g.
 --			GameLogic.AddBBS(nil, L"此命令只有在Paracraft中可用");
 --			return 
 		--end
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text);
+
 		local doc_root_dir, host, port;
 		doc_root_dir, cmd_text = CmdParser.ParseString(cmd_text);
 		host, cmd_text = CmdParser.ParseString(cmd_text);
@@ -446,23 +449,27 @@ e.g.
 
 			-- start server
 			local function startserver_()
+				NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 				if(WebServer:Start(doc_root_dir, host, port)) then
 					CommandManager:RunCommand("/clicktocontinue off");
 					local addr = WebServer:site_url();
 					if(addr) then
 						-- change windows title
-						NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 						local wnd_title = ParaEngine.GetAttributeObject():GetField("WindowText", "")
 						wnd_title = wnd_title:gsub("%sport:%d+", "");
 						wnd_title = wnd_title .. format(" port:%d", port);
 						ParaEngine.GetAttributeObject():SetField("WindowText", wnd_title);
 
 						-- show tips
-						GameLogic.SetStatus(format(L"Web Server启动成功: %s", addr));
-						GameLogic.AddBBS(nil, format("www_root: %s", doc_root_dir));
+						if(not options.silent) then
+							GameLogic.SetStatus(format(L"Web Server启动成功: %s", addr));
+							GameLogic.AddBBS(nil, format("www_root: %s", doc_root_dir));
+						end
 					end
 				else
-					GameLogic.AddBBS(nil, L"只能同时启动一个Server");
+					if(not options.silent) then
+						GameLogic.AddBBS(nil, L"只能同时启动一个Server");
+					end
 				end
 			end
 

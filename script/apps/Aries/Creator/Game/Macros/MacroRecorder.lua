@@ -43,6 +43,7 @@ function MacroRecorder.ShowPage()
 			height = 32,
 	}
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	MacroRecorder.ShowMacroRecordArea(true)
 	params._page.OnClose = function()
 		page = nil;
 	end;
@@ -64,6 +65,7 @@ function MacroRecorder.CloseWindow()
 		page:CloseWindow();
 		page = nil;
 	end
+	MacroRecorder.ShowMacroRecordArea(false)
 end
 
 function MacroRecorder.OnStop()
@@ -75,4 +77,53 @@ function MacroRecorder.OnClickAddSubTitle()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroAddSubTitle.lua");
 	local MacroAddSubTitle = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroAddSubTitle");
 	MacroAddSubTitle.ShowPage();
+end
+
+function MacroRecorder.ShowMacroRecordArea(bShow)
+    local _parent = ParaUI.GetUIObject("RecordSafeArea");
+    if(not bShow) then
+        if(_parent:IsValid()) then
+            _parent.visible = false;
+            ParaUI.Destroy(_parent.id);
+        end
+        return;
+    else
+        if(not _parent:IsValid()) then
+            local margin_top, margin_bottom,margin_left =102,90,80
+			local border_width = 6;
+            _parent = ParaUI.CreateUIObject("container", "RecordSafeArea", "_fi", 0,0,0,0);
+            _parent.background = "";
+            _parent.enabled = false;
+            _parent.zorder = 100;
+            _parent:AttachToRoot();
+
+            local _border = ParaUI.CreateUIObject("container", "border", "_fi", 0,0,0,0);
+            _border.background = "";
+            _border.enabled = false;
+            _parent:AddChild(_border);
+
+            local _this = ParaUI.CreateUIObject("container", "top", "_mt", margin_left, margin_top, margin_left, border_width);
+            _this.background = "Texture/whitedot.png";
+            _this.enabled = false;
+            _border:AddChild(_this);
+
+            local _this = ParaUI.CreateUIObject("container", "left", "_ml", margin_left, margin_top, border_width, margin_bottom);
+            _this.background = "Texture/whitedot.png";
+            _this.enabled = false;
+            _border:AddChild(_this);
+
+            local _this = ParaUI.CreateUIObject("container", "right", "_mr", margin_left, margin_top, border_width, margin_bottom);
+            _this.background = "Texture/whitedot.png";
+            _this.enabled = false;
+            _border:AddChild(_this);
+            
+            local _this = ParaUI.CreateUIObject("container", "bottom", "_mb", margin_left, margin_bottom, margin_left, border_width);
+            _this.background = "Texture/whitedot.png";
+            _this.enabled = false;
+            _border:AddChild(_this);
+			_border.colormask = "255 0 0 88";
+			_border:ApplyAnim();
+        end
+        _parent.visible = true;
+    end
 end

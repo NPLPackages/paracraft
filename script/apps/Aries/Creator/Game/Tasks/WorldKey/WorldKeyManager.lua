@@ -7,7 +7,6 @@ Use Lib:
 -------------------------------------------------------
 local WorldKeyManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyManager.lua")
 --]]
-local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local WorldKeyManager = NPL.export();
 
 function WorldKeyManager.GenerateActivationCodes(count, private_key, projectId, filename, folder_path, succee_cb)
@@ -179,10 +178,9 @@ function WorldKeyManager.OnclickNpc(project_id)
     if project_id == nil then
         return
     end
-    
-    local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
-    KeepworkServiceProject:GetProject(project_id, function(data, err)
-        if type(data) == 'table' then
+
+    GameLogic.GetFilters():apply_filters("service.keepwork_service_project.get_project",project_id,function(data,err)
+		if type(data) == 'table' then
             if data.username == System.User.username then
                 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyEncodePage.lua").Show(project_id);
             else
@@ -190,7 +188,7 @@ function WorldKeyManager.OnclickNpc(project_id)
                 CommandManager:RunCommand(string.format('/loadworld -force -s %s', project_id))
             end
         end
-    end)
+	end);
 end
 
 function WorldKeyManager.AddInvalidKey(key, world_data, succee_cb)

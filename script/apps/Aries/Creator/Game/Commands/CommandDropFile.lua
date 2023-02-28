@@ -45,7 +45,7 @@ other files...
 			DragDropHandlers.handleZipFile(filename);
 		elseif(filename:match("%.blocks%.stream%.xml$")) then
 			DragDropHandlers.handleBlockStreamFile(filename)
-		elseif(ext == "fbx" or ext == "x" or ext == "bmax" or filename:match("%.blocks%.xml$")) then
+		elseif(ext == "fbx" or ext == "glb" or ext == "gltf" or ext == "x" or ext == "bmax" or filename:match("%.blocks%.xml$")) then
 			DragDropHandlers.handleModelFile(filename, ext);
 		end
 	end,
@@ -173,18 +173,18 @@ function DragDropHandlers.handleModelFile(filename, ext)
 		end
 
 		if(Files.FileExists(destfile)) then
-			_guihelper.MessageBox(string.format(L"当前世界已经存在:%s 是否覆盖?", destfile), function(res)
+			_guihelper.MessageBox(string.format(L"当前世界已经存在:%s 是否覆盖?", commonlib.Encoding.DefaultToUtf8(destfile)), function(res)
 				if(res and res == _guihelper.DialogResult.Yes) then
 					CopyFiles();
 				end
 				DragDropHandlers.SendFileToSceneContext(targetfile);
 			end, _guihelper.MessageBoxButtons.YesNo);
 		else
-			_guihelper.MessageBox(string.format(L"是否导入外部模型文件:%s?", filename), function(res)
+			_guihelper.MessageBox(string.format(L"是否导入外部模型文件:%s?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
 				if(CopyFiles()) then
 					DragDropHandlers.SendFileToSceneContext(targetfile);
 				else
-					GameLogic.AddBBS(nil, format(L"导入失败了 %s", filename));
+					GameLogic.AddBBS(nil, format(L"导入失败了 %s", commonlib.Encoding.DefaultToUtf8(filename)));
 				end
 			end);
 		end

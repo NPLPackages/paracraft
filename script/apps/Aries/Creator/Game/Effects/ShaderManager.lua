@@ -72,6 +72,11 @@ function ShaderManager:RegisterAllEffects()
 	local CartoonEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.CartoonEffect");
 	local effect = CartoonEffect:new():Init(self);
 	self:RegisterEffect(effect);
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/ODSStereoEffect.lua");
+	local ODSStereoEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.ODSStereoEffect");
+	local effect = ODSStereoEffect:new():Init(self);
+	self:RegisterEffect(effect);
 end
 
 -- register new effects such as from external mod. 

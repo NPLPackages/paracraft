@@ -30,6 +30,8 @@ EditModelManipContainer:Property({"mainColor", "#ffff00"});
 EditModelManipContainer:Property({"PositionPlugName", "position", auto=true});
 EditModelManipContainer:Property({"ScalePlugName", "scale", auto=true});
 EditModelManipContainer:Property({"YawPlugName", "yaw", auto=true});
+EditModelManipContainer:Property({"PitchPlugName", "pitch", auto=true});
+EditModelManipContainer:Property({"RollPlugName", "roll", auto=true});
 EditModelManipContainer:Property({"OffsetPosPlugName", "offsetPos", auto=true});
 EditModelManipContainer:Property({"AngleGridStep", math.pi / 12, "GetAngleGridStep", "SetAngleGridStep", auto=true});
 EditModelManipContainer:Property({"SupportUndo", true, "IsSupportUndo", "SetSupportUndo", auto=true});
@@ -43,6 +45,7 @@ end
 function EditModelManipContainer:createChildren()
 	self.translateManip = self:AddTranslateManip();
 	self.translateManip:SetFixOrigin(true);
+	self.translateManip:SetShowGroundSnap(true);
 	self.scaleManip = self:AddScaleManip();
 	self.scaleManip.radius = 0.5;
 	self.scaleManip:SetUniformScaling(true);
@@ -95,6 +98,8 @@ function EditModelManipContainer:connectToDependNode(node)
 	local plugPos = node:findPlug(self.PositionPlugName);
 	local plugScale = node:findPlug(self.ScalePlugName);
 	local plugYaw = node:findPlug(self.YawPlugName);
+	local plugRoll = node:findPlug(self.RollPlugName);
+	local plugPitch = node:findPlug(self.PitchPlugName);
 	local plugOffsetPos = node:findPlug(self.OffsetPosPlugName);
 
 	self.node = node;
@@ -211,6 +216,32 @@ function EditModelManipContainer:connectToDependNode(node)
 			self:addPlugToManipConversionCallback(manipYawPlug, function(self, manipPlug)
 				return plugYaw:GetValue() or 0;
 			end);
+
+			if(plugPitch) then
+				local manipPitchPlug = self.rotateManip:findPlug("pitch");
+				self:addManipToPlugConversionCallback(plugPitch, function(self, plug)
+					commonlib.TimerManager.SetTimeout(function() self:SnapshotToHistory() end, 1000)
+					return manipPitchPlug:GetValue() or 0;
+				end);
+				self:addPlugToManipConversionCallback(manipPitchPlug, function(self, manipPlug)
+					return plugPitch:GetValue() or 0;
+				end);
+			end
+
+			if(plugRoll) then
+				local manipRollPlug = self.rotateManip:findPlug("roll");
+				self:addManipToPlugConversionCallback(plugRoll, function(self, plug)
+					commonlib.TimerManager.SetTimeout(function() self:SnapshotToHistory() end, 1000)
+					return manipRollPlug:GetValue() or 0;
+				end);
+				self:addPlugToManipConversionCallback(manipRollPlug, function(self, manipPlug)
+					return plugRoll:GetValue() or 0;
+				end);
+			end
+			if((plugRoll and plugRoll:GetValue() ~= 0) or (plugPitch and plugPitch:GetValue() ~= 0)) then
+				self.rotateManip:SetPitchEnabled(true);
+				self.rotateManip:SetRollEnabled(true);
+			end
 		else
 			self.rotateManip:SetVisible(false)
 			self.rotateManip.enabled = false
@@ -284,17 +315,29 @@ function EditModelManipContainer:Redo()
 	return true
 end
 
+function EditModelManipContainer:ToggleRotationMode()
+	if(self.rotateManip) then
+		local isEnabled = not self.rotateManip:IsPitchEnabled()
+		self.rotateManip:SetPitchEnabled(isEnabled);
+		self.rotateManip:SetRollEnabled(isEnabled);
+	end
+end
+
 -- virtual: actually means key stroke. 
-function EditModelManipContainer:keyPressEvent(key_event)
+function EditModelManipContainer:keyPressEvent(event)
+	local keyname = event.keyname;
+	if(keyname == "DIK_3") then
+		self:ToggleRotationMode();
+	end
 	if(self:IsSupportUndo()) then
-		local keyseq = key_event:GetKeySequence();
+		local keyseq = event:GetKeySequence();
 		if(keyseq == "Undo") then
 			if(self:Undo()) then
-				key_event:accept()
+				event:accept()
 			end
 		elseif(keyseq == "Redo") then
 			if(self:Redo()) then
-				key_event:accept()
+				event:accept()
 			end
 		end
 	end

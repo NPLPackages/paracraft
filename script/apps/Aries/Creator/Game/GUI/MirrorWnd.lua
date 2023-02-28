@@ -58,6 +58,7 @@ function MirrorWnd.ShowPage(blocks, pivot_x, pivot_y, pivot_z, callbackFunc)
 				width = 150,
 				height = 220,
 	};
+	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"MirrorWnd");
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	params._page.OnClose = function()
 		ParaTerrain.DeselectAllBlock(groupindex_hint);

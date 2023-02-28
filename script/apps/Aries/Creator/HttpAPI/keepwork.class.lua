@@ -36,5 +36,32 @@ HttpWrapper.Create("keepwork.userclass.joinclass", "%MAIN%/accounting/orgClassIn
 --http://yapi.kp-para.cn/project/130/interface/api/5027
 HttpWrapper.Create("keepwork.userclass.getclasses", "%MAIN%/accounting/orgClass/userTeachingClasses", "GET", true)
 
+-->>>>>>>>>>>>> 课程表 start >>>>>>>>>>>>
+--开始上课
+-- http://yapi.kp-para.cn/project/130/interface/api/5085
+HttpWrapper.Create("keepwork.schedule.startCourse", "%MAIN%/accounting/users/schedules/start", "POST", true)
 
+--下课
+-- http://yapi.kp-para.cn/project/130/interface/api/5087
+HttpWrapper.Create("keepwork.schedule.endCourse", "%MAIN%/accounting/users/schedules/finish", "POST", true)
 
+--学生上课打卡考勤
+-- http://yapi.kp-para.cn/project/130/interface/api/5089
+HttpWrapper.Create("keepwork.schedule.attendance", "%MAIN%/accounting/users/schedules/signIn", "POST", true)
+
+--当前时间的课表（登陆上来时请求判断是否有正在上的课）
+--http://yapi.kp-para.cn/project/130/interface/api/5091
+HttpWrapper.Create("keepwork.schedule.currentSchedule", "%MAIN%/accounting/users/schedules", "GET", true)
+
+--查询课表
+--http://yapi.kp-para.cn/project/130/interface/api/5093
+HttpWrapper.Create("keepwork.schedule.searchSchedule", "%MAIN%/accounting/users/schedules/search", "POST", true)
+
+-- 学生提交上课数据
+-- http://yapi.kp-para.cn/project/130/interface/api/5127
+HttpWrapper.Create("keepwork.schedule.scheduleReports", "%MAIN%/accounting/users/scheduleReports/submit", "POST", true)
+
+--<<<<<<<<<<<<< 课程表 end <<<<<<<<<<<<
+
+-- http://yapi.kp-para.cn/project/655/interface/api/5822
+HttpWrapper.Create("keepwork.classrooms.query", "%MAIN%/edu/v0/clients/classrooms/query", "POST", true)

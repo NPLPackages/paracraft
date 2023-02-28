@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="SelectBone.lua" refresh="false">
+<![CDATA[
+SelectBone = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBone");
+SelectBone.OnInit()
+]]>
+</script>
+<div style="background-color:#00000080;width:300px;height:56px">
+    <pe:gridview style="" name="gvwColorTable" CellPadding="5" DefaultNodeHeight="48" pagesize="20" ItemsPerLine="7"
+                 DataSource='<%=SelectBone.GetLevelColorList()%>'>
+        <Columns>
+            <pe:if condition='<%=SelectBone:GetLevelColor() == Eval("color")%>'>
+                <div style="position:relative;background-color:#ff6a00;width:28px;height:28px;" ></div>
+                <div style="position:relative;margin-top:28px;color:#ff6a00"><%=Eval("text")%></div>
+            </pe:if>
+            <div name='<%=Eval("index")%>' uiname='<%="SelectBone.Index_"..Eval("index")%>' style='<%=string.format("margin:2px;color:#ffffff;width:24px;height:24px;background-color:%s", Eval("color"))%>' onclick="SelectBone.OnClickLevelColor"></div>
+        </Columns>
+    </pe:gridview>
+</div>
+</pe:mcml>
+</html>
+

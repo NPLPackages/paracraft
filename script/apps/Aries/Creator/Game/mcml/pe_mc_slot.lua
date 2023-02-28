@@ -384,8 +384,8 @@ function pe_mc_slot.OnClickSlot(ui_obj, mcmlNode)
 	end
 
 	if(can_edit) then
+		local onclick = mcmlNode:GetAttributeWithCode("onclick");
 		if(mouse_button=="left") then
-			local onclick = mcmlNode:GetAttributeWithCode("onclick");
 			local shift_pressed = System.Windows.Keyboard:IsShiftKeyPressed();
 			local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
 
@@ -419,15 +419,20 @@ function pe_mc_slot.OnClickSlot(ui_obj, mcmlNode)
 				end
 			end
 		elseif(mouse_button=="right") then
-			local itemStack = mcmlNode.slot:GetStack();
-			if(itemStack) then
-				local newStack, hasHandled = itemStack:OnItemRightClick(EntityManager.GetPlayer());
-				if(not hasHandled) then
-					-- right click to take half. 
-					bIsDragClick = true;
-					count = math.floor(itemStack.count / 2);
-					if(count <= 0) then
-						count = nil;
+			if(onclick) then
+				-- if there is onclick event
+				Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onclick, mcmlNode);
+			else
+				local itemStack = mcmlNode.slot:GetStack();
+				if(itemStack) then
+					local newStack, hasHandled = itemStack:OnItemRightClick(EntityManager.GetPlayer());
+					if(not hasHandled) then
+						-- right click to take half. 
+						bIsDragClick = true;
+						count = math.floor(itemStack.count / 2);
+						if(count <= 0) then
+							count = nil;
+						end
 					end
 				end
 			end

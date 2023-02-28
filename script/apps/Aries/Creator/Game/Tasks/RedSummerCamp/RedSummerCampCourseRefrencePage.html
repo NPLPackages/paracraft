@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local page = document:GetPageCtrl();
+    function ClosePage()
+        local pageCtrl = document:GetPageCtrl();
+        pageCtrl:CloseWindow(true)
+    end
+
+    function ClickItem(name)
+        local url
+        ClosePage()
+        if name == "teacher" then
+            url = "https://keepwork.com/official/docs/teach/lessons/teacher_guide"
+        elseif name == "assessment" then
+            url = "https://keepwork.com/official/docs/teach/lessons/paracraft_exams"
+        elseif name == "learn" then
+            url = "https://keepwork.com/official/docs/index"
+        elseif name == "video_list" then
+            url = "https://keepwork.com/official/docs/videoguide"
+        else
+            url = "https://keepwork.com/official/docs/teach/lessons/small_proj_list"
+        end
+        ParaGlobal.ShellExecute("open", url, "", "", 1); 
+end
+]]></script>
+<style type="text/mcss">
+    {
+        item_image = {
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24",
+            width = 116,
+            height = 116,
+            float = "left",
+            ["margin-left"] = 10,
+        },
+    }
+</style>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000088"  > 
+    <div zorder="-3" align="center" valign="center" style=" width: 623px; height: 200px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
+        <div style="width: 600x; height: 30px;">
+            <div style="position: relative; width: 139px; height: 49px; margin-top: -8px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/cankaoziliao_139x49_32bits.png#0 0 139 49);"></div>
+            <input type="button" style="margin-left: 570px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        </div>
+        <div style="width: 630px;margin-top: 34px; margin-left: -10px;">
+            <div zorder="-2" onclick="ClickItem" name='teacher'  class="item_image">
+                <div align="center" valign="center" zorder="-1" style="width: 88px; height: 88px; margin-top: -6; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/course_32bits.png#0 0 98 98);"></div>
+                <div style="width: 95px; margin-left: 11px;margin-top: -6px;  height: 24px; text-align: center; color: #ffffff; background-color: #00000090;">老师培训</div>
+            </div>
+            <div zorder="-2" onclick="ClickItem" name='assessment'  class="item_image">
+                <div align="center" valign="center" zorder="-1" style="width: 88px; height: 88px; margin-top: -6; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/qualification_32bits.png#0 0 98 98);"></div>
+                <div style="width: 95px; margin-left: 11px;margin-top: -6px;  height: 24px; text-align: center; color: #ffffff; background-color: #00000090;">自我评测</div>
+            </div>
+            <div zorder="-2" onclick="ClickItem" name='learn'  class="item_image">
+                <div align="center" valign="center" zorder="-1" style="width: 88px; height: 88px; margin-top: -6; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/competition_32bits.png#0 0 98 98);"></div>
+                <div style="width: 95px; margin-left: 11px;margin-top: -6px;  height: 24px; text-align: center; color: #ffffff; background-color: #00000090;">学习资料</div>
+            </div>
+            <div zorder="-2" onclick="ClickItem" name='project_list'  class="item_image">
+                <div align="center" valign="center" zorder="-1" style="width: 88px; height: 88px; margin-top: -6; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/constitution_32bits.png#0 0 98 98);"></div>
+                <div style="width: 95px; margin-left: 11px;margin-top: -6px;  height: 24px; text-align: center; color: #ffffff; background-color: #00000090;">小项目列表</div>
+            </div>
+            <div zorder="-2" onclick="ClickItem" name='video_list'  class="item_image">
+                <div align="center" valign="center" zorder="-1" style="width: 88px; height: 88px; margin-top: -6; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/shipingziyuan_99x98_32bits.png#0 0 98 98);"></div>
+                <div style="width: 95px; margin-left: 11px;margin-top: -6px;  height: 24px; text-align: center; color: #ffffff; background-color: #00000090;">视频资源</div>
+            </div>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

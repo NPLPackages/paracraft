@@ -645,8 +645,8 @@ function QuestAction.GetServerTime()
     if System.options.isDevMode then
         return os.time()
     end
-    local timp_stamp = GameLogic.GetFilters():apply_filters('store_get', 'world/currentServerTime')
-    return timp_stamp
+    local timp_stamp = GameLogic.GetFilters():apply_filters('service.session.get_current_server_time')
+    return timp_stamp or os.time()
 end
 
 function QuestAction.ShowSpeciapTask()
@@ -1267,11 +1267,13 @@ local dongao_gsid = 40008
 
     param: lesson_index:课程索引 第几节课
 ]]--
-function QuestAction.GetDongaoLessonState(lesson_type, lesson_index)
-    if QuestAction.DongAoClientData == nil then
-        QuestAction.DongAoClientData = KeepWorkItemManager.GetClientData(dongao_gsid)
+function QuestAction.GetDongaoLessonState(lesson_type, lesson_index, gsid)
+    gsid = gsid or dongao_gsid
+    QuestAction.DongAoClientData = QuestAction.DongAoClientData or {}
+    if QuestAction.DongAoClientData[gsid] == nil then
+        QuestAction.DongAoClientData[gsid] = KeepWorkItemManager.GetClientData(gsid)
     end
-    local client_data = QuestAction.DongAoClientData
+    local client_data = QuestAction.DongAoClientData[gsid]
     if client_data == nil then
         return false
     end
@@ -1289,12 +1291,14 @@ function QuestAction.GetDongaoLessonState(lesson_type, lesson_index)
     return result.is_finish
 end
 
-function QuestAction.SetDongaoLessonState(lesson_type, lesson_index, is_finish)
-    if QuestAction.DongAoClientData == nil then
-        QuestAction.DongAoClientData = KeepWorkItemManager.GetClientData(dongao_gsid) or {}
+function QuestAction.SetDongaoLessonState(lesson_type, lesson_index, is_finish, gsid)
+    gsid = gsid or dongao_gsid
+    QuestAction.DongAoClientData = QuestAction.DongAoClientData or {}
+    if QuestAction.DongAoClientData[gsid] == nil then
+        QuestAction.DongAoClientData[gsid] = KeepWorkItemManager.GetClientData(gsid) or {}
     end
 
-    local client_data = QuestAction.DongAoClientData
+    local client_data = QuestAction.DongAoClientData[gsid]
 
     local key = lesson_type .. "_lesson_progress"
     client_data[key] = client_data[key] or {}
@@ -1368,16 +1372,22 @@ function QuestAction.OnLoadedWorldEnd()
 end
 
 function QuestAction.ReportLoginTime()
-    if not QuestAction.click_login_timestamp then
-        return
+    local duration = 0
+    if QuestAction.click_login_timestamp then
+        duration = QuestAction.GetServerTime() - QuestAction.click_login_timestamp
     end
-    local duration = QuestAction.GetServerTime() - QuestAction.click_login_timestamp
+    
     QuestAction.click_login_timestamp = nil
     if duration == 0 then
-        return
+        -- return
     end
 
-    local data = {duration = duration}
+    local data = {
+        duration = duration,
+        machineCode = ParaEngine.GetAttributeObject():GetField('MachineID', ''),
+        machineCode_old = ParaEngine.GetAttributeObject():GetField('MachineID_old', ''),
+        platform = System.os.GetPlatform(),
+    }
     QuestAction.ReportEvent("duration.login", data)
     -- GameLogic.GetFilters():apply_filters("user_behavior", 1, "duration.world_load", {projectId};
 end

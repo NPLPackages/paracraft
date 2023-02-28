@@ -56,6 +56,15 @@ end
 
 -- try show the singleton
 function TouchVirtualKeyboardIcon.ShowSingleton(bSHow)
+	if bSHow then
+		local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
+		local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
+		if MobileUIRegister.GetIsDevMode() and IsMobileUIEnabled then
+			return
+		end
+	end
+
 	NPL.load("(gl)script/ide/timer.lua");
 	local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
 		if(Screen:GetWidth() > 0) then
@@ -85,6 +94,10 @@ end
 
 -- @bShow: if nil, it will toggle show and hide. 
 function TouchVirtualKeyboardIcon:Show(bShow)
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled and bShow then
+		return
+	end
 	local _parent = self:GetUIControl();
 	if(bShow  == nil) then
 		bShow = not _parent.visible;

@@ -860,7 +860,7 @@ end
 -- return true, filename: if the file text is found. filename contains the full filename
 function Entity:FindFile(text, bExactMatch)
 	local filename = self:GetText();
-	if( (bExactMatch and filename == text) or (not bExactMatch and filename and filename:find(text))) then
+	if( (bExactMatch and filename == text) or (not bExactMatch and filename and filename:find(text, 1, true))) then
 		return true, filename
 	end
 end

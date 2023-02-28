@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ExamPaperPage.lua"><![CDATA[
+ExamPaperPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.Exam.ExamPaperPage");
+
+local page = document:GetPageCtrl();
+ExamPaperPage.OnInitCommitVideo(page)
+
+function ClosePage()
+    ExamPaperPage.CloseUploadVideoPage()
+end
+
+
+]]></script>
+    <pe:container width="100%" height="100%" style="background: url(Texture/Aries/Creator/keepwork/Window/dikuang_opaque_64x69_32bits.png#0 0 64 69:26 44 24 22);">
+        <div width="96" height="25" style="float: left; margin-left: 13px;margin-top: 8px; background: url(Texture/Aries/Creator/keepwork/Exam/tijiaowenjian_96x25_32bits.png#0 0 96 25);"></div>
+
+        <div align="center" style="font-size: 19;margin-top: 36px;" width="460" >
+            <%= L"请选择本地文件提交，提交的文件会存在您的网盘中，文件以规定时间的最后一次提交为准"%>
+        </div>
+        <div valign="bottom" align="center" height="45px" style='position: relative; margin-bottom:36px'>
+            <input type="button" value='<%= L"提交文件" %>' align="left" name='btn_commit_video' onclick="ExamPaperPage.OnBtnClick_videoPage()" style="position: relative;margin-left: 56px; text-offset-y: -2;font-weight: normal;font-size: 16; width: 128px;height: 45px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/anniu_128x45_32bits.png#0 0 128 45);"/>
+            <input type="button" value='<%= L"打开网盘" %>' align="center" name='btn_open_netdisk' onclick="ExamPaperPage.OnBtnClick_videoPage()" style="position: relative;text-offset-y: -2;font-weight: normal;font-size: 16; width: 128px;height: 45px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/anniuhui_128x45_32bits.png#0 0 128 45);"/>
+            <input type="button" value='<%= L"关闭" %>' align="right" name='btn_open_close' onclick="ClosePage" style="position: relative;margin-right: 56px; text-offset-y: -2;font-weight: normal;font-size: 16; width: 128px;height: 45px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/anniuhui_128x45_32bits.png#0 0 128 45);"/>
+        </div>
+    </pe:container>
+
+</pe:mcml>
+</body>
+</html>

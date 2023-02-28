@@ -59,6 +59,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 local Keepwork = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keepwork.lua");
 local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+local ServerConfigManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/ServerConfigManager.lua");
 
 local KeepWorkItemManager = NPL.export()
 
@@ -150,11 +151,15 @@ function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
         QuestProvider:OnInit();
 
 		GameLogic.ResetABPath();
-
         -- 皮肤检测 检测用户皮肤是否可以继续用
-        local CheckSkin = NPL.load("(gl)Mod/GeneralGameServerMod/UI/Vue/Page/User/CheckSkin.lua");
-        if CheckSkin and CheckSkin.CheckUserSkin then
-            CheckSkin.CheckUserSkin()
+        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+        if UserInfoPage and UserInfoPage.CheckUserSkin then
+            UserInfoPage.CheckUserSkin()
+        else
+            local CheckSkin = NPL.load("(gl)Mod/GeneralGameServerMod/UI/Vue/Page/User/CheckSkin.lua");
+            if CheckSkin and CheckSkin.CheckUserSkin then
+                CheckSkin.CheckUserSkin()
+            end
         end
     end)            
     return res;
@@ -439,6 +444,7 @@ function KeepWorkItemManager.Load(bForced, callback)
                         KeepWorkItemManager.LoadSchool(true, function()
 
                             UserPermission.LoadUserRoles()
+                            ServerConfigManager.RequestConfig()
                             KeepWorkItemManager.LoadItemsFromStaticExId(function()
                                 KeepWorkItemManager.loaded = true;
                                 if(callback)then
@@ -728,6 +734,16 @@ end
 function KeepWorkItemManager.GetProfile()
     return KeepWorkItemManager.profile or {};
 end
+
+function KeepWorkItemManager.GetUserRegion()
+    if KeepWorkItemManager.user_region and KeepWorkItemManager.user_region.stateId then
+        return KeepWorkItemManager.user_region
+    end
+
+    return {}
+    -- return Mod.WorldShare.Store:Get('user/region') or {}
+end
+
 -- load profile of logined user
 function KeepWorkItemManager.LoadProfile(bForced, callback)
     local cache_policy;
@@ -748,6 +764,17 @@ function KeepWorkItemManager.LoadProfile(bForced, callback)
             if(callback)then
                 callback(err, msg, data);
             end
+        end
+    end)
+    KeepWorkItemManager.user_region = {}
+    keepwork.user.selfRegion({
+    },function(err, msg, data)
+        -- print("keepwork.user.selfRegioneeeeeeeeee", err)
+        -- echo(data.region, true)
+        if err == 200 then
+            KeepWorkItemManager.user_region = data.region or {}
+            LOG.std(nil, "info", "keepwork.user.selfRegion", "keepwork.user.selfRegion stateId = %s", tostring(data.region and data.region.stateId or 0));
+            -- _guihelper.MessageBox(data.region.stateId)
         end
     end)
 end
@@ -817,18 +844,22 @@ end
 -- @param {number} gsid: global store id
 -- @return bOwn, guid, bag, copies, item
 function KeepWorkItemManager.HasGSItem(gsid)
-    if(not gsid)then
+    if (not gsid) then
         return
     end
+
     gsid = tonumber(gsid)
-    if(gsid > 0)then
+
+    if (gsid > 0) then
         for k,v in ipairs(KeepWorkItemManager.items) do
-            if( v.gsId == gsid)then
+            if (v.gsId == gsid)then
                 local copies = v.copies or 0;
                 local bOwn = false;
-                if(copies > 0)then
+                
+                if (copies > 0) then
                     bOwn = true;
                 end
+
                 return bOwn, v.id, v.bagId, copies, v;
             end    
         end
@@ -838,12 +869,15 @@ end
 function KeepWorkItemManager.UnionCopies(gsid_list)
     gsid_list = gsid_list or {};
     local copies_all = 0;
-    for k,v in ipairs(gsid_list) do
+
+    for k, v in ipairs(gsid_list) do
         local gsid = v.gsid;
 		local hasItem, guid, bag, copies = KeepWorkItemManager.HasGSItem(gsid);
+
         copies = copies or 0;
         copies_all = copies_all + copies;
     end
+
     return copies_all;
 end
 
@@ -1083,4 +1117,15 @@ end
 function KeepWorkItemManager.IsOrgStudentVip()
 	local profile = KeepWorkItemManager.GetProfile();
     return (profile.student == 1);
+end
+
+-- 是否为老师
+function KeepWorkItemManager.IsTeacher()
+	local profile = KeepWorkItemManager.GetProfile();
+    return profile.tLevel == 1
+end
+
+function KeepWorkItemManager.GetUID()
+    local profile = KeepWorkItemManager.GetProfile();
+    return profile.id
 end

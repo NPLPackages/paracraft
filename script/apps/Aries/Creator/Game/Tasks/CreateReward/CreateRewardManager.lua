@@ -77,7 +77,8 @@ function CreateRewardManager.CheckGetIndex()
     return index
 end
 
-function CreateRewardManager.ShowGiftBtn(parentRoot,isCreateRegion)
+function CreateRewardManager.ShowGiftBtn(parentRoot,isCreateRegion, offset_x)
+    offset_x = offset_x or 0
     if not parentRoot then
         return 
     end
@@ -90,18 +91,18 @@ function CreateRewardManager.ShowGiftBtn(parentRoot,isCreateRegion)
     local _parent = ParaUI.GetUIObject(CreateRewardManager.parentName);	
     if not giftBtn:IsValid() and not txtTime:IsValid() then        
         local strPath = ';NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/CreateReward/CreateRewardManager.lua") '
-        giftBtn = ParaUI.CreateUIObject("button", "giftBtn", "_lt", 310, 28, 58, 58);
+        giftBtn = ParaUI.CreateUIObject("button", "giftBtn", "_lt", 310 + offset_x, 28, 58, 58);
         giftBtn.background = "Texture/Aries/Creator/keepwork/CreateReward/jiangli_58X58_32bits.png;0 0 58 58";
         giftBtn.onclick = string.format([[%s.OnClickGiftBtn();]],strPath)
         parentRoot:AddChild(giftBtn);       
 
-        local txtTimebg = ParaUI.CreateUIObject("container", "gifttxt_bg", "_lt", 307, 72, 61, 28);
+        local txtTimebg = ParaUI.CreateUIObject("container", "gifttxt_bg", "_lt", 307 + offset_x, 72, 61, 28);
         txtTimebg.background = "Texture/Aries/Creator/keepwork/CreateReward/b2_61X28_32bits.png;0 0 61 28";
         txtTimebg.visible = true
         txtTimebg.zorder = 1
         parentRoot:AddChild(txtTimebg);
 
-        local txtTime = ParaUI.CreateUIObject("button", "gifttime_text", "_lt", 314, 71, 50, 30);
+        local txtTime = ParaUI.CreateUIObject("button", "gifttime_text", "_lt", 314 + offset_x, 71, 50, 30);
         txtTime.enabled = false;
         txtTime.text = CreateRewardManager.GetTimeText();
         txtTime.background = "";
@@ -116,7 +117,7 @@ function CreateRewardManager.ShowGiftBtn(parentRoot,isCreateRegion)
         tipTxtBg.visible = false
         parentRoot:AddChild(tipTxtBg)
 
-        local txtTip = ParaUI.CreateUIObject("button", "gifttip_text", "_lt", 230, 8, 91, 30);
+        local txtTip = ParaUI.CreateUIObject("button", "gifttip_text", "_lt", 230 + offset_x, 8, 91, 30);
         txtTip.enabled = false;
         txtTip.text = "可领取";
         txtTip.background = "";

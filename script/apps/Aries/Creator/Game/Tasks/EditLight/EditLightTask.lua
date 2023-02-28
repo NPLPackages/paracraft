@@ -25,7 +25,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local EditLightTask = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.EditLightTask"));
 
 local curInstance;
-local light;
+local lightEntity;
 
 -- this is always a top level task. 
 EditLightTask.is_top_level = true;
@@ -59,7 +59,7 @@ function EditLightTask:OnExit()
 	self:CloseWindow();
 
 	curInstance = nil;
-	light = nil;
+	lightEntity = nil;
 end
 
 function EditLightTask:RefreshPage()
@@ -71,26 +71,28 @@ end
 function EditLightTask:UpdateManipulators()
 	self:DeleteManipulators();
 
-	if(light) then
-		local x, y, z = light:GetPosition();
+	if(lightEntity) then
+		local x, y, z = lightEntity:GetPosition();
 
-		if(light.modelFilepath and light.modelFilepath ~= "") then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightModelManipContainer.lua");
-			local EditLightModelManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.EditLightModelManipContainer");
-			local lightModelManipCont = EditLightModelManipContainer:new();
-			lightModelManipCont:init(light);
+		if(self.isEditModelMode) then
+			if(lightEntity.modelFilepath and lightEntity.modelFilepath ~= "") then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightModelManipContainer.lua");
+				local EditLightModelManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.EditLightModelManipContainer");
+				local lightModelManipCont = EditLightModelManipContainer:new();
+				lightModelManipCont:init(lightEntity);
 
-			self:AddManipulator(lightModelManipCont);
-			lightModelManipCont:connectToDependNode(light);
+				self:AddManipulator(lightModelManipCont);
+				lightModelManipCont:connectToDependNode(lightEntity);
+			end
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightManipContainer.lua");
+			local EditLightManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.EditLightManipContainer");
+			local manipCont = EditLightManipContainer:new();
+			manipCont:init(lightEntity);
+
+			self:AddManipulator(manipCont);
+			manipCont:connectToDependNode(lightEntity);
 		end
-
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightManipContainer.lua");
-		local EditLightManipContainer = commonlib.gettable("MyCompany.Aries.Game.Manipulators.EditLightManipContainer");
-		local manipCont = EditLightManipContainer:new();
-		manipCont:init(light);
-
-		self:AddManipulator(manipCont);
-		manipCont:connectToDependNode(light);
 
 		self:RefreshPage();
 	end
@@ -104,7 +106,7 @@ end
 
 function EditLightTask:ShowPage(bShow)
 	if(not page) then
-		local width,height = 200, 600;
+		local width,height = 200, 500;
 		local params = {
 				url = "script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.html", 
 				name = "EditLightTask.ShowPage", 
@@ -119,8 +121,8 @@ function EditLightTask:ShowPage(bShow)
 				app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
 				directPosition = true,
 					align = "_lt",
-					x = 0,
-					y = 60,
+					x = 10,
+					y = 100,
 					width = width,
 					height = height,
 			};
@@ -140,29 +142,29 @@ function EditLightTask:ShowPage(bShow)
 end
 
 function EditLightTask:GetSelectedLight()
-	return light;
+	return lightEntity;
 end
 
 function EditLightTask:SelectLight(entityLight)
 	self:ShowPage(true);
 
-	if(light~=entityLight) then
-		if(light) then
-			light:Disconnect("valueChanged", EditLightTask, EditLightTask.OnLightValueChange);	
+	if(lightEntity~=entityLight) then
+		if(lightEntity) then
+			lightEntity:Disconnect("valueChanged", EditLightTask, EditLightTask.OnLightValueChange);	
 		end
 
-		light = entityLight;
-		light:Connect("valueChanged", EditLightTask, EditLightTask.OnLightValueChange, "UniqueConnection");
+		lightEntity = entityLight;
+		lightEntity:Connect("valueChanged", EditLightTask, EditLightTask.OnLightValueChange, "UniqueConnection");
 		self.UpdatePageFromLight();
-		self:UpdateManipulators();
 	end
+	self:UpdateManipulators();
 end
 
 function EditLightTask.OnLightValueChange()
 	local self = EditLightTask.GetInstance();
 	self:UpdatePageFromLight();
-	if(light) then
-		light:MarkForUpdate()
+	if(lightEntity) then
+		lightEntity:MarkForUpdate()
 	end
 end
 
@@ -183,18 +185,48 @@ function EditLightTask.CancelSelection()
 
 	self:ShowPage(false);
 	self:DeleteManipulators();
-	if(light) then
-		light:Disconnect("valueChanged", EditLightTask, EditLightTask.OnLightValueChange);	
-		light = nil;
+	if(lightEntity) then
+		lightEntity:Disconnect("valueChanged", EditLightTask, EditLightTask.OnLightValueChange);	
+		lightEntity = nil;
 	end
 end
 
 function EditLightTask:handleLeftClickScene(event, result)
-	local lightEntity = self:PickLightAtMouse();
-	if(lightEntity) then
-		self:SelectLight(lightEntity);
+	if(not event:IsCtrlKeysPressed()) then
+		local lightEntity = self:PickLightAtMouse(result);
+		if(lightEntity) then
+			self.isEditModelMode = true;
+			self:SelectLight(lightEntity);
+			GameLogic.AddBBS(nil, L"左键编辑模型，右键编辑光源", 5000, "0 255 0");
+		else
+			EditLightTask.CancelSelection()
+		end
 	else
-		EditLightTask.CancelSelection()
+		if(event.alt_pressed and result) then
+			-- alt + left click to get the block in hand without destroying it
+			if(result.block_id and result.block_id~=0 and result.blockX) then
+				GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ, result.side);
+			elseif(result.entity) then
+				GameLogic.GetPlayerController():PickItemByEntity(entity);
+			end
+		elseif(event.ctrl_pressed) then
+			EditLightTask.CancelSelection()
+			-- ctrl + left click to select block in edit mode
+			if(result and result.blockX) then
+				local bx, by, bz = result.blockX, result.blockY, result.blockZ
+				if(result.entity) then
+					bx, by, bz = result.entity:GetBlockPos();
+				end
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectBlocksTask.lua");
+				local SelectBlocks = commonlib.gettable("MyCompany.Aries.Game.Tasks.SelectBlocks");
+				if(SelectBlocks.GetCurrentInstance()) then
+					SelectBlocks.GetCurrentInstance().ExtendAABB(bx, by, bz)
+				else
+					local task = SelectBlocks:new({blockX = bx, blockY = by, blockZ = bz})
+					task:Run();
+				end
+			end
+		end
 	end
 	event:accept();
 end
@@ -205,11 +237,21 @@ function EditLightTask:handleRightClickScene(event, result)
 	end
 
 	local result = result or Game.SelectionManager:MousePickBlock(true, false, false);
-	if(result and result.blockX) then
-		local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX, result.blockY, result.blockZ, result.side);
-
-		local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x, blockY = y, blockZ = z, entityPlayer = EntityManager.GetPlayer(), block_id = 264, side = result.side, from_block_id = result.block_id, side_region=side_region })
-		task:Run();
+	if(result and result.blockX and result.block_id) then
+		local blockTemplate = BlockEngine:GetBlock(result.blockX, result.blockY, result.blockZ)
+		if(result.block_id == block_types.names.BlockLight) then
+			local lightEntity = self:PickLightAtMouse(result);
+			if(lightEntity) then
+				self.isEditModelMode = false;
+				self:SelectLight(lightEntity);
+				GameLogic.AddBBS(nil, L"左键编辑模型，右键编辑光源", 5000, "0 255 0");
+			end
+		else
+			local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX, result.blockY, result.blockZ, result.side);
+			local task = MyCompany.Aries.Game.Tasks.CreateBlock:new({blockX = x, blockY = y, blockZ = z, entityPlayer = EntityManager.GetPlayer(), block_id = 264, side = result.side, from_block_id = result.block_id, side_region=side_region })
+			task:Run();
+		end
+		
 		event:accept();
 	end
 end
@@ -251,28 +293,28 @@ end
 function EditLightTask:UpdatePageFromLight()
 	local self = EditLightTask.GetInstance();
 	if(self and page) then
-		if(light) then
-			local lightModel = light:GetField("modelFilepath", "");
-			page:SetValue("modelFilepath", string.gsub(lightModel, ".*/", ""));
+		if(lightEntity) then
+			local lightModel = lightEntity:GetField("modelFilepath", "");
+			page:SetValue("modelFilepath", lightModel);
 
-			Binding.NumberToString(light, "LightType", 0, page, "LightType", "0", nil, "int");
+			Binding.NumberToString(lightEntity, "LightType", 0, page, "LightType", "0", nil, "int");
 
-			Binding.PosVec3ToString(light, "Diffuse", {1, 1, 1}, page, "Diffuse", {1, 1, 1}, 0.001, "int");
-			Binding.PosVec3ToString(light, "Specular", {1, 1, 1}, page, "Specular", {1, 1, 1}, 0.001, "int");
-			Binding.PosVec3ToString(light, "Ambient", {1, 1, 1}, page, "Ambient", {1, 1, 1}, 0.001, "int");
+			Binding.PosVec3ToString(lightEntity, "Diffuse", {1, 1, 1}, page, "Diffuse", {1, 1, 1}, 0.001, "int");
+			Binding.PosVec3ToString(lightEntity, "Specular", {1, 1, 1}, page, "Specular", {1, 1, 1}, 0.001, "int");
+			Binding.PosVec3ToString(lightEntity, "Ambient", {1, 1, 1}, page, "Ambient", {1, 1, 1}, 0.001, "int");
 
-			Binding.PosVec3ToString(light, "modelOffsetPos", {1, 1, 1}, page, "Position", {1, 1, 1}, 0.001, "float");
-			Binding.XYZToString(light, "Yaw", "Pitch", "Roll", 0, page, "Rotation", "0,0,0", 0.001, "int");
+			Binding.PosVec3ToString(lightEntity, "modelOffsetPos", {1, 1, 1}, page, "Position", {1, 1, 1}, 0.001, "float");
+			Binding.XYZToString(lightEntity, "Yaw", "Pitch", "Roll", 0, page, "Rotation", "0,0,0", 0.001, "int");
 
-			Binding.NumberToString(light, "Range", 0, page, "Range", "0", 0.001, "float");
-			Binding.NumberToString(light, "Falloff", 0, page, "Falloff", "0", 0.001, "float");
+			Binding.NumberToString(lightEntity, "Range", 0, page, "Range", "0", 0.001, "float");
+			Binding.NumberToString(lightEntity, "Falloff", 0, page, "Falloff", "0", 0.001, "float");
 
-			Binding.NumberToString(light, "Attenuation0", 0, page, "Attenuation0", "0", 0.001, "float");
-			Binding.NumberToString(light, "Attenuation1", 0, page, "Attenuation1", "0", 0.001, "float");
-			Binding.NumberToString(light, "Attenuation2", 0, page, "Attenuation2", "0", 0.001, "float");
+			Binding.NumberToString(lightEntity, "Attenuation0", 0, page, "Attenuation0", "0", 0.001, "float");
+			Binding.NumberToString(lightEntity, "Attenuation1", 0, page, "Attenuation1", "0", 0.001, "float");
+			Binding.NumberToString(lightEntity, "Attenuation2", 0, page, "Attenuation2", "0", 0.001, "float");
 
-			Binding.NumberToString(light, "Theta", 0, page, "Theta", "0", 0.001, "int");
-			Binding.NumberToString(light, "Phi", 0, page, "Phi", "0", 0.001, "int");
+			Binding.NumberToString(lightEntity, "Theta", 0, page, "Theta", "0", 0.001, "int");
+			Binding.NumberToString(lightEntity, "Phi", 0, page, "Phi", "0", 0.001, "int");
 		else
 			page:SetValue("modelFilepath", "")
 			page:SetValue("LightType", "")
@@ -292,18 +334,30 @@ function EditLightTask:UpdatePageFromLight()
 	end
 end
 
+function EditLightTask.OnLightModelFileChange(btnName)
+	local self = EditLightTask.GetInstance();
+	if(self and page and lightEntity) then
+		local filename = page:GetValue("modelFilepath") or ""
+		local lastFilename = lightEntity:GetField("modelFilepath", "") or "";
+		if(filename ~= lastFilename) then
+			lightEntity:SetField("modelFilepath", filename);
+			self:UpdateManipulators();
+		end
+	end
+end
+
 function EditLightTask.ChangeLightModel()
 	local self = EditLightTask.GetInstance();
-	if(self and page and light) then
-		local local_filename = light:GetField("modelFilepath", "");
+	if(self and page and lightEntity) then
+		local local_filename = lightEntity:GetField("modelFilepath", "");
 
 		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 		local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
 		OpenAssetFileDialog.ShowPage(
 			L"请输入bmax, x或fbx文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中",
 			function(result)
-				if(light and result~=local_filename) then
-					light:SetField("modelFilepath", result or "");
+				if(lightEntity and result~=local_filename) then
+					lightEntity:SetField("modelFilepath", result or "");
 					self:UpdateManipulators();
 				end
 			end,
@@ -318,8 +372,8 @@ end
 
 function EditLightTask.ChangeLightType()
 	local self = EditLightTask.GetInstance();
-	if(self and page and light) then
-		Binding.StringToNumber(page, "LightType", "0", light, "LightType", 0, nil, "int");
+	if(self and page and lightEntity) then
+		Binding.StringToNumber(page, "LightType", "0", lightEntity, "LightType", 0, nil, "int");
 		self:UpdateManipulators();
 	end
 end
@@ -327,40 +381,40 @@ end
 function EditLightTask.ChangeDiffuseColor(r, g, b)
 	local color = {r, g, b};
 
-	if light then
-		light:SetField("Diffuse", color)
+	if lightEntity then
+		lightEntity:SetField("Diffuse", color)
 	end
 end
 
 function EditLightTask.ChangeSpecularColor(r, g, b)
 	local color = {r, g, b};
 
-	if light then
-		light:SetField("Specular", color)
+	if lightEntity then
+		lightEntity:SetField("Specular", color)
 	end
 end
 
 function EditLightTask.ChangeAmbientColor(r, g, b)
 	local color = {r, g, b};
 
-	if light then
-		light:SetField("Ambient", color)
+	if lightEntity then
+		lightEntity:SetField("Ambient", color)
 	end
 end
 
 function EditLightTask.UpdateLightFromPage()
 	local self = EditLightTask.GetInstance();
-	if(self and page and light) then
-		Binding.StringToXYZ(page, "Rotation", "0,0,0", light, "Yaw", "Pitch", "Roll", 0, 0.001, "int");
+	if(self and page and lightEntity) then
+		Binding.StringToXYZ(page, "Rotation", "0,0,0", lightEntity, "Yaw", "Pitch", "Roll", 0, 0.001, "int");
 
-		Binding.StringToNumber(page, "Range", "0", light, "Range", 0, 0.001, "float");
-		Binding.StringToNumber(page, "Falloff", "0", light, "Falloff", 0, 0.001, "float");
+		Binding.StringToNumber(page, "Range", "0", lightEntity, "Range", 0, 0.001, "float");
+		Binding.StringToNumber(page, "Falloff", "0", lightEntity, "Falloff", 0, 0.001, "float");
 
-		Binding.StringToNumber(page, "Attenuation0", "0", light, "Attenuation0", 0, 0.001, "float");
-		Binding.StringToNumber(page, "Attenuation1", "0", light, "Attenuation1", 0, 0.001, "float");
-		Binding.StringToNumber(page, "Attenuation2", "0", light, "Attenuation2", 0, 0.001, "float");
+		Binding.StringToNumber(page, "Attenuation0", "0", lightEntity, "Attenuation0", 0, 0.001, "float");
+		Binding.StringToNumber(page, "Attenuation1", "0", lightEntity, "Attenuation1", 0, 0.001, "float");
+		Binding.StringToNumber(page, "Attenuation2", "0", lightEntity, "Attenuation2", 0, 0.001, "float");
 
-		Binding.StringToNumber(page, "Theta", "0", light, "Theta", 0, 0.001, "int");
-		Binding.StringToNumber(page, "Phi", "0", light, "Phi", 0, 0.001, "int");
+		Binding.StringToNumber(page, "Theta", "0", lightEntity, "Theta", 0, 0.001, "int");
+		Binding.StringToNumber(page, "Phi", "0", lightEntity, "Phi", 0, 0.001, "int");
 	end
 end

@@ -32,7 +32,7 @@ DockPage.hide_ui_world_ids = {
 };
 DockPage.is_show = false;
 DockPage.pageCfg = {    
-    {name = "esc", enabled = true,  align="_rt",  width=100,height=90, bg="Texture/Aries/Creator/keepwork/dock/xitongESC_98x94_32bits.png#0 0 100 90", },
+    {name = "esc", enabled = true,  align="_rt", sortIndex=999,  width=100,height=90, bg="Texture/Aries/Creator/keepwork/dock/xitongESC_98x94_32bits.png#0 0 100 90", },
     {name = "present",  enabled = true,  align="_rt", width=100,height=90, bg="Texture/Aries/Creator/keepwork/dock/btn3_libao_32bits.png#0 0 100 90", }, 
     {name = "mall", enabled = true,  align="_rt", width=100,height=90, bg="Texture/Aries/Creator/keepwork/dock/ziyuan_101x93_32bits.png#0 0 100 90"},
     {name = "invitefriend",  enabled = true,  align="_rt", width=100,height=90, bg="Texture/Aries/Creator/keepwork/dock/btn3_jieban_32bits.png#0 0 100 90", }, 
@@ -99,6 +99,7 @@ end
 
 function DockPage.ClosePage()
     DockPage.is_show = false; 
+    DockPage.show_data = {}
     GameLogic.DockManager:RemoveAllDock()   
 end
 
@@ -116,7 +117,7 @@ end
 
 function DockPage.InitIconData()
     DockPage.RereshTopData()
-    
+    DockPage.show_data = {}
     local isAnimal = not DockPage.IsShowCenterUI()
     if isAnimal then
         DockPage.show_data = commonlib.copy(DockPage.animalPageCfg)
@@ -151,8 +152,8 @@ function DockPage.ShowDock()
             end
         end)
     end
-    print("dockpage================")
-    echo(DockPage.show_data,true)
+    -- print("dockpage================")
+    -- echo(DockPage.show_data,true)
 end
 
 function DockPage.Hide()
@@ -220,7 +221,7 @@ function DockPage.HandleFriendsFansLocalData()
             },
             userId = UserData.id,
         },function(err, msg, data)
-            if err == 200 then
+            if err == 200 and data and data.rows then
                 for k, v in pairs(data.rows) do
                     if not v.isFriend then
                         DockPage.FriendsFansData[v.id] = v
@@ -312,11 +313,11 @@ function DockPage.HasMsgCenterUnReadMsg()
     return DockPage.GetMsgCenterUnReadNum() > 0 or EmailManager.IsHaveNew()
 end
 
-function DockPage.HandMsgCenterMsgData()    
+function DockPage.HandMsgCenterMsgData(callbackFunc) 
     EmailManager.Init(true, function()
         keepwork.msgcenter.unReadCount({
         },function(err, msg, data)
-            if err == 200 then
+            if err == 200 and data and data.data then
                 local all_count = 0
                 for k, v in pairs(data.data) do
                     all_count = all_count + v
@@ -328,6 +329,14 @@ function DockPage.HandMsgCenterMsgData()
                 end 
             end
         end)
+        if callbackFunc and type(callbackFunc) == "function" then
+            callbackFunc()
+        else
+            if callbackFunc then
+                -- GameLogic.AddBBS("回调函数错误")
+                print("callbackFunc=====",callbackFunc)
+            end
+        end
     end) --获取邮件
 end
 
@@ -482,9 +491,15 @@ function DockPage.IsShowCenterUI()
 end
 
 function DockPage.OnClickDock(id)
+    DockPage.OnClickLeftTop(id)
     if(id == "character")then
-        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-        page.ShowUserInfoPage({username = System.User.keepworkUsername});
+        if true then
+            local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+            UserInfoPage.ShowPage(System.User.keepworkUsername)
+        else
+            local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+            page.ShowUserInfoPage({username = System.User.keepworkUsername});
+        end
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.character");
     elseif(id == "work")then
 		GameLogic.GetFilters():apply_filters('show_create_page');
@@ -544,7 +559,7 @@ function DockPage.OnClickDock(id)
         -- table.insert(DockPage.showPages,{id,InviteFriend.GetPageCtrl()})
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.invitefriend");
     elseif(id == "mall")then
-        local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+        local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
         KeepWorkMallPage.Show();
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.mall");
         return
@@ -569,6 +584,57 @@ function DockPage.OnClickDock(id)
         --_guihelper.MessageBox(id);
     end
 end
+
+function DockPage.OnClickLeftTop(id)
+    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+    local idCnf = {
+        winter_camp ="tiyujinsai",
+        papa="quweibiancheng",
+        lala="kuailejianzao",
+        kaka="jingcaidonghua",
+        huanbao="lajifenlei"
+    }
+    local name = idCnf[id]
+    if name then
+        if not GameLogic.GetFilters():apply_filters('service.session.is_real_name') then
+            GameLogic.RunCommand("/sendevent userVerification")
+            commonlib.TimerManager.SetTimeout(function()
+				_guihelper.MessageBox("你还没有完成实名认证，需要实名认证才可以参与学习。请尽快实名", nil, nil,nil,nil,nil,nil,{ ok = L"确定"});
+                _guihelper.MsgBoxClick_CallBack = function(res)
+                    if(res == _guihelper.DialogResult.OK) then
+                        GameLogic.GetFilters():apply_filters(
+                        'show_certificate',
+                        function(result)
+                            if (result) then                        
+                                DockPage.RefreshPage(0.01)
+                                GameLogic.QuestAction.AchieveTask("40006_1", 1, true)
+                                Page.ShowWinterCampMainWindow(name)
+                            end
+                        end)
+                    end
+                end 
+			end, 13000)
+            return
+        end
+        local profile = KeepWorkItemManager.GetProfile()
+        if profile and profile.schoolId and profile.schoolId > 0 then
+            Page.ShowWinterCampMainWindow(name)
+            return
+        end
+        GameLogic.GetFilters():apply_filters('cellar.my_school.after_selected_school', function ()
+            KeepWorkItemManager.LoadProfile(false, function()
+                local profile = KeepWorkItemManager.GetProfile()
+                -- 是否选择了学校
+                if profile and profile.schoolId and profile.schoolId > 0 then
+                    Page.ShowWinterCampMainWindow(name)
+                    return
+                end
+            end)
+        end);
+    end
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.winter_camp_main");
+end
+
 
 function DockPage.OnMouseEnter(name,dockItem)
     if dockItem then

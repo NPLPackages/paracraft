@@ -593,7 +593,7 @@ end
 	category = "Control", 
 	helpUrl = "", 
 	canRun = false,
-	hide_in_codewindow = true,
+	hide_in_codewindow = false,
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "repeat", 
@@ -1193,6 +1193,24 @@ setOutput(0)
 	end)
 	alert("你好")
 ]]}},
+},
+
+
+{
+	type = "break", 
+	message0 = L"跳出循环",
+	arg0 = {},	
+	category = "Control", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "break",
+	func_description = 'break',
+	ToNPL = function(self)
+		return "break\n"
+	end,
+	examples = {},
 },
 
 };

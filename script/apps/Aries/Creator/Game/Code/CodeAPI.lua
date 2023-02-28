@@ -46,6 +46,11 @@ local s_env_methods = {
 	"getActor",
 	"cmd",
 	"getPlayTimer",
+	"List_GetIndexByItem",
+	"List_IsExistItem",
+	"List_Insert",
+	"List_Remove",
+	"List_Length",
 
 	-- operator
 	"string_length",

@@ -1,0 +1,35 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/CourseDataCodePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CourseDataCodePage.lua"><![CDATA[
+local CourseDataCodePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/CourseDataCodePage.lua");
+CourseDataCodePage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+    CourseDataCodePage.CloseView()
+end
+
+function GetCodeImg()
+    return CourseDataCodePage.CodeImgUrl
+end
+
+]]></script>
+<kp:window mode="lite_opaque" width="570" height="390" icon="" onclose="ClosePage">
+    <div style="position: relative;">
+        <!-- <div style="margin-left: 160px;margin-top: 77px; width: 239px;height: 240px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/erweima_239x240_32bits.png#0 0 239 240);"></div> -->
+        <img src='<%=GetCodeImg()%>' style="margin-left: 160px;margin-top: 77px; width: 239px;height: 240px;"/>
+        <div style="font-size: 20px;margin-top: 15px;margin-left: 0px;color: #000000;text-align: center;">扫码查看课程报告</div>
+    </div>
+    <!-- <div style="position: relative;width: 570px;height: 390px;background-color: #ffffff; ">
+    </div> -->
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

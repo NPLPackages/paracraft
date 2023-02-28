@@ -118,7 +118,7 @@ end
 -- @param channel_name: or sound_name, there can be only one sound playing on each channel.
 --  one can also use the sound filename as the channel name.
 -- @param filename: if nil it is the channel_name
-function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch)
+function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch, play_start_cb, play_end_cb)
     local sound_name = channel_name;
 	local sound = self.playingSounds[sound_name];
 	if(filename) then
@@ -142,7 +142,13 @@ function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch
 			sound:stop();
 			sound:seek(from_time);
 		end
-		
+		if play_start_cb then
+			sound:SetPlayStartCb(play_start_cb)
+		end
+
+		if play_end_cb then
+			sound:SetPlayEndCb(play_end_cb)
+		end
 		sound:play2d(volume, pitch);
     else
 		if (AudioEngine.IsPlaying(sound_name)) then
@@ -160,6 +166,15 @@ function SoundManager:PlaySound(channel_name, filename, from_time, volume, pitch
 			new_sound:stop();
 			new_sound:seek(from_time);
 		end
+
+		if play_start_cb then
+			new_sound:SetPlayStartCb(play_start_cb)
+		end
+
+		if play_end_cb then
+			new_sound:SetPlayEndCb(play_end_cb)
+		end
+
 		new_sound:play2d(volume, pitch);
 
 		self.playingSounds[sound_name] = new_sound;
@@ -182,35 +197,144 @@ end
 -- If a sound is already playing from the given entity, update the position and velocity of that sound to match the
 -- entity. Otherwise, start playing a sound from that entity. Setting the last flag to true will prevent other
 -- sounds from overriding this one. 
--- @param name:
--- @param entity:
--- @param volume:
--- @param pitch:
--- @param priority:
-function SoundManager:PlayEntitySound(name, entity, volume, pitch, priority)
-    if (entity) then
-        local sound_name = "entity_"..entity.entityId;
-		local sound = self.playingSounds[sound_name];
-        if (sound) then
-            self:UpdateSoundLocation(entity);
-        else
-			if (AudioEngine.IsPlaying(sound_name)) then
-                AudioEngine.Stop(sound_name);
-            end
-			if (name) then
-                local sound_template = self:GetRandomSoundByName(name);
-                if (sound_template) then
-					local new_sound = AudioEngine.CreateGet(sound_name);
-                    new_sound.file = sound_template.file;
-					new_sound.loop = true;
+-- @param name:音效名称 会自动从音效库中查找音效 运行传文件路径 必传
+-- @param entity:播放音效的entity对象	必传
+-- @param volume:音量
+-- @param pitch:音高
+-- @param priority:权重
+-- @param loop:是否循环
+-- @param play_start_cb:开始播放声音前的回调
+-- @param play_end_cb:播放结束时的回调
+-- @param is_cover_paly:是否覆盖同一频道的声音重新播放
+-- @param channel:频道
 
-					local x, y, z = entity:GetPosition();
-					new_sound:play3d(x, y, z, nil, volume, pitch);
-					self.playingSounds[sound_name] = new_sound;
-                end
-            end
-        end
-    end
+function SoundManager:PlayEntitySound(name, entity, volume, pitch, priority, loop, play_start_cb, play_end_cb, is_cover_paly, channel, is_follow_entity)
+	if not name or not entity then
+		return
+	end
+
+	local sound_name = channel or "entity_"..entity.entityId;
+	local sound_template = self:GetRandomSoundByName(name);
+	local file_name = sound_template and sound_template.file or Files.GetWorldFilePath(name)
+	local sound = self.playingSounds[sound_name];
+	if (sound) then
+		if not is_cover_paly then
+			self:UpdateSoundLocation(entity);
+			return
+		end
+
+	else
+		if (AudioEngine.IsPlaying(sound_name)) then
+			AudioEngine.Stop(sound_name);
+		end
+
+		if file_name then
+			sound = AudioEngine.CreateGet(sound_name);
+			sound.file = file_name;
+			sound.loop = true;
+			self.playingSounds[sound_name] = sound;
+		end
+	end
+
+	if not sound then
+		return
+	end
+
+	sound:SetFileName(file_name);
+	if loop ~= nil then
+		sound.loop = loop
+	end
+
+	if play_start_cb then
+		sound:SetPlayStartCb(play_start_cb)
+	end
+
+	if play_end_cb then
+		sound:SetPlayEndCb(play_end_cb)
+	end
+
+	if is_follow_entity then
+		self:AddEntityFollowSound(entity, sound)
+		-- entity:AddFollowSound(sound)
+	end
+
+	local x, y, z = entity:GetPosition();
+	sound:play3d(x, y, z, nil, volume, pitch);
+end
+
+function SoundManager:AddEntityFollowSound(entity, sound)
+	if not entity or not entity.entityId then
+		return
+	end
+
+	if not self.entity_list then
+		self.entity_list = {}
+	end
+	if not self.entity_list[entity] then
+		self.entity_list[entity]  = {}
+		self:EntityReferenceCountChange(1)
+
+		entity:Connect("beforeDestroyed", self, self.BeforeEntityDestroyed);
+		entity:Connect("valueChanged", self, self.OnEntityPositionChange);
+	end
+
+	local sound_list = self.entity_list[entity]
+	if not sound_list[sound] then
+		sound_list[sound] = sound
+	end
+end
+
+function SoundManager:BeforeEntityDestroyed(entity)
+	if not self.entity_list then
+		return
+	end
+
+	if self.entity_list[entity] then
+		self.entity_list[entity] = nil
+		self:EntityReferenceCountChange(-1)
+	end
+end
+
+function SoundManager:OnEntityPositionChange(entity)
+	if not self.entity_list then
+		return
+	end
+	-- local self = SoundManager
+	local sound_list = self.entity_list[entity]
+	if not sound_list then
+		return
+	end
+
+	local activity_count = 0
+	for key, sound in pairs(sound_list) do
+		if sound and sound:isPlaying() then
+			local x, y, z = entity:GetPosition();
+			sound:move(x, y, z);
+			activity_count = activity_count + 1
+		else
+			sound_list[key] = nil
+		end
+	end
+	
+	if activity_count == 0 then
+		entity:Disconnect("beforeDestroyed", self, self.BeforeEntityDestroyed);
+		entity:Disconnect("valueChanged", self, self.OnEntityPositionChange);
+		self.entity_list[entity] = nil
+		self:EntityReferenceCountChange(-1)
+	end
+end
+
+function SoundManager:EntityReferenceCountChange(flag)
+	if not self.entity_reference_count then
+		self.entity_reference_count = 0
+	end
+
+	self.entity_reference_count = self.entity_reference_count + flag
+
+	if self.entity_reference_count == 0 then
+		self.entity_list = nil
+		self.entity_reference_count = nil
+	end
 end
 
 -- Stops playing the sound associated with the given entity
@@ -276,17 +400,45 @@ function SoundManager:CancelVibrate()
 	end
 end
 
+-- 让电影方块中的演员嘴巴动起来
+function SoundManager:PlayActorText(play_text, voicenarrator, voice_actor, prepare_cb, use3dvoice)
+	if voice_actor and voice_actor.SetVoiceMouthSkin then
+		local entity = voice_actor:GetEntity()
+		local play_entity = use3dvoice and entity or nil
+		local channel = "entity_"..entity.entityId
+		if use3dvoice then
+			channel = channel .. "_3d"
+		end
+		self:PlayText(play_text, voicenarrator, nil, channel,
+			function()
+				voice_actor:SetVoiceMouthSkin("88009")
+			end,
+			function()
+				voice_actor:SetVoiceMouthSkin()
+			end,
+			prepare_cb, play_entity)
+	else
+		self:PlayText(play_text, voicenarrator, nil, nil, nil, nil, prepare_cb)
+	end
+	
+end
+
 
 -- @param text: 合成文本
 -- @param voiceNarrator: 发音人, 0为女声，1为男声， 3为情感合成-逍遥，4为情感合成-丫丫；逍遥（精品）=5003，
 --小鹿=5118，博文=106，小童=110，小萌=111，米朵=103，小娇=5，默认为丫丫(女童音)
--- @param nTimeoutMS: 时间限制 超过该时间则不播放声音 单位：秒
-function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
+-- @param nTimeoutSeconds: 时间限制 超过该时间则不播放声音 单位：秒
+-- @param play_start_cb: 播放开始时的回调
+-- @param play_end_cb: 播放结束时的回调
+-- @param prepare_cb: 下载音效完成后的回调
+-- @param play_entity: 播放音效的entity对象 3d音效
+function SoundManager:PlayText(text,  voiceNarrator, nTimeoutSeconds, channel, play_start_cb, play_end_cb, prepare_cb, play_entity)
 	if nil == text or text == "" or text == '""' then
 		return
 	end
 	voiceNarrator = voiceNarrator or 10012
-	nTimeoutMS = nTimeoutMS or 7
+	voiceNarrator = tonumber(voiceNarrator)
+	nTimeoutSeconds = nTimeoutSeconds or 7
 
 	-- 一部分参数转变
 	if PlayTextToMicrosoft[voiceNarrator] then
@@ -295,20 +447,41 @@ function SoundManager:PlayText(text,  voiceNarrator, nTimeoutMS)
 
 	local start_timestamp = commonlib.TimerManager.GetCurrentTime();
 	self:PrepareText(text,  voiceNarrator, function(file_path)
-		if (commonlib.TimerManager.GetCurrentTime() - start_timestamp)/1000 > nTimeoutMS then
+		if (commonlib.TimerManager.GetCurrentTime() - start_timestamp)/1000 > nTimeoutSeconds then
+			if prepare_cb then
+				prepare_cb(false)
+			end
+			if play_end_cb then
+				play_end_cb(false)
+			end
 			return
 		end
 
-		local channel = "playtext" .. voiceNarrator
+		channel = channel or "playtext" .. voiceNarrator
 		self:SetPlayTextChannel(channel)
-		self:PlaySound(channel, file_path)
+		if play_entity then
+			self:PlayEntitySound(file_path, play_entity, 5, nil, nil, false, play_start_cb, play_end_cb, true, channel, true)
+		else
+			self:PlaySound(channel, file_path, nil, nil, nil, play_start_cb, play_end_cb)
+		end
+
+		if prepare_cb then
+			prepare_cb(true, channel)
+		end
+	end,function()
+		if prepare_cb then
+			prepare_cb(false)
+		end
+		if play_end_cb then
+			play_end_cb(false)
+		end
 	end)
 end
 
 -- @param text: 合成文本
 -- @param voiceNarrator: 发音人, 0为女声，1为男声， 3为情感合成-逍遥，4为情感合成-丫丫，默认为丫丫(女童音)
 -- @param callbackFunc: 下载声音后的回调函数
-function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
+function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc,onFail)
 	if nil == text or text == "" or text == '""' then
 		return
 	end
@@ -320,7 +493,8 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
 	end
 
 	voiceNarrator = voiceNarrator or 10012
-
+	voiceNarrator = tonumber(voiceNarrator)
+	
 	-- 一部分参数转变
 	if PlayTextToMicrosoft[voiceNarrator] then
 		voiceNarrator = PlayTextToMicrosoft[voiceNarrator]
@@ -343,17 +517,48 @@ function SoundManager:PrepareText(text,  voiceNarrator, callbackFunc)
 
 	System.os.GetUrl(url, function(err, msg, data)
 		if err == 200 and data then
+			if type(data)~="string" then 
+				keepwork.burieddata.uploadLog({
+					type = "NPLDebug",
+					logs = {
+						file = "script/apps/Aries/Creator/Game/Sound/SoundManager.lua",
+						line = "514",
+						msg = "System.os.GetUrl, download text voice data is not string",
+						url = url,
+					}
+				},function(err,msg,data)
+					
+				end)
+				if onFail then
+					onFail()
+				end
+				return
+			end
 			local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, data)
 			if callbackFunc then
 				callbackFunc(file_path)
 			end
 		else
 			self:DownloadSound(text, voiceNarrator, md5_value, function(download_data)
+				if type(download_data)~="string" then 
+					keepwork.burieddata.uploadLog({
+						type = "NPLDebug",
+						logs = {
+							file = "script/apps/Aries/Creator/Game/Sound/SoundManager.lua",
+							line = "534",
+							msg = "self:DownloadSound ,download text voice data is not string",
+							url = url,
+						}
+					},function(err,msg,data)
+						
+					end)
+					return
+				end
 				local file_path = self:SaveTempSoundFile(voiceNarrator, md5_value, download_data)
 				if callbackFunc then
 					callbackFunc(file_path)
 				end
-			end)
+			end,onFail)
 		end
 	end);
 
@@ -387,10 +592,13 @@ function SoundManager:GetTempSoundFile(voiceNarrator, md5_value)
 	local file_path = string.format("%s/%s/%s", disk_folder, voiceNarrator, filename)
 	if ParaIO.DoesFileExist(file_path, true) then
 		local file = ParaIO.open(file_path, "r")
-		if(file:IsValid()) then
-			return file_path
+		if file then
+			if(file:IsValid()) then
+				file:close()
+				return file_path
+			end
+			file:close()
 		end
-		
 	end
 end
 
@@ -426,9 +634,12 @@ function SoundManager:GetPlayTextFileSuffix(voiceNarrator)
 	return ".mp3"
 end
 
-function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback)
+function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback,onFail)
 	-- 没登录的话不允许请求这个接口
     if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+		if onFail then
+			onFail()
+		end
         return
     end
 
@@ -446,6 +657,10 @@ function SoundManager:DownloadSound(text, voiceNarrator, md5_value, callback)
 					callback(download_data)
 				end
 			end);
+		else
+			if onFail then
+				onFail()
+			end
 		end
 	end)
 end

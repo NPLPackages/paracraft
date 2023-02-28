@@ -163,7 +163,7 @@ end
 -- @return true if the current enity should be stopped. 
 function Entity:CollideWithEntity(fromEntity, deltaTime)
     local vx, vy, vz = self:GetVelocity();
-	local minSpeed = fromEntity:GetPhysicsObject():GetMinSpeed();
+	local minSpeed = fromEntity:GetPhysicsObject():GetMinSpeed() or 0;
 	if(vx~=0 and vy==0 and vz==0) then
 		fromEntity:GetPhysicsObject():SetVelocity(minSpeed+vx*1.2, nil, nil);
 	elseif(vx==0 and vy==0 and vz~=0) then

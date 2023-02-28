@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ExamPaperPage.lua"><![CDATA[
+ExamPaperPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.Exam.ExamPaperPage");
+ExamPaperPage.OnInit()
+local page = document:GetPageCtrl();
+
+function ClosePage()
+    page:CloseWindow();
+end
+
+function ds()
+    return ExamPaperPage.paper_data.questions
+end
+
+function GetCheckBg()
+    return 'Texture/Aries/Creator/keepwork/Exam/daanxuanzhong_11x11_32bits.png;0 0 11 11'
+end
+
+function GetProgress()
+    local acc_1 = 0;
+    local acc_2 = 0;
+    for k,v in pairs(ExamPaperPage._questionDetails) do
+        if v.answer then
+            acc_2 = acc_2 + 1
+        end
+        acc_1 = acc_1 + 1
+    end
+    return string.format("%s/%s",acc_2,acc_1)
+end
+
+function GetUnCheckBg()
+    return 'Texture/Aries/Creator/keepwork/Exam/daanweixuan_11x11_32bits.png;0 0 11 11'
+end
+
+function GetIndexStr(idx)
+    idx = tonumber(idx)
+    local info = ExamPaperPage.paper_data.questions[idx]
+    return info.index..""
+end
+
+function GetBoxBg(idx)
+    idx = tonumber(idx)
+    local index = ExamPaperPage.paper_data.questions[idx].index
+    local info = ExamPaperPage._questionDetails[index] 
+    local hasAnswer = info.answer and info.answer~=""
+    local isCur = info.index==ExamPaperPage.curQuestionDetail.index
+    local bg = (hasAnswer or isCur) and "Texture/Aries/Creator/keepwork/Exam/tihaowanchen_20x20_32bits.png#0 0 20 20" or "Texture/Aries/Creator/keepwork/Exam/tihaoweiwanchen_20x20_32bits.png#0 0 20 20"
+    return string.format("position:relative; background:url(%s)",bg)
+end
+
+function GetBoxXml()
+    local str = [[
+        <div align="center" valign="center" width="20px" height="20px" style='<%= GetBoxBg(Eval("index")) %>'> 
+            <label value='<%= GetIndexStr(Eval("index")) %>' style="text-align:center;font-size:12px; font-weight:bold;" name='<%= "text_"..Eval("index") %>'></label>
+        </div>
+    ]]
+    return str
+end
+
+function onClickDiv(name)
+    local value = string.gsub(name,"item","")
+    if value then
+        ExamPaperPage.onClickRadio(value)
+        if page then
+            page:SetValue("answerItem", value)
+        end
+    end
+end
+
+--主要是enabled字段无法通过 <%=%> 的方式赋值
+function GetBtnsXml()
+    local xml = [[
+        <pe:if condition='<%%= ExamPaperPage.IsCurFirstQuestion() and not ExamPaperPage.IsCurLastQuestion() %%>'>
+            <div style="margin-top: 18px;margin-left: -10px;" width="196px" align="center" >
+                <input type="button" zorder="10" value='<%%= L"下一题" %%>' name="btn_next" enabled="%s" onclick="ExamPaperPage.onBtnClick" align="center" style="position: relative; margin-top: 0px; margin-right:0px;width:63px;height:26px;background: url(Texture/Aries/Creator/keepwork/Exam/shangxiati_63x26_32bits.png#0 0 63 26);"/>
+            </div>
+        </pe:if>
+        <pe:if condition='<%%= not ExamPaperPage.IsCurFirstQuestion() and ExamPaperPage.IsCurLastQuestion() %%>'>
+            <div style="margin-top: 18px;margin-left: -10px;" width="196px" align="center" >
+                <input type="button" zorder="10" value='<%%= L"上一题" %%>' name="btn_pre" onclick="ExamPaperPage.onBtnClick" align="center"  style="margin-top: 0px; margin-left:0px;width:63px;height:26px;background: url(Texture/Aries/Creator/keepwork/Exam/shangxiati_63x26_32bits.png#0 0 63 26);"/>
+            </div>
+        </pe:if>
+        <pe:if condition='<%%= not ExamPaperPage.IsCurFirstQuestion() and not ExamPaperPage.IsCurLastQuestion() %%>'>
+            <div style="margin-top: 18px;margin-left: -10px;" width="196px" align="center" >
+                <input type="button" zorder="10" value='<%%= L"上一题" %%>' name="btn_pre" onclick="ExamPaperPage.onBtnClick" align="left"  style="margin-top: 0px; margin-left:0px;width:63px;height:26px;background: url(Texture/Aries/Creator/keepwork/Exam/shangxiati_63x26_32bits.png#0 0 63 26);"/>
+                <input type="button" zorder="10" value='<%%= L"下一题" %%>' enabled="%s" name="btn_next" onclick="ExamPaperPage.onBtnClick" align="right" style="position: relative; margin-top: 0px; margin-right:0px;width:63px;height:26px;background: url(Texture/Aries/Creator/keepwork/Exam/shangxiati_63x26_32bits.png#0 0 63 26);"/>
+            </div>
+        </pe:if>
+    ]]
+    local hasAnswer = ExamPaperPage.IsCurQuestionAnswered()
+    xml = string.format(xml,hasAnswer,hasAnswer)
+
+    return xml
+end
+
+function GetCommitBtn()
+    local xml = [[
+    <input align="center" type="button" name="btn_commit" enabled="%s" onclick="ExamPaperPage.onBtnClick" zorder="2" value='<%%= L"提交" %%>' style="color: #ffffff;font-size:12px; width:63px;height:26px;background:url(Texture/Aries/Creator/keepwork/Exam/tijiao_63x26_32bits.png#0 0 63 26)"/>
+    ]]
+    xml = string.format(xml,not ExamPaperPage.IsCommited())
+    return xml
+end
+
+]]></script>
+    <pe:container width="100%" height="100%" style="background: url(Texture/Aries/Creator/keepwork/Window/dikuang_opaque_64x69_32bits.png#0 0 64 69:26 44 24 22);">
+        <!-- <input type="button" zorder="10" value="" onclick="ClosePage" align="right" style="position: relative; margin-top: 0px; margin-right:0px;width:34px;height:34px;background: url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/guanbi_34x34_32bits.png#0 0 34 34);"/> -->
+        <div style="position: relative;width: 166px;height: 401px; margin-top: 39px;margin-left: 2px; background: url(Texture/Aries/Creator/keepwork/Exam/tihaodi_32x32_32bits.png#0 0 32 32:25 6 6 25);">
+            <div style="float: left; margin-left: 13px;margin-top: 17px; width: 17px;height: 17px; background: url(Texture/Aries/Creator/keepwork/Exam/shijian_17x17_32bits.png#0 0 17 17);"></div>
+            <label style="margin-left: 10px; margin-top: 15px;font-size:14px; font-weight:normal;color:#ffffff;" value='<%= (ExamPaperPage.curTimeVal or "45:00") %>' name="label_left_time"></label>
+            <div width="168px" height="272px" style="margin-top: 10px;margin-left: 0px; background:url();">
+                <pe:gridview style="width:168px;height:272px;" name="index_gridview" CellPadding="0" VerticalScrollBarStep="18" VerticalScrollBarOffsetX="8" xpagesize="28" ItemsPerLine="4 " DefaultNodeHeight="36"
+                        DataSource='<%= ds() %>'>
+                    <Columns>
+                        <div style=" width:38px;height:36px;">
+                            <!-- <%= GetBoxXml()%> -->
+                            <div align="center" valign="center" width="20px" height="20px" style='<%= GetBoxBg(Eval("index")) %>' name='<%=Eval("index")%>'> 
+                                <label value='<%= GetIndexStr(Eval("index")) %>' style="text-align:center;font-size:12px; font-weight:bold;" name='<%= "text_"..Eval("index") %>'></label>
+                            </div>
+                        </div>
+                    </Columns>
+                    <EmptyDataTemplate>
+                    </EmptyDataTemplate>
+                </pe:gridview>
+            </div>
+            <div style="margin: 10px;">
+                <label value='<%= GetProgress() %>' style="text-align:center;font-size:12px; font-weight:bold;color:#ffffff;" name='text_progress'></label>
+            </div>
+
+            <div style="margin-top: 5px;">
+                <%= GetCommitBtn() %>
+            </div>
+        </div>
+        <div width="448px" height="310px" style="margin-left: 185px;margin-top: 64px; background-color: #00000000;">
+            <pe:treeview name="scroll_content" style="margin:0px;margin-right:0px;background:;" VerticalScrollBarStep="18">
+                <%= ExamPaperPage.GetCurQuestionXmlInfo()%>
+            </pe:treeview>
+            <div width="432px" height="1px" align="center" style="margin-left: 0px;margin-top: 3px; background-color: #d3dbf5;"></div>
+            <%= GetBtnsXml() %>
+            
+        </div>
+        
+    </pe:container>
+
+</pe:mcml>
+</body>
+</html>

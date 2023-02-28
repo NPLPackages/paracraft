@@ -323,6 +323,16 @@ function ChatEdit.SetUseIME(is_use_ime)
 
 end
 
+local function isWorldForkCommand(str)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+	local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+	local cmd_class, cmd_name, cmd_text =  CommandManager:GetCmdByString(str)
+	if cmd_name and (cmd_name == "loadworld" or cmd_name == "load") and string.find(cmd_text,"-fork") then
+		return true
+	end
+	return false
+end
+
 function ChatEdit.OnClickSend(name)
 	if(not GameLogic.GameMode:CanChat()) then
 		GameLogic.AddBBS(nil, L"当前模式不允许聊天", 5000, "255 0 0");
@@ -368,20 +378,33 @@ function ChatEdit.OnClickSend(name)
 		if (words:match("^/")) then
 			CommandHelpPage.ClosePage();
 			if(GameLogic.GameMode:CanUseCommand()) then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
-				local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-				words, bSendMessage = CommandManager:RunFromConsole(words);
-				if(type(words) ~= "string") then
-					words = "";
+				if not isWorldForkCommand(words) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
+					local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+					words, bSendMessage = CommandManager:RunFromConsole(words);
+					if(type(words) ~= "string") then
+						words = "";
+					end
+				else
+					bSendMessage = false
+					GameLogic.AddBBS(nil, L"当前不允许使用fork命令", 5000, "255 0 0");
+					ChatEdit.LostFocus();
 				end
 			else
 				GameLogic.AddBBS(nil, L"当前模式不允许使用命令", 5000, "255 0 0");
+				if(not GameLogic.IsReadOnly()) then
+					_guihelper.MessageBox(L"当前模式不允许使用命令，但是你具有世界的编辑权限，是否要切换到编辑模式?", function(result)
+						if(result) then
+							GameLogic.RunCommand("/mode edit")
+						end
+					end)
+				end
 				ChatEdit.LostFocus();
 				return
 			end
 		else
 			local player = EntityManager.GetPlayer();
-			if(player:SendChatMsg(words)) then
+			if(player and player:SendChatMsg(words)) then
 				bSendMessage = false; 
 			end
 		end

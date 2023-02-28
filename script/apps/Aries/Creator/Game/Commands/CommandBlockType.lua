@@ -40,6 +40,8 @@ e.g.
 /block ColorBlock climbable true
 /block ColorBlock obstruction false
 /block 5 solid false     :let sunlight pass through
+/block 62 walkSound		:delete block 62 step sound,re_enter world will recover
+/block 62 walkSound xxx.mp3 	:use xxx.mp3 as block 62 step sound,re_enter world will recover,please put the mp3 in the world
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local blockid, name, value;
@@ -81,6 +83,22 @@ e.g.
 					elseif(name == "transparent") then
 						value, cmd_text = CmdParser.ParseBool(cmd_text);
 						block_template:SetTransparent(value)
+					elseif(name == "walkSound") then
+						value, cmd_text = CmdParser.ParseString(cmd_text);
+						if value == nil or value == "" then
+							block_template:DeleteBlockSound()
+						else
+							local filename;
+							if(not ParaIO.DoesAssetFileExist(commonlib.Encoding.Utf8ToDefault(value), true)) then
+								filename = ParaWorld.GetWorldDirectory()..commonlib.Encoding.Utf8ToDefault(value);
+								if(not ParaIO.DoesAssetFileExist(filename, true)) then
+									return;
+								end
+								block_template:SetBlockSound(filename)
+							else
+								block_template:SetBlockSound(commonlib.Encoding.Utf8ToDefault(value))
+							end
+						end
 					else
 						-- TODO: 
 					end

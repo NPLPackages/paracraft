@@ -220,7 +220,7 @@ function EditContext:handleLeftClickScene(event, result)
 				if(alt_pressed and result and result.blockX) then
 					-- alt + left click to get the block in hand without destroying it
 					if(result.block_id) then
-						GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ);
+						GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ, result.side);
 					elseif(result.entity) then
 						GameLogic.GetPlayerController():PickItemByEntity(entity);
 					end

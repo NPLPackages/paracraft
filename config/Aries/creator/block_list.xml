@@ -10,8 +10,8 @@ icon: optional icon
 uid: unique id used in macro recording
 -->
 <blocklist>
-  <category name="static" text="方块">    
-  	<block id="52"/>
+  <category name="static" text="方块">
+    <block id="52"/>
     <block id="17"/>
     <block id="5"/>
     <block id="51"/>
@@ -155,8 +155,8 @@ uid: unique id used in macro recording
     <block name="NetherBrick_Slope"/>
     <block name="Quartz_Slope"/>
   </category>
-	
-	<category name="deco" text="装饰">
+
+  <category name="deco" text="装饰">
     <block id="100"/>
     <block id="113"/>
     <block id="114"/>
@@ -185,13 +185,13 @@ uid: unique id used in macro recording
     <block id="209"/>
     <block name="Trapdoor" />
     <block name="Wooden_Door" />
-    <block name="IronTrapdoor" />    
-    <block name="Iron_Door" />    
+    <block name="IronTrapdoor" />
+    <block name="Iron_Door" />
     <block id="166"/>
     <block id="162"/>
     <block id="103"/>
     <block id="211"/>
-     <block id="213"/>
+    <block id="213"/>
     <block id="218"/>
     <block id="224"/>
     <block id="118"/>
@@ -242,8 +242,8 @@ uid: unique id used in macro recording
     <block name="Mirror" />
     <block name="BlockLight" />
   </category>
-  
-	<category name="character" text="编程">
+
+  <category name="character" text="编程">
     <block name="CodeBlock"/>
     <block name="Wire" />
     <block name="Lever" />
@@ -257,10 +257,12 @@ uid: unique id used in macro recording
     <block name="chicken"/>
     <block name="CodeBlock" tip="方块画笔代码方块" uid="BlockPen" icon="Texture/blocks/items/brush.png" server_data='{langConfigFile="npl_blockpen"}'/>
     <block name="CodeBlock" tip="摄影机代码方块" uid="CodeCamera" icon="Texture/blocks/items/ts_camera.png" server_data='{langConfigFile="npl_camera"}'/>
+    <block name="CodeBlock" tip="代码方块初级版" uid="CodeJunior" icon="Texture/blocks/codeblockjunior_cover.png" server_data='{langConfigFile="npl_junior", editmode="blockmode"}'/>
     <block name="AgentSignBlock"/>
     <block name="AgentItem"/>
-	</category>
-	
+
+  </category>
+
   <category name="gear" text="机关">
     <block name="Command_Block"/>
     <block name="CodeBlock"/>
@@ -309,6 +311,7 @@ uid: unique id used in macro recording
     <block name="BlockModel"/>
     <block name="PhysicsModel"/>
     <block name="MemoryBlock"/>
+    <block name="RailcarModel"/>
   </category>
 
   <category name="tool" text="工具">
@@ -327,7 +330,7 @@ uid: unique id used in macro recording
     <block name="CmdUrl"/>
     <block name="player_spawn_point"/>
     <block name="Minimap"/>
-    
+	  <block name="Material" />
     <block name="ColorBlock" />
     <block name="MetalBlock" />
     <block name="TransparentColorBlock" />
@@ -342,18 +345,30 @@ uid: unique id used in macro recording
     <block name="BlockModel" />
     <block name="PhysicsModel" />
     <block name="BlockLight" />
-    
+
     <block name="InvisibleBlock" tip="拿在手中时可见"/>
     <block name="InvisibleGlowStone" tip="拿在手中时可见"/>
     <block name="InvisibleClickSensor" tip="拿在手中时可见"/>
     <block name="BanBlock" block_data="2730" tip="拿在手中时可编辑"/>
     <block name="TransparentBanBlock" block_data="2730" tip="拿在手中时可编辑"/>
     <block name="InvisibleCameraBlocker" tip="拿在手中时可编辑"/>
-  
+
     <block name="AgentSignBlock" uid="MacroPlatform" tip="宏示教舞台" icon="Texture/blocks/items/agentMacroPlatform.png" server_data='{agentPackageName="macroplatform", tooltip="宏示教", agentUrl="Mod/Agents/macroplatform.xml", isGlobal=true,updateMethod="always"}'/>
     <block name="LinkBoy"/>
     <block name="nplcad3" test_sdk="true"/>
     <block name="CodePPT"/>
+    <block name="AgentSignBlock" uid="MacroPlatformS1" tip="S系列宏示教舞台" icon="Texture/blocks/items/agentMacroPlatforms.png" server_data='{agentPackageName="macroplatforms", tooltip="430宏示教", agentUrl="Mod/Agents/com.code.430_1.xml", isGlobal=true,updateMethod="always"}'/>
+    
+    <block name="ColorBlock_Stairs" />
+    <block name="ColorBlock_Slab" />
+    <block name="ColorBlock_Slope" />
+    <block name="TransparentColorBlock_Stairs" />
+    <block name="TransparentColorBlock_Slab" />
+    <block name="TransparentColorBlock_Slope" />
+    <block name="MetalBlock_Stairs" />
+    <block name="MetalBlock_Slab" />
+    <block name="MetalBlock_Slope" />
+    
   </category>
   <category name="others" text="其他">
   </category>

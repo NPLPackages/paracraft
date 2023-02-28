@@ -706,6 +706,9 @@ model id
     <item id="84118" model="actor;"><geoset category="8" id="10"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84118_dress.png"></texture></item>
     <item id="84119" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84119_outfit_boy.png"></texture></item>
     <item id="84120" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84120_sleep.png"></texture></item>
+    <!--20220623新增-->
+    <item id="84121" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84121_xiaohuangshirt01.png"></texture></item>
+    <item id="84122" model="actor;"><geoset category="8" id="1"></geoset><texture id="2" filename="Texture/blocks/CustomGeoset/body/84122_xiaohuangshirt02.png"></texture></item>
 
     <!--      85000 85999  裤子  geoset category="9"   5腿                1短裤 2长裤    -->
     <item id="85001" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/00Avatar_boy_body_01kuku2.png"></texture></item>
@@ -858,6 +861,9 @@ model id
     <item id="85131" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85131_blue_suit.png"></texture></item>
     <item id="85132" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85132_outfit_boy.png"></texture></item>
     <item id="85133" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85133_sleep.png"></texture></item>
+     <!--20220623新增-->
+    <item id="85134" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85134_xiaohuangshirt01.png"></texture></item>
+    <item id="85135" model="actor;"><geoset category="9" id="1"></geoset><texture id="5" filename="Texture/blocks/CustomGeoset/leg/85135_xiaohuangshirt02.png"></texture></item>
     
     <!--      86000 86999  背部  attachment id="15"    -->
     <!--第一批数据-->

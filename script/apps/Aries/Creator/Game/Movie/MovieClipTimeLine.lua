@@ -325,9 +325,11 @@ function MovieClipTimeLine:ShowTimeline(state)
 	else
 		local _this = ParaUI.GetUIObject(movie_clip_timeline_name)
 		if(not _this:IsValid()) then
-			if(System.options.IsTouchDevice) then
+			if(GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)) then
 				-- make it bigger on touch device
-				self:SetControlSize(24, 32);
+				self:SetControlSize(50, 50);
+				timeline_color_map["activated"] = "40 50 57 255"
+				timeline_color_map["not_recording"] = "40 50 57 255"
 			end
 
 			_this = ParaUI.CreateUIObject("container", movie_clip_timeline_name, "_mb", 0, 0, 0, self.height);
@@ -342,7 +344,9 @@ function MovieClipTimeLine:ShowTimeline(state)
 			end)
 			_guihelper.SetFontColor(_this, "#ffffff");
 			_this:AttachToRoot();
-			page = page or System.mcml.PageCtrl:new({url="script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html"});
+			local params = {url="script/apps/Aries/Creator/Game/Movie/MovieClipTimeLine.html"}
+			params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"MovieClipTimeLine");
+			page = page or System.mcml.PageCtrl:new(params);
 			page:Create("movieclipTimeLine", _this, "_fi", 0, 0, 0, 0);
 		end
 		_guihelper.SetUIColor(_this, timeline_color_map[state]);

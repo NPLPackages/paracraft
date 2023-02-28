@@ -264,7 +264,7 @@ function CustomCharItems:Init()
 			models[type] = groups;
 		end
 
-		LOG.std(nil, "info", "CustomCharItems", "%d skins loaded from %s", id, filename);
+		LOG.std(nil, "info", "CustomCharItems", "%d skins loaded from %s", id or 0, filename or "");
 
 		root = ParaXML.LuaXML_ParseFile("config/Aries/creator/CustomCharList.xml");
 		if (root) then
@@ -356,7 +356,10 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 						data.icon = item.icon;
 						data.name = item.name;
 						data.isVip = item.isVip;
-						itemList[#itemList+1] = data;
+						if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip',{noBoxTip=true})==true and data.type=="1" then --禁用vip功能时，过滤掉vip装饰
+						else
+							itemList[#itemList+1] = data;
+						end
 					end
 				end
 			end
@@ -750,4 +753,42 @@ function CustomCharItems:GetItemByGsid(gsid)
 		end
 	end
 	return item;
+end
+
+-- is_replace 是否替换嘴巴 如果为false 则原本有嘴巴的情况下用原来的嘴巴皮肤
+function CustomCharItems:AddMouthSkin(skin, mouth_id, is_replace)
+	local skin_id_tab = commonlib.split(skin, ";");
+
+	if #skin_id_tab == 0 then
+		return skin
+	end
+
+	if skin_id_tab[1] and not tonumber(skin_id_tab[1]) then
+		return skin
+	end
+	
+	-- 嘴巴的id是88开头
+	local target_index
+	for index, skin_id in ipairs(skin_id_tab) do
+		if math.floor(tonumber(skin_id)/1000) == 88 then
+			if not is_replace then
+				return skin
+			end
+
+			target_index = index
+			break
+		end
+	end
+
+	if target_index then
+		skin_id_tab[target_index] = mouth_id
+	else
+		skin_id_tab[#skin_id_tab + 1] = mouth_id
+	end
+	local skin_str = ""
+	for index = 1, #skin_id_tab do
+		local skin_id = skin_id_tab[index]
+		skin_str = skin_str .. skin_id .. ";"
+	end
+	return skin_str
 end

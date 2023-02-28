@@ -38,7 +38,7 @@ RacePage.ItemData = {
 		icon = "tu1_875X255_32bits"
 	},
 	{
-		visible = true,
+		visible = false,
 		time = "2022年3月-2022年11月",
 		signUpBtnInfo = {tooltip = "",endDay = "",endTime =""},
 		timeRule = {
@@ -81,12 +81,12 @@ RacePage.ItemData = {
 	},
 	{
 		visible = true,
-		time = "2021年8月15日-2022年8月31日",
-		signUpBtnInfo = {tooltip = "提交截止时间：2022年8月31日",endDay = "2022-8-31",endTime ="23:59:59"},
+		time = "2021年8月15日-2022年12月31日",
+		signUpBtnInfo = {tooltip = "提交截止时间：2022年12月31日",endDay = "2022-12-31",endTime ="23:59:59"},
 		timeRule = {
 			startDay="2021-08-15",
 			startTime="00:00:00",
-			endDay="2022-8-31",
+			endDay="2022-12-31",
 			endTime="23:59:59"
 		},
 		race="2021青少年“讲好中国故事”创意编程大赛",
@@ -101,7 +101,7 @@ RacePage.ItemData = {
 		icon = "tu3_875X255_32bits"
 	},
 	{
-		visible = true,
+		visible = false,
 		time = "2021年8月-2022年12月",
 		signUpBtnInfo = {tooltip = "",endDay = "",endTime =""},
 		timeRule = {
@@ -122,29 +122,29 @@ RacePage.ItemData = {
 		icon = "tu4_875X255_32bits"
 	},
 	{
-		visible = true,
-		time = "2021年8月 -2022年12月",
+		visible = false,
+		time = "2022年3月 -2022年12月",
 		signUpBtnInfo = {tooltip = "",endDay = "",endTime =""},
 		timeRule = {
-			startDay="2021-08-01",
+			startDay="2022-03-01",
 			startTime="00:00:00",
 			endDay="2022-12-31",
 			endTime="23:59:59"
 		},
-		race="第十二届全国青少年科学影像节",
-		content="第十二届全国青少年科学影像节申报作品分为科学探究纪录片、科学微电影和科普动画三个类别。推荐同学们使用帕拉卡制作动画短片申报科普动画类别，作品要求为采用MP4格式文件，画面比例为4:3或16:9，时长为5-8分钟。个人或集体创作均可，集体创作主创团队不超过8人，辅导教师不得多于2人，一个学生（团队）可申报多个作品。更多申报要求可参考往届作品及大赛官网。",
+		race="第十三届全国青少年科学影像节",
+		content="第十三届全国青少年科学影像节申报作品分为科学探究纪录片、科学微电影和科普动画三个类别。推荐同学们使用帕拉卡软件制作动画短片申报科普动画类别，作品采用MP4格式文件。画面比例为4:3，分辨率为720×576（像素）或画面比例16:9，分辨率为1280×720（像素），作品的时长不得超过4分钟。个人或集体申报均可。每项作品辅导教师不得多于2人，每项作品主创人员不得多于5人，不得中途换人。作品须遵守国家有关法律法规，尊重文化传统、公共道德，符合民族政策，内容健康，主题鲜明。更多申报要求及详情请前往大赛官网。",
 		ListData = {
-			{name = "往届作品",node_name = "previous_works",url = L"https://v.qq.com/x/page/v090720dwvn.html",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/common/tu2_98X98_32bits.png#0 0 98 98);"></div>]]}
+			-- {name = "往届作品",node_name = "previous_works",url = L"https://v.qq.com/x/page/v090720dwvn.html",icon =[[<div zorder="-1" style="position:relative;left:13px;top:8px;width: 100px; height: 100px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/common/tu2_98X98_32bits.png#0 0 98 98);"></div>]]}
 		},
-		leftTopBtnInfo = {btnText = "大赛官网",url = L"https://yxj.cyscc.org/"},
+		leftTopBtnInfo = {btnText = "大赛官网",url = L"https://yxj.cacsi.org.cn/"},
 		enterPage = {
-			{name = "大赛官网", node_name = "enter_yxj_Official_web", url = L"https://yxj.cyscc.org/ "}
+			{name = "大赛官网", node_name = "enter_yxj_Official_web", url = L"https://yxj.cacsi.org.cn/ "}
 		},
 		name = "ke_xue_ying_xiang_jie",
 		icon = "tu5_875X255_32bits"
 	},
 	{
-		visible = true,
+		visible = false,
 		time = "2022年4月10日-2022年5月10日",
 		signUpBtnInfo = {tooltip = "报名截止时间：2022年5月10日",endDay = "2022-5-10",endTime ="23:59:59"},
 		timeRule = {
@@ -162,6 +162,46 @@ RacePage.ItemData = {
 		},
 		name = "zhong_xiao_xue_dian_nao_zhi_zuo_huo_dong",
 		icon = "tu6_875X255_32bits"
+	},
+	{
+		visible = true,
+		time = "2022年12月-2023年12月",
+		signUpBtnInfo = {tooltip = "",endDay = "",endTime =""},
+		timeRule = {
+			startDay="2022-12-01",
+			startTime="00:00:00",
+			endDay="2023-12-31",
+			endTime="23:59:59"
+		},
+		race="IYT-P国际青少年编程等级考试-3D动画编程",
+		content="“IYT国际考级”项目英文名称为International Youth Test，简称“IYT”。由世界知名大学哈佛大学、哥伦比亚大学、加州大学伯克利分校、加州理工学院以及美国国家航空航天局喷气推进实验室、IBM、Facebook、RMDS Lab、中国数据中心等知名单位科学家、研究者共同发起的面向全球青少年的科技教育测评项目。“以考促学”推动全球青少年学习国际主流科技行业知识，为青少年发展、社会实践等提供统一、客观、公正的国际能力水平证明，提升青少年国际竞争力。证书可作为考生的科技特长证明及出国留学证明，针对通过8级及以上级别考试的优秀考生更可由RMDS专家出具留学推荐信。<br/>&#10;其中，国际青少年编程等级考试简称“IYT-P”面向全球6-18岁青少年编程能力水平的国际化评价项目自启动以来，得到国内外众多学校、考生及家长的积极参与及大力支持。 为更好地满足不同考生的考试需求，特增设3D动画编程考试项目。该项目考试对应使用工具为帕拉卡（Paracraft）3D动画编程教育平台。了解更多申报指南、要求等详情请前往大赛官网。",
+		ListData = {},
+		leftTopBtnInfo = {btnText = "大赛官网",url = L"www.iyttest.com"},
+		enterPage = {
+			{name = "大赛官网", node_name = "enter_zxxdnzzhd_Official_web", url = L"www.iyttest.com"}
+		},
+		name = "guo_ji_qing_shao_nian_bian_cheng",
+		icon = "tu9_875X255_32bits"
+	},
+	{
+		visible = true,
+		time = "2022年12月-2023年4月",
+		signUpBtnInfo = {tooltip = "",endDay = "",endTime =""},
+		timeRule = {
+			startDay="2022-12-01",
+			startTime="00:00:00",
+			endDay="2023-04-30",
+			endTime="23:59:59"
+		},
+		race="2023年广东省科技劳动教育暨学生信息素养提升实践活动",
+		content="由广东省教育厅主办，省教育厅事务中心(省电化教育馆)承办，以“创想、创作、创新、创造”为主题的“2023年广东省科技劳动教育暨学生信息素养提升实践活动”，旨在积极引导学生运用互联网、物联网、人工智能等信息科技，以项目化学习方式开展“创想、创新、创作、创造”等新型科技劳动实践探索活动，促进信息科技与跨学科知识的融合创新应用，提升实践能力，落实五育并举，促进学生德智体美劳全面发展。<br/>&#10;活动设有数字创作类、计算机思维类及科创实践类三大类。参赛者可以使用帕拉卡（Paracraft）平台创作作品送报数字创作类/计算机思维类。了解更多申报指南、要求等详情请前往大赛官网。",
+		ListData = {},
+		leftTopBtnInfo = {btnText = "大赛官网",url = L"https://srsc.gdedu.gov.cn/srsc/pub/tnotice/notice.do?act=notice&vccode=3386f0376f914954ae8edfb3a304560f"},
+		enterPage = {
+			{name = "大赛官网", node_name = "enter_zxxdnzzhd_Official_web", url = L"https://srsc.gdedu.gov.cn/srsc/pub/tnotice/notice.do?act=notice&vccode=3386f0376f914954ae8edfb3a304560f"}
+		},
+		name = "guang_dong_sheng_ke_ji_lao_dong_jiao_yu",
+		icon = "tu10_875X255_32bits"
 	}
 }
 
@@ -313,6 +353,9 @@ function RacePage.ClickCompetition()
 		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	elseif  RacePage.selectName == "zhong_xiao_xue_dian_nao_zhi_zuo_huo_dong" then
 		--全国中小学生电脑制作活动
+		local url = RacePage.Datas[RacePage.index].leftTopBtnInfo.url
+		ParaGlobal.ShellExecute("open", url, "", "", 1)
+	else
 		local url = RacePage.Datas[RacePage.index].leftTopBtnInfo.url
 		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	end

@@ -12,7 +12,7 @@ KeepWorkStackableItem.openBeanNoEnoughView();
 local KeepWorkStackableItemPage = NPL.export();
 commonlib.setfield("MyCompany.Aries.Creator.Game.KeepWork.KeepWorkStackableItemPage", KeepWorkStackableItemPage);
 
-local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 local page;

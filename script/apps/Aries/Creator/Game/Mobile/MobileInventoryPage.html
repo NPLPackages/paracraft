@@ -1,0 +1,186 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Mobile/MobileInventoryPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="true" type="text/npl" src="InventoryPage.lua"><![CDATA[
+local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
+block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+InventoryPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InventoryPage");
+local cur_player
+InventoryPage.OnInit();
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function DoModifyName()
+    return InventoryPage.modifyName;
+end
+
+function RenameOrSavename()
+    if(InventoryPage.modifyName) then
+        InventoryPage.SetPlayerDisplayName();
+    end
+    InventoryPage.modifyName = not InventoryPage.modifyName;
+    Page:Refresh(0.01);
+end
+
+function GetPlayerName()
+    local name = InventoryPage.GetPlayerDisplayName();
+    return name or "";
+end
+
+function GetTotalHP()
+    local value = 222222;
+    value = string.format("血量:%d",value);
+    return value;
+end
+
+function GetTotalMagicAttack()
+    local value = 222222;
+    value = string.format("魔法:%d",value);
+    return value;
+end
+
+function GetTotalPhysicalAttack()
+    local value = 222222;
+    value = string.format("攻击:%d",value);
+    return value;
+end
+
+function GetTotalPhysicalResist()
+    local value = 222222;
+    value = string.format("物防:%d",value);
+    return value;
+end
+
+function GetTotalMagicResist()
+    local value = 222222;
+    value = string.format("魔抗:%d",value);
+    return value;
+end
+
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        if(index<=27) then
+            return {slotNumber = index+9};
+        else
+            return {slotNumber = index-27};
+        end
+    end
+end
+
+function SwitchSkin()
+    --[[
+    local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+    CommandManager:RunCommand("/skin");
+    Page:Refresh(0.01);
+    ]]
+    local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+    UserInfoPage.ShowPage(System.User.keepworkUsername,"skin")
+    ClosePage();
+end
+
+function IsBagRow(index)
+    return index > 0 and index <= 9
+end
+
+function GetSchoolName()
+    return InventoryPage.GetSchoolName()
+end
+
+function GetNickName()
+    local nickname = InventoryPage.GetNickName()
+    if(nickname == nil or nickname == "")then
+        nickname = InventoryPage.GetUserName()
+    end
+    if nickname ~= nil and nickname ~= "" then
+        local width = 0
+        local name = ""
+        for uchar in string.gmatch(nickname, '([%z\1-\127\194-\244][\128-\191]*)') do
+            local w = _guihelper.GetTextWidth(uchar, "System;14");
+            width = width + tonumber(w)
+            if width < 240 then
+                name = name.. uchar
+            else
+                name = name.. "..."
+                break
+            end
+        end
+        return name
+    end
+    return ""
+end
+
+]]></script>
+<mb:window width = "816" height = "720" title = '<%=L"背包"%>' onclose = "ClosePage">
+    <pe:container  style="margin-left:13px;margin-top:87px;width:790px;height:624px;background: url(Texture/Aries/Creator/keepwork/Mobile/bag/di_31x31_32bits.png#0 0 31 31:15 15 15 15);">
+        <pe:container  style="margin-left:px;margin-top:px;width:790px;height:264px;background: url()">
+            <pe:if condition="<%= System.options.mc %>">
+                <pe:container alignment="_rb" style="margin-bottom:10px;margin-right:24px;width:120px;height:48px;background-color: #fff60000;">
+                    <input type="button" value='<%=L"主角形象"%>' style="font-weight: bold;color:#1a1a1a;position:relative;margin-top:0px;margin-left:0px;text-offset-y:-1;height:20px;min-width:120px;height:48px;font-size:18px;background: url(Texture/Aries/Creator/keepwork/Mobile/SystemsSetting/btn_confirm_160x64_32bits.png#0 0 160 64);" onclick="SwitchSkin" />    
+                </pe:container>
+            </pe:if>
+            <!-- <div style="margin-left:265px;margin-top:20px;height:32px;width:260px;;">
+                <pe:if condition="<%=not DoModifyName() %>">
+                    <input type="button" onclick="RenameOrSavename" style="position:relative;margin-top:12px;margin-left:195px;width:16x;height:16px;background: url(Texture/Aries/Creator/keepwork/Mobile/bag/xiugai_16x16_32bits.png#0 0 16 16);" />
+                    <div style="font-weight:bold;font-size:18px;position:relative;margin-top:6px;margin-left:50px;width:140px;text-align:center;color:#1a1a1a;">
+                        <%=GetPlayerName() %>
+                    </div>                
+                </pe:if>
+                <pe:if condition="<%=DoModifyName() %>">
+                    <input type="button" onclick="RenameOrSavename" value='<%=L"保存" %>' style="color:#1a1a1a;font-size:12px;font-weight: bold;position:relative;margin-top:0px;margin-left:195px;width:55px;height:32px;background: url(Texture/Aries/Creator/keepwork/Mobile/SystemsSetting/btn_confirm_160x64_32bits.png#0 0 160 64);"/>
+                    <div style="position:relative;margin-top:0px;margin-left:16px;width:175px;height:32px;background: url(Texture/Aries/Creator/keepwork/Mobile/create_new_world/shurukuang_32x32_32bits.png#0 0 32 32:8 8 8 8);">
+                        <input type="text" name="svr_mark" autofocus="false" value='<%=GetPlayerName() %>' uiname="inventory_player_displayname" rows="1" style="textcolor:#999999;font-size:14px;font-weight: bold;text-align:left;margin-top:4px;margin-left:10px;width:150px;height:24px;background: url();"/>
+                    </div>
+                </pe:if>
+            </div>
+            <div style="position:relative;margin-top:10px;margin-left:0px;width:790px;height:260px;">
+                <div style="position:relative;margin-left:267px;margin-top:-80px;width:20px;height:20px;" >
+                    <pe:mc_player name="MyPlayer" miniscenegraphname="AvatarMyselfTabCharacter" style="width:256px;height:256px;" IsInteractive="false" IsActiveRendering="true" RenderTargetSize="256" DefaultCameraObjectDist="5.8" DefaultLiftupAngle = "0"/>
+                </div>
+            </div> -->
+            <div style="float:left;width:320px;height:304px;margin-top:0px;margin-left:235px;background-color:#fff60000);">
+                <div style="margin-left:78px;margin-top:24px;width:164px;height:164px; background:url(Texture/Aries/Creator/keepwork/Mobile/esc/touxiang_256x256_32bits.png#0 0 256 256);">
+                    <pe:mc_player name="main_user_player" miniscenegraphname="Avatar_User_Character" style="width:164px;height:164px;margin-left: 0px; margin-top: -10px;" IsInteractive="false" fisrtFrameMove = "false" NoFrameMove="true" RenderTargetSize="256" DefaultCameraObjectDist="3.8" DefaultLiftupAngle = "0"/>
+                </div>
+                <div  style="margin-top:14px;font-size: 14px;color:#333333;text-align:center;overflow-y: auto;margin-left:0px;font-weight:bold;width: 320px;">
+                    <%=GetNickName()%>
+                </div>
+                <div  style="margin-top:10px;font-size: 12px;color:#141c33cc;text-align:center;overflow-y: auto;margin-left:0px;width: 320px;">
+                    <%=GetSchoolName()%>
+                </div>
+            </div>
+        </pe:container>
+        <pe:container alignment="_rb" style="margin-bottom:0px;margin-right:0px;width:788px;height:101px;background: url(Texture/Aries/Creator/keepwork/Mobile/bag/gongjudi_37x43_32bits.png#0 0 37 43:12 0 12  12);"> 
+        </pe:container>
+        <pe:container style="margin-left:10px;width:780px;height:384px;background: url()">
+            <pe:gridview name="MyInventoryBagItems" style="margin-left:0px;margin-top:0px;height:384px;" DataSource="<%=DS_Func_PlayerItems%>" CellPadding="12" DefaultNodeHeight = "72" ItemsPerLine="9" AllowPaging="false" RememberScrollPos="true" RememberLastPage="true" pagesize="36">
+                <Columns>
+                    <pe:if condition="<%=IsBagRow(Eval('slotNumber')) %>">
+                        <div style="margin-top:8px;font-weight:bold;background: url(Texture/Aries/Creator/keepwork/Mobile/bag/gezi_30x30_32bits.png#0 0 30 30:12 12 12 12);" class="mc_item">
+                            <pe:mc_slot bagpos ='<%=Eval("slotNumber")%>' style="width:72px;height:72px;"></pe:mc_slot>
+                        </div>
+                    </pe:if>
+                    <pe:if condition="<%= not IsBagRow(Eval('slotNumber'))%>">
+                        <div style="font-weight:bold;background: url(Texture/Aries/Creator/keepwork/Mobile/bag/baigezi_27x27_32bits.png#0 0 28 28:12 12 12 12);">
+                            <pe:mc_slot bagpos ='<%=Eval("slotNumber")%>' style="width:72px;height:72px;"></pe:mc_slot>
+                        </div>
+                    </pe:if>
+                </Columns>
+            </pe:gridview>
+        </pe:container>
+    </pe:container>
+</mb:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -26,24 +26,34 @@ Or run application with command line: bootstrapper = "script/apps/Aries/bootstra
 ------------------------------------------------------------
 ]]
 -- mainstate is just a dummy to set some ReleaseBuild=true
+
+_G.CHANNEL_CONFIG = {
+	CHANNEL_430 = "430",
+	CHANNEL_TUTORIAL = "tutorial",
+}
+
 NPL.load("(gl)script/mainstate.lua"); 
 NPL.load("(gl)script/ide/commonlib.lua"); 
 
 -- let us see replace im server if command line contains imserver="game"
 local imserver = ParaEngine.GetAppCommandLineByParam("imserver", "game");
-if(imserver == "game") then
+
+if (imserver == "game") then
 	NPL.load("(gl)script/apps/IMServer/IMserver_client.lua");
 	-- this will replace the default(real) jabber client with the one implemented by our own game server based IM server. Make sure this is done before you use it in the app code.
 	JabberClientManager = commonlib.gettable("IMServer.JabberClientManager");
 end
+
 NPL.load("(gl)script/kids/ParaWorldCore.lua"); -- ParaWorld platform includes
 NPL.load("(gl)script/ide/app_ipc.lua");
+
 -- load paracraft packages if any
-if(ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "" and ParaEngine.GetAppCommandLineByParam("src_paraworldapp", "")=="") then
+if (ParaEngine.GetAppCommandLineByParam("isDevEnv", "") == "" and
+	ParaEngine.GetAppCommandLineByParam("src_paraworldapp", "") == "") then
 	NPL.load("npl_packages/paracraft/");
 end
 
-if(IPCDebugger) then
+if (IPCDebugger) then
 	IPCDebugger.Start(); -- enable debugging if there is a command line setting. 
 end
 
@@ -61,8 +71,9 @@ System.options.disable_trading = nil;
 
 local commandLine = ParaEngine.GetAppCommandLine();
 -- whether it is mc version
-System.options.mc = (ParaEngine.GetAppCommandLineByParam("mc","false") == "true");
-if(not System.options.mc and commandLine and commandLine:match("mc=true")) then
+System.options.mc = (ParaEngine.GetAppCommandLineByParam("mc", "false") == "true");
+
+if (not System.options.mc and commandLine and commandLine:match("mc=true")) then
 	-- just in case it is comming from the website url. 
 	System.options.mc = true;
 end
@@ -79,12 +90,30 @@ System.options.cmdline_world = System.options.cmdline_world or ParaEngine.GetApp
 System.options.isCodepku = (ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true");
 
 System.User = System.User or {};
-if(not System.User.keepworktoken) then
+
+if (not System.User.keepworktoken) then
 	System.User.keepworktoken = ParaEngine.GetAppCommandLineByParam("keepworktoken",nil);
 end
 
+System.options.default_ui_scaling = {};
+ParaUI.GetUIObject("root"):GetField("UIScale", System.options.default_ui_scaling);
+
+--430开关
+System.options.isChannel_430 = (System.options.channelId=="430");
+System.options.channelId_tutorial = System.options.channelId =="tutorial";
+System.options.channelId_431 = System.options.channelId =="431";
+
+if (System.options.isChannel_430) then
+	System.options.isHideVip = true;
+end
+
+if (System.os.GetPlatform() == "mac" or System.os.GetPlatform() == "ios") then
+	System.options.isHideVip = true;
+end
+
 commonlib.setfield("System.options.isFromQQHall", ParaEngine.GetAppCommandLineByParam("isFromQQHall", "") == "true");
-if(ParaEngine.GetAppCommandLineByParam("isSchool", "") == "true") then
+
+if (ParaEngine.GetAppCommandLineByParam("isSchool", "") == "true") then
 	commonlib.setfield("System.options.isSchool", true);
 end
 
@@ -101,36 +130,38 @@ local function Aries_load_config(filename)
 
 	-- where the user from from
 	System.options.partner = ParaEngine.GetAppCommandLineByParam("partner", "");
-	if(System.options.partner == "") then
-		if(System.options.IsWebBrowser) then
+
+	if (System.options.partner == "") then
+		if (System.options.IsWebBrowser) then
 			System.options.partner = "web";
 		else
 			System.options.partner = "desktop";
 		end
 	end
+
 	System.options.partner = System.options.partner:sub(1,10);
 
-	if(System.options.partner == "qq") then
+	if (System.options.partner == "qq") then
 		-- if partner is qq we will show the qq login page by default. in most cases, it is in window mode. 
 		NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
 		local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
 		System.options.platform_id = Platforms.PLATS.QQ;
 		System.options.is_official = true;
-	elseif(System.options.partner == "keepwork") then
+	elseif (System.options.partner == "keepwork") then
 		NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
 		local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
 		System.options.platform_id = Platforms.PLATS.KEEPWORK;
 	end
-	
-    
+
 	-- we will enter this world first 
 	-- format: "nid@homeland" or "nid@save_slot_id"
 	-- example: "1234567@homeland" or "1234567@1"
 	System.options.visit_url = ParaEngine.GetAppCommandLineByParam("visit_url", "");
-	if(System.options.visit_url == "") then
+
+	if (System.options.visit_url == "") then
 		System.options.visit_url = nil;
 	end
-	
+
 	-- current url
 	System.options.cur_url = ParaEngine.GetAppCommandLineByParam("cur_url", "");
 	LOG.std(nil, "debug", "cur_url", System.options.cur_url);
@@ -140,28 +171,28 @@ local function Aries_load_config(filename)
 
 	-- External authentication string. 
 	System.options.url = ParaEngine.GetAppCommandLineByParam("url", "");
-	if(System.options.url ~="") then
-		
+
+	if (System.options.url ~= "") then
 		-- such as http://haqi.61.com/webplayer?platid=2144&id=46&time=20130304174349&key=D8D29A48D9CC1B19
 		NPL.load("(gl)script/ide/System/localserver/UrlHelper.lua");
 		local UrlHelper = commonlib.gettable("System.localserver.UrlHelper");
 		local tokens = UrlHelper.url_getparams_table(System.options.url);
 
-		if(tokens) then
-			if(not System.options.visit_url and tokens.visit_url) then
+		if (tokens) then
+			if (not System.options.visit_url and tokens.visit_url) then
 				System.options.visit_url = tokens.visit_url;
 			end
 
 			-- External authentication string. 
 			local has_token;
-			if( tokens.id and tokens.key and tokens.time) then
-				if(tokens.platid == "2144") then
+			if (tokens.id and tokens.key and tokens.time) then
+				if (tokens.platid == "2144") then
 					tokens.loginplat = 1;
 					tokens.plat = 4;
 					tokens.from = tokens.plat;
 					tokens.token = tokens.key;
 					region_id = tokens.plat;
-				elseif(tokens.platid == "fungame" or tokens.website == "fungame") then
+				elseif (tokens.platid == "fungame" or tokens.website == "fungame") then
 					tokens.loginplat = 1;
 					tokens.plat = 6;
 					tokens.from = 6;
@@ -173,8 +204,9 @@ local function Aries_load_config(filename)
 					tokens.sid = tokens.sid;
 					region_id = 0;
 				end
+
 				has_token = true;
-			elseif(tokens.platid == "gamagic" or tokens.platid == "thTH" or tokens.platid == "3") then
+			elseif (tokens.platid == "gamagic" or tokens.platid == "thTH" or tokens.platid == "3") then
 				has_token = true;
 				tokens.loginplat = 1;
 				tokens.plat = 3;
@@ -183,31 +215,36 @@ local function Aries_load_config(filename)
 				tokens.time = tonumber(tokens.time);
 				-- region_id = tokens.plat;
 			end
-			if(has_token) then
+
+			if (has_token) then
 				System.options.login_tokens = tokens;
 				System.options.plat = tokens.plat;
 				LOG.std(nil, "debug", "login_tokens", System.options.login_tokens)
 			end
 		end
 	end
-	if(System.options.isAB_SDK or System.options.isDevEnv)then
+
+	if (System.options.isAB_SDK or System.options.isDevEnv) then
 		System.options.clientconfig_file = ParaEngine.GetAppCommandLineByParam("config", "");
-		if(System.options.clientconfig_file=="") then
+
+		if (System.options.clientconfig_file == "") then
 			System.options.clientconfig_file = nil;
 		else
 			LOG.info("using game client config file: %s", System.options.clientconfig_file);
 		end
+
 		LOG.SetLogLevel("DEBUG");
 	else
 		LOG.SetLogLevel("INFO");
 	end
-	if(System.options.isAB_SDK or System.options.mc)then
+
+	if (System.options.isAB_SDK or System.options.mc) then
 		ParaEngine.GetAttributeObject():SetField("IgnoreWindowSizeChange",false);
 		LOG.std(nil, "info", "AssetManifest", "use local file first");
 		ParaEngine.GetAttributeObject():GetChild("AssetManager"):SetField("UseLocalFileFirst", true);
 	end
 
-	if(System.options.mc)then
+	if (System.options.mc) then
 		-- use paracraft icon file, it can also be any *.ico file on disk
 		if (System.options.isCodepku) then			
 			ParaEngine.GetAttributeObject():SetField("Icon", "icon.ico");
@@ -222,7 +259,7 @@ local function Aries_load_config(filename)
 
 	filename = filename or System.options.clientconfig_file or "config/GameClient.config.xml"
 
-	if(not ReleaseBuild) then
+	if (not ReleaseBuild) then
 		System.options.IsEditorMode = true;
 	else
 		-- release build: bring window to front. 
@@ -231,16 +268,20 @@ local function Aries_load_config(filename)
 
 	-- filename = "script/apps/GameServer/test/local.GameClient.config.xml"
 	local xmlRoot = ParaXML.LuaXML_ParseFile(filename);
-	if(not xmlRoot) then
+
+	if (not xmlRoot) then
 		local filename2 = string.lower(filename);
-		if(filename2 ~= filename) then
+
+		if (filename2 ~= filename) then
 			xmlRoot = ParaXML.LuaXML_ParseFile(filename2);
 		end
-		if(xmlRoot) then
+
+		if (xmlRoot) then
 			LOG.std("", "warning", "aries", "please change %s to %s", filename, filename2);
 		else
 			LOG.std("", "warning", "aries", "warning: failed loading game client config file %s", filename);
 		end
+
 		return;
 	end	
 
@@ -251,19 +292,18 @@ local function Aries_load_config(filename)
 	
 	-- check if it is a touch device. we can force it in command line
 	local IsTouchDevice = ParaEngine.GetAppCommandLineByParam("IsTouchDevice", "");
-	
-	if(IsTouchDevice ~= "") then
+
+	if (IsTouchDevice ~= "") then
 		-- we can force it in command line
 		System.options.IsTouchDevice = IsTouchDevice == "true";
 	else
 		System.options.IsTouchDevice = ParaEngine.GetAttributeObject():GetField("IsTouchInputting", false);	
 	end
 
-	if(System.options.IsTouchDevice) then
+	if (System.options.IsTouchDevice) then
 		-- NOTE: for now we will disable all system IME and use buildin virtual keyboard where possible. 
 		-- System.options.auto_virtual_keyboard = true
 	end
-	
 
 	-- always use compression. The current compression method is super light-weighted and is mostly for data encrption purposes. 
 	-- NPL.SetUseCompression(false, false);
@@ -272,23 +312,31 @@ local function Aries_load_config(filename)
 	local bg_loader_list;
 	node = commonlib.XPath.selectNodes(xmlRoot, "/GameClient/config")[1];
 	local client_ver_string;
-	if(node and node.attr) then
+
+	if (node and node.attr) then
 		-- if asset is not found locally, we will look in this place
-		if(node.attr.version) then
+		if (node.attr.version) then
 			client_ver_string = node.attr.version;
 		end
-		if(node.attr.region) then
+
+		if (node.attr.region) then
 			region_id = tonumber(node.attr.region);
 
             NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
 		    local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
-            if(Platforms.PLATS and region_id == Platforms.PLATS.KEEPWORK)then
+
+            if (Platforms.PLATS and region_id == Platforms.PLATS.KEEPWORK) then
 		        System.options.platform_id = region_id;
             end
 		end
 	end
-	local cmdVer = ParaEngine.GetAppCommandLineByParam("version","kids");
-	if (not IsMobilePlatform and cmdVer~=client_ver_string and not System.options.isAB_SDK and not System.options.mc) then
+
+	local cmdVer = ParaEngine.GetAppCommandLineByParam("version", "kids");
+
+	if (not IsMobilePlatform and
+		cmdVer ~= client_ver_string and
+		not System.options.isAB_SDK and
+		not System.options.mc) then
 		commonlib.echo("==============cmdVer ============== Fail")
 		commonlib.echo(cmdVer)
 		commonlib.echo(client_ver_string);
@@ -307,58 +355,66 @@ local function Aries_load_config(filename)
 
 	-- all platforms.
 	System.options.platforms = commonlib.XPath.selectNodes(xmlRoot, "/GameClient/platforms/platform") or {};
-	if(not System.options.mc) then
+
+	if (not System.options.mc) then
 		NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
 		local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
 		Platforms.Init();
 	end
 
 	-- default locale
-	System.options.locale = ParaEngine.GetAppCommandLineByParam("locale", "") ;
-	if(System.options.locale=="") then
-		System.options.locale = "zhCN"
+	System.options.locale = ParaEngine.GetAppCommandLineByParam("locale", "");
+
+	if (System.options.locale == "") then
+		System.options.locale = "zhCN";
 		local localeNode = commonlib.XPath.selectNodes(xmlRoot, "/GameClient/locale") or {};
-		if(localeNode[1]) then
+
+		if (localeNode[1]) then
 			local attr = localeNode[1].attr;
-			if(attr) then
+
+			if (attr) then
 				System.options.locale = attr.default;
 				-- TODO: call ParaEngine API to set the locale 
 			end
 		end
 	end
-	LOG.info("game default locale : %s", System.options.locale);
 
+	LOG.info("game default locale : %s", System.options.locale);
 
 	-- here we will defaults to kids version. 
 	System.options.isKid = ParaEngine.GetAppCommandLineByParam("version", client_ver_string or "kids");
-	if(System.options.isKid:match("_mc$")) then
+
+	if (System.options.isKid:match("_mc$")) then
 		System.options.isKid = System.options.isKid:gsub("_mc$", "");
 		System.options.mc = true;
 	end
 
 	-- whether it is the creator version. 
-	if(ParaEngine.GetAppCommandLineByParam("mc","false") == "true") then
+	if (ParaEngine.GetAppCommandLineByParam("mc", "false") == "true") then
 		System.options.mc = true;
 		-- force kids version in mc app.  
 		System.options.isKid = "kids"; 
 	end
 
-	if(System.options.isKid == "") then
+	if (System.options.isKid == "") then
 		System.options.isKid = nil;
 	else
 		System.options.isKid = System.options.isKid == "kids";
 	end
-	if(System.SystemInfo.GetField("name") == "Taurus") then
+
+	if (System.SystemInfo.GetField("name") == "Taurus") then
 		System.options.isKid = true;
 	end
+
 	System.options.version = if_else(System.options.isKid, "kids", "teen");
 
 	-- command line region_id will override config region id. 
-	if(not System.options.mc) then
+	if (not System.options.mc) then
 		NPL.load("(gl)script/apps/Aries/Login/ExternalUserModule.lua");
 		local ExternalUserModule = commonlib.gettable("MyCompany.Aries.ExternalUserModule");
 		region_id = tonumber(ParaEngine.GetAppCommandLineByParam("region", tostring(region_id or 0))) or region_id;
-		if(ExternalUserModule.Init) then
+
+		if (ExternalUserModule.Init) then
 			ExternalUserModule:Init(nil, region_id);
 		end
 	end
@@ -366,14 +422,16 @@ local function Aries_load_config(filename)
 	local node;
 	local bg_loader_list;
 	node = commonlib.XPath.selectNodes(xmlRoot, "/GameClient/asset_server_addresses")[1];
-	if(node and node.attr) then
+
+	if (node and node.attr) then
 		-- if asset is not found locally, we will look in this place
 		 bg_loader_list = node.attr.bg_loader_list;
 	end
 	
 	local node;
 	node = commonlib.XPath.selectNodes(xmlRoot, "/GameClient/asset_server_addresses/address")[1];
-	if(node and node.attr) then
+
+	if (node and node.attr) then
 		-- if asset is not found locally, we will look in this place
 		ParaAsset.SetAssetServerUrl(node.attr.host);
 		LOG.std("", "system", "aries", "Asset server: %s", node.attr.host)
@@ -381,7 +439,8 @@ local function Aries_load_config(filename)
 	
 	local chat_domain
 	node = commonlib.XPath.selectNodes(xmlRoot, "/GameClient/chat_server_addresses")[1];
-	if(node and node.attr) then
+
+	if (node and node.attr) then
 		chat_domain = node.attr.domain;
 		System.User.ChatDomain = chat_domain;
 		LOG.std("", "system", "aries", "Chat server domain: %s", System.User.ChatDomain);
@@ -389,42 +448,50 @@ local function Aries_load_config(filename)
 	
 	System.User.ChatServers = {};
 	local node;
+
 	for node in commonlib.XPath.eachNode(xmlRoot, "/GameClient/chat_server_addresses/address") do
-		if(node.attr and node.attr.host and node.attr.port) then
+		if (node.attr and node.attr.host and node.attr.port) then
 			System.User.ChatServers[#(System.User.ChatServers) + 1] = node.attr;
-			if(not chat_domain) then
+
+			if (not chat_domain) then
 				System.User.ChatDomain = node.attr.host;
 				System.User.ChatPort = tonumber(node.attr.port);
 			end
 		end	
 	end
-	
+
 	node = commonlib.XPath.selectNodes(xmlRoot, "/GameClient/web_domain")[1];
-	if(node and node.attr) then
+
+	if (node and node.attr) then
 		System.User.Domain = node.attr.domain;
 		LOG.std("", "system", "aries", "Web domain: %s", System.User.Domain)
 		local web_node = node;
 		node = commonlib.XPath.selectNodes(web_node, "/log_server")[1];
-		if(node and node.attr) then
+
+		if (node and node.attr) then
 			LOG.std("", "system", "aries", "Log server: %s", node.attr.host);
-			paraworld.ChangeDomain({logserver = node.attr.host})
+			paraworld.ChangeDomain({logserver = node.attr.host});
 		end
+
 		node = commonlib.XPath.selectNodes(web_node, "/file_server")[1];
-		if(node and node.attr) then
+
+		if (node and node.attr) then
 			LOG.std("", "system", "aries", "File server: %s", node.attr.host);
 			paraworld.ChangeDomain({fileserver = node.attr.host})
 		end
 
 		node = commonlib.XPath.selectNodes(web_node, "/login_news_page")[1];
-		if(node and node.attr) then
+
+		if (node and node.attr) then
 			LOG.std("", "system", "aries", "Login news page: %s", node.attr.host);
-			System.SystemInfo.SetField("login_news_page", node.attr.host)
+			System.SystemInfo.SetField("login_news_page", node.attr.host);
 		end
 	end
+
 	paraworld.ChangeDomain({domain=System.User.Domain, chatdomain=System.User.ChatDomain, asset_stats = bg_loader_list})
 
-	if(not ParaEngine.GetAttributeObject():GetField("IsFullScreenMode", false)) then
-		if(not System.options.IsWebBrowser) then
+	if (not ParaEngine.GetAttributeObject():GetField("IsFullScreenMode", false)) then
+		if (not System.options.IsWebBrowser) then
 			LOG.std("", "system", "IME", "use the default IME window when in windowed mode");
 			ParaUI.GetUIObject("root"):GetAttributeObject():SetField("EnableIME", false);
 		else
@@ -434,19 +501,22 @@ local function Aries_load_config(filename)
 	end
 
 	-- force debugger interface at startup
-	if(ParaEngine.GetAppCommandLineByParam("httpdebug", "") == "true") then
-		LOG.SetLogLevel("DEBUG");
-		local host = "127.0.0.1";
+	local force_http = true
+	local httpdebug = ParaEngine.GetAppCommandLineByParam("httpdebug", "") == "true"
+	if force_http or httpdebug then
+		if httpdebug then
+			LOG.SetLogLevel("DEBUG");
+		end
+		
+		local host = "0.0.0.0";  -- "127.0.0.1";
 		local port = 8099; -- if port is "0", we will not listen for incoming connection
 		NPL.load("(gl)script/apps/WebServer/WebServer.lua");
-		-- WebServer:Start("script/apps/WebServer/admin", host, port);
-		
 		local att = NPL.GetAttributeObject();
-		if(not att:GetField("IsServerStarted", false)) then
-			local function TestOpenNPLPort_()
-				System.os.GetUrl(format("http://127.0.0.1:%s/ajax/console?action=getpid", port), function(err, msg, data)
-					if(data and data.pid) then
-						if(System.os.GetCurrentProcessId() ~= data.pid) then
+		if (not att:GetField("IsServerStarted", false) and not System.os.IsEmscripten()) then
+			local function TestOpenNPLPort_(test_port)
+				System.os.GetUrl(format("http://127.0.0.1:%s/ajax/console?action=getpid", test_port or port), function(err, msg, data)
+					if (data and data.pid) then
+						if (System.os.GetCurrentProcessId() ~= data.pid) then
 							-- already started by another application, 
 							-- try 
 							port = port + 1;
@@ -454,10 +524,21 @@ local function Aries_load_config(filename)
 							return;
 						else
 							-- already opened by the same process
+							LOG.std(nil, "info", "WebServer", "NPL Network Layer started success  %s:%d", host, test_port or port);
 						end
 					else
+						WebServer:StopServer();
+						if (port > 8120) then 
+							LOG.std(nil, "info", "WebServer", "NPL Network Layer started failed!!!");
+							return 
+						end
 						WebServer:Start("script/apps/WebServer/admin", host, port);	
-						LOG.std(nil, "debug", "main_loop", "NPL Network Layer is started  %s:%d", host, port);
+						local test_port_ = port;
+						commonlib.TimerManager.SetTimeout(function()
+							TestOpenNPLPort_(test_port_);
+						end, 100); -- 再次测试端口, 确定webserver有效
+						LOG.std(nil, "info", "WebServer", "NPL Network Layer is started  %s:%d", host, port);
+						port = port + 1;
 					end
 				end);
 			end
@@ -476,20 +557,22 @@ local function Aries_load_config(filename)
 		local att = NPL.GetAttributeObject();
 		att:SetField("EnableAnsiMode", false);
 	end
+
 	ParaAsset.OpenArchive("main_mobile_res.pkg");
 end
+
 -- load from config file
 Aries_load_config();
-	
+
 -- some init stuffs that are only called once at engine start up, but after System.init()
 local bAries_Init;
 local function Aries_Init()
-	if(bAries_Init) then return end
+	if (bAries_Init) then return end
 	bAries_Init = true;
 	-- reset all replace files
 	ParaIO.LoadReplaceFile("", true);
 
-	if(System.options.mc) then
+	if (System.options.mc) then
 		-- local server is enabled to support full offline mode. 
 	else
 		-- default localserver enters memory mode. 
@@ -502,14 +585,17 @@ local function Aries_Init()
 	
 	---- also log client version in post log
 	local ClientVersion = "";
-	if(ParaIO.DoesFileExist("version.txt")) then
+
+	if (ParaIO.DoesFileExist("version.txt")) then
 		local file = ParaIO.open("version.txt", "r");
-		if(file:IsValid()) then
+
+		if (file:IsValid()) then
 			local text = file:GetText();
 			ClientVersion = string.match(text, "^ver=([%.%d]+)") or "";
 			file:close();
 		end
 	end
+
 	System.options.ClientVersion = ClientVersion;
 
 	---- send log information
@@ -521,7 +607,7 @@ local function Aries_Init()
 	--end);
 	
 	-- load default theme
-	if(System.options.mc) then
+	if (System.options.mc) then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/DefaultTheme.mc.lua");
 		System.options.MaxCharTriangles_show = 150000;
 		MyCompany.Aries.Creator.Game.Theme.Default:Load();
@@ -535,23 +621,24 @@ local function Aries_Init()
 			System.options.MaxCharTriangles_show = 50000;
 			System.options.MaxCharTriangles_hide = 20000;
 		end
+
 		MyCompany.Aries.Theme.Default:Load();
 	end
-	
+
 	-- limit the number of character triangles to drawn for this edition. 
 	ParaScene.GetAttributeObject():SetField("MaxCharTriangles", System.options.MaxCharTriangles_show);
 	-- turn off windows menu
 	ParaEngine.GetAttributeObject():SetField("ShowMenu", false);
-	
+
 	-- install the Aries app, if it is not installed yet.
-	if(System.options.mc) then
+	if (System.options.mc) then
 		System.App.Registration.CheckInstallApps({
 			{app={app_key="WebBrowser_GUID"}, IP_file="script/kids/3DMapSystemApp/WebBrowser/IP.xml"},
 			{app={app_key="worlds_GUID"}, IP_file="script/kids/3DMapSystemApp/worlds/IP.xml"},
 			{app={app_key="Debug_GUID"}, IP_file="script/kids/3DMapSystemApp/DebugApp/IP.xml"},
 			{app={app_key="Creator_GUID"}, IP_file="script/kids/3DMapSystemUI/Creator/IP.xml"},
 			{app={app_key="Aries_GUID"}, IP_file="script/apps/Aries/IP.xml", bSkipInsertDB = true},
-		})
+		});
 	else
 		System.App.Registration.CheckInstallApps({
 			{app={app_key="WebBrowser_GUID"}, IP_file="script/kids/3DMapSystemApp/WebBrowser/IP.xml"},
@@ -570,9 +657,8 @@ local function Aries_Init()
 			{app={app_key="Developers_GUID"}, IP_file="script/kids/3DMapSystemApp/Developers/IP.xml"},
 			{app={app_key="Debug_GUID"}, IP_file="script/kids/3DMapSystemApp/DebugApp/IP.xml"},
 			{app={app_key="MiniGames_GUID"}, IP_file="script/kids/3DMapSystemUI/MiniGames/IP.xml"},
-		
 			{app={app_key="Aries_GUID"}, IP_file="script/apps/Aries/IP.xml", bSkipInsertDB = true},
-		})
+		});
 	end
 	
 	-- change the login machanism to use our own login module
@@ -596,10 +682,11 @@ local function Aries_Init()
 	-- in case back buffer is not big enough, we will use UI scaling. 
 	NPL.load("(gl)script/ide/System/Windows/Screen.lua");
 	local Screen = commonlib.gettable("System.Windows.Screen");
-	if(System.options.mc) then
-		Screen:SetMinimumScreenSize(1280,720,true);
+
+	if (System.options.mc) then
+		Screen:SetMinimumScreenSize(1280, 720, true);
 	else
-		Screen:SetMinimumScreenSize(1020,595,true);
+		Screen:SetMinimumScreenSize(1020, 595, true);
 	end
 
 	local att = ParaEngine.GetAttributeObject();
@@ -618,61 +705,90 @@ local function Aries_Init()
 	---- include asset replace file
 	--ParaIO.LoadReplaceFile("AssetsReplaceFile.txt", false);
 
-	if(System.options.version == "teen") then
-		if(System.options.locale == "zhCN") then
+	if (System.options.version == "teen") then
+		if (System.options.locale == "zhCN") then
 			ParaIO.LoadReplaceFile("config/AssetsReplaceFile_HaqiTown_teen_zhCN.xml", false);
-		elseif(System.options.locale == "zhTW") then
+		elseif (System.options.locale == "zhTW") then
 			ParaIO.LoadReplaceFile("config/AssetsReplaceFile_HaqiTown_teen_zhTW.xml", false);
-		elseif(System.options.locale == "enUS") then
+		elseif (System.options.locale == "enUS") then
 			ParaIO.LoadReplaceFile("config/AssetsReplaceFile_HaqiTown_teen_enUS.xml", false);
-		elseif(System.options.locale == "jaJP") then
+		elseif (System.options.locale == "jaJP") then
 			ParaIO.LoadReplaceFile("config/AssetsReplaceFile_HaqiTown_teen_jaJP.xml", false);
-		elseif(System.options.locale == "thTH") then
+		elseif (System.options.locale == "thTH") then
 			ParaIO.LoadReplaceFile("config/AssetsReplaceFile_HaqiTown_teen_thTH.xml", false);
 		end
+
 		AudioEngine.CreateGet("Area_HaqiTown_DragonGlory_teen"):play2d();
 	end
 
 	NPL.load("(gl)script/apps/Aries/mcml/mcml_aries.lua");
 	MyCompany.Aries.mcml_controls.register_all();
 
-	if(not System.options.mc) then
+	if (not System.options.mc) then
 		-- load all worlds configuration file
 		NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
 		MyCompany.Aries.WorldManager:Init("config/Aries/Scene/AriesGameWorlds.config.xml");
-	
 
 		local login_news_page = System.SystemInfo.GetField("login_news_page");
-		if(login_news_page) then
-			if( not paraworld.GetLoginNewsPage) then
+
+		if (login_news_page) then
+			if (not paraworld.GetLoginNewsPage) then
 				paraworld.CreateRPCWrapper("paraworld.GetLoginNewsPage", login_news_page);
 			end
+
 			paraworld.GetLoginNewsPage(
 				-- added forbid_reuse to close the connection immediately after request, since we no longer needs a connection to this server any more. 
 				--{forbid_reuse=true},
 				{}, 
-				"default", function(msg)
-				if(msg and msg.code==0 and msg.data and msg.rcode==200) then
-					-- msg.data contains the XML code. 
-					local xmlRoot = ParaXML.LuaXML_ParseString(msg.data);
-					System.SystemInfo.SetField("login_news_page_data", xmlRoot);
-					NPL.load("(gl)script/apps/Aries/Login/LocalUserSelectPage.lua");
-					MyCompany.Aries.LocalUserSelectPage:LoadNews();
+				"default",
+				function(msg)
+					if (msg and msg.code==0 and msg.data and msg.rcode==200) then
+						-- msg.data contains the XML code. 
+						local xmlRoot = ParaXML.LuaXML_ParseString(msg.data);
+						System.SystemInfo.SetField("login_news_page_data", xmlRoot);
+						NPL.load("(gl)script/apps/Aries/Login/LocalUserSelectPage.lua");
+						MyCompany.Aries.LocalUserSelectPage:LoadNews();
+					end
 				end
-			end)
+			);
 		end
 	end
 
 	-------------------------------------------------------
-	--[[加载已有命令的快捷键列表
-	--local list = {
-						{Text = commandName, ShortcutKey = key, params = params,},
-						{Text = commandName, ShortcutKey = key params = params,},
-				}
-		--]]
+	--[[ 加载已有命令的快捷键列表
+		local list = {
+			{Text = commandName, ShortcutKey = key, params = params,},
+			{Text = commandName, ShortcutKey = key params = params,},
+		}
+	]]
 	-------------------------------------------------------
 	NPL.load("(gl)script/kids/3DMapSystemApp/DebugApp/app_main.lua");
 	Map3DSystem.App.Debug.DoLoadConfigFile();
+
+	if (System.options.mc) then
+		local platform = System.os.GetPlatform();
+
+		if (platform == "win32" or platform == "mac") then
+			System.options.appId = "paracraft";
+		else
+			if (platform ~= "mac" and platform ~= "ios") then
+				local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
+				System.options.channelId = PlatformBridge.getMobileChannelId();
+			end
+
+			if (platform == "android") then
+				System.options.appId = "paracraft-android";
+			elseif (platform == "ios") then
+				System.options.appId = "paracraft-ios";
+			elseif (platform == "mac") then
+				System.options.appId = "paracraft-mac";
+			end
+		end
+
+		if (System.options.channelId~=nil and System.options.channelId ~= "") then
+			System.options.appId = System.options.appId.."_"..System.options.channelId;
+		end 
+	end
 end
 
 local ClickToContinue;
@@ -680,7 +796,7 @@ local ClickToContinue;
 -- this script is activated every 0.5 sec. it uses a finite state machine (main_state). 
 -- State nil is the inital game state. state 0 is idle.
 local function activate()
-	if(main_state==0) then
+	if (main_state == 0) then
 		-- this is the main game loop
 		--if(ClickToContinue and ClickToContinue.FrameMove) then
 			--ClickToContinue.FrameMove();
@@ -688,13 +804,17 @@ local function activate()
 			--NPL.load("(gl)script/apps/Aries/Desktop/GUIHelper/ClickToContinue.lua");
 			--ClickToContinue = commonlib.gettable("MyCompany.Aries.Desktop.GUIHelper.ClickToContinue");
 		--end
-		
-	elseif(main_state==nil) then
+	elseif (main_state == nil) then
 		-- initialization 
 		main_state = System.init();
-		System.SystemInfo.SetField("name", "Aries")
-		if(main_state~=nil) then
-			if(System.options.mc) then
+		System.SystemInfo.SetField("name", "Aries");
+
+		if (main_state ~= nil) then
+			NPL.load("(gl)script/ide/System/localserver/LocalStorageUtil.lua");
+			local LocalStorageUtil = commonlib.gettable("System.localserver.LocalStorageUtil");
+			LocalStorageUtil.CheckFristInit();
+
+			if (System.options.mc) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Login/MainLogin.lua");
 				MyCompany.Aries.Game.MainLogin:start(Aries_Init);
 			else
@@ -702,17 +822,51 @@ local function activate()
 				MyCompany.Aries.MainLogin:start(Aries_Init);
 			end
 		end
-	elseif(main_state == "logo") then
-		if(not IsServerMode) then
+	elseif (main_state == "logo") then
+		if (not IsServerMode) then
 			NPL.load("(gl)script/kids/3DMapSystemUI/Desktop/LogoPage.lua");
-			System.UI.Desktop.LogoPage.Show(79, {
-				{name = "LogoPage_PE_bg", bg="Texture/whitedot.png", alignment = "_fi", left=0, top=0, width=0, height=0, color="255 255 255 255", anim="script/kids/3DMapSystemUI/Desktop/Motion/Bg_motion.xml"},
-				{name = "LogoPage_PE_logoTxt", bg="Texture/3DMapSystem/brand/ParaEngineLogoText.png", alignment = "_rb", left=-320-20, top=-20-5, width=320, height=20, color="255 255 255 255", anim="script/kids/3DMapSystemUI/Desktop/Motion/Bg_motion.xml"},
-				{name = "LogoPage_PE_logo", bg="Texture/Aries/FrontPage_32bits.png;0 111 512 290", alignment = "_ct", left=-512/2, top=-290/2, width=512, height=290, color="255 255 255 0", anim="script/apps/Aries/Desktop/Motion/Logo_motion.xml"},
-			})
+			System.UI.Desktop.LogoPage.Show(
+				79,
+				{
+					{
+						name = "LogoPage_PE_bg",
+						bg = "Texture/whitedot.png",
+						alignment = "_fi",
+						left = 0,
+						top = 0,
+						width = 0,
+						height = 0,
+						color = "255 255 255 255",
+						anim = "script/kids/3DMapSystemUI/Desktop/Motion/Bg_motion.xml"
+					},
+					{
+						name = "LogoPage_PE_logoTxt",
+						bg = "Texture/3DMapSystem/brand/ParaEngineLogoText.png",
+						alignment = "_rb",
+						left = -320-20,
+						top = -20-5,
+						width = 320,
+						height = 20,
+						color = "255 255 255 255",
+						anim = "script/kids/3DMapSystemUI/Desktop/Motion/Bg_motion.xml"
+					},
+					{
+						name = "LogoPage_PE_logo",
+						bg = "Texture/Aries/FrontPage_32bits.png;0 111 512 290",
+						alignment = "_ct",
+						left = -512/2,
+						top = -290/2,
+						width = 512,
+						height = 290,
+						color = "255 255 255 0",
+						anim = "script/apps/Aries/Desktop/Motion/Logo_motion.xml"
+					},
+				}
+			);
 		else
 			main_state = nil;
 		end
 	end	
 end
+
 NPL.this(activate);

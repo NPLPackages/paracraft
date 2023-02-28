@@ -1,0 +1,36 @@
+<!-- "Mod/NplBrowser/NplBrowserUpdaterPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2019.3.26</title>
+</head>
+<body> 
+<pe:mcml>
+    <script type="text/npl" refresh="true" src="NplBrowserUpdaterPage.lua">
+<![CDATA[
+local page = document:GetPageCtrl();
+local ClientUpdater430 = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater430");
+ClientUpdater430.OnInit();
+
+function IsAllDownloadFinished()
+    return not (not ClientUpdater430._IsAllDownloadFinished)
+end
+
+function onBtnApply()
+    ClientUpdater430:onBtnApplySlientlyDownload()
+end
+]]>
+    </script>
+    <div style="background:url(Texture/whitedot.png);background-color:#000000cc;width:400px;height:30px;color:#ffffff">
+        <div style="float:left;margin:5px;width:20px;height:20px;background:url(Texture/3DMapSystem/AppIcons/png/WebBrowser_64.png);"></div>
+        
+        <div style="float:left;margin:5px;width:340px;">
+            <label name="progressText" style="width:400px;height:25px;" value='<%=L"更新文件已准备好，请点击安装"%>'></label>
+        </div>
+        <pe:if condition='<%= true %>'>
+            <input type="button" value="安装" style="color:#ffffff;margin-top:-27px;margin-left:344px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#382 197 40 18:8 8 8 8);width:50px;height:24px;" onclick="onBtnApply()" />
+        </pe:if>
+    </div>
+</pe:mcml>
+</body>
+</html>

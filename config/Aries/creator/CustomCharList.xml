@@ -1,118 +1,118 @@
-<!--
+<!--type="2"
 	换装件在人物面板是否可见的配置，加avatarMode="false"这个属性就可以了
 	仅开发模式可见的物品debug="true"
 -->
 
 <customcharlist>
 	<category name="head" text="头部"> 
-		<item id="80001" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/80001_head01.png" name="默认头部"/>
+		<item id="80001" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/80001_head01.png" name="默认头部"/>
 	</category>
 		
 	<category name="eye" text="眼睛">
-		<item id="81001" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_02_blackman_32bits.png" name="眼睛1"/>
-		<item id="81002" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_ai_32bits.png" name="眼睛2"/>
-		<item id="81003" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_01_01_32bits.png" name="眼睛3"/>
-		<item id="81004" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_02_01_32bits.png" name="眼睛4"/>
-		<item id="81005" price="50" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_011_32bits.png" name="眼睛5"/>
-		<item id="81006" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_14_32bits.png" name="眼睛6"/>
-		<item id="81007" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AA_32bits.png" name="眼睛7"/>
-		<item id="81008" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AB_32bits.png" name="眼睛8"/>
-		<item id="81009" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AC_32bits.png" name="眼睛9"/>
-		<item id="81010" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AD_32bits.png" name="眼睛10"/>
-		<item id="81011" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AE_32bits.png" name="眼睛11"/>
-		<item id="81012" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AF_32bits.png" name="眼睛12"/>
-		<item id="81013" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AG_32bits.png" name="眼睛13"/>
-		<item id="81014" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_B_01_32bits.png" name="眼睛14"/>
-		<item id="81015" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_C_01_32bits.png" name="眼睛15"/>
-		<item id="81016" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_D_01_32bits.png" name="眼睛16"/>
-		<item id="81017" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_F_01_32bits.png" name="眼睛17"/>
-		<item id="81018" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a001_32bits.png" name="眼睛18"/>
-		<item id="81019" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a002_32bits.png" name="眼睛19"/>
-		<item id="81020" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a003_32bits.png" name="眼睛20"/>
-		<item id="81021" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_G_01_32bits.png" name="眼睛21"/>
-		<item id="81022" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_H_01_32bits.png" name="眼睛22"/>
-		<item id="81023" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_I_01_32bits.png" name="眼睛23"/>
-		<item id="81024" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_J_01_32bits.png" name="眼睛24"/>
-		<item id="81025" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_K_01_32bits.png" name="眼睛25"/>
-		<item id="81026" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_L_01_32bits.png" name="眼睛26"/>
-		<item id="81027" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_M_01_32bits.png" name="眼睛27"/>
-		<item id="81028" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_N_01_32bits.png" name="眼睛28"/>
-		<item id="81029" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_O_01_32bits.png" name="眼睛29"/>
-		<item id="81030" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_P_01_32bits.png" name="眼睛30"/>
-		<item id="81031" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_Q_01_32bits.png" name="眼睛31"/>
-		<item id="81032" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_R_01_32bits.png" name="眼睛32"/>
-		<item id="81033" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_R_03_32bits.png" name="眼睛33"/>
-		<item id="81034" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_S_01_32bits.png" name="眼睛34"/>
-		<item id="81035" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_T_01_32bits.png" name="眼睛35"/>
-		<item id="81036" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_02_01_32bits.png" name="眼睛36"/>
-		<item id="81037" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_01_32bits.png" name="眼睛37"/>
-		<item id="81038" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_02_32bits.png" name="眼睛38"/>
-		<item id="81039" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_03_32bits.png" name="眼睛39"/>
-		<item id="81040" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_C_01_32bits.png" name="眼睛40"/>
-		<item id="81041" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_C_02_32bits.png" name="眼睛41"/>
-		<item id="81042" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_C_03_32bits.png" name="眼睛42"/>
-		<item id="81043" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_0_32bits.png" name="眼睛43"/>
-		<item id="81044" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_01_32bits.png" name="眼睛44"/>
-		<item id="81045" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_02_32bits.png" name="眼睛45"/>
-		<item id="81046" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_03_32bits.png" name="眼睛46"/>
-		<item id="81047" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_E_01_32bits.png" name="眼睛47"/>
-		<item id="81048" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_F_01_32bits.png" name="眼睛48"/>
-		<item id="81049" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a001_32bits.png" name="眼睛49"/>
-		<item id="81050" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a002_32bits.png" name="眼睛50"/>
-		<item id="81051" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a003_32bits.png" name="眼睛51"/>
-		<item id="81052" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_G_01_32bits.png" name="眼睛52"/>
-		<item id="81053" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_H_01_32bits.png" name="眼睛53"/>
-		<item id="81054" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_I_01_32bits.png" name="眼睛54"/>
-		<item id="81055" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_J_01_32bits.png" name="眼睛55"/>
-		<item id="81056" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_K_01_32bits.png" name="眼睛56"/>
-		<item id="81057" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_L_01_32bits.png" name="眼睛57"/>
-		<item id="81058" price="50" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_M_01_32bits.png" name="眼睛58"/>
-		<item id="81059" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_ai_32bits.png" name="眼睛59"/>
-		<item id="81060" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_le_32bits.png" name="眼睛60"/>
-		<item id="81061" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_nu_32bits.png" name="眼睛61"/>
-		<item id="81062" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_xi_32bits.png" name="眼睛62"/>
-		<item id="81063" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_ai_32bits.png" name="眼睛63"/>
-		<item id="81064" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_le_32bits.png" name="眼睛64"/>
-		<item id="81065" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_nu_32bits.png" name="眼睛65"/>
-		<item id="81066" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_xi_32bits.png" name="眼睛66"/>
-		<item id="81067" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_le_32bits.png" name="眼睛67"/>
-		<item id="81068" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_nu_32bits.png" name="眼睛68"/>
-		<item id="81069" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_pangjuan_32bits.png" name="眼睛69"/>
-		<item id="81070" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_32bits.png" name="眼睛70"/>
-		<item id="81071" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_ai_32bits.png" name="眼睛71"/>
-		<item id="81072" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_nu_32bits.png" name="眼睛72"/>
-		<item id="81073" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_si_32bits.png" name="眼睛73"/>
-		<item id="81074" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_xi_32bits.png" name="眼睛74"/>
-		<item id="81075" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc_32bits.png" name="眼睛75"/>
-		<item id="81076" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc2_32bits.png" name="眼睛76"/>
-		<item id="81077" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc3_32bits.png" name="眼睛77"/>
-		<item id="81078" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye1_32bits.png" name="眼睛78"/>
+		<item id="81001" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_02_blackman_32bits.png" name="超大眼1"/>
+		<item id="81002" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_ai_32bits.png" name="犹豫"/>
+		<item id="81003" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_01_01_32bits.png" name="深邃"/>
+		<item id="81004" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_02_01_32bits.png" name="超大眼2"/>
+		<item id="81005" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_011_32bits.png" name="友好"/>
+		<item id="81006" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_14_32bits.png" name="坚定1"/>
+		<item id="81007" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AA_32bits.png" name="神气"/>
+		<item id="81008" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AB_32bits.png" name="和蔼"/>
+		<item id="81009" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AC_32bits.png" name="自信"/>
+		<item id="81010" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AD_32bits.png" name="友善"/>
+		<item id="81011" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AE_32bits.png" name="坚决"/>
+		<item id="81012" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AF_32bits.png" name="生气1"/>
+		<item id="81013" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_AG_32bits.png" name="肯定"/>
+		<item id="81014" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_B_01_32bits.png" name="星星1"/>
+		<item id="81015" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_C_01_32bits.png" name="无神1"/>
+		<item id="81016" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_D_01_32bits.png" name="眯眯眼1"/>
+		<item id="81017" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_F_01_32bits.png" name="难过1"/>
+		<item id="81018" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a001_32bits.png" name="正式1"/>
+		<item id="81019" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a002_32bits.png" name="眨眼1"/>
+		<item id="81020" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_fps10_a003_32bits.png" name="眨眼2"/>
+		<item id="81021" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_G_01_32bits.png" name="高兴"/>
+		<item id="81022" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_H_01_32bits.png" name="享受"/>
+		<item id="81023" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_I_01_32bits.png" name="馊主意"/>
+		<item id="81024" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_J_01_32bits.png" name="期待"/>
+		<item id="81025" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_K_01_32bits.png" name="认错"/>
+		<item id="81026" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_L_01_32bits.png" name="生气2"/>
+		<item id="81027" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_M_01_32bits.png" name="生气3"/>
+		<item id="81028" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_N_01_32bits.png" name="无神2"/>
+		<item id="81029" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_O_01_32bits.png" name="无神3"/>
+		<item id="81030" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_P_01_32bits.png" name="星星2"/>
+		<item id="81031" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_Q_01_32bits.png" name="眯眯眼2"/>
+		<item id="81032" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_R_01_32bits.png" name="偷窥"/>
+		<item id="81033" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_R_03_32bits.png" name="呆呆"/>
+		<item id="81034" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_S_01_32bits.png" name="坏主意1"/>
+		<item id="81035" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_T_01_32bits.png" name="坏主意2"/>
+		<item id="81036" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_02_01_32bits.png" name="正式2"/>
+		<item id="81037" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_01_32bits.png" name="幻彩1"/>
+		<item id="81038" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_02_32bits.png" name="小幻彩1"/>
+		<item id="81039" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_B_03_32bits.png" name="休息"/>
+		<item id="81040" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_C_01_32bits.png" name="幻彩2"/>
+		<item id="81041" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_C_02_32bits.png" name="小幻彩2"/>
+	
+		<item id="81043" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_0_32bits.png" name="幻彩3"/>
+		<item id="81044" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_01_32bits.png" name="幻彩4"/>
+		<item id="81045" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_D_02_32bits.png" name="小幻彩3"/>
+		
+		<item id="81047" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_E_01_32bits.png" name="黄金瞳"/>
+		<item id="81048" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_F_01_32bits.png" name="开小差"/>
+		<item id="81049" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a001_32bits.png" name="正式3"/>
+		<item id="81050" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a002_32bits.png" name="眨眼3"/>
+		<item id="81051" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_fps10_a003_32bits.png" name="眨眼4"/>
+		<item id="81052" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_G_01_32bits.png" name="胆小"/>
+		<item id="81053" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_H_01_32bits.png" name="喜欢"/>
+		<item id="81054" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_I_01_32bits.png" name="讨厌"/>
+		<item id="81055" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_J_01_32bits.png" name="不开心"/>
+		<item id="81056" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_K_01_32bits.png" name="想哭"/>
+		<item id="81057" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_L_01_32bits.png" name="放空"/>
+		<item id="81058" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_M_01_32bits.png" name="有神"/>
+		<item id="81059" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_ai_32bits.png" name="忧郁"/>
+		<item id="81060" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_le_32bits.png" name="眯眼高兴1"/>
+		<item id="81061" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_nu_32bits.png" name="坚定"/>
+		<item id="81062" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_hong_xi_32bits.png" name="平淡"/>
+		<item id="81063" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_ai_32bits.png" name="难过2"/>
+		<item id="81064" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_le_32bits.png" name="眯眼高兴2"/>
+		<item id="81065" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_nu_32bits.png" name="高眉"/>
+		<item id="81066" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_lan_xi_32bits.png" name="一字眉"/>
+		<item id="81067" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_le_32bits.png" name="眯眼高兴3"/>
+		<item id="81068" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_nu_32bits.png" name="凶狠"/>
+		<item id="81069" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_pangjuan_32bits.png" name="决心"/>
+		<item id="81070" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_32bits.png" name="一般"/>
+		<item id="81071" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_ai_32bits.png" name="认错1"/>
+		<item id="81072" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_nu_32bits.png" name="坚定2"/>
+		<item id="81073" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_sunbin_si_32bits.png" name="勾勾眉"/>
+		<item id="81074" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_xi_32bits.png" name="正经"/>
+		<item id="81075" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc_32bits.png" name="坚定3"/>
+		<item id="81076" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc2_32bits.png" name="坚定4"/>
+		<item id="81077" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_zhengc3_32bits.png" name="淡定"/>
+		<item id="81078" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye1_32bits.png" name="呆红"/>
 
 		
-		<item id="81086" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_le_32bits.png" name="眼睛86"/>
-		<item id="81087" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_nu_32bits.png" name="眼睛87"/>
-		<item id="81088" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_xi_32bits.png" name="眼睛88"/>
-		<item id="81089" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_zhengchang_32bits.png" name="眼睛89"/>
-		<item id="81090" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_le_32bits.png" name="眼睛90"/>
-		<item id="81091" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_nu_32bits.png" name="眼睛91"/>
-		<item id="81092" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_xi_32bits.png" name="眼睛92"/>
-		<item id="81093" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_ai_32bits.png" name="眼睛93"/>
-		<item id="81094" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_le_32bits.png" name="眼睛94"/>
-		<item id="81095" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_nu_32bits.png" name="眼睛95"/>
-		<item id="81096" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_xi_32bits.png" name="眼睛96"/>
-		<item id="81097" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_zhengchang_32bits.png" name="眼睛97"/>
+		<item id="81086" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_le_32bits.png" name="眯眼笑1"/>
+		<item id="81087" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_nu_32bits.png" name="凶狠2"/>
+		<item id="81088" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_xi_32bits.png" name="平和"/>
+		<item id="81089" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_zhengchang_32bits.png" name="机灵"/>
+		<item id="81090" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_le_32bits.png" name="眯眼笑2"/>
+		<item id="81091" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_nu_32bits.png" name="邪恶"/>
+		<item id="81092" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_fanpai_xi_32bits.png" name="心不在焉"/>
+		<item id="81093" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_ai_32bits.png" name="认错2"/>
+		<item id="81094" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_le_32bits.png" name="眯眼笑3"/>
+		<item id="81095" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_nu_32bits.png" name="小生气"/>
+		<item id="81096" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_xi_32bits.png" name="大黑1"/>
+		<item id="81097" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_zhengchang_32bits.png" name="大黑2"/>
 		
-		<item id="81098" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/yunhuhu_32bits.png" name="眼睛98"/>
-		<item id="81079" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/e1_32bits.png" name="眼睛79"/>
-		<item id="81080" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mojing_32bits.png" name="眼睛80"/>
-		<item id="81081" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_001_32bits.png" name="眼睛81"/>
-		<item id="81082" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_01_32bits.png" name="眼睛82"/>
-		<item id="81083" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_02_32bits.png" name="眼睛83"/>
-		<item id="81084" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_fps14_emoji001_32bits.png" name="眼睛84"/>
-		<item id="81085" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_G_012_32bits.png" name="眼睛85"/>
-		<item id="81099" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_A_01_32bits.png" name="眼睛99"/>
-		<item id="81100" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_A_02_32bits.png" name="眼睛100"/>
-		<item id="81101" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_yellow_32bits.png" name="眼睛101"/>
+		<item id="81098" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/yunhuhu_32bits.png" name="晕晕1"/>
+		<item id="81079" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/e1_32bits.png" name="害羞地笑"/>
+		<item id="81080" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mojing_32bits.png" name="墨镜"/>
+		<item id="81081" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_001_32bits.png" name="多瓣眉"/>
+		<item id="81082" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_01_32bits.png" name="正式5"/>
+		<item id="81083" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_02_32bits.png" name="睿智"/>
+		<item id="81084" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_A_fps14_emoji001_32bits.png" name="晕晕2"/>
+		<item id="81085" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_boy_G_012_32bits.png" name="><"/>
+		<item id="81099" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_A_01_32bits.png" name="委屈"/>
+		<item id="81100" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_girl_A_02_32bits.png" name="眯眼"/>
+		<item id="81101" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/eye_yellow_32bits.png" name="琥珀眼"/>
 		
 	</category>
 	
@@ -121,44 +121,44 @@
 
 
         <!-- 20211228新增-->
-        <item id="83190"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83190_teacher_male_32bits.png" name="眼镜老师（男）"/>
+        <item id="83190"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83190_teacher_male_32bits.png" name="戴眼镜（男）"/>
 
         <!-- 20211216新增-->
-        <item id="83187"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83187_cleaner_male_32bits.png" name="环卫工（男）" avatarMode="false"/>
-		<item id="83188"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83188_architect_male_32bits.png" name="建筑师（男）" avatarMode="false"/>
+        <item id="83187"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83187_cleaner_male_32bits.png" name="环卫帽子（男）" avatarMode="false"/>
+		<item id="83188"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83188_architect_male_32bits.png" name="建筑帽子（男）" avatarMode="false"/>
 		<item id="83189"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83189_archaeologist_male_32bits.png" name="考古（男）" avatarMode="false"/>
 
         <!-- 20211209新增-->
         <item id="83186"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83186_nurse_32bits.png" name="护士帽" avatarMode="false"/>
 
         <!-- 20211125冬令营道具-->
-        <item id="83181"  gsid="82022" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83181_omlypic_africa_32bits.png" name="冬运会（非洲）"/>
-        <item id="83182"  gsid="82023" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83182_omlypic_aisa_32bits.png" name="冬运会（亚洲）"/>
-		<item id="83183"  gsid="82024" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83183_omlypic_australia_32bits.png" name="冬运会（澳洲）"/>
-		<item id="83184"  gsid="82025" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83184_omlypic_europe_32bits.png" name="冬运会（欧洲）"/>
-		<item id="83185"  gsid="82026" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83185_omlypic_america_32bits.png" name="冬运会（美洲）"/>
+        <item id="83181"  gsid="82022" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83181_omlypic_africa_32bits.png" name="大象帽子"/>
+        <item id="83182"  gsid="82023" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83182_omlypic_aisa_32bits.png" name="熊猫帽子"/>
+		<item id="83183"  gsid="82024" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83183_omlypic_australia_32bits.png" name="树熊帽子"/>
+		<item id="83184"  gsid="82025" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83184_omlypic_europe_32bits.png" name="狮子帽子"/>
+		<item id="83185"  gsid="82026" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83185_omlypic_america_32bits.png" name="老虎帽子"/>
 
         <!-- 20211118新增-->
-        <item id="83180"  price="100" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83180_olympic_hat_32bits.png" name="冬运会" avatarMode="false"/>
+        <item id="83180"  price="100" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83180_olympic_hat_32bits.png" name="毛绒帽" avatarMode="false"/>
 		<!-- 20220303新增--> <!-- 后续新增至下方-->
-        <item id="83193"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83193_chef_32bits.png" name="厨师（男）"/>
-		<item id="83194"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83194_cheffy_32bits.png" name="厨师（女）"/>
-        <item id="83195"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83195_antiapidemic_32bits.png" name="防疫头盔"/>
-        <item id="83196"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83196_navy_hat_32bits.png" name="海军帽（男）"/>
-		<item id="83197"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83197_navy_hat_female_32bits.png" name="海军帽（女）"/>
-		<item id="83198"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83198_army_hat_32bits.png" name="陆军帽（男）"/>
-		<item id="83199"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83199_army_hat_female_32bits.png" name="陆军帽（女）"/>
-		<item id="83200"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83200_air_hat_32bits.png" name="空军帽（男）"/>
-		<item id="83201"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83201_air_hat_female_32bits.png" name="空军帽（女）"/>
-		<item id="83202"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83202_police_hat_32bits.png" name="警察"/>
-		<item id="83203"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83203_police_hat_female_32bits.png" name="女警1"/>
-		<item id="83204"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83204_police_hat_female2_32bits.png" name="女警2"/>
-		<item id="83205"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83205_traffic_police_hat_32bits.png" name="交警"/>
-		<item id="83206"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83206_traffic_police_hat_female_32bits.png" name="女交警1"/>
-		<item id="83207"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83207_traffic_police_hat_female2_32bits.png" name="女交警2"/>
-		<item id="83208"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83208_architect_hat_female_32bits.png" name="建筑师（女）"/>
-		<item id="83209"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83209_cleaner_hat_female_32bits.png" name="环卫工（女）"/>
-		<item id="83210"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83210_firefighter_hat_32bits.png" name="消防员"/>
+        <item id="83193"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83193_chef_32bits.png" name="厨帽（男）"/>
+		<item id="83194"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83194_cheffy_32bits.png" name="厨帽（女）"/>
+        <item id="83195"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83195_antiapidemic_32bits.png" name="防护头罩"/>
+        <item id="83196"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83196_navy_hat_32bits.png" name="制服帽子01（男）"/>
+		<item id="83197"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83197_navy_hat_female_32bits.png" name="制服帽子01（女）"/>
+		<item id="83198"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83198_army_hat_32bits.png" name="制服帽子02（男）"/>
+		<item id="83199"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83199_army_hat_female_32bits.png" name="制服帽子02（女）"/>
+		<item id="83200"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83200_air_hat_32bits.png" name="制服帽子03（男）"/>
+		<item id="83201"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83201_air_hat_female_32bits.png" name="制服帽子03（女）"/>
+		<item id="83202"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83202_police_hat_32bits.png" name="制服帽子04"/>
+		<item id="83203"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83203_police_hat_female_32bits.png" name="制服帽子05"/>
+		<item id="83204"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83204_police_hat_female2_32bits.png" name="制服帽子06"/>
+		<item id="83205"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83205_traffic_police_hat_32bits.png" name="制服帽子07"/>
+		<item id="83206"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83206_traffic_police_hat_female_32bits.png" name="制服帽子08"/>
+		<item id="83207"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83207_traffic_police_hat_female2_32bits.png" name="制服帽子09"/>
+		<item id="83208"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83208_architect_hat_female_32bits.png" name="建筑帽子（女）"/>
+		<item id="83209"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83209_cleaner_hat_female_32bits.png" name="环卫帽子（女）"/>
+		<item id="83210"  price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83210_firefighter_hat_32bits.png" name="防火帽子"/>
 
 		<!--20220324新加-->
 		<item id="83211" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83211_danmawei_32bits.png" name="单马尾"/>
@@ -172,16 +172,16 @@
         <item id="83179"  gsid="82021" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83179_feedwoman_hat_32bits.png" name="熊猫宝宝头（女）"/>
         <item id="83178"  gsid="82018" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83178_feedman_hat_32bits.png" name="熊猫宝宝头（男）"/>
 	    <!-- 20210624夏令营道具-->
-        <item id="83177"  gsid="82017" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83177_red_sodier_hat6_32bits.png" name="女文艺红军帽子02" avatarMode="false"/>
-        <item id="83176"  gsid="82016" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83176_red_sodier_hat5_32bits.png" name="女文艺红军帽子01" avatarMode="false"/>
-        <item id="83175"  gsid="82015" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83175_red_sodier_hat4_32bits.png" name="女红军帽子02" avatarMode="false"/>
-        <item id="83174"  gsid="82014" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83174_red_sodier_hat3_32bits.png" name="女红军帽子01" avatarMode="false"/>
-		<item id="83173"  gsid="82013" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83173_red_sodier_hat2_32bits.png" name="红军政委帽子" avatarMode="false"/>
-		<item id="83172"  gsid="82012" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83172_red_sodier_hat1_32bits.png" name="红军战士帽子"/>
-		<item id="83171"  gsid="82011" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83171_sodier_hat4_32bits.png" name="长官帽子" avatarMode="false"/>
-        <item id="83170"  gsid="82010" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83170_sodier_hat3_32bits.png" name="士兵帽" avatarMode="false"/>
-		<item id="83169"  gsid="82009" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83168_sodier_hat2_32bits.png" name="戴眼镜士兵帽" avatarMode="false"/>
-		<item id="83168"  gsid="82008" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83169_sodier_hat1_32bits.png" name="戴眼镜的长官帽子" avatarMode="false"/>
+        <item id="83177"  gsid="82017" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83177_red_sodier_hat6_32bits.png" name="蓝色帽子02（女）" avatarMode="false"/>
+        <item id="83176"  gsid="82016" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83176_red_sodier_hat5_32bits.png" name="蓝色帽子01（女）" avatarMode="false"/>
+        <item id="83175"  gsid="82015" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83175_red_sodier_hat4_32bits.png" name="蓝色帽子03（女）" avatarMode="false"/>
+        <item id="83174"  gsid="82014" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83174_red_sodier_hat3_32bits.png" name="蓝色帽子04（女）" avatarMode="false"/>
+		<item id="83173"  gsid="82013" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83173_red_sodier_hat2_32bits.png" name="蓝色帽子01（男）" avatarMode="false"/>
+		<item id="83172"  gsid="82012" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83172_red_sodier_hat1_32bits.png" name="蓝色帽子02（男）"/>
+		<item id="83171"  gsid="82011" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83171_sodier_hat4_32bits.png" name="绿色帽子01" avatarMode="false"/>
+        <item id="83170"  gsid="82010" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83170_sodier_hat3_32bits.png" name="绿色帽子02" avatarMode="false"/>
+		<item id="83169"  gsid="82009" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83168_sodier_hat2_32bits.png" name="戴眼镜绿色帽子01" avatarMode="false"/>
+		<item id="83168"  gsid="82008" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83169_sodier_hat1_32bits.png" name="戴眼镜绿色帽子02" avatarMode="false"/>
 		<!--20210610新增-->
 		<item id="83167"  gsid="82007" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83167_space_suit_hat_32bits.png" name="宇航帽"/>
 		<!--20210527新增-->
@@ -210,8 +210,6 @@
 		<item id="83038" price="200"  type="2" icon="Texture/Aries/Item/1476_PricessClownHat.png" name="迷你小丑帽"/>
 		<item id="83039" price="200"  type="2" icon="Texture/Aries/Item/1483_ForeignLandsHat.png" name="蒙面头巾"/>
 		<item id="83050" price="200"  type="2" icon="Texture/Aries/Item/1617_ShopNewYearsGalHat.png" name="兔耳装饰"/>
-		<item id="83051" price="200"  type="2" icon="Texture/Aries/Item/1618_ShopNewYearsRabbitHat01.png" name="兔子头套"/>
-		<item id="83052" price="200"  type="2" icon="Texture/Aries/Item/1619_ShopNewYearsRabbitHat02.png" name="灯笼头套"/>
 		<item id="83053" price="200"  type="2" icon="Texture/Aries/Item/1689_ShopWeddingHatGirl.png" name="白色头纱"/>
 		<item id="83064" price="200"  type="2" icon="Texture/Aries/Item/2042_ShopSpringHatGirl.png" name="红色花环"/>
 		<item id="83054" price="200"  type="2" icon="Texture/Aries/Item/1706_ShopSpringHatGirl.png" name="绿色花环"/>
@@ -220,7 +218,7 @@
 		<item id="83056" price="200"  type="2" icon="Texture/Aries/Item/1789_ColorfulSweltersCoolHat.png" name="浮潜眼睛"/>
 		<item id="83057" price="200"  type="2" icon="Texture/Aries/Item/1792_ColorfulMiniHat.png" name="条纹草帽"/>
 		<item id="83063" price="200"  type="2" icon="Texture/Aries/Item/2009_Colorful_TheKingsHat.png" name="黄色草帽"/>
-		<item id="83065" price="450"  type="2" icon="Texture/Aries/Item/2075_FireHatS3.png" name="恶魔之角"/>
+		<item id="83065" price="450"  type="2" icon="Texture/Aries/Item/2075_FireHatS3.png" name="红发角冠"/>
 		<item id="83066" price="450"  type="2" icon="Texture/Aries/Item/2082_IceHatS3.png" name="寒冰头饰"/>
 		<item id="83067" price="450"  type="2" icon="Texture/Aries/Item/2089_StormHatS3.png" name="半遮面具"/>
 		<item id="83068" price="200"  type="2" icon="Texture/Aries/Item/2096_LifeHatS3.png" name="白色发饰"/>
@@ -342,7 +340,7 @@
 		<item id="83146" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83146_32bits.png" name="形象" debug="true"/>
 		<item id="83147" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83147_32bits.png" name="形象" debug="true"/>
 		<item id="83148" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83148_32bits.png" name="形象1"/>
-		<item id="83150" price="200"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83150_32bits.png" name="形象2"/>
+		<item id="83150" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83150_32bits.png" name="形象2"/>
 		<item id="83151" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83151_32bits.png" name="形象3"/>
 		<item id="83152" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83152_32bits.png" name="形象4"/>
   		<!--20210309新加-->
@@ -351,179 +349,179 @@
 		<item id="83155" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83155_32bits.png" name="形象7"/>
 		<item id="83156" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83156_32bits.png" name="形象8"/>
 		<item id="83157" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83157_32bits.png" name="形象9"/>
-		<item id="83158" price="200"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83158_32bits.png" name="形象10"/>
+		<item id="83158" price="200"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/83158_32bits.png" name="形象10"/>
 	
 
-		<item id="82001" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_00.png" name="头发1"/>
-		<item id="82002" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_01.png" name="头发2"/>
-		<item id="82003" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_02.png" name="头发3"/>
-		<item id="82004" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_00.png" name="头发4"/>
-		<item id="82005" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_01.png" name="头发5"/>
-		<item id="82006" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_02.png" name="头发6"/>
-		<item id="82007" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_03.png" name="头发7"/>
-		<item id="82008" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_04.png" name="头发8"/>
-		<item id="82009" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_05.png" name="头发9"/>
-		<item id="82010" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_06.png" name="头发10"/>
-		<item id="82011" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_001.png" name="头发11"/>
-		<item id="82012" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_01.png" name="头发12"/>
-		<item id="82013" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_02.png" name="头发13"/>
-		<item id="82014" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_03.png" name="头发14"/>
-		<item id="82015" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_04.png" name="头发15"/>
-		<item id="82016" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_05.png" name="头发16"/>
-		<item id="82017" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_06.png" name="头发17"/>
-		<item id="82018" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_07.png" name="头发18"/>
-		<item id="82019" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_08.png" name="头发19"/>
-		<item id="82020" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_09.png" name="头发20"/>
-		<item id="82021" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_10.png" name="头发21"/>
-		<item id="82022" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_11.png" name="头发22"/>
-		<item id="82023" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_12.png" name="头发23"/>
-		<item id="82024" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_13.png" name="头发24"/>
-		<item id="82025" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_14.png" name="头发25"/>
-		<item id="82026" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_15.png" name="头发26"/>
-		<item id="82027" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_16.png" name="头发27"/>
-		<item id="82028" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_17.png" name="头发28"/>
-		<item id="82029" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_001.png" name="头发29"/>
-		<item id="82030" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_01.png" name="头发30"/>
-		<item id="82031" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_02.png" name="头发31"/>
-		<item id="82032" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_03.png" name="头发32"/>
-		<item id="82033" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_04.png" name="头发33"/>
-		<item id="82034" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_05.png" name="头发34"/>
-		<item id="82035" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_06.png" name="头发35"/>
-		<item id="82036" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_07.png" name="头发36"/>
-		<item id="82037" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_08.png" name="头发37"/>
-		<item id="82038" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_09.png" name="头发38"/>
-		<item id="82039" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_10.png" name="头发39"/>
-		<item id="82040" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_11.png" name="头发40"/>
-		<item id="82041" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_12.png" name="头发41"/>
-		<item id="82042" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_13.png" name="头发42"/>
-		<item id="82043" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_14.png" name="头发43"/>
-		<item id="82044" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_15.png" name="头发44"/>
-		<item id="82045" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_16.png" name="头发45"/>
-		<item id="82046" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_17.png" name="头发46"/>
-		<item id="82047" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_001.png" name="头发47"/>
-		<item id="82048" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_01.png" name="头发48"/>
-		<item id="82049" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_02.png" name="头发49"/>
-		<item id="82050" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_03.png" name="头发50"/>
-		<item id="82051" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_04.png" name="头发51"/>
-		<item id="82052" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_05.png" name="头发52"/>
-		<item id="82053" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_06.png" name="头发53"/>
-		<item id="82054" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_07.png" name="头发54"/>
-		<item id="82055" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_08.png" name="头发55"/>
-		<item id="82056" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_09.png" name="头发56"/>
-		<item id="82057" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_10.png" name="头发57"/>
-		<item id="82058" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_11.png" name="头发58"/>
-		<item id="82059" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_12.png" name="头发59"/>
-		<item id="82060" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_13.png" name="头发60"/>
-		<item id="82061" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_14.png" name="头发61"/>
-		<item id="82062" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_15.png" name="头发62"/>
-		<item id="82063" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_16.png" name="头发63"/>
-		<item id="82064" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_17.png" name="头发64"/>
-		<item id="82065" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_001.png" name="头发65"/>
-		<item id="82066" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_01.png" name="头发66"/>
-		<item id="82067" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_02.png" name="头发67"/>
-		<item id="82068" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_03.png" name="头发68"/>
-		<item id="82069" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_04.png" name="头发69"/>
-		<item id="82070" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_05.png" name="头发70"/>
-		<item id="82071" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_06.png" name="头发71"/>
-		<item id="82072" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_07.png" name="头发72"/>
-		<item id="82073" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_08.png" name="头发73"/>
-		<item id="82074" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_09.png" name="头发74"/>
-		<item id="82075" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_10.png" name="头发75"/>
-		<item id="82076" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_11.png" name="头发76"/>
-		<item id="82077" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_12.png" name="头发77"/>
-		<item id="82078" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_13.png" name="头发78"/>
-		<item id="82079" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_14.png" name="头发79"/>
-		<item id="82080" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_15.png" name="头发80"/>
-		<item id="82081" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_16.png" name="头发81"/>
-		<item id="82082" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_17.png" name="头发82"/>
-		<item id="82083" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa01.png" name="头发83"/>
-		<item id="82084" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa02.png" name="头发84"/>
-		<item id="82085" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa03.png" name="头发85"/>
-		<item id="82086" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa04.png" name="头发86"/>
-		<item id="82087" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa05.png" name="头发87"/>
-		<item id="82088" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa06.png" name="头发88"/>
-		<item id="82089" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa07.png" name="头发89"/>
-		<item id="82090" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa08.png" name="头发90"/>
-		<item id="82091" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa09.png" name="头发91"/>
-		<item id="82092" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa010.png" name="头发92"/>
-		<item id="82093" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa011.png" name="头发93"/>
-		<item id="82094" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa012.png" name="头发94"/>
-		<item id="82095" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa013.png" name="头发95"/>
-		<item id="82096" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa014.png" name="头发96"/>
-		<item id="82097" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa015.png" name="头发97"/>
-		<item id="82098" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa016.png" name="头发98"/>
-		<item id="82099" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa017.png" name="头发99"/>
-		<item id="82100" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa018.png" name="头发100"/>
-		<item id="82101" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa019.png" name="头发101"/>
-		<item id="82102" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa020.png" name="头发102"/>
-		<item id="82103" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa021.png" name="头发103"/>
-		<item id="82104" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa022.png" name="头发104"/>
-		<item id="82105" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa01.png" name="头发105"/>
-		<item id="82106" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa02.png" name="头发106"/>
-		<item id="82107" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa03.png" name="头发107"/>
-		<item id="82108" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa04.png" name="头发108"/>
-		<item id="82109" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa05.png" name="头发109"/>
-		<item id="82110" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa06.png" name="头发110"/>
-		<item id="82111" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa07.png" name="头发111"/>
-		<item id="82112" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa08.png" name="头发112"/>
-		<item id="82113" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa09.png" name="头发113"/>
-		<item id="82114" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa010.png" name="头发114"/>
-		<item id="82115" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa011.png" name="头发115"/>
-		<item id="82116" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa012.png" name="头发116"/>
-		<item id="82117" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa013.png" name="头发117"/>
-		<item id="82118" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa014.png" name="头发118"/>
-		<item id="82119" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa015.png" name="头发119"/>
-		<item id="82120" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa016.png" name="头发120"/>
-		<item id="82121" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa017.png" name="头发121"/>
-		<item id="82122" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa018.png" name="头发122"/>
-		<item id="82123" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa019.png" name="头发123"/>
-		<item id="82124" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa020.png" name="头发124"/>
-		<item id="82125" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa021.png" name="头发125"/>
-		<item id="82126" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa022.png" name="头发126"/>
-		<item id="82127" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa01.png" name="头发127"/>
-		<item id="82128" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa02.png" name="头发128"/>
-		<item id="82129" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa03.png" name="头发129"/>
-		<item id="82130" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa04.png" name="头发130"/>
-		<item id="82131" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa05.png" name="头发131"/>
-		<item id="82132" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa06.png" name="头发132"/>
-		<item id="82133" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa07.png" name="头发133"/>
-		<item id="82134" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa08.png" name="头发134"/>
-		<item id="82135" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa09.png" name="头发135"/>
-		<item id="82136" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa010.png" name="头发136"/>
-		<item id="82137" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa011.png" name="头发137"/>
-		<item id="82138" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa012.png" name="头发138"/>
-		<item id="82139" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa013.png" name="头发139"/>
-		<item id="82140" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa014.png" name="头发140"/>
-		<item id="82141" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa015.png" name="头发141"/>
-		<item id="82142" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa016.png" name="头发142"/>
-		<item id="82143" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa017.png" name="头发143"/>
-		<item id="82144" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa018.png" name="头发144"/>
-		<item id="82145" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa019.png" name="头发145"/>
-		<item id="82146" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa020.png" name="头发146"/>
-		<item id="82147" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa021.png" name="头发147"/>
-		<item id="82148" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa022.png" name="头发148"/>
-		<item id="82149" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa01.png" name="头发149"/>
-		<item id="82150" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa02.png" name="头发150"/>
-		<item id="82151" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa03.png" name="头发151"/>
-		<item id="82152" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa04.png" name="头发152"/>
-		<item id="82153" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa05.png" name="头发153"/>
-		<item id="82154" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa06.png" name="头发154"/>
-		<item id="82155" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa07.png" name="头发155"/>
-		<item id="82156" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa08.png" name="头发156"/>
-		<item id="82157" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa09.png" name="头发157"/>
-		<item id="82158" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa010.png" name="头发158"/>
-		<item id="82159" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa011.png" name="头发159"/>
-		<item id="82160" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa012.png" name="头发160"/>
-		<item id="82161" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa013.png" name="头发161"/>
-		<item id="82162" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa014.png" name="头发162"/>
-		<item id="82163" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa015.png" name="头发163"/>
-		<item id="82164" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa016.png" name="头发164"/>
-		<item id="82165" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa017.png" name="头发165"/>
-		<item id="82166" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa018.png" name="头发166"/>
-		<item id="82167" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa019.png" name="头发167"/>
-		<item id="82168" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa020.png" name="头发168"/>
-		<item id="82169" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa021.png" name="头发169"/>
-		<item id="82170" price="60"  type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa022.png" name="头发170"/>
+		<item id="82001" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_00.png" name="传统男发1"/>
+		<item id="82002" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_01.png" name="传统男发2"/>
+		<item id="82003" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_hair_02.png" name="传统男发3"/>
+		<item id="82004" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_00.png" name="传统女发1"/>
+		<item id="82005" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_01.png" name="传统女发2"/>
+		<item id="82006" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_02.png" name="传统女发3"/>
+		<item id="82007" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_03.png" name="传统女发4"/>
+		<item id="82008" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_04.png" name="传统女发5"/>
+		<item id="82009" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_05.png" name="传统女发6"/>
+		<item id="82010" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_hair_06.png" name="传统女发7"/>
+		<item id="82011" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_001.png" name="帅气刘海1"/>
+		<item id="82012" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_01.png" name="帅气刘海2"/>
+		<item id="82013" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_02.png" name="帅气刘海3"/>
+		<item id="82014" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_03.png" name="帅气刘海4"/>
+		<item id="82015" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_04.png" name="帅气刘海5"/>
+		<item id="82016" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_05.png" name="帅气刘海6"/>
+		<item id="82017" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_06.png" name="帅气刘海7"/>
+		<item id="82018" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_07.png" name="帅气刘海8"/>
+		<item id="82019" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_08.png" name="帅气刘海9"/>
+		<item id="82020" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_09.png" name="帅气刘海10"/>
+		<item id="82021" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_10.png" name="帅气刘海11"/>
+		<item id="82022" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_11.png" name="帅气刘海12"/>
+		<item id="82023" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_12.png" name="帅气刘海13"/>
+		<item id="82024" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_13.png" name="帅气刘海14"/>
+		<item id="82025" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_14.png" name="帅气刘海15"/>
+		<item id="82026" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_15.png" name="帅气刘海16"/>
+		<item id="82027" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_16.png" name="帅气刘海17"/>
+		<item id="82028" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_hair_17.png" name="帅气刘海18"/>
+		<item id="82029" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_001.png" name="扎克斯1"/>
+		<item id="82030" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_01.png" name="扎克斯2"/>
+		<item id="82031" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_02.png" name="扎克斯3"/>
+		<item id="82032" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_03.png" name="扎克斯4"/>
+		<item id="82033" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_04.png" name="扎克斯5"/>
+		<item id="82034" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_05.png" name="扎克斯6"/>
+		<item id="82035" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_06.png" name="扎克斯7"/>
+		<item id="82036" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_07.png" name="扎克斯8"/>
+		<item id="82037" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_08.png" name="扎克斯9"/>
+		<item id="82038" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_09.png" name="扎克斯10"/>
+		<item id="82039" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_10.png" name="扎克斯11"/>
+		<item id="82040" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_11.png" name="扎克斯12"/>
+		<item id="82041" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_12.png" name="扎克斯13"/>
+		<item id="82042" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_13.png" name="扎克斯14"/>
+		<item id="82043" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_14.png" name="扎克斯15"/>
+		<item id="82044" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_15.png" name="扎克斯16"/>
+		<item id="82045" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_16.png" name="扎克斯17"/>
+		<item id="82046" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_hair_17.png" name="扎克斯18"/>
+		<item id="82047" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_001.png" name="刺猬头1"/>
+		<item id="82048" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_01.png" name="刺猬头2"/>
+		<item id="82049" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_02.png" name="刺猬头3"/>
+		<item id="82050" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_03.png" name="刺猬头4"/>
+		<item id="82051" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_04.png" name="刺猬头5"/>
+		<item id="82052" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_05.png" name="刺猬头6"/>
+		<item id="82053" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_06.png" name="刺猬头7"/>
+		<item id="82054" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_07.png" name="刺猬头8"/>
+		<item id="82055" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_08.png" name="刺猬头9"/>
+		<item id="82056" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_09.png" name="刺猬头10"/>
+		<item id="82057" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_10.png" name="刺猬头11"/>
+		<item id="82058" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_11.png" name="刺猬头12"/>
+		<item id="82059" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_12.png" name="刺猬头13"/>
+		<item id="82060" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_13.png" name="刺猬头14"/>
+		<item id="82061" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_14.png" name="刺猬头15"/>
+		<item id="82062" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_15.png" name="刺猬头16"/>
+		<item id="82063" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_16.png" name="刺猬头17"/>
+		<item id="82064" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/5_Avatar_boy_hair_17.png" name="刺猬头18"/>
+		<item id="82065" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_001.png" name="小刘海1"/>
+		<item id="82066" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_01.png" name="小刘海2"/>
+		<item id="82067" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_02.png" name="小刘海3"/>
+		<item id="82068" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_03.png" name="小刘海4"/>
+		<item id="82069" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_04.png" name="小刘海5"/>
+		<item id="82070" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_05.png" name="小刘海6"/>
+		<item id="82071" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_06.png" name="小刘海7"/>
+		<item id="82072" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_07.png" name="小刘海8"/>
+		<item id="82073" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_08.png" name="小刘海9"/>
+		<item id="82074" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_09.png" name="小刘海10"/>
+		<item id="82075" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_10.png" name="小刘海11"/>
+		<item id="82076" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_11.png" name="小刘海12"/>
+		<item id="82077" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_12.png" name="小刘海13"/>
+		<item id="82078" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_13.png" name="小刘海14"/>
+		<item id="82079" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_14.png" name="小刘海15"/>
+		<item id="82080" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_15.png" name="小刘海16"/>
+		<item id="82081" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_16.png" name="小刘海17"/>
+		<item id="82082" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/6_Avatar_boy_hair_17.png" name="小刘海18"/>
+		<item id="82083" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa01.png" name="翘尾1"/>
+		<item id="82084" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa02.png" name="翘尾2"/>
+		<item id="82085" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa03.png" name="翘尾3"/>
+		<item id="82086" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa04.png" name="翘尾4"/>
+		<item id="82087" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa05.png" name="翘尾5"/>
+		<item id="82088" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa06.png" name="翘尾6"/>
+		<item id="82089" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa07.png" name="翘尾7"/>
+		<item id="82090" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa08.png" name="翘尾8"/>
+		<item id="82091" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa09.png" name="翘尾9"/>
+		<item id="82092" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa010.png" name="翘尾10"/>
+		<item id="82093" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa011.png" name="翘尾11"/>
+		<item id="82094" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa012.png" name="翘尾12"/>
+		<item id="82095" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa013.png" name="翘尾13"/>
+		<item id="82096" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa014.png" name="翘尾14"/>
+		<item id="82097" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa015.png" name="翘尾15"/>
+		<item id="82098" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa016.png" name="翘尾16"/>
+		<item id="82099" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa017.png" name="翘尾17"/>
+		<item id="82100" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa018.png" name="翘尾18"/>
+		<item id="82101" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa019.png" name="翘尾19"/>
+		<item id="82102" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa020.png" name="翘尾20"/>
+		<item id="82103" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa021.png" name="翘尾21"/>
+		<item id="82104" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/7_girl_toufa022.png" name="翘尾22"/>
+		<item id="82105" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa01.png" name="丸子头1"/>
+		<item id="82106" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa02.png" name="丸子头2"/>
+		<item id="82107" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa03.png" name="丸子头3"/>
+		<item id="82108" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa04.png" name="丸子头4"/>
+		<item id="82109" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa05.png" name="丸子头5"/>
+		<item id="82110" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa06.png" name="丸子头6"/>
+		<item id="82111" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa07.png" name="丸子头7"/>
+		<item id="82112" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa08.png" name="丸子头8"/>
+		<item id="82113" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa09.png" name="丸子头9"/>
+		<item id="82114" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa010.png" name="丸子头10"/>
+		<item id="82115" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa011.png" name="丸子头11"/>
+		<item id="82116" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa012.png" name="丸子头12"/>
+		<item id="82117" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa013.png" name="丸子头13"/>
+		<item id="82118" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa014.png" name="丸子头14"/>
+		<item id="82119" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa015.png" name="丸子头15"/>
+		<item id="82120" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa016.png" name="丸子头16"/>
+		<item id="82121" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa017.png" name="丸子头17"/>
+		<item id="82122" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa018.png" name="丸子头18"/>
+		<item id="82123" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa019.png" name="丸子头19"/>
+		<item id="82124" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa020.png" name="丸子头20"/>
+		<item id="82125" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa021.png" name="丸子头21"/>
+		<item id="82126" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/8_girl_toufa022.png" name="双马尾1"/>
+		<item id="82127" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa01.png" name="双马尾2"/>
+		<item id="82128" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa02.png" name="双马尾3"/>
+		<item id="82129" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa03.png" name="双马尾4"/>
+		<item id="82130" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa04.png" name="双马尾5"/>
+		<item id="82131" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa05.png" name="双马尾6"/>
+		<item id="82132" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa06.png" name="双马尾7"/>
+		<item id="82133" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa07.png" name="双马尾8"/>
+		<item id="82134" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa08.png" name="双马尾9"/>
+		<item id="82135" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa09.png" name="双马尾10"/>
+		<item id="82136" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa010.png" name="双马尾11"/>
+		<item id="82137" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa011.png" name="双马尾12"/>
+		<item id="82138" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa012.png" name="双马尾13"/>
+		<item id="82139" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa013.png" name="双马尾14"/>
+		<item id="82140" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa014.png" name="双马尾15"/>
+		<item id="82141" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa015.png" name="双马尾16"/>
+		<item id="82142" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa016.png" name="双马尾17"/>
+		<item id="82143" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa017.png" name="双马尾18"/>
+		<item id="82144" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa018.png" name="双马尾19"/>
+		<item id="82145" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa019.png" name="双马尾20"/>
+		<item id="82146" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa020.png" name="双马尾21"/>
+		<item id="82147" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa021.png" name="双马尾22"/>
+		<item id="82148" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/9_girl_toufa022.png" name="双马尾23"/>
+		<item id="82149" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa01.png" name="小豆芽1"/>
+		<item id="82150" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa02.png" name="小豆芽2"/>
+		<item id="82151" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa03.png" name="小豆芽3"/>
+		<item id="82152" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa04.png" name="小豆芽4"/>
+		<item id="82153" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa05.png" name="小豆芽5"/>
+		<item id="82154" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa06.png" name="小豆芽6"/>
+		<item id="82155" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa07.png" name="小豆芽7"/>
+		<item id="82156" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa08.png" name="小豆芽8"/>
+		<item id="82157" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa09.png" name="小豆芽9"/>
+		<item id="82158" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa010.png" name="小豆芽10"/>
+		<item id="82159" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa011.png" name="小豆芽11"/>
+		<item id="82160" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa012.png" name="小豆芽12"/>
+		<item id="82161" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa013.png" name="小豆芽13"/>
+		<item id="82162" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa014.png" name="小豆芽14"/>
+		<item id="82163" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa015.png" name="小豆芽15"/>
+		<item id="82164" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa016.png" name="小豆芽16"/>
+		<item id="82165" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa017.png" name="小豆芽17"/>
+		<item id="82166" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa018.png" name="小豆芽18"/>
+		<item id="82167" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa019.png" name="小豆芽19"/>
+		<item id="82168" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa020.png" name="小豆芽20"/>
+		<item id="82169" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa021.png" name="小豆芽21"/>
+		<item id="82170" price="60"  type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/10_girl_toufa022.png" name="小豆芽22"/>
 
 		
 
@@ -535,15 +533,19 @@
 	<category name="shirt" text="衣服">
 	    
 	    <!--20211118新加-->
-		<item id="84109" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84109_normal_people_32bits.png" name="平民" avatarMode="false"/>
+		<item id="84109" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84109_normal_people_32bits.png" name="古代平民" avatarMode="false"/>
 	    <!--20211118新加-->
-		<item id="84108" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84108_olympic_cloth_32bits.png" name="冬运会"/>
+		<item id="84108" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84108_olympic_cloth_32bits.png" name="红白运动服"/>
 		
 		<!--20220120新加--><!--后续新加至下方-->
 		<item id="84110" gsid="83019" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84110_blue_skirt_32bits.png" name="小红帽的裙子"/>
 		<item id="84111" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84111_brown_skirt_32bits.png" name="褐色裙子" avatarMode="false"/>
 		<item id="84112" price="60" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84112_sliceflower_skirt_32bits.png" name="碎花裙子" avatarMode="false"/>
-
+		
+		<!--20220623新加-->
+		<item id="84121" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84121_xiaohuangshirt01_32bits.png" name="麻衣1"/>
+		<item id="84122" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84122_xiaohuangshirt02_32bits.png" name="麻衣2"/>
+		
 		<!--20220310新加-->
 		<item id="84115" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84115_block_shirt_32bits.png" name="针织衬衫"/>
 		<item id="84116" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84116_purple_boy_32bits.png" name="紫色卫衣"/>
@@ -557,37 +559,37 @@
 		<item id="84114" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84114_origin2_32bits.png" name="原始人2"/>
 
 	    <!--20211028新加-->
-		<item id="84107" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84107_famale_teacher_32bits.png" name="女老师"/>
+		<item id="84107" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84107_famale_teacher_32bits.png" name="女职工衣服"/>
 	    <!--20211021新加-->
-		<item id="84084" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84084_antiepidemic_32bits.png" name="防疫服" avatarMode="false"/>
-		<item id="84085" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84085_chef_male_32bits.png" name="厨师（男）" avatarMode="false"/>
-		<item id="84086" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84086_ground_male_32bits.png" name="地勤（男）" avatarMode="false"/>
-		<item id="84087" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84087_cleaner_32bits.png" name="环卫工人" avatarMode="false"/>
-        <item id="84088" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84088_police1_32bits.png" name="警察1" avatarMode="false"/>
-        <item id="84089" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84089_police2_32bits.png" name="警察2" avatarMode="false"/>
-        <item id="84090" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84090_police3_32bits.png" name="交警" avatarMode="false"/>
-        <item id="84091" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84091_navy_32bits.png" name="海军" avatarMode="false"/>
-        <item id="84092" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84092_army_32bits.png" name="陆军" avatarMode="false"/>
-		<item id="84093" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84093_air_force_32bits.png" name="空军" avatarMode="false"/>
-		<item id="84094" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84094_bankman_32bits.png" name="银行员工" avatarMode="false"/>
+		<item id="84084" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84084_antiepidemic_32bits.png" name="防护服" avatarMode="false"/>
+		<item id="84085" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84085_chef_male_32bits.png" name="厨师服（男）" avatarMode="false"/>
+		<item id="84086" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84086_ground_male_32bits.png" name="职员服（男）" avatarMode="false"/>
+		<item id="84087" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84087_cleaner_32bits.png" name="环保服" avatarMode="false"/>
+        <item id="84088" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84088_police1_32bits.png" name="制服01" avatarMode="false"/>
+        <item id="84089" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84089_police2_32bits.png" name="制服02" avatarMode="false"/>
+        <item id="84090" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84090_police3_32bits.png" name="制服03" avatarMode="false"/>
+        <item id="84091" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84091_navy_32bits.png" name="制服04" avatarMode="false"/>
+        <item id="84092" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84092_army_32bits.png" name="制服05" avatarMode="false"/>
+		<item id="84093" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84093_air_force_32bits.png" name="制服06" avatarMode="false"/>
+		<item id="84094" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84094_bankman_32bits.png" name="员工服" avatarMode="false"/>
 		<item id="84095" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84095_host_32bits.png" name="男主持" avatarMode="false"/>
-		<item id="84096" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84096_firefighter_32bits.png" name="消防员" avatarMode="false"/>
+		<item id="84096" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84096_firefighter_32bits.png" name="防火服" avatarMode="false"/>
 		<item id="84097" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84097_feeder_32bits.png" name="饲养员" avatarMode="false"/>
-		<item id="84098" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84098_cafer_32bits.png" name="咖啡员工（男）" avatarMode="false"/>
+		<item id="84098" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84098_cafer_32bits.png" name="员工服1（男）" avatarMode="false"/>
 		<item id="84099" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84099_archaeologist_32bits.png" name="考古学家" avatarMode="false"/>
-		<item id="84100" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84100_fastfoodman_32bits.png" name="快餐员工（男）" avatarMode="false"/>
+		<item id="84100" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84100_fastfoodman_32bits.png" name="员工服2（男）" avatarMode="false"/>
 		<item id="84101" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84101_thief_32bits.png" name="小偷" avatarMode="false"/>
-		<item id="84102" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84102_nurse_32bits.png" name="护士" avatarMode="false"/>
-		<item id="84103" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84103_bankwoman_32bits.png" name="银行（女）" avatarMode="false"/>
-		<item id="84104" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84104_coffeewoman_32bits.png" name="咖啡员工（女）" avatarMode="false"/>
-		<item id="84105" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84105_fastfoodwoman_32bits.png" name="快餐员工（女）" avatarMode="false"/>
-		<item id="84106" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84106_cheffy_32bits.png" name="女厨师" avatarMode="false"/>
+		<item id="84102" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84102_nurse_32bits.png" name="护理服" avatarMode="false"/>
+		<item id="84103" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84103_bankwoman_32bits.png" name="员工服（女）" avatarMode="false"/>
+		<item id="84104" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84104_coffeewoman_32bits.png" name="员工服1（女）" avatarMode="false"/>
+		<item id="84105" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84105_fastfoodwoman_32bits.png" name="员工服2（女）" avatarMode="false"/>
+		<item id="84106" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84106_cheffy_32bits.png" name="厨师服（女）" avatarMode="false"/>
 
 
 	    <!--20210817新加-->
 		<item id="84083" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84083_white_longcoat_32bits.png" name="白大褂"/>
         <!--20210805新加-->
-		<item id="84074" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84074_32bits.png" name="粉红时代"/>
+		<item id="84074" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84074_32bits.png" name="粉红时代"/>
 		<item id="84075" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84075_32bits.png" name="泳衣（红黑）"/>
 		<item id="84076" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84076_32bits.png" name="泳衣（蓝黑）"/>
 		<item id="84077" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84077_32bits.png" name="泳衣（绿黑）"/>
@@ -595,25 +597,25 @@
 		<item id="84079" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84079_32bits.png" name="运动服（紫红）"/>
 		<item id="84080" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84080_32bits.png" name="运动服（红）"/>
 		<item id="84081" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84081_32bits.png" name="运动服（橙）"/>
-		<item id="84082" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84082_32bits.png" name="唐服（蓝）"/>
+		<item id="84082" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84082_32bits.png" name="唐服（蓝）"/>
 		
 	    <!--20210720新加-->
-		<item id="84062" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84062_32bits.png" name="班主任"/>
-		<item id="84063" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84063_32bits.png" name="条纹"/>
-		<item id="84064" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84064_32bits.png" name="衣服54"/>
+		<item id="84062" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84062_32bits.png" name="职业装"/>
+		<item id="84063" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84063_32bits.png" name="袖子条纹（蓝）"/>
+		<item id="84064" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84064_32bits.png" name="袖子"/>
 		<item id="84065" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84065_32bits.png" name="夏日校服（男）"/>
-		<item id="84066" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84066_32bits.png" name="夏日校服（女）"/>
-		<item id="84067" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84067_32bits.png" name="衣服57"/>
+		<item id="84066" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84066_32bits.png" name="夏日校服（女）"/>
+		<item id="84067" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84067_32bits.png" name="黄条纹"/>
 		<item id="84068" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84068_32bits.png" name="黑色校服"/>
-		<item id="84069" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84069_32bits.png" name="衣服59"/>
-		<item id="84070" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84070_32bits.png" name="衣服60"/>
-		<item id="84071" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84071_32bits.png" name="衣服61"/>
-		<item id="84072" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84072_32bits.png" name="衣服62"/>
-		<item id="84073" price="350" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84073_32bits.png" name="衣服63"/>
+		<item id="84069" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84069_32bits.png" name="唐服（灰）"/>
+		<item id="84070" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84070_32bits.png" name="默认（男）"/>
+		<item id="84071" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84071_32bits.png" name="唐服（绿）"/>
+		<item id="84072" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84072_32bits.png" name="默认（女）"/>
+		<item id="84073" price="350" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84073_32bits.png" name="女仙"/>
 
 	    <!--20210624新增-->
-		<item id="84061" gsid="83006" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84061_sodier_armor_32bits.png" name="军服" avatarMode="false"/>
-		<item id="84060" gsid="83005" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84060_red_sodier_armor_32bits.png" name="长征服"/>
+		<item id="84061" gsid="83006" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84061_sodier_armor_32bits.png" name="天蓝服01" avatarMode="false"/>
+		<item id="84060" gsid="83005" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84060_red_sodier_armor_32bits.png" name="天蓝服02"/>
 		<!--20210610新增-->
 		<item id="84059" gsid="83004" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84059_space_suit_armor_32bits.png" name="宇航服"/>
 		<!--20210527新增-->
@@ -630,56 +632,56 @@
 		<!--起始数据-->
 		<item id="84001" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_.png" name="鲲鲲"/>
 		<item id="84002" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_01.png" name="布鲁斯李"/>
-		<item id="84003" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_011.png" name="衣服3"/>
-		<item id="84004" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_012.png" name="衣服4"/>
-		<item id="84005" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_013.png" name="衣服5"/>
-		<item id="84006" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_014.png" name="衣服6"/>
-		<item id="84007" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_015.png" name="衣服7"/>
-		<item id="84008" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_016.png" name="衣服8"/>
+		<item id="84003" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_011.png" name="叠穿"/>
+		<item id="84004" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_012.png" name="山脉"/>
+		<item id="84005" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_013.png" name="碎花"/>
+		<item id="84006" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_014.png" name="菱形"/>
+		<item id="84007" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_015.png" name="竹子"/>
+		<item id="84008" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_016.png" name="黑黄帽衫"/>
 		<item id="84009" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_017.png" name="豹纹"/>
-		<item id="84010" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_xiaofu.png" name="蓝色校服"/>
+		<item id="84010" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_boy_body_xiaofu.png" name="蓝色校服"/>
 		<item id="84011" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_girl_body_01.png" name="副校长"/>
-		<item id="84012" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_girl_body_xiaofu.png" name="红色校服"/>
-		<item id="84013" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_caomei_boy_body.png" name="衣服13"/>
-		<item id="84014" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_jingcha_body.png" name="校长"/>
-		<item id="84015" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_shangren_body.png" name="衣服15"/>
-		<item id="84016" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_shizhuang_body.png" name="衣服16"/>
-		<item id="84017" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_xizhuang.png" name="米色西服"/>
+		<item id="84012" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_Avatar_girl_body_xiaofu.png" name="红色校服"/>
+		<item id="84013" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_caomei_boy_body.png" name="校长夏装"/>
+		<item id="84014" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_jingcha_body.png" name="校长"/>
+		<item id="84015" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_shangren_body.png" name="棕色领带"/>
+		<item id="84016" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_shizhuang_body.png" name="吊带"/>
+		<item id="84017" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_xizhuang.png" name="米色西服"/>
 		<item id="84018" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_01_xunlian_body.png" name="忍者"/>
-		<item id="84020" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_01.png" name="默认"/>
+		<item id="84020" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_01.png" name="默认"/>
 		<item id="84021" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_02.png" name="幻想星球（男）"/>
-		<item id="84022" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_03.png" name="心愿使者（男）"/>
+		<item id="84022" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_03.png" name="心愿使者（男）"/>
 		<item id="84023" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_04.png" name="樱花（男）"/>
 		<item id="84024" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_05.png" name="AI极客（男）"/>
 		<item id="84025" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_06.png" name="吉祥如意（男）"/>
 		<item id="84026" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_07.png" name="抗疫先锋（男）"/>
 		<item id="84027" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_02_Avatar_boy_body_11.png" name="黑色唐装"/>
 		<item id="84028" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_01.png" name="默认（女）"/>
-		<item id="84029" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_02.png" name="幻想星球（女）"/>
+		<item id="84029" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_02.png" name="幻想星球（女）"/>
 		<item id="84030" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_03.png" name="心愿使者（女）"/>
 		<item id="84031" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_04.png" name="樱花（女）"/>
-		<item id="84032" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_05.png" name="AI极客（女）"/>
-		<item id="84033" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_06.png" name="吉祥如意（女）"/>
+		<item id="84032" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_05.png" name="AI极客（女）"/>
+		<item id="84033" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_06.png" name="吉祥如意（女）"/>
 		<item id="84034" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_03_Avatar_girl_body_07.png" name="抗疫先锋（女）"/>
-		<item id="84035" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paizinan1.png" name="衣服35"/>
-		<item id="84036" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinan2.png" name="衣服36"/>
-		<item id="84037" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinan3.png" name="衣服37"/>
-		<item id="84038" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinv1.png" name="衣服38"/>
-		<item id="84039" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinv2.png" name="衣服39"/>
-		<item id="84040" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_qun02.png" name="衣服40"/>
+		<item id="84035" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paizinan1.png" name="汉服（蓝）"/>
+		<item id="84036" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinan2.png" name="汉服（深红）"/>
+		<item id="84037" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinan3.png" name="汉服（白）"/>
+		<item id="84038" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinv1.png" name="汉服（黑白）"/>
+		<item id="84039" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_paozinv2.png" name="汉服（花）"/>
+		<item id="84040" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/shirt_04_qun02.png" name="汉服（红白）"/>
 		<!--20210305新加-->
-		<item id="84041" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84042_32bits.png" name="衣服41"/>
-		<item id="84042" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84043_32bits.png" name="衣服42"/>
-		<item id="84043" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84041_32bits.png" name="衣服43"/>
+		<item id="84041" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84042_32bits.png" name="仙人（黄）"/>
+		<item id="84042" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84043_32bits.png" name="仙人（棕）"/>
+		<item id="84043" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84041_32bits.png" name="仙人（蓝）"/>
 		<!--20210309新加-->
-		<item id="84044" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84044_32bits.png" name="衣服44"/>
-		<item id="84045" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84045_32bits.png" name="衣服45"/>
-		<item id="84046" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84046_32bits.png" name="衣服46"/>
-		<item id="84047" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84047_32bits.png" name="衣服47"/>
-		<item id="84048" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84048_32bits.png" name="衣服48"/>
-		<item id="84049" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84051_32bits.png" name="衣服49"/>
-		<item id="84050" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84049_32bits.png" name="衣服50"/>
-		<item id="84051" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84050_32bits.png" name="衣服51"/>
+		<item id="84044" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84044_32bits.png" name="古代服饰1"/>
+		<item id="84045" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84045_32bits.png" name="古代服饰2"/>
+		<item id="84046" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84046_32bits.png" name="古代服饰3"/>
+		<item id="84047" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84047_32bits.png" name="古代服饰4"/>
+		<item id="84048" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84048_32bits.png" name="古代服饰5"/>
+		<item id="84049" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84051_32bits.png" name="古代服饰6"/>
+		<item id="84050" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84049_32bits.png" name="古代服饰7"/>
+		<item id="84051" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/84050_32bits.png" name="古代服饰8"/>
 
 		
 
@@ -687,7 +689,7 @@
 
 	<category name="pants" text="裤子">
         <!--20211118新增-->
-        <item id="85126" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85126_olympic_pant_32bits.png" name="冬运会"/>
+        <item id="85126" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85126_olympic_pant_32bits.png" name="红白运动裤"/>
 
 		<!--20220310新增  在此条后面新增-->
         <item id="85127" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85127_origin1_pant_32bits.png" name="原始人1"/>
@@ -700,25 +702,29 @@
 		<item id="85132" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85132_outfit_boy_32bits.png" name="运动裤"/>
 		<item id="85133" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85133_sleep_32bits.png" name="睡裤"/>
 	    
+		<!--20220324新增-->
+        <item id="85134" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85134_xiaohuangshirt01_32bits.png" name="农民裤子01"/>
+		<item id="85135" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85135_xiaohuangshirt02_32bits.png" name="农民裤子02"/>
+
         <!--20211021新增-->
         <item id="85106" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85106_antiepidemic_32bits.png" name="防疫服" avatarMode="false"/>
 		<item id="85107" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85107_cleaner_32bits.png" name="环卫工人" avatarMode="false"/>  
-		<item id="85108" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85108_police_32bits.png" name="警察" avatarMode="false"/>
-		<item id="85109" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85109_police3_32bits.png" name="交警" avatarMode="false"/>
-		<item id="85110" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85110_navy_32bits.png" name="海军" avatarMode="false"/>
+		<item id="85108" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85108_police_32bits.png" name="制服裤01" avatarMode="false"/>
+		<item id="85109" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85109_police3_32bits.png" name="制服裤子02" avatarMode="false"/>
+		<item id="85110" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85110_navy_32bits.png" name="制服裤子03" avatarMode="false"/>
 		<item id="85111" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85111_staff_32bits.png" name="职员裤子" avatarMode="false"/>
 		<item id="85112" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85112_staff2_32bits.png" name="职员裤子2" avatarMode="false"/>
-		<item id="85113" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85113_firefighter_32bits.png" name="消防员" avatarMode="false"/>
+		<item id="85113" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85113_firefighter_32bits.png" name="防火裤" avatarMode="false"/>
 		<item id="85114" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85114_feeder_32bits.png" name="饲养员" avatarMode="false"/>
 		<item id="85115" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85115_archaeologist_32bits.png" name="考古学家" avatarMode="false"/>
 		<item id="85116" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85116_staff3_32bits.png" name="职员裤子3" avatarMode="false"/>
-		<item id="85117" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85117_army_32bits.png" name="陆军" avatarMode="false"/>
+		<item id="85117" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85117_army_32bits.png" name="制服裤子04" avatarMode="false"/>
 		<item id="85118" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85118_staffskirt_32bits.png" name="职员裙子" avatarMode="false"/>
 		<item id="85119" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85119_staffskirt2_32bits.png" name="职员裙子2" avatarMode="false"/>
-		<item id="85120" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85120_navywoman_32bits.png" name="海军（女）" avatarMode="false"/>
-		<item id="85121" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85121_policewoman_32bits.png" name="警察（女）" avatarMode="false"/>
-		<item id="85122" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85122_air_force_woman_32bits.png" name="空军(女)" avatarMode="false"/>
-		<item id="85123" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85123_armywoman_32bits.png" name="陆军（女）" avatarMode="false"/>
+		<item id="85120" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85120_navywoman_32bits.png" name="制服裤子01（女）" avatarMode="false"/>
+		<item id="85121" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85121_policewoman_32bits.png" name="制服裤子02（女）" avatarMode="false"/>
+		<item id="85122" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85122_air_force_woman_32bits.png" name="制服裤子03(女)" avatarMode="false"/>
+		<item id="85123" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85123_armywoman_32bits.png" name="制服裤子03（女）" avatarMode="false"/>
 		<item id="85124" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85124_staffskirt3_32bits.png" name="职员裙子3" avatarMode="false"/>
 		<item id="85125" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85125_fastfoodwoman_32bits.png" name="快餐职员（女）" avatarMode="false"/>
 
@@ -732,29 +738,29 @@
 		<item id="85098" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85098_32bits.png" name="泳裤（蓝黑）"/>
 		<item id="85099" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85099_32bits.png" name="泳裤（绿黑）"/>
 		<item id="85100" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85100_32bits.png" name="泳裤（紫黑）"/>
-		<item id="85101" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85101_32bits.png" name="唐装"/>
-		<item id="85102" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85102_32bits.png" name="裤子92"/>
-		<item id="85103" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85103_32bits.png" name="裤子93"/>
-		<item id="85104" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85104_32bits.png" name="裤子94"/>
-        <item id="85105" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85105_32bits.png" name="裤子95"/>
+		<item id="85101" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85101_32bits.png" name="唐装"/>
+		<item id="85102" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85102_32bits.png" name="泳裤（红）"/>
+		<item id="85103" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85103_32bits.png" name="泳裤（蓝）"/>
+		<item id="85104" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85104_32bits.png" name="泳裤（绿）"/>
+        <item id="85105" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85105_32bits.png" name="泳裤（紫）"/>
 
 	    <!--20210720新增-->
-        <item id="85081" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85081_32bits.png" name="黑色西裤"/>
-		<item id="85082" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85082_32bits.png" name="裤子72"/>
+        <item id="85081" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85081_32bits.png" name="黑色西裤"/>
+		<item id="85082" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85082_32bits.png" name="青色西裤"/>
 		<item id="85083" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85083_32bits.png" name="夏日校服（男）"/>
-		<item id="85084" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85084_32bits.png" name="夏日校服（女）"/>
-		<item id="85085" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85085_32bits.png" name="粉红时代"/>
+		<item id="85084" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85084_32bits.png" name="夏日校服（女）"/>
+		<item id="85085" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85085_32bits.png" name="粉红时代"/>
 		<item id="85086" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85086_32bits.png" name="黑色校服"/>
-		<item id="85087" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85087_32bits.png" name="裤子77"/>
-		<item id="85088" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85088_32bits.png" name="裤子78"/>
-		<item id="85089" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85089_32bits.png" name="裤子79"/>
-		<item id="85090" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85090_32bits.png" name="裤子80"/>
-		<item id="85091" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85091_32bits.png" name="裤子81"/>
-		<item id="85092" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85092_32bits.png" name="裤子82"/>
+		<item id="85087" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85087_32bits.png" name="黑色裤"/>
+		<item id="85088" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85088_32bits.png" name="藏青短裤"/>
+		<item id="85089" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85089_32bits.png" name="牛仔短裤"/>
+		<item id="85090" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85090_32bits.png" name="袜裤"/>
+		<item id="85091" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85091_32bits.png" name="白袜裤"/>
+		<item id="85092" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85092_32bits.png" name="纯黑裤"/>
 	
         <!--20210624新增-->
-		<item id="85080" gsid="84007" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85080_sodier_pants_32bits.png" name="军裤" avatarMode="false"/>
-        <item id="85079" gsid="84006" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85079_red_sodier_pants_32bits.png" name="长征裤"/>
+		<item id="85080" gsid="84007" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85080_sodier_pants_32bits.png" name="天蓝裤01" avatarMode="false"/>
+        <item id="85079" gsid="84006" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85079_red_sodier_pants_32bits.png" name="天蓝裤02"/>
 
 	    <!--20210610新增-->
 		<item id="85078" gsid="84005" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85078_space_suit_pants_32bits.png" name="宇航裤"/>
@@ -769,71 +775,71 @@
 		<item id="85071"  gsid="84000" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/pants_01_Avatar_85071_32bits.png" name="海魂裤"/>
 		<item id="85072"  gsid="84001" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/pants_02_Avatar_85071_32bits.png" name="海魂裤(蓝)"/>
 		<!--起始数据-->
-		<item id="85001" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_00Avatar_boy_body_01kuku2.png" name="裤子1"/>
-		<item id="85002" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_.png" name="裤子2"/>
-		<item id="85003" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_01.png" name="裤子3"/>
-		<item id="85004" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_03.png" name="裤子4"/>
-		<item id="85005" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_xiaofu.png" name="蓝色校服"/>
-		<item id="85006" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_000.png" name="裤子6"/>
-		<item id="85007" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_03.png" name="布鲁斯李短裤"/>
+		<item id="85001" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_00Avatar_boy_body_01kuku2.png" name="纯白裤子"/>
+		<item id="85002" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_.png" name="高筒灰裤"/>
+		<item id="85003" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_01.png" name="高筒黑灰"/>
+		<item id="85004" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_03.png" name="高筒白灰"/>
+		<item id="85005" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_boy_leg_xiaofu.png" name="蓝色校服"/>
+		<item id="85006" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_000.png" name="白袜裤2"/>
+		<item id="85007" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_03.png" name="白袜黄裤"/>
 		<item id="85008" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_06.png" name="布鲁斯李短裤"/>
-		<item id="85009" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_xiaofu.png" name="红色校服"/>
-		<item id="85010" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_caome_boy_leg.png" name="裤子10"/>
-		<item id="85011" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_jingcha_leg.png" name="蓝色西裤"/>
-		<item id="85012" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui01.png" name="裤子12"/>
-		<item id="85013" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui02.png" name="裤子13"/>
-		<item id="85014" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui03.png" name="裤子14"/>
+		<item id="85009" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_Avatar_girl_leg_xiaofu.png" name="红色校服"/>
+		<item id="85010" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_caome_boy_leg.png" name="蓝色条纹"/>
+		<item id="85011" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_jingcha_leg.png" name="蓝色西裤"/>
+		<item id="85012" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui01.png" name="火焰"/>
+		<item id="85013" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui02.png" name="条纹长裤1"/>
+		<item id="85014" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui03.png" name="牛奶"/>
 		<item id="85015" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui04.png" name="豹纹"/>
-		<item id="85016" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui05.png" name="裤子16"/>
-		<item id="85017" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_shangren_boy_leg.png" name="棕色西裤"/>
-		<item id="85018" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_shangren_girl_leg.png" name="裤子18"/>
-		<item id="85019" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xizhuangku.png" name="米色西裤"/>
+		<item id="85016" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_lixiaolong_tui05.png" name="绿色裤子"/>
+		<item id="85017" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_shangren_boy_leg.png" name="棕色西裤"/>
+		<item id="85018" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_shangren_girl_leg.png" name="灰色裤袜"/>
+		<item id="85019" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xizhuangku.png" name="米色西裤"/>
 		<item id="85020" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xunlian_leg.png" name="忍者"/>
 		<item id="85021" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/1_xunlian_leg003.png" name="布鲁斯李"/>
-		<item id="85022" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_00Avatar_boy_body_01kuku2.png" name="裤子22"/>
-		<item id="85023" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_.png" name="裤子23"/>
+		<item id="85022" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_00Avatar_boy_body_01kuku2.png" name="白色短边"/>
+		<item id="85023" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_.png" name="灰色短边"/>
 		<item id="85024" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_01.png" name="黑色唐装"/>
 		<item id="85025" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_03.png" name="幻想星球（男）"/>
-		<item id="85026" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_xiaofu.png" name="裤子26"/>
-		<item id="85027" price="60" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_000.png" name="裤子27"/>
+		<item id="85026" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_xiaofu.png" name="红色短边"/>
+		<item id="85027" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_000.png" name="白袜"/>
 		<item id="85029" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_06.png" name="默认（女）"/>
-		<item id="85030" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_xiaofu.png" name="裤子30"/>
-		<item id="85031" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_caome_boy_leg.png" name="裤子31"/>
-		<item id="85032" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_jingcha_leg.png" name="裤子32"/>
-		<item id="85033" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui01.png" name="裤子33"/>
-		<item id="85034" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui02.png" name="裤子34"/>
-		<item id="85035" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui03.png" name="裤子35"/>
-		<item id="85036" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui04.png" name="裤子36"/>
-		<item id="85037" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui05.png" name="裤子37"/>
-		<item id="85038" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_shangren_boy_leg.png" name="裤子38"/>
-		<item id="85039" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_shangren_girl_leg.png" name="裤子39"/>
-		<item id="85040" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xizhuangku.png" name="裤子40"/>
-		<item id="85041" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xunlian_leg.png" name="裤子41"/>
-		<item id="85042" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xunlian_leg003.png" name="裤子42"/>
-		<item id="85044" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_02.png" name="裤子44"/>
-		<item id="85046" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_04.png" name="裤子46"/>
-		<item id="85047" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_05.png" name="裤子47"/>
-		<item id="85049" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_01.png" name="裤子49"/>
-		<item id="85050" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_02.png" name="裤子50"/>
-		<item id="85053" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu00.png" name="裤子53"/>
-		<item id="85054" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu01.png" name="裤子54"/>
-		<item id="85055" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu02.png" name="裤子55"/>
-		<item id="85056" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu03.png" name="裤子56"/>
-		<item id="85057" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu04.png" name="裤子57"/>
+		<item id="85030" price="60" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_xiaofu.png" name="红色短边"/>
+		<item id="85031" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_caome_boy_leg.png" name="蓝色条纹"/>
+		<item id="85032" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_jingcha_leg.png" name="蓝色短边"/>
+		<item id="85033" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui01.png" name="火焰"/>
+		<item id="85034" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui02.png" name="条纹长裤2"/>
+		<item id="85035" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui03.png" name="牛奶"/>
+		<item id="85036" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui04.png" name="豹纹"/>
+		<item id="85037" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_lixiaolong_tui05.png" name="绿色短边"/>
+		<item id="85038" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_shangren_boy_leg.png" name="棕色短边"/>
+		<item id="85039" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_shangren_girl_leg.png" name="灰袜"/>
+		<item id="85040" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xizhuangku.png" name="浅色短边"/>
+		<item id="85041" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xunlian_leg.png" name="忍者"/>
+		<item id="85042" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_xunlian_leg003.png" name="武术"/>
+		<item id="85044" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_02.png" name="白色绿边"/>
+		<item id="85046" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_04.png" name="黑色灰边"/>
+		<item id="85047" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_boy_leg_05.png" name="绿色竖纹"/>
+		<item id="85049" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_01.png" name="红点袜"/>
+		<item id="85050" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/2_Avatar_girl_leg_02.png" name="蓝条袜"/>
+		<item id="85053" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu00.png" name="厚棕裤"/>
+		<item id="85054" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu01.png" name="厚白裤"/>
+		<item id="85055" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu02.png" name="厚黑裤"/>
+		<item id="85056" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu03.png" name="厚灰裤"/>
+		<item id="85057" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/3_Avatar_boy_leg_xiangyu04.png" name="厚深裤"/>
 		<item id="85058" type="0" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu00.png" name="默认"/>
-		<item id="85059" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu01.png" name="裤子59"/>
-		<item id="85060" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu02.png" name="裤子60"/>
-		<item id="85061" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu03.png" name="裤子61"/>
-		<item id="85062" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu04.png" name="裤子62"/>
+		<item id="85059" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu01.png" name="厚白裤2"/>
+		<item id="85060" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu02.png" name="厚黑裤2"/>
+		<item id="85061" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu03.png" name="厚灰裤2"/>
+		<item id="85062" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/4_Avatar_boy_leg_xiangyu04.png" name="厚深裤2"/>
 		<!--20210305新加-->
-		<item id="85063" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85063_32bits.png" name="裤子63"/>
-		<item id="85064" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85064_32bits.png" name="裤子64"/>
+		<item id="85063" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85063_32bits.png" name="厚蓝白裤"/>
+		<item id="85064" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85064_32bits.png" name="厚蓝灰裤"/>
 		<item id="85065" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85065_32bits.png" name="虎纹裤1"/>
 		<item id="85066" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85066_32bits.png" name="虎纹裤2"/>
-		<item id="85067" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85067_32bits.png" name="裤子67"/>
-		<item id="85068" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85068_32bits.png" name="裤子68"/>
+		<item id="85067" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85067_32bits.png" name="厚蓝白裤2"/>
+		<item id="85068" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85068_32bits.png" name="厚蓝灰裤2"/>
 		<item id="85069" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85069_32bits.png" name="虎纹裤3"/>
-		<item id="85070" price="200" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85070_32bits.png" name="虎纹裤4"/>
+		<item id="85070" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/85070_32bits.png" name="虎纹裤4"/>
 	</category>
 	
 	<category name="back" text="背部">
@@ -849,11 +855,11 @@
 		<item id="86045" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86045_cleaner_back_32bits.png" name="环卫腰包" avatarMode="false"/>
 		<item id="86046" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86046_archaeologist_back_32bits.png" name="考古腰包" avatarMode="false"/>
          <!--20211118新加-->
-		<item id="86044" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86044_olympic_back_32bits.png" name="冬运会"/>
+		<item id="86044" price="200" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86044_olympic_back_32bits.png" name="红兜帽"/>
          <!--20210929新加-->
 		<item id="86043" gsid="85003" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86043_red_flag_bag_32bits.png" name="红旗书包"/>
-	    <!--20210624新加-->
-		<item id="86042" gsid="85002" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86042_red_scarf_32bits.png" name="红领巾"/>
+	    <!--20210624新加
+		<item id="86042" gsid="85002" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86042_red_scarf_32bits.png" name="红"/>-->
 	    <!--20210610新加-->
 		<item id="86041" gsid="85001" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86041_space_suit_bag_32bits.png" name="氧气瓶"/>
 		<item id="86040" gsid="85000" type="3" icon="Texture/Aries/Creator/keepwork/Avatar/icons/86040_shubao_32bits.png" name="小伙伴书包"/>
@@ -881,7 +887,7 @@
 		<item id="86003" price="250" type="2" icon="Texture/Aries/Item/1427_StormExchangeBack03.png" name="蝙蝠之翼3" wing="true"/>
 		<item id="86004" price="250" type="2" icon="Texture/Aries/Item/1428_DeathExchangeBack03.png" name="蝙蝠之翼4" wing="true"/>
 		<item id="86005" price="250" type="2" icon="Texture/Aries/Item/1429_LifeExchangeBack03.png" name="蝙蝠之翼5" wing="true"/>
-		<item id="86006" price="600" type="2" icon="Texture/Aries/Item/1482_ShiningBack.png" name="骨翼" wing="true"/>
+		<!--<item id="86006" price="600" type="2" icon="Texture/Aries/Item/1482_ShiningBack.png" name="骨翼" wing="true"/>
 		<item id="86012" type="1" icon="Texture/Aries/Item/1713_DarklyCombatBack.png" name="大恶魔之翼" wing="true"/>
 		<item id="86020" type="1" icon="Texture/Aries/Item/1812_AngelWings.png" name="大天使之翼" wing="true"/>
 		<item id="86021" price="600" type="2" icon="Texture/Aries/Item/1820_IceBackS2.png" name="魔龙之翼1" wing="true"/>
@@ -898,7 +904,7 @@
 		<item id="86035" type="1" icon="Texture/Aries/Item/2242_IceBackS4.png" name="元素之翼7" wing="true"/>
 		<item id="86036" type="1" icon="Texture/Aries/Item/2249_StormBackS4.png" name="元素之翼8" wing="true"/>
 		<item id="86037" type="1" icon="Texture/Aries/Item/2256_LifeBackS4.png" name="元素之翼9" wing="true"/>
-		<item id="86038" type="1" icon="Texture/Aries/Item/2263_DeathBackS4.png" name="元素之翼10" wing="true"/>
+		<item id="86038" type="1" icon="Texture/Aries/Item/2263_DeathBackS4.png" name="元素之翼10" wing="true"/> -->
 	</category>
 
 	<category name="right_hand_equipment" text="手持">
@@ -1084,41 +1090,40 @@
 	</category>
 
 	<category name="mouth" text="嘴巴">
-		<item id="88001" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_08_01_32bits.png" name="嘴巴1"/>
-		<item id="88002" price="50" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_fps10_a001_32bits.png" name="嘴巴2"/>
-		<item id="88003" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_fps10_a003_32bits.png" name="嘴巴3"/>
-		<item id="88004" price="50" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_01_01_32bits.png" name="嘴巴4"/>
-		<item id="88005" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_02_01_32bits.png" name="嘴巴5"/>
-		<item id="88006" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_03_01_32bits.png" name="嘴巴6"/>
-		<item id="88007" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a002_32bits.png" name="嘴巴7"/>
-		<item id="88008" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a003_32bits.png" name="嘴巴8"/>
-		<item id="88009" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a004_32bits.png" name="嘴巴9"/>
+		<item id="88001" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_08_01_32bits.png" name="很不高兴"/>
+		<item id="88002" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_fps10_a001_32bits.png" name="正常"/>
+		<item id="88003" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_fps10_a003_32bits.png" name="惊讶"/>
+		<item id="88004" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_01_01_32bits.png" name="咧嘴笑"/>
+		<item id="88005" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_02_01_32bits.png" name="美味"/>
+		<item id="88006" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_03_01_32bits.png" name="感动"/>
+		<item id="88007" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a002_32bits.png" name="咩咩"/>
+		<item id="88008" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_fps10_a003_32bits.png" name="大喊"/>
 		<item id="88013" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_mask_32bits.png" name="口罩"/>
-		<item id="88016" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_03_32bits.png" name="嘴巴10"/>
-		<item id="88017" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_04_32bits.png" name="嘴巴11"/>
-		<item id="88018" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_05_32bits.png" name="嘴巴12"/>
-		<item id="88019" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_06_32bits.png" name="嘴巴13"/>
-		<item id="88020" price="50" type="5" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_01_32bits.png" name="嘴巴14"/>
-		<item id="88021" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_02_01_32bits.png" name="嘴巴15"/>
-		<item id="88022" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_03_01_32bits.png" name="嘴巴16"/>
-		<item id="88023" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_04_01_32bits.png" name="嘴巴17"/>
-		<item id="88024" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_05_01_32bits.png" name="嘴巴18"/>
-		<item id="88025" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_06_01_32bits.png" name="嘴巴19"/>
-		<item id="88026" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_07_01_32bits.png" name="嘴巴20"/>
+		<item id="88016" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_03_32bits.png" name="大笑"/>
+		<item id="88017" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_04_32bits.png" name="微笑"/>
+		<item id="88018" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_05_32bits.png" name="龇牙"/>
+		<item id="88019" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_06_32bits.png" name="不高兴"/>
+		<item id="88020" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_01_32bits.png" name="不失礼貌"/>
+		<item id="88021" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_02_01_32bits.png" name="哇！"/>
+		<item id="88022" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_03_01_32bits.png" name="馋了"/>
+		<item id="88023" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_04_01_32bits.png" name="wow"/>
+		<item id="88024" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_05_01_32bits.png" name="哈哈哈"/>
+		<item id="88025" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_06_01_32bits.png" name="emm"/>
+		<item id="88026" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_07_01_32bits.png" name="哼"/>
       
 		<item id="88027" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_02_32bits.png" name="嘴巴21"/>
 		<item id="88028" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_boy_01_03_32bits.png" name="嘴巴22"/>
 
 		<!--20220120新增-->
-		<item id="88029" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_07_01_32bits.png" name="嘴巴23"/>
+		<item id="88029" price="50" type="2" icon="Texture/Aries/Creator/keepwork/Avatar/icons/mouth_girl_07_01_32bits.png" name="生气了"/>
 		
 	</category>
 
 
 	
-	<category name="pet" text="坐骑">
+	<!--<category name="pet" text="坐骑">
 	    <item id="89001" type="1" icon="Texture/Aries/Creator/keepwork/Avatar/icons/89001_tank_32bits.png" name="坦克"/>
-	</category>
+	</category> -->
 	
 
 </customcharlist>

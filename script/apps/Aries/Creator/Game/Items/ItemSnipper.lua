@@ -158,7 +158,10 @@ function ItemSnipper:FireMissile()
 						dY = offset_y * t;
 						dZ = offset_z * t;
 					end
-					EntityManager.GetPlayer():SetPosition(old_x+dX, old_y+dY, old_z+dZ);
+					local player = EntityManager.GetPlayer()
+					if(player) then
+						player:SetPosition(old_x+dX, old_y+dY, old_z+dZ);
+					end
 				end);
 		end
 	end

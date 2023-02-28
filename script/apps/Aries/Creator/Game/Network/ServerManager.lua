@@ -104,7 +104,7 @@ function ServerManager:Init(host, port, username, tunnelClient)
 		while NPL.Ping("127.0.0.1", tostring(port + i), 1000, true) ~= -1 and i <= 20 do
 			i = i + 1;
 		end
-
+		-- NPL.StopNetServer();
         NPL.StartNetServer(host, tostring(port + i));
 		self.curHost = host;
 		self.curPort = port + i;

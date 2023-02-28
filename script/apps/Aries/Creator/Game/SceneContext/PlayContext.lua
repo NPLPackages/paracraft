@@ -117,7 +117,10 @@ function PlayContext:handleLeftClickScene(event, result)
 			-- for scene object selection, blocks has higher selection priority.  
 			if( mode == "game" or mode == "survival") then
 				-- for game mode, we will display a quest dialog for character object
-				if(result.obj:IsCharacter()) then
+				if(result.entity) then
+					-- we will not display anything if it is from an entity object. 
+
+				elseif(result.obj:IsCharacter()) then
 					if(result.obj:GetField("GroupID", 0) == 0 ) then
 						NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/SelectCharacterTask.lua");
 						local task = MyCompany.Aries.Game.Tasks.SelectCharacter:new({obj=result.obj})

@@ -20,6 +20,10 @@
                 return RacePage.Datas
             end
 
+            function GetContentDS()
+                return {{}}
+            end
+
             function GetItemListData()
                 return RacePage.Datas[RacePage.index].ListData
             end
@@ -156,7 +160,8 @@
                 <pe:container alignment="_rt" style="background:url();">
                     <input type="button" value='' onclick="OnClickOfficialActivities" class="" style="margin-right:20px;margin-top:8px;width:66px;height:70px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/icon_66X70_32bits.png#0 0 66 70);" />
                     <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 8, "ShowVip")%>
-                    <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:6px;" />
+                    <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:20px;margin-top:6px;","2D_race")%>
+                    <!-- <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:6px;" /> -->
                 </pe:container>
                 <!--Close-->
                 <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
@@ -230,10 +235,17 @@
                 <pe:container alignment="_lt" style="background:url();position: absolute; top: 95px; left: 366px; width: 914px; height:578px;">
                     <!-- 顶部宣传图 -->
                     <img src='<%=GetTopImg()%>' style='position: absolute; margin-top: 0px; margin-left: 28px;width: 875px; height: 255px; ' />
-                    <pe:container alignment="_ctl" style="background-color: #00000000;width: 858px; height:220px;position: relative; margin-left: 28px;margin-top: 76px;">
-                        <div style="font-size: 18px; height: 180px; overflow-y: auto; margin-left: 0px;margin-top: 24px;;color:#212122;">
-                            <%=GetRaceContent()%>
-                        </div>
+                    <pe:container alignment="_ctl" style="background-color: #00000000;width: 862px; height:240px;position: relative; margin-left: 28px;margin-top: 86px;">
+                        <div style="float:left;">
+                            <pe:gridview style="margin-left:0px;margin-top:24px;" name="item_gridview" CellPadding="0" VerticalScrollBarStep="20" VerticalScrollBarOffsetX="-16" AllowPaging="false" ItemsPerLine="1" 
+                                DataSource="<%=GetContentDS()%>">
+                                <Columns>
+                                    <div style="font-size: 18px; overflow-y: auto; margin-left: 0px;margin-top: 0px;;color:#212122;">
+                                        <%=GetRaceContent()%>
+                                    </div> 
+                                </Columns>
+                            </pe:gridview>
+                       </div>
                     </pe:container>
                    
                     <pe:container alignment="_lb" style="background:url();width: 914px; height:140px;position: relative; margin-bottom: 10px;">

@@ -23,6 +23,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Direction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovable.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
+local Quaternion = commonlib.gettable("mathlib.Quaternion");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
@@ -41,6 +44,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 
 local math_abs = math.abs;
 local math_random = math.random;
@@ -509,6 +513,52 @@ function Entity:CheckCollision(deltaTime)
 			end
 		end
 	end
+	self:UpdateStandOnPhysicalEntity()
+end
+
+
+-- return entity that the this entity is standing on. 
+-- @param entityPlayer: check if this player on surface of the current entity. The current entity is usually a physical object. 
+-- @param maxHeightDiff: [0.01, 0.0.5],  default to 0.15
+function Entity:GetStandOnPhysicalEntity(maxHeightDiff)
+	local x, y, z = self:GetPosition();
+	local pt = ParaScene.Pick(x, y+0.5, z, 0, -1, 0, 5, "point")
+	if(pt:IsValid())then
+		local entityName = pt:GetName();
+		if(entityName and entityName~="") then
+			local entity = EntityManager.GetEntity(entityName);
+			if(entity ~= self) then
+				local x1, y1, z1 = pt:GetPosition()
+				if(math.abs(y - y1) < (maxHeightDiff or 0.15)) then
+					return entity;
+				end
+			end
+		end
+	end
+end
+
+-- this function should be called when collision changes and when value changed. 
+-- currently, we simply call it periodically in framemove's CheckCollision function. 
+function Entity:UpdateStandOnPhysicalEntity()
+	if(self.lastStandOnEntity and self.lastStandOnEntity:IsDragging()) then
+		return
+	end
+	local currentStandOnEntity = self:GetStandOnPhysicalEntity(0.2)
+	if(currentStandOnEntity) then
+		if(not self.lastStandOnEntity) then
+			-- tricky: we will do a more precise check for first standing on, and a more fuzzy check when leaving. 
+			currentStandOnEntity = self:GetStandOnPhysicalEntity(0.01)
+		end
+	end
+	if(currentStandOnEntity ~= self.lastStandOnEntity) then
+		if(self.lastStandOnEntity) then
+			self:UnLink()
+		end
+		self:LinkTo(currentStandOnEntity)
+		self.lastStandOnEntity = currentStandOnEntity
+	elseif(currentStandOnEntity) then
+		self:LinkTo(currentStandOnEntity)
+	end
 end
 
 function Entity:CollideWithEntity(fromEntity, deltaTime)
@@ -537,6 +587,37 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	self.capabilities:SaveToXMLNode(node, bSort);
 	return node;
+end
+
+function Entity:FrameMoveRules(deltaTime)
+	
+	if(not self.m_bRuleLoaded) then
+		self.m_bRuleLoaded = true;
+		local entities = GameLogic.EntityManager.GetEntitiesByItemID(20002)
+
+		if entities==nil or #entities==0 then --有出生点就走出生点的逻辑
+			local tempList = nil
+			local dft_cmds = (System.options.world_enter_cmds and commonlib.split(System.options.world_enter_cmds,";")) or {}
+			for i=#dft_cmds,1,-1 do
+				tempList = tempList or {}
+				local str = dft_cmds[i]:gsub("^[\"\'%s]+", ""):gsub("[\"\'%s]+$", "") --去掉字符串首尾的空格、引号
+				table.insert(tempList,1,str)
+			end
+			if tempList and #tempList>0 then
+				self:SetCommandTable(tempList)
+				local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
+
+				local variables = self:GetVariables();
+				local last_result;
+				local cmd_list = self:GetCommandList();
+				if(cmd_list) then
+					last_result = CommandManager:RunCmdList(cmd_list, variables, self);
+				end
+
+				self:SetCommandTable(nil)
+			end
+		end
+	end
 end
 
 -- adjust using the block below the character's feet. 
@@ -760,11 +841,69 @@ end
 
 -- set new skin texture by filename. 
 function Entity:SetSkin(skin, bIgnoreSetSkinId)
+	if System.options.channelId_431 then
+		self:SetSkinIn431Platform(skin)
+		return 
+	end
 	Entity._super.SetSkin(self, skin, bIgnoreSetSkinId);
 	if(not bIgnoreSetSkinId) then
 		self.dataWatcher:SetField(self.dataFieldSkin, self:GetSkin());
 	end
 end
+
+-- set new skin texture by filename. 
+-- @param skin: if nil, it will use the default skin. 
+-- if it only contains file path, then by default it will always be set at replaceable texture id 2.
+-- if the string is of format "id:filename;id:filename;...", it can be used to set multiple replaceable textures at custom index. 
+-- it can also be model and texture ids like "id1;id2;...", which is used in movie block actor. 
+--[[进入校园版的角色，使用同—衣着(对其他版本无影响)
+老师服装编号
+80001;84060;81010;85081;83190
+学生服装编号
+80001;82029;84012;81070;85009]]
+
+function Entity:SetSkinIn431Platform(skin)
+	-- local isTeacher = KeepWorkItemManager.IsTeacher()
+	-- local skin = skin
+	-- if isTeacher then
+	-- 	skin = "80001;84060;81010;85081;83190"
+	-- else
+	-- 	skin = "80001;82029;84012;81070;85009"
+	-- end
+	local skin = "80001;82029;84012;81070;85009"
+	if(self.skin ~= skin) then
+		if(skin) then
+			skin = tostring(skin)
+			local customSkin = skin;
+			if (self:HasCustomGeosets()) then
+				if(skin:match("^(%d+):[^;+]")) then
+					-- this never happens in a movie block actor, since movie block actor uses "id1;id2;..."
+					customSkin = CustomCharItems:ReplaceSkinTexture(self.skin, skin);
+				end
+			end
+			self.skin = customSkin;
+			if (not self.isCustomModel and not self.hasCustomGeosets) then
+				if (skin:match("^%d+;") and EntityManager.GetPlayer() == self) then
+					self.skin = nil;
+				elseif (not self:FindSkinFiles(skin)) then
+					LOG.std(nil, "warn", "Entity:SetSkin", "skin files does not exist %s", tostring(skin));
+				end
+			end
+		else
+			if (not self:HasCustomGeosets()) then
+				self.skin = skin;
+				self:RefreshSkin();
+			end
+		end
+
+		if(self.username == System.User.username) then
+			PlayerAssetFile.Store.skin = self.skin;
+		end
+
+		self:RefreshClientModel();
+	end
+end
+
 
 function Entity:GetSkinId()
 	return self.dataWatcher:GetField(self.dataFieldSkin, nil);
@@ -803,6 +942,9 @@ function Entity:OnShiftKeyPressed()
 			-- teleport entity to a free block nearby
 			local bx, by, bz = self:GetBlockPos();
 			self:PushOutOfBlocks(bx, by, bz);
+			if(GameLogic.Macros:IsRecording()) then
+				GameLogic.Macros:AddMacro("KeyPress", "shift+DIK_LSHIFT");
+			end
 		end
 	else
 		local obj = self:GetInnerObject();
@@ -877,7 +1019,11 @@ function Entity:ToggleFly(bFly)
 		player:SetField("FlyUsingCameraDir", true);
 
 		-- BroadcastHelper.PushLabel({id="fly_tip", label = "�������ģʽ����ס����Ҽ����Ʒ���, W��ǰ��", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
-
+		local cam_facing = Direction.GetFacingFromCamera();
+		local facing = cam_facing
+		if(player) then
+			player:SetFacing(facing);
+		end
 	elseif(bFly == false) then
 		-- restore to original density
 		player:SetDensity(GameLogic.options.NormalDensity);
@@ -997,6 +1143,16 @@ function Entity:SetGravity(value)
 	end
 end
 
+-- return true if we can take control of this entity by external agent like movie or code block.
+function Entity:CanBeAgent()
+	return true;
+end
+
+-- whether it can be searched via Ctrl+F FindBlockTask
+function Entity:IsSearchable()
+	return true;
+end
+
 -- @param actor: the parent ActorNPC
 function Entity:SetActor(actor)
 	self.m_actor = actor;
@@ -1028,4 +1184,171 @@ function Entity:MountOn(targetEntity, mountID)
 			targetEntity:SetFocus();
 		end
 	end
+end
+
+function Entity:IsMountOnRailCar()
+	if self.ridingEntity and self.ridingEntity.class_name == "Railcar" then
+		return true
+	end
+
+	return false
+end
+
+function Entity:GetRidingEntity()
+	return self.ridingEntity
+end
+
+
+-- support modify facing when linked
+function Entity:OnUpdateLinkFacing()
+	if(self.linkInfo and self.linkInfo.entity) then
+		self.linkInfo.facing = self:GetFacing() - self.linkInfo.entity:GetFacing();
+	end
+end
+
+-- do not support modify position when linked
+function Entity:OnUpdateLinkPosition()
+end
+
+-- but we use the current relative position between this and link target. 
+-- and if we move the current entity after the a link is established, we will modify the relative position.
+-- when the linkTarget's position and facing changes, the entity will also move according to the last relative position. 
+-- LinkTo function is suitable for linking between two static objects, like an apple can be linked to a table. 
+-- if we already attachedTo an object, we will detach from it, before link to it. 
+-- @param targetEntity: string or entity object. which entity to link to. if nil, it will detach from existing entity. 
+-- @param boneName: nil or a given bone name. If specified, we will use a timer to update. 
+-- @param pos: nil or 3d position offset
+-- @param rot: nil or 3d rotation 
+function Entity:LinkTo(targetEntity, boneName, pos, rot)
+	if(targetEntity) then
+		self.linkInfo = self.linkInfo or {};
+		local srcEntity = self
+		local x, y, z = srcEntity:GetPosition()
+		local tx, ty, tz = targetEntity:GetPosition()
+
+		local quatRot = Quaternion:new():FromEulerAnglesSequence(-targetEntity:GetRoll(), -targetEntity:GetPitch(), -targetEntity:GetFacing(), "zxy")
+
+		self.linkInfo.x, self.linkInfo.y, self.linkInfo.z = quatRot:RotateVector3(x - tx, y - ty, z - tz)
+		self.linkInfo.facing = srcEntity:GetFacing() - targetEntity:GetFacing();
+		self.linkInfo.scaling = targetEntity:GetScaling()
+		self.linkInfo.quatRot = quatRot;
+		self.linkInfo.boneName = boneName;
+		self.linkInfo.pos = pos;
+		self.linkInfo.rot = rot;
+
+		if(self.linkInfo.entity ~= targetEntity) then
+			self:UnLinkEntity(self.linkInfo.entity)
+			self.linkInfo.entity = targetEntity
+			targetEntity:Connect("valueChanged", self, self.UpdateEntityLink);
+			targetEntity:Connect("facingChanged", self, self.UpdateEntityLink);
+			targetEntity:Connect("scalingChanged", self, self.UpdateEntityLink);
+			targetEntity:Connect("beforeDestroyed", self, self.UnLink);
+			self:Connect("beforeDestroyed", self, self.UnLink);
+			--self:Connect("facingChanged", self, self.OnUpdateLinkFacing);
+			--self:Connect("valueChanged", self, self.OnUpdateLinkPosition);
+			targetEntity.childLinks = targetEntity.childLinks or commonlib.UnorderedArraySet:new();
+			targetEntity.childLinks:add(self);
+		end
+	else
+		self:UnLink();
+	end
+end
+
+-- private function:
+-- use UnLink, instead of this function
+function Entity:UnLinkEntity(entity)
+	if(entity) then
+		entity:Disconnect("valueChanged", self, self.UpdateEntityLink);
+		entity:Disconnect("facingChanged", self, self.UpdateEntityLink);
+		entity:Disconnect("scalingChanged", self, self.UpdateEntityLink);
+		entity:Disconnect("beforeDestroyed", self, self.UnLink);
+		--self:Disconnect("facingChanged", self, self.OnUpdateLinkFacing);
+		--self:Disconnect("valueChanged", self, self.OnUpdateLinkPosition);
+		entity.childLinks:removeByValue(self);
+	end
+end
+
+function Entity:UnLink()
+	if(self.linkInfo) then
+		self:UnLinkEntity(self.linkInfo.entity)
+		self.linkInfo = nil;
+	end
+	self.lastStandOnEntity = nil;
+end
+
+-- update this entity's position according to its link target
+function Entity:UpdateEntityLink()
+	local targetEntity = self:GetLinkToTarget()
+	if(targetEntity) then
+		if (self.linkInfo.boneName) then
+			local new_x, new_y, new_z, roll, pitch, yaw = targetEntity:ComputeBoneWorldPosAndRot(self.linkInfo.boneName, self.linkInfo.pos, self.linkInfo.rot); 
+			if(new_x) then
+				self:SetPosition(new_x, new_y, new_z);
+
+				-- we will simply ignore rotation. 
+				if(false) then
+					local obj = self:GetInnerObject();
+					obj:SetField("yaw", yaw or 0);
+					obj:SetField("roll", roll or 0);
+					obj:SetField("pitch", pitch or 0);	
+				end
+			end
+		else
+			local x, y, z = targetEntity:GetPosition();
+			--self.linkInfo.quatRot:FromAngleAxis(targetEntity:GetFacing(), mathlib.vector3d.unit_y)
+			self.linkInfo.quatRot:FromEulerAnglesSequence(targetEntity:GetRoll(), targetEntity:GetPitch(), targetEntity:GetFacing(), "zxy")
+
+			local rx, ry, rz = self.linkInfo.quatRot:RotateVector3(self.linkInfo.x, self.linkInfo.y, self.linkInfo.z)
+			local curScaling = targetEntity:GetScaling();
+			if(curScaling ~= self.linkInfo.scaling) then
+				local scaling = curScaling / self.linkInfo.scaling;
+				rx, ry, rz = rx * scaling, ry * scaling, rz * scaling;
+			end
+			self:SetPosition(x + rx, y + ry, z + rz)
+			self:SetFacing(targetEntity:GetFacing() + self.linkInfo.facing);
+		end
+	end
+end
+
+function Entity:HasLinkParent(parentEntity)
+	if(self == parentEntity) then
+		return true
+	else
+		local parent = self:GetLinkToTarget()
+		return parent and parent:HasLinkParent(parentEntity)
+	end
+end
+
+function Entity:GetLinkToTarget()
+	if(self.linkInfo) then
+		return self.linkInfo.entity;
+	end
+end
+
+-- @param callbackFunc: function(childEntity) end
+function Entity:ForEachChildLinkEntity(callbackFunc, ...)
+end
+
+-- @return true 
+function Entity:HasLinkChild(childEntity)
+end
+
+function Entity:GetLinkChild()
+end
+
+function Entity:BeginModify()
+end
+
+function Entity:EndModify()
+end
+
+-- virtual: for players, invisible players are always non-pickable. 
+function Entity:SetVisible(bVisible)
+	Entity._super.SetVisible(self, bVisible)
+	self:SetSkipPicking(not bVisible);
+end
+
+-- virtual function: right click to edit. 
+function Entity:OpenEditor(editor_name, entity)
+	-- disable editors
 end

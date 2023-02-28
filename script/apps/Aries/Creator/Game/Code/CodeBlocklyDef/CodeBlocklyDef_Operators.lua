@@ -487,6 +487,67 @@ say("math.abs(-1)=="..math.abs(1), 1)
 ]]}},
 },
 
+{
+	type = "string_contain", 
+	message0 = L"%1包含%2?",
+	arg0 = {
+		{
+			name = "left",
+			type = "input_value",
+			text = L"苹果",
+			shadow = { type = "text", value = "苹果",},
+		},
+		{
+			name = "index",
+			type = "input_value",
+			text = L"果", 
+			shadow = { type = "text", value = "果",},
+		},
+	},
+	output = {type = "field_number",},
+	category = "Operators", 
+	helpUrl = "", 
+	canRun = false,
+	-- hide_in_codewindow = true,
+	func_description = 'string_contain(%s, %s)',
+	ToNPL = function(self)
+		return string.format('string_contain("%s", "%s")', self:getFieldAsString('left'), self:getFieldAsString('index'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
+{
+	type = "string_char", 
+	message0 = L"%1的第%2个字符",
+	arg0 = {
+		{
+			name = "left",
+			type = "input_value",
+			text = L"苹果",
+			shadow = { type = "text", value = "苹果",},
+
+		},
+		{
+			name = "index",
+			type = "input_value",
+			shadow = { type = "math_number", value = L"1",},
+			text = L"1", 
+		},
+	},
+	output = {type = "field_number",},
+	category = "Operators", 
+	helpUrl = "", 
+	canRun = false,
+	-- hide_in_codewindow = true,
+	func_description = 'string_char(%s, %s)',
+	ToNPL = function(self)
+		return string.format('string_char("%s", %s)', self:getFieldAsString('left'), self:getFieldAsString('index'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+]]}},
+},
+
 };
 function CodeBlocklyDef_Operators.GetCmds()
 	return cmds;

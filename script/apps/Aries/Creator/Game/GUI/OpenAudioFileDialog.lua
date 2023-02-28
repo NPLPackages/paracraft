@@ -116,6 +116,22 @@ function OpenAudioFileDialog.OnOK()
 	end
 end
 
+function OpenAudioFileDialog.OnRecord()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/SoundRecorder.lua");
+	local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+	local SoundRecorder = commonlib.gettable("MyCompany.Aries.Game.Movie.SoundRecorder");
+	SoundRecorder.ShowPage(function(filename)
+		if(filename) then
+			local diskFilepath = Files.GetFilePath(filename)
+			if(diskFilepath) then
+				GameLogic.AddBBS("recordsound", L"录制文件成功保存到:"..filename, 10000, "0 255 0");
+				OpenAudioFileDialog.UpdateExistingFiles();
+				OpenAudioFileDialog.RefreshPage()
+			end
+		end
+	end);
+end
+
 function OpenAudioFileDialog.OnCloseWithResult(result)
 	if(page) then
 		OpenAudioFileDialog.result = result
@@ -136,6 +152,8 @@ end
 function OpenAudioFileDialog.GetExistingFiles()
 	if OpenAudioFileDialog.category_index == 1 then
 		return OpenAudioFileDialog.dsExistingFiles or {};
+	elseif OpenAudioFileDialog.category_index == 3 then
+		return OpenAudioFileDialog.dsRecordingFiles or {};
 	else
 		return OpenAudioFileDialog.OfficialAudioList or {};
 	end
@@ -201,6 +219,27 @@ function OpenAudioFileDialog.InitOfficialAudio()
 			{show_name="多彩舞曲20", filename="Audio/Haqi/New/RICH20.ogg"},
 			{show_name="多彩舞曲21", filename="Audio/Haqi/New/RICH21.ogg"},
 			{show_name="科技舞曲", filename="Audio/Haqi/New/Techno_1.ogg"},
+			{show_name="比赛为冠" , filename="Audio/Haqi/New/NewBgMusic/RaceIsWinner.ogg"},
+			{show_name="捕猎" , filename="Audio/Haqi/New/NewBgMusic/Hunting.ogg"},
+			{show_name="赛场" , filename="Audio/Haqi/New/NewBgMusic/Arena.ogg"},
+			{show_name="赛桨" , filename="Audio/Haqi/New/NewBgMusic/Paddle.ogg"},
+			{show_name="激昂" , filename="Audio/Haqi/New/NewBgMusic/Passionate.ogg"},
+			{show_name="胜利之歌" , filename="Audio/Haqi/New/NewBgMusic/SongOfVictory.ogg"},
+			{show_name="鼓舞人心" , filename="Audio/Haqi/New/NewBgMusic/Inspirational.ogg"},
+			{show_name="争分夺秒" , filename="Audio/Haqi/New/NewBgMusic/AgainstTime.ogg"},
+			{show_name="追风筝的人" , filename="Audio/Haqi/New/NewBgMusic/KiteChaser.ogg"},
+			{show_name="赛场欢呼声1" , filename="Audio/Haqi/New/NewBgMusic/ArenaCheers1.ogg"},
+			{show_name="赛场欢呼声2" , filename="Audio/Haqi/New/NewBgMusic/ArenaCheers2.ogg"},
+			{show_name="赛场掌声1" , filename="Audio/Haqi/New/NewBgMusic/Applause1.ogg"},
+			{show_name="赛场掌声2" , filename="Audio/Haqi/New/NewBgMusic/Applause2.ogg"},
+			{show_name="尖叫喝彩" , filename="Audio/Haqi/New/NewBgMusic/Screaming.ogg"},
+			{show_name="欢快聚会1" , filename="Audio/Haqi/New/NewBgMusic/PartyCheers1.ogg"},
+			{show_name="欢快聚会2" , filename="Audio/Haqi/New/NewBgMusic/PartyCheers2.ogg"},
+			{show_name="欢快聚会3" , filename="Audio/Haqi/New/NewBgMusic/PartyCheers3.ogg"},
+			{show_name="节目现场欢呼掌声1" , filename="Audio/Haqi/New/NewBgMusic/ShowCheersandApplause1.ogg"},
+			{show_name="节目现场欢呼掌声2" , filename="Audio/Haqi/New/NewBgMusic/ShowCheersandApplause2.ogg"},
+			{show_name="节目现场欢呼掌声3" , filename="Audio/Haqi/New/NewBgMusic/ShowCheersandApplause3.ogg"},
+			{show_name="节目现场欢呼掌声4" , filename="Audio/Haqi/New/NewBgMusic/ShowCheersandApplause4.ogg"},
 		}
 
 		local files = {}
@@ -295,31 +334,112 @@ function OpenAudioFileDialog.UpdateExistingFiles()
 	table.sort(files, function(a, b)
 		return (a.attr.writedate or 0) > (b.attr.writedate or 0);
 	end);
+
+
+	OpenAudioFileDialog.dsRecordingFiles = {}
+	--过滤掉录音的目录
+	local temp = {}
+	for k,v in pairs(OpenAudioFileDialog.dsExistingFiles) do
+		if not v.attr.filename:find("recording/") then
+			temp[#temp + 1] = v
+		else
+			OpenAudioFileDialog.dsRecordingFiles[#OpenAudioFileDialog.dsRecordingFiles + 1] = v
+		end
+	end
+	OpenAudioFileDialog.dsExistingFiles = temp
 end
 
 function OpenAudioFileDialog.OnOpenAudioFileDialog()
-	NPL.load("(gl)script/ide/OpenAudioFileDialog.lua");
+	NPL.load("(gl)script/ide/OpenFileDialog.lua")
 
-	local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenAudioFileDialog.filters, 
-		OpenAudioFileDialog.title,
-		OpenAudioFileDialog.GetSearchDirectory(), 
-		OpenAudioFileDialog.IsSaveMode);
-		
-	if(filename and page) then
-		local fileItem = Files.ResolveFilePath(filename);
-		if(fileItem) then
-			if(fileItem.relativeToWorldPath) then
-				local filename = fileItem.relativeToWorldPath;
-				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
-			elseif(fileItem.relativeToRootPath) then
-				local filename = fileItem.relativeToRootPath;
-				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
-			else
-				filename = filename:match("[^/\\]+$")
-				page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+	local function copyFile(filename)
+		if not GameLogic.IsReadOnly() then
+			local fileItem1 = filename:match("[^/\\]+$")
+			local destFile = OpenAudioFileDialog.GetSearchDirectory() .. fileItem1
+			local bCopySuc = ParaIO.CopyFile(filename,destFile,true)
+			if (bCopySuc and type(bCopySuc) == "string") then
+				GameLogic.AddBBS(nil, destFile .. "  copy " .. bCopySuc);
+			elseif (bCopySuc and type(bCopySuc) == "boolean") then
+				if (bCopySuc) then
+					GameLogic.AddBBS(nil, commonlib.Encoding.DefaultToUtf8(destFile) .. "  copy " .. "success");
+				else
+					GameLogic.AddBBS(nil, commonlib.Encoding.DefaultToUtf8(destFile) .. "  copy " .. "fail");
+				end
+			end
+			return bCopySuc
+		end
+	end 
+
+	local function RefreshPage(filename)
+		if(filename and page) then
+			local isCopy = false
+			local fileItem = Files.ResolveFilePath(filename);
+			if(fileItem) then
+				if not fileItem.isInWorldDirectory then
+					local file_size = ParaIO.GetFileSize(filename);
+					if file_size /2^20 > 10 then
+						if GameLogic.IsVip() then
+							isCopy = copyFile(filename)
+						else
+							GameLogic.IsVip("OnlineWorldData50Mb", true, function(result)
+								if result then
+									isCopy = copyFile(filename)
+								end
+							end)
+						end
+					else
+						isCopy = copyFile(filename)
+					end
+					
+				end
+				if not fileItem.isInWorldDirectory and not isCopy then
+					return 
+				end
+				if(fileItem.relativeToWorldPath) then
+					local filename = fileItem.relativeToWorldPath;
+					page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+				elseif(fileItem.relativeToRootPath) then
+					if System.os.GetPlatform() == "win32" then
+						local filename = fileItem.relativeToRootPath;
+						page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+					else
+						page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename:match("[^/\\]+$")));
+					end
+				else
+					filename = filename:match("[^/\\]+$")
+					page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+				end
+				OpenAudioFileDialog.UpdateExistingFiles()
+				OpenAudioFileDialog.RefreshPage()
 			end
 		end
 	end
+
+	if (System.os.GetPlatform() == "win32") then 
+		local filename = CommonCtrl.OpenFileDialog.ShowDialog_Win32(OpenAudioFileDialog.filters, 
+		OpenAudioFileDialog.title,
+		OpenAudioFileDialog.GetSearchDirectory(), 
+		OpenAudioFileDialog.IsSaveMode);
+		RefreshPage(filename);
+	elseif (System.os.GetPlatform() == "mac") then 
+		local filename = CommonCtrl.OpenFileDialog.ShowDialog_Mac("audio/*", 
+		OpenAudioFileDialog.title,
+		OpenAudioFileDialog.GetSearchDirectory(), 
+		OpenAudioFileDialog.IsSaveMode);
+		RefreshPage(filename);
+	elseif (System.os.GetPlatform() == "android") then
+		CommonCtrl.OpenFileDialog.ShowDialog_Android("audio/*", function(filepath)
+			if (filepath and filepath ~= "") then
+				RefreshPage(filepath);
+			end
+		end)
+	elseif (System.os.GetPlatform() == "ios") then
+		CommonCtrl.OpenFileDialog.ShowDialog_iOS("audio/*", function(filepath)
+			if (filepath and filepath ~= "") then
+				RefreshPage(filepath);
+			end
+		end)
+ 	end
 end
 
 function OpenAudioFileDialog.GetText()
@@ -358,7 +478,7 @@ end
 
 function OpenAudioFileDialog.GetTreeNodeText(item_data)
 	local text = ""
-    if OpenAudioFileDialog.category_index == 1 then
+    if OpenAudioFileDialog.category_index == 1 or OpenAudioFileDialog.category_index == 3 then
 		text = string.format("%s (%dKB) %s", commonlib.Encoding.DefaultToUtf8(item_data.filename), math.ceil(item_data.filesize/1000), item_data.writedate)
 	else
 		text = item_data.show_name

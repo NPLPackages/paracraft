@@ -18,6 +18,10 @@ NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 local Macro = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Macro"));
 
+local function null_func(params)
+	-- echo(parmas)
+end
+
 function Macro:ctor()
 end
 
@@ -31,7 +35,7 @@ function Macro:Init(text, lineNumber)
 			if(name) then
 				self.name = name;
 				self.params = params;
-				self.func = Macros[self.name];
+				self.func = Macros[self.name] or null_func;
 				if(Macros[self.name.."Trigger"]) then
 					self.hasTrigger = true
 				end
@@ -117,6 +121,7 @@ function Macro:RunImp()
 		LOG.std(nil, "debug", "Macro:Run", "%s(%s)", self.name, self.params or "");
 		local params = self:GetParams();
 		local result;
+
 		if(not params) then
 			result = self.func();
 		else

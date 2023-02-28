@@ -1,0 +1,534 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Friend/KeepWorkMallPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="true" type="text/npl" src="KeepWorkMallPageV2.lua">
+            <![CDATA[
+                KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
+                local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+
+                KeepWorkMallPage.OnInit();
+
+                function ClosePage()
+                    Page:CloseWindow();
+                    KeepWorkMallPage.CloseView()
+                end
+
+                function OpenVip()
+                    local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+                    VipPage.ShowPage("KeepMall");
+                end
+
+                function IsSelectRec()
+                    return KeepWorkMallPage.IsSelectRec() and not KeepWorkMallPage.IsSearchData()
+                end
+
+                function GetRecImg()
+                    return "Texture/Aries/Creator/keepwork/Mall/banner_998x180_32bits.png"
+                end
+
+                -- 大分类
+                function IsMenuSelected(index)
+                    return KeepWorkMallPage.cur_select_level == index;
+                end
+
+                function MenuItems(index)
+                    if(index == nil) then    
+                        return #KeepWorkMallPage.menu_data_sources;
+                    else
+                        return KeepWorkMallPage.menu_data_sources[index];
+                    end
+                end
+
+                function OnChangeMenu(name)
+                    KeepWorkMallPage.OnChangeMenu(name)
+                end
+
+                -- 小分类
+                function IsChildMenuSelected(index)
+                    return KeepWorkMallPage.cur_select_type_index == index;
+                end
+
+                function IsShowChildMenu()
+                    return #KeepWorkMallPage.GetChildMenuData() > 0
+                end
+
+                function MenuChildItems(index)
+                    if(index == nil) then    
+                        return #KeepWorkMallPage.GetChildMenuData()
+                    else
+                        return KeepWorkMallPage.GetChildMenuData()[index];
+                    end
+                end
+
+                function OnChangeChildMenu(name)
+                    KeepWorkMallPage.OnChangeChildMenu(name)
+                end
+
+                function GridsItems(index)
+                    if(index == nil) then    
+                        return #KeepWorkMallPage.grid_data_sources;
+                    else
+                        return KeepWorkMallPage.grid_data_sources[index];
+                    end
+                end
+
+                function ItemBeSelected(type_index,menu_item_index)
+                    if(KeepWorkMallPage.menu_item_index == menu_item_index) then
+                        return true;
+                    else
+                        return false;
+                    end
+                end
+
+                function ChangeMenuType(treenode)
+                    local attr = treenode.mcmlNode:GetPreValue("this");
+                    KeepWorkMallPage.ChangeMenuType(attr.level, attr.index)
+                end
+
+                function ChangeMenuItem(name,mcmlNode)
+                    local attr = mcmlNode:GetAttribute("param1")
+                    local menu_item_index = attr.menu_item_index
+                    KeepWorkMallPage.ChangeMenuItem(attr)
+                end
+
+                function OnSearch()
+                    if(virtual_key == Event_Mapping.EM_KEY_RETURN) then
+                        local search_ctrl = Page:FindUIControl("search_text")
+                        SearchProduct(search_ctrl.text)
+                    end
+                end
+
+                function SearchProduct()
+                    local search_ctrl = Page:FindUIControl("search_text")
+                    KeepWorkMallPage.SearchProduct(search_ctrl.text)
+                end
+
+                function OnclickBuy(name, mcmlNode)
+                    echo(33333, true)
+                    --local exid = tonumber(mcmlNode:GetAttribute("param1"));
+                    local data = mcmlNode:GetAttribute("param1");
+                    KeepWorkMallPage.OnClickBuy(data);
+                end
+
+                function IsShowFlag(data)
+                    if data.is_sell or data.is_has or data.can_use or data.is_use or data.vip_enabled then
+                        return true
+                    end
+
+                    return false
+                end
+
+                function IsOnlyNumber(desc)
+                    if type(tonumber(desc)) == "number" then
+                        return true
+                    end
+
+                    return false
+                end
+
+                function getIcon(itemData)
+                    return KeepWorkMallPage.GetIcon(itemData)
+                end
+
+                function CanUseCanvas3dIcon(itemData)
+                    return KeepWorkMallPage.CanUseCanvas3dIcon(itemData)
+                end
+
+                function IsSpecialModel(itemData)
+                    return KeepWorkMallPage.IsSpecialModel(itemData)
+                end
+
+                function IsShowUseCount(count)
+                    local count = count or 0
+                    return count > 0
+                end
+
+                function GetFileTypeIcon(itemData)
+                    local list = {
+                        ["bmax"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 116px; margin-top:8px;width: 49px; height:17px;background:url(Texture/Aries/Creator/keepwork/Mall/bmax_49x17_32bits.png#0 0 49 17);"></div>]]},
+                        ["blocks"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 116px; margin-top:8px;width: 49px; height:17px;background:url(Texture/Aries/Creator/keepwork/Mall/blocks_49x17_32bits.png#0 0 49 17);"></div>]]},
+                        ["x"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 132px; margin-top:8px;width: 39px; height:22px;background:url(Texture/Aries/Creator/keepwork/Mall/X_39x22_32bits.png#0 0 39 22);"></div>]]},
+                        ["liveModel"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 116px; margin-top:8px;width: 49px; height:17px;background:url(Texture/Aries/Creator/keepwork/Mall/livemodel_49x17_32bits.png#0 0 49 17);"></div>]]},
+                        ["fbx"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 132px; margin-top:8x;width: 39px; height:22px;background:url(Texture/Aries/Creator/keepwork/Mall/fbx_39x22_32bits.png#0 0 39 22);"></div>]]},
+                        ["stl"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 132px; margin-top:8px;width: 39px; height:22px;background:url(Texture/Aries/Creator/keepwork/Mall/stl_39x22_32bits.png#0 0 39 22);"></div>]]},
+                        ["cad"] = {icon = [[<div zorder="5" style="position:absolute;margin-left: 132px; margin-top:8px;width: 39px; height:22px;background:url(Texture/Aries/Creator/keepwork/Mall/CAD_39x22_32bits.png#0 0 39 22);"></div>]]},
+                    }
+                    local good_data = itemData.goods_data and itemData.goods_data[1]
+                    local fileType = good_data and good_data.fileType or itemData.modelType
+                    return fileType and list[fileType] and list[fileType].icon
+                end
+
+                function LoadModelFile(itemData,index)
+                    KeepWorkMallPage.LoadModelFile(itemData,index)
+                end
+
+                function GetRenderItemStr()
+                    return [[
+                        <div style="margin-left: 6px;
+                                    margin-top: 6px;
+                                    width: 170px;
+                                    height: 170px;
+                                    background:url(Texture/Aries/Creator/keepwork/Mall/kuang_170X170_32bits.png#0 0 170 170)" >
+                            <div style="position: relative;">
+                                <div style="width: 170px;
+                                            height: 108px;
+                                            background:;">
+                                    <div style="position: relative;
+                                                width: 123px;">
+                                        <pe:if condition='<%=Eval("use_little_icon") and Eval("hasIcon") and not CanUseCanvas3dIcon(Eval("this"))%>'>
+                                            <div style="position: relative;
+                                                        margin-left: 50px;
+                                                        margin-top: 36px;">
+                                                <img zorder="0" src='<%=Eval("icon")%>' width="64" height="64"/>
+                                            </div>
+                                        </pe:if>
+                                        <pe:if condition='<%=not Eval("use_little_icon") and Eval("hasIcon") and not CanUseCanvas3dIcon(Eval("this"))%>'>
+                                            <div style="position:relative;margin-left:21px;margin-top:36x;">
+                                                <img zorder="0" src='<%=Eval("icon")%>'width="128" height="64"/>
+                                            </div>
+                                        </pe:if>
+                                        <div style="margin-left: -5px;
+                                                    margin-top: -5px;">
+                                            <pe:if condition='<%= Eval("is_show_latest_tag") %>'>
+                                                <div zorder="1"
+                                                     style="float: left;
+                                                            margin-top: 0px;
+                                                            width: 24px;
+                                                            height: 32px;
+                                                            background:url(Texture/Aries/Creator/keepwork/Mall/xin_24x32_32bits.png#0 0 24 32);">
+                                                </div>
+                                            </pe:if>
+                                            <pe:if condition='<%=Eval("is_show_hot_tag") %>'>
+                                                <div zorder="1"
+                                                     style="float: left;
+                                                            margin-top: 0px;
+                                                            width: 24px;
+                                                            height: 32px;
+                                                            background:url(Texture/Aries/Creator/keepwork/Mall/re_24x32_32bits.png#0 0 24 32);">
+                                                </div>
+                                            </pe:if> 
+                                        </div>
+                                        <pe:if condition='<%= LoadModelFile(Eval("this"), Eval("index")) %>'></pe:if>
+                                        <pe:if condition='<%= CanUseCanvas3dIcon(Eval("this")) %>'>
+                                            <pe:if condition='<%= IsSpecialModel(Eval("this")) %>'>
+                                                <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index")) %>'
+                                                             xmlInfo ='<%= Eval("xmlInfo") %>'
+                                                             DefaultRotY="-0.785"
+                                                             IsInteractive="false"
+                                                             autoRotateSpeed="0"
+                                                             miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 48 + 1) %>'
+                                                             RenderTargetSize="128" 
+                                                             value='<%=getIcon(Eval("this"))%>'
+                                                             style="position: relative;
+                                                                    width: 73px;
+                                                                    height: 73px;
+                                                                    margin-top: 25px;
+                                                                    margin-left: 45px;" />
+                                            </pe:if>
+                                            <pe:if condition='<%=not IsSpecialModel(Eval("this"))%>'>
+                                                <pe:if condition='<%=Eval("isLiveModel")%>'>
+                                                    <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index")) %>'
+                                                                 xmlInfo ='<%= Eval("xmlInfo") %>'
+                                                                 DefaultRotY="1.57"
+                                                                 IsInteractive="false"
+                                                                 autoRotateSpeed="0"
+                                                                 miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 48 + 1) %>'
+                                                                 RenderTargetSize="128" 
+                                                                 value='<%=getIcon(Eval("this"))%>'
+                                                                 style="position: relative;
+                                                                        width: 73px;
+                                                                        height: 73px;
+                                                                        margin-top: 25px;
+                                                                        margin-left: 45px;" />
+                                                </pe:if>
+                                                <pe:if condition='<%= not Eval("isLiveModel") %>'>
+                                                    <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index")) %>'
+                                                                 xmlInfo ='<%= Eval("xmlInfo") %>'
+                                                                 DefaultRotY="-1.57"
+                                                                 IsInteractive="false"
+                                                                 autoRotateSpeed="0"
+                                                                 miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 48 + 1) %>'
+                                                                 RenderTargetSize="128" 
+                                                                 value='<%=getIcon(Eval("this"))%>'
+                                                                 style="position: relative;
+                                                                        width: 73px;
+                                                                        height: 73px;
+                                                                        margin-top: 25px;
+                                                                        margin-left: 45px;" />
+                                                </pe:if>
+                                            </pe:if> 
+                                        </pe:if>
+                                    </div>
+                                    <div style="position: absolute;
+                                                margin-left: 150px;
+                                                margin-top: -5px;">
+                                        <pe:if condition='<%= not Eval("hasPermission") %>'>
+                                            <div zorder="1"
+                                                 style="margin-left: 0px;
+                                                        margin-top: 0px;
+                                                        width: 27px;
+                                                        height: 33px;
+                                                        background: url(Texture/Aries/Creator/keepwork/Mall/VIP_37x41_32bits.png#0 0 37 41);">
+                                            </div>
+                                        </pe:if> 
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0px;
+                                            width: 163px;
+                                            height: 26px;
+                                            background-color: #00000000;">
+                                    <%= GetFileTypeIcon(Eval("this")) %>
+                                    <pe:if condition='<%= not Eval("enabled") %>'>
+                                        <div style="margin-left: 3px;
+                                                    margin-top: -105px;
+                                                    width: 164px;
+                                                    height: 131px;
+                                                    background: url(Texture/Aries/Creator/keepwork/Mall/yishirongan_64X64_32bits.png#0 0 64 64:16 16 16 16);">
+                                        </div>
+                                    </pe:if>
+                                </div>
+                                <div style="margin-top: 0px;
+                                            width: 163px;
+                                            height: 26px;
+                                            background: url();">
+                                    <div style="position: relative;
+                                                margin-left: 5px;
+                                                margin-top: 3px;
+                                                width: 163px;
+                                                height: 20px;
+                                                font-weight: bold;
+                                                font-size: 14px;
+                                                color: #000000;
+                                                text-align: center;">
+                                        <%= Eval("name") %>
+                                    </div>
+                                </div>
+                                <pe:if condition='<%=not IsShowFlag(XPath("this"))%>'>
+                                    <div style="position: relative;
+                                                margin-top: 5px;
+                                                margin-left: 58px;
+                                                padding-left: 5px;
+                                                font-size: 12px;">
+                                        <pe:if condition='<%=Eval("is_cost_fragment") %>'>
+                                            <div style="margin-top: 1px;
+                                                        float: left;
+                                                        width: 22px;
+                                                        height: 22px;
+                                                        background:url(Texture/Aries/Creator/keepwork/Mall/pifu_32bits.png#0 0 64 64:0 0 0 0);"></div> 
+                                        </pe:if>
+                                        <pe:if condition='<%= Eval("is_cost_bean") %>'>
+                                            <div style="margin-top: 1px;
+                                                        float: left;
+                                                        width: 22px;
+                                                        height: 21px;
+                                                        background:url(Texture/Aries/Creator/keepwork/Mall/icon_douzi_22X21_32bits.png#0 0 22 21:0 0 0 0);"></div> 
+                                        </pe:if>
+                                        <pe:if condition='<%= Eval("is_cost_coin") %>'>
+                                            <div style="margin-top: 3px;
+                                                        float: left;
+                                                        width: 20;
+                                                        height: 20;
+                                                        background:url(Texture/Aries/Creator/keepwork/Mall/icon_coin_32bits.png#0 0 14 14);"></div>  
+                                        </pe:if>
+                                        <pe:if condition='<%= IsOnlyNumber(Eval("cost_desc")) %>'>
+                                        </pe:if>
+                                        <pe:if condition='<%= not IsOnlyNumber(Eval("cost_desc")) %>'>
+                                            <div style="margin-left: 5px;
+                                                        margin-top: 1px;
+                                                        float: left;
+                                                        height: 20px;
+                                                        color: #000000;
+                                                        font-weight: bold;
+                                                        font-size: 16pt;">
+                                                <%= Eval("cost_desc") %>
+                                            </div>
+                                        </pe:if>
+                                    </div>
+                                </pe:if>
+                                <pe:if condition='<%=IsShowUseCount(Eval("useCount"))%>'>
+                                    <div style="position: relative;
+                                                margin-top: -45px;
+                                                padding-left: 8px;">
+                                        <div style="width: 17px;
+                                                    height: 17px;
+                                                    background: url(Texture/Aries/Creator/keepwork/Mall/aixin_14x17_32bits.png#0 0 17 17)"></div>
+                                        <div style="font-size: 14px;
+                                                    basefont-size: 14px;
+                                                    margin-left: 20px;
+                                                    margin-top: -20px;
+                                                    font-weight: bold">
+                                            <%= Eval("useCount") %>
+                                        </div>                    
+                                    </div>
+                                </pe:if>
+                            </div>
+                            <input type="button"
+                                   value=''
+                                   uiname='<%= "KeepWorkMallPageV2." .. Eval("id") .. Eval("name") %>'
+                                   onclick="OnclickBuy()"
+                                   param1='<%= XPath("this") %>'
+                                   style="position: relative;
+                                          margin-left: 0px;
+                                          margin-top: 0px;
+                                          font-size: 12px;
+                                          width: 170px;
+                                          height: 170px;
+                                          background: url();" />
+                        </div>
+                    ]]
+                end
+
+                function onClickBg()
+                end
+
+                function onClick_modelType()
+                    KeepWorkMallPage.onClick_modelType()
+                end
+
+                function OnChangeModelType(name)
+                    KeepWorkMallPage.OnChangeModelType(name)
+                end
+
+                function GetModelTypes()
+                    return KeepWorkMallPage.modelTypes
+                end
+
+                function GetSelectModelType()
+                    return GetModelName(KeepWorkMallPage.GetSelectModelType())
+                end
+
+                function GetModelName(name)
+                    if name == "all" then
+                        return L"全部"
+                    end
+                    return name
+                end
+            ]]>
+        </script>
+        <pe:container onclick="onClickBg" alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc"></pe:container>
+        <pe:container onclick="onClickBg" alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+            <!--Vip-->
+            <pe:container alignment="_rt" style="background:url();">
+                <%= GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 7, "OpenVip") %>
+                <%= GameLogic.GetFilters():apply_filters('get_vip_btn_div', nil, "KeepMall") %>
+            </pe:container>
+            <!--Close-->
+            <pe:container alignment="_lt" style="width: 400px; height: 60px; background:;">
+                <div style="position: relative; width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+                    <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+                </div>
+                <!-- LOGO -->
+                <div style="margin-left: 94px; margin-top: -3px; width: 294px; height: 64px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/shentongbei/shentongbei_32bits.png#15 790 294 64);">
+                    <div style="position: relative; margin-top: 10px; margin-left: 76px; width: 123px; height: 48px; background: url(Texture/Aries/Creator/keepwork/Mall/ziyuan_123_48_32bits.png#0 0 123 48);"> </div>
+                </div>
+            </pe:container>
+            <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">
+                <!--背景水印-->
+                <div style="position: relative; margin-top: -20px;">
+                    <div zorder="-1" style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                    <div zorder="-1" style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                    <div zorder="-1" style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                    <div zorder="-1" style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                    <div zorder="-1" style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+                </div>
+                <div style="margin-top: 30px; margin-left: 30px;">
+                    <div style="position:relative; width: 100px; height: 40px; margin-left: 830px;">
+                        <input zorder="3" type="button" value='<%=GetSelectModelType() %>' uiname="btn_drop_modelType" onclick='onClick_modelType' style="position: relative; text-offset-y:-2;text-offset-x:2;text-align:left; width: 100px; height: 36px; font-size:16px; base-font-size:16px; font-weight:bold; background:url(Texture/Aries/Creator/keepwork/vip/shuzishuru_32X32_32bits.png#0 0 32 32:14 14 14 14);" />
+                        <pe:if condition='<%= not KeepWorkMallPage.isExpland_modelType %>'>
+                            <div zorder="4" uiname="icon_expand" align="right" style="position: relative;float: left;margin-top: 14px; margin-right: 8px;width: 12px;height: 8px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/jiantou_12x8_32bits.png#0 0 12 8);"></div>
+                        </pe:if>
+                        <pe:if condition='<%= KeepWorkMallPage.isExpland_modelType %>'>
+                            <div zorder="4" uiname="KeepWorkMallPage.icon_unexpand" align="right" style="position: relative;float: left;margin-top: 14px; margin-right: 8px;width: 12px;height: 8px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/jiantou_shang_12x8_32bits.png#0 0 12 8);"></div>
+                            <pe:container zorder="2" uiname="KeepWorkMallPage.list_bg_modelType" style='position: relative;margin-top: 26px;padding-top: 10px; margin-left: 0px; width: 100px; height: 254px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/classes/xialakuang_30x24_32bits.png#0 0 30 24:10 10 10 10);'>
+                                <pe:repeat DataSource="<%=GetModelTypes()%>">
+                                    <pe:repeatitem style="float:left;width:100px;">
+                                        <pe:if condition='<%=KeepWorkMallPage.model_index == Eval("index") %>'>
+                                            <input type="button" value='<%=GetModelName(Eval("name"))%>' name='<%=Eval("index")%>' uiname = '<%=format("KeepWorkMallPage.ModelType_%d", Eval("index"))%>' onclick="OnChangeModelType" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#000000;font-size:14px; base-font-size:14px; font-weight: bold; width:100px;height:22px;background:url(Texture/Aries/Creator/keepwork/Mall/xuanzhondi_98x22_32bits.png#0 0 98 22)" />
+                                        </pe:if>
+                                        <pe:if condition='<%=KeepWorkMallPage.model_index ~= Eval("index") %>'>
+                                            <input type="button" value='<%=GetModelName(Eval("name"))%>' name='<%=Eval("index")%>' uiname = '<%=format("KeepWorkMallPage.ModelType_%d", Eval("index"))%>'   onclick="OnChangeModelType" style="margin-right:12px;margin-top:8px;margin-bottom:0px;color:#ffffff;font-size:14px; base-font-size:14px; font-weight: bold; width:100px;height:22px;background:url()" />
+                                        </pe:if>
+                                    </pe:repeatitem>
+                                </pe:repeat>
+                            </pe:container>
+                        </pe:if>
+                        
+
+                    </div>
+                    <div style="position: relative; margin-left:940px;width:240px; height: 40px;">
+                        <div style="width: 217px;height:36px;background:url(Texture/Aries/Creator/keepwork/vip/shuzishuru_32X32_32bits.png#0 0 32 32:14 14 14 14);">
+                            <input type="text" auto_virtual_keyboard="true" EmptyText='<%=L"请输入你要搜索的内容"%>' onkeyup="OnSearch" SkipAutoBadWordFilter="true" name="search_text" uiname="KeepWorkMallPageV2.search_text" CaretColor="#FF000000" textcolor="#000000" style="position: relative; font-size:12px;margin-left:5px;margin-top: 4px; width: 164px; height:28px; background: url();" />
+                            <input type="button" name="OK" uiname="KeepWorkMallPageV2.OK" tooltip="搜索" onclick="SearchProduct" style="margin-left: 170px; margin-top: -33px; width: 48px; height: 37px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/sousuo_48x37_32bits.png#0 0 48 37);  " />
+                        </div>
+                    </div>
+                    <!-- 左边大分类 -->
+                    <div style="position: relative; width:210px;height:610px;margin-top:-15px; ">
+                        <pe:gridview name="menu_gridview" uiname="KeepWorkMallPageV2.menu_gridview" RememberScrollPos="true" CellPadding="14" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="45" DataSource='<%=MenuItems%>' >
+                            <Columns>
+                                <pe:if condition='<%=IsMenuSelected(Eval("index"))%>'>
+                                    <input type="button" value= '<%=Eval("name")%>' name='<%=Eval("id") .. "_name_".. Eval("index")%>' uiname='<%="KeepWorkMallPageV2."..Eval("id") .. "_name_".. Eval("index")%>' onclick="OnChangeMenu" style="font-size: 20px; base-font-size:20px; font-weight: bold; width: 143px; height: 45px; background: url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan3_32X32_32bits.png#0 0 32 32:14 14 14 14);"/>
+                                </pe:if>
+
+                                <pe:if condition='<%=not IsMenuSelected(Eval("index"))%>'>
+                                    <input type="button" value= '<%=Eval("name")%>' name='<%=Eval("id") .. "_name_".. Eval("index")%>' uiname='<%="KeepWorkMallPageV2."..Eval("id") .. "_name_".. Eval("index")%>' onclick="OnChangeMenu" style="font-size: 20px; base-font-size:20px; font-weight: bold; width: 143px; height: 45px; background: url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:14 14 14 14);"/>
+                                </pe:if>
+                            </Columns>
+                        </pe:gridview>                
+                    </div>
+                    <!-- 中间的小分类：左边大分类的子分类 -->
+                    <pe:if condition='<%= IsShowChildMenu() %>'>
+                        <div style="position: relative; width: 780px; height: 72px; margin-left: 210px; margin-top: -2px;">
+                            <pe:gridview style="margin-top: -14px; margin-left: -14px;" name="menu_child_gridview" uiname="KeepWorkMallPageV2.menu_child_gridview"  CellPadding="14" AllowPaging="false" ItemsPerLine="12" DefaultNodeHeight="40" DataSource='<%=MenuChildItems%>' >
+                                <Columns>
+                                    <pe:if condition='<%=IsChildMenuSelected(Eval("index"))%>'>
+                                        <input type="button" value= '<%=Eval("name")%>' name='<%=Eval("id") .. "_name_".. Eval("index")%>' uiname='<%="KeepWorkMallPageV2."..Eval("id") .. "_name_".. Eval("index")%>' onclick="OnChangeChildMenu" style="font-size: 14px; base-font-size:14px; font-weight: bold; width: 88px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Mall/btn_qiehuan_32X32_32bits.png#0 0 32 32:14 14 14 14);"/>
+                                    </pe:if>
+            
+                                    <pe:if condition='<%=not IsChildMenuSelected(Eval("index"))%>'>
+                                        <input type="button" value= '<%=Eval("name")%>' name='<%=Eval("id") .. "_name_".. Eval("index")%>' uiname='<%="KeepWorkMallPageV2."..Eval("id") .. "_name_".. Eval("index")%>' onclick="OnChangeChildMenu" style="font-size: 14px; base-font-size:14px; font-weight: bold; width: 88px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Window/button/huianniu_32x32_32bits.png#0 0 32 32:14 14 14 14);"/>
+                                    </pe:if>
+                                </Columns>
+                            </pe:gridview>
+                        </div>
+                    </pe:if>
+                    <pe:if condition="<%= IsSelectRec() %>">
+                        <div style="position: relative; width: 1030px; height: 580px; margin-left: 200px; margin-top: 48px;">
+                            <pe:gridview style="margin-left:-12px; margin-top: -10px;" uiname="KeepWorkMallPageV2.item_gridview" name="item_gridview" VerticalScrollBarOffsetX="10" CellPadding="18" AllowPaging="false" ItemsPerLine="5 " DefaultNodeHeight="50" DataSource='<%=GridsItems%>'>
+                                <Columns>
+                                    <pe:if condition='<%=Eval("index") == 1 %>'>
+                                        <div style="margin-left: 10px; width: 942px; height: 170px; background: url(Texture/Aries/Creator/keepwork/Mall/banner_922x180_32bits.png#0 0 922 180);"></div>
+                                    </pe:if>
+                                    <pe:if condition='<%=Eval("index") >= 6 %>'>
+                                        <%=GetRenderItemStr()%>
+                                    </pe:if>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <div style="margin-left: 300px; margin-top: 100px;width: 326px; height: 177px; background: url(Texture/Aries/Creator/keepwork/Mall/zanwuziyuan_326x177_32bits.png#0 0 326 177);"></div>
+                                </EmptyDataTemplate>
+                            </pe:gridview>
+                        </div>
+                    </pe:if>
+                    <pe:if condition="<%=not IsSelectRec()%>">
+                        <div style="position: relative; width: 1030px; height: 580px; margin-left: 200px; margin-top: 48px;">
+                            <pe:gridview style="margin-left:-12px; margin-top: -10px;" uiname="KeepWorkMallPageV2.item_gridview" name="item_gridview" VerticalScrollBarOffsetX="10" CellPadding="18" AllowPaging="false" ItemsPerLine="5 " DefaultNodeHeight="50" DataSource='<%=GridsItems%>'>
+                                <Columns>
+                                    <%= GetRenderItemStr() %>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <div style="margin-left: 300px; margin-top: 100px; width: 326px; height: 177px; background: url(Texture/Aries/Creator/keepwork/Mall/zanwuziyuan_326x177_32bits.png#0 0 326 177);"></div>
+                                </EmptyDataTemplate>
+                            </pe:gridview>
+                        </div>
+                    </pe:if>
+                </div>       
+            </pe:container>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>

@@ -340,7 +340,13 @@ function ParacraftLearningRoomDailyPage.FillDays()
 	ParacraftLearningRoomDailyPage.Current_Item_DS = {};
 
 	for k = 1,ParacraftLearningRoomDailyPage.max_cnt do
-		table.insert(ParacraftLearningRoomDailyPage.Current_Item_DS, {});
+		if System.options.isHideVip then
+			if k <= 16 then
+				table.insert(ParacraftLearningRoomDailyPage.Current_Item_DS, {});
+			end
+		else
+			table.insert(ParacraftLearningRoomDailyPage.Current_Item_DS, {});
+		end
 	end
 end
 function ParacraftLearningRoomDailyPage.OnInit()
@@ -440,19 +446,6 @@ function ParacraftLearningRoomDailyPage.DoCheckin(callback)
 	show_page();
 end
 
-function ParacraftLearningRoomDailyPage.GetMaxLearnDays()
-	if ParacraftLearningRoomDailyPage.max_lesson == 0 then
-		local nLesson = 0
-		for title in string.gfind(ParacraftLearningRoomDailyPage.lessons, "([^\r\n]+)") do
-            if(title and title ~= "")then
-                nLesson = nLesson + 1
-            end
-		end
-		ParacraftLearningRoomDailyPage.max_lesson = nLesson
-	end
-	-- print("最大课程数是================",ParacraftLearningRoomDailyPage.max_lesson)
-end
-
 function ParacraftLearningRoomDailyPage.GetLearnDays()
 	local gsid = ParacraftLearningRoomDailyPage.gsid;
 	local template = KeepWorkItemManager.GetItemTemplate(gsid);
@@ -499,13 +492,12 @@ function ParacraftLearningRoomDailyPage.HasCheckedToday()
     if(not KeepWorkItemManager.IsLoaded())then
 		return true
 	end
-	ParacraftLearningRoomDailyPage.GetMaxLearnDays()
 	local date = ParaGlobal.GetDateFormat("yyyy-M-d");
 	local key = string.format("LearningRoom_HasCheckedToday_%s", date);
 	local gsid = ParacraftLearningRoomDailyPage.gsid;
 	local clientData = KeepWorkItemManager.GetClientData(gsid) or {};
 	local nLearnDays = ParacraftLearningRoomDailyPage.GetLearnDays()
-	if nLearnDays >= ParacraftLearningRoomDailyPage.max_lesson then
+	if nLearnDays >= ParacraftLearningRoomDailyPage.max_cnt_preset then
 		return true
 	end
 	return clientData[key];
@@ -527,7 +519,7 @@ function ParacraftLearningRoomDailyPage.SaveToLocal(callback)
 	KeepWorkItemManager.SetClientData(gsid, clientData, callback)
 end
 function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
-    if(System.options.enable_npl_brower and not NplBrowserLoaderPage.IsLoaded())then
+    if(System.options.enable_npl_brower and not NplBrowserLoaderPage.IsLoaded() and not System.os.IsWindowsXP())then
 		if(not ParacraftLearningRoomDailyPage.isLoading) then
 			ParacraftLearningRoomDailyPage.isLoading = true
 			NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
@@ -576,8 +568,12 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 
 		RedSummerCampPPtPage.StartTask("dailyVideo")
 		GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { started = true, learningIndex = index });
-		if System.os.GetPlatform() ~= 'win32' or not System.options.enable_npl_brower then
+		if System.os.GetPlatform() ~= 'win32' or not System.options.enable_npl_brower or  System.os.IsWindowsXP() then
 			-- 除了win32平台，使用默认浏览器打开视频教程
+			if System.os.IsWindowsXP() then
+				url = string.gsub(url, "https", "http")
+			end
+			
 			local cmd = string.format("/open %s", url);
 			GameLogic.RunCommand(cmd);
 			if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
@@ -593,7 +589,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 					local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
 					local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
 					GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
-	
+					GameLogic.GetFilters():apply_filters('finish_daily_video') 
 					QuestAction.SetDailyTaskValue("40009_1",1)
 					RedSummerCampPPtPage.OnCloseDailyVideo()
 				end, function()
@@ -631,7 +627,7 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 						local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
 						local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
 						GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
-	
+						GameLogic.GetFilters():apply_filters('finish_daily_video') 
 						QuestAction.SetDailyTaskValue("40009_1",1)
 					end, function()
 						_guihelper.MessageBox(L"签到失败！");

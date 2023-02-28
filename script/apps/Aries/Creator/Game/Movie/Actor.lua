@@ -240,7 +240,7 @@ function Actor:GetPosition()
 	end
 end
 
--- @return the entity position if any
+-- @return the entity orientation if any
 function Actor:GetRollPitchYaw()
 	if(self:GetEntity()) then
 		local obj = self:GetEntity():GetInnerObject();
@@ -510,10 +510,19 @@ function Actor:AutoAddKey(keyname, time, value)
 		if(self.is_adding_key) then
 			res = v:AddKey(time, value);
 		else
-			-- res = v:AutoAddKey(time, value);
-			res = v:AutoAppendKey(time, value);
+			res = v:AutoAddKey(time, value);
 		end
 		if(res) then
+			self:SetModified();
+		end
+	end
+end
+
+-- add new key at time, data. if there is already a key at the time, we will replace it. 
+function Actor:AddKey(keyname, time, value)
+	local v = self:GetVariable(keyname);
+	if(v) then
+		if(v:AddKey(time, value)) then
 			self:SetModified();
 		end
 	end
@@ -908,6 +917,10 @@ end
 
 function Actor:CanShowSelectManip()
 	return true
+end
+
+function Actor:SetIsAgent(isAgent)
+	self.isAgent = isAgent
 end
 
 function Actor:IsAgent()

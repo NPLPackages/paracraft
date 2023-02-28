@@ -999,8 +999,7 @@ function CameraController.OnSyncWorldFinish()
 					extra = {}
 				}
 				params.extra.railcar_fiexd_setting = setting;
-				local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
-				KeepworkServiceProject:UpdateProject(world_data.kpProjectId, params, function(data, err)
+				GameLogic.GetFilters():apply_filters("service.keepwork_service_project.update_project",world_data.kpProjectId,params,function(data,err)
 					if err == 200 then
 						setting.has_upload = true
 						setting.kpProjectId = world_data.kpProjectId
@@ -1011,7 +1010,7 @@ function CameraController.OnSyncWorldFinish()
 							file:close();
 						end
 					end
-				end)
+				end);
 			end
 		end
 	end

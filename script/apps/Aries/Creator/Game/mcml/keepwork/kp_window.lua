@@ -42,6 +42,38 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	local iconPosy = mcmlNode:GetNumber("icon_y") or -22
 	local help_type = mcmlNode:GetAttributeWithCode("help_type", nil, true)
 	local parent_width, parent_height = w, h;
+
+	if not mcmlNode:GetNumber("icon_width") then
+		local iconWidthWithCode = mcmlNode:GetAttributeWithCode("icon_width")
+
+		if iconWidthWithCode then
+			iconWidth = iconWidthWithCode
+		end
+	end
+
+	if not mcmlNode:GetNumber("icon_height") then
+		local iconHeightWithCode = mcmlNode:GetAttributeWithCode("icon_height")
+
+		if iconHeightWithCode then
+			iconHeight = iconHeightWithCode
+		end
+	end
+
+	if not mcmlNode:GetNumber("icon_x") then
+		local iconPosxWithCode = mcmlNode:GetAttributeWithCode("icon_x")
+
+		if iconPosxWithCode then
+			iconPosx = iconPosxWithCode
+		end
+	end
+
+	if not mcmlNode:GetNumber("icon_y") then
+		local iconPosyWithCode = mcmlNode:GetAttributeWithCode("icon_y")
+
+		if iconPosyWithCode then
+			iconPosy = iconPosyWithCode
+		end
+	end
 	
 	local title_height = 28;
 	
@@ -69,7 +101,7 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	_parent:AddChild(_this);
 
 	if help_type and help_type ~= "" then
-		local help_icon_x = mcmlNode:GetNumber("help_icon_x") or iconWidth
+		local help_icon_x = tonumber(mcmlNode:GetAttributeWithCode("help_icon_x")) or iconWidth
 		_this = ParaUI.CreateUIObject("button", "window_help_type", "_lt", help_icon_x, 5, 32, 32);	
 		
 		_this.background = "Texture/Aries/Creator/keepwork/Help/btn_32X32_32bits.png;0 0 32 32";
@@ -81,8 +113,9 @@ function kp_window.create_default(rootName, mcmlNode, bindingContext, _parent, l
 	end
 
 	local onclose = mcmlNode:GetString("onclose");
+	local isHideClose = mcmlNode:GetAttributeWithCode("is_hide_close")
 
-	if(onclose and onclose ~= "")then
+	if (onclose and onclose ~= "" and not isHideClose)then
 		local btn_size = 22
 		local btnName = mcmlNode:GetString("uiname_onclose") or "close_btn";
 		_this = ParaUI.CreateUIObject("button", btnName, "_rt", -btn_size-15, 10, btn_size, btn_size);	

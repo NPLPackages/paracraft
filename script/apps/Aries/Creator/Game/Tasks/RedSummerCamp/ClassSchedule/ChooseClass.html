@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ClassSimpleTip.lua"><![CDATA[
+ClassSimpleTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/ClassSchedule/ClassSimpleTip.lua") 
+ClassSimpleTip.OnInit()
+page = document:GetPageCtrl();
+
+key = page:GetRequestParam("key");
+tip = page:GetRequestParam("tip") or "";
+confirm_text = page:GetRequestParam("confirm_text") or "";
+tipstyle = page:GetRequestParam("tipstyle") or "font-size: 16px;padding-top: 26px;text-align: left;"
+
+function ClosePage()
+    page:CloseWindow();
+end
+
+function class_ds()
+    local ds = ClassSimpleTip.DS_classes()
+    return ds
+end
+
+function getStyle_classlist_bg()
+    local ds = class_ds()
+
+    local num = #ds
+    local height = 10+24*math.min(num,10)+10
+    local ret = string.format("position: relative;margin-top: 32px;padding-top: 10px; margin-left: 1px; width: 346px; height: %spx; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/classes/xialakuang_30x24_32bits.png#0 0 30 24:10 10 10 10);",height)
+    return ret
+end
+
+function get_class_list_xml()
+    local str = [[
+    <pe:container zorder="2" uiname="classlist_bg" style='<%= getStyle_classlist_bg() %>'>
+        <pe:gridview style='<%= string.format("margin:0px;width:346px;height:%spx;",24*math.min(#(ClassSimpleTip.DS_classes()),10)) %>' name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "24" 
+                DataSource='<%= ClassSimpleTip.DS_classes() %>'>
+                <Columns>
+                    <input 
+                        type="button" 
+                        class="listbutton_unselected" 
+                        value='<%= ClassSimpleTip.GetClassName(Eval("index")) %>' 
+                        name='<%=Eval("index")%>'
+                        onclick='ClassSimpleTip.OnClickSelectClass()'
+                        style="text-offset-x:12;width:346px;height:24px;text-align:left;color:#cccccc;" 
+                        MouseOver_BG="Texture/alphadot.png"
+                    />
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+    </pe:container>
+    ]]
+
+    return str
+end
+
+]]></script>
+    <pe:container width="100%" height="100%" style="background:url()">
+        <div width="496" height="234" style="margin-top: 0px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
+            <div style="position: relative;height: 40px;">
+                <div width="48px" height="25px" valign="center" style="position: relative;margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/xinxi_48x25_32bits.png#0 0 48 25);"></div>
+                <div width="24px" height="24px" align="right" valign="center" style="margin-right: 10px;">
+                    <input type="button" zorder="10" value="" onclick="ClosePage"  style="position: relative;width:24px;height:24px;background: url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/guanbi_34x34_32bits.png#0 0 34 34);"/>
+                </div>
+            </div>    
+    
+            <div height="124" style="margin-top: 40px;margin-left: 30px;margin-right: 30px;">
+                <div style='<%= tipstyle %>'>
+                    <%=tip%>
+                </div>
+            </div>
+    
+            <div style="position: relative;width: 348px; height:39px;margin-bottom:100px;" valign="bottom" align="center" width="348px">
+                <pe:container zorder="2" width="348px" height="39px" style="position: relative; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/baitiao_32x32_32bits.png#0 0 32 32:10 10 10 10);" onclick="ClassSimpleTip.OnClickExpandAllClass()">
+                    <pe:if condition='<%= ClassSimpleTip.curSelIdx==nil %>'>
+                        <label value='<%= L"选择上课班级" %>' name="default_text_sel" style="text-align:left;text-valign:center;font-size: 18px; height: 36px;margin-left: 10px;color:#999999"></label>
+                    </pe:if>
+                    <pe:if condition='<%= ClassSimpleTip.curSelIdx~=nil %>'>
+                        <label value='<%= ClassSimpleTip.GetClassName(ClassSimpleTip.curSelIdx) %>' name="default_text_sel" style="text-align:left;text-valign:center;font-size: 18px; height: 36px;margin-left: 10px;color:#000000"></label>
+                    </pe:if>
+                </pe:container>
+                
+                <pe:if condition='<%= ClassSimpleTip._isExpland %>'>
+                    <div zorder="4" uiname="icon_unexpand" align="right" style="position: relative;float: left;margin-top: 14px; margin-right: 16px;width: 13px;height: 9px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/shouqi_13x9_32bits.png#0 0 13 9);"></div>
+                </pe:if>
+                <pe:if condition='<%= not ClassSimpleTip._isExpland %>'>
+                    <div zorder="4" uiname="icon_expand"  align="right" style="position: relative;float: left;margin-top: 14px; margin-right: 16px;width: 13px;height: 9px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/zhankai_13x9_32bits.png#0 0 13 9);"></div>
+                </pe:if>
+                <pe:if condition='<%=ClassSimpleTip._isExpland%>'>
+                    <%=get_class_list_xml()%>
+                    <!-- <pe:container zorder="1" onclick="ClassSimpleTip.OnClickExpandAllClass()" style="position:absolute;margin-top: -720px; margin-left: -1280px; width: 2560px;height: 1440px; background:url()"></pe:container> -->
+                </pe:if>
+            </div>
+            <div valign="bottom" align="center" style="position: relative;margin-bottom: 60px;" width="160" height="30">
+                <div align="center" style="float: left; font-size: 16px;"><%= L"还未创建班级?"%></div>
+                <div align="center" style="float: left; font-size: 16px;color:#2e9be7" onclick="ClassSimpleTip.OnBtnJumpKeepWork_createClass"><%= L"去创建"%></div>
+            </div>
+            <div valign="bottom" align="center" width="326px" height="45px" style="position: relative; margin-bottom: 13px;">
+                <input type="button" value='<%= confirm_text %>' align="center" name='<%= key or confirm_text %>' onclick="ClassSimpleTip.OnBtnConfirmSelectClass" style="position: relative;text-offset-y: -2;font-weight: normal;font-size: 16; width: 128px;height: 45px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/anniu_128x45_32bits.png#0 0 128 45);"/>
+            </div>
+        </div>
+    </pe:container>
+
+</pe:mcml>
+</body>
+</html>

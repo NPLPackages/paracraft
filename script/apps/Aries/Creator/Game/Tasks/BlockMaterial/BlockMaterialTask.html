@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<pe:mcml>
+<script type="text/npl" src="BlockMaterialTask.lua" refresh="true">
+<![CDATA[
+BlockMaterialTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockMaterialTask");
+BlockMaterialTask.OnInit()
+local mat = BlockMaterialTask.GetInstance() and BlockMaterialTask.GetInstance():GetCurrentMaterial()
+curMaterialId = mat and mat.id or -1
+]]>
+</script>
+<div style="background-color:#00000080;width:350px;height:64px">
+    <!--<div style="float:left;margin-left:5px;">
+        <input type="button" name='-1' tooltip='<%=L"左键点击场景中的方块去除材质"%>' value="x" uiname="BlockMaterialTask.noMaterial" style="margin-top:5px;color:#ffffff;width:24px;height:24px;background-color:black" onclick="BlockMaterialTask.OnClickMaterial" /><br/>
+        <input type="button" name='0' tooltip='<%=L"空气材质"%>' value="air" uiname="BlockMaterialTask.airMaterial" style="margin-top:5px;color:#ffffff;width:24px;height:24px;background-color:white" onclick="BlockMaterialTask.OnClickMaterial" />
+    </div>-->
+    <div style="float:left;margin:2px;">
+        <pe:gridview style="width:262px;" AllowPaging="false" name="gvwMaterialTable" CellPadding="0" pagesize="18" ItemsPerLine="9"
+                     DataSource='<%=BlockMaterialTask.GetMaterials()%>'>
+            <Columns>
+                <div style='<%=format("padding:2px;%s", curMaterialId==Eval("id") and "background-color:yellow" or "")%>'>
+                    <input type="button" value="" name='<%=Eval("id")%>' uiname='<%="BlockMaterialTask.matId_"..Eval("id")%>' 
+                           style='<%=string.format("color:#ffffff;width:25px;height:25px;background-color:%s;background:url(%s)", Eval("color"), Eval("diffuseTexPath") or "Texture/whitedot.png")%>' onclick="BlockMaterialTask.OnClickMaterial" />
+                </div>
+            </Columns>
+            <PagerSettings Position="Top" height="36" style="position:relative;margin-left:250px;margin-top:4px;width:64px;height:80px" PreviousPageText="<" NextPageText=">"/>
+            <PagerTemplate>
+                <form>
+                <div>
+	                <input type="button" name="pre" invisibleondisabled="false" tooltip="上一页" style="width:24px;height:24px;background:url(Texture/Aries/Quest/pageleft_32bits.png#0 0 42 41)"/>
+                </div>
+                <div style="width:32px;height:12px;">
+	                <label name="page" style="text-align:center;font-size:12px;color:#cccccc;width:30px;height:12px;"/>
+	            </div>
+                <div>
+	                <input type="button" name="next" invisibleondisabled="false" tooltip="下一页" style="width:24px;height:24px;background:url(Texture/Aries/Quest/pageright_32bits.png#0 0 42 41)"/>
+                </div>
+                </form>
+	        </PagerTemplate>
+        </pe:gridview>
+    </div>
+    <div style="float:left; margin-left: 0px; margin-top: 2px;  width: 20px; height: 60px; color: #ffffff;">
+        <div style="margin-top: 20px; line-height: 20px;"><%=BlockMaterialTask.GetPageInfo()%></div>
+    </div>
+    <div style="float:left;margin-left:4px;">
+        <input type="button" name='edit' tooltip='<%=L"编辑当前材质"%>' value='<%=L"编辑..."%>' uiname="BlockMaterialTask.editMatrial" style="margin-top:5px;color:#ffffff;height:24px;min-width:55px;" onclick="BlockMaterialTask.OnClickEditMaterial" /><br/>
+        <input type="button" name='add' tooltip='<%=L"从资源库添加"%>' value='<%=L"添加..."%>'  uiname="BlockMaterialTask.addMatrial" style="margin-top:5px;color:#ffffff;height:24px;min-width:55px;" onclick="BlockMaterialTask.OnClickAddMaterial" />
+    </div>
+</div>
+</pe:mcml>
+</html>
+

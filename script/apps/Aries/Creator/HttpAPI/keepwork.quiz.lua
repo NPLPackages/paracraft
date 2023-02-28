@@ -22,7 +22,7 @@ function(self, err, msg, data)
 end
 )
 
---http://yapi.kp-para.cn/project/158/interface/api/2337
+--http://yapi.kp-para.cn/project/158/interface/api/2332
 -- get
 HttpWrapper.Create("keepwork.quiz.submit.b.score", "%MAIN%/online-quiz/v0/activityUserScore/score", "POST", true, nil,
 -- PreProcessor
@@ -32,6 +32,19 @@ end,
 -- Post Processor
 function(self, err, msg, data)
     return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.quiz.submit.b.score.post", callbackFunc); 
+end
+)
+
+--http://yapi.kp-para.cn/project/158/interface/api/5320
+-- get
+HttpWrapper.Create("keepwork.quiz.submit.c.score", "%MAIN%/online-quiz/v0/activityUserScore/url", "POST", true, nil,
+-- PreProcessor
+function(self, inputParams, callbackFunc, option)
+   return HttpWrapper.default_prepFunc(self, inputParams, callbackFunc, option, "keepwork.quiz.submit.c.score.post")
+end,
+-- Post Processor
+function(self, err, msg, data)
+    return HttpWrapper.default_postFunc(self, err, msg, data, "keepwork.quiz.submit.c.score.post", callbackFunc); 
 end
 )
 

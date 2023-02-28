@@ -210,7 +210,13 @@ function Keepwork:IsPrefectUserInfo()
     if (not info.mailPhone or tostring(info.mailPhone) == "") then return false end
     if (not info.mailRegion or info.mailRegion.hasChildren ~= 0) then return false end
 
-    GameLogic.QuestAction.AchieveTask("40051_60054_1", 1, true);  -- 标记任务完成
+    if GameLogic.QuestAction then
+        GameLogic.QuestAction.AchieveTask("40051_60054_1", 1, true);  -- 标记任务完成
+    else
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
+        local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+        QuestAction.AchieveTask("40051_60054_1", 1, true);
+    end
 
     self.isExitPrefectUserInfoItem = true;
     self.isPrefectUserInfo = true;

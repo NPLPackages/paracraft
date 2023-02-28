@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+    UserExchangeSkinSuccess = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserExchangeSkinResult.lua");
+    UserExchangeSkinSuccess.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+        UserInfoPage.RemoveSkinByName(UserExchangeSkinSuccess.name)
+    end
+
+    function OnUse()
+        ClosePage()
+        UserInfoPage.UseSkinBySkinName(UserExchangeSkinSuccess.name)
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000088"  > 
+    <div zorder="-3" align="center" valign="center" style=" width: 488px; height: 240px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
+        <div style="position: relative; width: 480px; height: 30px;">
+            <input type="button" style="margin-left: 460px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        </div>
+    
+        <div style="position: relative; margin-top: 70px; text-align: center; width: 480px;height:130px;">
+            <div style="margin-top:2px;margin-left: 10px; font-size: 18px; base-font-size: 18px;">
+                <%="“"..(UserExchangeSkinSuccess.name or "").."”".."兑换成功"%>
+            </div>
+            <div style="margin-top:2px;margin-left: 10px; margin-top: 20px; font-size: 18px; base-font-size: 18px;">
+                是否立即使用？
+            </div>
+        </div>
+        <div style="position: relative; margin-top: 180px; margin-left: 40px; width:480px;height:46px;">
+            <input type="button" onclick="OnUse()" value="<%=L'立即使用'%>" style="float: left; margin-left: 54px; width: 126px; height: 42px; background: url(Texture/Aries/Creator/keepwork/Window/button/huanganniu_32x32_32bits.png#0 0 32 32:14 14 14 14);"/>
+            <input type="button" onclick="ClosePage()" value="<%=L'暂不使用'%>" style="float: left; margin-left: 77px; width: 126px; height: 42px; background: url(Texture/Aries/Creator/keepwork/Window/button/huianniu_32x32_32bits.png#0 0 32 32:14 14 14 14);"/>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

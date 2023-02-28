@@ -193,6 +193,7 @@ function WorldCommon.SaveWorld()
 	local LocalNPC = commonlib.gettable("MyCompany.Aries.Creator.AI.LocalNPC")
 	LocalNPC:SaveToFile();
 	WorldCommon.SavePreviewImageIfNot();
+	WorldCommon.SetWorldTag("lastdaytime", GameLogic.RunCommand("/time now"))
 	WorldCommon.SaveWorldTag();
 	
 	if(System.options.mc) then
@@ -222,6 +223,8 @@ function WorldCommon.SetWorldTag(field_name, value)
 	if(WorldCommon.world_info) then
 		if(field_name ~= "size") then
 			WorldCommon.world_info[field_name or "name"] = value;
+
+			GameLogic.GetFilters():apply_filters('OnWorldTageChange', field_name)
 		end	
 	end
 end
@@ -267,7 +270,7 @@ end
 function WorldCommon.SaveWorldAs()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/LocalLoadWorld.lua");
 	local LocalLoadWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.LocalLoadWorld")
-			
+
 	local lastWorldName = WorldCommon.GetWorldTag("name") or "no_name"
 
 	if(GameLogic.IsRemoteWorld()) then
@@ -278,7 +281,11 @@ function WorldCommon.SaveWorldAs()
 
 	local defaultWorldName = lastWorldName;
 	for i=1, 10 do
-		local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. commonlib.Encoding.Utf8ToDefault(defaultWorldName) .. "/";
+		local baseFolder =
+			GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path') or
+			LocalLoadWorld.GetDefaultSaveWorldPath();
+
+		local targetFolder = baseFolder .. "/".. commonlib.Encoding.Utf8ToDefault(defaultWorldName) .. "/";
 		if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
 			defaultWorldName = lastWorldName..L"_副本"..tostring(i);
 		else
@@ -294,7 +301,7 @@ function WorldCommon.SaveWorldAs()
 	-- ban not institute student save as
 	local instituteVipSaveAsOnly = WorldCommon.GetWorldTag('instituteVipSaveAsOnly');
     local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld');
-	local currentEnterWorldUserId = currentEnterWorld.user and currentEnterWorld.user.id or 0;
+	local currentEnterWorldUserId = currentEnterWorld and currentEnterWorld.user and currentEnterWorld.user.id or 0;
     local userId = GameLogic.GetFilters():apply_filters('store_get', 'user/userId');
 	local userType = Mod.WorldShare.Store:Get('user/userType') or {};
     local isStudent = userType.student;
@@ -308,33 +315,47 @@ function WorldCommon.SaveWorldAs()
 		return;
 	end
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
-	local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
-	OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
-		if(result and result~="") then
-			local function callback()
-				local targetFolder = LocalLoadWorld.GetDefaultSaveWorldPath() .. "/".. result.. "/";
-				if (ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
-					_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
-						if(res and res == _guihelper.DialogResult.Yes) then
-							WorldCommon.SaveWorldAsImp(targetFolder);
-						end
-					end, _guihelper.MessageBoxButtons.YesNo);
-				else
-					WorldCommon.SaveWorldAsImp(targetFolder);
+	local function Handle()
+		NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenFileDialog.lua");
+		local OpenFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenFileDialog");
+		OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
+			if(result and result~="") then
+				local function callback()
+					local baseFolder =
+						GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path') or
+						LocalLoadWorld.GetDefaultSaveWorldPath();
+					local targetFolder = baseFolder .. "/".. result.. "/";
+					if (ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
+						_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
+							if(res and res == _guihelper.DialogResult.Yes) then
+								WorldCommon.SaveWorldAsImp(targetFolder);
+							end
+						end, _guihelper.MessageBoxButtons.YesNo);
+					else
+						WorldCommon.SaveWorldAsImp(targetFolder);
+					end
+
+					local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
+					GameLogic.GetFilters():apply_filters("user_event_stat", "world", "saveas:"..tostring(worldname), nil, nil);
+				end
+			
+				if GameLogic.GetFilters():apply_filters("WorldCommon.SaveWorldAs", false, callback) then
+					return false
 				end
 
-				local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
-				GameLogic.GetFilters():apply_filters("user_event_stat", "world", "saveas:"..tostring(worldname), nil, nil);
+				callback()
 			end
-		
-			if GameLogic.GetFilters():apply_filters("WorldCommon.SaveWorldAs", false, callback) then
-				return false
-			end
+		end, commonlib.Encoding.Utf8ToDefault(defaultWorldName), L"世界另存为", "localworlds", true)
+	end
 
-			callback()
+	local KeepworkServiceWorld = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceWorld.lua')
+	KeepworkServiceWorld:LimitFreeUser(false, function(result)
+		if result then
+			Handle()
+		else
+			GameLogic.ShowVipGuideTip("UnlimitWorldsNumber")
 		end
-	end, commonlib.Encoding.Utf8ToDefault(defaultWorldName), L"世界另存为", "localworlds", true)
+	end)
 end
 
 function WorldCommon.SaveWorldAsImp(folderName, callbackFunc)
@@ -360,10 +381,22 @@ function WorldCommon.SaveWorldAsImp(folderName, callbackFunc)
 							end
 						end
 					end
-					setAttrValueDefault({"communityWorld","instituteVipChangeOnly","instituteVipEnabled","instituteVipSaveAsOnly","isVipWorld"})
+					setAttrValueDefault({"communityWorld","instituteVipChangeOnly","instituteVipEnabled","instituteVipSaveAsOnly","isVipWorld",
+					"totalEditSeconds","totalClicks","totalKeyStrokes","totalSingleBlocks","totalWorkScore","editCodeLine","world_edit_code"})
 
 					save_world_handler:SaveWorldXmlNode(xmlRoot);
 					break;
+				end
+			end
+
+			local deleteList = {
+				"user_action_path.xml","block_hotVal_map.xml","user_code_data.xml","user_bones_data.xml","codeblock.txt",
+				"stats/user_action_path.xml","stats/block_hotVal_map.xml","stats/user_code_data.xml","stats/user_bones_data.xml","stats/codeblock.txt",
+			}
+			for k,v in ipairs(deleteList) do
+				local path = folderName.."/"..v 
+				if ParaIO.DoesFileExist(path) then
+					ParaIO.DeleteFile(path)
 				end
 			end
 	
@@ -519,4 +552,13 @@ function WorldCommon.GetPrivateKey()
 	if(type(privateKey) == "string" and (#privateKey) > 10) then
 		return privateKey
 	end
+end
+
+-- Set up a mother world. Users can then explore and create new worlds, but after all worlds exit, need to return to the parent world
+function WorldCommon.SetParentProjectId(parentProjectId)
+	WorldCommon.parentProjectId = parentProjectId
+end
+
+function WorldCommon.GetParentProjectId()
+	return WorldCommon.parentProjectId
 end

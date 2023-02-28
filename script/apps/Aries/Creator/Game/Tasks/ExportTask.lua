@@ -70,23 +70,25 @@ end
 function Export:ShowPage(bShow)
 	curInstance = self;
 	local width, height = 512, 400;
-	System.App.Commands.Call("File.MCMLWindowFrame", {
-			url = "script/apps/Aries/Creator/Game/Tasks/ExportTask.html", 
-			name = "ExportTask.ShowPage", 
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			isShowTitleBar = false,
-			bShow = bShow,
-			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			zorder = 1,
-			allowDrag = true,
-			directPosition = true,
-				align = "_ct",
-				x = -width/2,
-				y = -height/2,
-				width = width,
-				height = height,
-		});
+	local params = {
+		url = "script/apps/Aries/Creator/Game/Tasks/ExportTask.html", 
+		name = "ExportTask.ShowPage", 
+		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+		isShowTitleBar = false,
+		bShow = bShow,
+		DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		zorder = 1,
+		allowDrag = true,
+		directPosition = true,
+			align = "_ct",
+			x = -width/2,
+			y = -height/2,
+			width = width,
+			height = height,
+	}
+	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"ExportTask");
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
 end
 
 -- static function to retrieve the exporter database

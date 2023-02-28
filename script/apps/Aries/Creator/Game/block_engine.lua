@@ -114,15 +114,19 @@ function BlockEngine:Connect()
 
 	self.half_blocksize = blocksize / 2;
 
-
-	-- default to offset 200 meters below the ground.
-	--self:SetOffsetY(-200);
-	self:SetOffsetY(-self.blocksize*128); -- just for debugging. 
+	-- this ensures that blockworld and real world origin are the same. 
+	self:SetOffsetY(-self.blocksize*BlockEngine.region_height); 
 
 	block_types:OnWorldLoaded();
 
 	-- enter the block world with rendering.
     ParaTerrain.EnterBlockWorld(x,y,z);
+
+	-- 初始化材质
+	if (ParaAsset.GetBlockMaterial) then
+		-- print("========================init material============================");
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockMaterial/BlockMaterialEditor.lua");
+	end
 
 	self:UpdateEyePosition(x, y, z);
 
@@ -690,6 +694,9 @@ end
 -- @param entity_data: table of xml node as entity_data
 -- @return true if a new block is created. 
 function BlockEngine:SetBlock(x,y,z,block_id, block_data, flag, entity_data)
+	if not x or not y or not z then
+		return 
+	end
 	local last_block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 	local last_block_data = ParaTerrain.GetBlockUserDataByIdx(x,y,z);
 	block_id = block_id or last_block_id;
@@ -746,6 +753,9 @@ end
 -- Sets the block metadata at a given location. 
 -- @param flag: bitwise field. 1 will notify neighbor blocks. 2 or nil will be the default
 function BlockEngine:SetBlockData(x,y,z,block_data, flag)
+	if not x or not y or not z then
+		return 
+	end
 	local block_id = ParaTerrain.GetBlockTemplateByIdx(x,y,z);
 	local block = block_types.get(block_id);
 	if(block and block_data) then
@@ -1173,5 +1183,42 @@ function BlockEngine:RayPicking(fromX, fromY, fromZ, dirX, dirY, dirZ, length)
 	end
 end
 
+-- get real world Y value of the terrain surface from a given Block position. 
+-- blocks and physical meshes are taken into account. 
+-- @return nil or realHeightY
+function BlockEngine:GetTerrainHeight(bx, by, bz)
+	local x, y, z = BlockEngine:real_bottom(bx, by, bz)
+	local realHeightY;
+	local block_id, solid_y = BlockEngine:GetNextBlockOfTypeInColumn(bx, by, bz, block.attributes.obstruction, 255)
+	if(block_id) then
+		realHeightY = BlockEngine:realY(solid_y+1)
+	end
+	local pt = ParaScene.Pick(x, y+1.1, z, 0, -1, 0, 255, "point")	
+	if(pt:IsValid())then
+		local tx, ty, tz = pt:GetPosition()
+		if(not realHeightY or realHeightY < ty) then
+			realHeightY = ty
+		end
+	end
+	return realHeightY
+end
 
+local sideToFaces = {[5]=0, [4]=2, [0]=3, [2] = 1, [3]=5, [1] = 4}
+local function SideToFaceIndex(side)
+	return sideToFaces[side]
+end
 
+-- set block material from a block's face.
+-- @param side: if -1, we will remove all materials from the block
+-- @param nMaterialID: global unique material id, 0 for air
+function BlockEngine:SetBlockExternalMaterial(x, y, z, side, nMaterial)
+	local nFaceId = sideToFaces[side] or side;
+	return ParaTerrain.SetBlockMaterial(x, y, z, nFaceId, nMaterial)
+end
+
+-- get block's material of a given face
+-- @return -1 if not found
+function BlockEngine:GetBlockExternalMaterial(x, y, z, side)
+	local nFaceId = sideToFaces[side] or side;
+	return ParaTerrain.GetBlockMaterial(x, y, z, nFaceId)
+end

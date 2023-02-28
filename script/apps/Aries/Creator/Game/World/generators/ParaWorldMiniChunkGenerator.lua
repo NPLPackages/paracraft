@@ -195,6 +195,9 @@ function ParaWorldMiniChunkGenerator:OnLockTimer()
 	end
 
 	local player = EntityManager.GetPlayer()
+	if not player then
+		return 
+	end
 	local x, y, z = player:GetBlockPos();
 	local minX, minY, minZ = self:GetPivot();
 	local maxX = minX+128;
@@ -243,6 +246,8 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	local myHomeWorldName = string.format(L"%s的家园", System.User.keepworkUsername);
 	local myHomeWorldName1 = string.format(L"%s_main", System.User.keepworkUsername);
 	local currentWorldName = WorldCommon.GetWorldTag("name");
+	local currentWorldFloderName = ParaWorld.GetWorldDirectory():match("([^\\/]+)[\\/]$");
+
 	local function uploadMiniWorld(projectId)
 		keepwork.world.worlds_list({projectId = projectId}, function(err, msg, data)
 			if (data and type(data) == "table") then
@@ -285,7 +290,7 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	end
 	
 	if (WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
-		if myHomeWorldName == currentWorldName or myHomeWorldName1 == currentWorldName then
+		if myHomeWorldName == currentWorldName or myHomeWorldName1 == currentWorldFloderName then
 			showSaveTip()
 		end		
 	end

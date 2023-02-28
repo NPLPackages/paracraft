@@ -61,7 +61,8 @@ function Entity:ctor()
 	self.Specular = {1, 0, 0};
 	self.Ambient = {1, 0, 0};
 	self.offsetPos = vector3d:new(0,0.5,0);
-	self.modelFilepath = "model/blockworld/BlockModel/block_model_one.x"
+	self.modelFilepath = "character/CC/artwar/furnitures/hese_taideng.x"
+	self.mainAssetPath = self.modelFilepath;
 end
 
 function Entity:init()
@@ -85,6 +86,19 @@ end
 function Entity:isDirectionalLight()
 	local t = self:GetField("LightType");
 	return t == 3;
+end
+
+function Entity:SetModelFile(filename)
+	if(self.modelFilepath ~= filename) then
+		self.modelFilepath = filename;
+		filename = self:GetModelDiskFilePath(filename);
+		self:SetMainAssetPath(filename);
+		self:Refresh();
+	end
+end
+
+function Entity:GetModelFile()
+	return self.modelFilepath;
 end
 
 function Entity:GetOffsetPos()
@@ -267,14 +281,8 @@ function Entity:SetField(field, value)
 		return;
 	end
 	if field == "modelFilepath" then
-		self.modelFilepath = value
-
-		local lightModel = self.lightModel;
-		if(lightModel) then
-			lightModel:SetField("assetfile", value);
-		end
+		self:SetModelFile(value)
 		self:valueChanged();
-
 		return;
 	end
 
@@ -362,10 +370,9 @@ function Entity:CreateInnerObject()
 	self:SetInnerObject(lightObject);
 	ParaScene.Attach(lightObject);
 
-
 	local lightModel = ParaScene.CreateObject("BMaxObject", self:GetBlockEntityName(), x + self.modelOffsetPos[1], y + self.modelOffsetPos[2], z + self.modelOffsetPos[3]);
 
-	lightModel:SetField("assetfile", self.modelFilepath);
+	lightModel:SetField("assetfile", self:GetMainAssetPath());
 	lightModel:SetAttribute(0x8080, true);
 	lightModel:SetField("RenderDistance", 100);
 	lightModel:SetField("roll", self.modelRoll);
@@ -392,9 +399,6 @@ function Entity:LoadFromXMLNode(node)
 	local attr = node.attr;
 	if(attr) then
 		-- static model properties
-		if(attr.modelFilepath) then
-			self.modelFilepath = attr.modelFilepath;
-		end
 		if(attr.modelOffsetPos) then
 			self.modelOffsetPos:set(NPL.LoadTableFromString(attr.modelOffsetPos));
 		end
@@ -456,6 +460,9 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.Ambient) then
 			self.Ambient = NPL.LoadTableFromString(attr.Ambient);
 		end
+		if(attr.modelFilepath) then
+			self:SetModelFile(attr.modelFilepath)
+		end
 	end
 end
 
@@ -486,6 +493,11 @@ function Entity:SaveToXMLNode(node, bSort)
 	attr.Specular = commonlib.serialize_compact(self.Specular);
 	attr.Ambient = commonlib.serialize_compact(self.Ambient);
 	return node;
+end
+
+-- return true if we can take control of this entity by external agent like movie or code block.
+function Entity:CanBeAgent()
+	return true;
 end
 
 -- @param actor: the parent ActorNPC
@@ -571,5 +583,25 @@ function Entity:OnUpdateFromPacket(packet_UpdateEntityBlock)
 			setNumbersField("Attenuation1", attr.Attenuation1)
 			setNumbersField("Attenuation2", attr.Attenuation2)
 		end
+	end
+end
+
+function Entity:OpenEditor(editor_name, entity)
+	if(editor_name == "entity") then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditLight/EditLightTask.lua");
+		local EditLightTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditLightTask");
+		if(not EditLightTask.GetInstance()) then
+			GameLogic.GetPlayerController():PickItemByEntity(self);
+		end
+		if(EditLightTask.GetInstance()) then
+			EditLightTask.GetInstance():SelectLight(self);
+		end
+	end
+end
+
+function Entity:Refresh(bForceRefresh, playerObj)
+	local lightModel = self.lightModel;
+	if(lightModel) then
+		lightModel:SetField("assetfile", self:GetMainAssetPath());
 	end
 end

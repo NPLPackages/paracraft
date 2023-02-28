@@ -1,0 +1,28 @@
+<!--script/apps/Aries/Creator/Game/Code/FindCodeBlock.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="FindCodeBlock.lua"><![CDATA[
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+FindCodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.FindCodeBlock");
+FindCodeBlock.OnInit();
+]]></script>
+<div style="font-size:12px;padding:10px;background-color:#292929;" class="default">
+    <div style="color:#ffffff;font-size:14px;">
+        <div class="mc_paper_panel">
+            <pe:treeview name="result" style="background:;height:256px;" VerticalScrollBarStep="20" DefaultNodeHeight="20" DataSource='<%=FindCodeBlock.GetDataSource()%>' ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="true" DefaultIndentation="0">
+                <NodeTemplates>
+                    <NodeTemplate DataType="block">
+                        <pe:treenode icon='<%=XPath("this|icon")%>' tooltip='<%=L"左键打开，右键传送"%>' selected='<%=FindCodeBlock.GetSelectedResultIndex() == XPath("this|index")%>' OnClick="FindCodeBlock.OnClickItem" uiname='<%="FindCodeBlock.sel_"..XPath("this|index")%>' text='<%=XPath("this|name") or ""%>' ></pe:treenode>
+                    </NodeTemplate>
+                </NodeTemplates>
+            </pe:treeview>
+        </div>
+        <div style="margin-top:5px;">
+            <div style="position:relative">
+                <input type="text" autofocus="true" onkeyup="FindCodeBlock.OnKeyUp" onchange="FindCodeBlock.OnTextChange" uiname="FindCodeBlock.text" name="text" style="margin-right:100px;height:24px" />
+            </div>
+            <input type="button" DefaultButton="true" align="right" uiname="FindCodeBlock.ok" name="ok" value='<%=L"确定"%>' onclick="FindCodeBlock.OnOpen" style="width:80px;" class="mc_light_grey_button_with_fillet" />
+        </div>
+    </div>
+</div>
+</pe:mcml>
+

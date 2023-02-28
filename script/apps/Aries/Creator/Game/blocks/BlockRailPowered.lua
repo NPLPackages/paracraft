@@ -157,4 +157,5 @@ function block:UpdateDirData(x, y, z, blockData, shapeData, neighbor_block_id)
             BlockEngine:NotifyNeighborBlocksChange(x, y + 1, z, self.id);
         end
     end
+    self:RefreshTrackShape(x,y,z, false);
 end

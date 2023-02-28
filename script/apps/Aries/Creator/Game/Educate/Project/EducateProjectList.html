@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="EducateProjectList.lua" ><![CDATA[
+    local EducateProjectList = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProjectList.lua")
+    EducateProjectList.OnInit()
+
+    function ClosePage()
+        EducateProjectList.ClosePage()
+    end
+   
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#E3EEFD; ">
+    <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">   
+        <div style="width: 1232px; height: 640px; margin-left:24px; margin-top:40px; background: url(Texture/Aries/Creator/paracraft/Educate/beijingdi_50x50_32bits.png#0 0 50 50 :24 24 24 24);">
+            <div style="position: relative; width: 320px; height: 112px; background: url(Texture/Aries/Creator/paracraft/Educate/biaotidiban_320x112_32bits.png#0 0 320 112);">
+                <input type="button" onclick="ClosePage()" style="position: relative; margin-left: 104px; margin-top: 43px; width: 34px; height: 26px; background: url(Texture/Aries/Creator/paracraft/Educate/Project/fanhui_34x26_32bits.png#0 0 34 26);" />
+                <div style="margin-left: 171px; margin-top: 42px; color: #000000; font-size: 20px; base-font-size: 20px; font-weight: bold;">
+                    <%=L"加载世界"%>
+                </div>
+            </div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

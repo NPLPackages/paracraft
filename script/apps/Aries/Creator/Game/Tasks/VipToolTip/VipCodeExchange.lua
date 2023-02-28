@@ -17,13 +17,57 @@ NPL.load("(gl)script/ide/timer.lua");
 
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local VipCodeExchange = NPL.export()
-
+VipCodeExchange.code_histroy = {}
 local page = nil
 function VipCodeExchange.OnInit()
     page = document:GetPageCtrl();
 end
 
 function VipCodeExchange.ShowView()
+    if true then
+        VipCodeExchange.GetCodeHistroy(function()
+            VipCodeExchange.ShowPage()
+        end)
+        return 
+    end
+    VipCodeExchange.ShowPage()
+end
+
+function VipCodeExchange.GetCodeHistroy(callfunc)
+    keepwork.activateCodes.codehistroy({
+        ["x-per-page"] = 1000,
+        ["x-page"] = 1,
+        ["x-order"] = "updatedAt-desc",
+    },function(err,msg,data)
+        VipCodeExchange.code_histroy = {}
+        if err == 200 and data and data.rows then
+            for k,v in pairs(data.rows) do
+                local temp = {}
+                temp.key = v.key
+                temp.activateTime = v.activateTime or "2022-3-26T01:58:01.000Z"
+                temp.activateTime = VipCodeExchange.GetTimeString(temp.activateTime)
+                temp.activatedDeadline = v.activatedDeadline or "2022-3-26T01:58:01.000Z"
+                temp.activatedDeadline = VipCodeExchange.GetTimeString(temp.activatedDeadline)
+                temp.title = v.record and v.record.displayName or "测试"
+                VipCodeExchange.code_histroy[#VipCodeExchange.code_histroy + 1] = temp
+            end
+        end
+        if callfunc then
+            callfunc()
+        end
+    end)
+end
+
+function VipCodeExchange.GetTimeString(strTime)
+    if not strTime or strTime == "" then
+        return ""
+    end
+    local time_stamp = commonlib.timehelp.GetTimeStampByDateTime(strTime)
+	local date_desc = os.date("%Y.%m.%d", time_stamp)
+    return date_desc
+end
+
+function VipCodeExchange.ShowPage()
     local view_width = 0--400
     local view_height = 0--300
     local params = {
@@ -34,7 +78,7 @@ function VipCodeExchange.ShowView()
         style = CommonCtrl.WindowFrame.ContainerStyle,
         allowDrag = false,
         enable_esc_key = true,
-        zorder = 11,
+        zorder = 100001,
         cancelShowAnimation = true,
         directPosition = true,
         align = "_fi",
@@ -76,7 +120,8 @@ function VipCodeExchange.Exchange(code)
                     local role = data.role
                     VipCodeExchange.RefreshUserInfo()
                     RedSummerCampCourseScheduling.ExchangeLessonSuc()
-                    VipCodeExchangeResult.ShowView("恭喜你激活码使用成功。")                    
+                    VipCodeExchangeResult.ShowView("恭喜你激活码使用成功。")   
+
                 else
                     if data and data.message then
                         VipCodeExchangeResult.ShowView(data.message)
@@ -99,7 +144,7 @@ function VipCodeExchange.Exchange(code)
             end
         end)
     else
-        VipCodeExchangeResult.ShowView("请输入正确的兑换码")
+        VipCodeExchangeResult.ShowView("请输入正确的激活码")
     end
 end
 

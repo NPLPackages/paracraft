@@ -1,0 +1,86 @@
+<pe:mcml>
+<script type="text/npl" refresh="false" src="CodeBlockWindow.lua">
+<![CDATA[
+CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+function OnClickEditMode(name)
+    if CodeBlockWindow.IsBlocklyEditMode() then
+        if GameLogic.Macros:IsPlaying() or GameLogic.Macros:IsRecording() then
+            CodeBlockWindow.OnClickEditMode(name)
+            return
+        end
+        if name ~= "codeMode" then
+            CodeBlockWindow.OnClickEditMode(name)
+        else
+            _guihelper.MessageBox("代码模式需要手动输入代码，请使用电脑下载帕拉卡客户端，在电脑端使用鼠标键盘编辑输入代码体验更佳。", function()
+                CodeBlockWindow.OnClickEditMode(name)
+            end,_guihelper.MessageBoxButtons.OK);
+        end
+    else
+        CodeBlockWindow.OnClickEditMode(name)
+    end
+end
+
+function GetCustomToolbarMCML()
+	local mcmlText = string.format([[<input type="button" value='<%%="%s"%%>' tooltip='<%%="%s"%%>' onclick="CodeBlockWindow.OnChangeModel" style="margin-left:48px;min-width:128px;margin-top:5px;color:#333333;font-size:16px;font-weight:bold;height:40px;background:url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/role_model_128x40_32bits.png#0 0 128 40)" />]],L"角色模型", L"也可以通过电影方块编辑");
+	return mcmlText
+end
+
+function OnBtnResize(name)
+    CodeBlockWindow.ToggleSize(name)
+    local bIsBig = CodeBlockWindow:IsBigCodeWindowSize()
+    local btn = ParaUI.GetUIObject("CodeBlockWindow.resizeBtn")
+    btn.background = bIsBig and "Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/btn_min_40x40_32bits.png#0 0 40 40" or "Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/btn_max_40x40_32bits.png#0 0 40 40"
+end
+
+]]></script>
+<div width="100%" height="100%" style = "background-color:#3E4759" class="default">
+    <div style="margin:10px;height:44px;">
+        <div style="float:left;margin-left:14px;margin-top:5px">
+            <input type="button" uiname="CodeBlockWindow.run" name="run" tooltip='<%=L"编译并运行"%>' style="margin-left: 0px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/bofang_40x40_32bits.png#0 0 40 40); " onclick="CodeBlockWindow.OnClickCompileAndRun" />
+            <input type="button" uiname="CodeBlockWindow.pause" name="pause" tooltip='<%=L"终止运行"%>' style="margin-left: 16px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/zanting_40x40_32bits.png#0 0 40 40); " onclick="CodeBlockWindow.OnClickStop" />
+        </div>
+        <%=GetCustomToolbarMCML()%>
+        <input type="text" uiname="CodeBlockWindow.filename" name="filename" EmptyText='<%=L"角色名称"%>' value='<%=CodeBlockWindow.GetFilename()%>' onchange="CodeBlockWindow.OnChangeFilename" CaretColor="#FFFFFFFF" style="font-size:18px;font-weight:bold;margin-left:15px;margin-top:4px;textcolor:#000000;text-valign: center; width:194px;height:40px;background:url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/role_name_64x32_32bits.png#0 0 64 32:10 10 10 10);"  />
+
+        <pe:if condition="<%=CodeBlockWindow.IsBlocklyEditMode()%>">
+            <div style="float:left;padding:0px;margin-left:44px;margin-top:5px;width: 192px; height: 37px;background:url()">
+                <input type="button" uiname="CodeBlockWindow.blockMode" name="blockMode" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用".."\n"..L"Ctrl+左键使用系统浏览器打开"%>' onclick="OnClickEditMode" style="width: 96px;height:40pxcolor:#333333;font-weight:bold;font-size:16px;height:37px;background:url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/xuanzhongzuo_96x40_32bits.png#0 0 96 40)"/>
+                <input type="button" uiname="CodeBlockWindow.codeMode" name="codeMode" value='<%=L"代码"%>' tooltip='<%=L"NPL代码编辑模式(推荐使用)".."\n"..L"左键选择, 右键可切换代码语言"%>' onclick="OnClickEditMode" style="width: 96px;height:40px color:#333333;font-weight:bold;font-size:16px;height:37px;background:url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/huiyou_96x40_32bits.png#0 0 96 40)" />
+            </div>
+        </pe:if>
+        <pe:if condition="<%=not CodeBlockWindow.IsBlocklyEditMode()%>">
+            <div style="float:left;padding:0px;margin-left:44px;margin-top:5px;width: 192px; height: 37px;background:url()">
+                <input type="button" uiname="CodeBlockWindow.blockMode" name="blockMode" value='<%=L"图块"%>' tooltip='<%=L"用图块编辑NPL代码, 建议8岁以下用户使用".."\n"..L"Ctrl+左键使用系统浏览器打开"%>' onclick="OnClickEditMode" style="width: 96px;height:40pxcolor:#333333;font-weight:bold;font-size:16px;height:37px;background:url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/huizuo_96x40_32bits.png#0 0 96 40)"/>
+                <input type="button" uiname="CodeBlockWindow.codeMode" name="codeMode" value='<%=L"代码"%>' tooltip='<%=L"NPL代码编辑模式(推荐使用)".."\n"..L"左键选择, 右键可切换代码语言"%>' onclick="OnClickEditMode" style="width: 96px;height:40px color:#333333;font-weight:bold;font-size:16px;height:37px;background:url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/xuanzhongyou_96x40_32bits.png#0 0 96 40)" />
+            </div>
+        </pe:if>
+        <div style="position:relative;float:left;width:124px;" align="right">
+            <input type="button" uiname="CodeBlockWindow.resizeBtn" name="resizeBtn" tooltip='<%=L"放缩窗口"%>' onclick="OnBtnResize()" style="margin-left:2px;margin-top:2px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/btn_max_40x40_32bits.png#0 0 40 40);" />
+            <input type="button" uiname="CodeBlockWindow.saveAndClose" name="saveAndClose" tooltip='<%=L"关闭"%>' onclick="CodeBlockWindow.Close()" style="margin-left:24px;margin-top:2px;width:40px;height:40px;background:url(Texture/Aries/Creator/keepwork/Mobile/CodeBlockWindow/guanbi_40x40_32bits.png#0 0 40 40);" />
+        </div>
+    </div>
+    <pe:if condition='<%=CodeBlockWindow.temp_nplbrowser_reload%>'>
+        <pe:container alignment="_fi" style="position:relative;margin-bottom:14px;background:url();">
+            <pe:nplbrowser name="nplbrowser_codeblock" min_width="600" min_height="550" url="<%=CodeBlockWindow.GetBlockEditorUrl()%>" style="background:url();" visible="<%=CodeBlockWindow.IsNPLBrowserVisible()%>"/>
+        </pe:container>
+        <pe:container name="browserLoadingTips" class="default" style="position:relative;margin:20px;background:url();"><%=L"正在加载图块， 首次加载或更新会比较慢，你也可以用外部浏览器编辑图块，再次点击上方图块按钮可查看图块代码"%></pe:container>
+    </pe:if>
+    <pe:container alignment="_fi" name="helpContainer" style="position:relative;margin-bottom:14px;margin-left:0px;width:392px;background:url();">
+        <iframe src= "script/apps/Aries/Creator/Game/Mobile/CodeBlockWindow/CodeHelpWindow.mobile.html" width="392"/>
+    </pe:container>
+    <pe:container alignment="_fi" name="codeContainer" style="position:relative;margin-bottom:14px;margin-left:392px;background-color: #F7F9F6;">
+            <pe:container name="blocklyTip" zorder="1" alignment="_lt" style="color:#ffffff;display:none;padding-left:10px;padding-right:10px;position:relative;padding-bottom:3px;margin-left:60px;margin-top:6px;background-color:#0b9b3a80;" >
+                <%=L"点击上方'图块'按钮，可打开图块编辑器"%>
+            </pe:container>
+            <pe:if condition='<%=CodeBlockWindow.IsShowHelpWnd()%>'>
+                <iframe name="helpWnd" src='<%=CodeBlockWindow.GetHelpWndUrl()%>' height="230"></iframe>
+            </pe:if>
+            <pe:hotkey name="helpCodeHotkey" hotkey="DIK_F1" onclick="CodeBlockWindow.OnLearnMore"/>
+            <input uiname="CodeBlockWindow.code" name="code" rows="20" language="npl" height="100%" value='<%=(CodeBlockWindow.GetCodeFromEntity() or "")%>' 
+                ReadOnly="<%=CodeBlockWindow.IsBlocklyEditMode()%>" OnMouseOverWordChange="CodeBlockWindow.OnMouseOverWordChange" OnRightClick="CodeBlockWindow.OnRightClick"
+                ShowLineNumber="true" UseSystemControl="true" enable_ime="false" EmptyText='<%=L"点击这里输入..."%>' CaretColor="#000000" style="textcolor:#000000;font-family:Consolas" lineheight="<%=CodeBlockWindow.GetFontSize()+4%>" fontsize="<%=CodeBlockWindow.GetFontSize()%>"/>
+    </pe:container>
+    <script type="text/npl" refresh="true">CodeBlockWindow.UpdateEditModeUI();</script>
+</div>
+</pe:mcml>
+

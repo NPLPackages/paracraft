@@ -72,8 +72,11 @@ local cmds = {
 	examples = {{desc = "", canRun = true, code = [[
 while (true) do
     playNote("1", 0.5)
+	wait(1)
     playNote("2", 0.5)
-    playNote("3", 0.5)
+	wait(1)
+	playNote("3", 0.5)
+	wait(1)
 end
 ]]}},
 },
@@ -112,12 +115,18 @@ end
 
 {
 	type = "playMusic", 
-	message0 = L"播放背景音乐%1",
+	message0 = L"播放背景音乐%1音量%2",
 	arg0 = {
 		{
 			name = "filename",
 			type = "input_value",
 			shadow = { type = "playMusicFileTypes", value = "1",},
+			text = "1",
+		},
+		{
+			name = "volume",
+			type = "input_value",
+			shadow = { type = "math_number", value = "1",},
 			text = "1",
 		},
 	},
@@ -127,12 +136,12 @@ end
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "playMusic",
-	func_description = 'playMusic(%s)',
+	func_description = 'playMusic(%s, %s)',
 	ToNPL = function(self)
-		return string.format('playMusic("%s")\n', self:getFieldAsString('filename'));
+		return string.format('playMusic("%s", %s)\n', self:getFieldAsString('filename'), self:getFieldAsString('volume'));
 	end,
 	examples = {{desc = L"播放音乐后停止", canRun = true, code = [[
-playMusic("2")
+playMusic("2", 0.8)
 wait(5)
 playMusic()
 ]]}},
@@ -233,6 +242,30 @@ end
 },
 
 {
+	type = "playSoundAndWait", 
+	message0 = L"播放声音%1等待播完",
+	arg0 = {
+		{
+			name = "filename",
+			type = "input_value",
+			shadow = { type = "playSoundFileTypes", value = "break",},
+			text = "break",
+		},
+	},
+	category = "Sound", 
+	helpUrl = "", 
+	canRun = true,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "playSoundAndWait",
+	func_description = 'playSoundAndWait(%s)',
+	ToNPL = function(self)
+		return string.format('playSoundAndWait("%s")\n', self:getFieldAsString('filename'));
+	end,
+	examples = {},
+},
+
+{
 	type = "stopSound", 
 	message0 = L"暂停播放声音%1",
 	arg0 = {
@@ -270,7 +303,7 @@ stopSound("levelup2")
 
 {
 	type = "playText", 
-	message0 = L"朗读文字%1",
+	message0 = L"朗读文字%1播音员%2",
 	arg0 = {
 		{
 			name = "filename",
@@ -278,6 +311,44 @@ stopSound("levelup2")
 			shadow = { type = "text", value = "你好",},
 			text = "你好",
 		},
+		{
+			name = "narrator",
+			type = "field_dropdown",
+			text = "0",
+			options = {
+				{L"无", "-1"},
+				{L"女声", "0"},
+				{L"男声", "1"},
+				{L"逍遥", "3"},
+				{L"丫丫", "4"},        
+				{L"逍遥2", "5003"},
+				{L"小鹿", "5118"},
+				{L"博文", "106"},
+				{L"小童", "110"},
+				{L"小萌", "111"},
+				{L"米朵", "103"},
+				{L"小娇", "5"},
+				{L"晓萱", "10001"},
+				{L"云希", "10002"},
+				{L"晓墨", "10003"},
+				{L"晓涵", "10004"},
+				{L"云哲", "10005"},
+				{L"云野", "10006"},
+				{L"晓颜", "10007"},
+				{L"晓辰", "10008"},
+				{L"晓曼(粤语)", "10010"},
+				{L"晓秋", "10011"},
+				{L"晓悠", "10012"},
+				{L"晓晓", "10013"},
+				{L"云扬", "10015"},
+				{L"晓睿", "20007"},
+				{L"晓双", "20008"},
+				{L"晓佳(粤语)", "20015"},
+				{L"云龍(粤语)", "20016"},
+				{L"晓臻", "20017"},
+				{L"晓雨", "20018"},
+			}
+		}
 	},
 	category = "Sound", 
 	helpUrl = "", 
@@ -285,15 +356,17 @@ stopSound("levelup2")
 	previousStatement = true,
 	nextStatement = true,
 	funcName = "playText",
-	func_description = 'playText(%s)',
+	func_description = 'playText(%s, nil, %s)',
 	ToNPL = function(self)
-		return string.format('playText("%s")\n', self:getFieldAsString('filename'));
+		return string.format('playText("%s", nil, %s)\n', self:getFieldAsString('filename'), self:getFieldAsString('narrator'));
 	end,
 	examples = {{desc = "使用文本播放语音", canRun = true, code = [[
 playText("欢迎来到我的世界")
 ]]},
 {desc = "参数2可以延迟执行后面的代码", canRun = true, code = [[
-playText("你好", 2)
+playText("读完后执行后面的", -1)
+tip("你好")
+playText("2秒后执行后面的", 2)
 tip("你好")
 ]]},
 {desc = [[参数3可以选择不同的声音 0: 女声,1: 男声,3: 逍遥,4: 丫丫,        
@@ -302,7 +375,7 @@ tip("你好")
 -- 10007: 晓颜,10008: 晓辰,10010: 晓曼,10011: 晓秋,10012: 晓悠,10013: 晓晓,
 -- 10015: 云扬,20007: 晓睿,20008: 晓双,20015: 晓佳,20016: 云龍,20017: 晓臻,
 -- 20018: 晓雨]], canRun = true, code = [[
-playText("你好", 1, 1)
+playText("你好", -1, 1)
 tip("你好")
 ]]},
 },

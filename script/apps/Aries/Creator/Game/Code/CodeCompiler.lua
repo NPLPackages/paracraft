@@ -94,9 +94,21 @@ function CodeCompiler:InjectLineStepToCode(code)
 		local lines = {};
 		local isInLongString
 		for line in string.gmatch(code or "", "([^\r\n]*)\r?\n?") do
-			lines[#lines+1] = injectLineStep_(line);	
+			if(isInLongString) then
+				lines[#lines+1] = line;	
+				isInLongString = line:match("%]%]") == nil;
+			else
+				isInLongString = line:match("%[%[[^%]]*$") ~= nil;
+				lines[#lines+1] = injectLineStep_(line);	
+			end
 		end
 		code = table.concat(lines, "\n");
+		-- local lines = {};
+		-- local isInLongString
+		-- for line in string.gmatch(code or "", "([^\r\n]*)\r?\n?") do
+		-- 	lines[#lines+1] = injectLineStep_(line);	
+		-- end
+		-- code = table.concat(lines, "\n");
 		return code;
 	end
 end

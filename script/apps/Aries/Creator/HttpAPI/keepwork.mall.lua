@@ -25,3 +25,11 @@ HttpWrapper.Create("keepwork.mall.buy", "%MAIN%/core/v0/mall/products/buy", "POS
 
 --http://yapi.kp-para.cn/project/32/interface/api/2727
 HttpWrapper.Create("keepwork.mall.orderResule", "%MAIN%/core/v0/mall/mOrders/", "GET", false)
+
+--搜索商城商品
+--http://yapi.kp-para.cn/project/46/interface/api/5125
+HttpWrapper.Create("keepwork.mall.searchGoods", "%MAIN%/es/v0/products", "GET", true)
+
+--使用商城物品
+--http://yapi.kp-para.cn/project/32/interface/api/5235
+HttpWrapper.Create("keepwork.mall.useGood", "%MAIN%/core/v0/mProducts/:id/use", "POST", true)

@@ -40,6 +40,9 @@ local function GetBoxBlockBySlabID(slab_id)
 			[block_types.names.Spruce_Wood_Slab] = block_types.names.Spruce_Wood_Planks,
 			[block_types.names.Birch_Wood_Slab] = block_types.names.Birch_Wood_Planks,
 			[block_types.names.Jungle_Wood_Slab] = block_types.names.Jungle_Wood_Planks,
+			[block_types.names.ColorBlock_Slab] = block_types.names.ColorBlock,
+			[block_types.names.TransparentColorBlock_Slab] = block_types.names.TransparentColorBlock,
+			[block_types.names.MetalBlock_Slab] = block_types.names.MetalBlock,
 			
 		}
 	end
@@ -71,6 +74,14 @@ function ItemSlab:TryCreate(itemStack, entityPlayer, x,y,z, side, data, side_reg
 			local last_block_data = ParaTerrain.GetBlockUserDataByIdx(x_, y_, z_);
 			local color_data = band(last_block_data, 0xff00);
 			last_block_data = band(last_block_data, 0x00ff);
+
+			if last_block_id==281 or last_block_id==284 or last_block_id==287 then
+				-- color_data = self:DataToColor(color_data,8)
+				-- color_data = self:ColorToData(color_data,16)
+				color_data = itemStack:GetPreferredBlockData() or 0
+				color_data = self:DataToColor(color_data,8)
+				color_data = self:ColorToData(color_data,16)
+			end
 			
 			if(last_block_data == 0) then
 				if(side == 5 or data == 1) then

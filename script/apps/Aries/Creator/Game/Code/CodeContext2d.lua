@@ -632,7 +632,7 @@ function CodeContext2d:drawPath(rule)
 	end
 end
 
-function CodeContext2d:Render(painterContext)  
+function CodeContext2d:Render(painterContext, bPreserveAllCommands)  
 	if(self.hasClearCommand) then
 		self.window:SetAutoClearBackground(false);
 	end
@@ -656,7 +656,9 @@ function CodeContext2d:Render(painterContext)
 			painterContext[cmd[1]](painterContext, cmd[2], cmd[3], cmd[4])
 		end
 	end
-	self:clearCommands()
+	if(not bPreserveAllCommands) then
+		self:clearCommands()
+	end
 	
 	self:clearStates()
 end

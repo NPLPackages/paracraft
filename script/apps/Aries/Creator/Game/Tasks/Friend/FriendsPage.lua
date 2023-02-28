@@ -37,7 +37,6 @@ local TopBtListType = {
 
 function FriendsPage.OnInit()
 	page = document:GetPageCtrl();
-	page.OnClose = FriendsPage.CloseView
 
 	TypeToCb[TopBtListType.RecentContact] = FriendsPage.GetRecentContactLlist
 	TypeToCb[TopBtListType.Friend] = FriendsPage.GetFriendsLlist
@@ -77,8 +76,9 @@ function FriendsPage.Show(index, msg_content)
 				style = CommonCtrl.WindowFrame.ContainerStyle,
 				allowDrag = true,
 				enable_esc_key = true,
-				zorder = 0,
+				zorder = 1,
 				--app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+				isTopLevel = true,
 				directPosition = true,
 					align = "_ctl",
 					x = 10,
@@ -219,9 +219,11 @@ end
 
 function FriendsPage.SetListDataAndFlushGridView(rows)
 	FriendsPage.HandleListData(rows)
-	local gvw_name = "item_gridview";
-	local node = page:GetNode(gvw_name);
-	pe_gridview.DataBind(node, gvw_name, false);
+	if page then
+		local gvw_name = "item_gridview";
+		local node = page:GetNode(gvw_name);
+		pe_gridview.DataBind(node, gvw_name, false);
+	end
 end
 
 function FriendsPage.HandleListData(rows)
@@ -346,6 +348,7 @@ function FriendsPage.OpenFriendMenu(data)
 		-- NewProfileMain.ShowPage(ctl.nid);
 		local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
 		user_page.ShowUserInfoPage({username=data.username});
+		FriendsPage.CloseView()
 	end, }));
 
 
@@ -543,13 +546,16 @@ end
 
 function FriendsPage.CloseView()
 	IsOpen = false
-
 	local ctl = CommonCtrl.GetControl("FriendsPage.FriendMenu");
 	if ctl then
 		ctl:Hide()
 	end
 	
 	FriendsPage.ClearData()
+	if page then
+		page:CloseWindow()
+		page = nil
+	end
 end
 
 function FriendsPage.ClearData()

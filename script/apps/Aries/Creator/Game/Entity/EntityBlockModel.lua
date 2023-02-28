@@ -35,10 +35,14 @@ local Packets = commonlib.gettable("MyCompany.Aries.Game.Network.Packets");
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockBase"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityBlockModel"));
 
 Entity:Property({"scale", 1, "getScale", "setScale"});
-Entity:Property({"minScale", 0.02});
+Entity:Property({"minScale", 0.0001});
 Entity:Property({"maxScale", 1000});
 Entity:Property({"yaw", 0, "getYaw", "setYaw"});
+Entity:Property({"roll", 0, "GetRoll", "SetRoll"});
+Entity:Property({"pitch", 0, "GetPitch", "SetPitch"});
 Entity:Property({"useRealPhysics", nil, "HasRealPhysics", "EnablePhysics", auto=true});
+Entity:Property({"isDynamicPhysicsEnabled", nil, "IsDynamicPhysicsEnabled", "EnableDynamicPhysics", auto=true});
+Entity:Property({"physicsShape", "box", "GetPhysicsShape", "SetPhysicsShape", auto=true});
 Entity:Property({"enableDropFall", true, "IsDropFallEnabled", "EnableDropFall", auto=true});
 Entity:Property({"bIsAutoTurning", nil, "IsAutoTurningDuringDragging", "SetAutoTurningDuringDragging", auto=true});
 Entity:Property({"isStackable", nil, "IsStackable", "SetIsStackable", auto=true});
@@ -53,8 +57,6 @@ Entity:Property({"onbeginDragEvent", nil, "GetOnBeginDragEvent", "SetOnBeginDrag
 Entity:Property({"onendDragEvent", nil, "GetOnEndDragEvent", "SetOnEndDragEvent", auto=true});
 Entity:Property({"onTickEvent", nil, "GetOnTickEvent", "SetOnTickEvent", auto=true});
 Entity:Property({"framemove_interval", nil, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
-Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
-Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
 Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
 
 Entity:Property({"offsetPos", {0,0,0}, "GetOffsetPos", "SetOffsetPos"});
@@ -107,15 +109,15 @@ function Entity:EnablePhysics(bEnabled)
 	end
 end
 
--- @param filename: if nil, self.filename is used
-function Entity:GetModelDiskFilePath(filename)
-	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile())) or Files.WorldPathToFullPath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile()));
-end
-
 function Entity:GetDisplayName()
 	local displayName = Entity._super.GetDisplayName(self);
 	if(not displayName) then
-		displayName = self:GetModelFile();
+		local name = self:GetName() or ""
+		if(name == "") then
+			displayName = self:GetModelFile();
+		else
+			displayName = format("%s:%s", self:GetModelFile() or "", name);
+		end
 	end
 	return displayName;
 end
@@ -179,23 +181,27 @@ function Entity:CreateInnerObject(filename, scale)
 	-- OBJ_SKIP_PICKING = 0x1<<15:
 	-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
 	model:SetAttribute(0x8080, true);
-	model:SetField("RenderDistance", 100);
+	-- model:SetField("RenderDistance", 100);
 	if(self:HasRealPhysics()) then
 		model:SetField("EnablePhysics", true);
 		if(self:IsForceLoadPhysics()) then
 			model:LoadPhysics(); 
 		end
 	end
+	if(self.materialId) then
+		model:SetField("MaterialID", self.materialId);
+	end
 	if(self:GetIdleAnim() ~= 0) then
 		self:SetIdleAnim(self:GetIdleAnim())
 	end
 
+	self:SetInnerObject(model);
+	ParaScene.Attach(model);
+
 	if((self.opacity or 1) ~= 1) then
 		self:SetOpacity(self.opacity or 1);
 	end
-
-	self:SetInnerObject(model);
-	ParaScene.Attach(model);
+	
 	return model;
 end
 
@@ -278,56 +284,6 @@ function Entity:setScale(scale)
 	end
 end
 
--- @param value: if value is nil, name is used as string value
-function Entity:SetStaticTag(name, value)
-	if(value==nil) then
-		self.staticTag = name;
-		self.tagFields = nil;
-	elseif(name) then
-		self:SetTagField(name, value);
-	end
-end
-
--- @param name: if nil, the raw tag string is returned, otherwise we will treat tag as a key, value table
-function Entity:GetStaticTag(name)
-	if(name==nil) then
-		return self.staticTag;
-	else
-		return self:GetTagField(name);
-	end
-end
-
-function Entity:SetTagField(name, value)
-	if(name) then
-		local t = self.tagFields;
-		if(not t) then
-			t = {};
-			self.tagFields = t;
-		end
-		if(t[name] ~= value) then
-			t[name] = value
-			if(value==nil and not next(t)) then
-				self.staticTag = ""
-			else
-				self.staticTag = commonlib.serialize_compact(t);
-			end
-		end
-	end
-end
-
-function Entity:GetTagField(name)
-	if(name) then
-		if(not self.tagFields) then
-			if(self.staticTag and self.staticTag~="") then
-				self.tagFields = commonlib.totable(self.staticTag);
-			else
-				self.tagFields = {};
-			end
-		end
-		return self.tagFields[name]
-	end
-end
-
 function Entity:Destroy()
 	self:DestroyInnerObject();
 	Entity._super.Destroy(self);
@@ -374,6 +330,11 @@ end
 function Entity:SetSpeedScale(vale)
 end
 
+-- whether it can be searched via Ctrl+F FindBlockTask
+function Entity:IsSearchable()
+	return true;
+end
+
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	local attr = node.attr;
@@ -412,12 +373,6 @@ function Entity:LoadFromXMLNode(node)
 		end
 		if(attr.onmountEvent) then
 			self:SetOnMountEvent(attr.onmountEvent);
-		end
-		if(attr.tag) then
-			self:SetTag(attr.tag);
-		end
-		if(self.staticTag and self.staticTag~="") then
-			attr.staticTag = self.staticTag
 		end
 		if(attr.category) then
 			self.category = attr.category
@@ -468,12 +423,6 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	if(self.onmountEvent) then
 		attr.onmountEvent = self.onmountEvent
-	end
-	if(self.tag) then
-		attr.tag = self.tag
-	end
-	if(attr.tag) then
-		self:SetTag(attr.tag);
 	end
 	if(self.category and self.category~="") then
 		attr.category = self.category
@@ -619,16 +568,33 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 	end
 end
 
+-- return true if we can take control of this entity by external agent like movie or code block.
+function Entity:CanBeAgent()
+	return true;
+end
+
 function Entity:OpenEditor(editor_name, entity)
-	local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
-	if(ctrl_pressed) then
-		Entity._super.OpenEditor(self, editor_name, entity);
-	else
+	if(editor_name =="EditModelTask") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
 		local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+		if(not EditModelTask.GetInstance()) then
+			GameLogic.GetPlayerController():PickItemByEntity(self);
+		end
 		if(EditModelTask.GetInstance()) then
 			EditModelTask.GetInstance():SetTransformMode(true)
 			EditModelTask.GetInstance():SelectModel(self);
+		end
+	else
+		local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
+		if(ctrl_pressed) then
+			Entity._super.OpenEditor(self, editor_name, entity);
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
+			local EditModelTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.EditModelTask");
+			if(EditModelTask.GetInstance()) then
+				EditModelTask.GetInstance():SetTransformMode(true)
+				EditModelTask.GetInstance():SelectModel(self);
+			end
 		end
 	end
 end
@@ -684,9 +650,11 @@ end
 -- @param bExactMatch: if for exact match
 -- return true, filename: if the file text is found. filename contains the full filename
 function Entity:FindFile(text, bExactMatch)
-	local filename = self:GetText();
-	if( (bExactMatch and filename == text) or (not bExactMatch and filename and filename:find(text))) then
-		return true, filename
+	if(text) then
+		local filename = self:GetText();
+		if( (bExactMatch and filename == text) or (not bExactMatch and filename and filename:find(text, 1, true))) then
+			return true, filename
+		end
 	end
 end
 

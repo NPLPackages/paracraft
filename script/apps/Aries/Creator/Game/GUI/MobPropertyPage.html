@@ -24,7 +24,7 @@ end
     <div style="float:left;margin-left:0px;">
         <div>
             <div style="float:left;width:50px;text-align:right;"><%=L"名称:"%></div>
-            <input type="text" uiname="MobPropertyPage.name" name="name" class="mc_text" value='<%=tostring(MobPropertyPage.GetItemName() or "") %>' style="width:120px;height:25px"/>
+            <input type="text" auto_virtual_keyboard="true" uiname="MobPropertyPage.name" name="name" class="mc_text" value='<%=tostring(MobPropertyPage.GetItemName() or "") %>' style="width:120px;height:25px"/>
             <div style="float:left;width:50px;text-align:right;">ID:</div>
             <%=tostring(MobPropertyPage.GetItemID())%>
         </div>
@@ -35,7 +35,7 @@ end
     <div style="margin-top:5px;">
         <div style="float:left;">
             <div>
-                <select uiname="MobPropertyPage.assetfile" name="assetfile" onselect="MobPropertyPage.OnChangeAssetFile" class="mc_text" DataSource='<%=MobPropertyPage.GetAssetFileDS()%>' AllowUserEdit="true" style="width:200px;height:25px;"/>
+                <select uiname="MobPropertyPage.assetfile" name="assetfile" onselect="MobPropertyPage.OnSelectItem" class="mc_text" DataSource='<%=MobPropertyPage.GetAssetFileDS()%>' AllowUserEdit="true" style="width:200px;height:25px;"/>
                 <input type="button" class="mc_light_grey_button_with_fillet" uiname="MobPropertyPage.openfile" name="openfile" value='<%=L"选择模型..."%>' tooltip='<%=L"打开文件浏览器"%>' style="min-width:100px;height:25px;margin-left:3px;" onclick="MobPropertyPage.OnOpenAssetFile" />
             </div>
             <div>

@@ -9,7 +9,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RailCar/RailCarFiexdCameraPag
 --]]
 local RailCarFiexdCameraPage = NPL.export();
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
-local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local server_time = 0
 local page
 
@@ -233,12 +232,11 @@ function RailCarFiexdCameraPage.ClickOk()
             extra = {}
         }
         params.extra.railcar_fiexd_setting = RailCarFiexdCameraPage.SettingData;
-    
-        KeepworkServiceProject:UpdateProject(world_data.kpProjectId, params, function(data, err)
+        GameLogic.GetFilters():apply_filters("service.keepwork_service_project.update_project",world_data.kpProjectId,params,function(data,err)
             if err == 200 then
                 save_local(true)
             end
-        end)
+        end);
     else
         save_local()
     end

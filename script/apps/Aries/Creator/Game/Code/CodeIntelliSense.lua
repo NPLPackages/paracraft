@@ -771,6 +771,7 @@ function CodeIntelliSense.ShowContextMenuForWord(word, line, from, to)
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"重做" .. "           Ctrl + Y", Name = "Redo", Type = "Menuitem", onclick = nil, }))
 		node:AddChild(CommonCtrl.TreeNode:new({Type = "Separator", }));
 		node:AddChild(CommonCtrl.TreeNode:new({Text = L"编辑..." .. "", Name = "EditCode", Type = "Menuitem", onclick = nil, }))
+		node:AddChild(CommonCtrl.TreeNode:new({Text = L"格式化" .. "", Name = "FormatCode", Type = "Menuitem", onclick = nil, }))
 		if(word) then
 			node:AddChild(CommonCtrl.TreeNode:new({Text = L"查看定义...", tag = word, Name = "GotoDefinition", Type = "Menuitem", onclick = nil, }))
 		end
@@ -844,6 +845,11 @@ function CodeIntelliSense.OnClickContextMenuItem(node)
 		local codeblock = CodeBlockWindow.GetCodeBlock()
 		if(codeblock) then
 			GameLogic.RunCommand("open", "npl://editcode?src="..codeblock:GetFilename());
+		end
+	elseif(name == "FormatCode") then
+		local codeblock = CodeBlockWindow.GetCodeBlock()
+		if(codeblock) then
+			CodeBlockWindow.FormatCode()
 		end
 	elseif(name == "AddBreakPointHere") then
 		CodeIntelliSense:AddBreakPointHere()

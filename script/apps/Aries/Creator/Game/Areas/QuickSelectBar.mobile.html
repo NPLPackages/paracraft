@@ -1,4 +1,4 @@
-﻿<!-- "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.mobile.html" -->
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/QuickSelectBar.html" -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -29,7 +29,11 @@ function ds_CustomBtn(index)
         return QuickSelectBar.custombtn_nodes[index];
     end
 end
-        
+
+function OnClickItem(mcmlNode)
+    GameLogic.GetPlayerController():OnClickHandToolIndex(mcmlNode.slot.slotIndex);
+end
+
 function GetExpValue()
     return 16;
 end
@@ -42,79 +46,77 @@ function OnCreateExpBar(params,node)
 	params.parent:AddChild(_this);
 end
 
-function OnCreateHPAndHunger(params,node)
-    local name = node:GetAttribute("name");
-    local background;
-    if(name:match("mc_hp")) then
-        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;118 68 18 18"
-    elseif(name:match("mc_hunger")) then
-        background = "Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png;118 45 18 22"
-    end
-    local _this = ParaUI.CreateUIObject("button", name, 
-        params.alignment, params.left, params.top, params.width, params.height);
-	_this.background = background;
-    _this.enabled = false;
-    _guihelper.SetUIColor(_this, "#ffffffff");
-
-	params.parent:AddChild(_this);
+function IsShowMallIcon()
+    return not System.options.isCodepku
 end
 
-function OpenInventoryPage()
-    QuickSelectBar.SwitchInventoryPage();
+function IsHomeWorld()
+    local isHomeWorld = false
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local currentWorldName = WorldCommon.GetWorldTag("name")
+    local myName = string.format("%s的家园",System.User.keepworkUsername)
+    local myOldName = string.format("%s_main",System.User.keepworkUsername)
+    if currentWorldName == myName or currentWorldName == myOldName then
+        isHomeWorld = true
+    end	
+    return isHomeWorld
+end
+
+function IsEditor()
+    local isEditor = GameLogic.GameMode:IsEditor()
+    local mode = GameLogic.GameMode:GetMode()
+    if mode == "movie" then
+        isEditor = false
+    end
+    return isEditor
 end
 
 ]]></script>
-<div style="width:400px;height:100px;" >
-    <pe:container style="margin-top:0px;background:;">
-        <pe:container name="handtool_highlight_bg" zorder="-1" style="position:relative;margin-top:0px;margin-left:4px;width:76px;height:76px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#308 1 34 34:12 12 12 12)">
+<div style="width:900px;height:160px;" >
+    <!-- 自定义按钮 -->
+    <div style="height:36px;margin-top:6px;width:450px;"></div>
+    <pe:container style="margin-top:5px;width:900px;height:160px;background:url();">
+        <pe:container name="handtool_highlight_bg" zorder="-1" style="position:relative;margin-top:12px;margin-left:12px;width:72px;height:72px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#74 45 40 40:12 12 12 12)">
         </pe:container>
-        <input name="handtool_tooltip" type="button" visible="false" enabled="false" zorder="-1" class="text" style="color:#cccccc;position:relative;font-weight:bold;margin-top:-45px;margin-left:3px;width:100px;height:36px;background:url(Texture/Aries/Creator/Mobile/blocks_UI_32bits.png#344 2 32 32:12 12 12 12)" />
+        <input name="handtool_tooltip" type="button" visible="false" enabled="false" zorder="-1" style="color:#cccccc;position:relative;font-weight:bold;font-size:14px;margin-top:-36px;background-color:#ffffffff;margin-left:3px;width:100px;height:36px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12)" />
         <script type="text/npl"><![CDATA[
             QuickSelectBar:OnHandToolIndexChanged();
         ]]></script>
-        <pe:container zorder="-2" style="position:relative;margin-left:1px;background:;">
-            <pe:gridview style="position:relative;margin-left:0px;" RememberLastPage="true" name="quickSelectBar" CellPadding="0" ItemsPerLine="5" AllowPaging="false" DefaultNodeHeight="76" pagesize="5"
+        <pe:container zorder="-2" style="position:relative;width:800px;background: url();">
+            <pe:gridview style="position:relative;margin-left:1px;" RememberLastPage="true" name="quickSelectBar" CellPadding="8" ItemsPerLine="9" AllowPaging="false" DefaultNodeHeight="70" pagesize="9"
                 DataSource='<%=ds_CustomBtn%>'>
 	            <Columns>
-                    <pe:if condition='<%=Eval("index") ~= 5%>'>
-                        <div style="width:76px;height:76px;padding:1px;margin-left:1px;">
-                            <div zorder="-1" style="position:relative;width:74px;height:74px;background-color:#ffffff60;" class="mobile_button"></div>
-                        </div>
-                    </pe:if>
-                    <pe:if condition='<%=Eval("index") == 5%>'>
-                        <div style="width:76px;height:76px;padding:1px;margin-left:1px;">
-                            <div zorder="-1" style="position:relative;width:74px;height:74px;background-color:#ffffff60;" class="mobile_button">
-                                <div style="float:left;margin-left:19px;margin-top:33px;width:6px;height:6px;background-color:#ffffff50;" class="mobile_line">
-                                </div>
-                                <div style="float:left;margin-left:10px;margin-top:33px;width:6px;height:6px;background-color:#ffffff50;" class="mobile_line">
-                                </div>
-                                <div style="float:left;margin-left:10px;margin-top:33px;width:6px;height:6px;background-color:#ffffff50;" class="mobile_line">
-                                </div>
-                            </div>
-                        </div>
-                    </pe:if>
+                    <div style="width:70px;height:70px;padding:2px;margin-left:2px; margin-top: 2px; ">
+                        <div zorder="-1" style="position:relative;width:70px;height:70px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#32 45 38 38:12 12 12 12)"></div>
+                    </div>
                 </Columns>
             </pe:gridview>
         </pe:container>
-        <pe:gridview style="position:relative;margin-left:1px;" RememberLastPage="true" name="quickSelectBar" CellPadding="0" ItemsPerLine="5" AllowPaging="false" DefaultNodeHeight="76" pagesize="5"
-            DataSource='<%=ds_CustomBtn%>'>
-	        <Columns>
-                <pe:if condition='<%=Eval("index") ~= 5%>'>
-                    <div style="width:76px;height:76px;padding:6px;margin-left:1px;">
-                        <pe:mc_slot bagpos ='<%=Eval("index")%>' style="width:64px;height:64px;" ontouch='QuickSelectBar.OnTouchItem' />
+        <div style="position:relative;margin-left:1px;width:800px;" >
+            <pe:gridview RememberLastPage="true" name="quickSelectBar" CellPadding="8" ItemsPerLine="9" AllowPaging="false" DefaultNodeHeight="70" pagesize="9"
+                DataSource='<%=ds_CustomBtn%>'>
+	            <Columns>
+		            <div style="width:70px;height:70px;margin-left:2px; margin-top: 2px;">
+                        <div style="margin-left: 6px; margin-top: 7px;">
+                            <pe:mc_slot uiname='<%=format("QuickSelectBar.btn%d", Eval("index"))%>' tooltip="" tooltip_is_lock_position="true" tooltip_offset_x="-4" tooltip_offset_y="-40" bagpos ='<%=Eval("index")%>' style="width:60px;height:60px;" onclick='OnClickItem' />
+                        </div>
                     </div>
+	            </Columns>
+            </pe:gridview>
+        </div>
+        <div style="position:relative;margin-left:740px;margin-top:14px;">
+            <pe:if condition='<%=IsEditor() and GameLogic.options:GetProjectId() ~= "29477"%>'>
+                <input uiname="QuickSelectBar.btnInventory" name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:1px;margin-left:0px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/icon/E_64x64_32bits.png#0 0 64 64)"/>
+
+                <pe:if condition='<%=IsShowMallIcon() %>'>
+                    <input uiname="QuickSelectBar.btnMall" name="btnMall" type="button" onclick="QuickSelectBar.OnClickMall" tooltip='<%=L"资源: 快捷键R"%>' style="margin-top:1px;margin-left:20px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/icon/shangdian_64x64_32bits.png#0 0 64 64)" />
                 </pe:if>
-                <pe:if condition='<%=Eval("index") == 5%>'>
-                    <input type="button" zorder="1" style="width:76px;height:76px;padding:6px;margin-left:1px;background:;" onclick="OpenInventoryPage"/>
-                </pe:if>
-	        </Columns>
-        </pe:gridview>
-       <!-- <div style="position:relative;width:76px;height:76px;padding:1px;margin-left:311px;background-color:#ffffff80;background:url(Texture/Aries/Creator/Mobile/UI_32bits.png#2 2 32 32:12 12 12 12)">
-            <div style="position:relative;margin-left:48px;width:6px;height:6px;" class="mobile-line"/>
-            <div style="position:relative;margin-left:10px;width:6px;height:6px;" class="mobile-line"/>
-            <div style="position:relative;margin-left:10px;width:6px;height:6px;" class="mobile-line"/>
-            <input type="button" zorder="-1" style="position:relative;width:74px;height:74px;background:;"/>
-        </div>-->
+            </pe:if>
+            <pe:if condition='<%=not IsEditor()%>'>
+                <input name="btnInventory" type="button" onclick="QuickSelectBar.OnClickInventory" tooltip='<%=L"工具栏: 快捷键E"%>' style="margin-top:0px;margin-left:0px;width:64px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/icon/huiseshangcheng_64x64_32bits.png#0 0 64 64)"/>
+            </pe:if>
+            
+        </div>
     </pe:container>
 </div>
 </pe:mcml>

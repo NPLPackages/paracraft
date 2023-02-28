@@ -27,8 +27,15 @@ local ParaLifeTipButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLif
 local ParaLifeFrontPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeFrontPage")
 local ParaLifeHomeButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeHomeButton")
 
+local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
+
 ParaLife:Property({"bEnabled", nil, "IsEnabled", "SetEnabled"});
 ParaLife:Property({"isShowPlayer", false, "SetShowPlayer", "IsShowPlayer"});
+ParaLife:Property("isNoEdit", false, "IsNoEdit", "SetNoEdit" );
+ParaLife:Property("isNoBookBtn", false, "IsNoBookBtn", "SetNoBookBtn");
+ParaLife:Property("isNoBackBtn", false, "IsNoBackBtn", "SetNoBackBtn");
+ParaLife:Property("isNoFacialBtn", false, "IsNoFacialBtn", "SetNoFacialBtn");
+ParaLife:Property("isNoBagBtn", false, "IsNoBagBtn", "SetNoBagBtn");
 
 function ParaLife:ctor()
 end
@@ -43,9 +50,8 @@ function ParaLife:Init()
 		return self:OnChangeDesktopMode(mode);
 	end);
 
-	GameLogic:Connect("WorldLoaded", ParaLife, function()
-		self:OnWorldLoad()
-	end, "UniqueConnection");
+	GameLogic:Connect("WorldLoaded", self, self.OnWorldLoad, "UniqueConnection");
+	GameLogic:Connect("WorldUnloaded", self, self.OnWorldUnLoaded, "UniqueConnection");
 end
 
 -- virtual: called when a desktop mode is changed such as from game mode to edit mode. 
@@ -136,28 +142,19 @@ end
 
 function ParaLife:SetShowOptions(options)
 	self.isShowPlayer = options.showplayer==true
-	self._isNoEdit = options.noedit == true
-	self._isNoBookBtn = options.nobookbutton == true
-	self._isNoBackBtn = options.nobackbutton == true
+	self:SetNoEdit(options.noedit == true)
+	self:SetNoBookBtn(options.nobookbutton == true)
+	self:SetNoBackBtn(options.nobackbutton == true)
+	self:SetNoFacialBtn(options.nofacial == true)
+	self:SetNoBagBtn(options.nobag == true)
 	
 	self:SetEnabled(self.bEnabled)
 	ParaLifeFrontPage.RefreshPage()
+	ParalifeLiveModel.RefreshPage()
 end
 
 function ParaLife:IsShowPlayer()
 	return self.isShowPlayer;
-end
-
-function ParaLife:IsNoEdit()
-	return self._isNoEdit;
-end
-
-function ParaLife:IsNoBookBtn()
-	return self._isNoBookBtn;
-end
-
-function ParaLife:IsNoBackBtn()
-	return self._isNoBackBtn;
 end
 
 function ParaLife:UpdateShowViewStates(isShow)
@@ -167,7 +164,7 @@ end
 function ParaLife:Show()
 	self:Init()
 	self.visible = true;
-	local ParalifeLiveModel = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParalifeLiveModel.lua");
+	
 	ParalifeLiveModel.ShowView()
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeTouchController.lua");
@@ -235,6 +232,14 @@ end
 
 function ParaLife:OnWorldLoad()
 	self:SetLinePathJumpHeightWhileHidden(nil)
+end
+
+function ParaLife:OnWorldUnLoaded()
+	self:SetNoEdit(false)
+	self:SetNoBookBtn(false)
+	self:SetNoBackBtn(false)
+	self:SetNoFacialBtn(false)
+	self:SetNoBagBtn(false)
 end
 
 function ParaLife:SetLinePathJumpHeightWhileHidden(height)

@@ -240,6 +240,7 @@ function EditCodeBlockContext:updateManipulators(delaySeconds)
 		manipCont:SetShowGrid(true);
 		manipCont:SetSnapToGrid(false);
 		manipCont:SetGridSize(BlockEngine.blocksize/2);
+		manipCont:SetShowGroundSnap(true)
 		manipCont:init();
 		self:AddManipulator(manipCont);
 		manipCont:connectToDependNode(actor);

@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ParaLifeBMaxSelectorPage.lua"><![CDATA[
+ParaLifeBMaxSelectorPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeBMaxSelectorPage");
+ParaLifeBMaxSelectorPage.OnInit()
+local pageCtrl = document:GetPageCtrl();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function SetControlVisible(name, v)
+    local control = Page:FindControl(name)
+    if control then
+        control.visible = v
+    end
+end
+function on_mouse_enter(index)
+    local name = "img_" .. index
+    SetControlVisible(name, true)
+end
+
+function on_mouse_leave(index)
+    local name = "img_" .. index
+    SetControlVisible(name, false)
+end
+]]></script>
+<!-- DefaultCameraObjectDist="3.5" -->
+<!-- <pe:container uiname="paralife_back" ClickThrough="true" alignment="_fi" width="100%" height="100%" style="background:;">
+    <pe:container alignment="_fi" zorder="-1" name="touch_bg" uiname="ui_touch_bg" width="100%" height="100%" style="position: relative; background:url()" > -->
+    <pe:container width="362px" height="720" alignment="_rt" style="background: url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/dikuang_157x197_32bits.png#0 0 157 197:60 100 65 65);">
+        <input type="button" zorder="10" value="" onclick="ClosePage" style="position: relative; margin-top: 10px; margin-left:308px;width:34px;height:34px;background: url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/guanbi_34x34_32bits.png#0 0 34 34);"/>
+        
+        <div style="width:324px;height:610px;margin-top: 72px;margin-left:20px; ">
+            <pe:gridview style="margin-left:0px;margin-top:0px;width:324px;height:610px;" name="item_gridview" CellPadding="0" AllowPaging="true" pagesize="18" ItemsPerLine="3 " DefaultNodeHeight="90"
+                        DataSource='<%=ParaLifeBMaxSelectorPage.GetDataSource()%>'>
+                <PagerSettings Position="Bottom" height="42" style="position:relative;width:324px;margin-top:0px;height:42px;" PreviousPageText="" NextPageText=""/>
+                <PagerTemplate>
+                    <form>
+                        <input type="button" name="pre" zorder="2" style="width:30px;height:41px;margin-left:25px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/zuojiantou_30x41_32bits.png#0 0 30 41);"/>
+                        <div style="float:left;margin-top:0px;text-singleline:true;">
+                            <label name="page" style="base-font-size:22px;font-size: 22px;color:#000000;text-align:center;width:200px;height:30px;margin:4px"/>
+                        </div>
+                        <input type="button" name="next" zorder=2 style="width:30px;height:41px;margin-top:0px;background:url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/youjiantou_30x41_32bits.png#0 0 30 41)"/>
+                    </form>
+                </PagerTemplate>
+                <Columns>
+                    <pe:container style="width:108px;height:90px;padding-left:0px;background:url();">
+                        <pe:container name='<%=Eval("index")%>' style="width: 81px; height: 81px;margin-top: 4;margin-left: 14; background:url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/weixuanzhong_81x81_32bits.png#0 0 81 81)">
+                            <pe:container name='<%= "img_" .. Eval("index")%>' visible='false' style="width: 81px; height: 81px;margin-top: 0;margin-left: 0; background:url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/xuanzhong_80x80_32bits.png#0 0 80 80)" ></pe:container>
+                            <pe:container name='<%= Eval("index")%>' candrag="true" ondragend="ParaLifeBMaxSelectorPage.OnDragEnd" style="width: 73px; height: 73px;margin-top: -77;margin-left: 4;background:url()"
+                                          onclick="ParaLifeBMaxSelectorPage.OnClickItem"  onmouseenter='on_mouse_enter' onmouseleave='on_mouse_leave' >
+                                <pe:canvas3d name='<%= format("canvas3d_%d", Eval("index") % 18) %>' DefaultRotY="-1.57" IsInteractive="false" autoRotateSpeed="0" 
+                                             miniscenegraphname='<%= format("minisceneBmaxPreview_%d", Eval("index") % 18) %>' RenderTargetSize="128" 
+                                             value='<%=ParaLifeBMaxSelectorPage.GetModelValue(Eval("index"))%>' style="position:relative;width:73px;height:73px;margin-top: 0px;" />
+                            </pe:container>
+                        </pe:container>
+                    </pe:container>
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+        </div>
+    </pe:container>
+<!-- </pe:container> -->
+<% ParaLifeBMaxSelectorPage.OnPageLoaded() %>
+</pe:mcml>
+</body>
+</html>

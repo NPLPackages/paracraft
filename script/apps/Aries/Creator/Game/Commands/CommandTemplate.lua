@@ -13,6 +13,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/EnterGamePage.lua");
 NPL.load("(gl)script/apps/Aries/Scene/WorldManager.lua");
 NPL.load("(gl)script/apps/Aries/SlashCommand/SlashCommand.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");	
 local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
@@ -30,7 +31,7 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 Commands["loadtemplate"] = {
 	name="loadtemplate", 
-	quick_ref="/loadtemplate [-r] [-history]  [-abspos] [-tp] [-a seconds] [x y z] [-rename bool][templatename]", 
+	quick_ref="/loadtemplate [-r] [-history]  [-abspos] [-tp] [-a seconds] [x y z] [-rename bool][-write_reference_from_path bool][templatename]", 
 	desc=[[load template to the given position
 @param -a seconds: animate building progress. the followed number is the number of seconds (duration) of the animation. 
 @param -l seconds: according to the tier to load. the followed number is the number of seconds (duration) of the animation. 
@@ -60,6 +61,7 @@ default name is "default"
 		local opaque;
 		local nohistory = fromEntity ~= EntityManager.GetPlayer();
 		local rename;
+		local write_reference_from_path;
 
 		while(cmd_text) do
 			option, cmd_text = CmdParser.ParseOption(cmd_text);
@@ -82,6 +84,9 @@ default name is "default"
 				elseif (option == "rename") then
 					option, cmd_text = CmdParser.ParseBool(cmd_text);
 					rename = option;
+				elseif option == "write_reference_from_path" then
+					option, cmd_text = CmdParser.ParseBool(cmd_text);
+					write_reference_from_path = option;
 				elseif (option == "l") then
 					load_anim_duration, cmd_text = CmdParser.ParseInt(cmd_text);
 					if (load_anim_duration ~= 0) then
@@ -146,6 +151,7 @@ default name is "default"
 						load_anim_duration = load_anim_duration,
 						UseAbsolutePos = UseAbsolutePos,
 						TeleportPlayer = TeleportPlayer,
+						write_reference_from_path = write_reference_from_path,
 						nohistory = nohistory,
 						opaque = opaque,
 						rename = rename
@@ -162,7 +168,7 @@ default name is "default"
 
 Commands["savetemplate"] = {
 	name="savetemplate", 
-	quick_ref="/savetemplate [-auto_pivot] [-relative_motion] [-hollow] [-ref] [-withentity] [templatename]", 
+	quick_ref="/savetemplate [-auto_pivot] [-relative_motion] [-hollow] [-ref] [-withentity] [-hidetip][-write_reference_from_path][templatename]", 
 	desc=[[save template with current selection
 @param templatename: if no name is provided, it will be default
 @param auto_pivot: if true, use the bottom center of all blocks as pivot
@@ -179,7 +185,6 @@ Commands["savetemplate"] = {
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
 		local options;
 		options, cmd_text = CmdParser.ParseOptions(cmd_text);
-
 		local templatename = cmd_text:match("(%S*)$");
 		if(not templatename or templatename == "") then
 			templatename = "default";
@@ -205,16 +210,19 @@ Commands["savetemplate"] = {
 			hollow = options.hollow,
 			exportReferencedFiles = options.ref,
 			withentity = options.withentity,
+			write_reference_from_path = options.write_reference_from_path,
 			bSelect=nil})
 		if(task:Run()) then
-			BroadcastHelper.PushLabel({id="savetemplate", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+			if not options.hidetip then
+				BroadcastHelper.PushLabel({id="savetemplate", label = format(L"模板成功保存到:%s", commonlib.Encoding.DefaultToUtf8(filename)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+			end
 		end
 	end,
 };
 
 Commands["savemodel"] = {
 	name="savemodel", 
-	quick_ref="/savemodel [-auto_scale false] [-f] [-interactive|i] [modelname]", 
+	quick_ref="/savemodel [-auto_scale false] [-f] [-interactive|i][-hidetip] [modelname]", 
 	desc=[[save bmax model with current selection. 
 @param -auto_scale: whether or not scale model to one block size. default value is true
 @param modelname: if no name is provided, it will be "default"
@@ -254,6 +262,8 @@ Commands["savemodel"] = {
 			templatename = ParaIO.GetWritablePath().."temp"..templatename:sub(2, -1)
 		end
 		local filename;
+		local use_map
+		local relative_path_map
 		if(commonlib.Files.IsAbsolutePath(templatename)) then
 			templatename = templatename:gsub("%.bmax$", "");
 			relative_path = format("%s.bmax", templatename);
@@ -262,9 +272,24 @@ Commands["savemodel"] = {
 			templatename = templatename:gsub("^blocktemplates/", ""):gsub("%.bmax$", "");
 			templatename = commonlib.Encoding.Utf8ToDefault(templatename);
 			relative_path = format("blocktemplates/%s.bmax", templatename);
+			local re = ParaIO.CreateDirectory(GameLogic.GetWorldDirectoryAt()..relative_path);
+			if not re then
+				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+				NPL.load("(gl)script/apps/Aries/Desktop/GameMemoryProtector.lua");
+				local GameMemoryProtector = commonlib.gettable("MyCompany.Aries.Desktop.GameMemoryProtector");
+				relative_path_map = commonlib.Encoding.DefaultToUtf8(relative_path)
+				local chineseMap = commonlib.LoadTableFromFile(Files.GetWritablePath().."worlds/DesignHouse/blocktemplates/chinese_map.json")
+				local md5 = GameMemoryProtector.hash_func_md5(relative_path:match("[^/]+$"))
+				chineseMap = chineseMap or {}
+				chineseMap[md5] = commonlib.Encoding.DefaultToUtf8(templatename);
+				commonlib.SaveTableToFile(chineseMap, "worlds/DesignHouse/blocktemplates/chinese_map.json",true);
+				templatename = commonlib.Encoding.Utf8ToDefault(md5);
+				relative_path = format("blocktemplates/%s.bmax", templatename);
+				use_map = true
+			end
+		
 			filename = GameLogic.GetWorldDirectoryAt()..relative_path;
 		end
-
 		local function saveModel_()
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
 			local BlockTemplate = commonlib.gettable("MyCompany.Aries.Game.Tasks.BlockTemplate");
@@ -272,10 +297,13 @@ Commands["savemodel"] = {
 				filename = filename, auto_scale = auto_scale, bSelect=nil, 
 			})
 			if(task:Run()) then
-				BroadcastHelper.PushLabel({id="savemodel", label = format(L"BMax模型成功保存到:%s", commonlib.Encoding.DefaultToUtf8(relative_path)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+				if not options.hidetip then
+					BroadcastHelper.PushLabel({id="savemodel", label = format(L"BMax模型成功保存到:%s", use_map and relative_path_map or commonlib.Encoding.DefaultToUtf8(relative_path)), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+				end
 				
 				if(options.interactive or options.i) then
-					GameLogic.GetFilters():apply_filters("file_exported", "bmax", filename);
+					local name = use_map and GameLogic.GetWorldDirectoryAt()..commonlib.Encoding.Utf8ToDefault(relative_path_map) or filename
+					GameLogic.GetFilters():apply_filters("file_exported", "bmax", name);
 					GameLogic.GetFilters():apply_filters("user_event_stat", "model", "export.bmax", 10, nil);
 				end
 				return true, relative_path;
@@ -284,7 +312,8 @@ Commands["savemodel"] = {
 
 		if(options.interactive or options.i) then
 			if(not options.f and ParaIO.DoesFileExist(filename)) then
-				_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
+				local _name = use_map and relative_path_map or commonlib.Encoding.DefaultToUtf8(relative_path)
+				_guihelper.MessageBox(format(L"文件 %s 已经存在, 是否覆盖?", _name), function(res)
 					if(res and res == _guihelper.DialogResult.Yes) then
 						saveModel_()
 					end
@@ -362,24 +391,29 @@ Commands["exportgltf"] = {
 /exportgltf 32 32 32
 -- export the given parax file to gltf(glb) file
 /exportgltf given.x output.gltf(glb)
+-- export entity
+/exportgltf -name  entityName  
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
+		local ParaXModelAttr = commonlib.gettable("System.Scene.Assets.ParaXModelAttr");
+		local function success_callback(filename)
+			local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+			_guihelper.MessageBox(string.format(L"成功导出:%s, 是否打开所在目录", commonlib.Encoding.DefaultToUtf8(filename)), function(res)
+				if(res and res == _guihelper.DialogResult.Yes) then
+					local info = Files.ResolveFilePath(filename)
+					if(info and info.relativeToRootPath) then
+						local absPath = ParaIO.GetWritablePath()..info.relativeToRootPath;
+						local absPathFolder = absPath:gsub("[^/\\]+$", "")
+						ParaGlobal.ShellExecute("open", absPathFolder, "", "", 1);
+					end
+				end
+			end, _guihelper.MessageBoxButtons.YesNo);
+		end
 		local function ParaXToGltf(parax, gltf)
-			NPL.load("(gl)script/ide/System/Scene/Assets/ParaXModelAttr.lua");
-			local ParaXModelAttr = commonlib.gettable("System.Scene.Assets.ParaXModelAttr");
 			local attr = ParaXModelAttr:new():initFromAssetFile(parax, function(attr)
 				if (attr:SaveToGltf(gltf)) then
-					local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
-					_guihelper.MessageBox(string.format(L"成功导出:%s, 是否打开所在目录", commonlib.Encoding.DefaultToUtf8(gltf)), function(res)
-						if(res and res == _guihelper.DialogResult.Yes) then
-							local info = Files.ResolveFilePath(gltf)
-							if(info and info.relativeToRootPath) then
-								local absPath = ParaIO.GetWritablePath()..info.relativeToRootPath;
-								local absPathFolder = absPath:gsub("[^/\\]+$", "")
-								ParaGlobal.ShellExecute("open", absPathFolder, "", "", 1);
-							end
-						end
-					end, _guihelper.MessageBoxButtons.YesNo);
+					success_callback(gltf);
 				else
 					_guihelper.MessageBox(L"parax模型中的纹理加载失败，请稍后重试！");
 				end
@@ -424,6 +458,23 @@ Commands["exportgltf"] = {
 					return;
 				end
 			end
+		elseif (options.name) then
+			local entityName = CmdParser.ParseString(cmd_text);
+			local entity = EntityManager.GetEntity(entityName);
+			local filename = GameLogic.current_worlddir.."blocktemplates/entity_".. entityName .. ".gltf";
+			if (entity) then
+				local obj = entity:GetInnerObject();
+				if (obj and obj.Export) then
+					obj:Export(filename, "gltf");
+					success_callback(filename);
+				else
+					local assetfile = entity:GetMainAssetPath();
+					if (assetfile) then
+						ParaXToGltf(assetfile, filename);
+					end
+				end
+			end	
+			return;
 		else
 			local x1, y1, z1, cmd_text = CmdParser.ParsePos(cmd_text, fromEntity);
 			if (x1 and y1 and z1) then

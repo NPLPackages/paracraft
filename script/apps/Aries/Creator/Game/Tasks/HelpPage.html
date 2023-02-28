@@ -171,9 +171,11 @@ function StartBuild()
         Page:Refresh(0.01)
         return;
     end
-
-	GameLogic.GetFilters():apply_filters("user_event_stat", "help", "startTutorial:"..tostring(HelpPage.select_task_index), 1, nil);
-
+    local curBuildData = HelpPage.GetGridview_DS(HelpPage.select_task_index)
+    local name = curBuildData and curBuildData.name or "startTutorial_"..tostring(HelpPage.select_task_index)
+    local themeName = "theme"..HelpPage.select_item_index
+    local click_name = "click.help."..themeName.."."..name
+    GameLogic.GetFilters():apply_filters("user_behavior", 1, click_name);
     local task = BuildQuest:new({theme_id=HelpPage.select_item_index, task_id=HelpPage.select_task_index, step_id=1,category = HelpPage.cur_category})
     task:Run();
     HelpPage.ClosePage();

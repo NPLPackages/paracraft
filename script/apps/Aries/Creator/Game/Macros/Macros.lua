@@ -93,10 +93,12 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/Macro.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroVoice.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroControl.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroKeys.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroMouse.lua");
 NPL.load("(gl)script/ide/SliderBar.lua");
 NPL.load("(gl)script/ide/TreeView.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Macros/MacroPlayer.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
+
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MacroPlayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.MacroPlayer");
 local Screen = commonlib.gettable("System.Windows.Screen");
@@ -111,6 +113,8 @@ local KeyFrameCtrl = commonlib.gettable("MyCompany.Aries.Game.Movie.KeyFrameCtrl
 local Macros = commonlib.gettable("MyCompany.Aries.Game.GameLogic.Macros")
 local pe_mc_slot = commonlib.gettable("MyCompany.Aries.Game.mcml.pe_mc_slot");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
+
+local ConvertToWebMode = NPL.load('(gl)script/apps/Aries/Creator/Game/Macros/ConvertToWebMode/ConvertToWebMode.lua');
 
 local lastPlayerPos = {pos = {x=0, y=0, z=0}, facing=0, recorded=false};
 local lastCameraPos = {camobjDist=10, LiftupAngle=0, CameraRotY=0, recorded = false, lookatX=0, lookatY = 0, lookatZ = 0};
@@ -606,7 +610,7 @@ end
 
 local MaxNonVIPMacroAllowed = 3000;
 
-function Macros:EndRecord()
+function Macros:EndRecord(bHideBBS)
 	if(not self.isRecording) then
 		return;
 	end
@@ -635,8 +639,12 @@ function Macros:EndRecord()
 			end
 		end
 		local text = table.concat(out, "\n");
-		ParaMisc.CopyTextToClipboard(text);
-		GameLogic.AddBBS(nil, format(L"%d个示教宏命令已经复制到裁剪版", #(self.macros)), 5000, "0 255 0")
+		if not bHideBBS then
+			ParaMisc.CopyTextToClipboard(text);
+			GameLogic.AddBBS(nil, format(L"%d个示教宏命令已经复制到裁剪版", #(self.macros)), 5000, "0 255 0")
+		else
+			return text
+		end
 	end
 	GameLogic.GetFilters():apply_filters("Macro_EndRecord");
 end
@@ -742,7 +750,7 @@ function Macros:HasUnplayedPreparedMode()
 	return Macros.hasUnplayedPreparedMode;
 end
 
--- @param cx, cy, cz: if nil, we will not play using absolute position. otherwise, we will play relatively. 
+-- @param cx, cy, cz: if nil, we will play using absolute position. otherwise, we will play relatively. 
 function Macros:PrepareDefaultPlayMode(cx, cy, cz, isAutoPlay, bNoHelp, nSpeed)
 	Macros.hasUnplayedPreparedMode = true;
 	Macros.SetPlayOrigin(cx, cy, cz)
@@ -770,6 +778,10 @@ function Macros:PrepareInitialBuildState()
     CreatorDesktop.OnChangeTabview(1)
     CreatorDesktop.ShowNewPage(false)
     
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
+	local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+	EscFramePage.ShowPage(false);
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 	CodeBlockWindow:SetBigCodeWindowSize(false);
@@ -790,6 +802,11 @@ function Macros:PrepareInitialBuildState()
     local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
     ChatEdit.LostFocus()
 
+	local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+	if UserInfoPage and UserInfoPage.IsVisible and UserInfoPage.IsVisible() then
+		UserInfoPage.ClosePage(true)
+	end
+
 	local TouchVirtualKeyboardIcon = commonlib.gettable("MyCompany.Aries.Game.GUI.TouchVirtualKeyboardIcon")
 	if TouchVirtualKeyboardIcon and TouchVirtualKeyboardIcon.GetSingleton then
 		TouchVirtualKeyboardIcon = TouchVirtualKeyboardIcon.GetSingleton()
@@ -806,14 +823,18 @@ end
 -- @param text: text lines of macros. if nil, it will play from clipboard
 -- @param maxPrepareTime: max number of seconds, if prepare downloading text-to-speech audio files if any. default to 3 seconds. 
 function Macros:Play(text, speed, maxPrepareTime)
-	Macros.hasUnplayedPreparedMode = false;
-	text = text or ParaMisc.GetTextFromClipboard() or "";
-	self.maxPrepareTime = maxPrepareTime or 3;
-	self.text_lines = {}
-	local macros = self:LoadMacrosFromText(text)
-	self:PlayMacros(macros, 1, speed);
-	self:InitPrePlaytextData()
-	self:PreparePlayText(5)
+	ConvertToWebMode:OnPlay(function()
+		Macros.hasUnplayedPreparedMode = false;
+		text = text or ParaMisc.GetTextFromClipboard() or "";
+		self.maxPrepareTime = maxPrepareTime or 3;
+		self.text_lines = {}
+
+		local macros = self:LoadMacrosFromText(text)
+
+		self:PlayMacros(macros, 1, speed);
+		self:InitPrePlaytextData()
+		self:PreparePlayText(5)
+	end)
 end
 
 function Macros:BeginPlay()
@@ -846,6 +867,13 @@ function Macros.OnShowExitDialog(p1)
 		_guihelper.MessageBox(L"是否退出示教系统?", function(res)
 			if(res and res == _guihelper.DialogResult.Yes) then
 				Macros:Stop();
+
+				if (Macros.GetHelpLevel() == -2) then
+					ConvertToWebMode:StopCapture();
+					GameLogic.DockManager:ShowAllDock();
+					ConvertToWebMode:StopComputeRecordTime();
+					ConvertToWebMode:StopComputeDuringTime();
+				end
 			else
 				Macros:Resume()
 			end
@@ -907,33 +935,40 @@ end
 
 -- @param fromLine: optional
 function Macros:PlayMacros(macros, fromLine, speed)
-	fromLine = fromLine or 1
-	if(fromLine == 1) then
-		self:BeginPlay()
-		if(speed) then
+	fromLine = fromLine or 1;
+
+	if (fromLine == 1) then
+		self:BeginPlay();
+
+		if (speed) then
 			Macros.SetPlaySpeed(speed);
 		end
 	end
+
 	self.macros = macros;
 	self.needResumePlay = false;
+
 	local function play()
-		while(true) do
+		while (true) do
 			local m = macros[fromLine];
-			if(m) then
+
+			if (m) then
 				if Macros.IsTextManualPlay() and self.text_lines[fromLine] == 1 and Macros.IsAutoPlay() then
-					self:Pause()
-					MacroPlayer.ShowNextController(true)
-					self.text_lines[fromLine] = 0
+					self:Pause();
+					MacroPlayer.ShowNextController(true);
+					self.text_lines[fromLine] = 0;
 				end
+
 				self.isPlaying = true;
 				self.curLine = fromLine
 				local isAsync = nil;
 				MacroPlayer.Focus();
 				GameLogic.GetFilters():apply_filters("Macro_PlayMacro", fromLine, macros);
+
 				m:Run(function()
-					if(isAsync) then
-						if(self.isPlaying) then
-							if(not self:IsPaused()) then
+					if (isAsync) then
+						if (self.isPlaying) then
+							if (not self:IsPaused()) then
 								self:PlayMacros(macros, fromLine+1)
 							else
 								self.needResumePlay = true;
@@ -948,14 +983,23 @@ function Macros:PlayMacros(macros, fromLine, speed)
 					self:PreparePlayText()
 				end
 
-				if(isAsync == false) then
+				if (isAsync == false) then
 					fromLine = fromLine + 1;
 				else
 					isAsync = true;
 					break;
 				end
 			else
-				self:Stop()
+				self:Stop();
+
+				if (Macros.GetHelpLevel() == -2) then
+					ConvertToWebMode:StopCapture();
+					GameLogic.DockManager:ShowAllDock();
+					ConvertToWebMode:StopComputeRecordTime();
+					ConvertToWebMode:StopComputeDuringTime();
+					ConvertToWebMode:GenerateMacroList();
+				end
+
 				break;
 			end
 		end
@@ -964,11 +1008,14 @@ function Macros:PlayMacros(macros, fromLine, speed)
 	if (fromLine == 1) then
 		self.firstTextPrepared = false;
 		self.elapsedPrepareTime = 0;
+
 		if(self.checkText) then
 			self.checkText:Change();
 		end
+
 		self.checkText = commonlib.Timer:new({callbackFunc = function(timer)
 			self.elapsedPrepareTime = self.elapsedPrepareTime + 1;
+
 			if (not has_playtext or self.elapsedPrepareTime >= self.maxPrepareTime or self.firstTextPrepared) then
 				self.checkText:Change();
 				play();
@@ -979,7 +1026,6 @@ function Macros:PlayMacros(macros, fromLine, speed)
 		play();
 	end
 end
-
 
 function Macros:Stop()
 	if(self.checkText) then
@@ -993,8 +1039,9 @@ function Macros:Stop()
 
 		local player = EntityManager.GetPlayer();
 		local lookX, lookY, lookZ = ParaCamera.GetLookAtPos()
-
-		player:SetFocus();
+		if player then
+			player:SetFocus();
+		end
 		local obj = player:GetInnerObject();
 		if(obj) then
 			if(obj.ToCharacter) then
@@ -1061,7 +1108,7 @@ local currentViewportParams = {fov=1.5, aspectRatio=1, screenWidth=800, screenHe
 -- it is usually called before handling user event, just in case the user changed viewport during processing. 
 function Macros:SaveViewportParams()
 	local viewport = ViewportManager:GetSceneViewport();
-	currentViewportParams.screenWidth, currentViewportParams.screenHeight = Screen:GetWidth()-viewport:GetMarginRight(), Screen:GetHeight() - viewport:GetMarginBottom();
+	currentViewportParams.screenWidth, currentViewportParams.screenHeight = Screen:GetWidth()-viewport:GetMarginRight() / Screen:GetUIScaling()[1], Screen:GetHeight() - viewport:GetMarginBottom() / Screen:GetUIScaling()[2];
 	currentViewportParams.fov = Cameras:GetCurrent():GetFieldOfView()
 	currentViewportParams.aspectRatio = Cameras:GetCurrent():GetAspectRatio()
 	currentViewportParams.saveTime = commonlib.TimerManager.GetCurrentTime();

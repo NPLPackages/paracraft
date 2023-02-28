@@ -42,6 +42,7 @@ function EditModelTask:ctor()
 	self.position = vector3d:new(0,0,0);
 	self.transformMode = false;
 	self.isWorldTransform = true;
+	self.show_drag_bt = true
 end
 
 local page;
@@ -108,6 +109,7 @@ function EditModelTask:OnExit()
 	self:CloseWindow();
 	curInstance = nil;
 	page = nil;
+	self.modelManip = nil;
 end
 
 function EditModelTask:UpdateUIFromModel()
@@ -161,9 +163,16 @@ function EditModelTask.OnResetModel()
 	if(self) then
 		local entity = self:GetSelectedModel();
 		if(entity) then
+			local bIsDynamicPhysics;
+			if(entity:IsDynamicPhysicsEnabled()) then
+				bIsDynamicPhysics = true;
+				entity:EnableDynamicPhysics(false)
+			end
 			local matLocal = entity:GetModelLocalTransform()
 			if(not matLocal or matLocal:isIdentity()) then
 				entity:setYaw(0);
+				entity:SetRoll(0);
+				entity:SetPitch(0);
 				entity:setScale(1);
 				if(entity.SetOffsetPos) then
 					entity:SetOffsetPos({0,0,0});
@@ -171,13 +180,16 @@ function EditModelTask.OnResetModel()
 			else
 				entity:SetModelLocalTransform(nil);
 			end
+			if(bIsDynamicPhysics) then
+				entity:EnableDynamicPhysics(true)
+			end
 		end
 	end
 end
 
 function EditModelTask:UpdateManipulators()
 	self:DeleteManipulators();
-
+	self.modelManip = nil;
 	if(self.entityModel) then
 		if(self:IsWorldTransformMode()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelManipContainer.lua");
@@ -185,6 +197,7 @@ function EditModelTask:UpdateManipulators()
 			local manipCont = EditModelManipContainer:new();
 			manipCont:init();
 			self:AddManipulator(manipCont);
+			self.modelManip = manipCont;
 			manipCont:connectToDependNode(self:GetSelectedModel());
 		else
 			NPL.load("(gl)script/ide/System/Scene/Manipulators/LocalTransformManipContainer.lua");
@@ -210,12 +223,22 @@ function EditModelTask:ShowPage()
 	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 	local viewport = ViewportManager:GetSceneViewport();
 	local parent = viewport:GetUIObject(true)
-
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled then
+		local window = self:CreateGetToolWindow();
+		window:Show({
+			name="EditModelTask", 
+			url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
+			alignment="_ctb", left=52, top= -110, width = 640, height = 96, parent = parent
+		});
+		window:SetUIScaling(1.5,1.5)
+		return 
+	end
 	local window = self:CreateGetToolWindow();
 	window:Show({
 		name="EditModelTask", 
 		url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
-		alignment="_ctb", left=0, top=-55, width = 360, height = 64, parent = parent
+		alignment="_ctb", left=0, top= -55, width = 360, height = 64, parent = parent
 	});
 end
 
@@ -244,7 +267,7 @@ function EditModelTask:handleLeftClickScene(event, result)
 		if(event.alt_pressed and result) then
 			-- alt + left click to get the block in hand without destroying it
 			if(result.block_id and result.block_id~=0 and result.blockX) then
-				GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ);
+				GameLogic.GetPlayerController():PickBlockAt(result.blockX, result.blockY, result.blockZ, result.side);
 			elseif(result.entity) then
 				GameLogic.GetPlayerController():PickItemByEntity(entity);
 			end
@@ -472,6 +495,36 @@ function EditModelTask.OnClickDeleteModel()
 	end
 end
 
+function EditModelTask.IsHaveSkin()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local entity = self:GetSelectedModel()
+		if(entity) then
+			if entity.class_name ~= "LiveModel" then
+				return true
+			end
+			return (entity.IsCustomModel and entity:IsCustomModel()) or (entity.HasCustomGeosets and entity:HasCustomGeosets())
+		end
+	end
+	return false
+end
+
+function EditModelTask.OnChangeModel()
+	local self = EditModelTask.GetInstance();
+	if(self) then
+		local entity = self:GetSelectedModel()
+		if(entity and entity.GetModelFile) then
+			local old_value = entity:GetModelFile()
+			NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
+			local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAssetFileDialog");
+			OpenAssetFileDialog.ShowPage(L"请输入bmax, x或fbx文件的相对路径, <br/>你也可以随时将外部文件拖入窗口中", function(result)
+				if(result and result~="" and result~=old_value) then
+					entity:SetModelFile(commonlib.Encoding.DefaultToUtf8(result))
+				end
+			end, old_value, L"选择模型文件", "model")
+		end
+	end
+end
 
 function EditModelTask.OnChangeSkin()
 	local self = EditModelTask.GetInstance();
@@ -623,10 +676,25 @@ function EditModelTask:IsWorldTransformMode()
 	return self.isWorldTransform;
 end
 
+function EditModelTask:SetDragBtVisible(flag)
+	self.show_drag_bt = flag
+end
+
+function EditModelTask:GetDragBtVisible()
+	return self.show_drag_bt
+end
+
 function EditModelTask.OnClickToggleTransformMode()
 	local self = EditModelTask.GetInstance();
 	if(self) then
 		self.isWorldTransform = not self.isWorldTransform;
 		self:UpdateManipulators()
+	end
+end
+
+function EditModelTask.OnClickToggleRotationMode()
+	local self = EditModelTask.GetInstance();
+	if(self and self.modelManip) then
+		self.modelManip:ToggleRotationMode()
 	end
 end

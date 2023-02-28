@@ -570,7 +570,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end,old_value,true); 
+		end,old_value,true, nil, {auto_virtual_keyboard=true}); 
 	elseif(keyname == "pos") then
 		local title = format(L"起始时间%s, 请输入位置x,y,z:", strTime);
 		local bx, by, bz = self:GetValue("lookat_x", curTime),self:GetValue("lookat_y", curTime), self:GetValue("lookat_z", curTime)
@@ -602,7 +602,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end, old_value)
+		end, old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "rot") then
 		local title = format(L"起始时间%s, 请输入roll, pitch, yaw (-1.57, 1.57)<br/>", strTime);
 		old_value = string.format("%f, %f, %f", self:GetValue("eye_roll", curTime) or 0,self:GetValue("eye_liftup", curTime) or 0,self:GetValue("eye_rot_y", curTime) or 0);
@@ -624,7 +624,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end,old_value)
+		end,old_value, nil, nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "scaling" or keyname == "eye_dist") then
 		local title = format(L"起始时间%s, 请输入放大系数(默认1)", strTime);
 
@@ -640,7 +640,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end,old_value, nil, nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "is_fps") then
 		local title = format(L"起始时间%s, 是否为第一人称(1或0)", strTime);
 
@@ -655,7 +655,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end, old_value~= nil and tostring(old_value))
+		end, old_value~= nil and tostring(old_value), nil, nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "parent") then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditParentLinkPage.lua");
 		local EditParentLinkPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditParentLinkPage");
@@ -673,7 +673,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			if(callbackFunc) then
 				callbackFunc(true);
 			end
-		end, old_value);
+		end, old_value, nil, nil, {auto_virtual_keyboard=true});
 	elseif(keyname == "static") then
 		old_value = {name = self:GetValue("name", 0) or "", isAgent = self:GetValue("isAgent", 0)}
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditStaticPropertyPage.lua");
@@ -693,6 +693,6 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			{value="false", text=L"默认"},
 			{value="relative", text=L"相对摄影机"},
 			{value="searchNearPlayer", text=L"相对主角"},
-		});
+		}, nil, {auto_virtual_keyboard=true});
 	end
 end

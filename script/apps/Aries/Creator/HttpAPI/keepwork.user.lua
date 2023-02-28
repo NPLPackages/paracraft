@@ -11,11 +11,22 @@ NPL.load("(gl)script/ide/System/localserver/localserver.lua");
 
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
---http://yapi.kp-para.cn/project/32/interface/api/cat_97
-HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/users/login", "POST", false)
+if System.options.channelId_431 then
+    --http://yapi.kp-para.cn/project/32/interface/api/cat_97
+    HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/edu/users/login", "POST", false)
+else
+    HttpWrapper.Create("keepwork.user.login", "%MAIN%/core/v0/users/login", "POST", false)
+end
 
+--http://yapi.kp-para.cn/project/32/interface/api/5593
+HttpWrapper.Create("keepwork.user.judgeTokenEnough", "%MAIN%/core/v0/user/judgeTokenEnough", "GET", true)
+
+if System.options.channelId_431 then
 --http://yapi.kp-para.cn/project/32/interface/api/492
-HttpWrapper.Create("keepwork.user.profile", "%MAIN%/core/v0/users/profile", "GET", true)
+    HttpWrapper.Create("keepwork.user.profile", "%MAIN%/core/v0/edu/users/profile", "GET", true)
+else
+    HttpWrapper.Create("keepwork.user.profile", "%MAIN%/core/v0/users/profile", "GET", true)
+end
 
 -- https://api.keepwork.com/core/v0/users/3   更新用户信息
 HttpWrapper.Create("keepwork.user.setinfo", "%MAIN%/core/v0/users/:id", "PUT", true);
@@ -27,6 +38,9 @@ HttpWrapper.default_prepFunc,
 -- Post Processor
 HttpWrapper.default_postFunc
 )
+
+--http://yapi.kp-para.cn/project/32/interface/api/2357
+HttpWrapper.Create("keepwork.user.check", "%MAIN%/core/v0/users", "GET", true)
 
 --http://yapi.kp-para.cn/project/32/interface/api/2477
 HttpWrapper.Create("keepwork.user.school", "%MAIN%/core/v0/users/school", "GET", true)
@@ -61,6 +75,10 @@ HttpWrapper.Create("keepwork.user.buySkinUsingBean", "%MAIN%/core/v0/clothes/set
 -- http://yapi.kp-para.cn/project/32/interface/api/4417
 -- 根据知识豆服装获取结算信息
 HttpWrapper.Create("keepwork.user.getCheckInfoFromSkin", "%MAIN%/core/v0/clothes/priceQuery", "POST", true)
+
+-- http://yapi.kp-para.cn/project/32/interface/api/5355
+-- 服装单个结算
+HttpWrapper.Create("keepwork.user.buySingleSkinUseBean", "%MAIN%/core/v0/clothes/settlementSingle", "POST", true)
 
 -- 查询
 HttpWrapper.Create("keepwork.user.search", "%MAIN%/core/v0/users/search", "POST", true)
@@ -153,3 +171,11 @@ HttpWrapper.Create("keepwork.config.all", "%MAIN%/core/v0/paracraftConfigs", "GE
 -- 判断是否节假日
 -- http://10.28.18.44:3001/project/32/interface/api/4676
 HttpWrapper.Create("keepwork.date.isholiday", "%MAIN%/core/v0/holiday", "GET", false)
+
+-- 获取用户所在地区
+-- http://10.28.18.44:3001/project/32/interface/api/5121
+HttpWrapper.Create("keepwork.user.selfRegion", "%MAIN%/core/v0/selfRegion", "GET", true)
+
+-- 获取用户的第三方绑定
+-- http://yapi.kp-para.cn/project/32/interface/api/972
+HttpWrapper.Create("keepwork.user.authUsers", "%MAIN%/core/v0/oauth_users", "GET", true)

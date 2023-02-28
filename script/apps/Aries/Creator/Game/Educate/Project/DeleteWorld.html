@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local DeleteWorld = NPL.load('(gl)Mod/WorldShare/cellar/DeleteWorld/DeleteWorld.lua')
+    -- service
+    local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceSession.lua')
+    local KeepworkServiceProject = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceProject.lua')
+
+    local Create = NPL.load('(gl)Mod/WorldShare/cellar/Create/Create.lua')
+
+    function get_select_world()
+        return DeleteWorld.GetSelectWorld()
+    end
+
+    function get_world_name()
+        if not get_select_world() then
+            return ''
+        end
+    
+        local text = ''
+
+        if get_select_world().is_zip then
+            text = get_select_world().text .. '.zip'
+        else
+            text = get_select_world().foldername
+        end
+
+        return Mod.WorldShare.Utils.WordsLimit(text, 300, 50)
+    end
+
+    function get_status(status)
+        if(status == 'local') then
+            return get_select_world().status == nil or get_select_world().status ~= 2
+        elseif(status == 'remote') then
+            return get_select_world().status ~= nil and get_select_world().status ~= 1
+        elseif(status == 'all') then
+            return get_select_world().status ~= nil and get_select_world().status ~= 1 and get_select_world().status ~= 2
+        end
+    end
+
+    function delete_all()
+        if is_shared_world() then
+            on_exit_shared_world()
+            return
+        end
+        if type(DeleteWorld.DeleteRemoteWithoutPwd) == "function" then
+            local selectedWorld = get_select_world()
+            if selectedWorld and selectedWorld.kpProjectId and selectedWorld.kpProjectId > 0 then
+                DeleteWorld:DeleteRemoteWithoutPwd(function()
+                    local worldPath = selectedWorld.worldpath
+                    if ParaIO.DoesFileExist(worldPath .. '/tag.xml', false) then
+                        DeleteWorld:DeleteLocal(function()
+                            GameLogic.AddBBS(nil,"删除项目成功")
+                            Create:GetWorldList(Create.statusFilter)
+                            close_page()
+                        end,true)
+                    else
+                        GameLogic.AddBBS(nil,"删除项目成功")
+                        Create:GetWorldList(Create.statusFilter)
+                        close_page()
+                    end
+
+                end)            
+            else
+                DeleteWorld:DeleteLocal(function()
+                    GameLogic.AddBBS(nil,"删除项目成功")
+                    Create:GetWorldList(Create.statusFilter)
+                    close_page()
+                end,true)
+            end
+           
+        end
+        
+    end
+
+    function close_page()
+        DeleteWorld:ClosePage()
+    end
+
+    function get_window_style()
+        return Mod.WorldShare.Utils.FixCenter(500, 270)
+    end
+
+    function is_multiplayer_world()
+        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+        if (currentWorld.project and currentWorld.project.memberCount or 0) > 1 then
+            return true
+        else
+            return false
+        end
+    end
+
+    function is_mine_world()
+        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+        local username = Mod.WorldShare.Store:Get('user/username') or ''
+        local user = currentWorld.user
+
+        if not user or
+            type(user) ~= 'table' or
+            not user.username then
+            return false
+        end
+
+        if username == user.username then
+            return true
+        else
+            return false
+        end
+    end
+
+    function is_shared_world()
+        return is_multiplayer_world() and not is_mine_world()
+    end
+
+    function get_delete_tip()
+        if is_shared_world() then
+            return L"是否退出共享世界"
+        end
+        return L"是否删除该作品"
+    end
+
+    function get_button_text()
+        return is_shared_world() and L'退出' or L'删除'
+    end
+
+    function on_exit_shared_world()
+        local selectedWorld = get_select_world()
+
+        if not selectedWorld then
+            return
+        end
+
+        _guihelper.MessageBox(
+            format(L'确定要退出《%s》项目？<br />(注意：退出后本地数据也会删除！)', selectedWorld.text),
+            function(res)
+                if res and res == _guihelper.DialogResult.Yes then
+                    local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+
+                    if currentWorld.kpProjectId == selectedWorld.kpProjectId then
+                        KeepworkServiceProject:LeaveMultiProject(currentWorld.kpProjectId, function(data, err)
+                            if err == 200 then
+                                if currentWorld.status == 2 then
+                                    Create:GetWorldList(Create.statusFilter)
+                                else
+                                    DeleteWorld:DeleteLocal(function()
+                                        Create:GetWorldList(Create.statusFilter)
+                                    end, true)
+                                end
+                                close_page()
+                            end
+                        end)
+                    end
+                end
+            end,
+            _guihelper.MessageBoxButtons.YesNo
+        )
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000088; ">
+    <pe:container alignment="_ct" style="margin-left:-215px;margin-top:-140px;width:1280px;height:720px;background:url();">   
+        <div width='430' height='280' style="margin-left: ;">
+            <div style="width: 430x; height: 45px;background: url(Texture/Aries/Creator/paracraft/Educate/tanchuangdin_54x60_32bits.png#0 0 54 60:25 25 25 25);">
+                <div style="position: relative; margin-left: 24px; margin-top: 12px;color: #ffffff; font-weight: bold; font-size: 16px;base-font-size: 16px;"><%=L"删除作品"%></div>
+                <input type="button" style="position: relative; margin-left: 392px; margin-top: 18px; width:14px;height:14px;background: url(Texture/Aries/Creator/paracraft/Educate/guanbi_14x14_32bits.png#0 0 14 14);" onclick="close_page"/>
+            </div>
+            <div style=" width: 430x; height: 250px;background: url(Texture/Aries/Creator/paracraft/Educate/tanchuangdi_54x60_32bits.png#0 0 54 60:25 25 25 25);">
+                <div style="margin-left: 177px; margin-top: 31px; width: 75x; height: 75px;background: url(Texture/Aries/Creator/paracraft/Educate/shanchu_75x75_32bits.png#0 0 75 75)"></div>
+                <div style="text-align: center; margin-top: 14px; "><%=get_delete_tip()%></div>
+                <div style="width: 430px; height: 40px; margin-top: 28px;">
+                    <input type="button" value="取消" style="position: relative; margin-left: 80px; margin-top: 0px; width:100px;height:40px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/shurukuang_46x46_32bits.png#0 0 46 46:20 20 20 20);" onclick="close_page"/>
+                    <input type="button" value="<%=get_button_text()%>" style="position: relative; margin-left: 250px; margin-top: 0px; width:100px;height:40px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/shurukuang_46x46_32bits.png#0 0 46 46:20 20 20 20);" onclick="delete_all"/>
+                </div>
+            </div>
+        </div>
+    </pe:container>
+
+</pe:container>
+
+</pe:mcml>
+</body>
+</html>

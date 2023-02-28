@@ -21,7 +21,6 @@ local RefuseList = {}
 
 function FriendsApplyPage.OnInit()
     page = document:GetPageCtrl();
-    page.OnClose = FriendsApplyPage.CloseView
     
 end
 
@@ -50,7 +49,7 @@ function FriendsApplyPage.Show(user_data)
             style = CommonCtrl.WindowFrame.ContainerStyle,
             allowDrag = true,
             enable_esc_key = true,
-            zorder = -1,
+            zorder = 1,
             --app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
             directPosition = true,
             
@@ -149,8 +148,11 @@ function FriendsApplyPage.UpdataFoucsList(updata_cb)
 end
 
 function FriendsApplyPage.CloseView()
-    print("FriendsApplyPage.CloseView()")
     FriendsApplyPage.ClearData()
+    if page then
+        page:CloseWindow()
+        page = nil
+    end
 end
 
 function FriendsApplyPage.ClearData()

@@ -211,7 +211,9 @@ EnvFramePage.category_others = {
 function EnvFramePage.OnToggleShader(name, value)
 	local res = GameLogic.options:SetRenderMethod(value,true)
 	if not res then
-		Page:SetValue("comboShader", "1");
+		if page then
+			page:SetValue("comboShader", "1");
+		end
 	else
 		if page then
 			if value=="1" then
@@ -262,6 +264,10 @@ end
 
 function EnvFramePage.OnToggleAutoTimesGo(bChecked)
 	GameLogic.options:SetTimesAutoGo(bChecked,true)
+	if not bChecked then
+		local time = GameLogic.RunCommand("/time now")
+		GameLogic.options:SetFrozenDayTime(time,true)
+	end
 end
 
 function EnvFramePage.OnCopyCmd(name)

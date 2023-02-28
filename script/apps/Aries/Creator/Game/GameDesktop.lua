@@ -184,14 +184,14 @@ function Desktop.OnActivateDesktop(mode)
 	if(bIgnoreDefaultDesktop) then
 		return;
 	end
-
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
 	if(not Desktop.bSkipDefaultDesktop) then
 		Desktop.ShowAllAreas();
 		if(isToggleMode) then
 			if(Desktop.mode == "editor") then
 				GameLogic.AddBBS("desktop", L"进入编辑模式", 3000, "0 255 0");
 			else
-				GameLogic.AddBBS("desktop", L"进入播放模式", 3000, "255 255 0");
+				GameLogic.AddBBS("desktop", IsMobileUIEnabled and L"进入游戏模式" or L"进入播放模式", 3000, "255 255 0");
 			end
 		end
 		Desktop.mode = mode;
@@ -458,7 +458,17 @@ function Desktop.OnExit(bForceExit, bRestart)
 				end
 			};
 			-- use this filter to display a dialog when user exits the application, return nil if one wants to replace the implementation.
-			dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog);
+			
+			local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+			local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
+			if Game.is_started and isHomeWorkWorld then
+				local MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
+				MobileSaveWorldPage.ClosePage()
+				MobileSaveWorldPage.ShowPage("exit_world", dialog.callback)
+				dialog = nil
+			else
+				dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog);
+			end
 
 			if(dialog and dialog.callback and dialog.text) then
 				_guihelper.MessageBox(dialog.text, 
@@ -501,7 +511,10 @@ function Desktop.ForceExit(bRestart)
 	else
 		ParaEngine.GetAttributeObject():SetField("IsWindowClosingAllowed", true);
 		if (bRestart) then
-			GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
+			if (GameLogic.events) then
+				GameLogic.events:DispatchEvent({type = "OnWorldUnload"});	
+			end
+
 			Game.Exit();
 
 			local restartTable = commonlib.gettable('RestartTable');

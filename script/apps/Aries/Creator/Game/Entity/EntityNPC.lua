@@ -36,6 +36,7 @@ local math_floor = math.floor;
 
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityMob"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityNPC"));
 
+Entity:Signal("beforeDestroyed")
 -- persistent object by default. 
 Entity.is_persistent = true;
 -- whether this entity can be synchronized on the network by EntityTrackerEntry. 
@@ -153,6 +154,15 @@ function Entity:FrameMove(deltaTime)
 	end
 end
 
+function Entity:IsSearchable()
+	return true;
+end
+
+-- return true if we can take control of this entity by external agent like movie or code block.
+function Entity:CanBeAgent()
+	return true;
+end
+
 -- @param actor: the parent ActorNPC
 function Entity:SetActor(actor)
 	self.m_actor = actor;
@@ -163,3 +173,7 @@ function Entity:GetActor()
 	return self.m_actor;
 end
 
+function Entity:Destroy()
+	self:beforeDestroyed(self);
+	Entity._super.Destroy(self);
+end

@@ -127,7 +127,7 @@ function LocalLoadWorld.CreateHomeWorld(myHomeWorldName, worldTitle)
 	local worldpath = CreateNewWorld.CreateWorld({
 		worldname = myHomeWorldName, 
 		title = worldTitle or format(L"%s的家园", System.User.keepworkUsername),
-		creationfolder = CreateNewWorld.GetWorldFolder(),
+		creationfolder = "worlds/DesignHouse/_user/" .. System.User.keepworkUsername,
 		world_generator = "paraworldMini",
 		seed = worldname,
 		inherit_scene = true,
@@ -142,15 +142,22 @@ function LocalLoadWorld.CreateHomeWorld(myHomeWorldName, worldTitle)
 end
 
 function LocalLoadWorld.CreateGetHomeWorld()
-	local myHomeWorldName;
-	if(System.User.keepworkUsername) then
-		local folderPath = LocalLoadWorld.GetDefaultSaveWorldPath();
-		myHomeWorldName = tostring(System.User.keepworkUsername).."_main";
+	if (System.User.keepworkUsername and
+        type(System.User.keepworkUsername) == "string") then
+		local myHomeWorldName = System.User.keepworkUsername .. "_main";
+		local folderPath = "worlds/DesignHouse/_user/" .. System.User.keepworkUsername;
+		local oldFolderPath = "worlds/DesignHouse";
+
 		-- create home world if not exist
-		if(not ParaIO.DoesFileExist(folderPath.."/"..myHomeWorldName.."/tag.xml", false)) then
-			LocalLoadWorld.CreateHomeWorld(myHomeWorldName)
+		if (ParaIO.DoesFileExist(oldFolderPath .. "/" .. myHomeWorldName .. "/tag.xml", false)) then
+			return oldFolderPath .. "/" .. myHomeWorldName;
+		else
+			if (not ParaIO.DoesFileExist(folderPath .. "/" .. myHomeWorldName .. "/tag.xml", false)) then
+				LocalLoadWorld.CreateHomeWorld(myHomeWorldName);
+			end
+
+			return folderPath .. "/" .. myHomeWorldName;
 		end
-		return folderPath.."/"..myHomeWorldName;
 	end
 end
 

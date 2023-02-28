@@ -16,6 +16,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/OpenAssetFileDialog.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerSkins.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+NPL.load("(gl)script/apps/Aries/Desktop/GameMemoryProtector.lua");
+local GameMemoryProtector = commonlib.gettable("MyCompany.Aries.Desktop.GameMemoryProtector");
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local PlayerSkins = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerSkins")
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
@@ -63,11 +65,14 @@ function OpenAssetFileDialog.GetFilters(filterName)
 	if(filterName == "model") then
 		return {
 			-- {L"全部文件(*.fbx,*.x,*.bmax,*.xml)",  "*.fbx;*.x;*.bmax;*.xml", exclude="*.blocks.xml"},
-			{L"全部文件(*.fbx,*.FBX,*.x,*.bmax)",  "*.fbx;*.FBX;*.x;*.bmax", exclude="*.blocks.xml"},
+			-- {L"全部文件(*.fbx,*.FBX,*.x,*.bmax,*.gltf,*.glb)",  "*.fbx;*.FBX;*.x;*.bmax;*.gltf;*.glb", exclude="*.blocks.xml"},
+			{L"全部文件(*.fbx,*.FBX,*.x,*.bmax,*.glb,*.gltf)",  "*.fbx;*.FBX;*.x;*.bmax;*.glb;*.gltf", exclude="*.blocks.xml"},
 			{L"FBX模型(*.fbx)",  "*.fbx"},
+			-- {L"GLTF模型(*.gltf, *.glb)",  "*.gltf;*.glb"},
 			{L"bmax模型(*.bmax)",  "*.bmax"},
 			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml", exclude="*.blocks.xml"},
 			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
+			{L"GLTF模型(*.glb,*.gltf)",  "*.glb;*.gltf"},
 		};
 	elseif(filterName == "modelStrict") then
 		return {
@@ -314,7 +319,8 @@ function OpenAssetFileDialog.UpdateExistingFiles()
 				for i = 1, #result do
 					if(type(filterFunc) == "function" and filterFunc(result[i])) then
 						local beExist = false;
-
+						--压缩包里读出来的，都是UTF8编码
+						result[i].filename = commonlib.Encoding.Utf8ToDefault(result[i].filename)
 						if (localFiles and #localFiles > 0) then
 							for _, item in ipairs(localFiles) do
 								if item and item.attr and item.attr.filename and
@@ -617,6 +623,19 @@ function OpenAssetFileDialog.RefreshFileTreeView()
 	end
 end
 
+function OpenAssetFileDialog.GetFilenameMap(filename)
+	if(filename) then
+		local name = filename:match("[^/]+$")
+		local md5 = GameMemoryProtector.hash_func_md5(commonlib.Encoding.Utf8ToDefault(name))
+		local chineseMap = commonlib.LoadTableFromFile(Files.GetWritablePath().."worlds/DesignHouse/blocktemplates/chinese_map.json")
+		chineseMap = chineseMap or {}
+		if chineseMap[md5] ~= nil then
+			name = name:gsub("%..*$", "")
+			return filename:gsub(name, md5),name
+		end
+	end
+end
+
 function OpenAssetFileDialog.OnTextChange(name, mcmlNode)
 	local text = mcmlNode:GetUIValue()
 	if(text and text:match("^[/?]")) then
@@ -624,6 +643,10 @@ function OpenAssetFileDialog.OnTextChange(name, mcmlNode)
 			if(page) then
 				local text = page:GetUIValue("text") or ""
 				local searchText = text:match("^[/?](.+)")
+				local name_map,name = OpenAssetFileDialog.GetFilenameMap(searchText)
+				if name_map then
+					searchText = name_map
+				end
 				if(OpenAssetFileDialog.SetSearchText(searchText)) then
 					OpenAssetFileDialog.RefreshFileTreeView()
 				end

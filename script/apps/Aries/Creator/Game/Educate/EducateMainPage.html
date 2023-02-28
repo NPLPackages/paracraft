@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    EducateMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/EducateMainPage.lua")
+    EducateMainPage.OnInit()
+    function ClosePage()
+        EducateMainPage.ClosePage()
+    end
+
+    function ChangeTabIndex(name)
+        EducateMainPage.ChangeTabIndex(name)
+    end
+
+    function IsShowCreateWorld()
+        return EducateMainPage.isShowCreateWorld
+    end
+
+    function OpenWebUrl()
+        EducateMainPage.OpenWebUrl()
+    end
+
+    function OnClickGo()
+        local opus_content = Page:GetValue('project_text', '')
+
+        local pid = get_project_id(opus_content)
+
+        if pid then
+            GameLogic.RunCommand("/loadworld " .. pid)
+
+            if pid and tonumber(pid) == "number" then
+                GameLogic.GetFilters():apply_filters('user_behavior', 1, 'click.main_worldID_open', {useNoId = true})
+            end
+        else
+            GameLogic.GetFilters():apply_filters('cellar.common.common_load_world.go_to_url', opus_content)
+        end
+    end
+
+    function GetIframe()
+        if EducateMainPage.tab_view_index == 1 then
+            return "script/apps/Aries/Creator/Game/Educate/Project/EducateProject.html"
+        elseif EducateMainPage.tab_view_index == 2 then
+            return "script/apps/Aries/Creator/Game/Educate/NoviceCourse/NoviceCoursePage.html"
+        end
+        return "script/apps/Aries/Creator/Game/Educate/Project/EducateProject.html"
+    end
+
+    function get_project_id(opus_content)
+        if (tonumber(opus_content or '') or 9999999) < 9999999 then
+            return opus_content
+        end
+
+        local pid = string.match(opus_content or '', "^p(%d+)$")
+
+        if not pid then
+            pid = string.match(opus_content or '', "/pbl/project/(%d+)")
+        end
+
+        return pid or false
+    end
+
+    function OnKeyUp()
+        if(virtual_key == Event_Mapping.EM_KEY_RETURN or virtual_key == Event_Mapping.EM_KEY_NUMPADENTER) then
+            OnClickGo()
+        end
+    end
+
+    function OnClickCourse()
+        EducateMainPage.OnClickLesson()
+    end
+
+    function GetUserPortrait()
+        local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+        local profile = KeepWorkItemManager.GetProfile()
+        if profile and profile.portrait then
+            return profile.portrait
+        end
+        return "Texture/Aries/Creator/paracraft/Educate/default_icon_114X114_32bits.png#0 0 114 114"
+    end
+
+    function GetUserName()
+        return EducateMainPage.GetUserName()
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#E3EEFD; ">
+    <!--Close-->
+    <pe:container alignment="_ctl" zorder="2" style="width: 100px;height: 720px; background:;">
+        <div style="width: 123px; height: 720px; background: url(Texture/Aries/Creator/paracraft/Educate/cebianlan_123x720_32bits.png#0 0 123 720);">
+            <div style="margin-top: 32px; width: 100xp; height: 40px;">
+                <div style="width: 50px; height: 50px; margin-left: 28px; ">
+                    <div style="position: relative; width: 48px; height: 48px; background: url(Texture/Aries/Creator/paracraft/Educate/touxiangdi_48x48_32bits.png#0 0 48 48);"></div>
+                    <img name="img_protrait" src="<%=GetUserPortrait()%>" style="position: relative; margin: 2px; width: 44px; height: 44px;"/>
+                </div>
+            </div>
+            
+            <label name="txt_user" value="<%=GetUserName()%>" style="color: #ffffff; font-size: 12px; font-weight: bold; margin-top: 14px; width: 100px; height: 20px; text-align: center;"></label>
+
+            <div style="width: 100px; height: 380px; margin-top: 30px;">
+                <pe:repeat DataSource="<%=EducateMainPage.tab_buttons%>">
+                    <pe:repeatitem>
+                        <div name="<%=Eval('index')%>" onclick="ChangeTabIndex" style="width: 100px; height: 50px; margin-top: 10px; ">
+                            <pe:if condition="<%=Eval('index') == EducateMainPage.tab_view_index%>">
+                                <input type="button" value="<%=Eval('value')%>" name="<%=Eval('index')%>" onclick="ChangeTabIndex" style="color: #82b0ff; margin-left:10px; width: 80px; height: 30px; background: url(Texture/Aries/Creator/paracraft/Educate/celanxuanzhong_30x30_32bits.png#0 0 30 30:14 14 14 14);"/> 
+                            </pe:if>
+                            <pe:if condition="<%=Eval('index') ~= EducateMainPage.tab_view_index%>">
+                                <input type="button" value="<%=Eval('value')%>" name="<%=Eval('index')%>" onclick="ChangeTabIndex" style="color: #ffffff;margin-left:10px;width: 80px; height: 30px; background: url();"/> 
+                            </pe:if>
+                        </div>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+            <div style="width: 100px; height: 60px;">
+                <input type="button" name="btn_web" onclick="OpenWebUrl" style=" margin-left:30px; width: 40px; height: 40px; background: url(Texture/Aries/Creator/paracraft/Educate/Login/wangzhan_40x40_32bits.png#0 0 40 40);"/> 
+                <div for="btn_web" style="text-align: center; color: #ffffff; font-size: 10px;"><%=L"打开网站"%></div>
+            </div>
+
+            <div style="width: 100px; height: 60px; margin-top: 40px;">
+                <input type="button" onclick="ClosePage" style="width: 40px; height: 40px; margin-left: 30px; background: url(Texture/Aries/Creator/paracraft/Educate/guanbi_40x40_32bits.png#0 0 40 40);" />
+            </div>
+
+        </div>
+    </pe:container>
+    <!-- Texture/Aries/Creator/paracraft/Educate/beijingdi_50x50_32bits.png#0 0 50 50:24 24 24 24 -->
+    <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">   
+        <div style="position: relative; height:35px;margin-top:34px;" >
+            <pe:container uiname="search_input_bg" style="margin-top: 0px; margin-left: 820px; width: 300px;height:35px;background:url(Texture/Aries/Creator/paracraft/Educate/Project/shuru_64x35_32bits.png#0 0 64 35:30 16 30 16);">
+                <input type="text" EmptyText='<%=L"输入世界ID或服务器地址"%>' onkeyup="OnKeyUp" SkipAutoBadWordFilter="true" name="project_text" CaretColor="#FF000000" textcolor="#000000"
+                    style="position: relative; font-size:14px; base-font-size:14px; margin-left:10px;margin-top: 4px; width: 290px; height:30px; background: url();" />
+                <input type="button" onclick="OnClickGo" style="margin-left: 249px; margin-top: -32px; width: 48px; height: 28px; background: url(Texture/Aries/Creator/paracraft/Educate/jinru_47x27_32bits.png#0 0 48 28);  " />
+            </pe:container>
+            <pe:container uiname="lesson_button_bg" visible="true" style="width: 60px; height: 60px; margin-left: 1160px; margin-top: -50px; background: url();">
+                <input type="button" name="course" onclick="OnClickCourse" style="width: 45px; height: 45px; background: url(Texture/Aries/Creator/paracraft/Educate/Project/dangqianketang_40x40_32bits.png#0 0 40 40);"/>
+                <div for="course" style="margin-top: 2px; font-size: 10px;"><%=L"当前课堂"%></div>
+            </pe:container>
+        </div>    
+        <!-- RIGHT -->
+        <div style="position: relative; margin-left:124px;margin-top:90px;width:1132px;height:600px;background:url(Texture/Aries/Creator/paracraft/Educate/beijingdi_50x50_32bits.png#0 0 50 50 :24 24 24 24);">
+            <div style="position: relative; width: 320px; height: 112px; background: url(Texture/Aries/Creator/paracraft/Educate/biaotidiban_320x112_32bits.png#0 0 320 112);"></div>
+            
+        </div>
+        <!-- <div style="position:relative;margin-top:45px;width:240px;height:450px;">
+            <iframe name="building_wnd" src='<%=CreatorDesktop.GetTab().url or "" %>'></iframe>
+        </div> -->
+        <pe:if condition ="<%=IsShowCreateWorld()%>">
+            <div style="position: relative; margin-left: 124px;margin-top:90px;">
+                <iframe name="educate_main_frame" src="script/apps/Aries/Creator/Game/Educate/CreateWorld/CreateNewWorld.html"></iframe>
+            </div>
+        </pe:if>
+        <pe:if condition ="<%=not IsShowCreateWorld()%>">
+            <div style="position: relative; margin-left: 124px;margin-top:90px;">
+                <iframe name="educate_main_frame" src="<%=GetIframe()%>"></iframe>
+            </div>
+        </pe:if>
+    </pe:container>
+
+</pe:container>
+</pe:mcml>
+</body>
+</html>

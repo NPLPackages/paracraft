@@ -348,3 +348,20 @@ function FriendManager.ChatWithFriend(chat_uid)
 	end)
 
 end
+
+function FriendManager.CloseAllFriendPage()
+  local FriendsProjectPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsProjectPage.lua");
+  FriendsProjectPage.CloseView();
+
+  local AddFriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/AddFriendsPage.lua");
+  AddFriendsPage.CloseView();
+
+  local FriendsApplyPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsApplyPage.lua");
+  FriendsApplyPage.CloseView();
+
+  local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
+  FriendsPage.CloseView();
+
+  local FriendChatPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendChatPage.lua");
+  FriendChatPage.CloseView();
+end

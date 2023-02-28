@@ -19,5 +19,5 @@ local SaveFileDialog = commonlib.inherit(OpenFileDialog, commonlib.gettable("MyC
 -- @param default_text: default text to be displayed. 
 -- @param filters: "model", "bmax", "audio", "texture", nil for any file, or filters table
 function SaveFileDialog.ShowPage(text, OnClose, default_text, title, filters)
-	return OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, true);
+	return OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, true, nil, true);
 end

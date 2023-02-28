@@ -200,7 +200,7 @@ function NplBrowserLoaderPage.Check(callback)
 	    LOG.std(nil, "info", "NplBrowserLoaderPage.OnCheck", "npl browser isn't supported on %s",System.os.GetPlatform());
         return
     end
-    if (System.os.GetPlatform() == "mac" or System.os.GetPlatform() == 'ios')then
+    if (System.os.GetPlatform() == "mac" or System.os.GetPlatform() == 'ios' or System.os.GetPlatform() == "android")then
         NplBrowserLoaderPage.loaded = true;
         if (type(callback) == "function") then
             callback(true);
@@ -301,10 +301,12 @@ function NplBrowserLoaderPage.SetChecked(v)
     NplBrowserLoaderPage.Close();
     NplBrowserLoaderPage.is_opened = false;
     NplBrowserLoaderPage.asset_manager = nil;
+
+    GameLogic.GetFilters():apply_filters('nplbrowser_checked', v)
 end
 function NplBrowserLoaderPage.IsLoaded()
     if (System.os.GetPlatform() == 'mac' or
-        -- System.os.GetPlatform() == 'android' or
+        System.os.GetPlatform() == 'android' or
         System.os.GetPlatform() == 'ios' ) then
         return true;
     end

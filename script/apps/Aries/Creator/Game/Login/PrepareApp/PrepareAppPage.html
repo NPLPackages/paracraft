@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <title>2014.1.14</title>
+    </head>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl" refresh="false">
+                <![CDATA[
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/Login/PrepareApp/PrepareApp.lua");
+                    local PrepareApp = commonlib.gettable("MyCompany.Aries.Game.PrepareApp");
+                    PrepareApp.OnInit()
+
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
+                    local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
+                    if System.options.channelId_431 then
+                        ClientVersion = L"帕拉卡智慧教育";
+                    else
+                        ClientVersion = string.format(L"Paracraft帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
+                    end
+
+                    function get_background()
+                        local filter_bg = GameLogic.GetFilters():apply_filters(
+                                            "cellar.main_login.get_login_background",
+                                            false
+                                          );
+
+                        if (filter_bg) then
+                            return filter_bg;
+                        else
+                            return "Texture/Aries/Creator/Paracraft/login_bg_32bits.png#0 0 1280 720";
+                        end
+                    end
+                ]]>
+            </script>
+            <!-- <pe:container alignment="_fi" zorder="-1" width="100%" height="100%" style="<%= format('position: relative;background:url(%s)', get_background()) %>">
+            </pe:container> -->
+            <pe:container style="background-color: #FFF4D4;" alignment="_fi" zorder="-1" width="100%" height="100%" >
+            </pe:container>
+
+            <pe:container alignment="_ct" style="position: relative; background:url();margin-left: -255px;margin-top: 0px;" width="511">
+                <div align="center" style="margin-top:-198px; background: url(Texture/zhuangshi_281x191_32bits.png#0 0 281 191);" width="281" height="191"></div>
+                <div style="background:url(Texture/progress_bg_511x50_32bits.png#0 0 511 50);" width="511" height="50" >
+                    <pe:container style="position:relative;margin-top: 7px;margin-left: 6px;background:url()" width="500" height="36">
+                        <img uiname="progress_fg" src="Texture/progress_fg_500x36_32bits.png#0 0 0 36;" width="0" height="36"/>
+                    </pe:container>
+                    <label name="text_bar_tip" value='<%= L"Loading..." %>' style="margin-left: 18px;margin-top: -2px; font-size: 18; text-align:left;text-valign:center;height: 50px;"/>
+                </div>
+                <div width="500" height="50">
+                    <label name="text_state_tip"  value='<%=L"正在努力加载..."%>' style="margin-left: 18px;margin-top: 0px; height: 30px;font-size: 18;base-font-size:18; text-align:left;color:#333333;font-weight: bold;"/>
+                </div>
+                
+                
+            </pe:container>
+
+            <pe:container alignment="_mb" width="0" height="85px" style="position: relative; background:url()">
+                <pe:container align="left" style="position: relative; color: #8f815f; font-size: 12px; font-weight: bold; margin-left: 20px; background:url()">
+
+                <pe:if condition="<%= not System.options.channelId_431 %>">
+                        <div style="margin-top:35px;text-shadow:true"><%= Eval("ClientVersion") %></div>
+                        <div style="margin-top:0px;text-shadow:true"><%= L"(c)Tatfook. powered by NPL and ParaEngine"%></div>
+                    </pe:if>
+                </pe:container>
+            </pe:container>
+        </pe:mcml>
+    </body>
+</html>
+

@@ -73,7 +73,19 @@ end
 
 function GetCurWorldName()
     local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-    return WorldCommon.GetWorldTag("name");
+    local text = WorldCommon.GetWorldTag("name") or ""
+    local width = 0
+    local name = ""
+    if text~= nil and text ~= "" then
+        for uchar in string.gmatch(text, '([%z\1-\127\194-\244][\128-\191]*)') do
+            local w = _guihelper.GetTextWidth(uchar, "System;14");
+            width = width + tonumber(w)
+            if width < 350 then
+                name = name.. uchar
+            end
+        end
+    end
+    return name
 end
 
 function GetVersion()
@@ -153,6 +165,16 @@ function OnReturnLastWorld()
     ClosePage();
     WorldStacks:ReturnLastWorld();
 end
+
+function IsHomeWorkWorld()
+    if GameLogic.IsReadOnly() then
+        return false
+    end
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
+    return isHomeWorkWorld
+end
 ]]></script>
 <div style="height:64px;width:370px;">
     <pe:if condition='<%=WorldStacks:GetReturnWorld() ~= nil%>'>
@@ -162,23 +184,33 @@ end
 <aries:window mode="thin" style="width:370px;" title='<%=L"系统设置"%>' onclose="ClosePage">
 <div style="padding-bottom:10px;">
     
-    <div style="margin-top:10px;">
-        <input type="button" tooltip='<%=L"点击备份并查看历史版本"%>' value='<%=format(L"版本:%d", GameLogic.options:GetRevision())%>' style="margin-left:31px;font-size:14px;height:26px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickRevision"/>
-        <input type="button" value='<%=L"历史"%>' tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickViewHistory" />
-        <div style="float:left;margin-left: 6px; color: #ffffff;"  tooltip='<%=L"点击打开所在目录"%>' onclick="OnOpenWorldDir">
-            <%=format("%s", GetCurWorldName() or "") %>
-            <input type="button" value='...' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_button_blue"/>
-        </div>
+    <div style="margin-top:10px;margin-right:30px;">
+        <pe:if condition="<%= not System.options.channelId_431 %>">
+            <input type="button" tooltip='<%=L"点击备份并查看历史版本"%>' value='<%=format(L"版本:%d", GameLogic.options:GetRevision())%>' style="margin-left:31px;font-size:14px;height:26px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickRevision"/>
+            <input type="button" value='<%=L"历史"%>' tooltip='<%=L"点击查看历史版本目录, 解压可恢复到最近几天的版本"%>' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_blue_button_with_fillet" onclick="OnClickViewHistory" />
+            <div style="float:left;margin-left: 12px; color: #ffffff;"  tooltip='<%=L"点击打开所在目录"%>' onclick="OnOpenWorldDir">
+                <%=format("%s", GetCurWorldName() or "") %>
+                <input type="button" value='...' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_button_blue"/>
+            </div>
+        </pe:if>
+        <pe:if condition="<%= System.options.channelId_431 %>">
+            <div style="text-align:left;float:left;margin-left: 30px; color: #ffffff;"  tooltip='<%=L"点击打开所在目录"%>' onclick="OnOpenWorldDir">
+                <%=format("%s", GetCurWorldName() or "") %>
+                <input type="button" value='...' style="margin-left:4px;font-size:14px;height:26px;color:#ffffff;" class="mc_button_blue"/>
+            </div>
+        </pe:if>
     </div>
     <div style="margin-left:31px;">
         <div style="margin-top:13px;">
-            <input type="button" value='<%=L"分享世界"%>' uiname="EscFramePage.shareWorld" name="shareWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <input type="button" value='<%=L"上传世界"%>' uiname="EscFramePage.shareWorld" name="shareWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
             <input type="button" value='<%=GameLogic.IsReadOnly() and L"另存为..." or L"保存世界"%>' tooltip="Ctrl+S" name="saveWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
-        <div style="margin-top:8px;">
-            <input type="button" value='<%=L"新建世界"%>' name="createNewWorld" uiname="EscFramePage.createNewWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-            <input type="button" value='<%=L"加载世界"%>' tooltip="Ctrl+O" uiname="EscFramePage.loadWorld" name= "loadWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
-        </div>
+        <pe:if condition = "<%=not IsHomeWorkWorld()%>">
+            <div style="margin-top:8px;">
+                <input type="button" value='<%=L"新建世界"%>' name="createNewWorld" uiname="EscFramePage.createNewWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                <input type="button" value='<%=L"加载世界"%>' tooltip="Ctrl+O" uiname="EscFramePage.loadWorld" name= "loadWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            </div>
+        </pe:if>
         <pe:if condition='<%=not System.options.mc %>'>
         <div style="margin-top:8px;">
             <input type="button" value='<%=L"邀请好友"%>' name="friends" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
@@ -189,13 +221,18 @@ end
             <input type="button" value='<%=L"系统设置"%>' name= "systemSetting" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
         <div style="margin-top:8px;">
-            <pe:if condition='<%=System.options.mc %>'>
-                <input type="button" value='<%=GetServerButtonValue() %>' name= "openServerPage" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <pe:if condition='<%= System.options.channelId_431 %>'>
+                <input type="button" value='<%=L"退出世界"%>' uiname="EscFramePage.exitWorld" name= "exitWorld" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
             </pe:if>
-            <pe:if condition='<%=not System.options.mc %>'>
-                <input type="button" value='<%=L"继续创作"%>' name= "continueGame" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+            <pe:if condition='<%=not System.options.channelId_431 %>'>
+                <pe:if condition='<%=System.options.mc %>'>
+                    <input type="button" value='<%=GetServerButtonValue() %>' name= "openServerPage" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                </pe:if>
+                <pe:if condition='<%=not System.options.mc %>'>
+                    <input type="button" value='<%=L"继续创作"%>' name= "continueGame" style="width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                </pe:if>
+                <input type="button" value='<%=L"退出世界"%>' uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
             </pe:if>
-            <input type="button" value='<%=L"退出世界"%>' uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:41px;width:130px;height:31px;color:#ffffff;" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
         </div>
     </div>
     <div style="margin-left:41px;margin-top:8px;">

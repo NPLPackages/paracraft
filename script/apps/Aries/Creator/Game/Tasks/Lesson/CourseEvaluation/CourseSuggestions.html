@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local CourseSuggestions = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/CourseEvaluation/CourseSuggestions.lua");
+    CourseSuggestions.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function OnSubmit()
+        CourseSuggestions.OnSubmit()
+    end
+]]></script>
+<kp:window  title='<%=L"提交课程建议或意见"%>' width="570" height="390"  uiname_onclose="CourseEvaluation.OnClose" onclose="ClosePage">
+    <div style="width: 518px; height: 227px;  margin-top: 55px;  margin-left: 25px; background: url(Texture/Aries/Creator/keepwork/macro/shurukuang_28x28_32bits.png#0 0 28 28:12 12 12 12);">
+        <input name="suggest" rows="12" height="227" WordWrap="true" width="510" UseSystemControl="false" enable_ime="false" EmptyText='<%=L"请输入您的意见和建议..."%>' CaretColor="#000000" style="margin-top: 2px; textcolor:#000000;font-family:Consolas;" lineheight="20" fontsize="14"/>
+    </div>
+    <div style="font-size: 14px; base-font-size:14px; color: #131313;  margin-top: 6px; margin-left: 25px;" ><%=L"另外也欢迎同学们给我们的课程提出宝贵的意见或建议:"%></div>
+    <input type="button" align="center" value="提交" style="margin-top: 16px; width:128px;height:46px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnSubmit"/>
+</kp:window>
+</pe:mcml> 
+</body>
+</html>

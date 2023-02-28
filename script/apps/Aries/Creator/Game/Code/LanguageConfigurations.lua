@@ -22,6 +22,8 @@ function LanguageConfigurations:LoadConfigByFilename(filename)
 	local langConfig;
 	if(filename == "" or filename == "npl") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/ParacraftCodeBlockly.lua");
+	elseif(filename == "npl_junior") then
+		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlocklyDef/CodeBlocklyJunior.lua");
 	elseif(filename == "npl_cad") then
 		langConfig = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCad/NplCad.lua");
 	elseif(filename == "mcml" or filename == "html") then
@@ -63,6 +65,7 @@ end
 function LanguageConfigurations:IsBuildinFilename(filename)
 	return filename == "" 
 	or filename=="npl" 
+	or filename=="npl_junior" 
 	or filename=="npl_cad" 
 	or filename=="npl_micro_robot"  
 	or filename=="npl_blockpen" 

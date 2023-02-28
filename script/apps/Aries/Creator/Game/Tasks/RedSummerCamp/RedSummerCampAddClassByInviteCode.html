@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local page = document:GetPageCtrl();
+    function ClosePage()
+        page:CloseWindow(true)
+    end
+
+    function ClickCommit(name)
+        
+        RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseSchedulingV2.lua");
+
+        local code = Page:GetValue("invite_code_input")
+        if(code)then
+            code = string.gsub(code, "%s+", "")
+        end
+        if code=="" then
+            GameLogic.AddBBS(nil,L"邀请码不可为空")
+            return
+        end
+
+        RedSummerCampCourseScheduling.OnCommitAddClass(page,code,function()
+            local ClassSchedule_new = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/ClassSchedule/ClassSchedule_new.lua") 
+            ClassSchedule_new.OnAddedClass()
+        end)
+    end
+
+    function onKeyUp(name, mcmlNode, obj)
+        local code = Page:GetValue("invite_code_input")
+        if(code)then
+            local found = string.match(code, "[\r\n]+");
+            if(found)then
+                code = string.gsub(code, "[\r\n]+", "")
+                Page:SetUIValue("invite_code_input", code)
+                if(obj and obj.SetCaretPosition)then
+                    obj:SetCaretPosition(-1);
+                end
+            end
+        end
+    end
+]]></script>
+<style type="text/mcss">
+    {
+        item_image = {
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24",
+            width = 116,
+            height = 116,
+            float = "left",
+            ["margin-left"] = 10,
+        },
+    }
+</style>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000088"  > 
+    <div zorder="-3" align="center" valign="center" style=" width: 500px; height: 200px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
+        <div style="width: 488x; height: 30px;">
+            <div style="position: relative; width: 128px; height: 64px; margin-top: -24px;margin-left: 2px; background: url(Texture/Aries/Creator/keepwork/Window/title/biaoti_xuexiao_32bits.png);"></div>
+            <div style="position: relative;margin-left: 118px;margin-top: 12px;font-size: 14px;base-font-size: 14px;color: #ffffff;"><%=L"加入班级"%></div>
+            <input type="button" style="margin-left: 460px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        </div>
+        <div style="margin-top: 40px; margin-left: 77px;width: 342px;height:32px;background:url(Texture/Aries/Creator/keepwork/vip/shuzishuru_32X32_32bits.png#0 0 32 32:14 14 14 14);">
+            <input type="text" EmptyText='<%=L"请输入从老师处获取的邀请码"%>' onkeyup="onKeyUp" SkipAutoBadWordFilter="true" name="invite_code_input" uiname="invite_code_input" CaretColor="#000000ff" style="font-size:12px;margin-left:5px;margin-top: 3px; textcolor:#000000;height:28px;background:url();" />
+        </div>
+
+        <input type="button" name="OK" value='<%= (L"提交") %>' style="margin-left:81px;margin-top:28px;width:132px;height:44px;font-size:15px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="ClickCommit()"/>
+        <input type="button" name="Cancel" value='<%= (L"取消") %>' style="margin-left:72px;margin-top:28px;width:132px;height:44px;font-size:15px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);"  onclick="ClosePage()"/>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

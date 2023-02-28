@@ -63,6 +63,7 @@ function GetTextPosDS()
     return {
         {value="center", text=L"屏幕中间"},
         {value="bottom", text=L"屏幕下方", selected=true},
+        {value="headon", text=L"演员头顶"},
     };
 end
 function GetBGAnimDS()
@@ -114,9 +115,13 @@ function OnClearText()
     Page:SetValue("text", "");
 end
 
+function GetActorNames()
+    return EditMovieTextPage.GetActorNames();
+end
+
 ]]></script>
 <aries:window mode="thin" style="width:640px;" title='<%=EditMovieTextPage.GetTitle()%>' uiname_onclose="EditMovieTextPage.OnClose" onclose="EditMovieTextPage.OnClose">
-<div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
+<div style="margin: 10px; margin-bottom: 17px; color: #ffffff;">
     <div style="margin-top: 5px;">
         <div style="float:left;">
             <%=L"字号:"%>
@@ -154,7 +159,7 @@ end
             <%=L"背景动画:"%>
             <select uiname="EditMovieTextPage.bganim" name="bganim" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetBGAnimDS()%>'>
             </select>
-        </div>
+        </div>  
     </div>
     <div style="margin-top: 10px; ">
         <div style="float:left;" tooltip='<%=L"%name% 为角色名字"%>'><%=L"文字:"%></div>
@@ -162,18 +167,36 @@ end
             <input type="text" onchange="EditMovieTextPage.OnTextChange" autofocus="true" uiname="EditMovieTextPage.text" name="text" EmptyText='<%=L"在这里输入字幕"%>' rows="3" UseSystemControl="true" CaretColor="#FFFFFFFF" style="background:;" />
         </div>
     </div>
-    <div style="margin-top:10px;">
-        <input type="button" uiname="EditMovieTextPage.Reset" name="Reset" style="margin-left:30px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>' />
-        <input type="button" uiname="EditMovieTextPage.ClearText" name="ClearText" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClearText" value='<%=L"清除文字"%>' />
-        <div style="float:left;margin-left:10px;">
+
+    <div style="margin-top: 10px;">
+
+        <div style="float:left;margin-left:30px;">
             <div style="margin-top: 2px; float: left; margin-left:0px;width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/Quest/VIP_20X20_32bits.png#0 0 20 20);"></div>
             <%=L"播音员:"%>
             <select uiname="EditMovieTextPage.voicenarrator" onclick="EditMovieTextPage.OnClickSelcetNarrator" name="voicenarrator" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetVoiceNarratorDS()%>'>
             </select>
         </div>
 
-        <input type="button" uiname="EditMovieTextPage.ListeningTest" name="ListeningTest" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnListeningTest" value='<%=L"试听"%>' />
-        <label name="SoundDesc" style="float:left;margin-left:12px;width: 80px;"/>
+        <input type="button" uiname="EditMovieTextPage.ListeningTest" name="ListeningTest" style="margin-left:10px;min-width:70px;margin-top: 3px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnListeningTest" value='<%=L"试听"%>' />
+        <label name="SoundDesc" style="float:left;margin-left:12px;width: 80px;margin-top: 3px;"/>
+        
+        <div style="float:left;margin-left:45px;">
+            <%=L"唇同步:"%>
+            <!-- <input type="text" uiname="EditMovieTextPage.voicebelongto" EmptyText='<%=L"角色名称"%>' name="voicebelongto" style="width: 126px; height:24px;"/> -->
+            
+            <select uiname="EditMovieTextPage.voicebelongto" name="voicebelongto" AllowUserEdit="true" style="height:24px;width:70px" DataSource="<%=GetActorNames()%>"></select>
+        </div>        
+        <div style="float:left;margin-left:5px;margin-top: 2px;">
+            <input type="checkbox" tooltip='<%=L"文字配音在角色所在的三维坐标的位置播放"%>' uiname="EditMovieTextPage.use3dvoice" name="use3dvoice" style="margin-top:2px;" />
+            <div for="use3dvoice" tooltip='<%=L"文字配音在角色所在的三维坐标的位置播放"%>' uiname="CodeBlockSettings.use3dvoicefor" style="float:left;margin-left:2px;" >
+                <%=L"3D音效"%> 
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:10px;">
+        <input type="button" uiname="EditMovieTextPage.Reset" name="Reset" style="margin-left:30px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>' />
+        <input type="button" uiname="EditMovieTextPage.ClearText" name="ClearText" style="margin-left:10px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="OnClearText" value='<%=L"清除文字"%>' />
+
         <input type="button" uiname="EditMovieTextPage.OK" name="OK" DefaultButton="true" align="right" style="margin-right:20px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnOK" value='<%=L"确定"%>' />
     </div>
 </div>

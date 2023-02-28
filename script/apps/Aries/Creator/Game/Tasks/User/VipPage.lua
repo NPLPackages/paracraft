@@ -1,35 +1,39 @@
 --[[
 Title: VipPage
-Author(s): leio
-Date: 2021/7/9
+Author(s): leio, big
+CreateDate: 2021.7.9
+ModifyDate: 2022.8.11
 Desc:  
 Use Lib:
 -------------------------------------------------------
 local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
 VipPage.ShowPage();
 --]]
+
 local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+local ServerConfigManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/ServerConfigManager.lua");
+
 NPL.load("(gl)script/ide/System/Encoding/base64.lua");
 NPL.load("(gl)script/ide/timer.lua");
-local Encoding = commonlib.gettable("System.Encoding");
 NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
-local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
-NPL.load("(gl)script/ide/DateTime.lua");
-local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 NPL.load("(gl)script/ide/DateTime.lua");
 
-local VipPage = NPL.export()
-local page
+local Encoding = commonlib.gettable("System.Encoding");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+
+local VipPage = NPL.export();
+local page;
 
 VipPage.products_types = {
 	twelve_month_vip = "twelve_month_vip", 
 	six_month_vip = "six_month_vip"
 };
+
 VipPage.pay_types = {
 	weixin = "weixin", 
 	zhifubao = "zhifubao"
 };
-
 
 VipPage.products = {};
 VipPage.loaded_products = false;
@@ -41,43 +45,68 @@ VipPage.order_state_map = {};
 VipPage.timer = nil;
 VipPage.desc = nil; -- vip功能描述
 VipPage.default_cache_policy = "access plus 1 month";
-VipPage.showRealNameGift = false
+VipPage.showRealNameGift = false;
+
 function VipPage.OnInit()
     page = document:GetPageCtrl();
 	page.OnCreate = VipPage.OnCreate
 end
+
 function VipPage.GetPageCtrl()
     return page;
 end
+
 function VipPage.RefreshPage()
 	if(page)then
 		page:Refresh(0);
 	end
 end
+
 function VipPage.ClosePage()
 	if(page)then
 		page:CloseWindow(true)
 	end
 end
+
 function VipPage.VipIsValidCallback()
 	VipPage.ClosePage();
 end
 
 function VipPage.ShowPage(key, desc)
+	if (System.options.isHideVip) then
+		return;
+	end
 
-	VipPage.selected_order = nil;
-	VipPage.order_state_map = {};
-	VipPage.orders = {};
-	GameLogic.GetFilters():remove_filter("became_vip", VipPage.VipIsValidCallback);
-	GameLogic.GetFilters():add_filter("became_vip", VipPage.VipIsValidCallback);
-	VipPage.LoadPruducts(function(v)
-		if(v)then
-			VipPage.ShowPage__(key, desc);
-			VipPage.OnSelected();
-			--VipPage.StartTimer();
-		end
-	end)
+	local VipFullPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipFullPage.lua");
+	if VipFullPage then
+		VipFullPage.ShowPage(key, desc);
+		return
+	end
+	
+
+	-- 云南的话走其他界面
+	local yunnanVipPageConfig = ServerConfigManager.GetConfigByName("yunnanVipPage")
+	local user_region = KeepWorkItemManager.GetUserRegion() or {}
+
+	if yunnanVipPageConfig and yunnanVipPageConfig.config and yunnanVipPageConfig.config.regionId == user_region.stateId then
+		local SpecialAreaVipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/SpecialAreaVipPage.lua");
+		SpecialAreaVipPage.ShowPage();
+	else
+		VipPage.selected_order = nil;
+		VipPage.order_state_map = {};
+		VipPage.orders = {};
+		GameLogic.GetFilters():remove_filter("became_vip", VipPage.VipIsValidCallback);
+		GameLogic.GetFilters():add_filter("became_vip", VipPage.VipIsValidCallback);
+		VipPage.LoadPruducts(function(v)
+			if(v)then
+				VipPage.ShowPage__(key, desc);
+				VipPage.OnSelected();
+				--VipPage.StartTimer();
+			end
+		end)
+	end
 end
+
 function VipPage.ShowPage__(key, desc)
 	VipPage.key = key; 
 	VipPage.desc = desc; -- vip功能描述
@@ -92,6 +121,7 @@ function VipPage.ShowPage__(key, desc)
 			enable_esc_key = true,
 			zorder = 10,
 			directPosition = true,
+			isTopLevel = true,
 				align = "_ct",
 				x = -690/2,
 				y = -530/2 + 15,
@@ -99,26 +129,6 @@ function VipPage.ShowPage__(key, desc)
 				height = 530,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-	-- 更新奖励显示
-	-- local is_verified = GameLogic.GetFilters():apply_filters('store_get', 'user/isVerified');
-	-- if not is_verified then
-	-- 	local SessionsData = NPL.load('(gl)Mod/WorldShare/database/SessionsData.lua')
-	-- 	local machineCode = SessionsData:GetDeviceUUID()
-	-- 	keepwork.user.macAddresses({
-	-- 		router_params = {
-	-- 			id = machineCode,
-	-- 		}
-	-- 	},function(err, msg, data)
-	-- 		VipPage.has_vip_reward = true
-	-- 		if err == 200 then
-	-- 			if data and data.realnameUserId and data.realnameUserId ~= 0 then
-	-- 				VipPage.has_vip_reward = false
-	-- 			end
-	-- 		end
-	-- 		VipPage.RefreshPage();
-	-- 	end)
-	-- end
 end
 
 -- 加载产品列表，获取价格
@@ -129,28 +139,7 @@ function VipPage.LoadPruducts(callback)
 		end
 		return
 	end
-	--[[
-	return {
-  products={
-    {
-      code="six_month_vip",
-      description="",
-      id=5,
-      name="",
-      picUrl="",
-      price=49800 
-    },
-    {
-      code="twelve_month_vip",
-      description="",
-      id=6,
-      name="",
-      picUrl="",
-      price=88000 
-    } 
-  } 
-}
-	--]]
+
 	local cache_key = VipPage.CreateKeyByParams("VipPage.LoadPruducts.v1")
 	local cache_item = HttpWrapper.GetCacheByKey(cache_key, VipPage.default_cache_policy);
 	if(cache_item)then
@@ -178,6 +167,7 @@ function VipPage.LoadPruducts(callback)
 		end
     end)
 end
+
 -- get product info
 -- @param product_type: "six_month_vip" or "twelve_month_vip"
 function VipPage.GetProduct(product_type)
@@ -190,6 +180,7 @@ function VipPage.GetProduct(product_type)
 		end
 	end
 end
+
 --@param:productCode: "six_month_vip" or "twelve_month_vip"
 --@param:channel: "wx_pub_qr" or "alipay_qr"
 function VipPage.OnCreateOrGetOrder(productCode, channel, callback)
@@ -285,6 +276,7 @@ function VipPage.OnSelectedPay(type)
     end)
 
 end
+
  -- "six_month_vip" or "twelve_month_vip"
 function VipPage.OnSelected(type)
     type = type or VipPage.products_types.twelve_month_vip
@@ -296,7 +288,6 @@ function VipPage.OnSelected(type)
         VipPage.selected_order = order;
         VipPage.RefreshPage();
     end)
-
 end
 
 function VipPage.Update()
@@ -324,8 +315,8 @@ function VipPage.Update()
 	else
 		VipPage.ClearTimer();
 	end
-
 end
+
 function VipPage.OnCheckOrderState()
 	if(not VipPage.selected_order)then
 		return
@@ -342,6 +333,7 @@ function VipPage.OnCheckOrderState()
 		VipPage.order_state_map[id] = data.state;
     end)
 end
+
 function VipPage.StartTimer()
 	if(not VipPage.timer)then
 		VipPage.timer = commonlib.Timer:new({callbackFunc = function(timer)
@@ -350,18 +342,21 @@ function VipPage.StartTimer()
 	end
 	VipPage.timer:Change(0, 3000);
 end
+
 function VipPage.ClearTimer()
 	if(VipPage.timer)then
 		VipPage.timer:Change();
 		VipPage.timer = nil;
 	end
 end
+
 function VipPage.ClearOrderCacheKeys()
 	local values = VipPage.GetOrderCacheKeysForUSer() or {};
 	for k,v in pairs(values) do
 		HttpWrapper.DeleteCacheByKey(k);
 	end
 end
+
 -- 和用户订单关联的cache key
 function VipPage.GetOrderCacheKeysForUSer()
 	local profile = KeepWorkItemManager.GetProfile()
@@ -369,6 +364,7 @@ function VipPage.GetOrderCacheKeysForUSer()
 	local item_key = string.format("VipPage_Order_CacheKeys_%s",tostring(userId));
 	return GameLogic.GetPlayerController():LoadLocalData(item_key, {}, true);
 end
+
 function VipPage.SaveOrderCacheKeyForUser(key)
 	if(not key)then
 		return
@@ -407,12 +403,6 @@ function VipPage.GetVipStateDesc()
 		s = string.format("你的会员在%s后到期，续费后将自动延期", date_desc)
 	end
     return s;
-
---    if profile.vip ~= 1 then
---        return string.format("会员状态：%s", state)
---    end
---
---    return string.format("会员状态：%s &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;有效日期：%s", state, date_desc)
 end
 
 function VipPage.CreateKeyByParams(url, url_queries)
@@ -441,8 +431,8 @@ function VipPage.CreateOrGetQRImgFile(productCode, from, QR)
 		file:close();
     end
     return filepath;
-
 end
+
 function VipPage.GetQRInputUrl(productCode, from)
     local userId = GameLogic.GetFilters():apply_filters('get_user_id') 
 	productCode = productCode or ""
@@ -482,6 +472,7 @@ function VipPage.GetQuickResponseCode(productCode, callback)
         end
     end)
 end
+
 function VipPage.IsDevMode()
     if(System and System.options)then
         return System.options.isDevEnv;
@@ -500,7 +491,6 @@ function VipPage.GetDesc2()
 
 	return notOrganizationVipDesc;
 end
-
 
 function VipPage.OnCreate()
 	VipPage.SetActive("mouse_enter_tip",false)

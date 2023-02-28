@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local ModelDescription = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/ModelDescription.lua");
+    ModelDescription.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+]]></script>
+<kp:window width="448" height="356"  onclose="ClosePage">
+    <div style="position: relative; margin-top: 49px; margin-left: 18px;">
+        <div style="width: 177px;height: 112px; background: url(Texture/Aries/Creator/keepwork/Noticev2/1_177x112_32bits.png#0 0 177 112);"></div>
+        <div style="font-size: 12px; base-font-size: 12px; color: #333333; margin-left: 180px; margin-top: -100px;">①在创建的世界内可通过建造-工具-活动模型，来创建新的活动模型</div>
+    </div>
+    <div style="position: relative; margin-top: 170px; margin-left: 18px;">
+        <div style="width: 177px;height: 69px; background: url(Texture/Aries/Creator/keepwork/Noticev2/2_177x69_32bits.png#0 0 177 69);"></div>
+        <div style="font-size: 12px; base-font-size: 12px; color: #333333; margin-left: 180px; margin-top: -70px;">②可以自己创建新的活动模型，也可以用素材库的模型来放置一个活动模型</div>
+    </div>
+
+    <div style="position: relative; margin-top: 244px; margin-left: 18px;">
+        <div style="width: 177px;height: 107px; background: url(Texture/Aries/Creator/keepwork/Noticev2/3_177x107_32bits.png#0 0 177 107);"></div>
+        <div style="font-size: 12px; base-font-size: 12px; color: #333333; margin-left: 180px; margin-top: -110px;">③确认要创作的活动模型以后，即可在世界中展示这个模型啦！区别于之前的活动模型</div>
+        <div style="font-size: 12px; base-font-size: 14px; color: #333333; font-weight: bold; margin-left: 180px; margin-top: -40px;">是可以直接拖动来控制位置的，非常方便</div>
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>

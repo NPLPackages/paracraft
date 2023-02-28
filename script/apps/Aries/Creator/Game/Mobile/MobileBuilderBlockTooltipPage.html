@@ -1,0 +1,43 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Mobile/MobileBuilderBlockTooltipPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="true" type="text/npl" src="MobileBuilderFramePage.lua"><![CDATA[
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemClient.lua");
+    local block_id = Page:GetRequestParam("block_id")
+    local tooltip = ""
+    local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+    local block_item = ItemClient.GetItem(tonumber(block_id));
+    if(block_item) then
+        tooltip = block_item:GetTooltip();
+    end
+    local tooltip2 = ""--L"Ctrl+右键帮助"
+    local tooltip_width = _guihelper.GetTextWidth(tooltip, "System;16") + 30;
+    local tooltip2_width = _guihelper.GetTextWidth(tooltip2, "System;16");
+    local width = math.max(tooltip_width,tooltip2_width)
+    local height = 35
+
+    function GetBgStyle()
+       return string.format([[width: %spx;height:%spx;]], width,height)
+    end
+
+    function GetTooltip()
+        return tooltip--.."<br/>"..tooltip2
+    end
+]]></script>
+<div class="mc_item" style = "<%=GetBgStyle()%>">
+    <div style="padding: 4px;">
+        <div style="color:#ffffff;text-align:center;float:left;line-height:24px;font-size:16px">
+            <%=GetTooltip()%>
+        </div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>
+

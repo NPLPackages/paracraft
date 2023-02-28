@@ -36,6 +36,7 @@ function RulePlayer:Init(rule_name, rule_value)
 		rule_value = value;
 	end
 	self.name = name;
+	GameLogic.GetFilters():apply_filters('OnPlayerRuleChange')
 	if(rule_name == "AutoWalkupBlock") then
 		self:SetAutoWalkupBlock(rule_value);
 		return self;
@@ -125,4 +126,5 @@ function RulePlayer:OnRemove()
 	elseif(rule_name == "PickingDist") then
 		GameLogic.options:SetPickingDist();
 	end
+	GameLogic.GetFilters():apply_filters('OnPlayerRuleChange')
 end

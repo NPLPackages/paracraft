@@ -349,6 +349,11 @@ end
 function Entity:FaceTarget(x,y,z)
 end
 
+-- return true if we can take control of this entity by external agent like movie or code block.
+function Entity:CanBeAgent()
+	return true;
+end
+
 -- @param actor: the parent ActorNPC
 function Entity:SetActor(actor)
 	self.m_actor = actor;
@@ -378,9 +383,10 @@ function Entity:SetPosition(x,y,z)
 				self.bx, self.by, self.bz = bx, by, bz;
 			end
 			self:valueChanged();
+			return true;
 		end
 	else
-		Entity._super.SetPosition(self, x,y,z);
+		return Entity._super.SetPosition(self, x,y,z);
 	end
 end
 

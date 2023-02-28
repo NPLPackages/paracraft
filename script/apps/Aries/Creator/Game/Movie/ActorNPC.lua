@@ -263,7 +263,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	end
 
 	if((isReuseActor or isAgent) and name and name~="") then
-		local entity, offsetFacing = self:FindAgentEntity(name, isReuseActor);
+		local entity, offsetFacing = self:FindAgentEntity(name, isReuseActor or isAgent);
 		
 		if(isAgent and isReuseActor==false and (not newName) and entity) then
 			-- tricky: we still need to reuse actor, even if isReuseActor == false under above conditions
@@ -316,7 +316,7 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, newName, movieclip
 	return self;
 end
 
--- @param name: "player" for main player or the name of a global entity object. 
+-- @param name: "player" for main player or the name of an entity object
 -- @param searchMode: nil or "searchNearPlayer"
 -- @return entity, offsetFacing: the second parameter is returned only if searchMode is "searchNearPlayer"
 function Actor:FindAgentEntity(name, searchMode)
@@ -326,23 +326,32 @@ function Actor:FindAgentEntity(name, searchMode)
 		entity = EntityManager.GetPlayer();
 	else
 		if(searchMode == "searchNearPlayer") then
+			local movieClip = self:GetMovieClip();
 			local playerActor = movieClip and movieClip:FindActor("player");
 			if(playerActor) then	
 				-- if the movie clip already contains a player, we will use it to locate the entity
-				local x, y, z = playerActor:TransformToEntityPosition(x, y, z)
+				local x = self:GetValue("x", 0);
+				local y = self:GetValue("y", 0);
+				local z = self:GetValue("z", 0);
+				if(not x) then
+					x, y, z = playerActor:GetEntity():GetPosition();
+				end
+				x, y, z = playerActor:TransformToEntityPosition(x, y, z)
 				local bx, by, bz = BlockEngine:block(x, y+0.1, z);
-				local r = 1;
-				local entities = EntityManager.GetEntitiesByMinMax(bx-r, by-r, bz-r, bx+r, by+r, bz+r)
+				local r = 2;
+				local entities = EntityManager.FindEntities({x=bx, y=by, z=bz, r=r, category="searchable"})
 				if(entities and #entities>0) then
 					-- tricky: we will match either name or assetfile 
 					local assetfile = self:GetValue("assetfile", 0);
 					for i, entity_ in ipairs(entities) do
-						if(entity_:GetName() == name) then
-							entity = entity_;
-							break;
-						elseif(entity_.GetModelFile and entity_:GetModelFile() == assetfile) then
-							entity = entity_;
-							break;
+						if(entity_:CanBeAgent()) then
+							if(entity_:GetName() == name) then
+								entity = entity_;
+								break;
+							elseif(entity_.GetModelFile and entity_:GetModelFile() == assetfile) then
+								entity = entity_;
+								break;
+							end
 						end
 					end
 				end
@@ -354,18 +363,17 @@ function Actor:FindAgentEntity(name, searchMode)
 				-- search near the current player
 				local x, y, z = EntityManager.GetPlayer():GetBlockPos()
 				local r = 5;
-				local entities = EntityManager.FindEntities({name = name, x=x,  y=y, z=z, r=r})
+				local entities = EntityManager.FindEntities({name = name, x=x,  y=y, z=z, r=r, category="searchable"})
 				if(entities and #entities>0) then
 					entity = entities[1];
-					if(entity and not entity.SetActor) then
+					if(entity and not entity:CanBeAgent()) then
 						entity = nil;
 					end
 				end
 			end
-		end
-		if(not entity) then
+		else
 			entity = EntityManager.GetEntity(name);
-			if(entity and not entity.SetActor) then
+			if(entity and not entity:CanBeAgent()) then
 				entity = nil;
 			end
 		end
@@ -585,6 +593,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					if skin then
 						self:AddKeyFrameByName("skin", nil, skin);
 					end
+					result = commonlib.Encoding.DefaultToUtf8(result)
 					self:AddKeyFrameByName(keyname, nil, result);
 					self:FrameMovePlaying(0);
 					if(callbackFunc) then
@@ -611,7 +620,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "blockinhand") then
 		local title = format(L"起始时间%s, 请输入手持物品ID(空为0)", strTime);
 
@@ -627,7 +636,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "skin") then
 		local title = format(L"起始时间%s, 请输入皮肤ID或名称", strTime);
 
@@ -665,7 +674,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 							callbackFunc(true);
 						end
 					end
-				end, old_value);
+				end, old_value,nil,nil, {auto_virtual_keyboard=true});
 			else
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/EditSkinPage.lua");
 				local EditSkinPage = commonlib.gettable("MyCompany.Aries.Game.Movie.EditSkinPage");
@@ -696,7 +705,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "opacity") then
 		local title = format(L"起始时间%s, 请输入透明度[0,1](默认1)", strTime);
 
@@ -712,7 +721,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "facing" or keyname == "HeadUpdownAngle" or keyname=="HeadTurningAngle") then
 		local title;
 		if(keyname == "facing") then
@@ -737,7 +746,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end, old_value)
+		end, old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "head") then
 		local title = format(L"起始时间%s, 请输入头部角度[-90, 90]<br/>左右角度, 上下角度:", strTime);
 		old_value = string.format("%f, %f", (self:GetValue("HeadTurningAngle", curTime) or 0) / math.pi * 180, 
@@ -759,7 +768,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "rot") then
 		local title = format(L"起始时间%s, 请输入roll, pitch, yaw [-180, 180]<br/>", strTime);
 		old_value = string.format("%f, %f, %f", (self:GetValue("roll", curTime) or 0) / math.pi * 180,
@@ -783,7 +792,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "pos") then
 		local title = format(L"起始时间%s, 请输入位置x,y,z:", strTime);
 		local bx, by, bz = self:GetValue("x", curTime),self:GetValue("y", curTime), self:GetValue("z", curTime);
@@ -814,7 +823,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					end
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "gravity") then
 		local title = format(L"起始时间%s, 请输入重力加速度(默认18.36)", strTime);
 
@@ -830,7 +839,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "speedscale") then
 		local title = format(L"起始时间%s, 请输入运动速度系数(默认1)", strTime);
 
@@ -846,7 +855,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value)
+		end,old_value,nil,nil, {auto_virtual_keyboard=true})
 	elseif(keyname == "bones") then
 		local var = self:GetBonesVariable();
 		if(var) then
@@ -880,7 +889,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 								end
 							end
 						end
-					end,old_value)
+					end,old_value,nil,nil, {auto_virtual_keyboard=true})
 				end
 			else
 				local rangeVar = var:GetRangeVariable();
@@ -907,7 +916,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 							callbackFunc(true);
 						end
 					end
-				end, old_value)
+				end, old_value,nil,nil, {auto_virtual_keyboard=true})
 			end
 		end
 	elseif(keyname == "parent") then
@@ -927,7 +936,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			if(callbackFunc) then
 				callbackFunc(true);
 			end
-		end, old_value);
+		end, old_value,nil,nil, {auto_virtual_keyboard=true});
 	elseif(keyname == "static") then
 		old_value = {name = self:GetValue("name", 0) or "", 
 			isAgent = self:GetValue("isAgent", 0), 
@@ -984,7 +993,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 			if(callbackFunc) then
 				callbackFunc(true);
 			end
-		end, old_value);
+		end, old_value,nil,nil, {auto_virtual_keyboard=true});
 	end
 end
 
@@ -1060,7 +1069,10 @@ function Actor:SaveStaticAppearance()
 	local obj = entity:GetInnerObject();
 	if(obj) then
 		local assetfile = obj:GetPrimaryAsset():GetKeyName();
-		self:AutoAddKey("assetfile", curTime, PlayerAssetFile:GetNameByFilename(assetfile));
+		assetfile = PlayerAssetFile:GetNameByFilename(assetfile)
+		assetfile = Files.GetRelativePath(assetfile)
+		assetfile = commonlib.Encoding.DefaultToUtf8(assetfile)
+		self:AutoAddKey("assetfile", curTime, assetfile);
 	end
 	local skin = entity:GetSkin();
 	if(skin) then
@@ -1163,7 +1175,9 @@ function Actor:FrameMoveRecording(deltaTime)
 		end
 		
 		local assetfile = obj:GetPrimaryAsset():GetKeyName();
-		self:AutoAddKey("assetfile", curTime, PlayerAssetFile:GetNameByFilename(assetfile));
+		assetfile = PlayerAssetFile:GetNameByFilename(assetfile)
+		assetfile = commonlib.Encoding.DefaultToUtf8(assetfile)
+		self:AutoAddKey("assetfile", curTime, assetfile);
 	end
 	self:EndUpdate();
 end
@@ -1427,6 +1441,7 @@ function Actor:FrameMovePlaying(deltaTime)
 	gravity = self:GetValue("gravity", curTime);
 	opacity = self:GetValue("opacity", curTime);
 	assetfile = self:GetValue("assetfile", curTime);
+	assetfile = assetfile and PlayerAssetFile:GetBuildInFilenameByName(assetfile)
 	blockinhand = self:GetValue("blockinhand", curTime);
 	cam_dist = self:GetValue("cam_dist", curTime);
 
@@ -1447,10 +1462,17 @@ function Actor:FrameMovePlaying(deltaTime)
 		end
 		
 		-- this may cause animation instance to lose all custom bones, Time and EnableAnim properties. 
-		if(entity:SetMainAssetPath(PlayerAssetFile:GetFilenameByName(assetfile))) then
+		if(entity:SetModelFile(assetfile)) then
 			self:assetfileChanged();
+			
+			if(assetfile and entity:GetModelFile() ~= assetfile) then
+				-- tricky: this will convert non-utf8 to utf8 string for backward compatibility
+				self:AddKey("assetfile", curTime, entity:GetModelFile());
+			end
 		end
+		
 		if(not self:IsIgnoreSkinAnim()) then
+			skin = self:HandleSkin(skin, assetfile)
 			entity:SetSkin(skin);
 			entity:SetBlockInRightHand(blockinhand);
 		end
@@ -1650,3 +1672,62 @@ function Actor:ReleaseEntityControl()
 	self:UnbindAnimInstance();
 end
 
+function Actor:SetVoiceMouthSkin(mouth_skin)
+	self.mouth_skin = mouth_skin
+	-- 恢复下皮肤
+	if self.entity then
+		local entity = self.entity;
+		local curTime = self:GetTime();
+		local skin
+		if self:IsIgnoreSkinAnim() then
+			skin = entity:GetSkin()
+			if self.mouth_skin and not self.last_actor_skin then
+				self.last_actor_skin = skin
+			elseif self.last_actor_skin then
+				skin = self.last_actor_skin
+				if not self.mouth_skin then
+					self.last_actor_skin = nil
+				end
+				
+			end
+		else
+			skin = self:GetValue("skin", curTime);
+		end
+
+		local assetfile = self:GetValue("assetfile", curTime);
+		skin = self:HandleSkin(skin, assetfile)
+		entity:SetSkin(skin);
+	end
+end
+
+function Actor:HandleSkin(skin, assetfile)
+	if not skin and assetfile ~= CustomCharItems.defaultModelFile then
+		return skin
+	end
+	
+	if not self.mouth_skin then
+		if not skin and assetfile == CustomCharItems.defaultModelFile then
+			return ""
+		end
+
+		return skin
+	end
+
+	-- 可换装模型的话 也给他装上嘴巴
+	if not skin and assetfile == CustomCharItems.defaultModelFile then
+		return tostring(self.mouth_skin)
+	end
+
+	local result_skin = CustomCharItems:AddMouthSkin(skin, self.mouth_skin, true)
+	return result_skin
+end
+
+function Actor:SetBoneManipContainer(manipCont)
+	if manipCont then
+		self.manipCont = manipCont
+	end
+end
+
+function Actor:GetBoneManipContainer()
+	return self.manipCont
+end

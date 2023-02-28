@@ -42,7 +42,7 @@ local op_side_to_data = {
 
 -- user data to direction side
 local data_to_side = {
-	[0] = 0, [1] = 1, [2] = 2,[3] = 0,[4] = 3,[5] = 4,[6] = 5,[7] = 0,
+	[0] = 1, [1] = 1, [2] = 2,[3] = 0,[4] = 3,[5] = 4,[6] = 5,[7] = 0,
 }
 
 function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, camx,camy,camz, lookat_x,lookat_y,lookat_z)
@@ -143,7 +143,11 @@ function block:OnActivated(x, y, z, entity)
 		if(entity) then
 			EntityManager.SetLastTriggerEntity(entity);
 		end
-		BlockEngine:SetBlockData(x,y,z, data+8);
+		local data = data + 8
+		if data == 8 then --blockdata不能是8
+			data = data + 1
+		end
+		BlockEngine:SetBlockData(x,y,z, data);
 		self:NotifyNeighborBlocksByDir(x, y, z, data);
 		GameLogic.GetSim():ScheduleBlockUpdate(x, y, z, self.id, self:tickRate());
 

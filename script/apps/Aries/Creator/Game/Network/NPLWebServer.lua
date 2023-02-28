@@ -35,7 +35,7 @@ function NPLWebServer.CheckServerStarted(callbackFunc)
 	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandManager.lua");
 		local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
-		CommandManager:RunCommand("/webserver");
+		CommandManager:RunCommand("/webserver -silent");
 		addr = WebServer:site_url();
 		if(addr) then
 			callbackFunc(true, addr);	

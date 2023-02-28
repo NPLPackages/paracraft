@@ -84,65 +84,92 @@ function InventoryPage.ShowPage()
 			page:CloseWindow(true);
 		end
 	end
-
-	local customParams = GameLogic.GetFilters():apply_filters("InventoryPage.PageParams")
-
-	if(System.options.IsMobilePlatform) then
-		local params = customParams or {
-			url = "script/apps/Aries/Creator/Game/Areas/InventoryPage.mobile.html", 
-			name = "InventoryPage.ShowPage", 
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			isShowTitleBar = false,
-			DestroyOnClose = false,
-			bToggleShowHide=true, 
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			allowDrag = false,
-			enable_esc_key = true,
-			--bShow = bShow,
-			click_through = true, 
-			zorder = -1,
-			directPosition = true,
-				align = "_ct",
-				x = -940/2,
-				y = -610/2,
-				width = 920,
-				height = 542,
-		};
-		System.App.Commands.Call("File.MCMLWindowFrame", params);
-	else
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
-		local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
-		local bActivateMenu = true;
-		if(page and page:IsVisible()) then
-			bActivateMenu = false;
-		end
-		DesktopMenuPage.ActivateMenu(bActivateMenu);
-
-		local params = customParams or {
-			url = "script/apps/Aries/Creator/Game/Areas/InventoryPage.html", 
-			name = "InventoryPage.ShowPage", 
-			app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-			isShowTitleBar = false,
-			DestroyOnClose = false,
-			enable_esc_key = true,
-			bToggleShowHide=true, 
-			style = CommonCtrl.WindowFrame.ContainerStyle,
-			zorder = -3,
-			allowDrag = true,
-			click_through = true,
-			directPosition = true,
-				align = "_ct",
-				x = -430/2,
-				y = -460/2,
-				width = 430,
-				height = 460,
-		};
-		System.App.Commands.Call("File.MCMLWindowFrame", params);
-
-		params._page.OnClose = function()
-			DesktopMenuPage.ActivateMenu(false);
-		end;
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
+	local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
+	local bActivateMenu = true;
+	if(page and page:IsVisible()) then
+		bActivateMenu = false;
 	end
+	DesktopMenuPage.ActivateMenu(bActivateMenu and not IsMobileUIEnabled);
 	
+	if IsMobileUIEnabled then
+		InventoryPage.GetProfile()
+	end
+	local params = customParams or {
+		url = "script/apps/Aries/Creator/Game/Areas/InventoryPage.html", 
+		name = "InventoryPage.ShowPage", 
+		app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+		isShowTitleBar = false,
+		DestroyOnClose = false,
+		enable_esc_key = true,
+		bToggleShowHide=true, 
+		style = CommonCtrl.WindowFrame.ContainerStyle,
+		zorder = -3,
+		allowDrag = true,
+		click_through = true,
+		directPosition = true,
+			align = "_ct",
+			x = -430/2,
+			y = -460/2,
+			width = 430,
+			height = 460,
+	};
+	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"InventoryPage");
+	System.App.Commands.Call("File.MCMLWindowFrame", params);
+	params._page.OnClose = function()
+		DesktopMenuPage.ActivateMenu(false);
+	end;
+end
+
+function InventoryPage.GetProfile()
+	local function handle()
+		InventoryPage.RefreshPage()
+	end
+	if InventoryPage.profile == nil then
+		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+		local profile = KeepWorkItemManager.GetProfile()
+		if (profile.username == nil or profile.username == "") then
+		    KeepWorkItemManager.LoadProfile(true, function(err, msg, data)
+		        if(err ~= 200)then
+		            return
+		        end
+		        if data.username and data.username ~= "" then
+					InventoryPage.profile = profile
+		           handle()
+		        end
+		    end)
+		else    
+		    InventoryPage.profile = profile
+		    handle()
+		end
+	else
+		handle()
+	end
+end
+
+function InventoryPage.GetUserName()
+	if InventoryPage.profile then
+		return InventoryPage.profile.username
+	end
+end
+
+function InventoryPage.GetNickName()
+	if InventoryPage.profile then
+		return InventoryPage.profile.nickname
+	end
+end
+
+function InventoryPage.GetSchoolName()
+	if InventoryPage.profile and InventoryPage.profile.school then
+		return InventoryPage.profile.school.name
+	end
+	return ""
+end
+
+function InventoryPage.RefreshPage()
+	if page then
+		page:Refresh(0)
+	end
 end
 

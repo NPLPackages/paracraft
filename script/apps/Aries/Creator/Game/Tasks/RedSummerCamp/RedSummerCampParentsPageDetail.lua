@@ -25,6 +25,11 @@ local pageConfig = {
 
 function RedSummerCampParentsPageDetail.Show(name)
 	local pageName = pageConfig[name]
+	if name == "charge" then
+		local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
+		VipPage.ShowPage("charge_detail");
+		return
+	end
 	if not pageName then
 		return 
 	end

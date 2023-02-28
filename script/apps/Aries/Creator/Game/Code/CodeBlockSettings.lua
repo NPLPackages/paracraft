@@ -53,6 +53,7 @@ function CodeBlockSettings.OnInit()
 		page:SetValue("allowFastMode", entity:IsAllowFastMode() == true);
 		page:SetValue("isStepMode", entity:IsStepMode() == true);
 		page:SetValue("isOpenSource", type(entity.IsOpenSource) == "function" and entity:IsOpenSource() == true);
+		page:SetValue("isCodeReadOnly", type(entity.IsCodeReadOnly) == "function" and entity:IsCodeReadOnly() == true);
 		page:SetValue("isUseNplBlockly", type(entity.IsUseNplBlockly) == "function" and entity:IsUseNplBlockly() == true);
 		page:SetValue("isUseCustomBlock", type(entity.IsUseCustomBlock) == "function" and entity:IsUseCustomBlock() == true);
 		page:SetValue("FontSize", tostring(CodeBlockWindow.GetFontSize()));
@@ -128,6 +129,21 @@ function CodeBlockSettings.OnSetOpenSource(value)
 	end
 end
 
+function CodeBlockSettings.IsCodeReadOnly()
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity and type(entity.IsCodeReadOnly) == "function") then
+		return entity:IsCodeReadOnly();
+	end
+end
+
+function CodeBlockSettings.OnSetCodeReadOnly(value)
+	local entity = CodeBlockWindow.GetCodeEntity()
+	if(entity and type(entity.SetCodeReadOnly) == "function") then
+		entity:SetCodeReadOnly(value == true);
+		CodeBlockWindow.UpdateCodeReadOnly()
+	end
+end
+
 function CodeBlockSettings.OnSetUseNplBlockly(value)
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if(entity and type(entity.SetUseNplBlockly) == "function") then
@@ -139,12 +155,11 @@ function CodeBlockSettings.ClickBlockToolboxBtn()
 	local entity = CodeBlockWindow.GetCodeEntity()
 	if (not entity or type(entity.IsUseNplBlockly) ~= "function" or not entity:IsUseNplBlockly()) then return end 
 	if(page) then page:CloseWindow() end
-	
+	local config = CodeBlockWindow.PrepareNplBlocklyConfig(entity);
 	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
-	local language = entity:IsUseCustomBlock() and "UserCustomBlock" or entity:GetLanguageConfigFile();
 	Page.Show({
-		XmlText = entity:GetNplBlocklyToolboxXmlText() or "",
-		Language = (language == "npl" or language == "") and "SystemNplBlock" or language,
+		XmlText = config.toolbox_xmltext,
+		Language = config.language,
 		OnConfirm = function(text)
 			entity:SetNplBlocklyToolboxXmlText(text);
 		end

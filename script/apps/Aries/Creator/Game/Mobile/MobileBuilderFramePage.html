@@ -1,0 +1,271 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/BuilderFramePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="MobileBuilderFramePage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileBuilderFramePage.lua");
+BuilderFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileBuilderFramePage")
+local BlockTemplatePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.BlockTemplatePage");
+local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+local uiversion = tonumber(Page:GetRequestParam("version")) or 0;
+BuilderFramePage.OnInit(uiversion);
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetCategoryButtons()
+    return BuilderFramePage.GetCategoryButtons();
+end
+
+function DS_Items(index)
+    if(index == nil) then
+        return #BuilderFramePage.Current_Item_DS;
+    else
+        return BuilderFramePage.Current_Item_DS[index];
+    end
+end
+
+function OnClickBlock(block_id, mcmlNode)
+    if(mouse_button == "right" and ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL)) then
+        BuilderFramePage.OnHelpBlock(block_id);
+    else
+        local item = mcmlNode:GetPreValue("this", true);
+        if(item) then
+            if (item.block_id == 10516) then
+                GameLogic.IsVip("PythonCodeBlock", true, function(result)
+                    if result then
+                        BuilderFramePage.OnClickBlock(item);
+                    end
+                end)
+            else
+                BuilderFramePage.OnClickBlock(item);
+            end
+        end
+    end
+end
+
+function OnChangeCategory(index)
+    BuilderFramePage.OnChangeCategory(index);
+end
+
+function OnClickBlocksShop()
+    _guihelper.MessageBox(L"测试期间, 模板商城暂未开放~");
+end
+
+
+
+function OnSelectOfficial()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/QuickSelectBar.lua");
+    local QuickSelectBar = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.QuickSelectBar");
+    QuickSelectBar.OnClickTemplate();
+end
+
+function SearchBlock(name,mcmlNode)
+    local search_ctl = Page:FindUIControl("block_search_text_ctl");
+    if(search_ctl and search_ctl.text) then
+        BuilderFramePage.SearchBlock(string.lower(search_ctl.text));
+    end
+end
+
+function DS_Func_PlayerItems(index)
+    if(not index) then
+        return 36;
+    else
+        if(index<=27) then
+            return {slotNumber = index+9};
+        else
+            return {slotNumber = index-27};
+        end
+    end
+end
+
+function OnClickManageTemplateWnd()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildQuestTask.lua");
+	local BuildQuest = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildQuest");
+    BuildQuest.ShowPage();
+end
+
+function GetBlockUIName(id, data, uid)
+    local text;
+    if(uid)then
+        text = "BuilderFramePage.block_"..uid;
+    elseif(data and data~=0) then
+        text = format("BuilderFramePage.block_%d:%d", id, data)
+    else
+        text = format("BuilderFramePage.block_%d", id)
+    end
+    return text;
+end
+
+function ds_CustomBtn(index)
+    if(not index) then
+        return #(BuilderFramePage.custombtn_nodes);
+    else
+        return BuilderFramePage.custombtn_nodes[index];
+    end
+end
+
+function isSelctIndex(index)
+    return tonumber(index) and tonumber(index) == GameLogic.GetPlayerController():GetHandToolIndex()
+end
+
+function OnClickItem(index)
+    local index = tonumber(index)
+    if index > 0 then
+        GameLogic.GetPlayerController():OnClickHandToolIndex(index)
+        BuilderFramePage.RefreshPage()
+    end
+end
+
+function DS_GetBlockTemplates()
+    local allData = BlockTemplatePage.GetAllTemplatesDS();
+    echo(allData)
+    return allData
+end
+
+function OnClickRefreshAllTemplates()
+    BlockTemplatePage.GetAllTemplatesDS(true);
+    Page:Refresh(0.1);
+end
+
+function OnChangeTempCategory(index)
+    print("index============",index)
+    BuilderFramePage.OnChangeTempCategory(index)
+end
+
+function DS_TempItems()
+    return BuilderFramePage.select_templates
+end
+
+local objParams = {
+    name = "model",
+    IsCharacter = true,
+    AssetFile = "model/common/star/star01_an.x", -- earth
+    -- AssetFile = "model/common/star/star04_an.x",  
+    x = 0,
+    y = 0,
+    z = 0,
+}
+function GetModelParams(file)
+    objParams.AssetFile = file
+    print("file============",file)
+   
+    return objParams;
+end
+
+function GetFileName(file)
+    if not file or file == "" then
+        return ""
+    end
+    return commonlib.Encoding.DefaultToUtf8(file:match("[^/\\]+$"))
+end
+
+function GetTooltipPage(block_id)
+    return string.format("page://script/apps/Aries/Creator/Game/Mobile/MobileBuilderBlockTooltipPage.html?block_id=%s",block_id)
+end
+
+function GetCategoryUIName(index)
+    local index = tonumber(index) or 0
+    if index and index > 3 then
+        index = index + 1
+    end
+    return string.format("BuilderFramePage.category_%d",index)
+end
+]]></script>
+<div style="width: 880px; height: 600px;">
+    <div style="width:850px;margin-left:-6px;margin-top:-8px;">
+        <pe:repeat DataSource="<%=GetCategoryButtons()%>">
+            <pe:repeatitem style="float:left;width:100px; height: 50px;">
+                <pe:if condition='<%=BuilderFramePage.category_index == Eval("index") %>' >
+                    <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' uiname = '<%=GetCategoryUIName(Eval("index"))%>' onclick="OnChangeCategory" style="float: left; margin-left:12px;margin-top:8px;color:#000000;font-size:22px; base-font-size:22px; font-weight: bold; width:100px;height:46px;background:url(Texture/Aries/Creator/keepwork/Mobile/creator/anniu1_32x32_32bits.png#0 0 32 32:14 14 14 14)" />
+                </pe:if>
+                <pe:if condition='<%=BuilderFramePage.category_index ~= Eval("index") %>' >
+                    <input type="button" value='<%=Eval("text")%>' uiname = '<%=GetCategoryUIName(Eval("index"))%>'  name='<%=Eval("index")%>' onclick="OnChangeCategory" style="float: left; margin-left:12px;margin-top:8px;color:#000000;font-size:22px; base-font-size:22px; font-weight: bold; width:100px;height:46px;background:url(Texture/Aries/Creator/keepwork/Mobile/creator/anniu_32x32_32bits.png#0 0 32 32:14 14 14 14)" />
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </div>
+    <pe:if condition='<%=BuilderFramePage.category_name ~= "template"%>'>
+        <div zorder="-1" style="position: relative; margin-left: 4px;margin-top: 15px; width:860px;height:540px;background: url(Texture/Aries/Creator/keepwork/Mobile/creator/dikuang_64x64_32bits.png#0 0 64 64: 30 30 30 30);"></div>
+    </pe:if>
+    <pe:if condition='<%=BuilderFramePage.category_name == "template"%>'>
+        <div zorder="-1" style="position: relative; margin-left: 4px; margin-top: 68;  width:860px;height:482px;background: url(Texture/Aries/Creator/keepwork/Mobile/creator/dikuang_64x64_32bits.png#0 0 64 64: 30 30 30 30);"></div>
+    </pe:if>
+    <div style="margin-left:5px;margin-top:20px;width:850px;height:420px;">
+        <pe:if condition='<%=BuilderFramePage.category_name ~= "template"%>'>
+            <pe:gridview style="margin:0px" uiname="BuilderFramePage.gridviewItems" name="new_builder_gvwItems" CellPadding="13" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="0" AllowPaging="false" ItemsPerLine="8" DefaultNodeHeight = "88" 
+                DataSource='<%=DS_Items%>'> 
+	            <Columns>
+                    <div style="width:88px;height:88px; background: url(Texture/Aries/Creator/keepwork/Mobile/creator/baigezi_27x27_32bits.png#0 0 27 27:12 12 12 12);" >
+                        <pe:mc_block uid='<%=Eval("uid")%>' uiname = '<%=GetBlockUIName(Eval("block_id"), Eval("block_data"), Eval("uid"))%>' block_id='<%=Eval("block_id")%>' block_data='<%=Eval("block_data")%>' icon='<%=Eval("icon")%>' style="width:64px;height:64px; margin-left: 11px; margin-top: 11px;" tooltip ='<%=GetTooltipPage(Eval("block_id"))%>'  tooltip_is_lock_position = "true" tooltip_offset_y="60" tooltip_offset_x="-10" onclick="OnClickBlock"/>    
+                    </div>
+                </Columns>
+	            <EmptyDataTemplate>
+	            </EmptyDataTemplate>
+            </pe:gridview>
+        </pe:if>
+        <pe:if condition='<%=BuilderFramePage.category_name == "template"%>'>
+            <div style="position: relative; width: 850px; margin-top: 10px; ">
+                <pe:repeat DataSource="<%=BuilderFramePage.templates%>">
+                    <pe:repeatitem style="float:left;width:113px; height: 44px;">
+                        <pe:if condition='<%=BuilderFramePage.select_template_index == Eval("index") %>' >
+                            <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>'  onclick="OnChangeTempCategory" style="float:left;margin-left: 12px;color:#000000;font-size:18px; base-font-size:18px; font-weight: bold; width:100px;height:46px;background:url(Texture/Aries/Creator/keepwork/Mobile/creator/biaoqian1_113x44_32bits.png#0 0 113 44)" />
+                        </pe:if>
+                        <pe:if condition='<%=BuilderFramePage.select_template_index ~= Eval("index") %>' >
+                            <input type="button" value='<%=Eval("text")%>' name='<%=Eval("index")%>' onclick="OnChangeTempCategory" style="float:left;margin-left: 12px;color:#000000;font-size:18px; base-font-size:18px; font-weight: bold; width:100px;height:46px;background:url(Texture/Aries/Creator/keepwork/Mobile/creator/biaoqian2_113x44_32bits.png#0 0 113 44)" />
+                        </pe:if>
+                    </pe:repeatitem>
+                </pe:repeat>
+            </div>
+            <div style="width:880px;height:360px; margin-top: 60px;">
+                <pe:treeview style="background:;height:360px;" ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="false" DefaultIndentation="0" VerticalScrollBarOffsetX="26" VerticalScrollBarStep = "120">
+                    <pe:repeat DataSource="<%=DS_TempItems()%>">
+                        <pe:repeatitem>
+                            <div style="float: left; margin-left: 20px; margin-top: 20px; width:400px;height:70px; background: url(Texture/Aries/Creator/keepwork/Mobile/creator/baigezi_27x27_32bits.png#0 0 27 27: 12 12 12 12);" >
+                                <div style="position: relative; margin-left: 17px; margin-top: 21px; width: 34px; height: 27px; background: url(Texture/Aries/Creator/keepwork/Mobile/creator/wenjian_34x27_32bits.png#0 0 34 27);"></div>
+                                <div style="position: relative; color: #1a1a1a; font-size: 18px; base-font-size: 18px; margin-left: 70px; margin-top: 22px;">
+                                    <%=GetFileName(Eval("filename"))%>
+                                </div>
+                                <input type="button" name="<%=Eval('index')%>" onclick="BuilderFramePage.OnClickTemplateItem" style="width:400px;height:70px; background: url();" />
+                            </div>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                </pe:treeview>
+            </div>
+        </pe:if>
+    </div>
+    <!-- 显示选择栏的内容 -->
+    <div style="width: 852px; height: 130px; margin-left: 8x; margin-top: -9px;">
+        <pe:gridview style="position:relative;margin-left:50px; margin-top: 20px;" RememberLastPage="true" name="BuilderFramePage.quickSelectBar" CellPadding="10" ItemsPerLine="9" AllowPaging="false" DefaultNodeHeight="0"
+            DataSource='<%=ds_CustomBtn%>'>
+            <Columns>
+                <div style="width:72px;height:72px;padding:3px;margin-left:2px; margin-top: 5px;">
+                    <pe:if condition='<%=BuilderFramePage.CheckHasItem(Eval("index"))%>'>
+                        <div zorder="-2" style="position:relative;margin-top:-3px;margin-left:-3px;width:72px;height:72px;background:url(Texture/Aries/Creator/keepwork/Mobile/creator/youwuping_32x32_32bits.png#0 0 32 32:14 14 14 14)"></div>
+                    </pe:if>
+                    <pe:if condition='<%=not BuilderFramePage.CheckHasItem(Eval("index"))%>'>
+                        <div zorder="-2" style="position:relative;margin-top:-3px;margin-left:-3px;width:72px;height:72px;background:url(Texture/Aries/Creator/keepwork/Mobile/creator/kongbai_32x32_32bits.png#0 0 32 32:14 14 14 14)"></div>
+                    </pe:if>
+                    <div  style="position: relative; width:72px;height:72px;padding:3px;margin-left:1px;">
+                        <pe:mc_slot tooltip_is_lock_position="true" tooltip_offset_x="-4" tooltip_offset_y="-40" bagpos ='<%=Eval("index")%>' style="width:56px;height:56px;" />
+                    </div>
+                    <input zorder="2"  type="button" name="<%=Eval('index')%>" onclick="OnClickItem"  style="position:relative;width:72px;height:72px;background:url();"/> 
+                    <pe:if condition="<%=isSelctIndex(Eval('index'))%>"> 
+                        <div zorder="-1" style="position:relative;margin-top:-3px;margin-left:-3px;width:72px;height:72px;background:url(Texture/Aries/Creator/keepwork/Mobile/creator/xuanzhong_36x36_32bits.png#0 0 36 36:16 16 16 16)"></div>
+                    </pe:if>
+                </div>
+            </Columns>
+        </pe:gridview>
+        <div style=" margin-top: -111px; width: 852px; height: 104px; background: url(Texture/Aries/Creator/keepwork/Mobile/creator/gongjudi_37x43_32bits.png#0 0 37 43: 15 20 15 20);"></div>
+    </div>
+</div>
+</pe:mcml>
+</body>
+</html>
+

@@ -160,28 +160,6 @@ function ParaWorldLoginAdapter:EnterWorld(close)
     
 end
 
-function ParaWorldLoginAdapter.ShowExitWorld(restart)
-    local DockExitPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockExitPage.lua")
-    DockExitPage.ShowPage(function()
-        _guihelper.MessageBox(L"是否离开当前世界，返回登录界面？", function(res)
-            if(res and res == _guihelper.DialogResult.Yes)then
-                ParaWorldLoginAdapter.MainWorldId = nil;
-                ParaWorldLoginAdapter.ParaWorldId = nil;
-                Desktop.is_exiting = true;
-
-                if (System.os.GetPlatform() ~= "android") then
-                    GameLogic.GetFilters():apply_filters('logout', nil, function()
-                        GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true);
-                    end);
-                end
-
-                Desktop.ForceExit(restart);
-            end
-        end, _guihelper.MessageBoxButtons.YesNo);        
-    end)    
-end
-
-
 function ParaWorldLoginAdapter.CheckAndReset()
 	commonlib.TimerManager.SetTimeout(function()
 		local generatorName = WorldCommon.GetWorldTag("world_generator");

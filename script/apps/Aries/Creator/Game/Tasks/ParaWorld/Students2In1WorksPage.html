@@ -1,0 +1,74 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Quest/Students2In1WorksPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="Students2In1WorksPage.lua"><![CDATA[
+local Students2In1WorksPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/Students2In1WorksPage.lua");
+Students2In1WorksPage.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+end
+
+function GridsItems(index)
+    if(index == nil) then
+        return #Students2In1WorksPage.GridData;
+    else
+        return Students2In1WorksPage.GridData[index];
+    end
+end
+
+function GetItemName(index)
+    return Students2In1WorksPage.GetItemName(index)
+end
+
+function ClickGridItem(name,mcmlNode)
+    local index = tonumber(mcmlNode:GetAttribute("param1"));
+    Students2In1WorksPage.ClickGridItem(index)
+end
+
+function ClickNextPage()
+    Students2In1WorksPage.ClickNextPage()
+end
+
+]]></script>
+<div style="width:593px;height:592px;background:url(Texture/Aries/Creator/keepwork/map/016_593X592_32bits.png#0 0 593 592);">
+    <div tooltip="显示你所在的班级里的同学的作品信息,点击后可以参观该作品,快去给你的同学点赞吧!" style="position: relative;margin-left:120px;margin-top:35px;width:30px;height:29px;background:url(Texture/Aries/Creator/keepwork/map/012_30X29_32bits.png#0 0 30 29);">
+    </div>
+    <div onclick="ClosePage" style="position: relative;margin-left:515px;margin-top:30px;width:39px;height:39px;background:url(Texture/Aries/Creator/keepwork/map/013_39X39_32bits.png#0 0 39 39);">
+    </div>
+
+    <div style="float:left;width:556px;height:445px;margin-top:67px;margin-left:7px;background:;">
+        <pe:gridview style="margin-left:5px;" name="item_gridview" CellPadding="6" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight="50"
+                     DataSource='<%=GridsItems%>'>
+            <Columns>
+                <div style="width: 100px;height: 80px;background:">
+                    <div onclick="ClickGridItem" param1='<%=Eval("index")%>' style="margin-left:18px;margin-top:0px;width:67px;height:60px;background:url(Texture/Aries/Creator/keepwork/map/014_67X60_32bits.png#0 0 67 60);">
+                    </div>
+                    <div onclick="ClickGridItem" param1='<%=Eval("index")%>' style="text-align: center;">
+                        <%=GetItemName(Eval("index"))%>
+                    </div>
+                </div>
+            </Columns>
+            <EmptyDataTemplate>
+            </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+
+    <div style="margin-top: 2px;">
+        <div onclick="ClickNextPage" style="float: left;margin-left:240px;margin-top:0px;width:35px;height:35px;background:url(Texture/Aries/Creator/keepwork/map/015_35X35_32bits.png#0 0 35 35);">
+        </div>
+        <div onclick="ClickNextPage" style="float: left;font-size: 18px;font-weight: bold;margin-left: 5px;margin-top: 3px;">
+            换一批
+        </div>
+    </div>
+</div>
+    
+</pe:mcml>
+</body>
+</html>
+

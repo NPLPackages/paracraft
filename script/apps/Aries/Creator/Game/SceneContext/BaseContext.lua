@@ -401,11 +401,28 @@ function BaseContext:ClearPickDisplay()
 end
 
 -- called every 30 milliseconds, when user is holding the left button without releasing it. 
--- @param fDelta: 
+-- @param fDelta:
+local uiMouseX, uiMouseY 
 function BaseContext:OnLeftMouseHold(fDelta)
+	if GameLogic.Macros:IsRecording() and GameLogic.Macros.IsMouseTrack() then
+		if not uiMouseX then
+			uiMouseX, uiMouseY = ParaUI.GetMousePosition();
+			GameLogic.Macros.RecordMouseTrack(uiMouseX, uiMouseY,fDelta)
+		else
+			local curx,cury = ParaUI.GetMousePosition();
+			local dx,dy = curx - uiMouseX,cury-uiMouseY
+			local dis = math.sqrt(dx^2 + dy^2)
+			if dis < 15 then
+				GameLogic.Macros.RecordMouseTrack(uiMouseX, uiMouseY,fDelta)
+			else
+				uiMouseX, uiMouseY = ParaUI.GetMousePosition();
+				GameLogic.Macros.RecordMouseTrack(uiMouseX, uiMouseY,fDelta)
+			end
+		end
+		return 
+	end
 	local last_x, last_y, last_z = click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ;
 	local result = self:CheckMousePick();
-	
 	if(result) then
 		if(result.block_id) then
 			click_data.last_mouse_down_block.blockX, click_data.last_mouse_down_block.blockY, click_data.last_mouse_down_block.blockZ = result.blockX,result.blockY,result.blockZ;
@@ -448,14 +465,14 @@ function BaseContext:UpdateClickStrength(fDelta, result)
 		click_data.result = nil;
 	else
 		if(click_data.result == nil and result) then
-			click_data.result = commonlib.clone(result);
+			click_data.result = result:CloneMe();
 			click_data.strength = 0;
 		elseif(result) then
 			if(click_data.result.blockX == result.blockX and click_data.result.blockY == result.blockY and click_data.result.blockZ == result.blockZ) then
 				click_data.strength = (click_data.strength or 0) + fDelta;
 				-- TODO: clicking on terrain. 
 			else
-				click_data.result = commonlib.clone(result);
+				click_data.result = result:CloneMe();
 				-- tricky: if the user keeps pressing the button on multiple blocks, the strength does not vanish to 0 immediately, 
 				-- instead, it only decreases for a small number like 250(self.max_break_time*0.5). 
 				if(result.blockX) then
@@ -742,8 +759,9 @@ end
 
 function BaseContext:handleKeyEvent(event)
 	BaseContext._super.handleKeyEvent(self, event);
-	if(event:isAccepted()) then
-		if(GameLogic.Macros:IsRecording() and event:isAccepted() and not event.recorded) then
+	
+	if(GameLogic.Macros:IsRecording()) then
+		if (event:isAccepted() or GameLogic.GetPlayer():IsMountOnRailCar()) and not event.recorded and not GameLogic.Macros.IsMouseTrack() then
 			event.recorded = true;
 			GameLogic.Macros:AddMacro("KeyPress", GameLogic.Macros.GetButtonTextFromKeyEvent(event));
 		end
@@ -904,27 +922,29 @@ function BaseContext:OnCreateBlock(result, event)
 
 		if(GameLogic.GameMode:IsEditor()) then
 			if(alt_pressed and shift_pressed) then
-				if(block_id or result.block_id == block_types.names.water) then
+				if(block_id or result.block_id == block_types.names.water) and block_id ~= block_types.names.PhysicsModel and block_id ~= block_types.names.BlockModel then
 					-- if ctrl key is pressed, we will replace block at the cursor with the current block in right hand. 
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
 					local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_id = block_id or 0, to_data = block_data, max_radius = 30, preserveRotation=true})
 					task:Run();
+					GameLogic.GetFilters():apply_filters("create_block_event","ReplaceBlocks",task);
 				end
 			elseif(shift_pressed) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/FillLineTask.lua");
 				local task = MyCompany.Aries.Game.Tasks.FillLine:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_data = block_data, side = result.side})
 				task:Run();
-				GameLogic.GetFilters():apply_filters("create_block_event");
+				GameLogic.GetFilters():apply_filters("create_block_event","FillLine",task);
 			elseif(alt_pressed) then
-				if(block_id) then
+				if(block_id and block_id ~= block_types.names.PhysicsModel and block_id ~= block_types.names.BlockModel) then 
 					-- if alt key is pressed, we will replace block at the cursor with the current block in right hand. 
 					NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ReplaceBlockTask.lua");
 					local task = MyCompany.Aries.Game.Tasks.ReplaceBlock:new({blockX = result.blockX,blockY = result.blockY, blockZ = result.blockZ, to_id = block_id, max_radius = 0, side = result.side, preserveRotation=true})
 					task:Run();
+					GameLogic.GetFilters():apply_filters("create_block_event","ReplaceBlock",task);
 				end
 			else
 				self:OnCreateSingleBlock(x,y,z, block_id, result)
-				GameLogic.GetFilters():apply_filters("create_block_event");
+				GameLogic.GetFilters():apply_filters("create_block_event","CreateSingleBlock");
 			end
 		else
 			self:OnCreateSingleBlock(x,y,z, block_id, result)
@@ -1085,7 +1105,7 @@ function BaseContext:handlePlayerKeyEvent(event)
 			GameLogic.TalkToNearestNPC();
 			event:accept();
 		elseif(dik_key == "DIK_R") then
-			local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+			local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
 			local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
 			if not MovieClipController.IsVisible() then
 				if KeepWorkMallPage.isOpen then
@@ -1108,7 +1128,9 @@ function BaseContext:close()
 end
 
 -- handle all global key events that should always be available to the user regardless of whatever scene context. 
--- return true if key is handled. 
+-- return true if key is handled.
+local nKeyCapsLockPressTime = 0 
+local doubleKeyTime = 240 --比较正常的一个值
 function BaseContext:HandleGlobalKey(event)
 	local dik_key = event.keyname;
 	local ctrl_pressed = event.ctrl_pressed;
@@ -1232,9 +1254,30 @@ function BaseContext:HandleGlobalKey(event)
 	if(dik_key == "DIK_F9") then
 		CommandManager:RunCommand("record");
 		event:accept();
+	elseif (dik_key == "DIK_CAPSLOCK") then
+		-- local dik_key = event.keyname;
+		if nKeyCapsLockPressTime ~= 0 then
+			local timeDis = ParaGlobal.GetGameTime() - nKeyCapsLockPressTime
+			if timeDis <= doubleKeyTime and GameLogic.Macros:IsRecording() then 
+				--GameLogic.AddBBS(nil,"键盘双击")
+				print("IsMouseTrack========",GameLogic.Macros.IsMouseTrack(),timeDis,nKeyCapsLockPressTime)
+				nKeyCapsLockPressTime = 0
+				if not GameLogic.Macros.IsMouseTrack() then
+					GameLogic.Macros:AddMacro("BeginMouseTrack");
+					GameLogic.Macros.BeginMouseTrack() 
+				else
+					GameLogic.Macros.GenerRecordMacros()
+					GameLogic.Macros:AddMacro("EndMouseTrack");
+					GameLogic.Macros.EndMouseTrack()
+				end
+			end
+		end
+
+		nKeyCapsLockPressTime = ParaGlobal.GetGameTime()
+		event:accept();
 	elseif(dik_key == "DIK_RETURN") then
 		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByRETURN") then
-			if(GameLogic.GameMode:CanChat()) then
+			if(GameLogic.GameMode:CanChat() and GameLogic.options:IsShowChatWnd()) then
 				--System.App.Commands.Call(System.App.Commands.GetDefaultCommand("EnterChat"));
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
 				MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
@@ -1243,7 +1286,7 @@ function BaseContext:HandleGlobalKey(event)
 		end
 	elseif(dik_key == "DIK_SLASH") then
 		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyBySLASH") then
-			if(GameLogic.GameMode:CanChat()) then
+			if(GameLogic.GameMode:CanChat() and GameLogic.options:IsShowChatWnd()) then
 				NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
 				MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
 				MyCompany.Aries.ChatSystem.ChatEdit.SetText("/");
@@ -1484,6 +1527,9 @@ function BaseContext:SetTargetPosition(x, y, z, moveTime)
 		return
 	end
 	local obj = player:GetInnerObject()
+	if(not obj) then
+		return
+	end
 	local attr = ParaCamera.GetAttributeObject();
 	local fromX, fromY, fromZ = player:GetPosition()
 	self.startPlayerX, self.startPlayerY, self.startPlayerZ = fromX, fromY, fromZ

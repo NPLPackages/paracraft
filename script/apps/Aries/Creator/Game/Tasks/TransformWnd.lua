@@ -38,7 +38,6 @@ function TransformWnd.ShowPage(blocks, trans, callbackFunc)
 	
 	local x, y, width, height = 124, 160, 115, 300;
 	local align = "_lt";
-	
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/TransformWnd.html", 
 			name = "TransformWnd.ShowPage", 
@@ -56,6 +55,7 @@ function TransformWnd.ShowPage(blocks, trans, callbackFunc)
 				width = width,
 				height = height,
 		};
+	params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"TransformWnd");
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 	params._page.OnClose = function()
 		ParaTerrain.DeselectAllBlock(groupindex_hint);
@@ -151,6 +151,7 @@ end
 
 -- public function
 function TransformWnd.UpdateHintLocation(blocks, dx,dy,dz, axis, rot_angle)
+	TransformWnd.SelectBlocksMultiFrames(nil);
 	ParaTerrain.DeselectAllBlock(groupindex_hint);
 
 	blocks = blocks or TransformWnd.blocks;
@@ -213,11 +214,54 @@ function TransformWnd.UpdateHintLocation(blocks, dx,dy,dz, axis, rot_angle)
 			blocks = final_blocks;
 		end
 		if(#final_blocks > 0) then
-			for i = 1, #final_blocks do
-				local b = final_blocks[i];
-				ParaTerrain.SelectBlock(b[1], b[2], b[3], true, groupindex_hint);
-			end
+			TransformWnd.SelectBlocksMultiFrames(final_blocks)
 		end
+	end
+end
+
+TransformWnd.MaxSelectedBlocksPerTick = 20000;
+
+function TransformWnd.UnLoadWorld()
+	TransformWnd.SelectBlocksMultiFrames();
+end
+
+-- select blocks in multiple frames if there are too many blocks.
+-- @param blocks: if nil we will deselect all blocks. or it may contains array of millions of blocks.
+function TransformWnd.SelectBlocksMultiFrames(blocks)
+	if(TransformWnd.selectBlocksTimer) then
+		TransformWnd.multiframeBlocks = nil
+		TransformWnd.selectBlocksTimer:Change();
+		GameLogic:Disconnect("WorldUnloaded", TransformWnd.UnLoadWorld);
+	end
+	if(not blocks) then
+		ParaTerrain.DeselectAllBlock(groupindex_hint);
+		return
+	end
+	for i = 1, math.min(#blocks, TransformWnd.MaxSelectedBlocksPerTick) do
+		local b = blocks[i];
+		ParaTerrain.SelectBlock(b[1], b[2], b[3], true, groupindex_hint);
+	end
+	if(#blocks > TransformWnd.MaxSelectedBlocksPerTick) then
+		-- start timer
+		GameLogic:Connect("WorldUnloaded", TransformWnd.UnLoadWorld, nil, "UniqueConnection");
+
+		TransformWnd.selectBlocksTimer = TransformWnd.selectBlocksTimer or commonlib.Timer:new({callbackFunc = TransformWnd.OnSelectBlocksTimer})
+		TransformWnd.multiframeBlocks = blocks;
+		TransformWnd.fromSelectBlockIndex = TransformWnd.MaxSelectedBlocksPerTick + 1;
+		TransformWnd.selectBlocksTimer:Change(10, 10);
+	end
+end
+
+function TransformWnd.OnSelectBlocksTimer(timer)
+	local blocks = TransformWnd.multiframeBlocks;
+	if(blocks and #blocks >= TransformWnd.fromSelectBlockIndex) then
+		for i=TransformWnd.fromSelectBlockIndex, math.min(#blocks, TransformWnd.fromSelectBlockIndex + TransformWnd.MaxSelectedBlocksPerTick-1) do
+			local b = blocks[i];
+			ParaTerrain.SelectBlock(b[1], b[2], b[3], true, groupindex_hint);
+		end
+		TransformWnd.fromSelectBlockIndex = TransformWnd.fromSelectBlockIndex + TransformWnd.MaxSelectedBlocksPerTick;
+	else
+		timer:Change();
 	end
 end
 

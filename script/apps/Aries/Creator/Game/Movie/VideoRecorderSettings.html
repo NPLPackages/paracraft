@@ -35,6 +35,11 @@ function OnToggleShowWatermark(bChecked)
     end)
 end
 
+function GetRecordPath()
+    local pathStr = commonlib.Encoding.DefaultToUtf8(VideoRecorderSettings.GetOutputFilepath())
+    return _guihelper.TrimUtf8TextByWidth(pathStr, 460, "System;14;norm")
+end
+
 ]]></script>
 <aries:window mode="thin" style="width:400px;" title='<%=L"录制视频"%>' onclose="VideoRecorderSettings.OnClose">
     <div style="margin: 10px; margin-bottom: 15px; color: #ffffff;">
@@ -45,6 +50,10 @@ end
             <option value="mp4 720p">MPEG4 720p (.mp4)</option>
             <option value="mp4 1080p">MPEG4 1080p (.mp4)</option>
             <option value="mp4 stereo">MPEG4 L/R 3D(.mp4)</option>
+            <!-- <option value="mp4 ODS 2k">ODS 2k(.mp4)</option>
+            <option value="mp4 ODS 1280P">ODS 1280P(.mp4)</option> -->
+            <option value="mp4 ODS single eye">ODS single eye(.mp4)</option>
+            <option value="mp4 ODS single eye macro">ODS Macro(.mp4)</option>
             <option value="flv" >Flash(.flv)</option>
             <option value="gif">GIF(.gif)</option>
             <option value="avi">Xvid (.avi)</option>
@@ -73,6 +82,7 @@ end
             <option value="2400000">2400KB/s</option>
             <option value="5120000">5120KB/s (720P)</option>
             <option value="7776000">7776KB/s (1080P)</option>
+            <option value="51608000">51608KB/s (2K)</option>
         </select>
     </div>
     <div>
@@ -102,18 +112,41 @@ end
         <input type="checkbox" name="IsShowLogo" onclick="OnToggleShowWatermark" style="margin-top:3px;margin-left:20px;" checked="checked"/><div style="float:left;margin-left:3px;" for="IsShowLogo"><%=L"显示水印"%></div>
         <input type="checkbox" name="checkboxShader" onclick="OnToggleShader" style="margin-top:3px;margin-left:20px;" checked='<%=HasShader()%>'/><div style="float:left;margin-left:3px;" for="checkboxShader"><%=L"真实光影"%></div>
     </div>
+    
+    <pe:if condition='<%= VideoRecorderSettings.IsOdsStereo() %>'>
+        <div  style="margin:5px;"><hr /></div>
+        <div style="margin-left: -20px;">
+            <input type="checkbox" name="isLockCameraUpDir" style="margin-top:3px;margin-left:20px;" checked='<%=true %>'/><div style="float:left;margin-left:3px;" for="isLockCameraUpDir"><%=L"锁死俯仰角"%></div>
+            <div style="float:left;margin-left:20px;">
+                <%=L"锁死摄像机距离"%>:
+                <select name="lockCameraDist" style="height:23px">
+                    <option value="0">0</option>
+                    <option value="4">4</option>
+                    <option value="8">8</option>
+                    <option value="16">16</option>
+                    <option value="20" selected="true">20</option>
+                    <option value="30">60</option>
+                </select>
+            </div>
+            <input type="checkbox" name="isIgnoreUI" style="margin-top:3px;margin-left:20px;" checked='<%=true %>'/><div style="float:left;margin-left:3px;" for="isIgnoreUI"><%=L"是否忽略UI"%></div>
+        </div>
+    </pe:if>
     <div  style="margin:5px;"><hr /></div>
-    <div>
+    <div style="min-height:30px ; font-size: 14px;">
+        <!-- <input type="button" name="filename" tooltip='<%=L"点击打开所在目录"%>' value='<%=commonlib.Encoding.DefaultToUtf8(VideoRecorderSettings.GetOutputFilepath())%>' style="color: #ff6a00; background:; margin-top: 0px;text-align:left;max-width:245px;" onclick="VideoRecorderSettings.OnOpenOutputFolder"/> -->
         <div><%=L"材质包: "%><input type="button" name="texturemod" tooltip='<%=L"点击切换"%>' onclick="TextureModPage.ShowPage" value='<%=TextureModPage.GetCurrentTexturePackName()%>' style="color:#36a402;background:;margin-top:0px;" /></div>
-        <%=L"输出文件名: "%><input type="button" name="filename" tooltip='<%=L"点击打开所在目录"%>' value='<%=commonlib.Encoding.DefaultToUtf8(VideoRecorderSettings.GetOutputFilepath())%>' style="color: #ff6a00; background:; margin-top: 0px;text-align:left;max-width:245px;" onclick="VideoRecorderSettings.OnOpenOutputFolder"/>
-        <input type="button" tooltip='<%=L"修改输出目录"%>' style="width:20px;margin-top:0px;margin-left:5px;" value="..." class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnClickSelectOutputFolder"/>
+        <%=L"输出文件名: "%><div tooltip='<%=L"点击打开所在目录"%>' onclick="VideoRecorderSettings.OnOpenOutputFolder" style="position: relative; color: #ff6a00; margin-top: -20px; margin-left: 80px; text-align:left;width:245px;"><%=GetRecordPath()%></div>
+        <input type="button" tooltip='<%=L"修改输出目录"%>' style="width:20px;margin-top:-18px;margin-left:325px;" value="..." class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnClickSelectOutputFolder"/>
     </div>
-    <div  style="margin:5px;"><hr /></div>
+    <div  style="margin:5px; margin-top: 15px;"><hr /></div>
     <div style="margin-top:5px;">
         <input type="button" name="Reset" style="margin-left:0px;min-width:70px;" class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnReset" tooltip='<%=L"使用默认值"%>' value='<%=L"重置"%>'/>
         <input type="button" name="Start" style="margin-left:5px;min-width:80px;" class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnStartAfterThreeSecond" value='<%=L"3秒后开始"%>' />
-        <input type="button" name="OK" DefaultButton="true" style="margin-left:20px;min-width:60px;" class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnOK" value='<%=L"确定"%>' />
+        <input type="button" name="OK" DefaultButton="true" style="margin-left:20px;min-width:60px;height:24px;margin-top:-1px" class="mc_yellow_button_with_fillet" onclick="VideoRecorderSettings.OnOK" value='<%=L"确定"%>' />
         <input type="button" name="Cancel" style="margin-left:20px;min-width:60px;" class="mc_light_grey_button_with_fillet" onclick="VideoRecorderSettings.OnClose" value='<%=L"取消"%>' />
+    </div>
+    <div style="margin-top:5px;text-align:center">
+        <%=L"强烈建议先存盘再录制视频！"%>
     </div>
 </div>
 </aries:window>

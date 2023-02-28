@@ -45,6 +45,14 @@ float4 vWorldPos		: worldpos;
 // x for world time, y for rainStrength,
 float4 g_parameter0		: ConstVector1; 
 
+// block material params
+float4 materialUV	: materialUV;
+float4 materialBaseColor : materialBaseColor;
+float4 materialEmissiveColor : materialEmissiveColor;
+float materialMetallic : materialMetallic;
+float materialSpecular : materialSpecular;
+
+
 // texture 0
 texture tex0 : TEXTURE; 
 sampler tex0Sampler: register(s0) = sampler_state 
@@ -60,6 +68,11 @@ texture tex1 : TEXTURE;
 sampler tex1Sampler: register(s1) = sampler_state 
 {
 	Texture = <tex1>;
+	AddressU = wrap;
+	AddressV = wrap;
+	MagFilter = Linear;
+	MinFilter = Linear;
+	MipFilter = Linear;
 };
 
 // normal map
@@ -395,9 +408,9 @@ BlockPSOut WaterPS(WaterBlockVSOut input)
 	float3 normal = input.normal.xyz*2-1;
 	normal += (tex2D(normalSampler, input.texcoord.zw)*2.0 - 1.0).xyz*WATER_BUMP_MAX_AMPLITUDE;
 	normal = normalize(normal);
-	o.Normal = float4(normal*0.5 + 0.5, 1.0);
+	o.Normal = float4(normal*0.5 + 0.5, 1); // since water is alpha blended, the alpha channel must be 1, instead of (1-specular)
 #else
-	o.Normal = float4(input.normal.xyz, 1.0);
+	o.Normal = float4(input.normal.xyz, 1);
 #endif
 
 	return o;
@@ -513,6 +526,149 @@ BlockPSOut BumpBlockPS(BumpBlockVSOut input)
 	return o;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// basic cube or solid blocks 
+///////////////////////////////////////////////////////////////////////////////
+
+BumpBlockVSOut MaterialMainVS(float4 position	: POSITION,
+	float3	Norm : NORMAL,
+	half4 color : COLOR0,
+	half4 color2 : COLOR1,
+	float2 texcoord : TEXCOORD0)
+{
+	BumpBlockVSOut output;
+
+	output.pos = mul(position, mWorldViewProj);
+	float3 normal = Norm;
+	output.texcoord = texcoord;
+
+	// emissive block light received by this block. 
+	float torch_light_strength = color.y;
+
+	// sun light + sky(fog) light
+	float sun_light_strength = color.x;
+
+	// apply AO shadow
+	output.color.xyz = color.www;
+	output.color.xyz *= color2.rgb;
+
+	output.color.w = 1;
+
+	// block category id
+	output.depth.r = color.z;
+	// torch light value
+	output.depth.g = sun_light_strength;
+	// sun light value
+	output.depth.b = torch_light_strength;
+	// view space linear depth value
+	float4 viewPos = mul(position, mWorldView);
+	output.depth.a = viewPos.z;
+
+	// calculate world position
+	float3 worldblockPos = (vWorldPos.xyz / BLOCK_SIZE) + position.xyz;
+
+	float3 binormal;
+	float3 tangent;
+	if (normal.x > 0.5) {
+		//  1.0,  0.0,  0.0
+		tangent = (float3(0.0, 0.0, -1.0));
+		binormal = (float3(0.0, -1.0, 0.0));
+		output.texcoord = worldblockPos.zy;
+	}
+	else if (normal.x < -0.5) {
+		// -1.0,  0.0,  0.0
+		tangent = (float3(0.0, 0.0, 1.0));
+		binormal = (float3(0.0, -1.0, 0.0));
+		output.texcoord = float2(32000.0-worldblockPos.z, worldblockPos.y);
+	}
+	else if (normal.y > 0.5) {
+		//  0.0,  1.0,  0.0
+		tangent = (float3(1.0, 0.0, 0.0));
+		binormal = (float3(0.0, 0.0, 1.0));
+		output.texcoord = worldblockPos.xz;
+	}
+	else if (normal.y < -0.5) {
+		//  0.0, -1.0,  0.0
+		tangent = (float3(1.0, 0.0, 0.0));
+		binormal = (float3(0.0, 0.0, 1.0));
+		output.texcoord = float2(32000.0 - worldblockPos.x, worldblockPos.z);
+	}
+	else if (normal.z > 0.5) {
+		//  0.0,  0.0,  1.0
+		tangent = (float3(1.0, 0.0, 0.0));
+		binormal = (float3(0.0, -1.0, 0.0));
+		output.texcoord = float2(32000.0-worldblockPos.x, worldblockPos.y);
+	}
+	else if (normal.z < -0.5) {
+		//  0.0,  0.0, -1.0
+		tangent = (float3(-1.0, 0.0, 0.0));
+		binormal = (float3(0.0, -1.0, 0.0));
+		output.texcoord = worldblockPos.xy;
+	}
+	output.texcoord += materialUV.zw;
+	output.tangent = tangent;
+	output.binormal = binormal;
+
+	if (materialMetallic > 0.1)
+	{
+		// normal map
+
+		// block category id
+		output.depth.r = 50.0/255.0; // metal's category id is 50
+		output.normal = normal;
+	}
+	else
+	{
+		output.normal = Norm * 0.5 + 0.5;
+	}
+
+	return output;
+}
+
+BlockPSOut MaterialMainPS(BumpBlockVSOut input)
+{
+	BlockPSOut o;
+
+	float2 uv = (input.texcoord - floor(input.texcoord / materialUV.xy)*materialUV.xy) / materialUV.xy;
+	uv.y = 1.0 - uv.y;
+
+	float4 albedoColor = tex2D(tex0Sampler, uv);
+	albedoColor = albedoColor * materialBaseColor;
+	
+	o.Color = albedoColor * input.color;
+	o.BlockInfo = float4(input.depth.rgb, 1);
+	o.Depth = float4(input.depth.a, 0, 0, 1);
+
+	if (materialEmissiveColor.a > 0)
+	{
+		float4 emissiveColor = tex2D(tex1Sampler, uv);
+		emissiveColor.rgb *= materialEmissiveColor.rgb;
+		emissiveColor.a *= materialEmissiveColor.a;
+		o.Color.rgb = lerp(o.Color.rgb, emissiveColor.rgb, emissiveColor.a);
+		o.BlockInfo.b = clamp(o.BlockInfo.b + emissiveColor.a, 0, 1.0);
+	}
+
+	if (materialMetallic > 0.1)
+	{
+		float3 normal = input.normal.xyz;
+		// tagent to world space row major matrix
+		float3x3 tbnMatrix = float3x3(input.tangent, input.binormal, normal);
+
+		// normal map 
+		float4 normalColor = tex2D(normalSampler, uv);
+		float3 bumpNormal = mul((normalColor.xyz * 2.0 - 1.0), tbnMatrix);
+		normal = normalize(bumpNormal);
+		normal = normal * 0.5 + 0.5;
+		o.Normal = float4(normal.xyz, normalColor.w * (1 - materialSpecular));
+	}
+	else
+	{
+		o.Normal = float4(input.normal.xyz, (1 - materialSpecular));
+	}
+
+	return o;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -580,6 +736,12 @@ technique SimpleMesh_vs30_ps30
 	{
 		VertexShader = compile vs_3_0 BumpBlockVS();
 		PixelShader = compile ps_3_0 BumpBlockPS();
+		FogEnable = false;
+	}
+	pass P5
+	{
+		VertexShader = compile vs_3_0 MaterialMainVS();
+		PixelShader = compile ps_3_0 MaterialMainPS();
 		FogEnable = false;
 	}
 }

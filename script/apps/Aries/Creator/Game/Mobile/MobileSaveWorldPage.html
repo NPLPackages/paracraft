@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="MobileSaveWorldPage.lua" ><![CDATA[
+local KeepworkServiceWorld = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceWorld.lua')
+local ShareWorld = NPL.load('(gl)Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua')
+local WorldExitDialog = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
+MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
+MobileSaveWorldPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnClickClosePage()
+    ClosePage()
+    local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
+    Desktop.is_exiting = false
+end
+
+
+
+function GetProjectId()
+    return GameLogic.options:GetProjectId() or ""
+end
+
+function OnEditValueChange()
+    MobileSaveWorldPage.OnEditValueChange()
+end
+
+function OnClickTakeImage()
+    --MobileSaveWorldPage.TakeImage()
+    local MobileScreenshotPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileScreenshotPage.lua")
+    MobileScreenshotPage.ShowPage()
+    ClosePage()
+end
+
+function on_click_save_and_share()
+    GameLogic.GetFilters():apply_filters(
+        "service.keepwork_service_world.limit_free_user",
+        false,
+        function(result)
+            if result then
+                _guihelper.SetMessageBoxLockHide(true)
+                MobileSaveWorldPage.SaveName()
+                GameLogic.QuickSave()
+                _guihelper.SetMessageBoxLockHide(false)
+
+                WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Cancel)
+                local desc = Page:GetValue("save_world_multilineedit")
+                MobileSaveWorldPage.SaveDesc(desc)
+                ShareWorld.callback = function()
+                    --[[
+                        _guihelper.MessageBox(L'保存并上传成功！是否要继续退出世界', function()
+                            WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
+                        end)
+                    ]]
+                    MobileSaveWorldPage.SaveDesc(desc)
+                end
+                --ShareWorld:ClosePage()
+                ClosePage();
+                ShareWorld:OnClick()
+            else
+                if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip')==true then
+                    return
+                end
+                _guihelper.MessageBox(L'操作被禁止了，免费用户最多只能拥有家园+1个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。')
+            end
+        end,
+        true
+    );
+end
+
+function OnSaveWorld()
+    --local worldname = Page:GetUIValue("worldname")
+    MobileSaveWorldPage.OnSaveWorld();
+    ClosePage();
+end
+
+function OnExitWorld()
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
+    
+    if isHomeWorkWorld and not GameLogic.IsReadOnly() then
+        MobileSaveWorldPage.OnSaveWorldAndExit()
+    else
+        MobileSaveWorldPage.OnExitWorld()
+    end
+end
+
+function OnFocuseIn(name, index)
+    MobileSaveWorldPage.OnFocuseIn(name, index)
+end
+
+function OnSaveWorldAndExit()
+    MobileSaveWorldPage.OnSaveWorldAndExit();
+end
+
+function GetTitle()
+    return MobileSaveWorldPage.GetTitle()
+end
+]]></script>
+<mb:window ClickThrough="false" width="880" height="642" title='<%= GetTitle()%>' onclose="OnClickClosePage">
+    <div style="height: 80px;"></div>
+    <div style="margin-left: 48px;margin-top: 18px;float: left; width: 401px;height: 239px;background:;">
+        <pe:if condition="<%=not GameLogic.IsReadOnly()%>">
+            <pe:container zorder="1" style="position:relative;margin-top:200 px;margin-left:-5px;width: 144px;height: 52px;background:url(Texture/Aries/Creator/keepwork/Mobile/saveworld/bt1_144x52_32bits.png#0 0 144 52)">
+                <div style="position:relative;width: 144px;height: 52px; background:" tooltip='<%=L"点击重新截图"%>' onclick="OnClickTakeImage">
+                </div>
+                <div style="position:relative;">
+                    <div style="float: left;margin-left: 16px; margin-top:15px;width: 20px;height: 19px;background:url(Texture/Aries/Creator/keepwork/Mobile/saveworld/icon1_20x19_32bits.png#0 0 20 19)">
+                    </div>
+                    <div style="float: left;margin-left: 10px;margin-top:10px;font-size: 20px;">重新截图</div>
+                </div>
+            </pe:container>        
+        </pe:if>
+
+        <img style="position:relative;" name="WorldImage" width="401" height="239" />
+
+    </div>
+    <div style="margin-left: 26px;margin-top: 18px;float: left; width: 401px;height: 239px;">
+        <div style="margin-left: 0px;color:#333333;font-size: 26px;base-font-size:26px;font-weight: bold;">作品名称:</div>
+        <!-- <input type="text" name="worldname" value='' style="margin-top:4px;width:360px;height:64px;background:url(Texture/Aries/Creator/keepwork/Mobile/common/input_bg1_64x64_32bits.png#0 0 64 64:25 25 25 25)"/> -->
+        <pe:if condition="<%=GameLogic.IsReadOnly()%>">
+            <div style="width:360px;height:64px;margin-top: 8px;background:url()">
+                <input type="text" ReadOnly="true" MoveViewWhenAttachWithIME="true" name="worldname" value='' EmptyText='<%=L"输入作品名称"%>' style="margin-left:-2px;margin-top:18px;width:360px;height:40px;font-size: 28px;base-font-size:28px;color:#ffffff; background:;" />    
+            </div>
+        </pe:if>
+
+        <pe:if condition="<%=not GameLogic.IsReadOnly()%>">
+            <div style="width:360px;height:64px;margin-top: 8px;background:url(Texture/Aries/Creator/keepwork/Mobile/common/input_bg1_64x64_32bits.png#0 0 64 64:25 25 25 25)">
+                <input type="text" MoveViewWhenAttachWithIME="true" name="edit_worldname" value='' EmptyText='<%=L"输入作品名称"%>' style="margin-left:15px;margin-top:8px;width:334px;height:50px;font-size: 28px;base-font-size:28px;color:#ffffff; background:;" />
+            </div>
+        </pe:if>
+
+        
+        <div style="margin-top: 28px;float: left; color:#333333;font-size: 26px;base-font-size:26px;font-weight: bold;">项目ID:</div>
+        <div style="margin-top: 28px;margin-left: 10px;float: left; color:#333333;font-size: 26px;base-font-size:26px;font-weight: bold;"><%=GetProjectId()%></div>
+    </div>
+    <pe:if condition="<%=GameLogic.IsReadOnly()%>">
+        <!-- <input ReadOnly="true" MoveViewWhenAttachWithIME="true" name="save_world_multilineedit" EmptyText='<%=L"请输入作品描述"%>' EmptyTextColor="#FFFFFF" AlwaysShowCurLineBackground="false" style="width:776px;margin-left: 4px;margin-top: 15px;height:50px;background:;font-size: 28px;base-font-size:28px;"/> -->
+        <div style="width:784px;height:150px;margin-left: 48px;margin-top: 20px;background:url()">
+            <div style="color: #000000;font-size: 26px;base-font-size:26px">作品描述：</div>
+            <input ReadOnly="true" name="save_world_multilineedit" EmptyText='<%=L"作者没有写描述哦..."%>' EmptyTextColor="#999999" AlwaysShowCurLineBackground="false" style="textcolor: #999999; width:776px;margin-left: -2px;margin-top: 10px;height:50px;background:;font-size: 26px;base-font-size:26px;"/>
+        </div>
+    </pe:if>
+
+    <pe:if condition="<%=not GameLogic.IsReadOnly()%>">
+        <div style="width:784px;height:144px;margin-left: 48px;margin-top: 26px;background:url(Texture/Aries/Creator/keepwork/Mobile/common/input_bg1_64x64_32bits.png#0 0 64 64:25 25 25 25)">
+            <input MoveViewWhenAttachWithIME="true" name="edit_save_world_multilineedit" EmptyText='<%=L"请输入作品描述"%>' EmptyTextColor="#FFFFFF" AlwaysShowCurLineBackground="false" style="width:776px;margin-left: 4px;margin-top: 15px;height:50px;background:;font-size: 28px;base-font-size:28px;"/>
+        </div>
+    </pe:if>
+
+    <div style="margin-top: 26px;">
+        <pe:if condition='<%=MobileSaveWorldPage.button_type == "save_world"%>'>
+            <input type="button" value='保存并上传' onclick="on_click_save_and_share" style="margin-left: 320px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt2_244x76_32bits.png#0 0 244 76)" />
+            <input type="button" value='本地保存' onclick="OnSaveWorld" style="margin-left: 25px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt1_244x76_32bits.png#0 0 244 76)" />
+        </pe:if>
+
+        <pe:if condition='<%=MobileSaveWorldPage.button_type == "upload_world"%>'>
+            <input type="button" value='保存并上传' onclick="on_click_save_and_share" style="margin-left: 586px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt2_244x76_32bits.png#0 0 244 76)" />
+        </pe:if>
+
+        <pe:if condition='<%=MobileSaveWorldPage.button_type == "exit_world"%>'>
+            <pe:if condition="<%=not GameLogic.IsReadOnly()%>">
+                <input type="button" value='保存并退出' onclick="OnSaveWorldAndExit" style="margin-left: 50px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt2_244x76_32bits.png#0 0 244 76)" />
+                <input type="button" value='取消' onclick="OnClickClosePage" style="margin-left: 23px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt1_244x76_32bits.png#0 0 244 76)" />
+                <input type="button" value='直接退出' onclick="OnExitWorld" style="margin-left: 23px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt3_244x76_32bits.png#0 0 244 76)" />
+            </pe:if>
+            <pe:if condition="<%=GameLogic.IsReadOnly()%>">
+                <!-- <input type="button" value='保存并退出' onclick="OnSaveWorldAndExit" style="margin-left: 50px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt2_244x76_32bits.png#0 0 244 76)" /> -->
+                <input type="button" value='取消' onclick="OnClickClosePage" style="margin-left: 322px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt1_244x76_32bits.png#0 0 244 76)" />
+                <input type="button" value='退出' onclick="OnExitWorld" style="margin-left: 23px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt3_244x76_32bits.png#0 0 244 76)" />
+            </pe:if>
+        </pe:if>
+
+        <pe:if condition='<%=MobileSaveWorldPage.button_type == "commit_work"%>'>
+            <input type="button" value='保存并提交' onclick="on_click_save_and_share" style="margin-left: 586px; width: 244px;height:76px;float:left;font-size: 32px;font-weight: bold; background:url(Texture/Aries/Creator/keepwork/Mobile/common/bt1_244x76_32bits.png#0 0 244 76)" />
+        </pe:if>
+    </div>
+</mb:window>
+</pe:mcml>
+</body>
+</html>

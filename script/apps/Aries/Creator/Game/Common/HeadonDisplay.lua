@@ -2,7 +2,7 @@
 Title: Headon Display
 Author(s): LiXizhi
 Date: 2019/11/8
-Desc: Create a headon display object
+Desc: Create a headon display object. Head on display uses a shared UI object and draw method is called every render frame. 
 use the lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HeadonDisplay.lua");
@@ -14,6 +14,8 @@ gui:Show({url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:
 NPL.load("(gl)script/ide/System/Core/PainterContext.lua");
 NPL.load("(gl)script/ide/System/Windows/Window.lua");
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeContext2d.lua");
+local CodeContext2d = commonlib.gettable("MyCompany.Aries.Game.Code.CodeContext2d")
 local Screen = commonlib.gettable("System.Windows.Screen");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local PainterContext = commonlib.gettable("System.Core.PainterContext");
@@ -308,9 +310,6 @@ function HeadonDisplay:create_sys(native_window, initializeWindow, destroyOldWin
 	self.native_ui_obj = _this;
 	self:setAttribute("WA_WState_Created");     
 	self:UpdateGeometry_Sys();
-	if(self.bSelfPaint~=nil) then
-		self:EnableSelfPaint(self.bSelfPaint);
-	end
 	if(not self.AutoClearBackground) then
 		self:SetAutoClearBackground(self.AutoClearBackground);
 	end
@@ -339,6 +338,7 @@ function HeadonDisplay.onDraw2D(obj)
 		self:handleRender()
 	end
 end
+
 
 function HeadonDisplay.onDraw(obj)
 	local id = obj.text;
@@ -370,4 +370,39 @@ function HeadonDisplay:FilterImage(filename)
 		end
 	end
 	return filename;
+end
+
+function HeadonDisplay:prepareCodeContext()
+	if(self.context2d) then
+		return
+	end
+	self.context2d = CodeContext2d:new();
+	self.context2d:SetWindow(self);
+	self.context2d:clearRect();
+end
+
+-- do nothing, since head on display is always rendered to 3d scene on each frame. No self paint is enabled. 
+function HeadonDisplay:markDirty()
+end
+
+-- do nothing, since head on display is always rendered to 3d scene on each frame. No self paint is enabled. 
+function HeadonDisplay:EnableSelfPaint(bSelfPaint)
+end
+
+-- @param name: default to "2d"
+function HeadonDisplay:getContext(name)
+	self:prepareCodeContext()
+	return self.context2d;
+end
+
+-- virtual
+function HeadonDisplay:Render(painterContext)
+	if(self.context2d) then
+		local ok, msg = pcall(self.context2d.Render, self.context2d, painterContext, true)
+		if(not ok and msg) then
+			painterContext:DrawText(0,0, "error in painting");
+			painterContext:DrawText(0,20, msg);
+		end	
+	end
+	return HeadonDisplay._super.Render(self, painterContext);
 end

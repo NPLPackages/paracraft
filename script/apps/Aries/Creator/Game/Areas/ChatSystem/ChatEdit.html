@@ -6,187 +6,333 @@
     <title>ChatEdit, by lixizhi, 2011/3/14</title>
 </head>
 <body>
-<pe:mcml>
-<script type="text/npl" src="ChatEdit.lua"><![CDATA[
-KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
-local ChatEdit = MyCompany.Aries.ChatSystem.ChatEdit;
-local page = document:GetPageCtrl();
-ChatEdit.Init();
+    <pe:mcml>
+        <script type="text/npl" src="ChatEdit.lua">
+            <![CDATA[
+                KpChatChannel = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpChatChannel.lua");
+                local ChatEdit = MyCompany.Aries.ChatSystem.ChatEdit;
+                local page = document:GetPageCtrl();
+                ChatEdit.Init();
 
-function OnQuickword(sName)
-    local btn = page:FindUIControl(sName);
-    if(btn and btn:IsValid())then
-        local name = btn.name;
-        local x,y,width, height = btn:GetAbsPosition();
-        local KpQuickWord = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpQuickWord.lua");
-        KpQuickWord.OnQuickword(x,y,width, height);
-    end
-end
-function IsOpened_BulletScreen()
-	return KpChatChannel.BulletScreenIsOpened()
-end
-function OnOpen_BulletScreen()
-    KpChatChannel.SetBulletScreen(true)
-end
-function OnClose_BulletScreen()
-    KpChatChannel.SetBulletScreen(false)
-end
-function IsGGSMode()
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-    local ChatWindow = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatWindow");
-    return ChatWindow.ggs_mode;
-end
+                function OnQuickword(sName)
+                    local btn = page:FindUIControl(sName);
+                    if(btn and btn:IsValid())then
+                        local name = btn.name;
+                        local x,y,width, height = btn:GetAbsPosition();
+                        local KpQuickWord = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/KpQuickWord.lua");
+                        KpQuickWord.OnQuickword(x,y,width, height);
+                    end
+                end
 
-function IsEnableIme()
-    if ChatEdit.enable_ime ~= nil then
-        return ChatEdit.enable_ime
-    end
+                function IsOpened_BulletScreen()
+                    return KpChatChannel.BulletScreenIsOpened()
+                end
 
-    return not ChatEdit.IsShowIMEBt()
-end
+                function OnOpen_BulletScreen()
+                    KpChatChannel.SetBulletScreen(true)
+                end
 
-function GetChatEditTextDiv()
-    local div_str = ""
-    if IsEnableIme() then
-        if IsGGSMode() then
-            div_str = [[<input type="text" uiname="ChatEdit.text" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" %s style="%s;position:relative;margin-top:-2px;height:%s;background:;" class="bordertext"/>]]
-        else
-            div_str = [[<input type="text" uiname="ChatEdit.text" name="chatedit_words" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" %s style="%s;position:relative;margin-top:-2px;height:%s;background:;" class="bordertext"/>]]
-        end
-    else
-        if IsGGSMode() then
-            div_str = [[<input type="text" uiname="ChatEdit.text" enable_ime="false" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" %s style="%s;position:relative;margin-top:-2px;height:%s;background:;" class="bordertext"/>]]
-        else
-            div_str = [[<input type="text" uiname="ChatEdit.text" name="chatedit_words" enable_ime="false" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" %s style="%s;position:relative;margin-top:-2px;height:%s;background:;" class="bordertext"/>]]
-        end
-    end
+                function OnClose_BulletScreen()
+                    KpChatChannel.SetBulletScreen(false)
+                end
 
-    local height = "22px"
-    local width_str = 'width="100%"'
-    local size_str = ""
-    if System.os.IsTouchMode() then
-        height = "38px"
-        size_str = "font-size:22px"
-    end 
+                function IsGGSMode()
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+                    local ChatWindow = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatWindow");
+                    return ChatWindow.ggs_mode;
+                end
 
-    div_str = string.format(div_str, width_str, size_str, height)
-    return div_str
-end
+                function IsEnableIme()
+                    if ChatEdit.enable_ime ~= nil then
+                        return ChatEdit.enable_ime
+                    end
 
-function GetBgStyle()
+                    return not ChatEdit.IsShowIMEBt()
+                end
 
-    if System.os.IsTouchMode() then
-        return "height:39px;background-color:#000000a0;"
-    end 
-    return "height:29px;background-color:#000000a0;"
-end
+                function GetChatEditTextDiv()
+                    local div_str = ""
 
-function GetChatEditDiv()
-    if not System.os.IsTouchMode() then
-        return [[
-            <div width="100%" style="position:relative;float:left;margin-top:4px;margin-left:10px;margin-right:80px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
-                <%=GetChatEditTextDiv()%>
-            </div>
+                    if IsEnableIme() then
+                        if IsGGSMode() then
+                            div_str = [[<input type="text" uiname="ChatEdit.text" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" %s style="%s;position:relative;margin-top:-2px;height:%s;background:;" class="bordertext"/>]]
+                        else
+                            div_str = [[<input type="text" uiname="ChatEdit.text" name="chatedit_words" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" %s style="%s;position:relative;margin-top:-2px;height:%s;background:;" class="bordertext"/>]]
+                        end
+                    else
+                        if IsGGSMode() then
+                            div_str = [[<input type="text" uiname="ChatEdit.text" enable_ime="false" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" %s style="%s;position:relative;margin-top:-2px;height:%s;background:;" class="bordertext"/>]]
+                        else
+                            div_str = [[<input type="text" uiname="ChatEdit.text" name="chatedit_words" enable_ime="false" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" %s style="%s;position:relative;margin-top:-2px;height:%s;background:;" class="bordertext"/>]]
+                        end
+                    end
 
-            <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:30px;width:50px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
-            name="send"  uiname="ChatEdit.send" tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-            <input value='X' type="button" align="right" style="position:relative;margin-right:5px;width:20px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
-                name="cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-            
-            <pe:if condition="<%= MyCompany.Aries.ChatSystem.ChatEdit.IsShowIMEBt() %>">
-                <input value='<%= L"中文" %>' type="button" align="right" style="position:relative;margin-right:85px;width:40px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
-                name="imebt"  uiname="ChatEdit.imebt" onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeIme"/>
-            </pe:if> 
-        ]]
-    else
-        return [[
-                <div width="100%" style="position:relative;float:left;margin-top:0px;margin-left:10px;margin-right:80px;height:35px;background:url(Texture/whitedot.png);background-color:#000000cc">
-                    <%=GetChatEditTextDiv()%>
-                </div>
+                    local height = "22px"
+                    local width_str = 'width="100%"'
+                    local size_str = ""
+                    if System.os.IsTouchMode() then
+                        height = "38px"
+                        size_str = "font-size:22px"
+                    end 
 
-                <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:30px;width:50px;margin-top:4px;height:30px;" class="mc_light_grey_button_with_fillet" 
-                name="send"  uiname="ChatEdit.send" tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-                <input value='X' type="button" align="right" style="position:relative;margin-right:5px;width:20px;margin-top:4px;height:30px;" class="mc_light_grey_button_with_fillet" 
-                    name="cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-                
-                <pe:if condition="<%= MyCompany.Aries.ChatSystem.ChatEdit.IsShowIMEBt() %>">
-                    <input value='<%= L"中文" %>' type="button" align="right" style="position:relative;margin-right:85px;width:40px;margin-top:4px;height:30px;" class="mc_light_grey_button_with_fillet" 
-                    name="imebt"  uiname="ChatEdit.imebt" onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeIme"/>
-                </pe:if> 
-        ]]
-    end
-end
+                    div_str = string.format(div_str, width_str, size_str, height)
+                    return div_str
+                end
 
-function GetGGSChatEditDiv()
-    if not System.os.IsTouchMode() then
-        return [[
-                <div width="100%" style="position:relative;float:left;margin-top:4px;margin-left:10px;margin-right:60px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
-                    <!-- <input type="text" uiname="ChatEdit.text" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/> -->
-                    <%=GetChatEditTextDiv()%>
-                </div>
-                <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:5px;width:50px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
-                name="send"  uiname="ChatEdit.send" tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-                <pe:if condition="<%= MyCompany.Aries.ChatSystem.ChatEdit.IsShowIMEBt() %>">
-                    <input value='<%= L"中文" %>' type="button" align="right" style="position:relative;margin-right:60px;width:40px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
-                    name="ggs_imebt"  uiname="ChatEdit.imebt" onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeIme"/>
-                </pe:if> 
-        ]]
-    else
-        return [[
-                <div width="100%" style="position:relative;float:left;margin-top:0px;margin-left:10px;margin-right:60px;height:35px;background:url(Texture/whitedot.png);background-color:#000000cc">
-                    <!-- <input type="text" uiname="ChatEdit.text" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/> -->
-                    <%=GetChatEditTextDiv()%>
-                </div>
-                <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:5px;width:50px;margin-top:4px;height:30px;" class="mc_light_grey_button_with_fillet" 
-                name="send"  uiname="ChatEdit.send" tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-                <pe:if condition="<%= MyCompany.Aries.ChatSystem.ChatEdit.IsShowIMEBt() %>">
-                    <input value='<%= L"中文" %>' type="button" align="right" style="position:relative;margin-right:60px;width:40px;margin-top:4px;height:30px;" class="mc_light_grey_button_with_fillet" 
-                    name="ggs_imebt"  uiname="ChatEdit.imebt" onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeIme"/>
-                </pe:if> 
-        ]]
-    end
-end
-]]></script>
-<pe:if condition="<%= not System.options.IsMobilePlatform %>">
-    <div width="100%" style="<%=GetBgStyle()%>">
-        <pe:if condition="<%= KpChatChannel.IsInWorld() %>">
-            <div style="float:left;margin-left:5px;margin-top:4px;">
-                <pe:if condition="<%= IsOpened_BulletScreen() %>">
-                        <input type="button" uiname="ChatEdit.toggleBullet" tooltip='<%=L"关闭弹幕"%>' style="font-size:12px;margin-top:0px;width:21px;height:21px;background:url(Texture/Aries/Creator/keepwork/chat/bomb_on_32bits.png#0 0 21 21);" 
-                            onclick="OnClose_BulletScreen()" />
-                </pe:if>
-                <pe:if condition="<%= not IsOpened_BulletScreen() %>">
-                        <input type="button" uiname="ChatEdit.toggleBullet" tooltip='<%=L"开启弹幕"%>' style="font-size:12px;margin-top:0px;width:21px;height:21px;background:url(Texture/Aries/Creator/keepwork/chat/bomb_off_32bits.png#0 0 21 21);" 
-                            onclick="OnOpen_BulletScreen()" />
+                function GetBgStyle()
+                    if System.os.IsTouchMode() then
+                        return "height:39px;background-color:#000000a0;"
+                    end 
+                    return "height:29px;background-color:#000000a0;"
+                end
+
+                function GetChatEditDiv()
+                    if not System.os.IsTouchMode() then
+                        return [[
+                            <div width="100%"
+                                 style="position: relative;
+                                        float: left;
+                                        margin-top: 4px;
+                                        margin-left: 10px;
+                                        margin-right: 80px;
+                                        height: 20px;
+                                        background: url(Texture/whitedot.png);background-color:#000000cc">
+                                <%= GetChatEditTextDiv() %>
+                            </div>
+                            <input value='<%= L"发送" %>'
+                                   type="button"
+                                   align="right"
+                                   style="position: relative;
+                                          margin-right: 30px;
+                                          width: 50px;
+                                          margin-top: 4px;
+                                          height: 20px;"
+                                   class="mc_light_grey_button_with_fillet" 
+                                   name="send"
+                                   uiname="ChatEdit.send"
+                                   tooltip='<%= L"发送" %>'
+                                   onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+                            <input value='X'
+                                   type="button"
+                                   align="right"
+                                   style="position: relative;
+                                          margin-right: 5px;
+                                          width: 20px;
+                                          margin-top: 4px;
+                                          height: 20px;"
+                                   class="mc_light_grey_button_with_fillet" 
+                                   name="cancel"
+                                   tooltip='<%= L"取消" %>'
+                                   onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+                            <pe:if condition="<%= MyCompany.Aries.ChatSystem.ChatEdit.IsShowIMEBt() %>">
+                                <input value='<%= L"中文" %>'
+                                       type="button"
+                                       align="right"
+                                       style="position: relative;
+                                              margin-right: 85px;
+                                              width: 40px;
+                                              margin-top: 4px;
+                                              height: 20px;"
+                                       class="mc_light_grey_button_with_fillet" 
+                                       name="imebt"
+                                       uiname="ChatEdit.imebt"
+                                       onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeIme"/>
+                            </pe:if> 
+                        ]]
+                    else
+                        return [[
+                                <div width="100%"
+                                     style="position: relative;
+                                            float: left;
+                                            margin-top: 0px;
+                                            margin-left: 10px;
+                                            margin-right: 80px;
+                                            height: 35px;
+                                            background: url(Texture/whitedot.png);background-color:#000000cc">
+                                    <%= GetChatEditTextDiv() %>
+                                </div>
+                                <input value='<%= L"发送" %>'
+                                       type="button"
+                                       align="right"
+                                       style="position: relative;
+                                              margin-right: 30px;
+                                              width: 50px;
+                                              margin-top: 4px;
+                                              height: 30px;"
+                                       class="mc_light_grey_button_with_fillet" 
+                                       name="send"
+                                       uiname="ChatEdit.send"
+                                       tooltip='<%=L"发送"%>'
+                                       onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend" />
+                                <input value='X'
+                                       type="button"
+                                       align="right"
+                                       style="position: relative;
+                                              margin-right: 5px;
+                                              width: 20px;
+                                              margin-top: 4px;
+                                              height: 30px;"
+                                       class="mc_light_grey_button_with_fillet" 
+                                       name="cancel"
+                                       tooltip='<%=L"取消"%>'
+                                       onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend" />
+                                <pe:if condition="<%= MyCompany.Aries.ChatSystem.ChatEdit.IsShowIMEBt() %>">
+                                    <input value='<%= L"中文" %>'
+                                           type="button"
+                                           align="right"
+                                           style="position: relative;
+                                                  margin-right: 85px;
+                                                  width: 40px;
+                                                  margin-top: 4px;
+                                                  height: 30px;"
+                                           class="mc_light_grey_button_with_fillet" 
+                                           name="imebt"
+                                           uiname="ChatEdit.imebt"
+                                           onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeIme" />
+                                </pe:if> 
+                        ]]
+                    end
+                end
+
+                function GetGGSChatEditDiv()
+                    if not System.os.IsTouchMode() then
+                        return [[
+                            <div width="100%" style="position:relative;float:left;margin-top:4px;margin-left:10px;margin-right:60px;height:20px;background:url(Texture/whitedot.png);background-color:#000000cc">
+                                <!-- <input type="text" uiname="ChatEdit.text" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/> -->
+                                <%=GetChatEditTextDiv()%>
+                            </div>
+                            <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:5px;width:50px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
+                            name="send"  uiname="ChatEdit.send" tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+                            <pe:if condition="<%= MyCompany.Aries.ChatSystem.ChatEdit.IsShowIMEBt() %>">
+                                <input value='<%= L"中文" %>' type="button" align="right" style="position:relative;margin-right:60px;width:40px;margin-top:4px;height:20px;" class="mc_light_grey_button_with_fillet" 
+                                name="ggs_imebt"  uiname="ChatEdit.imebt" onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeIme"/>
+                            </pe:if> 
+                        ]]
+                    else
+                        return [[
+                            <div width="100%" style="position:relative;float:left;margin-top:0px;margin-left:10px;margin-right:60px;height:35px;background:url(Texture/whitedot.png);background-color:#000000cc">
+                                <!-- <input type="text" uiname="ChatEdit.text" name="chatedit_words_ggsmode" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:-2px;height:22px;background:;" class="bordertext"/> -->
+                                <%=GetChatEditTextDiv()%>
+                            </div>
+                            <input value='<%= L"发送" %>' type="button" align="right" style="position:relative;margin-right:5px;width:50px;margin-top:4px;height:30px;" class="mc_light_grey_button_with_fillet" 
+                            name="send"  uiname="ChatEdit.send" tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+                            <pe:if condition="<%= MyCompany.Aries.ChatSystem.ChatEdit.IsShowIMEBt() %>">
+                                <input value='<%= L"中文" %>' type="button" align="right" style="position:relative;margin-right:60px;width:40px;margin-top:4px;height:30px;" class="mc_light_grey_button_with_fillet" 
+                                name="ggs_imebt"  uiname="ChatEdit.imebt" onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnChangeIme"/>
+                            </pe:if> 
+                        ]]
+                    end
+                end
+            ]]>
+        </script>
+        <pe:if condition="<%= not System.options.IsMobilePlatform %>">
+            <div width="100%" style="<%=GetBgStyle()%>">
+                <pe:if condition="<%= KpChatChannel.IsInWorld() %>">
+                    <div style="float:left;margin-left:5px;margin-top:4px;">
+                        <pe:if condition="<%= IsOpened_BulletScreen() %>">
+                                <input type="button"
+                                       uiname="ChatEdit.toggleBullet"
+                                       tooltip='<%= L"关闭弹幕" %>'
+                                       style="font-size: 12px;
+                                              margin-top: 0px;
+                                              width: 21px;
+                                              height: 21px;
+                                              background: url(Texture/Aries/Creator/keepwork/chat/bomb_on_32bits.png#0 0 21 21);" 
+                                       onclick="OnClose_BulletScreen()" />
+                        </pe:if>
+                        <pe:if condition="<%= not IsOpened_BulletScreen() %>">
+                                <input type="button"
+                                       uiname="ChatEdit.toggleBullet"
+                                       tooltip='<%= L"开启弹幕" %>'
+                                       style="font-size: 12px;
+                                              margin-top: 0px;
+                                              width: 21px;
+                                              height: 21px;
+                                              background: url(Texture/Aries/Creator/keepwork/chat/bomb_off_32bits.png#0 0 21 21);" 
+                                       onclick="OnOpen_BulletScreen()" />
+                        </pe:if>    
+                        <input type="button"
+                               tooltip="快捷语言"
+                               style="font-size: 12px;
+                                      margin-left: 10px;
+                                      margin-top: 1px;
+                                      width: 24px;
+                                      height:20px;background:url(Texture/Aries/Creator/keepwork/chat/quick_language_off_32bits.png#0 0 24 20);" 
+                               onclick="OnQuickword()"
+                               uiname="ChatEdit.quickword_btn"
+                               name="quickword_btn"/>
+                    </div>
                 </pe:if>    
-                <input type="button" tooltip="快捷语言" style="font-size:12px;margin-left:10px;margin-top:1px;width:24px;height:20px;background:url(Texture/Aries/Creator/keepwork/chat/quick_language_off_32bits.png#0 0 24 20);" 
-                    onclick="OnQuickword()" uiname="ChatEdit.quickword_btn" name="quickword_btn"/>
-                
+                <!-- hiding send/close btn -->
+                <pe:if condition="<%=not IsGGSMode()%>">
+                    <%= GetChatEditDiv() %>
+                </pe:if>
+                <pe:if condition="<%=IsGGSMode()%>">
+                    <%= GetGGSChatEditDiv() %>
+                </pe:if>
             </div>
-        </pe:if>    
-           
-        <!--hiding send/close btn-->
-        <pe:if condition="<%=not IsGGSMode()%>">
-            <%=GetChatEditDiv()%>
         </pe:if>
-        <pe:if condition="<%=IsGGSMode()%>">
-            <%=GetGGSChatEditDiv()%>
+        <pe:if condition="<%= System.options.IsMobilePlatform %>">
+            <div width="100%"
+                 style="height: 45px;
+                        background-color: #ffffffff;"
+                 class="mobile_button">
+                    <div width="100%"
+                         style="position:relative;
+                                float:left;
+                                margin-top:2px;
+                                margin-left:5px;
+                                margin-right:175px;
+                                height:40px;
+                                background-color:#000000cc"
+                         class="mobile_button_white">
+                        <input type="text"
+                               uiname="ChatEdit.text"
+                               name="chatedit_words_mobile"
+                               auto_virtual_keyboard="true"
+                               onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp"
+                               textcolor="#FFFFFFFF"
+                               CaretColor="#FFFFFFFF"
+                               width="100%"
+                               style="position:relative;
+                                      margin-top:5px;
+                                      height:30px;
+                                      font-size:20px;
+                                      background: url();"
+                               class="mobile_button_black" />
+                    </div>
+                    <input zorder="1"
+                    align="right"
+                           value='<%=L"取消"%>'
+                           type="button"
+                           style="position: relative;
+                                  margin-right: 5px;
+                                  font-size: 14px;
+                                  margin-top: 3px;
+                                  min-width: 85px;
+                                  height: 38px;"
+                           class="mobile_button_white" 
+                           name="cancel"
+                           uiname="ChatEdit.cancel"
+                           tooltip='<%=L"取消"%>'
+                           onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+                    <input zorder="1"
+                           align="right"
+                           value='<%=L"发送"%>'
+                           type="button"
+                           style="position: relative;
+                                  margin-right: 95px;
+                                  font-size: 14px;
+                                  margin-top: 3px;
+                                  min-width: 70px;
+                                  height: 38px;"
+                           class="mobile_button_white" 
+                           name="send"
+                           uiname="ChatEdit.send"
+                           tooltip='<%=L"发送"%>'
+                           onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
+            </div>
         </pe:if>
-        
-        
-    </div>
-</pe:if>
-<pe:if condition="<%= System.options.IsMobilePlatform %>">
-    <div width="100%" style="height:45px;background-color:#ffffffff;" class="mobile_button">
-        <div width="100%" style="position:relative;float:left;margin-top:2px;margin-left:5px;margin-right:175px;height:40px;background-color:#000000cc" class="mobile_button_white">
-            <input type="text" uiname="ChatEdit.text" name="chatedit_words_mobile" onkeyup="MyCompany.Aries.ChatSystem.ChatEdit.OnKeyUp" textcolor="#FFFFFFFF" CaretColor="#FFFFFFFF" width="100%" style="position:relative;margin-top:5px;height:30px;font-size:20px;background:;" class="mobile_button_black"/>
-        </div>
-        <input zorder="1" align="right" value='<%=L"取消"%>' type="button" style="position:relative;margin-right:5px;font-size:14px;margin-top:3px;min-width:85px;height:38px;" class="mobile_button_white" 
-                name="cancel" uiname="ChatEdit.cancel" tooltip='<%=L"取消"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-        <input zorder="1" align="right" value='<%=L"发送"%>' type="button" style="position:relative;margin-right:95px;font-size:14px;margin-top:3px;min-width:70px;height:38px;" class="mobile_button_white" 
-                name="send" uiname="ChatEdit.send" tooltip='<%=L"发送"%>' onclick="MyCompany.Aries.ChatSystem.ChatEdit.OnClickSend"/>
-    </div>
-</pe:if>
-</pe:mcml> 
+    </pe:mcml> 
 </body>
 </html>

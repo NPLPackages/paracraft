@@ -405,7 +405,7 @@ float4 Composite1PS(VSOutput input):COLOR
 		color.xyz = lerp(torch_light.xyz+sun_light.xyz, sun_light.xyz, sun_light_strength / (torch_light_strength + sun_light_strength+0.001));
 		
 		// CalculateSpecularHighlight
-		if (category_id == 50)
+		if (category_id == 50 || specular > 0.01)
 		{
 			float3 cameraSpaceViewDir = normalize(cameraSpacePosition);
 			float3 cameraSpaceNormal = mul(normal, (float3x3)matView);
@@ -424,6 +424,14 @@ float4 Composite1PS(VSOutput input):COLOR
 			// water blocks
 			float3 cameraSpaceNormal = mul(normal, (float3x3)matView);
 			float4 reflection = ComputeRayTraceWaterReflection(cameraSpacePosition, cameraSpaceNormal);
+
+#define USE_WATER_REFLECTION_FRESNEL_EFFECT
+#ifdef USE_WATER_REFLECTION_FRESNEL_EFFECT
+			float3 cameraSpaceViewDir = -normalize(cameraSpacePosition);
+			const float fresnelPower = 3.0;
+			float fresnel = pow(saturate(1.0 - dot(cameraSpaceViewDir, cameraSpaceNormal)), fresnelPower) * 0.98 + 0.02;
+			reflection.a *= fresnel;
+#endif
 			color.xyz = lerp(color.xyz, reflection.rgb, reflection.a);
 		}
 

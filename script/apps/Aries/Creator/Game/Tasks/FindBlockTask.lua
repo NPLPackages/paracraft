@@ -2,7 +2,7 @@
 Title: Find Block Task Command
 Author(s): LiXizhi
 Date: 2019/6/10
-Desc: Ctrl+F to activate this dialog.
+Desc: Ctrl+F to activate this dialog. Left click to teleport. Alt+Click to pick the entity. Ctrl+Click to select
 
 use the lib:
 ------------------------------------------------------------
@@ -19,6 +19,7 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
+local Keyboard = commonlib.gettable("System.Windows.Keyboard");
 local FindBlockTask = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.Task"), commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask"));
 
 FindBlockTask:Property({"text", nil, "GetText", "SetText", auto=true});
@@ -277,14 +278,20 @@ function FindBlockTask.SetResults(entities)
 		for i, entity in ipairs(entities) do
 			local item = entity:GetItemClass()
 			local name = entity:GetDisplayName() or "";
-			if(name == "" and entity.isPowered) then
+			if(name == "") then
 				-- tricky: for unnamed, yet powered code block, we will list them
-				name = "(powered)"
+				if(entity.isPowered) then
+					name = "(powered)"
+				end
+				local modelFilename = entity:GetModelFile();
+				if(modelFilename and modelFilename~="") then
+					name = modelFilename
+				end
 			end
 			if(item and name~="") then
 				name = name:gsub("\r?\n"," ")
 				local index = #resultDS+1
-				resultDS[index] = {name="block", attr={index=index,name=name, lowerText = string.lower(name), icon = item:GetIcon()}};
+				resultDS[index] = {name="block", attr={index=index,name=name, class_name = entity.class_name, lowerText = string.lower(name), icon = item:GetIcon()}};
 				results[index] = entity;
 				local x, y, z = entity:GetBlockPos();
 				local container = EntityManager.GetRegion(x, z);
@@ -406,6 +413,25 @@ function FindBlockTask.OnClickItem(treenode)
 	FindBlockTask.SetSelectedIndexByResultIndex(index)
 	FindBlockTask.GotoItemAtIndex(index);
 	
+	if(Keyboard:IsAltKeyPressed()) then
+		local entity = FindBlockTask.GetResultAt(index);
+		if(entity) then
+			GameLogic.GetPlayerController():PickItemByEntity(entity);
+		end
+	elseif(Keyboard:IsCtrlKeyPressed()) then
+		local entity = FindBlockTask.GetResultAt(index);
+		if(entity) then
+			if(entity:isa(EntityManager.EntityLiveModel) or entity:isa(EntityManager.EntityBlockModel)) then
+				entity:OpenEditor("EditModelTask");
+			elseif(entity:isa(EntityManager.EntityNPC)) then
+				entity:OpenEditor("SelectModel")
+			elseif(entity.OpenEditor) then
+				entity:OpenEditor("entity");
+			end
+		end
+	end
+
+
 	if(mouse_button == "left") then
 		FindBlockTask.OnClose()
 	end

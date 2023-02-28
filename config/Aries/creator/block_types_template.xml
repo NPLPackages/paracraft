@@ -139,6 +139,7 @@ e.g.
     <model id_data="5" assetfile="[filename]_ground.x" facing="0" condition="{[5]='obstruction'}"></model>
   </block>
   <block name="Stairs" shape="stairs" class="BlockStair" texture="" customBlockModel="true" modelName="stairs" obstruction="true" blockcamera="true" customModel="true">
+  
     <!--  corner:    -->
     <model id_data="14" assetfile="[filename]_corner.x" facing="1.57" transform="1,0,0,0,-1,0,0,0,-1,0,0,0"  condition="{[2]=1,[4]=1,[6]=0,[8]=0,[0]='solid'}"></model>
     <model id_data="5" assetfile="[filename]_corner.x" facing="3.14"  condition="{[2]=1,[4]=1,[6]=0,[8]=0}"></model>

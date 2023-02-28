@@ -58,6 +58,8 @@ function MainLogin:start(init_callback)
 	self.handlers = self.handlers or {
 		-- check for graphics settings
 		CheckGraphicsSettings = self.CheckGraphicsSettings,
+		-- do some preloading work
+		PrepareApp = self.PrepareApp,
 		-- load the background 3d scene
 		LoadBackground3DScene = self.LoadBackground3DScene,
 		-- update the core ParaEngine and minimal art assets. The logo page is also displayed here. 
@@ -128,6 +130,8 @@ function MainLogin:next_step(state_update)
 		self:Invoke_handler("LoadPackages");
 	elseif(not state.CheckGraphicsSettings) then
 		self:Invoke_handler("CheckGraphicsSettings");
+	elseif (not state.PrepareApp) then
+		self:Invoke_handler("PrepareApp")
 	elseif(not state.Loaded3DScene) then
 		if(not System.options.isAB_SDK) then
 			-- uncomment to enable 3d bg scene during login
@@ -162,36 +166,64 @@ function MainLogin:next_step(state_update)
 end
 
 function MainLogin:UpdateCoreClient()
-
+	if System.os.GetPlatform()=="win32" and ParaEngine.GetAppCommandLineByParam("use_dev_ftp_updater", "")=="true" then
+		NPL.load("(gl)script/apps/Aries/ParacraftCI/FtpUtil.lua",true);
+		local DevUpdaterFromFtp = NPL.load("(gl)script/apps/Aries/Creator/Game/Login/Update/DevUpdaterFromFtp.lua",true);
+		local _devUpdater = DevUpdaterFromFtp:new()
+		
+		_devUpdater:Check(function(needUpdate)
+			print("======DevUpdaterFromFtp needUpdate",needUpdate)
+			if needUpdate then
+				_devUpdater:StartUpdate(function()
+					self:next_step({IsUpdaterStarted = true});
+				end)
+			else
+				self:next_step({IsUpdaterStarted = true});
+			end
+		end)
+		return
+	else
+		--以正常方式打开时，修复版本号，不然如果有更新的话，会获取不到差分资源列表
+		local verStr = GameLogic.options.GetClientVersion()
+		local _,n = verStr:gsub("%.",".")
+		local patt = "%.%d%d%d%d%d%d%d%d%d%d%d%d%d%d$"
+		if n==3 and verStr:match(patt) then
+			verStr = verStr:gsub(patt,"")
+			ParaIO.CopyFile("version.txt","version.txt.dev",true)
+			commonlib.Files.WriteFile("version.txt","ver="..verStr)
+		end
+	end
 	self:checkAutoConnectTeacher()
 	local platform = System.os.GetPlatform();
 
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
-	local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
-
 	local testCoreClient = false;
 	if (not testCoreClient and platform == "win32" and not System.os.IsWindowsXP()) then
-		if System.options.channelId=="430" then --430windows版，还是下载到本目录
-			local gamename = "Paracraft"
-			gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater430.lua");
-			local ClientUpdater430 = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater430");
-			local _updater = ClientUpdater430:new({gamename=gamename});
+		local gamename = "Paracraft"
+		gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater430.lua");
+		local ClientUpdater430 = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater430");
+		local _updater = ClientUpdater430:new({gamename=gamename});
+
+		if System.options.isChannel_430 then --430windows版，还是下载到本目录
+			
 			GameLogic.GetFilters():apply_filters("ShowClientUpdaterNotice");
-			_updater:Check(function(bNeedUpdate, latestVersion,curVersion)
+			_updater:Check(function(bNeedUpdate, latestVersion,curVersion,bAllowSkip,needAppStoreUpdate)
 				GameLogic.GetFilters():apply_filters("HideClientUpdaterNotice");
 				print("-----hyz 181 bNeedUpdate",bNeedUpdate)
-				if bNeedUpdate then
+				if bNeedUpdate==nil then --表示检查更新失败
+					self:next_step({IsUpdaterStarted = true});
+					GameLogic.AddBBS(nil,L"检查更新失败")
+				elseif bNeedUpdate then
 					--不是是最新版，作为局域网客户端开启，随时准备进行同步
 					GameLogic.GetFilters():apply_filters('start_lan_client',{
 						realLatestVersion=latestVersion,
-						isAutoInstall=not _updater:canAutoSkip(),
-						needShowDownloadWorldUI=not _updater:canAutoSkip(),
+						isAutoInstall=not bAllowSkip,
+						needShowDownloadWorldUI=not bAllowSkip,
 						onUpdateError = function()
 							self:next_step({IsUpdaterStarted = true});
 						end
 					})
-					if _updater:canAutoSkip() then 
+					if bAllowSkip then
 						self:next_step({IsUpdaterStarted = true});
 						_updater:checkNeedSlientDownload(); --局域网内，可以跳过更新的情况下，去看看是否需要静默更新
 					else
@@ -210,6 +242,10 @@ function MainLogin:UpdateCoreClient()
 							_updater:Download(true);
 						end)
 					end
+				elseif needAppStoreUpdate then --需要跳转应用商店更新(windows不会走到此分支)
+					self:next_step({IsUpdaterStarted = true});
+					--TODO
+					--显示跳转更新UI
 				else
 					--已经是最新版了，开启服务器
 					GameLogic.GetFilters():apply_filters('start_lan_server',{
@@ -226,43 +262,35 @@ function MainLogin:UpdateCoreClient()
 		self:next_step({IsUpdaterStarted = true});
 		if (not System.options.isAB_SDK and
 		    ParaEngine.GetAppCommandLineByParam("noclientupdate", "") == "") then
-			local AutoUpdater = NPL.load("AutoUpdater");
-			local updater = AutoUpdater:new();
-			local gamename = "Paracraft"
-			gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
 
 			-- Removed by LiXizhi: this could take a long time when there is no network, so we just disabled the popup dialog. 
 			--GameLogic.GetFilters():apply_filters('cellar.common.msg_box.show', L'正在检查版本...', 30000, nil, nil, nil, nil, '_ct', true)
-
-			updater:onInit(ParaIO.GetWritablePath(), ClientUpdater:GetUpdateConfigFilename(), function(state)	end)
-			updater:check(nil, function(bSucceed)
-				-- GameLogic.GetFilters():apply_filters('cellar.common.msg_box.close')
-
-				if(bSucceed and updater:isNeedUpdate()) then
+			_updater:Check(function(bNeedUpdate, latestVersion,curVersion,bAllowSkip,needAppStoreUpdate)
+				if System.options.launcherVer and System.options.launcherVer>=5 then
+					if bNeedUpdate==nil then --表示检查更新失败
+						GameLogic.AddBBS(nil,L"检查更新失败")
+					elseif bNeedUpdate then
+						if System.options.isDevMode then
+							print("bNeedUpdate, latestVersion,curVersion,bAllowSkip,needAppStoreUpdate",bNeedUpdate, latestVersion,curVersion,bAllowSkip,needAppStoreUpdate)
+						end
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.lua");
+						local ClientUpdateDialog = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdateDialog")
+						
+						ClientUpdateDialog.Show(latestVersion,curVersion,gamename,function()
+							_updater:Download(true);
+						end,bAllowSkip)
+					elseif needAppStoreUpdate then --需要跳转应用商店更新(windows不会走到此分支)
+						
+					else
+						
+					end
+				elseif bNeedUpdate then
 					System.options.isParacraftNeedUpdate = true;
-
-					if GameLogic.GetFilters():apply_filters('cellar.client_update_dialog.show', false, updater, gamename) then
+					if GameLogic.GetFilters():apply_filters('cellar.client_update_dialog.show', false, _updater, gamename) then
 						return
 					end
-					
-					-- System.App.Commands.Call("File.MCMLWindowFrame", {
-					-- 	url = format("script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.html?latestVersion=%s&curVersion=%s&curGame=%s", updater:getLatestVersion(), updater:getCurVersion(), gamename), 
-					-- 	name = "ClientUpdateDialog", 
-					-- 	isShowTitleBar = false,
-					-- 	DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-					-- 	style = CommonCtrl.WindowFrame.ContainerStyle,
-					-- 	zorder = 1,
-					-- 	allowDrag = false,
-					-- 	isTopLevel = true,
-					-- 	directPosition = true,
-					-- 		align = "_ct",
-					-- 		x = -210,
-					-- 		y = -100,
-					-- 		width = 420,
-					-- 		height = 250,
-					-- });
 				end
-			end);
+			end)
 		end
 	else
 		-- For android, mac, iOS, winXP, it will always use latest version and download pkg to apps/haqi/ folder without updating executable. 
@@ -270,6 +298,8 @@ function MainLogin:UpdateCoreClient()
 		-- NOTE: version smaller than this are not allowed to run. one must upgrade the NPL runtime. 
 		local minVer = {0, 7, 509}
 
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdater.lua");
+		local ClientUpdater = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdater");
 		local updater = ClientUpdater:new();
 		if ParaEngine.GetAppCommandLineByParam("noclientupdate", "") == "true" then
 			self:next_step({IsUpdaterStarted = true});
@@ -317,40 +347,31 @@ function MainLogin:UpdateCoreClient()
 
 		GameLogic.GetFilters():apply_filters("ShowClientUpdaterNotice");
 
-		updater:Check(function(bNeedUpdate, latestVersion, comparedVersion)
+		updater:Check(function(bNeedUpdate, latestVersion,curVersion,bAllowSkip,needAppStoreUpdate)
 			GameLogic.GetFilters():apply_filters("HideClientUpdaterNotice");
-
-			if (bNeedUpdate) then
-				-- if System.options.channelId=="430" then --对于windows电脑的430版本特殊处理,允许跳过的更新一律跳过
-				-- 	if updater:canAutoSkip() then 
-				-- 		self:next_step({IsUpdaterStarted = true});
-				-- 	else
-				-- 		NPL.load("(gl)script/apps/Aries/Creator/Game/Login/ClientUpdateDialog.lua");
-				-- 		local ClientUpdateDialog = commonlib.gettable("MyCompany.Aries.Game.MainLogin.ClientUpdateDialog")
-				-- 		local gamename = "Paracraft"
-				-- 		gamename = GameLogic.GetFilters():apply_filters('GameName', gamename)
-				-- 		ClientUpdateDialog.Show(updater.autoUpdater:getLatestVersion(), updater:getCurVersion(),gamename,function()
-				-- 			print("hyz update log--------MainLogin 281")
-				-- 			updater:Download(function(bSucceed)
-				-- 				print("hyz update log--------MainLogin 283",bSucceed)
-				-- 				if(bSucceed) then
-				-- 					updater:Restart();
-				-- 				else
-				-- 					self:next_step({IsUpdaterStarted = true});
-				-- 				end
-				-- 			end);
-				-- 		end)
-				-- 	end
-				-- else
-					updater:Download(function(bSucceed)
-						if(bSucceed) then
-							updater:Restart();
-						else
-							self:next_step({IsUpdaterStarted = true});
-						end
-					end);
-				-- end
+			if bNeedUpdate==nil then --表示更新失败
+				self:next_step({IsUpdaterStarted = true});
+				GameLogic.AddBBS(nil,L"检查更新失败")
+			elseif (bNeedUpdate) then
+				updater:Download(function(bSucceed)
+					if(bSucceed) then
+						updater:Restart();
+					else
+						self:next_step({IsUpdaterStarted = true});
+					end
+				end);
+			elseif needAppStoreUpdate then --需要跳转应用商店更新
+				if bAllowSkip then
+					self:next_step({IsUpdaterStarted = true});
+				else
+					local jumpUrl = updater:getAppStoreUrl()
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Login/Update/JumpAppStoreDialog.lua");
+					local JumpAppStoreDialog = commonlib.gettable("MyCompany.Aries.Game.Login.Update.JumpAppStoreDialog")
+					JumpAppStoreDialog.Show(latestVersion,curVersion,jumpUrl)
+					-- self:next_step({IsUpdaterStarted = true});
+				end
 			else
+				local comparedVersion = updater:getComparedResult()
 				if (comparedVersion == 100) then
 					self:next_step({IsUpdaterStarted = true});
 					return;
@@ -368,7 +389,7 @@ end
 
 --430版本，自动连接教师服务器（教师服务器开启以后，会周期性发送局域网广播）
 function MainLogin:checkAutoConnectTeacher()
-	if System.options.channelId=="430" then 
+	if System.options.isChannel_430 then 
         GameLogic.RunCommand("/lan -auto_find_teacher=true")
     end
 end
@@ -446,11 +467,15 @@ function MainLogin:LoadBackground3DScene()
 		return self:next_step({Loaded3DScene = true});
 	end
 
-	local titlename = GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡 Paracraft")
-	local desc = GameLogic.GetFilters():apply_filters('GameDescription', L"3D动画编程创作工具")
+	local titlename = System.options.channelId_431 and GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡智慧教育") or GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡 Paracraft")
+	local desc =GameLogic.GetFilters():apply_filters('GameDescription', L"3D动画编程创作工具")
 
-	System.options.WindowTitle = string.format("%s -- ver %s", titlename, GameLogic.options.GetClientVersion());
-	ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, desc));
+	System.options.WindowTitle =  string.format("%s -- ver %s", titlename, GameLogic.options.GetClientVersion());
+	if System.options.channelId_431 then
+		ParaEngine.SetWindowText(System.options.WindowTitle);
+	else
+		ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, desc));
+	end
 
 	-- just in case it is from web browser. inform to switch to 3d display. 
 	if(System.options.IsWebBrowser) then
@@ -613,7 +638,7 @@ end
 
 function MainLogin:ShowLoginModePage()
 	self:AutoAdjustUIScalingForTouchDevice(function()
-		self:CheckShowTouchVirtualKeyboard();
+		-- self:CheckShowTouchVirtualKeyboard();
 	end);
 
 	if (System.options.cmdline_world and
@@ -815,5 +840,21 @@ function MainLogin:ShowLoginBackgroundPage(bShow, bShowCopyRight, bShowLogo, bSh
 				height = 0,
 			cancelShowAnimation = true,
 		});
+	end
+end
+
+function MainLogin:PrepareApp()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/PrepareApp/PrepareApp.lua");
+	local PrepareApp = commonlib.gettable("MyCompany.Aries.Game.PrepareApp");
+	if true then --System.options.isDevMode
+		if System.os.GetPlatform()~="win32" then
+			PrepareApp.LoadScripts()
+			self:next_step({PrepareApp = true});
+		else
+			PrepareApp.start()
+		end
+	else
+		PrepareApp.LoadScripts()
+		self:next_step({PrepareApp = true});
 	end
 end

@@ -10,16 +10,29 @@ local KpUserTag = NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/KpU
 local KpUserTag = NPL.export();
 
 function KpUserTag.Is_crown(user_info)
+    if System.options.isHideVip then 
+        return false
+    end
     return user_info.vip == 1;
 end
 function KpUserTag.Is_student(user_info)
+    if System.options.isHideVip then 
+        return false
+    end
     return user_info.student == 1;
 end
 function KpUserTag.Is_teacher(user_info)
+    if System.options.isHideVip then 
+        return false
+    end
     return user_info.tLevel == 1;
 end
 
 function KpUserTag.GetMcml(user_info)
+    if (System.options.isHideVip) then
+        return "";
+    end
+
     if(not user_info)then
         return
     end

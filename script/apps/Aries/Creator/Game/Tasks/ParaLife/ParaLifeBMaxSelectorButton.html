@@ -1,0 +1,31 @@
+<!-- 
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="" ><![CDATA[
+    ParaLifeBMaxSelectorButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeBMaxSelectorButton")
+    ParaLifeBMaxSelectorButton.OnInit()
+]]></script>
+<pe:container ClickThrough="true" alignment="_fi" width="100%" height="100%" style="background:;">
+    <pe:container alignment="_rb"  style="position: relative; margin-bottom: -50px; margin-right: 15px; background:;">
+        <input type="button" name="btn_bmaxselector" style="width:128px;height:128px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/close_32bits.png#0 0 128 128);" onclick="ParaLifeBMaxSelectorButton.OnClickHome()"/>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html> -->
+
+<pe:mcml>
+<script type="text/npl" refresh="false" src="ParaLifeBMaxSelectorButton.lua">
+    ParaLifeBMaxSelectorButton = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeBMaxSelectorButton")
+    ParaLifeBMaxSelectorButton.OnInit()
+</script>
+<pe:container ClickThrough="true" style="background:;" alignment="_fi" width="100%" height="100%">
+    <pe:container alignment="_rb"  style="position: relative; margin-bottom: -50px; margin-right: 15px; background:;">
+        <input type="button" name="btn_bmaxselector" style="margin-left:20px;width:96px;height:160px;background: url(Texture/Aries/Creator/keepwork/Paralife/main/wupinlan_119x200_32bits.png#0 0 119 201);" onclick="ParaLifeBMaxSelectorButton.OnClickHome"/>
+    </pe:container>
+    
+</pe:container>
+</pe:mcml>

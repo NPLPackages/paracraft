@@ -70,6 +70,12 @@ local local_statement = {
 	enable_npl_brower = true,
 	-- Whether to lock the resolution to 1280x720
 	is_resolution_locked = false,
+	IgnoreWindowSizeChange = false,
+	LockWindowSize = false,
+	--不记住账号和密码
+	IgnoreRememberAccount = false,
+	--指定帧率
+	FPS = 60,
 }
 
 local function _loadChannelOptions(optionPath)
@@ -108,15 +114,19 @@ local function _loadChannelOptions(optionPath)
 end
 
 --[[
-	读取game_iotions参数,先查找config/option.ini，如果是特殊渠道，如chennelId==430，再查找一次config/option_430.ini
+	读取game_iotions参数,先查找config/option.ini，如果是特殊渠道，如chennelId==430，再查找一次config/channel_option_430.ini
 	配置文件格式是 每一行一个参数，以等号("=")隔开，同时必须在上方先声明过的
 	如：
 	world_enter_cmds = /paralife show;/shader 1
 	enable_npl_brower = false
 	is_resolution_locked = true
+	IgnoreWindowSizeChange = true
+	LockWindowSize = true
+	FPS = 30
+	IgnoreRememberAccount = false
 ]]
-function options.InitChannelOptions()
-	if options._isChannelOptionsLoaded then
+function options.InitChannelOptions(bForce)
+	if options._isChannelOptionsLoaded and not bForce then
 		return
 	end
 	options._isChannelOptionsLoaded = true
@@ -133,4 +143,18 @@ function options.InitChannelOptions()
 	end
 
 	options.enable_npl_brower = options.enable_npl_brower and System.os.GetPlatform()=="win32"
+
+	if System.options.IgnoreWindowSizeChange==true then 
+		ParaEngine.GetAttributeObject():SetField("IgnoreWindowSizeChange", true);
+	elseif System.options.IgnoreWindowSizeChange==false then 
+		ParaEngine.GetAttributeObject():SetField("IgnoreWindowSizeChange", false);
+	end
+
+	if System.options.LockWindowSize==true then 
+		ParaEngine.GetAttributeObject():SetField("LockWindowSize", true);
+	elseif System.options.LockWindowSize==false then 
+		ParaEngine.GetAttributeObject():SetField("LockWindowSize", false);
+	end
+
+	
 end

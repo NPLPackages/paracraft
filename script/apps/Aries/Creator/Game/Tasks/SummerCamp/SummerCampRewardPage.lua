@@ -120,8 +120,13 @@ function SummerCampRewardPage.OnClickGetReward(index)
             page:Refresh(0)
 
             if index == #SummerCampRewardPage.RewardData then
-                local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
-                Page.ShowUserInfoPage({AvatarDefaulIndex = "right_hand_equipment"});
+                if true then
+                    local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+                    UserInfoPage.ShowPage(System.User.keepworkUsername)
+                else
+                    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+                    page.ShowUserInfoPage({username = System.User.keepworkUsername});
+                end
             end
         end)
     end) 

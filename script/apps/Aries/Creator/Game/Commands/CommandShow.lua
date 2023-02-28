@@ -18,6 +18,8 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 local BroadcastHelper = commonlib.gettable("CommonCtrl.BroadcastHelper");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");	
 local ItemClient = commonlib.gettable("MyCompany.Aries.Game.Items.ItemClient");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
+local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
 
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
 local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
@@ -27,7 +29,8 @@ Commands["show"] = {
 	name="show", 
 	quick_ref=[[/show [desktop|player|boundingbox|wireframe|perf|info|touch|mobile|playertouch|
 terrain|mod|physics|vision|quickselectbar|tips|map|camera|anim|paralife|axis|
-dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo] [on|off]], 
+miniuserinfo|chatwindow|
+dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom] [on|off]], 
 	desc = [[show different type of things.
 Other show filters: 
 /show desktop.builder.[static|movie|character|playerbag|gear|deco|tool|template|env] [on|off]
@@ -41,7 +44,6 @@ Other show filters:
 /show paralife -showplayer : show the default player
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 		local name, bIsShow;
 		name, cmd_text = CmdParser.ParseString(cmd_text);
 		bIsShow, cmd_text = CmdParser.ParseBool(cmd_text);
@@ -71,10 +73,24 @@ Other show filters:
 			end
 			GameLogic.options:SetShowInfoWindow(bIsShow);
 		elseif(name == "touch") then
-			GameLogic.options:ShowTouchPad(true);
+			local options
+			options, cmd_text = CmdParser.ParseOptions(cmd_text);
+			if not options.useOld and MobileUIRegister.GetIsDevMode() then
+				MobileUIRegister.SetMobileUIEnable(true)
+			else
+				MobileUIRegister.SetMobileUIEnable(false)
+				GameLogic.options:ShowTouchPad(true);
+			end
 		elseif(name == "mobile") then
-			System.options.IsTouchDevice = true;
-			GameLogic.options:ShowTouchPad(true);
+			local options
+			options, cmd_text = CmdParser.ParseOptions(cmd_text);
+			if not options.useOld and MobileUIRegister.GetIsDevMode() then
+				MobileUIRegister.SetMobileUIEnable(true)
+			else
+				MobileUIRegister.SetMobileUIEnable(false)
+				System.options.IsTouchDevice = true;
+				GameLogic.options:ShowTouchPad(true);
+			end
 		elseif(name == "terrain") then
 			if(bIsShow == nil) then
 				bIsShow = true;
@@ -85,7 +101,9 @@ Other show filters:
 				GameLogic.RunCommand("/terrain -hide")
 			end
 		elseif(name == "player" or name=="") then
-			EntityManager.GetPlayer():SetVisible(true);
+			if EntityManager.GetPlayer() then
+				EntityManager.GetPlayer():SetVisible(true);
+			end
 		elseif(name == "camera" ) then
 			local entity = EntityManager.GetFocus();
 			if(entity and entity:isa(EntityManager.EntityCamera)) then
@@ -125,16 +143,6 @@ Other show filters:
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 			ParaWorldMinimapWnd:Show();
-		elseif(name == "dock") then
-			DockPage.Show(true);
-		elseif(name == "dock_left_top") then
-			DockPage.SetUIVisible_LeftTop(true);
-		elseif(name == "dock_right_top") then
-			DockPage.SetUIVisible_RightTop(true);
-		elseif(name == "dock_center_bottom") then
-			DockPage.SetUIVisible_CenterBottom(true);
-		elseif(name == "dock_right_bottom") then
-			DockPage.SetUIVisible_RightBottom(true);
 		elseif (name == "miniuserinfo") then
 			local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
 			MiniWorldUserInfo.ShowInMiniWorld();
@@ -151,6 +159,9 @@ Other show filters:
 				end
 			end)
 		elseif (name == "playertouch") then
+			if MobileUIRegister.GetMobileUIEnabled() then
+				return
+			end
 			local player_ctr = GameLogic.GetPlayerController()
 			player_ctr:SetEnableDragPlayerToMove(true)
 
@@ -166,24 +177,25 @@ Other show filters:
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 			ParaLife:SetShowPlayer(options.showplayer==true)
 			ParaLife:SetEnabled(true)
-		elseif (name == "esc") then
-			local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
-    		EscDock.ShowView(true)
 		elseif (name == "axis") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InfoWorldAxisWindow.lua");
 			local InfoWorldAxisWindow = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InfoWorldAxisWindow");
 			InfoWorldAxisWindow.GetInstance():Show(true);
+		elseif(name == "chatwindow") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+			MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+			GameLogic.options:SetShowChatWnd(true)
 		end
 	end,
 };
-
 
 -- hide the current player, desktop, etc. 
 Commands["hide"] = {
 	name="hide", 
 	quick_ref=[[/hide [desktop|player|boundingbox|wireframe|touch|mobile|playertouch|
 terrain|vision|ui|keyboard|quickselectbar|tips|map|info|camera|paralife|axis|
-dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuserinfo
+miniuserinfo|chatwindow|
+dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|
 ]], 
 	desc=[[hide different type of things.e.g.
 /hide quickselectbar
@@ -191,7 +203,6 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 /hide player
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
-		local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 		local name;
 		name, cmd_text = CmdParser.ParseString(cmd_text);
 		name = name or "";
@@ -212,10 +223,18 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 		elseif(name == "info") then
 			GameLogic.options:SetShowInfoWindow(false);
 		elseif(name == "touch") then
-			GameLogic.options:ShowTouchPad(false);
+			if MobileUIRegister.GetIsDevMode() then
+				MobileUIRegister.SetMobileUIEnable(false)
+			else
+				GameLogic.options:ShowTouchPad(false);
+			end
 		elseif(name == "mobile") then
-			System.options.IsTouchDevice = false;
-			GameLogic.options:ShowTouchPad(false);
+			if MobileUIRegister.GetIsDevMode() then
+				MobileUIRegister.SetMobileUIEnable(false)
+			else
+				System.options.IsTouchDevice = false;
+				GameLogic.options:ShowTouchPad(false);
+			end
 		elseif(name == "player" or name=="") then
 			EntityManager.GetPlayer():SetVisible(false);
 		elseif(name == "camera" ) then
@@ -246,16 +265,6 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldMinimapWnd.lua");
 			local ParaWorldMinimapWnd = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldMinimapWnd");
 			ParaWorldMinimapWnd:Close();
-		elseif(name == "dock") then
-			DockPage.Hide();
-		elseif(name == "dock_left_top") then
-			DockPage.SetUIVisible_LeftTop(false);
-		elseif(name == "dock_right_top") then
-			DockPage.SetUIVisible_RightTop(false);
-		elseif(name == "dock_center_bottom") then
-			DockPage.SetUIVisible_CenterBottom(false);
-		elseif(name == "dock_right_bottom") then
-			DockPage.SetUIVisible_RightBottom(false);
 		elseif (name == "miniuserinfo") then
 			local MiniWorldUserInfo = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/MiniWorldUserInfo.lua");
 			MiniWorldUserInfo.ClosePage()
@@ -263,6 +272,9 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 			local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
 			World2In1.HidePage();
 		elseif (name == "playertouch") then
+			if MobileUIRegister.GetMobileUIEnabled() then
+				return
+			end
 			local player_ctr = GameLogic.GetPlayerController()
 			player_ctr:SetEnableDragPlayerToMove(false)
 			-- TouchMiniKeyboard.GetSingleton():SetKeyboardMod()
@@ -276,13 +288,15 @@ dock|dock_left_top|dock_right_top|dock_center_bottom|dock_right_bottom|miniuseri
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLife.lua");
 			local ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
 			ParaLife:SetEnabled(false)
-		elseif (name == "esc") then
-			local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
-    		EscDock.ShowView(false)
 		elseif (name == "axis") then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/InfoWorldAxisWindow.lua");
 			local InfoWorldAxisWindow = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.InfoWorldAxisWindow");
 			InfoWorldAxisWindow.GetInstance():Show(false);
+		elseif(name == "chatwindow") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+			MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
+			MyCompany.Aries.ChatSystem.ChatWindow.HideEdit();
+			GameLogic.options:SetShowChatWnd(false)
 		end
 	end,
 };

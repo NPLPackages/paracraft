@@ -70,7 +70,7 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 		-- _this.text = "打开"
 		_this:SetScript("onclick", function()
 			if projectid then
-				RedSummerCampPPtPage.OnClickAction(action_type, projectid)
+				RedSummerCampPPtPage.OnClickAction(action_type, projectid, parentLayout.step_num)
 			end
 		end);
 		_parent:AddChild(_this);
@@ -100,7 +100,7 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 			_this.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/neibushiping_83x85_32bits.png;0 0 83 85";
 			_this:SetScript("onclick", function()
 				if course_id then
-					RedSummerCampPPtPage.OnClickAction(action_type, course_id)
+					RedSummerCampPPtPage.OnClickAction(action_type, course_id, parentLayout.step_num)
 				end
 			end);
 			_parent:AddChild(_this);
@@ -157,6 +157,44 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 
 		css.height = root_y + root_height
 		css.width = root_width
+	elseif action_type == "link" then
+		local text_value = mcmlNode:GetString("value") or "";
+		local root_y = -2
+		local root_width = 278
+		local root_height = 41
+		local projectid = mcmlNode:GetString("projectid");
+		local fontName = "System;21;bold";
+
+		local sendevent= mcmlNode:GetString("sendevent")
+		
+		local _this = ParaUI.CreateUIObject("button", "action_button_type", "_lt", left + 75, top + root_y, root_width, root_height);
+		_this.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/biaotianniu_278x41_32bits.png;0 0 278 41";
+		-- _this.tooltip = string.format("点击打开世界：%s", projectid)
+		_parent:AddChild(_this);
+		local link = mcmlNode:GetString("href");
+		local buseToken = mcmlNode:GetBool("buseToken");
+		_this:SetScript("onclick", function()
+			if link then
+				RedSummerCampPPtPage.OnClickAction(action_type, link, buseToken, parentLayout.step_num)
+			end
+		end);
+		_parent:AddChild(_this);
+
+		local button_text = ParaUI.CreateUIObject("text", "action_button_text", "_lt", _this.x + 10, _this.y + 7, root_width - 6, root_height);
+		button_text.text = text_value
+		button_text.font = fontName
+		_guihelper.SetFontColor(button_text, "#000000");
+
+		_parent:AddChild(button_text);
+		
+
+		_parent = _this;
+
+		if projectid then
+			RedSummerCampPPtPage.SetStepValueToProjectId(parentLayout.step_num, projectid)
+		end
+
+		css.height = root_y + root_height
 	elseif action_type == "button" then
 		local text_value = mcmlNode:GetString("value") or "";
 		local root_y = -2
@@ -184,7 +222,7 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 		-- _this.font = fontName
 		_this:SetScript("onclick", function()
 			if projectid then
-				RedSummerCampPPtPage.OnClickAction(action_type, projectid, sendevent)
+				RedSummerCampPPtPage.OnClickAction(action_type, projectid, sendevent, parentLayout.step_num)
 			end
 		end);
 
@@ -214,12 +252,11 @@ function action.create_default(rootName, mcmlNode, bindingContext, _parent, left
 		local fontName = "System;21;bold";
 
 		RedSummerCampPPtPage.SetSaveWorldStepValue(parentLayout.step_num)
-
 		local _this = ParaUI.CreateUIObject("button", "action_button_type", "_lt", left + 75, top + root_y, root_width, root_height);
 		_this.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/biaotianniu_278x41_32bits.png;0 0 278 41";
 		_parent:AddChild(_this);
 		_this:SetScript("onclick", function()
-			RedSummerCampPPtPage.OnClickAction(action_type)
+			RedSummerCampPPtPage.OnClickAction(action_type, parentLayout.step_num)
 		end);
 
 		local button_text = ParaUI.CreateUIObject("text", "action_button_text", "_lt", _this.x + 10, _this.y + 7, root_width - 6, root_height);
@@ -301,7 +338,7 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 		-- _this.text = "打开"
 		_this:SetScript("onclick", function()
 			if projectid then
-				RedSummerCampPPtPage.OnClickAction(action_type, projectid)
+				RedSummerCampPPtPage.OnClickAction(action_type, projectid, parentLayout.step_num)
 			end
 		end);
 		_parent:AddChild(_this);
@@ -329,7 +366,7 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 			_this.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/neibushiping_83x85_32bits.png;0 0 83 85";
 			_this:SetScript("onclick", function()
 				if course_id then
-					RedSummerCampPPtPage.OnClickAction(action_type, course_id)
+					RedSummerCampPPtPage.OnClickAction(action_type, course_id, parentLayout.step_num)
 				end
 			end);
 			_parent:AddChild(_this);
@@ -386,6 +423,50 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 
 		css.height = root_y + root_height
 		css.width = root_width
+	elseif action_type == "link" then
+		local text_value = mcmlNode:GetString("value") or "";
+		local root_y = -3
+		local root_width = 398
+		local root_height = 58
+		-- local root_width = 174
+		local projectid = mcmlNode:GetString("projectid");
+		-- if(projectid) then
+		-- 	if(text_value) then
+		-- 		text_value = text_value.." "..projectid;
+		-- 	else
+		-- 		text_value = L"项目ID: "..projectid;
+		-- 	end
+		-- end
+		local fontName = "System;26;bold";
+		
+
+		local sendevent= mcmlNode:GetString("sendevent")
+		
+		local _this = ParaUI.CreateUIObject("button", "action_button_type", "_lt", left + 112, top + root_y, root_width, root_height);
+		_this.background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/biaotianniu_278x41_32bits.png;0 0 278 41";
+		-- _this.tooltip = string.format("点击打开世界：%s", projectid)
+		_parent:AddChild(_this);
+		local link = mcmlNode:GetString("href");
+		local buseToken = mcmlNode:GetBool("buseToken");
+		_this:SetScript("onclick", function()
+			if link then
+				RedSummerCampPPtPage.OnClickAction(action_type, link, buseToken, parentLayout.step_num)
+			end
+		end);
+		_parent:AddChild(_this);
+
+		local button_text = ParaUI.CreateUIObject("text", "action_button_text", "_lt", _this.x + 9, _this.y + 12, root_width - 6, root_height);
+		button_text.text = text_value
+		button_text.font = fontName
+		_guihelper.SetFontColor(button_text, "#000000");
+		_parent:AddChild(button_text);
+		_parent = _this;
+
+		if projectid then
+			RedSummerCampPPtPage.SetStepValueToProjectId(parentLayout.step_num, projectid)
+		end
+
+		css.height = root_y + root_height
 	elseif action_type == "button" then
 		local text_value = mcmlNode:GetString("value") or "";
 		local root_y = -3
@@ -411,7 +492,7 @@ function action.create_full_page(rootName, mcmlNode, bindingContext, _parent, le
 		_parent:AddChild(_this);
 		_this:SetScript("onclick", function()
 			if projectid then
-				RedSummerCampPPtPage.OnClickAction(action_type, projectid, sendevent)
+				RedSummerCampPPtPage.OnClickAction(action_type, projectid, sendevent, parentLayout.step_num)
 			end
 		end);
 

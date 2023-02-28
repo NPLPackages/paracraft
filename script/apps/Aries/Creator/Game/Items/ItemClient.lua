@@ -72,6 +72,7 @@ function ItemClient.PreloadItemClass()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemMinimap.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemBlockModel.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemColorBlock.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemMaterial.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemEmpty.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemSign.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ItemBlockBone.lua");
@@ -192,7 +193,9 @@ end
 -- @return blockDsItem
 function ItemClient.AddBlock(block_id, index, category_name, blockName, isWorldOnly)
 	local item = ItemClient.CreateGetByBlockID(block_id);
-	
+	if item.hideforSchool and (System.options.isChannel_430 or System.options.isSchool) then
+		return {}
+	end
 	local blockDSItem = { __index = item, block_id = block_id, uid = blockName, isWorldOnly=isWorldOnly};
 	setmetatable(blockDSItem, blockDSItem);
 
@@ -236,6 +239,17 @@ function ItemClient.SearchBlocks(block_id_or_name, category_name, ds)
 						end
 						if(searchkey and string.match(searchkey,block_id_or_name)) then
 							bMatch = true;
+						else
+							local searchkey2 = item:GetSearchKey2();
+							if searchkey2 and searchkey2~="" then
+								local keys = commonlib.split(searchkey2,";")
+								for k,v in pairs(keys) do
+									if string.match(v,block_id_or_name) then
+										bMatch = true;
+										break
+									end
+								end
+							end
 						end
 					end
 					if(bMatch and not idMap[item.id]) then

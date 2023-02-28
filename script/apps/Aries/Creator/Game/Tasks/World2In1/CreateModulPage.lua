@@ -100,7 +100,14 @@ function CreateModulPage.CloseView()
     end
 end
 
-function CreateModulPage.Show(create_project_name, parent_id, close_cb)
+function CreateModulPage.CloseWindow()
+    if page and page:IsVisible() then
+        page:CloseWindow()
+    end
+end
+
+function CreateModulPage.Show(create_project_name, parent_id, close_cb,moduleData)
+    CreateModulPage.moduleData = moduleData
     CreateModulPage.close_cb = close_cb
     CreateModulPage.parent_id = parent_id
     CreateModulPage.create_project_name = create_project_name
@@ -147,7 +154,7 @@ function CreateModulPage.ShowView()
 
     if not CreateModulPage.not_bind then
         CreateModulPage.not_bind = true
-        GameLogic.GetFilters():add_filter("save_world_info", function()
+        GameLogic.GetFilters():add_filter("save_world_info", function(ctx, node)
             if CreateModulPage.to_path then
                 local to_path = CreateModulPage.to_path
                 CreateModulPage.to_path = nil
@@ -162,6 +169,7 @@ function CreateModulPage.ShowView()
                     GameLogic.RunCommand(string.format('/loadworld %s', to_path))
                 end
             end
+            return ctx, node
         end);
     end
 
@@ -196,7 +204,11 @@ function CreateModulPage.HandleData(cb)
     end
 
     if is_all then
-        project_list = all_projects_data
+        if CreateModulPage.moduleData ~= nil then
+            project_list = CreateModulPage.moduleData
+        else
+            project_list = all_projects_data
+        end
     end
 
     local type_to_world = {}
@@ -262,7 +274,7 @@ function CreateModulPage.OnClickCreate()
             page:CloseWindow()
             CreateModulPage.close_cb = nil
             CreateModulPage.CloseView()
-    
+
             local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
             CreateNewWorld.CreateWorldByName(project_name, "paraworldMini")
         end);
@@ -311,8 +323,11 @@ function CreateModulPage.OnClickCreate()
         GameLogic.AddBBS("create_module", L"世界名字太长了, 请重新输入", 5000, "255 0 0");
         return
     end
-    if CreateModulPage.project_file_path == nil then
-        CreateModulPage.project_file_path = ParaIO.GetWritablePath() .. "worlds/DesignHouse/"
+
+    if GameLogic.GetFilters():apply_filters('is_signed_in') then
+        CreateModulPage.project_file_path = GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path')
+    else
+        CreateModulPage.project_file_path = "worlds/DesignHouse"
     end
 
     local function to_world2in1_region()
@@ -323,9 +338,10 @@ function CreateModulPage.OnClickCreate()
         
         CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update -fork %d]], project_name, parent_id,region_id))
     end
-    
+
     local name = commonlib.Encoding.Utf8ToDefault(project_name)
-    local world_path = CreateModulPage.project_file_path .. name
+    local world_path = CreateModulPage.project_file_path .. "/" .. name
+
     if parent_id ~= 0 then
         if ParaIO.DoesFileExist(world_path, true) then
             _guihelper.MessageBox("模板已经存在了，是否直接使用该模板，否则请修改项目名称", function()	
@@ -335,19 +351,18 @@ function CreateModulPage.OnClickCreate()
             to_world2in1_region()
         end
     else
-
         if ParaIO.DoesFileExist(world_path, true) then
             _guihelper.MessageBox("世界已经存在了，是否直接进入该世界", function()	
                 page:CloseWindow()
                 CreateModulPage.close_cb = nil
                 CreateModulPage.CloseView()
-                local path = "worlds/DesignHouse/" .. name
-                GameLogic.RunCommand(string.format('/loadworld %s', path))
-                
+
+                GameLogic.RunCommand(string.format('/loadworld %s', world_path))                
             end)
             return
         else
-            CreateModulPage.to_path = "worlds/DesignHouse/" .. project_name
+            CreateModulPage.to_path = CreateModulPage.project_file_path .. "/" .. project_name
+
             CommandManager:RunCommand(format([[/createworld -name "%s" -parentProjectId %d -update -fork %d]], project_name, parent_id,region_id))
         end
     end

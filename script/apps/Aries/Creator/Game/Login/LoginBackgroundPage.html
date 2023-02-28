@@ -11,7 +11,11 @@
                     NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
                     local options = commonlib.gettable("MyCompany.Aries.Game.GameLogic.options")
 
-                    ClientVersion = string.format(L"Paracraft帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
+                    if System.options.channelId_431 then
+                        ClientVersion = L"帕拉卡智慧教育";
+                    else
+                        ClientVersion = string.format(L"Paracraft帕拉卡 %s(%s)", options.GetBaseVersion(), options.GetClientVersion());
+                    end
                     LatestVersion = LatestVersion or false;
 
                     function get_background()
@@ -59,8 +63,10 @@
                             <div><%= L"请到官网更新" %></div>
                         </div>
                     </pe:if>
-                    <div style="margin-top:35px;text-shadow:true"><%= Eval("ClientVersion") %></div>
-                    <div style="margin-top:0px;text-shadow:true"><%= L"(c)Tatfook. powered by NPL and ParaEngine"%></div>
+                    <pe:if condition="<%= not System.options.channelId_431 %>">
+                        <div style="margin-top:35px;text-shadow:true"><%= Eval("ClientVersion") %></div>
+                        <div style="margin-top:0px;text-shadow:true"><%= L"(c)Tatfook. powered by NPL and ParaEngine"%></div>
+                    </pe:if>
                 </pe:container>
             </pe:container>
         </pe:mcml>

@@ -94,6 +94,10 @@ function Files.GetTempPath()
 	return Files.projectTempPath;
 end
 
+function Files.GetWritablePath()
+	return ParaIO.GetWritablePath();
+end
+
 -- this is called when world exits
 function Files.ClearWorldSearchPaths()
 	Files.worldSearchPath = nil;
@@ -160,8 +164,11 @@ end
 -- one can check the result after 1 second
 -- @param any_filename: relative to world path. 
 function Files.GetRemoteWorldFile(any_filename)
-	GameLogic.GetPlayer():AddToSendQueue(Packets.PacketGetFile:new():Init(any_filename));
-	LOG.std(nil, "info", "Files", "fetching remote file: %s", any_filename)	
+	local player = GameLogic.GetPlayer();
+	if (type(player) == "table" and type(player.AddToSendQueue) == "function") then
+		GameLogic.GetPlayer():AddToSendQueue(Packets.PacketGetFile:new():Init(any_filename));
+		LOG.std(nil, "info", "Files", "fetching remote file: %s", any_filename)	
+	end
 end
 
 
@@ -232,7 +239,7 @@ function Files:UnloadAllUnusedAssets(MaxRefCount)
 				local ext = filename:match("%.(%w+)$");
 				if(ext) then
 					ext = string.lower(ext)
-					if(ext == "bmax" or ext == "x" or ext == "fbx") then
+					if(ext == "bmax" or ext == "x" or ext == "fbx" or ext == "glb" or ext == "gltf") then
 						ParaAsset.LoadParaX("", filename):UnloadAsset();
 						LOG.std(nil, "info", "Files", "unload unused asset file: %s", filename);
 					end
@@ -337,7 +344,7 @@ function Files:UnloadAllWorldAssets(MaxRefCount)
 				local ext = filename:match("worlds/DesignHouse/.*%.(%w+)$") or filename:match("temp/.*%.(%w+)$");
 				if(ext) then
 					ext = string.lower(ext)
-					if(ext == "bmax" or ext == "x" or ext == "fbx") then
+					if(ext == "bmax" or ext == "x" or ext == "fbx" or ext == "glb" or ext == "gltf") then
 						ParaAsset.LoadParaX("", filename):UnloadAsset();
 						LOG.std(nil, "info", "Files", "unload world asset file: %s", filename);
 					end
@@ -404,7 +411,7 @@ function Files:GarbageCollect(bModel, bTexture)
 					local ext = filename:match("%.(%w+)$");
 					if(ext) then
 						ext = string.lower(ext)
-						if(ext == "bmax" or ext == "x" or ext == "fbx") then
+						if(ext == "bmax" or ext == "x" or ext == "fbx" or ext == "glb" or ext == "gltf") then
 							ParaAsset.LoadParaX("", filename):UnloadAsset();
 							count = count + 1;
 							LOG.std(nil, "debug", "Files", "GarbageCollect unused asset file: %s", filename);
@@ -507,6 +514,34 @@ function Files.GetFilePath(filename)
 		return filepath;
 	else
 		return Files.FindFile(filename);
+	end
+end
+
+--[[
+字符串编码相关：
+	已知1.windows上，默认编码是defaultEncode，Android和IOS是utf8。
+	已知2.只读世界的zip包和pkg包里，路径是utf8（但是读取的时候仍然可以传入default,因为专门设置过映射:addUtf8ToDefaultAlias）
+	
+	规范1.Entity存盘时，必须以utf8保存;
+	规范2.读取资源传入路径的时候，要转成default （主要是在Windows必要，Android和IOS上直接就找到了）
+	规范3.用于UI上显示时，必须用Utf8，不然会乱码
+]]
+
+--获取资源路径
+function Files.GetFilePathIgnoewEncodeMode(filename)
+	local ret = Files.GetFilePath(filename) --移动端传utf8中文路径，直接能找到；windows端旧的电影方块存盘的数据是default（已纠正，新的没问题），也走这里
+	if ret then
+		return ret
+	end
+	local tryDefaultEncoding = commonlib.Encoding.Utf8ToDefault(filename) --windows端如果传入utf8中文路径，就走到这里了
+	ret = Files.GetFilePath(tryDefaultEncoding)
+	if ret then
+		return ret
+	end
+	local tryUtf8Encoding = ParaMisc.EncodingConvert("gb2312", "utf-8", filename) --兼容旧的电影方块数据在移动端上的表现
+	ret = Files.GetFilePath(tryUtf8Encoding)
+	if ret then
+		return ret
 	end
 end
 

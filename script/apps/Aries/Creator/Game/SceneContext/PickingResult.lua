@@ -51,6 +51,14 @@ function PickingResult:CopyFrom(obj)
 	self.mouseX, self.mouseY = obj.mouseX, obj.mouseY;
 end
 
+-- only block and physical position is returned, entity picking position is not returned. 
+function PickingResult:GetPhysicalPos()
+	local x = self.physicalX or self.blockRealX
+	local y = self.physicalY or self.blockRealY
+	local z = self.physicalZ or self.blockRealZ
+	return x, y, z
+end
+
 function PickingResult:CloneMe()
 	local obj = PickingResult:new();
 	obj:CopyFrom(self);

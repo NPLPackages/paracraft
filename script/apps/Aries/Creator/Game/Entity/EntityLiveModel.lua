@@ -51,10 +51,13 @@ local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local Entity = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Game.EntityManager.Entity"), commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLiveModel"));
 
 Entity:Property({"scale", 1, "getScale", "setScale"});
-Entity:Property({"minScale", 0.02});
+Entity:Property({"minScale", 0.0001});
 Entity:Property({"maxScale", 1000});
 Entity:Property({"yaw", 0, "getYaw", "setYaw"});
+Entity:Property({"roll", 0, "GetRoll", "SetRoll"});
+Entity:Property({"pitch", 0, "GetPitch", "SetPitch"});
 Entity:Property({"useRealPhysics", false, "HasRealPhysics", "EnablePhysics", auto=true});
+Entity:Property({"isDynamicPhysicsEnabled", false, "IsDynamicPhysicsEnabled", "EnableDynamicPhysics", auto=true});
 -- used by ItemLiveModel:GetNearbyPhysicalModelDropPoints
 Entity:Property({"gridSize", BlockEngine.blocksize*0.25, "GetGridSize", "SetGridSize", auto=true});
 Entity:Property({"dropRadius", 0.2, "GetDropRadius", "SetDropRadius", auto=true});
@@ -78,11 +81,9 @@ Entity:Property({"onbeginDragEvent", nil, "GetOnBeginDragEvent", "SetOnBeginDrag
 Entity:Property({"onendDragEvent", nil, "GetOnEndDragEvent", "SetOnEndDragEvent", auto=true});
 Entity:Property({"onTickEvent", nil, "GetOnTickEvent", "SetOnTickEvent", auto=true});
 Entity:Property({"framemove_interval", 1, "GetFrameMoveInterval", "SetFrameMoveInterval", auto=true});
-Entity:Property({"tag", nil, "GetTag", "SetTag", auto=true});
-Entity:Property({"staticTag", nil, "GetStaticTag", "SetStaticTag", auto=true});
 Entity:Property({"category", nil, "GetCategory", "SetCategory", auto=true});
 Entity:Property({"yawOffset", 0, "GetYawOffset", "SetYawOffset", auto=true});
-
+Entity:Property({"physicsShape", "box", "GetPhysicsShape", "SetPhysicsShape", auto=true});
 Entity:Signal("beforeDestroyed")
 Entity:Signal("clicked", function(mouse_button) end)
 Entity:Signal("assetfileChanged");
@@ -434,6 +435,16 @@ function Entity:LoadFromXMLNode(node)
 		if(attr.useRealPhysics) then
 			self.useRealPhysics = (attr.useRealPhysics == "true") or (attr.useRealPhysics == true);
 		end
+		if(attr.physicsShape) then
+			self.physicsShape = attr.physicsShape
+		end
+		if(attr.isDynamicPhysicsEnabled) then
+			self.isDynamicPhysicsEnabled = (attr.isDynamicPhysicsEnabled == "true") or (attr.isDynamicPhysicsEnabled == true);
+			-- BUG: for unknown reason, if static and dynamic entity are loaded in the same frame, there is a chance for dynamic entity to fall through the static ones.
+			--if (self.isDynamicPhysicsEnabled) then
+			--	self.stateLoadPhysics = true;
+			--end
+		end
 		if(attr.isStackable) then
 			self.isStackable = (attr.isStackable == "true") or (attr.isStackable == true);
 		end
@@ -476,12 +487,6 @@ function Entity:LoadFromXMLNode(node)
 		end
 		if(attr.framemove_interval) then
 			self.framemove_interval = tonumber(attr.framemove_interval)
-		end
-		if(attr.tag) then
-			self:SetTag(attr.tag);
-		end
-		if(attr.staticTag) then
-			self.staticTag = attr.staticTag;
 		end
 		if(attr.category) then
 			self.category = attr.category
@@ -529,6 +534,23 @@ function Entity:HasStaticTag(tagName)
 	end
 end
 
+function Entity:GetModelLocalTransform()
+	if(self.localTransformDirty) then
+		self.localTransformDirty = false;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			self.modelLocalTransform = obj:GetField("LocalTransform", self.modelLocalTransform or mathlib.Matrix4:new());
+			local scale = self:GetScaling();
+			if(scale ~= 1) then
+				-- tricky: for API backward compatibility reason, obj:GetField("LocalTransform") has scaling applied, we need to remove it. 
+				scale = 1/scale;
+				self.modelLocalTransform:ApplyScaling(scale, scale, scale);
+			end
+		end
+	end
+	return self.modelLocalTransform
+end
+
 function Entity:SaveToXMLNode(node, bSort)
 	node = Entity._super.SaveToXMLNode(self, node, bSort);
 	local attr = node.attr;
@@ -560,12 +582,6 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.framemove_interval ~= Entity.framemove_interval) then
 		attr.framemove_interval = self.framemove_interval
 	end
-	if(self.tag and self.tag~="") then
-		attr.tag = self.tag
-	end
-	if(self.staticTag and self.staticTag~="") then
-		attr.staticTag = self.staticTag
-	end
 	if(self.category and self.category~="") then
 		attr.category = self.category
 	end
@@ -592,7 +608,17 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.useRealPhysics) then
 		attr.useRealPhysics = true;
 	elseif self.isDragging and self.beforeDragHasPhysics then
-		attr.beforeDragHasPhysics = true
+		attr.useRealPhysics = true
+	end
+	if(self.physicsShape and self.physicsShape~="box") then
+		attr.physicsShape = self.physicsShape;
+	end
+	if(self.isDynamicPhysicsEnabled) then
+		attr.isDynamicPhysicsEnabled = true;
+	elseif self.isDragging and self.beforeDragHasDynamicPhysics then
+		attr.isDynamicPhysicsEnabled = true
+	end
+	if(self.physicsProps) then
 	end
 	attr.canDrag = self.canDrag;
 	attr.stackHeight = self.stackHeight;
@@ -627,7 +653,10 @@ function Entity:SaveToXMLNodeWithAllLinkedInfo()
     local loadLinkedXmls;
     loadLinkedXmls = function (_entity,xmlInfo)
         xmlInfo.linkList = {}
-        local num = _entity:GetMountPointsCount() or 0
+        local num = 0
+		if _entity.GetMountPointsCount then
+			num = _entity:GetMountPointsCount() or 0
+		end
         _entity:ForEachChildLinkEntity(function(eee)
             local mountIdx = nil
             for i=1,num do
@@ -673,6 +702,23 @@ function Entity:ConvertLinkInfoToString(linkInfo)
 	end
 end
 
+-- if true, this entity can not be pushed by other movable entities
+function Entity:SetStaticBlocker(bIsBlocker)
+	self:EnablePhysics(bIsBlocker);
+end
+
+-- return true if this entity can not be pushed by other movable entities
+function Entity:IsStaticBlocker()
+	return self.useRealPhysics;
+end
+
+
+-- has static or dynamic physics
+function Entity:HasPhysics()
+	return self.useRealPhysics or self.isDynamicPhysicsEnabled;
+end
+
+
 -- we will use C++ polygon-level physics engine for real physics. 
 function Entity:HasRealPhysics()
 	return self.useRealPhysics;
@@ -680,6 +726,9 @@ end
 
 -- this function may remove entity object and create a new one inplace
 function Entity:EnablePhysics(bEnabled)
+	if(self.isDynamicPhysicsEnabled and bEnabled) then
+		self:EnableDynamicPhysics(false);
+	end
 	if( (self.useRealPhysics==true) ~= (bEnabled==true)) then
 		self.useRealPhysics = bEnabled == true;
 		local obj = self:GetInnerObject()
@@ -706,16 +755,151 @@ function Entity:LoadPhysics()
 	end
 end
 
+--@param halfwidth, halfheight, halfdepth: special a AABB region to check, default to 1, 3, 1
+-- return true if all nearby static physical objects are loaded. 
+function Entity:CheckNearbyStaticPhysicsLoaded(halfwidth, halfheight, halfdepth)
+	if(self.stateLoadPhysics == "waitForStatic") then
+		return false;
+	end
+	local bx, by, bz = self:GetBlockPos();
+	halfwidth = halfwidth or 1
+	halfheight = halfheight or 3
+	halfdepth = halfdepth or 1
+	local min_x, min_y, min_z = bx - halfwidth, by - halfheight, bz - halfdepth;
+	local max_x, max_y, max_z = bx + halfwidth, by + halfheight, bz + halfdepth;
+
+	for x = min_x, max_x do
+		for y = min_y, max_y do
+			for z = min_z, max_z do
+				local entities = EntityManager.GetEntitiesInBlock(x, y, z);
+				if(entities) then
+					for entity,_ in pairs(entities) do
+						if(entity ~= self) then
+							if(entity:HasRealPhysics()) then
+								if(not entity:CheckLoadPhysics()) then
+									self.stateLoadPhysics = "waitForStatic";
+									return false
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return true
+end
+
+-- this function is recursive, and return a map of all nearby connected physical models in a map. 
+--@param halfwidth, halfheight, halfdepth: special a AABB region to check, default to 1, 1, 1
+-- @param outEntities: all nearby entity models are in this map 
+-- return false if at least one nearby dynamic model's is not ready, otherwise it is true
+function Entity:CheckNearbyDynamicPhysicsModelLoaded(outEntities, halfwidth, halfheight, halfdepth)
+	if(outEntities[self]) then
+		return true;
+	end
+	if(self:IsDynamicPhysicsEnabled()) then
+		outEntities[self] = true
+	end
+	if(not self:CheckNearbyStaticPhysicsLoaded()) then
+		return false;
+	end
+	local obj = self:GetInnerObject()
+	if(obj and not obj:GetPrimaryAsset():IsLoaded()) then
+		return false
+	end
+
+	local bx, by, bz = self:GetBlockPos();
+	halfwidth = halfwidth or 1
+	halfheight = halfheight or 1
+	halfdepth = halfdepth or 1
+	local min_x, min_y, min_z = bx - halfwidth, by - halfheight, bz - halfdepth;
+	local max_x, max_y, max_z = bx + halfwidth, by + halfheight, bz + halfdepth;
+
+	for x = min_x, max_x do
+		for y = min_y, max_y do
+			for z = min_z, max_z do
+				local entities = EntityManager.GetEntitiesInBlock(x, y, z);
+				if(entities) then
+					for entity,_ in pairs(entities) do
+						if(entity ~= self) then
+							if(entity:IsDynamicPhysicsEnabled()) then
+								if(not outEntities[entity]) then
+									if(not entity:CheckNearbyDynamicPhysicsModelLoaded(outEntities, halfwidth, halfheight, halfdepth)) then
+										return false
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return true
+end
+
 -- we wil ensure physics are loaded.  This function can be called very often, such as during mouse picking. 
 -- @return true if we have loaded physics
 function Entity:CheckLoadPhysics()
+	self.stateLoadPhysics = false;
 	if(self:HasRealPhysics()) then
 		local obj = self:GetInnerObject()
 		if(obj and obj:GetField("EnablePhysics", false) and obj:GetPrimaryAsset():IsLoaded()) then
+			--echo({"static", obj:GetPrimaryAsset():GetKeyName()})
 			obj:LoadPhysics()
 			return true;
 		end
+	elseif(self:IsDynamicPhysicsEnabled()) then
+		local obj = self:GetInnerObject()
+		if(obj and not obj:GetField("EnableDynamicPhysics", false)) then
+			if(obj:GetPrimaryAsset():IsLoaded()) then
+				-- TODO: the following is still not optimal way to check for physical objects loading order. Duplicated checks may exists in the same tick. 
+				-- but in most cases, they are negligible. 
+
+				-- tricky: we need to ensure that all nearby static physical objects are loaded before dynamic ones. 
+				-- nearby block world physics are checked in C++ game engine, so we only preload static physical entities. 
+				if(self:CheckNearbyStaticPhysicsLoaded()) then
+					-- tricky: load all neaby dynamic physical entities in one pass, just in case they stack on one another.  
+					local entities = {}
+					if(self:CheckNearbyDynamicPhysicsModelLoaded(entities)) then
+						for entity, _ in pairs(entities) do
+							entity.isDynamicPhysicsEnabled = nil;
+							--echo({"dynamic", obj:GetPrimaryAsset():GetKeyName()})
+							entity:EnableDynamicPhysics(true)
+						end
+						return true;
+					else
+						self.stateLoadPhysics = "waitForDynamic";
+					end
+				else
+					self.stateLoadPhysics = "waitForStatic";
+				end
+			else
+				-- TODO: force load asset even it is not in viewport
+				obj:GetPrimaryAsset():LoadAsset()
+				self.stateLoadPhysics = "waitForSelfModel";
+			end
+			if(self.stateLoadPhysics) then
+				if(not self.framemove_interval) then
+					self:SetFrameMoveInterval(0.5);
+				end
+			end
+		end
 	end
+end
+
+-- whether it will check for collision detection and run FrameMove 
+function Entity:SetDummy(bIsDummy)
+	if(self.isDynamicPhysicsEnabled and bIsDummy) then
+		self:EnableDynamicPhysics(false);
+	end
+	Entity._super.SetDummy(self, bIsDummy)
+end
+
+-- return true if we can take control of this entity by external agent like movie or code block.
+function Entity:CanBeAgent()
+	return true;
 end
 
 -- whether to force load physics, if false, it will only load when player collide with it. 
@@ -753,7 +937,7 @@ function Entity:CreateInnerObject()
 		-- MESH_USE_LIGHT = 0x1<<7: use block ambient and diffuse lighting for this model. 
 		obj:SetAttribute(128, true);
 		obj:SetField("MovementStyle", 3); -- linear
-		obj:SetField("RenderDistance", 100);
+		-- obj:SetField("RenderDistance", 100);
 		if(self:HasRealPhysics()) then
 			obj:SetField("EnablePhysics", true);
 			if(self:IsAlwaysLoadPhysics()) then
@@ -774,6 +958,9 @@ function Entity:CreateInnerObject()
 		end
 		if(self:GetBootHeight() ~= 0) then
 			obj:SetField("BootHeight", self:GetBootHeight());
+		end
+		if(self.materialId) then
+			obj:SetField("MaterialID", self.materialId);
 		end
 		self:Refresh(nil, obj)
 
@@ -840,10 +1027,29 @@ function Entity:getYaw()
 	return self:GetFacing();
 end
 
+function Entity:GetYaw()
+	return self:getYaw(0)
+end
+
+function Entity:SetYaw(yaw)
+	self:setYaw(yaw)
+end
+
 function Entity:setYaw(yaw)
 	if(self:getYaw() ~= yaw) then
 		self:SetFacing(yaw);
 		self:valueChanged();
+	end
+end
+
+-- virtual: auto refresh dynamic physics
+function Entity:SetFacing(facing)
+	if(Entity._super.SetFacing(self, facing) and self.isDynamicPhysicsEnabled) then
+		local obj = self:GetInnerObject();
+		if(obj and obj:GetField("EnableDynamicPhysics", false)) then
+			self:EnableDynamicPhysics(false)
+			self:EnableDynamicPhysics(true)
+		end
 	end
 end
 
@@ -866,13 +1072,20 @@ function Entity:setScale(scale)
 		local obj = self:GetInnerObject();
 		if(obj) then
 			obj:SetScale(scale);
+
+			if(self.isDynamicPhysicsEnabled) then
+				if(obj:GetField("EnableDynamicPhysics", false)) then
+					self:EnableDynamicPhysics(false)
+					self:EnableDynamicPhysics(true)
+				end
+			end
 		end
 		self:valueChanged();
 	end
 end
 
 function Entity:Destroy()
-	self:beforeDestroyed();
+	self:beforeDestroyed(self);
 	self:DestroyInnerObject();
 	Entity._super.Destroy(self);
 end
@@ -892,6 +1105,15 @@ function Entity:Refresh(bForceRefresh, playerObj)
 			end;
 			playerObj:SetField("assetfile", assetPath);
 		end
+		if playerObj:GetField("pitch","")~=self:GetPitch() then
+			playerObj:SetField("pitch", self:GetPitch());
+		end
+		if playerObj:GetField("roll","")~=self:GetRoll() then
+			playerObj:SetField("roll", self:GetRoll());
+		end
+		if playerObj:GetField("yaw","")~=self:GetYaw() then
+			playerObj:SetField("yaw", self:GetYaw());
+		end
 		self.isCustomModel = PlayerAssetFile:IsCustomModel(assetPath);
 		self.hasCustomGeosets = PlayerAssetFile:HasCustomGeosets(assetPath);
 		self:RefreshSkin(playerObj);
@@ -905,10 +1127,6 @@ function Entity:EndEdit()
 	self:CheckLoadPhysics();
 end
 
--- @param filename: if nil, self.filename is used
-function Entity:GetModelDiskFilePath(filename)
-	return Files.GetFilePath(commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile())) or Files.GetTempPath()..commonlib.Encoding.Utf8ToDefault(filename or self:GetModelFile())
-end
 
 function Entity:SetModelFile(filename)
 	if(self.filename ~= filename) then
@@ -1123,6 +1341,10 @@ end
 -- called every 1500 milliseconds
 function Entity:OnHover(hoverEntity)
 	local event = Event:new():init("onhover");	
+	if(hoverEntity) then
+		event.name = self.name;
+		event.hoverEntityName = hoverEntity.name or "";
+	end
 	self:event(event);
 
 	-- send a general event or user defined one
@@ -1166,6 +1388,29 @@ end
 -- called when the user clicks on the block
 -- @return: return true if it is an action block and processed . 
 function Entity:OnClick(x, y, z, mouse_button, entity, side)
+	--这里的逻辑是点击了删除按钮
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	local context = GameLogic.GetSceneContext()
+	local isDelete = (context and context.IsDeleteStatus) and context:IsDeleteStatus() or false
+	if IsMobileUIEnabled and mouse_button == "left" then
+		if isDelete and GameLogic.GameMode:IsEditor() then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/DragEntityTask.lua");
+			local dragTask = MyCompany.Aries.Game.Tasks.DragEntity:new({})
+			dragTask:DeleteEntity(self)
+			self:SetDead();
+			return true
+		end
+	end
+
+	-- 这里是因为宏示教左右键换了，得换回来
+	if IsMobileUIEnabled and GameLogic.Macros:IsPlaying() then
+		if mouse_button == "left" then
+			mouse_button="right"
+		elseif mouse_button == "right" then
+			mouse_button="left"
+		end
+	end
+
 	local curTime = commonlib.TimerManager.GetCurrentTime()
 	if(self.lastClickTime == curTime) then
 		return
@@ -1198,6 +1443,11 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 					return true;
 				end
 			end
+			local IsAltKeyPressed = System.Windows.Keyboard:IsAltKeyPressed(); 
+			if IsMobileUIEnabled and GameLogic.GameMode:CanEditBlock() and not IsAltKeyPressed and not event:isAccepted() and not GameLogic.Macros:IsPlaying() then
+				self:OpenEditor("entity", entity);
+				return true
+			end
 		else
 			if(mouse_button=="right" and GameLogic.GameMode:CanEditBlock()) then
 				self:OpenEditor("entity", entity);
@@ -1212,7 +1462,7 @@ end
 
 function Entity:OpenEditor(editor_name, entity)
 	local ctrl_pressed = System.Windows.Keyboard:IsCtrlKeyPressed();
-	if(ctrl_pressed) then
+	if(ctrl_pressed and (editor_name == "entity" or not editor_name)) then
 		Entity._super.OpenEditor(self, editor_name, entity);
 	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.lua");
@@ -1570,6 +1820,10 @@ function Entity:BeginDrag()
 	if(self.beforeDragHasPhysics) then
 		self:EnablePhysics(false);
 	end
+	self.beforeDragHasDynamicPhysics = self.isDynamicPhysicsEnabled;
+	if(self.beforeDragHasDynamicPhysics) then
+		self:EnableDynamicPhysics(false);
+	end
 	self:ForEachChildLinkEntity(Entity.BeginDrag)
 	self:OnBeginDrag()
 	self:BeginModify()
@@ -1589,6 +1843,11 @@ function Entity:EndDrag(dragLocation)
 		self:EnablePhysics(true);
 		self.beforeDragHasPhysics = nil;
 	end
+	if(self.beforeDragHasDynamicPhysics) then
+		self:EnableDynamicPhysics(true);
+		self.beforeDragHasDynamicPhysics = nil;
+		self:SetPhysicalProperty(nil); -- restore
+	end
 	self:ForEachChildLinkEntity(Entity.EndDrag)
 	self:OnEndDrag(dragLocation)
 	self:CheckCollision()
@@ -1597,6 +1856,8 @@ function Entity:EndDrag(dragLocation)
 end
 
 function Entity:OnBeginDrag()
+	local event = Event:new():init("onbegindrag");	
+	self:event(event);
 	-- send a general event or user defined one
 	local onbeginDragEvent = self.onbeginDragEvent or "__entity_onbegindrag"
 	if(onbeginDragEvent) then
@@ -1632,6 +1893,9 @@ function Entity:RestoreDragLocation()
 end
 
 function Entity:OnEndDrag(dragLocation)
+	local event = Event:new():init("onenddrag");
+	self:event(event);
+
 	-- send a general event or user defined one
 	local onendDragEvent = self.onendDragEvent or "__entity_onenddrag"
 	if(onendDragEvent) then
@@ -1793,14 +2057,16 @@ function Entity:FrameMove(deltaTime)
 				self:OnMainAssetLoaded()
 			end
 		end
-		if(GameLogic.GameMode:IsEditor()) then
-			if(not self:IsVisible()) then
-				self:SetOpacity(0.5)
-				self:SetVisible(true)
-			end
-		else
-			if(self:IsVisible() ~= self:IsDisplayModel()) then
-				self:SetVisible(self:IsDisplayModel())
+		if(self:IsPersistent()) then
+			if(GameLogic.GameMode:IsEditor()) then
+				if(not self:IsVisible()) then
+					self:SetOpacity(0.5)
+					self:SetVisible(true)
+				end
+			else
+				if(self:IsVisible() ~= self:IsDisplayModel()) then
+					self:SetVisible(self:IsDisplayModel())
+				end
 			end
 		end
 	end
@@ -1813,6 +2079,12 @@ function Entity:FrameMove(deltaTime)
 			return;
 		end
 		self:MoveEntity(deltaTime);
+	end
+	if(self.stateLoadPhysics) then
+		self:CheckLoadPhysics();
+	end
+	if(self.isDynamicPhysicsEnabled) then
+		self:UpdateDynamicPhysics()
 	end
 end
 
@@ -1994,7 +2266,7 @@ end
 function Entity:GetDragDisplayOffsetY()
 	if(self.dragDisplayOffsetY) then
 		return self.dragDisplayOffsetY;
-	elseif(self:GetCategory() == "customCharItem" or self:HasCustomGeosets()) then
+	elseif(self:GetCategory() == "customCharItem" or self:HasCustomGeosets() or not self.enableDropFall) then
 		return 0;
 	end
 	return 0.3
@@ -2002,76 +2274,6 @@ end
 
 function Entity:SetDragDisplayOffsetY(dragDisplayOffsetY)
 	self.dragDisplayOffsetY = dragDisplayOffsetY
-end
-
--- @param value: if value is nil, name is used as string value
-function Entity:SetStaticTag(name, value)
-	if(value==nil) then
-		self.staticTag = name;
-		self.tagFields = nil;
-	elseif(name) then
-		self:SetTagField(name, value);
-	end
-end
-
--- @param name: if nil, the raw tag string is returned, otherwise we will treat tag as a key, value table
-function Entity:GetStaticTag(name)
-	if(name==nil) then
-		return self.staticTag;
-	else
-		return self:GetTagField(name);
-	end
-end
-
-function Entity:SetTagField(name, value)
-	if(name) then
-		local t = self.tagFields;
-		if(not t) then
-			t = {};
-			self.tagFields = t;
-		end
-		if(t[name] ~= value) then
-			t[name] = value
-			if(value==nil and not next(t)) then
-				self.staticTag = ""
-			else
-				self.staticTag = commonlib.serialize_compact(t);
-			end
-		end
-	end
-end
-
-function Entity:GetTagField(name)
-	if(name) then
-		if(not self.tagFields) then
-			if(self.staticTag and self.staticTag~="") then
-				self.tagFields = commonlib.totable(self.staticTag);
-			else
-				self.tagFields = {};
-			end
-		end
-		return self.tagFields[name]
-	end
-end
-
--- @param value: if value is nil, name is used as string value
-function Entity:SetTag(name, value)
-	if(value==nil) then
-		self.tag = name;
-	elseif(name) then
-		local t = commonlib.totable(self.tag)
-		t[name] = value;
-		self.tag = commonlib.serialize_compact(t);
-	end
-end
-
--- @param name: if nil, the raw tag string is returned, otherwise we will treat tag as a key, value table
-function Entity:GetTag(name)
-	if(name==nil) then
-		return self.tag;
-	elseif(self.tag) then
-		return commonlib.totable(self.tag)[name];
-	end
 end
 
 function Entity:IsBiped()
@@ -2223,5 +2425,238 @@ function Entity:MoveEntity(deltaTime, bTryMove)
 			-- tick at high FPS
 			self:SetFrameMoveInterval(self:GetTickRateInterval());
 		end
+	end
+end
+
+-- virtual: auto refresh dynamic physics
+function Entity:SetBlockPos(bx, by, bz)
+	if(self.isDynamicPhysicsEnabled and bx) then
+		if(self.bx~=bx or self.by~=by or self.bz~=bz ) then
+			local obj = self:GetInnerObject();
+			if(obj and obj:GetField("EnableDynamicPhysics", false)) then
+				self:EnableDynamicPhysics(false)
+				self:SetBlockPos(bx, by, bz)
+				self:EnableDynamicPhysics(true)
+				return true
+			end
+		else
+			return	
+		end
+	end
+	return Entity._super.SetBlockPos(self, bx, by, bz)
+end
+
+-- virtual: auto refresh dynamic physics
+function Entity:SetPosition(x, y, z)
+	if(self.isDynamicPhysicsEnabled and x) then
+		if(self.x~=x or self.y~=y or self.z~=z ) then
+			local obj = self:GetInnerObject();
+			if(obj and obj:GetField("EnableDynamicPhysics", false)) then
+				self:EnableDynamicPhysics(false)
+				self:SetPosition(x, y, z);
+				self:EnableDynamicPhysics(true)
+				return true
+			end
+		else
+			return	
+		end
+	end
+	return Entity._super.SetPosition(self, x, y, z)
+end
+
+
+function Entity:UpdateDynamicPhysics()
+	if(self.isDynamicPhysicsEnabled) then
+		local obj = self:GetInnerObject();
+		if(obj) then
+			self.localTransformDirty = true;
+			local x, y, z = obj:GetPosition()
+			if(self:SetPositionEntityOnly(x, y, z)) then
+				obj:UpdateTileContainer();
+			end
+		end
+	end
+end
+
+function Entity:EnableDynamicPhysics(bEnable)
+	if(self.useRealPhysics and bEnable) then
+		self:EnablePhysics(false)
+	end
+	if(self.isDynamicPhysicsEnabled ~= bEnable) then
+		self.isDynamicPhysicsEnabled = bEnable;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			if(bEnable) then
+				self:SetPhysicsShape(self:GetPhysicsShape(), true)
+			
+				-- we will delay load physics in C++ game engine until all nearby models are ready
+				if(obj:GetPrimaryAsset():IsLoaded()) then
+					if(not self.stateLoadPhysics) then
+						-- this will cause check load dynamics physics to be called in framemove.
+						self.stateLoadPhysics = true
+					end
+					obj:SetField("EnableDynamicPhysics", true);
+					self:SetPhysicalProperty(); -- restore physical property
+					self.facing, self.pitch, self.roll = 0,0,0;
+					self.modelLocalTransform = nil;
+					self:SetFrameMoveInterval(self:GetTickRateInterval());
+				else
+					self.stateLoadPhysics = "waitForStatic";
+					if(not self.framemove_interval) then
+						self:SetFrameMoveInterval(0.5);
+					end
+				end
+			else
+				self.stateLoadPhysics = false;
+				obj:SetField("EnableDynamicPhysics", false);
+
+				-- update model local transform
+				self.localTransformDirty = true;
+				self.facing, self.pitch, self.roll = obj:GetField("yaw", 0), obj:GetField("pitch", 0), obj:GetField("roll", 0);
+				self:SetFrameMoveInterval(nil);
+			end
+		end
+	end
+end
+
+function Entity:IsDynamicPhysicsEnabled()
+	return self.isDynamicPhysicsEnabled;
+end
+
+-- apply impulse to the center of the mass on the dynamic physical object. 
+function Entity:ApplyCentralImpulse(dx, dy, dz)
+	if(self:IsDynamicPhysicsEnabled()) then
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("ApplyCentralImpulse", {dx, dy, dz});
+		end
+	end
+end
+
+-- @param shape: default to "box", can be "sphere|box|capsule", etc. 
+-- @param forceUpdate: true if force setting the shape
+function Entity:SetPhysicsShape(shape, forceUpdate)
+	if(self.physicsShape ~= shape or forceUpdate) then
+		self.physicsShape = shape;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("PhysicsShape", shape);
+			return true
+		end
+	end
+end
+
+function Entity:GetPhysicsShape()
+	return self.physicsShape;
+end
+
+-- properties that are preserved during saving
+local staticPhysicsProperties = {"Mass", "LinearDamping", "AngularDamping", "GravityX", "GravityY", "GravityZ", "Friction", "RollingFriction", "SpinningFriction"}
+-- @param name: it can be name like "Mass" or a table containing name, value pairs like {LinearVelocityX=1, LinearVelocityY=0, LinearVelocityZ=0}. 
+-- if name is nil, we will restore all static physics properties in current self.physicsProps
+-- All property names and default values:
+--   Mass: 1, set to 0 to make this kinematic (static) character
+--   LinearDamping, AngularDamping:0, 0
+--   GravityX, GravityY, GravityZ:-10
+--   LinearFactorX, LinearFactorY, LinearFactorZ:1,1
+--   AngularFactorX, AngularFactorY, AngularFactorZ:1
+--   LinearVelocityX, LinearVelocityY, LinearVelocityZ: 0,0,0
+--   AngularVelocityX, AngularVelocityY, AngularVelocityZ:0,0,0
+--   LocalInertiaX,LocalInertiaY, LocalInertiaZ: 0.03, 0.03, 0.03, etc
+--   Flags: 8
+--   ActivationState: 2
+--   DeactivationTime: 2.01667
+--   Restitution: 0
+--   Friction: 0.5 
+--   RollingFriction, SpinningFriction: 0, 0
+--   ContactStiffness, ContactDamping: 10000, 0.1
+--   IslandTag, CompanionId: 2, -1
+--   HitFraction: 1
+--   CollisionFlags: 0
+--   CcdSweptSphereRadius, CcdMotionThreshold: 0, 0
+-- @param value: all values should be number. default values are
+function Entity:SetPhysicalProperty(name, value)
+	if(self.isDynamicPhysicsEnabled) then
+		local data;
+		self.physicsProps = self.physicsProps or (name and {});
+		if(type(value) == "number") then
+			self.physicsProps[name] = value
+			data = format("{%s=%s}", name, value)
+		elseif(type(name) == "table") then
+			for k, v in pairs(name) do
+				self.physicsProps[k] = v;
+			end
+			data = commonlib.serialize_compact(name)
+		elseif(not name and self.physicsProps) then
+			local name = {}
+			for _, key in ipairs(staticPhysicsProperties) do
+				name[key] = self.physicsProps[key]
+			end
+			data = commonlib.serialize_compact(name)
+		end
+		if(data) then
+			local obj = self:GetInnerObject();
+			if(obj and obj:GetField("EnableDynamicPhysics", false)) then
+				obj:SetField("PhysicalProperty", data);
+			end
+		end
+	else
+		LOG.std(nil, "warn", "physics", "setting physical property for non-physical entity %s", self.name or "");
+	end
+end
+
+-- @param name: it can be name like "Mass" or nil to return a name, value pairs of all parameters. 
+-- @param forceRefresh: if true, we will fetch fresh values otherwise we will use last set values. 
+-- @return value or a table containing all name, value pairs.
+function Entity:GetPhysicalProperty(name, forceRefresh)
+	if(self.isDynamicPhysicsEnabled) then
+		if(name and self.physicsProps and not forceRefresh) then
+			local value = self.physicsProps[name]
+			if(value) then
+				return value;
+			end
+		end
+		local obj = self:GetInnerObject();
+		if(obj) then
+			self.physicsProps = NPL.LoadTableFromString(obj:GetField("PhysicalProperty", ""))
+			if(self.physicsProps) then
+				if(name) then
+					return self.physicsProps[name]
+				else
+					return self.physicsProps
+				end
+			end
+		end
+	else
+		LOG.std(nil, "warn", "physics", "getting physical property for non-physical entity %s", self.name or "");
+	end
+end
+
+
+-- @param nGroupId: [0,15]  0 is default. 15 is for kinematic, such as main character and block engine. It will skip ray picking in bipedobject. 
+function Entity:SetPhysicsGroup(nGroupId)
+	if((self.physicsGroup or 0) ~= nGroupId) then
+		self.physicsGroup = nGroupId;
+		local obj = self:GetInnerObject();
+		if(obj) then
+			obj:SetField("PhysicsGroup", nGroupId)
+		end
+	end
+end
+
+function Entity:GetPhysicsGroup()
+	return self.physicsGroup or 0;
+end
+
+-- kinematic object does not react to forces, but will push other dynamic physical objects. 
+-- this is usually for a character, just create an invisible entity and update its position at some interval.
+function Entity:SetPhysicsKinematic()
+	self:SetPhysicsGroup(15)
+	self:SetPhysicalProperty("Mass", 0)
+
+	local obj = self:GetInnerObject();
+	if(obj and obj:GetField("EnableDynamicPhysics", false)) then
+		self:EnableDynamicPhysics(false)
+		self:EnableDynamicPhysics(true)
 	end
 end

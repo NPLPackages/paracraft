@@ -98,6 +98,7 @@ function Email.Show()
 end
 
 function Email.ShowView()
+
 	Email.InitData()
 	local view_width = 1040
 	local view_height = 620
@@ -109,8 +110,9 @@ function Email.ShowView()
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = true,
 			enable_esc_key = true,
-			zorder = 0,
+			zorder = 2,
 			--app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+			isTopLevel = true,
 			directPosition = true,
 				align = "_ct",
 				x = -view_width/2,
@@ -527,8 +529,8 @@ function Email.ClickEmailItem(index)
 	-- 	return 
 	-- end
 	Email.select_email_idx = index
-	EmailManager.SetEamilReaded(index)
-	EmailManager.ReadEamil(index)
+	EmailManager.SetEmailReaded(index)
+	EmailManager.ReadEmail(index)
 end
 
 
@@ -546,7 +548,7 @@ function Email.OnClickGetAll()
 	if not isgetall then
 		local ids = EmailManager.GetAllUnGetRewardEmailIds()
 		EmailManager.GetEmailReward(ids)
-		EmailManager.SetEamilReaded(ids)
+		EmailManager.SetEmailReaded(ids)
 		isgetall = true
 	end
 	commonlib.TimerManager.SetTimeout(function()
@@ -607,6 +609,262 @@ function Email.GetEmailContent(str)
 	str = string.gsub(str,"&lt","<")
 	str = string.gsub(str,"&gt",">")
 	str = string.gsub(str,"\\"," ")
-	--print(str)
+	-- print("str=============",str)
 	return str
 end
+
+
+--lesson logic
+
+function Email.OnClickGoLesson()
+	-- if not EmailManager.IsInCourseTime() then
+	-- 	GameLogic.AddBBS(nil,"现在不是上课时间")
+	-- 	return 
+	-- end
+	local email_content = EmailManager.cur_email_content and EmailManager.cur_email_content[1] or {}
+	local content = email_content.content 
+	-- echo(email_content,true)
+	local isNewCourse = false
+	local id = email_content.id
+	local course_data = EmailManager.LoadEmailCfg()
+	course_data = course_data[id]
+	if not course_data then
+		course_data = EmailManager.FindEmailDataById(id)
+		isNewCourse = true
+	end
+	if System.options.isDevMode then
+		print("Email.OnClickGoLesson",isNewCourse)
+		echo(course_data,true)
+		echo(email_content)
+	end
+	if course_data then
+		if course_data.projectId and course_data.projectId > 0 then
+			local commandStr = string.format("/loadworld -s -auto %d", course_data.projectId)
+			GameLogic.RunCommand(commandStr)
+			return
+		end
+		if page then
+			page:CloseWindow()
+			page = nil
+		end
+		Email.CloseView()
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.email.lesson");
+		local RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseSchedulingV2.lua") 
+		local ppt_index = (course_data.ppt_index and course_data.ppt_index > 0) and course_data.ppt_index or nil
+		if not ppt_index then
+			ppt_index = course_data.pptIndex
+		end
+		RedSummerCampCourseScheduling.ShowPPTPage(course_data.course_name,ppt_index)
+	end
+end
+
+function Email.getTimeStampByString(timeStr)
+	if not timeStr then
+		return -1
+	end
+    local patt = "(%d+)%D(%d+)%D(%d+)%s+(%d+)%D(%d+)"
+    local y,m,d,h,min = string.match(timeStr,patt)
+    local time_stamp = os.time({year = tonumber(y), month = tonumber(m), day = tonumber(d), hour=tonumber(h), min=tonumber(min), sec=0})
+    return time_stamp
+end
+
+function Email.OpenEmailPage()
+	if EmailManager.email_list then
+		local function Open()
+			local num = #EmailManager.email_list
+			for i = 1,num do
+				local id = EmailManager.email_list[i].id
+				if EmailManager.IsTutorialEmail(id) and not Email.IsAutoOpen and EmailManager.IsInCourseTime() then --存在课程邮件 Email.IsAutoOpen 是否自动弹出，只有第一次打开应用
+					Email.Show();
+					Email.IsAutoOpen = true
+					break
+				end
+			end 
+		end
+		local emailCfg = EmailManager.LoadEmailCfg()
+		if not emailCfg then
+			keepwork.good.good_info({
+				router_params = {
+					gsId = 12002,
+				}
+			},function(err, msg, data)
+				if err == 200 then
+					Email.SetGoodInfo(data,function()
+						Open()
+					end)
+				end
+			end)  
+		else
+			Open()
+		end
+	end
+end
+
+function Email.SetGoodInfo(good_info,callback)
+	if not good_info then
+		return 
+	end
+	local extra = good_info.data.extra 
+	local courseCfg =  extra and extra.course_validation
+	local emailCnf = extra and extra.email_config
+	if System.options.isDevMode then
+		print("Email.OpenEmailPage")
+		print("ext==========================")
+		echo(extra,true)
+	end
+	local email_data
+	local CourseValidationCfg = {}
+	EmailManager.SetExtraConfig(extra)
+	if emailCnf and emailCnf.data then
+		local course_name = emailCnf.course_name
+		local course_start_time = Email.getTimeStampByString(emailCnf.course_start_time)
+		local course_end_time = Email.getTimeStampByString(emailCnf.course_end_time)
+		
+		email_data = {}
+		for k,v in pairs(emailCnf.data) do
+			email_data[v.id] = {}
+			email_data[v.id].ppt_index = v.pptIndex
+			email_data[v.id].projectId = v.projectId
+			email_data[v.id].course_name = course_name
+		end
+		email_data.course_start_time = course_start_time
+		email_data.course_end_time = course_end_time
+		EmailManager.SetEmailCfg(email_data)
+	end
+	Email.SetCourseConfig(courseCfg)
+	local courseCnf = EmailManager.GetCourseValidationCfg()
+	if type(email_data) == "table" or type(courseCnf) == "table" then
+		if callback then
+			callback()
+		end
+	end
+end
+
+function Email.SetCourseConfig(courseCfg)
+	if courseCfg then
+		local CourseValidationCfg = {}
+		local emails = courseCfg.email_config or {}
+		local courses = courseCfg.course_config or {}
+		local roles = courseCfg.user_roles or {}
+		local num1 = #emails
+		local num2 = #courses
+		local isHaveData = false
+		CourseValidationCfg.course_config = {}
+		CourseValidationCfg.email_config = {}
+		for k,v in pairs(roles) do
+			local role = v.role
+			local course_name = v.course
+			if num1 > 0 then
+				local temp = {}
+				for i=1,num1 do
+					if emails[i]  and emails[i].role_name == role then
+						temp[#temp + 1] = emails[i]
+					end
+				end
+				isHaveData = true
+				CourseValidationCfg.email_config[#CourseValidationCfg.email_config + 1] = temp
+			end
+			if num2 > 0 then
+				local temp = {}
+				for i=1,num2 do
+					if courses[i] and courses[i].role_name == role then
+						temp[#temp + 1] = courses[i]
+					end
+				end
+				isHaveData = true
+				CourseValidationCfg.course_config[#CourseValidationCfg.course_config + 1] = temp
+			end
+			CourseValidationCfg.role_data = roles
+		end
+		if isHaveData then
+			EmailManager.SetCourseValidationCfg(CourseValidationCfg)
+		end
+	end
+end
+-- local function strings_split(str, sep) 
+-- 	local list = {}
+-- 	local str = str .. sep
+-- 	for word in string.gmatch(str, '([^' .. sep .. ']*)' .. sep) do
+-- 		list[#list+1] = word
+-- 	end
+-- 	return list
+-- end
+
+-- function Email.GetLessonDataByEmail(content,key)
+-- 	if not content or content == "" then
+-- 		return
+-- 	end
+-- 	local find_key = ""
+-- 	if key == "code" then
+-- 		find_key = "课程名称"
+-- 	else
+-- 		find_key = "课程章节"
+-- 	end
+-- 	local all = strings_split(content,";")
+-- 	if all then
+-- 		for k,v in pairs(all) do
+-- 			if v and (v:find(find_key.."：") or v:find(find_key..":")) then
+-- 				print("data==========",v)
+-- 				return v
+-- 			end
+-- 		end
+-- 	end
+-- end
+
+-- local function trimStr(url)
+-- 	local url = url or ""
+-- 	url = string.gsub(url,"<br>","")
+-- 	url = string.gsub(url,"&nbsp","")
+-- 	url = string.gsub(url,"<p>","")
+-- 	url = string.gsub(url,"</p>","")
+-- 	url = string.gsub(url,";","")
+-- 	url = string.gsub(url,"&lt","")
+-- 	url = string.gsub(url,"&gt","")
+-- 	url = string.gsub(url,"\\","")
+-- 	url = string.gsub(url,"</div>","")
+-- 	url = string.gsub(url,"<div>","")
+-- 	url = string.gsub(url,"<span>","")
+-- 	url = string.gsub(url,"</span>","")
+-- 	url = string.gsub(url,"课程名称：","")
+-- 	url = string.gsub(url,"课程名称:","")
+-- 	url = string.gsub(url,"上课时间：","")
+-- 	url = string.gsub(url,"上课时间:","")
+-- 	url = string.gsub(url,"课程章节：","")
+-- 	url = string.gsub(url,"课程章节:","")
+-- 	return url
+-- end
+
+
+
+-- function Email.GetEmailContentData(id)
+-- 	keepwork.email.readEmail({
+--         router_params = {
+--             id = id,
+--         }
+--     },function(err, msg, data)
+--         if err == 200 then
+--             local email_content = data.data
+--             if  email_content and  email_content[1] then
+--                 local content =  email_content[1].content
+-- 				local time = trimStr(Email.GetLessonTime(content))
+-- 				if Email.IsInLessonTime(time) then
+-- 					Email.Show();
+-- 				end
+--             end          
+--         end
+--     end)
+-- end
+
+-- function Email.GetLessonTime(content_str)
+-- 	if not content_str or content_str == "" then
+-- 		return
+-- 	end
+-- 	local all = strings_split(content_str,";")
+-- 	if all then
+-- 		for k,v in pairs(all) do
+-- 			if v and (v:find("上课时间:") or v:find("上课时间：")) then
+-- 				return v
+-- 			end
+-- 		end
+-- 	end
+-- end

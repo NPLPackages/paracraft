@@ -65,3 +65,57 @@ function NplBrowserManager:PreLoadWindows(list)
 		mytimer:Change(5000, nil)
 	end
 end
+
+function NplBrowserManager:SetVideoUrl(url)
+	if url == self.cur_video_url then
+		return
+	end
+
+	url = url or ""
+	local list = commonlib.split(url,";")
+	self.video_url_map = {}
+	for index = 1, #list do
+		local str = list[index]
+        local len = string.len(str)
+        local zero_num = 0
+		
+        for i = len, 1, -1 do
+			if i > 1 then
+				local char = string.sub(str,i,i)
+				if char == "." then
+					local video_type = string.sub(str,i+1,len)
+					self.video_url_map[video_type] = str
+					break
+				end
+
+			end
+
+        end
+	end
+	
+	self.cur_video_url = url
+end
+
+-- video_type:"webm" or "mp4"
+function NplBrowserManager:GetVideoUrlSrc(video_type)
+	video_type = video_type or "webm"
+	local video_url_map = self.video_url_map or {}
+	local url = video_url_map[video_type]
+	return url or ""
+end
+
+function NplBrowserManager:PauseVideo()
+	self.IsVideoPaused = true
+end
+
+function NplBrowserManager:PlayVideo()
+	self.IsVideoPaused = false
+end
+
+function NplBrowserManager:ClearVideoPausedState()
+	self.IsVideoPaused = nil
+end
+
+function NplBrowserManager:GetVideoPaused()
+	return self.IsVideoPaused
+end

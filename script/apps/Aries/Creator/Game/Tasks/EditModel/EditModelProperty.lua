@@ -21,6 +21,15 @@ local OpenAssetFileDialog = commonlib.gettable("MyCompany.Aries.Game.GUI.OpenAss
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/PlayerAssetFile.lua");
 local PlayerAssetFile = commonlib.gettable("MyCompany.Aries.Game.EntityManager.PlayerAssetFile")
 local page;
+
+local function StringToBooleanNil(value)
+	if(value == "true") then
+		return true
+	elseif(value == "false") then
+		return false
+	end
+end
+
 function EditModelProperty.OnInit()
 	page = document:GetPageCtrl();
 end
@@ -41,10 +50,19 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 				mountpoints[#mountpoints + 1] = {index = i, name = mp:GetName()}
 			end
 		end
+		local physicsType;
+		if(modelEntity:IsDynamicPhysicsEnabled()) then
+			physicsType = "dynamic"..modelEntity:GetPhysicsShape();
+		else
+			physicsType = modelEntity:HasRealPhysics()
+		end
+		
 		EditModelProperty.ShowPage(function(values)
 			if(values) then
-				if(modelEntity:GetName()~=values.name and not modelEntity:isa(EntityManager.EntityBlockBase)) then
-					if(not EntityManager.GetEntity(values.name)) then
+				if(modelEntity:GetName()~=values.name) then
+					-- entity live model must use globally unique name. entity block model can share the same name
+					local isNameGloballyUnique = (not modelEntity:isa(EntityManager.EntityBlockBase))
+					if(not isNameGloballyUnique or not EntityManager.GetEntity(values.name)) then
 						modelEntity:SetName(values.name)
 					else
 						_guihelper.MessageBox(format(L"%s名字已经存在了, 无法改名。请换个名字", values.name or ""))
@@ -129,7 +147,20 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 					end
 				end
 				-- this one needs to be called last, since it may change entity.  
-				modelEntity:EnablePhysics(values.hasRealPhysics)
+				
+				if(type(values.hasRealPhysics) == "string" and values.hasRealPhysics:match("^dynamic")) then
+					local shape = values.hasRealPhysics:match("^dynamic(.*)");
+					if(shape and shape ~= "" and modelEntity:GetPhysicsShape() ~= shape) then
+						modelEntity:EnableDynamicPhysics(false)
+						modelEntity:SetPhysicsShape(shape);
+					end
+					modelEntity:EnableDynamicPhysics(true)
+				else
+					if(modelEntity:IsDynamicPhysicsEnabled()) then
+						modelEntity:EnableDynamicPhysics(false)
+					end
+					modelEntity:EnablePhysics(StringToBooleanNil(values.hasRealPhysics))
+				end
 				if(callbackFunc) then
 					callbackFunc(modelEntity)
 				end
@@ -137,7 +168,7 @@ function EditModelProperty.ShowForEntity(modelEntity, callbackFunc)
 		end, {
 			name=modelEntity:GetName(), 
 			itemId = modelEntity:GetItemId(),
-			hasRealPhysics = modelEntity:HasRealPhysics(),
+			hasRealPhysics = physicsType,
 			isStackable = modelEntity.isStackable,
 			isDisplayModel = modelEntity:IsDisplayModel(),
 			enableDropFall = modelEntity:IsDropFallEnabled(),
@@ -203,14 +234,6 @@ function EditModelProperty.ShowPage(OnClose, last_values)
 	end
 end
 
-local function StringToBooleanNil(value)
-	if(value == "true") then
-		return true
-	elseif(value == "false") then
-		return false
-	end
-end
-
 function EditModelProperty.OnOK()
 	if(page) then
 		local name = page:GetValue("name");
@@ -233,7 +256,7 @@ function EditModelProperty.OnOK()
 			dragDisplayOffsetY = nil;
 		end
 		local idleAnim = tonumber(page:GetValue("idleAnim", 0)) or 0
-		local hasRealPhysics = StringToBooleanNil(page:GetValue("hasRealPhysics"))
+		local hasRealPhysics = page:GetValue("hasRealPhysics")
 		local autoTurning = StringToBooleanNil(page:GetValue("autoTurning"))
 		local isStackable = StringToBooleanNil(page:GetValue("isStackable"))
 		local canDrag = StringToBooleanNil(page:GetValue("canDrag"))
@@ -276,7 +299,7 @@ function EditModelProperty.UpdateUIFromValue(values)
 		page:SetValue("isStackable", tostring(values.isStackable));
 		page:SetValue("isDisplayModel", values.isDisplayModel);
 		page:SetValue("enableDropFall", values.enableDropFall);
-		page:SetValue("opacity", values.opacity);
+		page:SetValue("opacity", math.floor(values.opacity*100)/100);
 		page:SetValue("bootHeight", values.bootHeight);
 		page:SetValue("stackHeight", tostring(values.stackHeight));
 		page:SetValue("framemove_interval", tostring(values.framemove_interval or ""));
@@ -301,7 +324,9 @@ function EditModelProperty.UpdateUIFromValue(values)
 end
 
 function EditModelProperty.OnClose()
-	page:CloseWindow();
+	if(page) then
+		page:CloseWindow();
+	end
 end
 
 function EditModelProperty.OnReset()

@@ -1,0 +1,136 @@
+﻿<template style="width: 160px; height: 30px;">
+    <div onclick=ClickSubStep class="btn" style="background-color: #000000; position: absolute; left: 0px; top: 14px; width:10px; height: 3px; background:url(Texture/Aries/Creator/keepwork/ggs/user/btn_jian_10X3_32bits.png#0 0 10 3)"></div>
+    <div onclick=clickSelectStep style="position: absolute; left: 15px; top: 10px; width:130px; height:10px; background-color: #cccccc;">
+        <div ref="sliderbar" style="height: 26px; width: 8px; background-color: #888888; margin-top: -8px;" onmousedown="OnSliderMouseDown" onmousemove="OnSliderMouseMove" onmouseup="OnSliderMouseUp"></div>
+    </div>
+    <div onclick=ClickAddStep class="btn" style="background-color: #000000; position: absolute; left: 155px; top: 10px; width:10px; height: 11px; background:url(Texture/Aries/Creator/keepwork/ggs/user/btn_jia_11X11_32bits.png#0 0 11 11)"></div>
+</template>
+
+<script type="text/lua">
+local MaxValue = 255;
+local MinValue = 0;
+local AttrValue = 0;
+local StepValue = 1;
+local IsRealTimeUpdate = false;
+local CurValue = 0;
+local OnValueChangeCallBack = nil;
+local SliderWidth = 8;
+local SliderTrackWidth = 130 - SliderWidth;
+
+
+local mouseDown = false;
+local mouseDownX = 0;
+local mouseDownY = 0;
+local mouseScreenX = 0;
+local mouseScreenY = 0;
+local mouseMoveValue = 0;
+function OnSliderMouseDown()
+    local event = GetEvent();
+    local element = event and event:GetElement();
+    local parentElement = element:GetParentElement();
+    mouseScreenX, mouseScreenY = event:GetScreenXY();
+    mouseDownX, mouseDownY = parentElement:GetRelPoint(mouseScreenX, mouseScreenY);
+    mouseDown = true;
+    element:CaptureMouse();
+end
+
+function OnSliderMouseMove()
+    if(not mouseDown) then return end 
+
+    local event = GetEvent();
+    local element = event and event:GetElement();
+    local screenX, screenY = event:GetScreenXY();
+    local x = mouseDownX + screenX - mouseScreenX; 
+    x = math.min(math.max((x or 0) - SliderWidth / 2, 0), SliderTrackWidth);
+    local percentage = x * 1.0 /  SliderTrackWidth;
+    mouseMoveValue = MinValue + (MaxValue - MinValue) * percentage;
+    if(IsRealTimeUpdate) then 
+        print("-------1", mouseMoveValue)
+        OnValueChange(mouseMoveValue);
+    else
+        print("-------2")
+        UpdateSliderPosition(mouseMoveValue);
+    end
+end
+
+function OnSliderMouseUp()
+    mouseDown = false;
+    local event = GetEvent();
+    local element = event and event:GetElement();
+    element:ReleaseMouseCapture();
+    OnValueChange(mouseMoveValue);
+end
+
+function UpdateSliderPosition(value)
+    local sliderbarEl = GetRef("sliderbar");
+    if (not sliderbarEl) then return end
+    sliderbarEl:SetStyleValue("margin-left", math.floor((value - MinValue) * SliderTrackWidth / (MaxValue - MinValue)));
+    sliderbarEl:UpdateLayout();
+end 
+
+function clickSelectStep(event)
+    local event = GetEvent();
+    local element = event and event:GetElement();
+    if(event and element)then
+        local elementX, elementY = element:GetRelPoint(event.x, event.y);
+        local x = math.min(math.max((elementX or 0) - SliderWidth / 2, 0), SliderTrackWidth);
+        local percentage = x * 1.0 /  SliderTrackWidth;
+        OnValueChange(MinValue + (MaxValue - MinValue) * percentage);
+    end
+end
+
+function OnValueChange(value)
+    if (type(OnValueChangeCallBack) == "function") then
+        OnValueChangeCallBack(value);
+    end
+    UpdateSliderPosition(value);
+end
+
+function ClickAddStep()
+    CurValue = math.min(CurValue + StepValue, MaxValue);
+    OnValueChange(CurValue);
+end
+
+function ClickSubStep()
+    CurValue = math.max(CurValue - StepValue, MinValue);
+    OnValueChange(CurValue);
+end
+
+
+function OnAttrValueChange()
+    MaxValue = tonumber(GetAttrValue("MaxValue") or MaxValue);
+    MinValue = tonumber(GetAttrValue("MinValue") or MinValue);
+    StepValue = tonumber(GetAttrValue("StepValue") or StepValue);
+    IsRealTimeUpdate = GetAttrBoolValue("IsRealTimeUpdate", IsRealTimeUpdate);
+    AttrValue = GetAttrValue("value") or AttrValue;
+    AttrValue = math.max(MinValue, math.min(MaxValue, AttrValue));
+    OnValueChangeCallBack = GetAttrValue("onchange");
+    CurValue = AttrValue;
+    UpdateSliderPosition(CurValue);
+end
+
+function OnReady()
+    OnAttrValueChange();
+end 
+
+
+</script>
+
+<!-- 
+    <sliderbar 
+        ref="sliderbar"
+        v-on:change="Change"
+        min=100
+        max=120
+        v-bind:value="value"
+        min_step=2
+        direction="vertical" 
+        style="height: 130px; width: 10px; margin-top: 2px;" 
+        background_width=10
+        background_height=130
+        background="Texture/Aries/Creator/keepwork/ggs/user/btn_ladongdi_10x130_32bits.png#0 0 10 130"
+        button_width=22 
+        button_height=8
+        button_bg="Texture/Aries/Creator/keepwork/ggs/user/btn_ladong_20X8_32bits.png#0 0 22 8">
+    </sliderbar>
+ -->

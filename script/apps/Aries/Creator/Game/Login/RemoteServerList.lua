@@ -215,9 +215,9 @@ function RemoteServerList:LoadFromHttpURL()
 	if(not url:match("%?")) then
 		url = format("%s?skin=plain", url);
 	end
-	NPL.load("(gl)script/ide/System/localserver/URLResourceStore.lua");
-
-	local ls = System.localserver.CreateStore(nil, 3, "userdata");
+	NPL.load("(gl)script/ide/System/localserver/LocalStorageUtil.lua");
+	local LocalStorageUtil = commonlib.gettable("System.localserver.LocalStorageUtil");
+	local ls = LocalStorageUtil.CreateUserDataStore()
 	if(ls) then
 		local mytimer;
 		local function get_url_(retry_count)

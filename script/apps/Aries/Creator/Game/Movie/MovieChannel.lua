@@ -96,6 +96,14 @@ function MovieChannel:CreateGetStartMovieClip()
 			end
 			self.clips[1] = movieClip;
 			self.curClipIndex = 1;
+
+			if(not self.startupMovieEntity) then
+				blockEntity:Connect("beforeRemoved", function()
+					if(self.clips and self.clips[1] == movieClip) then
+						self:Reset()
+					end
+				end)
+			end
 		end
 	end
 	return self.clips and self.clips[1];

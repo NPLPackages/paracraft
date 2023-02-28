@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ExamFinishLastTip.lua"><![CDATA[
+
+local page = document:GetPageCtrl();
+
+tip = page:GetRequestParam("tip") or 0;
+
+function ClosePage()
+    page:CloseWindow();
+end
+
+
+]]></script>
+    <pe:container width="100%" height="100%" style="background: url(Texture/Aries/Creator/keepwork/Window/dikuang_opaque_64x69_32bits.png#0 0 64 69:26 44 24 22);">
+        <input type="button" zorder="10" value="" onclick="ClosePage" align="right" style="position: relative; margin-top: 8px; margin-right:13px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/guanbi_34x34_32bits.png#0 0 34 34);"/>
+        <div style="margin-top: 120px;margin-left: 0px; position: relative;">
+            <label value='<%= tip or L"当前这是最后一题，请检查答案或交卷" %>' style="text-align: center; height: 30px; font-size:16px; font-weight:normal;color:#333333;"></label>
+        </div>
+
+        <div style="margin-top: 272px;margin-left: -10px;" width="196px" align="center" >
+            <input type="button" zorder="10" value='<%= L"确定" %>' name="confirm" onclick="ClosePage" align="center"  style="margin-top: 0px; margin-left:0px;width:92px;height:30px;background: url(Texture/Aries/Creator/keepwork/Exam/shangxiati_63x26_32bits.png#0 0 63 26:10 10 10 10);"/>
+        </div>
+    </pe:container>
+
+</pe:mcml>
+</body>
+</html>

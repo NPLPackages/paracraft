@@ -54,6 +54,8 @@ CreateNewWorld.world_info = {
 	
 }
 
+CreateNewWorld.worldScope = "mini"
+CreateNewWorld.worldTerrain = "normal"
 
 -- default world folder path
 CreateNewWorld.OpenWorld_Folder = "worlds/DesignHouse";
@@ -85,36 +87,38 @@ end
 -- show page
 -- is_close:is only close page when click retturn button
 function CreateNewWorld.ShowPage(is_only_close)
-	local function Handle()
-		CreateNewWorld.is_only_close = is_only_close
-		local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
-		if(isCustomShow == "show") then
-			System.App.Commands.Call("File.MCMLWindowFrame", {
-				url = "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html", 
-				name = "CreateMCNewWorld", 
-				isShowTitleBar = false,
-				DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-				style = CommonCtrl.WindowFrame.ContainerStyle,
-				zorder = 0,
-				allowDrag = false,
-				directPosition = true,
-					align = "_ct",
-					x = -700/2,
-					y = -450/2,
-					width = 700,
-					height = 450,
-				cancelShowAnimation = true,
-			});
-		end
-	end
-
 	if (GameLogic.GetFilters():apply_filters('is_signed_in')) then
 		GameLogic.GetFilters():apply_filters(
             "service.keepwork_service_world.limit_free_user",
             false,
             function(result)
                 if result then
-                    Handle();
+                    CreateNewWorld.is_only_close = is_only_close
+					local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
+					if (isCustomShow == "show") then
+						local url = System.options.channelId_431 and "script/apps/Aries/Creator/Game/Educate/Other/CreateNewWorld.html" or "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html"
+						local params = {
+							url = url,
+							name = "CreateMCNewWorld", 
+							isShowTitleBar = false,
+							DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+							style = CommonCtrl.WindowFrame.ContainerStyle,
+							zorder = 0,
+							allowDrag = false,
+							directPosition = true,
+							align = "_fi",
+							x = 0,
+							y = 0,
+							width = 0,
+							height = 0,
+							cancelShowAnimation = true,
+						}
+						params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"CreateNewWorld");
+						System.App.Commands.Call(
+							"File.MCMLWindowFrame",
+							params
+						);
+					end
                 else
                     GameLogic.ShowVipGuideTip("UnlimitWorldsNumber")
                 end
@@ -294,12 +298,16 @@ end
 
 function CreateNewWorld.OnClickCreateWorld()
 	local status = GameLogic.GetFilters():apply_filters("OnClickCreateWorld");
-
 	if(status) then
 		return
 	end
 	
 	local world_name = CreateNewWorld.page:GetValue("new_world_name") or CreateNewWorld.default_worldname;
+	local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString(world_name);
+    if temp~=world_name then 
+        _guihelper.MessageBox(L"世界名包含敏感词，请重新输入");
+        return
+    end
 	local item = CreateNewWorld.cur_terrain;
 	-- 迷你地块
 	if item and item.terrain == "paraworldMini" then
@@ -343,7 +351,9 @@ function CreateNewWorld.CreateWorldByName(world_name, terrain)
 			return
 		end
 	end
-	
+
+    local platform = System.options.appId or 'paracraft'
+
 	local params = {
 		-- since world name is used as the world path name, we will only use letters as filename. 
 		--worldname = ParaGlobal.GetDateFormat("yyMMdd").."_"..ParaGlobal.GetTimeFormat("Hmmss").."_"..string.gsub(world_name, "%W", ""),
@@ -355,6 +365,7 @@ function CreateNewWorld.CreateWorldByName(world_name, terrain)
 		seed = templ_world.seed or world_name,
 		inherit_scene = true,
 		inherit_char = true,
+		platform = platform,
 	}
 
 	LOG.std(nil, "info", "CreateNewWorld", params);
@@ -420,6 +431,7 @@ function CreateNewWorld.CreateWorld(values)
 				attr.texture_pack_path = TexturePackage.default_texture_path;
 				attr.texture_pack_type = TexturePackage.default_texture_type;
 				attr.texture_pack_url  = TexturePackage.default_texture_url;
+				attr.platform = values.platform;
 
 				if(values.world_generator) then
 					attr.world_generator = values.world_generator;
@@ -487,6 +499,72 @@ function CreateNewWorld.OnSelectWorld_imp(world)
 	--page:SetValue("WorldImage", world.preview or "");
 end
 
+function CreateNewWorld.CheckWorldNameExist(foldername)
+	local currentWorldList = Mod.WorldShare.Store:Get('world/compareWorldList') or {}
+    foldername = foldername:gsub('[%s/\\]', '')
+
+    for key, item in ipairs(currentWorldList) do
+        if item.foldername == foldername then
+            return true
+        end
+    end
+	return false
+end
+
+function CreateNewWorld.GetUserName()
+	local function handle()
+		local worldname = L"默认名字"
+		local nickname = CreateNewWorld.profile and CreateNewWorld.profile.nickname
+		if CreateNewWorld.profile and CreateNewWorld.profile.info and CreateNewWorld.profile.info.name and CreateNewWorld.profile.info.name ~= "" then
+			nickname = CreateNewWorld.profile.info.name
+		end
+		local username = CreateNewWorld.profile and CreateNewWorld.profile.username
+		local name = (nickname ~= nil and nickname~= "") and nickname or ((username ~= nil and username~= "") and username)
+		local worldname = name or worldname
+		local worldfolder = CreateNewWorld.GetWorldFolder()
+		
+		if(not string.match(worldfolder, "/$")) then
+			worldfolder = worldfolder.."/"
+		end
+
+		if(not commonlib.Files.IsAbsolutePath(worldfolder)) then
+			worldfolder = ParaIO.GetWritablePath()..worldfolder;
+		end
+
+		for i=1, 1000 do
+			local name = worldname.. "-" .. tostring(i)
+			local world_name_locale = commonlib.Encoding.Utf8ToDefault(name);
+			local worldpathWithUsername = (username and username~="") and worldfolder.."_user/"..username.."/"..world_name_locale.."/tag.xml" or (worldfolder..world_name_locale).."/tag.xml"	
+			local worldpath = (worldfolder..world_name_locale).."/tag.xml";	
+			if(not CreateNewWorld.CheckWorldNameExist(name) and not ParaIO.DoesFileExist(worldpath, false) and not ParaIO.DoesFileExist(worldpathWithUsername, false)) then
+				worldname = name
+				break
+			end
+		end
+		CreateNewWorld.LastWorldName = worldname;
+		CreateNewWorld.page:Refresh(0);
+	end
+	if CreateNewWorld.profile == nil then
+		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+		local profile = KeepWorkItemManager.GetProfile()
+		if (profile.username == nil or profile.username == "") then
+		    KeepWorkItemManager.LoadProfile(true, function(err, msg, data)
+		        if(err ~= 200)then
+		            return
+		        end
+		        if data.username and data.username ~= "" then
+					CreateNewWorld.profile = data
+		           handle()
+		        end
+		    end)
+		else    
+		    CreateNewWorld.profile = profile
+		    handle()
+		end
+	else
+		handle()
+	end
+end
 
 
 function CreateNewWorld.GetAvailableNewWorldName()
@@ -512,4 +590,21 @@ function CreateNewWorld.GetAvailableNewWorldName()
 		end
 	end
 	return worldname;
+end
+
+
+function CreateNewWorld:IsMiniWorldScope()
+	return CreateNewWorld.worldScope == "mini"
+end
+
+function CreateNewWorld:SetWorldScope(scope)
+	CreateNewWorld.worldScope = scope
+end
+
+function CreateNewWorld:IsNormalTerrain()
+	return CreateNewWorld.worldTerrain== "normal"
+end
+
+function CreateNewWorld:SetWorldTerrain(terrain)
+	CreateNewWorld.worldTerrain = terrain
 end

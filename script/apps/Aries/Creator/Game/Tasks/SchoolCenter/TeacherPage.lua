@@ -362,10 +362,13 @@ function TeacherPage.OpenHistoryWork()
 end
 
 function TeacherPage.OpenMyProject()
-    -- local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-    -- last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="works"});
-    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
-    Page.ShowUserInfoPage({HeaderTabIndex="works"});
+    if true then
+        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+        UserInfoPage.ShowPage(System.User.keepworkUsername)
+    else
+        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
+        page.ShowUserInfoPage({username = System.User.keepworkUsername});
+    end
 end
 
 function TeacherPage.OpenPersonalDataStatistics()

@@ -1,0 +1,65 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ContactTeacher/ContactTeacherAlert.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="ContactTeacherAlert.lua"><![CDATA[
+local ContactTeacherAlert = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ContactTeacher/ContactTeacherAlert.lua");
+local UserPermission = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserPermission.lua");
+ContactTeacherAlert.OnInit()
+function ClosePage()
+    Page:CloseWindow(0)
+end
+
+function OnClickContactTeacher()
+    ContactTeacherAlert.OnClickContactTeacher()
+end
+
+function OnClickBuyVip()
+    ContactTeacherAlert.OnClickBuyVip()
+end
+
+function GetVipLimitTimeDesc()
+    return ContactTeacherAlert.GetVipLimitTimeDesc()
+end
+
+function HasTimeRule()
+    return ContactTeacherAlert.HasTimeRule()
+end
+
+]]></script>
+<kp:window name="iframe" width="478" height="266" icon_x="5" icon_y="-12" icon="Texture/Aries/Creator/keepwork/ContactTeacher/xinxi_109x53_32bits.png"   onclose="ClosePage">
+    <pe:if condition="<%=HasTimeRule()%>">
+        <div style="margin-top: 90px;margin-left: 0px;font-size: 14px; text-align: center;color: #333333;">
+            <%=GetVipLimitTimeDesc()%>
+        </div>
+        <div style="margin-top: 8px;margin-left: 0px;font-size: 14px; text-align: center;color: #333333">
+            可联系学校老师解锁该功能,或者开通Paracraft会员使用此功能
+        </div>
+    </pe:if>
+
+    <pe:if condition="<%=not HasTimeRule()%>">
+        <div style="margin-top: 90px;margin-left: 0px;font-size: 14px; text-align: center;color: #333333;">
+            请联系学校老师免费开通此功能
+        </div>
+        <div style="margin-top: 8px;margin-left: 0px;font-size: 14px; text-align: center;color: #333333">
+            或者开通Paracraft会员使用此功能
+        </div>
+    </pe:if>
+
+
+    <div style="height: 45px;margin-top: 50px;">
+        <input type="button" onclick="OnClickContactTeacher" value="联系老师" style="float: left; margin-left:70px;margin-top:0px;width: 128px;height: 45px;background: url(Texture/Aries/Creator/keepwork/ContactTeacher/anniuhuise_71x25_32bits.png#0 0 71 25:20 3 20 3);" />
+        <input type="button" onclick="OnClickBuyVip" value="开通会员" style="float: left; margin-left:82px;margin-top:0px;width: 128px;height: 45px;background: url(Texture/Aries/Creator/keepwork/ContactTeacher/anniucaise_71x25_32bits.png#0 0 71 25:20 3 20 3);" />
+    </div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

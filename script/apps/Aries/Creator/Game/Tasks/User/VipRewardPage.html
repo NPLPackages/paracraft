@@ -1,0 +1,52 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/User/VipRewardPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <style type="text/mcss">
+        </style>
+        <script refresh="false" type="text/npl" src="VipRewardPage.lua">
+<![CDATA[
+
+local VipRewardPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipRewardPage.lua");
+VipRewardPage.OnInit()
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetUserName()
+    return VipRewardPage.GetUserName()
+end
+]]>
+</script>
+<kp:window class="default" mode="lite" width="488" height="373" onclose="ClosePage">
+    <div style="position: relative;width: 333px;height: 76px;margin-left: 70px;margin-top: -20px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/vip_reward/biaoti_333x76_32bits.png#0 0 333 76)"></div>
+    <div style="width: 194px;height: 18px;margin-left: 40px;margin-top: 85px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/vip_reward/zunjingde_194x18_32bits.png#0 0 194 18)">
+        <div style="margin-left: 54px;color: #333333; margin-top: -4px;"><%=GetUserName()%></div>
+    </div>
+
+    <div style="width: 261px;height: 44px; margin-left: 110px;margin-top: 20px;color: #000000;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/vip_reward/ganxie_261x44_32bits.png#0 0 261 44)">
+    </div>
+
+    <div style="margin-top: 16px;">
+        <div style="float: left; width: 82px;height: 105px;margin-left: 57px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/vip_reward/ziyuan_82x105_32bits.png#0 0 82 105)">
+        </div>
+        <div style="float: left; width: 82px;height: 105px;margin-left: 16px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/vip_reward/huanzhaung_82x105_32bits.png#0 0 82 105)">
+        </div>
+        <div style="float: left; width: 82px;height: 105px;margin-left: 16px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/vip_reward/biaoshi_82x105_32bits.png#0 0 82 105)">
+        </div>
+        <div style="float: left; width: 82px;height: 105px;margin-left: 16px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/vip_reward/kongjian_82x105_32bits.png#0 0 82 105)">
+        </div>
+    </div>
+
+    <input type="button" value="立即体验" onclick="ClosePage" style="text-offset-y:-2;margin-left: 180px;margin-top: 20px; width: 128px;height: 45px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/vip_reward/anniu_128x45_32bits.png#0 0 128 45)"/>
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -534,7 +534,13 @@ function KeyFrameCtrl:Update(_parent, width, height)
 				ui_obj_name = tostring(nUIIndex);
 				ui_obj = _parent:GetChild(ui_obj_name);
 				if(not ui_obj:IsValid()) then
-					ui_obj = ParaUI.CreateUIObject("button",ui_obj_name, "_lt", 0, 0, key_button_width,self.key_button_height or self.height);
+					local height = self.key_button_height or self.height
+					local pos_y = 0
+					if System.options.IsTouchDevice then
+						pos_y = 2
+						height = height - 4
+					end
+					ui_obj = ParaUI.CreateUIObject("button",ui_obj_name, "_lt", 0, pos_y, key_button_width,height);
 					_parent:AddChild(ui_obj);
 					ui_obj:SetScript("onclick", function(uiobj)
 						self:OnClickKeyFrame(uiobj);
@@ -546,19 +552,22 @@ function KeyFrameCtrl:Update(_parent, width, height)
 				end
 				last_x = x;
 
-				ui_obj.background = self.key_button_background;
+				local background = System.options.IsTouchDevice and "Texture/Aries/Creator/keepwork/Mobile/MovieClip/weixuanzhon_20x33_32bits.png#0 0 20 33" or KeyFrameCtrl.key_button_background
+				ui_obj.background = background;
 				ui_obj.visible = true;
 				self:SetUIObjTooltip(ui_obj, time, nil);
 				
 				if(self.is_shifting and self.shift_ui_x_offset and 
 					(not single_mode and self.shift_begin_time <= time) or (single_mode and self.shift_begin_time==time) ) then
 					ui_obj.x = x + self.shift_ui_x_offset;
-					_guihelper.SetUIColor(ui_obj, self.key_button_color_shifting);
+					local button_color = System.options.IsTouchDevice and "#808080" or self.key_button_color_shifting
+					_guihelper.SetUIColor(ui_obj, button_color);
 					local new_time = self:GetKeyTimeByUIPos(self.shift_ui_x_offset+self.shift_begin_ui_x)
 					self:ShowMoveTime(_parent,new_time,self.begin_click_obj)
 				else
 					ui_obj.x = x;
-					_guihelper.SetUIColor(ui_obj, self.key_button_color);
+					local button_color = System.options.IsTouchDevice and "#ffffff" or self.key_button_color
+					_guihelper.SetUIColor(ui_obj, button_color);
 				end
 				
 				nUIIndex = nUIIndex + 1;

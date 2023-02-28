@@ -1,0 +1,83 @@
+<html>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl">
+                <![CDATA[
+                    NPL.load('(gl)script/apps/Aries/Creator/Game/Login/Rebranding.lua')
+
+                    -- load lib
+                    Rebranding = commonlib.gettable('MyCompany.Aries.Creator.Game.Rebranding')
+
+                    local page = document:GetPageCtrl()
+                    Mod.WorldShare.Store:Set('page/MainLogin', page)
+
+                    function GetModDes()
+                        local modname = ParaEngine.GetAppCommandLineByParam('mod','')
+                        local s = string.format(L'当前Mod:%s',modname)
+                        return s
+                    end
+
+                    function OnCustomCharacter()
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    session_window = {
+                        width = 320,
+                        ['min-height'] = 320,
+                        ["base-font-size"] = 16,
+                        ["font-size"] = 16,
+                        color = "#ffffff",
+                        ["padding-right"] = 40,
+                        ["padding-left"] = 40,
+                        ["padding-top"] = 20,
+                        ["padding-bottom"] = 10,
+                    },
+                    text_field = {
+                        background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;72 20 16 16:3 3 3 3",
+                        border = "none",
+                        width = 165,
+                    },
+                    offline_button = {
+                        ["margin-left"] = 0,
+                        width = 75,
+                        height = 33,
+                        ["font-size"] = 14,
+                    },
+                    login_button = {
+                        ["margin-left"] = 5,
+                        width = 150,
+                        height = 33,
+                        textcolor = "#000000",
+                        color = "#000000",
+                        ["font-size"] = 18
+                        background = "Texture/Aries/Creator/keepwork/worldshare_32bits.png;149 104 17 16:4 4 4 4",
+                    },
+                }
+            </style>
+            <!-- <pe:container alignment="_ct" ClickThrough="true" style="position:relative;background:;margin-left:-260px;margin-top:-300px;width:520px;height:500px;">
+                <div style='<%="position:relative;margin-left:130px;margin-top: 20px;width: 270px;height: 225px;background:url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#643 421 270 225);"%>'></div>
+                <pe:if condition='<%=Rebranding:GetValue("companylogo") ~= nil %>'>
+                    <div style='<%=format("position:relative;margin-top:15px;margin-left:-220px;width:256px;height:64px;background:url(%s)", Rebranding:GetValue("companylogo"))%>'></div>
+                </pe:if>
+                <pe:if condition='<%=Rebranding:GetValue("company")~=nil and not Rebranding:GetValue("companylogo")%>'>
+                    <div style="position:relative;margin-top:15px;margin-left:-220px;color:#572712"><%=Rebranding:GetValue("company")%></div>
+                </pe:if>
+                <div style="position:relative;margin-left:0px;width:520px;margin-top:150px;font-size:14px;font-weight:bold;color:#572712;shadow-quality:8;shadow-color:#f0cec8c4;text-shadow:true;text-align:center">
+                    <%=Rebranding:GetValue("titleaddon")%>
+                </div>
+            </pe:container> -->
+            <!--persistent setting button-->
+            <!-- <pe:container alignment="_ctb" ClickThrough="true" style="position:relative;background:;margin-left:70px;width:400px;height:105px;">
+                <!--<input type="button" enabled="false" value='<%=L"更多设定..." %>' class="mc_big_button" style="margin-top:16px;font-size:14px;width:256px;height:36px;" onclick="OnCustomCharacter" />-->
+                <pe:if condition='<%= System.options.isDevEnv == true %>'>
+                    <div style="margin-left:-40px;margin-top:6px;font-size:14px;width:336px;height:36px;color:#FF3030;text-align:center;font-weight:bold">
+                        <%=L"开发者模式" %><br/>
+                        <%= GetModDes()%>
+                    </div>
+                </pe:if>
+            </pe:container> -->
+        </pe:mcml>
+    </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local PracticeTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/Practice/PracticeTip.lua");
+    PracticeTip.OnInit()
+    function ClosePage()
+        PracticeTip.ClosePage()
+    end
+
+    function RestartScene()
+        PracticeTip.RestartScene()
+    end
+
+    function ReplayMacro()
+        PracticeTip.ReplayMacro()
+    end
+
+    function StartCheck()
+        PracticeTip.StartCheck()
+    end
+
+]]></script>
+<pe:container uiname="practice_root" ClickThrough="true"  width="1280" height="130" style="position:relative;background:url()">
+    <pe:container style="position: relative; width: 457px; height: 120px; background: url(Texture/Aries/Creator/keepwork/macro/lessonpractice/xinximianban_457x120_32bits.png#0 0 457 120);">
+        <div style="position: relative; margin-left: 10px;">
+            <pe:mc_player name="teacher_practice" miniscenegraphname="practice_teacher" style="width:128px;height:128px;margin-left: -26px; margin-top: -54px;"  IsInteractive="false" NoFrameMove="true" RenderTargetSize="256" DefaultCameraObjectDist="5.7" />
+        </div>
+        <div style="position: relative; margin-top: 2px; margin-left: 90px;">
+            <pe:label name="lesson_title" style="height:  60px;color: #ffc104;text-shadow:true;shadow-quality:8; font-size: 14px; base-font-size:14px;font-weight: bold;"></pe:label>
+        </div>
+        <div style="position: relative; margin-left:112px; margin-top:36px;">
+            <pe:label name="practice_tip" style="text-valign:center;text-align:left; font-size: 12px; base-font-size: 12px;width:330px;height:48px; color: #000000;"></pe:label>
+        </div>
+        <div style="position: relative; margin-left: 37px; margin-top: 93px;">
+            <pe:label name="practice_name" style="text-align:center; font-size: 12px; color: #ffc104; base-font-size: 12px; font-weight: bold; width:70px;height:20px;"></pe:label>
+        </div>
+        <div style="margin-left: 120px; margin-top: 90px; width: 300px; height: 120px;">
+            <input type="button" onclick="ReplayMacro"  style="position: relative; width: 62px; height: 26px; background: url(Texture/Aries/Creator/keepwork/macro/lessonpractice/chongxinkan_62x26_32bits.png#0 0 62 26);"/>
+            <input type="button" onclick="RestartScene" style="position: relative; margin-left: 70px; width: 62px; height: 26px; background: url(Texture/Aries/Creator/keepwork/macro/lessonpractice/fuyuan_62x26_32bits.png#0 0 62 26);"/>
+            <!-- <input type="button" onclick="StartCheck" style="position: relative; margin-left: 260px; width: 78px; height: 28px; background: url(Texture/Aries/Creator/keepwork/macro/lessonpractice/kaishijiancha_78x28_32bits.png#0 0 78 28);"/> -->
+        </div>
+    </pe:container>  
+    <pe:container alignment="_rt" style="margin-top: 30px; margin-right: 30px; background:url();">
+        <input type="button" onclick="ClosePage" style=" width: 86px; height: 35px; background: url(Texture/Aries/Creator/keepwork/macro/lessonpractice/fanhui_86x35_32bits.png#0 0 86 35);" />
+    </pe:container>        
+</pe:container>
+</pe:mcml>
+</body>
+</html>

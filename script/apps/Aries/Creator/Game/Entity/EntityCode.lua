@@ -18,6 +18,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityBlockCodeBase.lua");
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");
 local BoxTrigger = commonlib.gettable("MyCompany.Aries.Game.PhysicsWorld.BoxTrigger")
 local CodeActorItemStack = commonlib.gettable("MyCompany.Aries.Game.Code.CodeActorItemStack");
+local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");
 local InventoryBase = commonlib.gettable("MyCompany.Aries.Game.Items.InventoryBase");
 local CodeBlock = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlock");
 local Direction = commonlib.gettable("MyCompany.Aries.Game.Common.Direction")
@@ -39,6 +40,7 @@ Entity:Property({"isAllowFastMode", false, "IsAllowFastMode", "SetAllowFastMode"
 Entity:Property({"isStepMode", false, "IsStepMode", "SetStepMode", auto=true})
 Entity:Property({"hasDiskFileMirror", false, "HasDiskFileMirror", "SetHasDiskFileMirror"})
 Entity:Property({"isOpenSource", false, "IsOpenSource", "SetOpenSource"})
+Entity:Property({"isCodeReadOnly",false,"IsCodeReadOnly","SetCodeReadOnly"})
 Entity:Signal("beforeRemoved")
 Entity:Signal("editModeChanged")
 Entity:Signal("inventoryChanged", function(slotIndex) end)
@@ -130,6 +132,11 @@ function Entity:SaveToXMLNode(node, bSort)
 	if(self.triggerBoxString and self.triggerBoxString~="") then
 		node.attr.triggerBoxString = self.triggerBoxString;
 	end
+
+	local editTime = tonumber(self:GetLastEditTime())
+	if editTime and editTime > 0 then
+		node.attr.editTime = editTime
+	end
 	
 	if(self:IsAllowClientExecution()) then
 		node.attr.allowClientExecution = true;
@@ -145,6 +152,9 @@ function Entity:SaveToXMLNode(node, bSort)
 	end
 	if(self:IsOpenSource()) then
 		node.attr.isOpenSource = true;
+	end
+	if(self:IsCodeReadOnly()) then
+		node.attr.isCodeReadOnly = true;
 	end
 
 	if(self:GetLanguageConfigFile()~="") then
@@ -167,10 +177,11 @@ function Entity:LoadFromXMLNode(node)
 	self.isStepMode = (node.attr.isStepMode == "true" or node.attr.isStepMode == true);
 	self.hasDiskFileMirror = (node.attr.hasDiskFileMirror == "true" or node.attr.hasDiskFileMirror == true);
 	self.isOpenSource = (node.attr.isOpenSource == "true" or node.attr.isOpenSource == true);
+	self.isCodeReadOnly = (node.attr.isCodeReadOnly == "true" or node.attr.isCodeReadOnly == true)
 	self.languageConfigFile = node.attr.languageConfigFile;
 	self.codeLanguageType = node.attr.codeLanguageType;
 	self.triggerBoxString = node.attr.triggerBoxString;
-	
+	self:SetLastEditTime(node.attr.editTime)
 	local isPowered = (node.attr.isPowered == "true" or node.attr.isPowered == true);
 	if(isPowered) then
 		self.delayLoad = node.attr.delayLoad;
@@ -184,6 +195,9 @@ function Entity:LoadFromXMLNode(node)
 
 	if(self.triggerBoxString) then
 		self:SetTriggerBoxByString(self.triggerBoxString)
+	end
+	if self.isCodeReadOnly then
+		self:SetCodeReadOnly(self.isCodeReadOnly)
 	end
 end
 
@@ -405,14 +419,12 @@ function Entity:OnClick(x, y, z, mouse_button, entity, side)
 end
 
 function Entity:OpenEditor(editor_name, entity)
-	-- 没权限的话 不允许编辑代码方块
-	
 	local function open_editor()
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
 		local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
 		CodeBlockWindow.Show(true);
 		CodeBlockWindow.SetCodeEntity(self);
-		GameLogic.GetFilters():apply_filters("CodeBlockEditorOpened", CodeBlockWindow, entity)	
+		GameLogic.GetFilters():apply_filters("CodeBlockEditorOpened", CodeBlockWindow, entity,self)	
 	end
 
 	if self.languageConfigFile == "" or self.languageConfigFile == "npl_cad" then
@@ -770,7 +782,16 @@ function Entity:SetOpenSource(bOpenSource)
 end
 
 function Entity:IsOpenSource()
-	return self.isOpenSource;
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	return self.isOpenSource or IsMobileUIEnabled;
+end
+
+function Entity:SetCodeReadOnly(bReadOnly)
+	self.isCodeReadOnly = bReadOnly == true;
+end
+
+function Entity:IsCodeReadOnly()
+	return self.isCodeReadOnly;
 end
 
 function Entity:GetText()
@@ -880,4 +901,19 @@ function Entity:Compile()
 	else
 		return true
 	end
+end
+
+-- this is a memory only object and never serialized. 
+function Entity:GetAgentInventoryView()
+	if(not self.agentInventoryView) then
+		local inventory = InventoryBase:new():Init(1)
+		local item = ItemStack:new():Init(block_types.names.AgentItem, 1, {name=filename});
+		inventory:AddItem(item);
+		self.agentInventoryView = ContainerView:new():Init(inventory);
+	end
+	local itemStack = self.agentInventoryView:GetSlotItemStack(1)
+	if(itemStack) then
+		itemStack:SetDataField("name", self:GetFilename())
+	end
+	return self.agentInventoryView;
 end

@@ -93,7 +93,7 @@ function Rank.ShowView()
         style = CommonCtrl.WindowFrame.ContainerStyle,
         allowDrag = true,
         enable_esc_key = true,
-        zorder = 0,
+        zorder = 1,
         --app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
         directPosition = true,
         
@@ -102,6 +102,7 @@ function Rank.ShowView()
         y = -585/2,
         width = 958,
         height = 585,
+        isTopLevel = true,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);
 
@@ -277,7 +278,8 @@ function Rank.HandleRankData(data)
     Rank.RewardData = {}
 
     for index = 1, 3 do
-        local exid = Rank.cur_select_item_data.exid + index - 1
+        local exid = Rank.cur_select_item_data.exid or 0
+        local exid = exid + index - 1
         local exchange_data = KeepWorkItemManager.GetExtendedCostTemplate(exid)
         
         if exchange_data and exchange_data.exchangeTargets and exchange_data.exchangeTargets[1] then
@@ -348,12 +350,11 @@ function Rank.GetRankListData(cb)
         ["x-per-page"] = 1000,
         ["x-page"] = 1,
     },function(err, msg, data)
-        Rank.server_list_data = data
-        -- print("cccccccc")
-        -- echo(data, true)
-        Rank.HandleRankData()
-
         if err == 200 then
+            Rank.server_list_data = data
+            -- print("cccccccc")
+            -- echo(data, true)
+            Rank.HandleRankData()
             if cb then
                 cb()
             end

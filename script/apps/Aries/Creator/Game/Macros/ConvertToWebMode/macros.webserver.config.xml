@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- web server configuration file: this node can be child node, thus embedded in shared xml -->
+<WebServer>
+  <!--which HTTP ip and port this server listens to. -->
+  <servers>
+    <!-- @param host, port: which ip port to listen to. if * it means all. -->
+    <server host="*" port="8100" host_state_name="">
+      <defaultHost rules_id="simple_rule"></defaultHost>
+      <virtualhosts>
+        <!-- force "http://127.0.0.1/" to match to iternal npl_code_wiki site for debugging  -->
+        <host name="127.0.0.1:8100" rules_id="simple_rule" allow='{"127.0.0.1"}'></host>
+      </virtualhosts>
+    </server>
+  </servers>
+  <!-- rules used when starting a web server. Multiple rules with different id can be defined. -->
+  <rules id="simple_rule">
+    <rule match="^/" with="WebServer.filehandler" params='{baseDir = "%CD%", filename = "index.html"}'></rule>
+  </rules>
+</WebServer>

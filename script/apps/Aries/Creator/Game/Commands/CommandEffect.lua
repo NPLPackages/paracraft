@@ -37,6 +37,10 @@ Commands["shader"] = {
 				return "disabled";
 			end
 
+			if System.os.GetPlatform()=="android" then
+				return false
+			end
+
 			local shader_method = tonumber(cmd_text:match("([%d%.]+)") or 1);
 
 			if(GameLogic.GetShaderManager():SetShaders(math.min(2, shader_method))) then

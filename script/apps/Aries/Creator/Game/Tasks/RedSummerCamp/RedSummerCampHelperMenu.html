@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local page = document:GetPageCtrl();
+    function ClosePage()
+        page:CloseWindow(true)
+    end
+    _x = tonumber(Page:GetRequestParam("x"));
+    _y = tonumber(Page:GetRequestParam("y"));
+
+    _width = 162
+    _listOfHelpNode = {
+    }
+
+    table.insert(_listOfHelpNode,{
+        {
+            text = "教学视频",
+            cmdName = "help.videotutorials"
+        },
+        {
+            text = "官方文档",
+            cmdName = "help.learn"
+        },
+        {
+            text = "入门必看",
+            cmdName = "help.dailycheck"
+        },
+        {
+            text = "提问",
+            cmdName = "help.ask"
+        },
+    })
+
+    table.insert(_listOfHelpNode,{
+        type = "Separator"
+    })
+
+    table.insert(_listOfHelpNode,{
+        {
+            text = "提交意见或反馈",
+            cmdName = "help.bug"
+        },
+        {
+            text = "关于Paracraft",
+            cmdName = "help.about"
+        },
+    })
+
+    function getItemText(index)
+        return _listOfHelpNode[index] and _listOfHelpNode[index].text
+    end
+
+    function onClickItem(name)
+        local idx_1,idx_2 = unpack(commonlib.split(name,"_"))
+        local info = _listOfHelpNode[tonumber(idx_1)][tonumber(idx_2)]
+
+        if info then
+            if info.cmdName then
+                if info.cmdName == 'help.dailycheck' and
+                   not Mod.WorldShare.Store:Get('user/isVerified') and
+                   (not System.options.isChannel_430) then
+                    _guihelper.MessageBox(L'请先完善您的资料')
+                    return
+                end
+
+                GameLogic.RunCommand("/menu "..info.cmdName);
+                ClosePage();
+            end
+        end 
+    end
+
+    function get_bg_style()
+        local bg = "background: url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#493 341 16 34:4 4 4 4)"
+        local height = 310
+        local str = string.format("position:absolute;%s;width:%spx;height:%spx;margin-left:%spx;margin-top:%spx;padding-top:5px",bg,_width,height,_x-10,_y)
+        return str
+    end
+
+    function get_sub_list(idx_1)
+        return _listOfHelpNode[idx_1]
+    end
+
+    function get_item_value(idx_1,idx_2)
+        local ret = _listOfHelpNode[idx_1][idx_2]
+        return ret.text
+    end
+
+    function get_item_name(idx_1,idx_2)
+        return idx_1.."_"..idx_2
+    end
+
+    function get_list_xmls()
+        local ret = ""
+        for k,tab in ipairs(_listOfHelpNode) do
+            if tab.type=="Separator" then
+                local divStr = [[
+                    <div align="center" style="background:url(Texture/Aquarius/Common/ContextMenu_Separator.png);width:140px;height: 2px;margin-top: 4px;margin-bottom: 3px;"></div>
+                ]]
+                ret = ret.. divStr
+            elseif tab.type=="items" or tab.type==nil then
+                local arrStr = string.format("_listOfHelpNode[%s]",k)
+                local listStr = [[
+                    <pe:repeat DataSource='<%%= get_sub_list(%s) %%>'>
+                        <pe:repeatitem>
+                            <div style="padding-left: 2px;">
+                                <input 
+                                    type="button" 
+                                    class="listbutton_unselected" 
+                                    value='<%%= get_item_value(%s,Eval("index")) %%>' 
+                                    name='<%%= get_item_name(%s,Eval("index")) %%>'
+                                    onclick='onClickItem'
+                                    style="text-offset-x:12;width:158px;height:24px;text-align:left;color:#ffffff;font-size:14px;" 
+                                    MouseOver_BG="Texture/alphadot.png"
+                                />
+                            </div>
+                        </pe:repeatitem>
+                    </pe:repeat>
+                ]]
+                listStr = string.format(listStr,k,k,k)
+                ret = ret.. listStr
+            end
+        end
+        return ret
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000000" onclick="ClosePage()">
+    <pe:container zorder="2" uiname="classlist_bg" style='<%= get_bg_style() %>'>
+        <%= get_list_xmls() %>
+        
+        <div>
+            <div align="center" style="margin-top: 12px; width: 128px;height: 128px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/erweima_110x128_32bits.png#0 0 128 128);">
+                
+            </div>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

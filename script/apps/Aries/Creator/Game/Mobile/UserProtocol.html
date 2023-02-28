@@ -1,0 +1,77 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/User/UserProtocol.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="UserProtocol.lua">
+    <![CDATA[
+        UserProtocol = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/UserProtocol.lua");
+        UserProtocol.OnInit()
+        function ClosePage()
+            Page:CloseWindow();
+        end
+
+        function GridDs(index)
+            if(index == nil) then    
+                return #UserProtocol.GridDs
+            else
+                return UserProtocol.GridDs[index];
+            end
+        end
+
+        function GetPageIndex()
+            return UserProtocol.index or 1
+        end
+
+        function GetData()
+            return UserProtocol.htmlData 
+        end
+        
+        function GetTitle()
+            local index = GetPageIndex()
+            if index == 1 then
+                return L"用户许可协议"
+            else
+                return L"用户隐私协议"
+            end
+        end
+    ]]>
+</script>
+<style type="text/mcss">
+    {
+        user_agreement = {
+            ["base-font-size"] = 16,
+            ["font-size"] = 16,
+            ["padding-right"] = 30,
+            ["padding-left"] = 30,
+            ["padding-top"] = 10,
+            ["padding-bottom"] = 20,
+            color = '#ffffff'
+            textcolor = '#ffffff'
+        }
+    }
+</style>
+<mb:window width = "640" height = "672" title_bg_height = "64" title = '<%=GetTitle()%>' onclose="ClosePage">
+    <div style="min-width: 600px;height:570px;position: relative; margin-top: 60px;">
+        <pe:treeview name='user_agreement'
+                            class='user_agreement'
+                            style='background:;'
+                            VerticalScrollBarOffsetX='10'
+                            VerticalScrollBarStep=“20”>
+            <div style="color: #000000">
+                <div style="height: 15px;width: 15px;"></div>
+                <%= GetData() %>
+                <div style="height: 200px;width: 600px;">
+                </div>
+            </div>
+        </pe:treeview> 
+    </div>
+</mb:window>
+</pe:mcml>
+</body>
+</html>
+

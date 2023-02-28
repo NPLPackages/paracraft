@@ -49,6 +49,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "KeyPressEvent" , event:KeyEvent KeyPressEvent: custom KeyPressEvent
 - GUI:
   - "File.MCMLWindowFrame", params: all mcml v1 pages goes through this filter. 
+  - "File.MCMLWindowFrameClose": called when the v1 pages is closed
   - "cellar.main_login.show_login_mode_page": this is the first user interface shown. One must install this filter very early, such as in mod.loadOnStartup. 
   - "ShowClientUpdaterNotice": show client updater notice when stared updater.
   - "HideClientUpdaterNotice": hide client updater notice when finished updater.
@@ -121,6 +122,9 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "service.local_service_world.set_community_world": set community world enabled.
   - "service.local_service_word.is_community_world": is community world.
   - "OnCreateHomeWorld": create home world event.
+  - "OnPlayMovieText": play movie text event.
+  - "OnMacroMovieText": play macro text event.
+  - "OnWorldTageChange": on world tage change
 
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
@@ -129,6 +133,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "item_client_new_item_type_added", block_id, item:
   - "user_event_stat", category, action, value, label:
   - "user_behavior", event tracking
+  - "on_permission_load",when load user permission complete 
   - "OnBeforeRestart", appName: before entire NPL runtime is restarted. 
   - "GameName", titlename: get game name string
   - "GameDescription", desc: get game description string, which will be shown in the window title area
@@ -187,6 +192,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "CodeBlockEditorOpened": nil, custom code block editor
   - "CustomCodeBlockClicked": false, determine whether code block can be opened
   - "OnCodeBlockLineStep": locationInfo: in format of "filename:line:"
+- player rules
+  -"OnPlayerRuleChange": when player rule register or unregister
 
 ## Adding New filters
 If you want to add new filters to paracraft, you can either start a new issue on github or send us a pull request with your code. 

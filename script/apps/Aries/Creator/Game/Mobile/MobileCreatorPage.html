@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="MobileCreatorPage.lua" ><![CDATA[
+    MobileCreatorPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileCreatorPage.lua")
+    MobileCreatorPage.OnInit()
+    function ClosePage()
+        MobileCreatorPage.ClosePage()
+    end
+
+    function GetTabviewButtons()
+        return MobileCreatorPage.tabview_ds
+    end
+
+    function OnChangeTabview(index)
+        MobileCreatorPage.tabview_index = tonumber(index) or 1
+        MobileCreatorPage.RefreshPage()
+    end
+
+    function clickBg()
+    end
+]]></script>
+<pe:container onclick="clickBg" ClickThrough = "false" alignment="_fi" width="100%" height="100%" style="background-color:#fff60000">
+    <pe:container alignment="_ctt" style="width: 1060px; height: 590px; margin-left: -10px;margin-top: 70px ;background-color:#00000000">
+        <pe:repeat DataSource="<%=GetTabviewButtons()%>">
+            <pe:repeatitem style="float:left;width:50px;">
+                <pe:if condition='<%=MobileCreatorPage.tabview_index == Eval("index") %>' >
+                    <div style="margin-left: 10px;margin-top: 11px; width: 72px; height: 152px; background: url(Texture/Aries/Creator/keepwork/Mobile/creator/select_72x152_32bits.png#0 0 72 152);">
+                        <div style="position: relative; width: 40px; margin-left: 22px; margin-top: 40px;  font-weight:bold; color: #000000; font-size: 24px; base-font-size: 24px;"><%=Eval("text")%></div>                        
+                        <input type="button" uiname = '<%=format("NewDesktopPage.tab_%d", Eval("index"))%>' name='<%=Eval("index")%>' onclick="OnChangeTabview" style="width: 72px; height: 152px; background:url()" />
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=MobileCreatorPage.tabview_index ~= Eval("index") %>' >
+                    <div style="margin-left: 18px; margin-top: 11px; width: 64px; height: 136px; background: url(Texture/Aries/Creator/keepwork/Mobile/creator/normal_64x136_32bits.png#0 0 64 136);">
+                        <div style="position: relative; width: 40px; margin-left: 20px; margin-top: 32px;  font-weight:bold; color: #ffffff; font-size: 24px; base-font-size: 24px;"><%=Eval("text")%></div>                        
+                        <input type="button" uiname = '<%=format("NewDesktopPage.tab_%d", Eval("index"))%>' name='<%=Eval("index")%>' onclick="OnChangeTabview" style="width: 64px; height: 136px; background:url()" />
+                    </div>
+                </pe:if>
+            </pe:repeatitem>
+        </pe:repeat>
+    </pe:container>
+    <pe:container alignment="_ctt" style="width:900px;height:721px;background-color: #ffffff00;">
+        <mb:window width="900" height="721" title='<%= L"工具"%>'  onclose="ClosePage" uiname_onclose="NewDesktopPage.close" style="margin-left: -10px; margin-top: -1px;">
+            <div style="position:relative;margin-top:100px; margin-left: 16px;  width:870px;height:590px;">
+                <iframe name="building_wnd" src='<%=MobileCreatorPage.GetTab() or ""%>'></iframe>
+            </div>
+        </mb:window>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

@@ -9,7 +9,7 @@
 <pe:mcml>
 <script refresh="true" type="text/npl" src="RedSummerCampMainWorldPage.lua">
 <![CDATA[
-local RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
+RedSummerCampMainWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainWorldPage.lua");
 RedSummerCampMainWorldPage.OnInit()
 function ClosePage()
     local pageCtrl = document:GetPageCtrl();
@@ -123,7 +123,8 @@ end
     <!--Vip-->
     <pe:container alignment="_rt" style="background:url();">
         <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 7, "OpenVip")%>
-        <input type="button" value='' onclick="OpenVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
+        <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:20px;margin-top:5px;",RedSummerCampMainWorldPage.name or "RedSummerCampMainWorldPage")%>
+        <!-- <input type="button" value='' onclick="OpenVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" /> -->
     </pe:container>
     <!--Close-->
     <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">

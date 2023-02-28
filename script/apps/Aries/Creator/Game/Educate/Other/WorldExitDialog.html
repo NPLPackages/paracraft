@@ -1,0 +1,308 @@
+<!-- script/apps/Aries/Creator/Game/Educate/Other/WorldExitDialog.html -->
+
+<html>
+    <body>
+        <pe:mcml>
+            <script type='text/npl'src='WorldExitDialog.lua'refresh='false'>
+                <![CDATA[
+                    -- UI
+                    local WorldExitDialog = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
+                    local ShareWorld = NPL.load('(gl)script/apps/Aries/Creator/Game/Educate/Other/ShareWorld.lua')
+                    local Grade = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/Grade.lua')
+                    local Panorama = NPL.load('Mod/WorldShare/cellar/Panorama/Panorama.lua')
+                    local SyncWorld = NPL.load('(gl)Mod/WorldShare/cellar/Sync/SyncWorld.lua')
+                    local Compare = NPL.load('(gl)Mod/WorldShare/service/SyncService/Compare.lua')
+ 
+                    -- service
+                    local KeepworkService = NPL.load('(gl)Mod/WorldShare/service/KeepworkService.lua')
+                    local KeepworkServiceSession = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceSession.lua')
+                    local KeepworkServiceWorld = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceWorld.lua')
+
+                    -- lib
+                    local WorldCommon = commonlib.gettable('MyCompany.Aries.Creator.WorldCommon')
+                    local os = commonlib.gettable('System.os')
+                    local Desktop = commonlib.gettable('MyCompany.Aries.Creator.Game.Desktop')
+
+                    local page = document:GetPageCtrl()
+
+                    page:SetNodeValue('ShareWorldImage', WorldExitDialog.GetPreviewImagePath())
+
+                    function get_cur_world_name()
+                        local text = WorldCommon.GetWorldTag('name')
+                    
+                        if _guihelper.GetTextWidth(text) > 400 then
+                            local function chsize(char)
+                                if not char then
+                                    return 0
+                                elseif char > 240 then
+                                    return 4
+                                elseif char > 225 then
+                                    return 3
+                                elseif char > 192 then
+                                    return 2
+                                else
+                                    return 1
+                                end
+                            end
+
+                            local len = 0
+                            local count = 0
+                            local currentIndex = 1
+
+                            while currentIndex <= #text do
+                                local charsizenum = chsize(string.byte(text, currentIndex))
+
+                                currentIndex = currentIndex + charsizenum
+
+                                if len >= 90 then
+                                    break
+                                end
+
+                                if charsizenum ~= 0 then
+                                    count = count + 1
+
+                                    if charsizenum >= 3 then
+                                        len = len + 3.2
+                                    else
+                                        len = len + 1.6
+                                    end
+                                end
+                            end
+
+                            text = System.Core.UniString:new(text):sub(1, count).text .. '...'
+                        end
+
+                        return text
+                    end
+
+                    function on_click_cancel()
+                        WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Cancel)
+                    end
+
+
+                    function on_click_save_and_exit()
+                        KeepworkServiceWorld:LimitFreeUser(false, function(result)
+                            if result then
+                                WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Yes)
+                            else
+                                if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip')==true then
+                                    return
+                                end
+                                _guihelper.MessageBox(L'操作被禁止了，免费用户最多只能拥有家园+1个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。')
+                            end
+                        end,true)
+                    end
+
+                    function on_click_save_and_share()
+                        if not KeepworkServiceSession:IsSignedIn() then
+                            return
+                        end
+                        _guihelper.SetMessageBoxLockHide(true)
+                        GameLogic.QuickSave()
+                        _guihelper.SetMessageBoxLockHide(false)
+                        WorldExitDialog.OnDialogResult(_guihelper.DialogResult.Cancel)
+
+                        ShareWorld:SysncWorld(function(bSuccess)
+                            if bSuccess then
+                                WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
+                            else
+                                GameLogic.AddBBS(nil,"保存世界失败")
+                            end
+                        end)
+                    end
+
+                    function on_click_exit_without_save()
+                        if GameLogic.IsReadOnly() then
+                            WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
+                            return 
+                        end
+                        local remote_revision = tonumber(Mod.WorldShare.Store:Get('world/remoteRevision') or 0)
+                        local current_revision = tonumber(Mod.WorldShare.Store:Get('world/currentRevision') or 0)
+
+                        if remote_revision < current_revision then
+                            _guihelper.MessageBox("注意：当前世界未保存，退出将丢失已进行的修改", function(res)
+                                if(res and res == _guihelper.DialogResult.Yes) then
+                                    WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
+                                end
+                            end, _guihelper.MessageBoxButtons.YesNo);
+                        else
+                            WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
+                        end
+                    end
+
+                    function snapshot()
+                        if GameLogic.IsReadOnly() then
+                            return 
+                        end
+                        WorldExitDialog.Snapshot()
+                    end
+
+                    function get_project_id()
+                        local currentWorld = Mod.WorldShare.Store:Get('world/currentWorld')
+
+                        if currentWorld and
+                           currentWorld.kpProjectId and
+                           currentWorld.kpProjectId ~= 0 then
+                            return tostring(currentWorld.kpProjectId)
+                        end
+
+                        return L'上传世界后获得'
+                    end
+
+                    function has_project_id()
+                        local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+
+                        if currentEnterWorld and
+                           currentEnterWorld.kpProjectId and
+                           currentEnterWorld.kpProjectId ~= 0 then
+                            return true
+                        else
+                            return false
+                        end
+                    end
+
+                    function is_user_world()
+                        return WorldExitDialog:IsUserWorld()
+                    end
+
+                    function is_community_world_exit()
+                        if KeepworkServiceSession:IsSignedIn() then
+                            local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+                            if currentEnterWorld.communityWorld == "true" or currentEnterWorld.communityWorld == true then
+                                if currentEnterWorld.members and type(currentEnterWorld.members) == 'table' then
+                                    local username = Mod.WorldShare.Store:Get('user/username')
+                                    for key, item in ipairs(currentEnterWorld.members) do
+                                        if username == item then
+                                            return false
+                                        end
+                                    end
+
+                                end
+                                return true
+                            else
+                                return false
+                            end
+                        else
+                            return false
+                        end
+                    end
+
+                    function is_show_unlock_button()
+                        local currentEnterWorld = Mod.WorldShare.Store:Get('world/currentEnterWorld')
+
+                        if currentEnterWorld.shared then
+                            return true
+                        else
+                            return false
+                        end
+                    end
+
+                    function unlock()
+                        _guihelper.MessageBox(
+                            L'强制解锁后，其他成员可能会覆盖您当前编辑的内容，是否继续？',
+                            function(res)
+                                if res and res == _guihelper.DialogResult.Yes then
+                                    KeepworkServiceWorld:UnlockWorld(function(result)
+                                        if result then
+                                            _guihelper.MessageBox(L'解锁成功')
+                                        end
+                                    end)
+                                end
+                            end,
+                            _guihelper.MessageBoxButtons.YesNo
+                        )                    
+                    end
+                ]]>
+            </script>
+            <style type='text/mcss'
+                   src='Mod/WorldShare/cellar/Theme/Mcss/Theme1.mcss'>
+                {
+                    button1 = {
+                        width = 100,
+                        height = 32
+                    },
+                    button2 = {
+                        width = 140,
+                        height = 28,
+                        background = 'Texture/Aries/Creator/keepwork/worldshare_32bits.png;256 21 16 16:3 3 3 3',
+                        color = '#ffffff'
+                    },
+                    star_area = {
+                        ['margin-top'] = 0,
+                        ['margin-left'] = 50
+                    },
+                    dialog_container = {
+                        width = 630,
+                        height = 400
+                    },
+                    dialog_header = {
+                        height = 40
+                    }
+                }
+            </style>
+            <kp:window width='660' height='400' onclose='on_click_cancel()' title="<%=L'退出世界'%>">
+                <div class='dialog_container'>
+                    <div style='margin-left: 20px; margin-top: 30px; color:#ffffff;'>
+                        <div style='margin-top: 15px;'>
+                            <pe:if condition='<%= not is_show_unlock_button() %>'>
+                                <div style="height: 35px;"></div>
+                            </pe:if>
+                            <pe:if condition='<%= is_show_unlock_button() %>'>
+                                <input type='button'class='theme1_gray_button'style='width: 90px;height: 35px;'value='<%= L"强制解锁" %>'onclick='unlock()' />
+                            </pe:if>
+                        </div>
+                        <div style='width: 615x;padding: 10px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#660 273 32 32:8 8 8 8);'>
+                            <div style='float:left;width: 280px;height: 185px;'>
+                                <div zorder='2' class='theme1_gray_image_mask' style='width: 280px; height: 185px;'></div>
+                                <img name='ShareWorldImage'zorder='1'width='280'height='185'  />
+                            </div>
+                            <div style='float: right;base-font-size: 18px;font-size: 18px;padding-left: 28px;'>
+                                <div style='margin-top: 0px;margin-bottom: 10px;'>
+                                    <span style='color: #181818'><%= '项目名称：'..get_cur_world_name() %></span>
+                                </div>
+                                <div style='margin-top: 0px;margin-bottom: 10px;'>
+                                    <span style='color: #181818'><%= '项目ID：'.. get_project_id() %></span>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div style='padding-left: 15px;margin-top: 16px;color: #000000'>
+                        <pe:if condition='<%= not is_community_world_exit() %>'>
+                            <pe:if condition='<%=not GameLogic.IsReadOnly() %>'>
+                                <div style='position: relative; margin-left: 5px; color: #181818; margin-top: 5x; base-font-size: 15px; font-size:15px;'>
+                                    <%= L'注意：退出前请上传保存世界，避免作品流失'%>
+                                </div>
+                            </pe:if>
+
+                            <div style='width: 400px; margin-top: 40x; margin-left: 240px;'>
+                                <pe:if condition='<%= not GameLogic.IsReadOnly() and (not has_project_id() or is_user_world()) %>'>
+                                    <input type='button'
+                                           onclick='on_click_save_and_share()'
+                                           value='<%= L"保存后退出" %>'
+                                           class='theme1_orange_button'
+                                           style='min-width:114px;height:44px;' />
+                                </pe:if>
+                                <pe:if condition='<%= GameLogic.IsReadOnly() %>'>
+                                    <input type='button' style='margin-left: -185px; min-width:114px;height:44px; background: url();' />
+                                </pe:if>
+                                
+                                <input type='button'
+                                       onclick='on_click_exit_without_save()'
+                                       value='<%= L"直接退出" %>'
+                                       class='theme1_gray_button'
+                                       style='margin-left: 20px;min-width: 114px;height: 44px;' />
+                                
+                                <input type='button'
+                                       onclick='on_click_cancel()'
+                                       value='<%= L"取消" %>'
+                                       class='theme1_gray_button'
+                                       style='margin-left: 20px;min-width: 114px;height: 44px;' />
+                            </div>
+                        </pe:if>
+                    </div>
+                </div>
+            </kp:window>
+        </pe:mcml>
+    </body>
+</html>

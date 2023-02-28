@@ -219,5 +219,134 @@ NPL.export({
 		return string.format('/return %s\n', self:getFieldAsString('input'));
 	end,
 },
+
+{
+	type = "cmd_createentity", 
+	message0 = L"创建 %1 名称 %2 在X %3 Y %4 Z %5 位置",
+	arg0 = {
+		{
+			name = "className",
+            type = "field_dropdown",
+			options = {
+				{ L"矿车", "EntityRailcar" }
+			},
+			text = "EntityRailcar"
+		},
+
+		{
+			name = "entityName",
+            type = "input_value",
+			shadow = { type = "text", value = "car",},
+			text = "car"
+		},
+
+		{
+			name = "x",
+			type = "input_value",
+			shadow = { type = "math_number", value = "0",},
+			text = "0"
+		},
+
+		{
+			name = "y",
+			type = "input_value",
+			shadow = { type = "math_number", value = "0",},
+			text = "0"
+		},
+
+		{
+			name = "z",
+			type = "input_value",
+			shadow = { type = "math_number", value = "0",},
+			text = "0"
+		},
+	},
+	category = "CommandControl", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "createentity",
+	func_description = '/createentity %s %s %s %s %s',
+	ToNPL = function(self)
+		return string.format('/createentity %s %s %s, %s, %s\n', self:getFieldAsString('className'), self:getFieldAsString('entityName'), self:getFieldAsString('x'), self:getFieldAsString('y'), self:getFieldAsString('z'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+	/createentity EntityRailcar car 19204,6,19313 
+	/createentity EntityRailcar 19204,6,19313 
+	]]}},
+},
+
+{
+	type = "cmd_kill", 
+	message0 = L"删除主角 %1 格以内的 %2",
+	arg0 = {
+		{
+			name = "radius",
+			text = "5",
+			type = "input_value",
+			shadow = { type = "math_number", value = "5",},
+		},
+
+		{
+			name = "className",
+            type = "field_dropdown",
+			options = {
+				{ L"矿车", "Railcar" }
+			},
+			text = "Railcar",
+		},
+	},
+	category = "CommandControl", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "kill",
+	func_description = '/kill @e{r = %s, type = %s}',
+	ToNPL = function(self)
+		return string.format('/kill @e{r = %s, type = "%s"}\n', self:getFieldAsString('radius'), self:getFieldAsString('className'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+	]]}},
+},
+
+{
+	type = "cmd_mount", 
+	message0 = L"自动上车",
+	arg0 = {
+	},
+	category = "CommandControl", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "mount",
+	func_description = '/mount @p',
+	ToNPL = function(self)
+		return string.format('/mount @p\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+	]]}},
+},
+
+{
+	type = "cmd_unmount", 
+	message0 = L"自动下车",
+	arg0 = {
+	},
+	category = "CommandControl", 
+	helpUrl = "", 
+	canRun = false,
+	previousStatement = true,
+	nextStatement = true,
+	funcName = "unmount",
+	func_description = '/unmount @p',
+	ToNPL = function(self)
+		return string.format('/unmount @p\n');
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+	]]}},
+},
 ---------------------
 })

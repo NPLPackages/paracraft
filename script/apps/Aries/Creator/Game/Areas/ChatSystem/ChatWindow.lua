@@ -1,8 +1,9 @@
 --[[
 Title: Multi-functional Chat Window 
-Author(s): zrf, refactored by LiXizhi
-Date: 2011/3/9
-Desc:  the chat window is comprised of the chat log page and the chat edit page. 
+Author(s): zrf, refactored by LiXizhi, big
+CreateDate: 2011.3.9
+ModifyDate: 2022.8.18
+Desc: the chat window is comprised of the chat log page and the chat edit page. 
  1. The log page displays all the history messages in several categories. 
  2. The edit page allows the user to post text and actions to any specified channel. 
 
@@ -12,13 +13,13 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
 MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage();
 MyCompany.Aries.ChatSystem.ChatWindow.HideAll();
 
-
 MyCompany.Aries.ChatSystem.ChatWindow.ResetPosition(true);
 
 dispatch dik_key == "DIK_RETURN" in BaseContext.lua
 -------------------------------------------------------
 ]]
-if(not System.options.mc) then
+
+if (not System.options.mc) then
 	NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/ChatWindow.lua");
 	return
 end
@@ -30,6 +31,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
 NPL.load("(gl)script/apps/Aries/SlashCommand/SlashCommand.lua");
 NPL.load("(gl)script/apps/Aries/BBSChat/ChatSystem/SmileyPage.lua");
 NPL.load("(gl)script/apps/Aries/Chat/BadWordFilter.lua");
+
 local Scene = commonlib.gettable("MyCompany.Aries.Scene");
 local MsgHandler = commonlib.gettable("MyCompany.Aries.Combat.MsgHandler");
 local WorldManager = commonlib.gettable("MyCompany.Aries.WorldManager");
@@ -64,45 +66,60 @@ function ChatWindow.ResetPosition(ggs_valid)
     -- set ggs_mode first
     ChatWindow.ggs_mode = ggs_valid;
 
-    if(ggs_valid)then
-	-- 手机版默认不打开
+    if (ggs_valid) then
+		-- 手机版默认不打开
 		if not System.os.IsTouchMode() then
 			ChatWindow.ShowAllPage(true)
 		end
     end
 
-    if(ggs_valid)then
+    if (ggs_valid) then
         parent_wnd_pos_config = ChatWindow.DefaultUIPos.ParentWnd_ggs_valid;
         edit_wnd_pos_config = ChatWindow.DefaultUIPos.EditWnd_ggs_valid;
     else
         parent_wnd_pos_config = ChatWindow.DefaultUIPos.ParentWnd;
         edit_wnd_pos_config = ChatWindow.DefaultUIPos.EditWnd;
     end
+
 	local _parentwnd = ChatWindow.CreateGetParentWnd();
-    if(_parentwnd and _parentwnd:IsValid())then
-		_parentwnd:Reposition(parent_wnd_pos_config.alignment,parent_wnd_pos_config.left,parent_wnd_pos_config.top,parent_wnd_pos_config.width,parent_wnd_pos_config.height);
+
+	if(_parentwnd and _parentwnd:IsValid())then
+		_parentwnd:Reposition(
+			parent_wnd_pos_config.alignment,
+			parent_wnd_pos_config.left,
+			parent_wnd_pos_config.top,
+			parent_wnd_pos_config.width,
+			parent_wnd_pos_config.height
+		);
     end
-    
 
     NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatEdit.lua");
     local ChatEdit = commonlib.gettable("MyCompany.Aries.ChatSystem.ChatEdit");
 
-
-
 	local edit_container = ParaUI.GetUIObject("ChatEditPage");
-     if(edit_container and edit_container:IsValid())then
-		edit_container:Reposition(edit_wnd_pos_config.alignment,edit_wnd_pos_config.left,edit_wnd_pos_config.top,edit_wnd_pos_config.width,edit_wnd_pos_config.height);
-        if(ChatEdit.page)then
+
+	if (edit_container and edit_container:IsValid()) then
+		edit_container:Reposition(
+			edit_wnd_pos_config.alignment,
+			edit_wnd_pos_config.left,
+			edit_wnd_pos_config.top,
+			edit_wnd_pos_config.width,
+			edit_wnd_pos_config.height
+		);
+
+		if (ChatEdit.page) then
 			ChatEdit.page:Refresh(0);
         end
     end
 end
+
 -- public: call this once at init time. 
 function ChatWindow.InitSystem()
-	if(ChatWindow.IsInited) then
+	if (ChatWindow.IsInited) then
 		return
 	end
-	if(System.options.IsMobilePlatform) then
+
+	if (System.options.IsMobilePlatform) then
 		ChatWindow.DefaultUIPos = {
 			RestoreBtn = {alignment = "_lb", left = 2, top = -254+75, width = 21, height = 24, background = "Texture/Aries/ChatSystem/jiahao_32bits.png;0 0 21 24"},
 			EditWnd = {alignment = "_lb", left = 2, top = -45, width = 700, height = 50},
@@ -121,25 +138,16 @@ function ChatWindow.InitSystem()
 
     NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic");
+
 	GameLogic.GetFilters():add_filter("ggs", function(msg)
 	    LOG.std("", "info", "ChatWindow recieve ggs filter", msg);
         
         msg = msg or {};
-	--[[
-        local DockPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockPage.lua");
 
-        if(msg.action == "LoadWorld")then
-            DockPage.Show();
-            ChatWindow.ResetPosition(true);
-        elseif(msg.action == "ExitWorld")then
-            DockPage.Hide();
-            ChatWindow.ResetPosition(false);
-        end
- 	]]
         local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
 		KeepWorkItemManager.OnGGSMsg(msg);
 
-		return msg;  -- 保证其它filter也能收到此消息
+		return msg; -- 保证其它filter也能收到此消息
     end)
 end
 
@@ -152,25 +160,29 @@ end
 -- show the chat log page and the edit box page
 -- @param bSetFocus: default to false. if true, the editbox will have the focus. 
 function ChatWindow.ShowAllPage(bSetFocus)
-	if(System.options.IsMobilePlatform) then
+	if (System.options.IsMobilePlatform) then
 		MyCompany.Aries.Creator.Game.Desktop.ShowMobileDesktop(false);
 	end
+
 	ChatWindow.BeShowAll = if_else(bSetFocus,true,false);
 	ChatWindow.ShowChatLogPage();
 	ChatWindow.ShowEditPage(bSetFocus);
 	ChatWindow.isshow = true;
+
 	local _parentwnd = ChatWindow.CreateGetParentWnd();
-	if(_parentwnd) then
+
+	if (_parentwnd) then
 		_parentwnd.visible = true;
 	end
+
 	ChatWindow.CreateGetRestoreBtn().visible = false;
 	ChatWindow.minimized = false;
 end
 
 -- show without toggling. 
 function ChatWindow.Show()
-	if(not ChatWindow.isshow) then
-		if(ChatWindow.minimized) then
+	if (not ChatWindow.isshow) then
+		if (ChatWindow.minimized) then
 			ChatWindow.CreateGetRestoreBtn().visible = true;
 		else
 			ChatWindow.ShowAllPage();
@@ -185,10 +197,13 @@ function ChatWindow.HideAll()
 	ChatWindow.HideChatLog();
 	ChatWindow.HideEdit();
 	ChatWindow.isshow = false;
+
 	local _parentwnd = ChatWindow.CreateGetParentWnd();
-	if(_parentwnd) then
+
+	if (_parentwnd) then
 		_parentwnd.visible = false;
 	end
+
 	ChatWindow.CreateGetRestoreBtn().visible = false;
 end
 
@@ -200,17 +215,20 @@ end
 -- hide only the chat log page
 function ChatWindow.HideChatLog()
 	local _parent = ParaUI.GetUIObject("ChatLogPage");
-	if(_parent and _parent:IsValid()) then
+
+	if (_parent and _parent:IsValid()) then
 		_parent.visible = false;
 	end
+
 	ChatWindow.is_shown = false;	
 	ChatWindow.is_fade_out = true;
+
 	GameLogic.GetFilters():apply_filters("ChatLogWindowShowAndHide", false);
 end
 
 -- return true if page is shown after switch
 function ChatWindow.ShowSwitch()
-	if(ChatWindow.is_shown == true)then
+	if (ChatWindow.is_shown == true)then
 		ChatWindow.HideChatLog()
 		return false;
 	else
@@ -226,25 +244,12 @@ local size_modes = {
 	350,
 	520,
 }
+
 function ChatWindow.ToggleChatWindowSize(send_msg,words)
-	--ChatWindow.size_mode = ((ChatWindow.size_mode or 0) + 1) % (#size_modes);
-	--local new_height = size_modes[ChatWindow.size_mode+1];
---
-	--local params = ChatWindow.DefaultUIPos.ParentWnd;
-	--params.top = params.top - (new_height - params.height);
-	--params.height = new_height;
-	--local _parentwnd = ChatWindow.CreateGetParentWnd();
-	--_parentwnd:Reposition(params.alignment, params.left, params.top, params.width, params.height);
-	--if(ChatWindow.page) then
-		--ChatWindow.page:Refresh(0.01);
-		--local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-			--ChatWindow.RefreshScrollBar();
-		--end})
-		--mytimer:Change(500, nil);
-	--end
 	local params = ChatWindow.DefaultUIPos.ParentWnd;
 	local new_height = 0;
-	if(send_msg) then
+
+	if (send_msg) then
 		local rows = ChatWindow.GetMsgNeedRows(words);
 		new_height = rows*14;
 	else
@@ -253,20 +258,23 @@ function ChatWindow.ToggleChatWindowSize(send_msg,words)
 
 	params.top = params.top - (new_height - params.height);
 	params.height = new_height;
+	
 	local _parentwnd = ChatWindow.CreateGetParentWnd();
+
 	_parentwnd:Reposition(params.alignment, params.left, params.top, params.width, params.height);
-	if(ChatWindow.page) then
+
+	if (ChatWindow.page) then
 		ChatWindow.page:Refresh(0.01);
 		local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
 			ChatWindow.RefreshScrollBar();
-		end})
+		end});
 		mytimer:Change(500, nil);
 	end
 end
 
 -- return true if page is shown after switch
 function ChatWindow.ToggleShow()
-	if(ChatWindow.is_shown) then
+	if (ChatWindow.is_shown) then
 		ChatWindow.OnClickWndMinimize();
 		return false;
 	else
@@ -275,19 +283,27 @@ function ChatWindow.ToggleShow()
 	end
 end
 
-
 function ChatWindow.CreateGetParentWnd()
-	if(ChatWindow.DefaultUIPos.ParentWnd) then
+	if (ChatWindow.DefaultUIPos.ParentWnd) then
 		local _parent = ParaUI.GetUIObject("ChatAreaParentWnd");
-		if(not _parent:IsValid()) then
-			_parent = ParaUI.CreateUIObject("container", "ChatAreaParentWnd", ChatWindow.DefaultUIPos.ParentWnd.alignment, ChatWindow.DefaultUIPos.ParentWnd.left, ChatWindow.DefaultUIPos.ParentWnd.top, ChatWindow.DefaultUIPos.ParentWnd.width, ChatWindow.DefaultUIPos.ParentWnd.height);
+		
+		if (not _parent:IsValid()) then
+			_parent =
+				ParaUI.CreateUIObject(
+					"container",
+					"ChatAreaParentWnd",
+					ChatWindow.DefaultUIPos.ParentWnd.alignment,
+					ChatWindow.DefaultUIPos.ParentWnd.left,
+					ChatWindow.DefaultUIPos.ParentWnd.top,
+					ChatWindow.DefaultUIPos.ParentWnd.width,
+					ChatWindow.DefaultUIPos.ParentWnd.height
+				);
 			_parent.background = "";
 			_parent.zorder = -1;
 			_parent:GetAttributeObject():SetField("ClickThrough", true);
-			--_parent.ondragbegin = [[;ParaUI.AddDragReceiver("root");]];
-			--_parent.candrag = true;
 			_parent:AttachToRoot();
 		end
+
 		return _parent;
 	end
 end
@@ -352,25 +368,41 @@ function ChatWindow.ShowChatLogPage(bForceRefreshPage, alignment, left, top, wid
 		ChatWindow.DefaultUIPos.LogWnd = {alignment = "_lb", left = 2, top = -290, width = 400, height = 250}
 	end
 
-	if(bForceRefreshPage or not ChatWindow.page) then
-		ChatWindow.page = Map3DSystem.mcml.PageCtrl:new({
-			url="script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.html", 
-			click_through=true});
+	if (bForceRefreshPage or not ChatWindow.page) then
+		ChatWindow.page =
+			Map3DSystem.mcml.PageCtrl:new({
+				url = "script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.html", 
+				click_through = true
+			});
 	end
-	
-	if(bForceRefreshPage) then
+
+	if (bForceRefreshPage) then
 		ParaUI.Destroy("ChatLogPage");
 	end
+
 	local _parent = ParaUI.GetUIObject("ChatLogPage");
-	if(not _parent or not _parent:IsValid()) then
-		_parent = ParaUI.CreateUIObject("container", "ChatLogPage", alignment or ChatWindow.DefaultUIPos.LogWnd.alignment, left or ChatWindow.DefaultUIPos.LogWnd.left, top or ChatWindow.DefaultUIPos.LogWnd.top, width or ChatWindow.DefaultUIPos.LogWnd.width, height or ChatWindow.DefaultUIPos.LogWnd.height);
+
+	if (not _parent or not _parent:IsValid()) then
+		_parent =
+			ParaUI.CreateUIObject(
+				"container",
+				"ChatLogPage",
+				alignment or ChatWindow.DefaultUIPos.LogWnd.alignment,
+				left or ChatWindow.DefaultUIPos.LogWnd.left,
+				top or ChatWindow.DefaultUIPos.LogWnd.top,
+				width or ChatWindow.DefaultUIPos.LogWnd.width,
+				height or ChatWindow.DefaultUIPos.LogWnd.height
+			);
+
 		_parent.background = "";
-		_parent.visible=false;
+		_parent.visible = false;
 		_parent.zorder = -3;
+
 		_parent:GetAttributeObject():SetField("ClickThrough", true);
 
 		local _parentwnd = ChatWindow.CreateGetParentWnd();
-		if(_parentwnd) then
+
+		if (_parentwnd) then
 			_parentwnd:AddChild(_parent);
 		else
 			_parent:AttachToRoot();
@@ -387,15 +419,16 @@ function ChatWindow.ShowChatLogPage(bForceRefreshPage, alignment, left, top, wid
 end
 
 function ChatWindow.FadeIn(animSeconds)
-	if(ChatWindow.is_fade_out) then
+	if (ChatWindow.is_fade_out) then
 		ChatWindow.is_fade_out = false;
-		if(ChatWindow.page) then
+
+		if (ChatWindow.page) then
 			local _parent = ChatWindow.page:FindControl("canvas");
-			--local _parent = ParaUI.GetUIObject("ChatLogPage");
-			UIAnimManager.ChangeAlpha("Aries.ChatWindow", _parent, 255, 256/(animSeconds or 0.5))
+			UIAnimManager.ChangeAlpha("Aries.ChatWindow", _parent, 255, 256 / (animSeconds or 0.5))
 
 			local canvas_tab_btn = ChatWindow.page:FindControl("canvas_tab_btn");
-            if(canvas_tab_btn and canvas_tab_btn:IsValid())then
+
+			if(canvas_tab_btn and canvas_tab_btn:IsValid())then
 			    UIAnimManager.ChangeAlpha("Aries.ChatWindow_canvas_tab_btn", canvas_tab_btn, 255, 256/(animSeconds or 0.5))
             end
 		end
@@ -403,16 +436,22 @@ function ChatWindow.FadeIn(animSeconds)
 end
 
 function ChatWindow.FadeOut(animSeconds)
-	if(not ChatWindow.is_fade_out) then
+	if (not ChatWindow.is_fade_out) then
 		ChatWindow.is_fade_out = true;
-		if(ChatWindow.page) then
+
+		if (ChatWindow.page) then
 			local _parent = ChatWindow.page:FindControl("canvas");
-			--local _parent = ParaUI.GetUIObject("ChatLogPage");
-			UIAnimManager.ChangeAlpha("Aries.ChatWindow", _parent, if_else(System.options.version == "teen", 0, 0), 256/(animSeconds or 4))
+			UIAnimManager.ChangeAlpha(
+				"Aries.ChatWindow",
+				_parent,
+				if_else(System.options.version == "teen", 0, 0),
+				256 / (animSeconds or 4)
+			);
 
             local canvas_tab_btn = ChatWindow.page:FindControl("canvas_tab_btn");
-            if(canvas_tab_btn and canvas_tab_btn:IsValid())then
-			    UIAnimManager.ChangeAlpha("Aries.ChatWindow_canvas_tab_btn", canvas_tab_btn, 0, 256/(animSeconds or 4))
+
+            if (canvas_tab_btn and canvas_tab_btn:IsValid()) then
+			    UIAnimManager.ChangeAlpha("Aries.ChatWindow_canvas_tab_btn", canvas_tab_btn, 0, 256 / (animSeconds or 4))
             end
 		end
 	end

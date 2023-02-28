@@ -14,7 +14,7 @@ local ParacraftLearningRoomDailyPage = NPL.load("(gl)script/apps/Aries/Creator/G
 local RedSummerCampRecCoursePage = NPL.export();
 
 RedSummerCampRecCoursePage.courses = {
-	{ id = 29477, label = L"欢迎来到帕拉卡",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/welcome_32bits.png;0 0 195 100",  },
+	{ id = 29477, label = L"基础操作",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/welcome_32bits.png;0 0 195 100",  },
 	{ id = 42701, label = L"建模入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/lala_32bits.png;0 0 195 100",  },
 	{ id = 42457, label = L"编程入门",  icon = "Texture/Aries/Creator/keepwork/RedSummerCamp/courses/icons/papa_32bits.png;0 0 195 100",  },
 

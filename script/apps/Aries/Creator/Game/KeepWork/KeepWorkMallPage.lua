@@ -381,142 +381,144 @@ function KeepWorkMallPage.HandleDataSources()
     end
 	local count = 0
 	for k, v in pairs(KeepWorkMallPage.grid_data_sources) do
-		v.name = commonlib.GetLimitLabel(v.name,20)
-		v.goods_data = {}
-		if v.rule and v.rule.exchangeTargets and v.rule.exchangeTargets[1] then
-			local goods = v.rule.exchangeTargets[1].goods			
-			for index, value in ipairs(goods) do
-				
-				local goods_data = KeepWorkMallPage.GetItemTemplate(goods[1]) or {}
-				v.goods_data[#v.goods_data + 1] = goods_data
-			end
-		end
-
-		v.cost_name = ""
-		v.cost = 0
-		v.cost_desc = ""
-		v.enabled = true
-		v.is_show_hot_tag = string.find(v.tags, "hot") and string.find(v.tags, "hot") > 0
-		v.is_show_latest_tag = string.find(v.tags, "latest") and string.find(v.tags, "latest") > 0
-		v.isLink = v.method == 1  or (v.purchaseUrl ~= nil and v.purchaseUrl ~= "") --购买方式，0：内部购买；1：外部购买
-		local modelUrl = v.goods_data[1] and v.goods_data[1].modelUrl or ""
-		v.isModelProduct = #v.goods_data == 1 and modelUrl ~= ""
-		local downloadUrl =  (modelUrl ~= nil and modelUrl ~= "") and modelUrl or v.modelUrl
-		v.vip_enabled = false
-		-- 售完或者到达购买上限的情况下不允许购买
-		v.hasIcon = v.icon ~= "" and v.icon ~= nil
-		v.buy_txt = "购买"
-		v.show_state = KeepWorkMallPage.show_state.sell
-		v.isLiveModel = v.modelType == "liveModel"
-		v.hasPermission = KeepWorkItemManager.CheckHasPermission(v)
-		if v.rule and v.rule.storage == 0 then
-			v.buy_txt = "售完"
-			v.enabled = false
-			v.is_sell = true
-			v.show_state = KeepWorkMallPage.show_state.sell_out
-		else
-			v.enabled = KeepWorkMallPage.checkIsGetLimit(v) or v.hasPermission
-			if v.hasPermission then
-				v.buy_txt = "使用"
-				v.enabled = true
-				v.is_use = false
-				if v.isLink then
-					v.can_use = false
-				else
-					v.can_use = true
+		if not v.empty then
+			v.name = commonlib.GetLimitLabel(v.name,20)
+			v.goods_data = {}
+			if v.rule and v.rule.exchangeTargets and v.rule.exchangeTargets[1] then
+				local goods = v.rule.exchangeTargets[1].goods			
+				for index, value in ipairs(goods) do
+					
+					local goods_data = KeepWorkMallPage.GetItemTemplate(goods[1]) or {}
+					v.goods_data[#v.goods_data + 1] = goods_data
 				end
-				v.show_state = KeepWorkMallPage.show_state.can_use
-			else
-				v.vip_enabled = true
-				v.enabled = false
-				v.show_state = KeepWorkMallPage.show_state.vip_enabled
 			end
-			if v.isModelProduct then
-				local good_data = v.goods_data[1]
-				local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(good_data.gsId)
-				local bag_nums = copies and copies or 0
-				
-				if good_data.extra and good_data.extra.vip_enabled == true then
+	
+			v.cost_name = ""
+			v.cost = 0
+			v.cost_desc = ""
+			v.enabled = true
+			v.is_show_hot_tag = string.find(v.tags, "hot") and string.find(v.tags, "hot") > 0
+			v.is_show_latest_tag = string.find(v.tags, "latest") and string.find(v.tags, "latest") > 0
+			v.isLink = v.method == 1  or (v.purchaseUrl ~= nil and v.purchaseUrl ~= "") --购买方式，0：内部购买；1：外部购买
+			local modelUrl = v.goods_data[1] and v.goods_data[1].modelUrl or ""
+			v.isModelProduct = #v.goods_data == 1 and modelUrl ~= ""
+			local downloadUrl =  (modelUrl ~= nil and modelUrl ~= "") and modelUrl or v.modelUrl
+			v.vip_enabled = false
+			-- 售完或者到达购买上限的情况下不允许购买
+			v.hasIcon = v.icon ~= "" and v.icon ~= nil
+			v.buy_txt = "购买"
+			v.show_state = KeepWorkMallPage.show_state.sell
+			v.isLiveModel = v.modelType == "liveModel"
+			v.hasPermission = KeepWorkItemManager.CheckHasPermission(v)
+			if v.rule and v.rule.storage == 0 then
+				v.buy_txt = "售完"
+				v.enabled = false
+				v.is_sell = true
+				v.show_state = KeepWorkMallPage.show_state.sell_out
+			else
+				v.enabled = KeepWorkMallPage.checkIsGetLimit(v) or v.hasPermission
+				if v.hasPermission then
+					v.buy_txt = "使用"
+					v.enabled = true
+					v.is_use = false
+					if v.isLink then
+						v.can_use = false
+					else
+						v.can_use = true
+					end
+					v.show_state = KeepWorkMallPage.show_state.can_use
+				else
 					v.vip_enabled = true
 					v.enabled = false
 					v.show_state = KeepWorkMallPage.show_state.vip_enabled
 				end
-
-				if good_data.extra and good_data.extra.icon_size ~= nil then
-					v.use_little_icon = true
-				end
-
-				-- 如果是vip专属 再判断下是不是vip 如果是vip 那么就直接已拥有的显示
-				if v.vip_enabled and System.User.isVip or v.vip_enabled == false then
-					bag_nums = 1
-				end
-
-				if not good_data.fileType and v.modelType then
-					good_data.fileType = v.modelType
-				end
-				v.modelType = (v.modelType and v.modelType~= "") and v.modelType or good_data.fileType
-
-				v.isLiveModel = good_data.fileType == "liveModel"
-
-				v.bag_nums = bag_nums
-				v.is_use_in_player = good_data.bagId == bagId
-				if bag_nums > 0 then
-					if good_data.bagId == bagId then
-						v.buy_txt = "已拥有"
+				if v.isModelProduct then
+					local good_data = v.goods_data[1]
+					local bHas,guid,bagid,copies = KeepWorkItemManager.HasGSItem(good_data.gsId)
+					local bag_nums = copies and copies or 0
+					
+					if good_data.extra and good_data.extra.vip_enabled == true then
+						v.vip_enabled = true
 						v.enabled = false
-						v.is_has = true
-						v.can_use = false
-						v.show_state = KeepWorkMallPage.show_state.has
-					else
-						if GameLogic.GameMode:IsEditor() then
-							v.buy_txt = "使用"
-							v.enabled = true
-							v.is_use = false
-							v.can_use = true
-							v.show_state = KeepWorkMallPage.show_state.can_use
-						else
+						v.show_state = KeepWorkMallPage.show_state.vip_enabled
+					end
+	
+					if good_data.extra and good_data.extra.icon_size ~= nil then
+						v.use_little_icon = true
+					end
+	
+					-- 如果是vip专属 再判断下是不是vip 如果是vip 那么就直接已拥有的显示
+					if v.vip_enabled and System.User.isVip or v.vip_enabled == false then
+						bag_nums = 1
+					end
+	
+					if not good_data.fileType and v.modelType then
+						good_data.fileType = v.modelType
+					end
+					v.modelType = (v.modelType and v.modelType~= "") and v.modelType or good_data.fileType
+	
+					v.isLiveModel = good_data.fileType == "liveModel"
+	
+					v.bag_nums = bag_nums
+					v.is_use_in_player = good_data.bagId == bagId
+					if bag_nums > 0 then
+						if good_data.bagId == bagId then
 							v.buy_txt = "已拥有"
 							v.enabled = false
 							v.is_has = true
 							v.can_use = false
 							v.show_state = KeepWorkMallPage.show_state.has
+						else
+							if GameLogic.GameMode:IsEditor() then
+								v.buy_txt = "使用"
+								v.enabled = true
+								v.is_use = false
+								v.can_use = true
+								v.show_state = KeepWorkMallPage.show_state.can_use
+							else
+								v.buy_txt = "已拥有"
+								v.enabled = false
+								v.is_has = true
+								v.can_use = false
+								v.show_state = KeepWorkMallPage.show_state.has
+							end
 						end
+	
+						--file ：blocktemplates/河马.bmax
+						
 					end
-
-					--file ：blocktemplates/河马.bmax
-					
 				end
 			end
-		end
-		
-		
-		if v.rule and v.rule.exchangeCosts and v.rule.exchangeCosts[1] then
-			v.cost = v.rule.exchangeCosts[1].amount
 			
-			local cost_item_data = KeepWorkMallPage.GetItemTemplate(v.rule.exchangeCosts[1]) or {}
-			v.cost_name = cost_item_data.name or ""
-
-			if cost_item_data.gsId == ENUM_OF_GSID.FRAGMENT_GSID then
-				v.is_cost_fragment = true;
-			elseif cost_item_data.gsId == bean_gsid then
-				v.is_cost_bean = true
-			elseif cost_item_data.gsId == coin_gsid then
-				v.is_cost_coin = true
+			
+			if v.rule and v.rule.exchangeCosts and v.rule.exchangeCosts[1] then
+				v.cost = v.rule.exchangeCosts[1].amount
+				
+				local cost_item_data = KeepWorkMallPage.GetItemTemplate(v.rule.exchangeCosts[1]) or {}
+				v.cost_name = cost_item_data.name or ""
+	
+				if cost_item_data.gsId == ENUM_OF_GSID.FRAGMENT_GSID then
+					v.is_cost_fragment = true;
+				elseif cost_item_data.gsId == bean_gsid then
+					v.is_cost_bean = true
+				elseif cost_item_data.gsId == coin_gsid then
+					v.is_cost_coin = true
+				end
+	
+				if v.is_cost_bean or v.is_cost_coin or v.is_cost_fragment then
+					v.cost_desc = v.cost
+				else
+					v.cost_desc = v.cost .. v.cost_name
+				end
+			elseif v.price then
+				v.cost_desc = v.price
 			end
-
-			if v.is_cost_bean or v.is_cost_coin or v.is_cost_fragment then
-				v.cost_desc = v.cost
-			else
-				v.cost_desc = v.cost .. v.cost_name
+			
+	
+			v.needDownload = (downloadUrl~= nil and downloadUrl ~= "") and not downloadUrl:match("character/") and v.modelType ~= "blocks"
+			if v.needDownload then
+				count = count + 1
 			end
-		elseif v.price then
-			v.cost_desc = v.price
-		end
-		
-
-		v.needDownload = (downloadUrl~= nil and downloadUrl ~= "") and not downloadUrl:match("character/") and v.modelType ~= "blocks"
-		if v.needDownload then
-			count = count + 1
 		end
 	end
 

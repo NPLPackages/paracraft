@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    LessonPPTPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/LessonPPTPage.lua");
+    LessonPPTPage.OnInit()
+
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    
+]]></script>
+<pe:container uiname="ppt_page_bg" alignment="_fi" width="100%" height="100%" style="background-color:#000000ff">
+    <pe:if condition='<%=LessonPPTPage.GetCurDataType() == "videos"%>'>
+        <pe:container alignment="_ct" width="1280" height="720" style="margin-left: -560px; margin-top: -360px; position:relative;background:url();">
+            <pe:nplbrowser name="nplbrowser_pptpage"  width="1100" height="720" withControl="<%=false%>" enabledResize="true" visible="<%=LessonPPTPage.IsNPLBrowserVisible()%>" url="<%=LessonPPTPage.GetDataUrl()%>" style="background:url();"/>
+        </pe:container>
+    </pe:if>
+    <pe:if condition='<%=LessonPPTPage.GetCurDataType() == "images"%>'>
+        <pe:container style="position:relative;background:url();">
+            <img uiname="pptpage_fg" src= '<%=LessonPPTPage.GetDataUrl()%>' width="<%=LessonPPTPage.GetImageWidth()%>" height="<%=LessonPPTPage.GetImageHeight()%>"/>
+        </pe:container>
+    </pe:if>
+    <div>
+        <pe:container alignment="_ctl" style="position:relative;background:url();">
+            <input zorder="3" type="button" onclick="LessonPPTPage.OnClickPrePage" style="margin-left:8px;width:72px;height:51px;background:url(Texture/Aries/Creator/keepwork/macro/lessonppt/zuo_72x51_32bits.png#0 0 72 51)"/>
+        </pe:container>
+        <pe:container alignment="_ctr" style="position:relative;background:url();">
+            <input zorder="3" type="button" onclick="LessonPPTPage.OnClickNextPage" style="margin-right: 8px; width:72px;height:51px;background:url(Texture/Aries/Creator/keepwork/macro/lessonppt/you_72x51_32bits.png#0 0 72 51)"/>
+        </pe:container>
+    </div>
+    <pe:hotkey name="helpPrePage" hotkey="DIK_LEFT" onclick="LessonPPTPage.OnClickPrePage"/>
+    <pe:hotkey name="helpPrePage" hotkey="DIK_UP" onclick="LessonPPTPage.OnClickPrePage"/>
+    <pe:hotkey name="helpNextPage" hotkey="DIK_RIGHT" onclick="LessonPPTPage.OnClickNextPage"/>
+    <pe:hotkey name="helpNextPage" hotkey="DIK_DOWN" onclick="LessonPPTPage.OnClickNextPage"/>
+</pe:container>
+
+</pe:mcml>
+</body>
+</html>

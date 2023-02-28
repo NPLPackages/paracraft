@@ -1,0 +1,78 @@
+<html>
+<body>
+    <pe:mcml>
+        <script type='text/npl' refresh='false'>
+            <![CDATA[
+                -- UI
+                local ShareWorld = NPL.load('(gl)script/apps/Aries/Creator/Game/Educate/Other/ShareWorld.lua')
+                ShareWorld.OnInit()
+
+                function worldname()
+                    return Mod.WorldShare.Utils.WordsLimit(ShareWorld:GetWorldName())
+                end
+
+                function snapshot()
+                    ShareWorld:Snapshot()
+                end
+
+                function size()
+                    return ShareWorld:GetWorldSize()
+                end
+
+
+                function share_now()
+                    ShareWorld:OnClick()
+                end
+
+                function remote_revision()
+                    return ShareWorld:GetRemoteRevision()
+                end
+
+                function current_revision()
+                    return tostring(ShareWorld:GetCurrentRevision())
+                end
+
+                function close()
+                    ShareWorld:ClosePage()
+                end
+             ]]>
+        </script>
+        <style type='text/mcss'>
+            {
+                info = {
+                    ["font-size"] = 13,
+                    ["base-font-size"] = 13,
+                    ["margin-bottom"] = 5,
+                }
+            }
+        </style>
+        <kp:window width='640'height='380' title='<%=L"保存世界" %>' onclose='close()'>
+            <div style='margin-top:60px'>
+                <div style='width: 595px;'align='center'>
+                    <div style='width: 595px;padding: 10px;background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#660 273 32 32:8 8 8 8);'>
+                        <div style='float:left'>
+                            <div zorder='2' style='position: relative; width: 300px;height: 200px; background:url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#614 273 32 32:8 8 8 8)'></div>
+                            <img name='share_world_image' zorder='1' width='300'height='200' />
+                        </div>
+                        <div style='float:right;padding-left:28px;'>                
+                            <div style='font-size: 18px;base-font-size: 18px;margin-bottom: 25px;'><%= worldname() %></div>
+                            <div class="info"><%=L"大小：" %><%= size() %></div>
+                            <div class="info"><%=L"远程版本号：" %><%= remote_revision() %></div>
+                            <div class="info"><%=L"本地版本号：" %>
+                                <label name='current_revision' value='<%= current_revision() %>' />
+                            </div>
+                            <div onclick='snapshot()' tooltip='<%= L"重新截图" %>' style="margin-top: 43px;font-size: 18px;base-font-size:18px;color: #0c61cf;">
+                                重新截图
+                                <div style="margin-top: -3px;margin-left: 2px; width:70px;height: 2px;background-color: #0c61cf;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style='width: 600px;'align='center'>
+                    <input type='button' uiname="ShareWorld.share_now" onclick='share_now()' value='<%=L"保存" %>'style='margin-left: 480px;float: left;text-offset-y:-2; margin-top: 30px;min-width: 100px;height:40px;background: url(Texture/Aries/Creator/keepwork/worldshare_32bits.png#576 198 38 64:12 10 12 15);' />
+                </div>
+            </div>
+        </kp:window>
+    </pe:mcml>
+</body>
+</html>

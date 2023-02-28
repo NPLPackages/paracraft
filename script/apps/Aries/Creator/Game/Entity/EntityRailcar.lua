@@ -152,6 +152,9 @@ function Entity:init()
 		});
 		-- obj:SetField("GroupID", self.group_id);
 		-- make it linear movement style
+		if not obj then
+			return
+		end
 		obj:SetField("MovementStyle", 3);
 		
 		obj:SetField("PerceptiveRadius", item.PerceptiveRadius or 40);
@@ -235,8 +238,8 @@ function Entity:SaveToXMLNode(node, bSort)
 		attr.rotationYaw = self.rotationYaw;
 	end
 
-	if self.mainAssetPath then
-		attr.mainAssetPath = self.mainAssetPath;
+	if self:GetMainAssetPath() then
+		attr.mainAssetPath = self:GetMainAssetPath();
 	end
 
 	return node;
@@ -350,6 +353,9 @@ function Entity:SetRotation(yaw, pitch)
 	local x, y, z = self:GetPosition();	
 	self.prevMoveAngle = self.moveAngle or 0
 
+	if self.prevPosX==nil then
+		return
+	end
 	local distance_x = x - self.prevPosX
 	local distance_y = z - self.prevPosZ
 
@@ -634,6 +640,10 @@ function Entity:GetRailPointFromPos(posX, posY, posZ, isInputBlockIndex)
     end
 end
 
+function Entity:SetMovePower(power)
+	self.movePower = power
+end
+
 function Entity:UpdateOnTrack(deltaTime, bx, by, bz, maxSpeed, slopeDecayFactor, curBlockId, blockData)
     self.fallDistance = 0;
 	local posX, posY, posZ = self:GetPosition();
@@ -715,6 +725,11 @@ function Entity:UpdateOnTrack(deltaTime, bx, by, bz, maxSpeed, slopeDecayFactor,
     if (self.riddenByEntity) then
 		-- player on the rail can slowly move the car
         deltaDistWalked = self.riddenByEntity.moveForward;
+		if self.movePower and (not deltaDistWalked or deltaDistWalked == 0) then
+			deltaDistWalked = self.movePower
+			self.movePower = nil
+		end
+
         if (deltaDistWalked and deltaDistWalked > 0) then
             local motionScale = self.motionX * self.motionX + self.motionZ * self.motionZ;
             if (motionScale < 0.01) then

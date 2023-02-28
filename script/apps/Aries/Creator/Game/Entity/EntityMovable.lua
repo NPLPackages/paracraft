@@ -374,6 +374,7 @@ end
 function Entity:SetSkin(skin)
 	if(self.skin ~= skin) then
 		if(skin) then
+			skin = tostring(skin)
 			local customSkin = skin;
 			if (self:HasCustomGeosets()) then
 				if(skin:match("^(%d+):[^;+]")) then

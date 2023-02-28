@@ -110,17 +110,18 @@ end
 -- Starts (or continues) destroying a block with given ID at the given coordinates for the given partially destroyed value
 function WorldTrackerServer:DestroyBlockPartially(entityId, x,y,z, destroyedStage)
     local playerList = self.theWorldServer:GetEntityTracker().playerEntityList;
-
-    for i = 1, #(playerList) do
-        local player = playerList[i];
-        if (player and player.worldObj == self.theWorldServer and player.entityId ~= entityId) then
-            local dx = x - player.bx;
-            local dy = y - player.by;
-            local dz = z - player.bz;
-
-            if ((dx * dx + dy * dy + dz * dz) < 1024) then
-                player:SendPacketToPlayer(Packets.PacketBlockDestroy(entityId, x,y,z, destroyedStage));
-            end
-        end
-    end
+	if playerList then
+		for i = 1, #(playerList) do
+			local player = playerList[i];
+			if (player and player.worldObj == self.theWorldServer and player.entityId ~= entityId) then
+				local dx = x - player.bx;
+				local dy = y - player.by;
+				local dz = z - player.bz;
+	
+				if ((dx * dx + dy * dy + dz * dz) < 1024) then
+					player:SendPacketToPlayer(Packets.PacketBlockDestroy(entityId, x,y,z, destroyedStage));
+				end
+			end
+		end
+	end
 end

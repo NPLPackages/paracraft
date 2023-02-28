@@ -65,6 +65,23 @@ function ClickConverBt(name, mcmlNode)
         end
     end
 end
+
+function IsSupportVideo()
+    return RedSummerCampPPtPage.IsSupportVideo()
+end
+
+function CreateWorld()
+    RedSummerCampPPtPage.CreateWorld()
+end
+
+function UseMidTitle()
+    return RedSummerCampPPtPage.UseMidTitle()
+end
+
+function CreateWorld()
+    RedSummerCampPPtFullPage.ChangeVideoVisible(false)
+    RedSummerCampPPtPage.CreateWorld()
+end
 ]]>
 </script>
 <style type="text/mcss">
@@ -136,6 +153,12 @@ end
             ["margin-left"] = 65,
             ["margin-top"] = 45,
         }, 
+        step_img = {
+            width = 614,
+            height = 614,
+            ["margin-left"] = 65,
+            ["margin-top"] = 50,
+        }, 
         yellon_button = {
             background = "Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8",
             ["base-font-size"] = 20,
@@ -166,16 +189,111 @@ end
             ["margin-left"] = 105,
             ["margin-top"] = 14,
         },        
+
+        ppt_cover_div = {
+            width = 1000,
+            height = 630,
+            ["margin-top"] = 15,
+        },  
+
+        cover_left = {
+            width = 450,
+            height = 390,
+            float = "left",
+            ["margin-left"] = 105,
+            ["margin-top"] = 80,
+            ["font-size"] = 14,
+        },
+        
+        cover_right = {
+            width = 315,
+            height = 390,
+            float = "left",
+            ["margin-left"] = 90,
+            ["margin-top"] = 100,
+        },  
+ 
+        cover_title = {
+            ["margin-top"] = 25,
+            height = 90,
+        },      
+
+        cover_title_left = {
+            width = 72,
+            height = 72,
+            float = "left",
+            background = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/tubiao_72x72_32bits.png#0 0 72 72",
+        },
+        cover_title_right = {
+            width = 300,
+            height = 72,
+            ["margin-left"] = 15,
+            float = "left",
+            ["font-size"] = 12,
+        },
+        cover_title_text = {
+            ["font-size"] = 18,
+            ["font-weight"] = "bold",
+        },    
+        cover_title_text2 = {
+            ["font-size"] = 12,
+            ["margin-top"] = 5,
+        },     
+        cover_desc = {
+            ["padding-bottom"] = 60,
+        },      
+        cover_difficult = {
+            width = 408,
+            height = 122,
+            ["font-size"] = 14,
+        },   
+        cover_button = {
+            background = "Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8",
+            ["base-font-size"] = 18,
+            ["font-size"] = 18,
+            ["font-weight"] = "bold",
+            ["margin-left"] = 0,
+            ["margin-top"] = 0,
+            width = 108,
+            height = 44,
+        },
+
+        cover_right_img = {
+            width = 512,
+            height = 512,
+            position = "relative",
+            ["margin-left"] = 0,
+            ["margin-top"] = 0,
+        }, 
+
+        CreateWorldBt = {
+            background = "Texture/Aries/Creator/keepwork/SchoolCenter/btn_qiehuan_32X32_32bits.png#0 0 32 32:8 8 8 8",  
+            ["base-font-size"] = 18,
+            ["font-size"] = 18,
+            ["font-weight"] = "bold",
+            ["margin-left"] = 812,
+            ["margin-top"] = 25,
+            width = 129,
+            height = 46,
+        }, 
+
+        VideoContainer = {
+            background = "",
+            ["margin-left"] = 130,
+            ["margin-top"] = 20,
+            width = 810,
+            height = 479,
+        }, 
     }
 </style>
 
-<pe:container ClickThrough="false" alignment="_fi" width="100%" height="100%" style="background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj3_32bits.png#0 0 5 512:1 10 2 10);">
+<pe:container ClickThrough="false" uiname="PPTFullPageRoot" alignment="_lt" width="1280" height="720" style="background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/bj3_32bits.png#0 0 5 512:1 10 2 10);">
     <pe:container zorder="1" visible="false" name="export_mode_container" onclick="" alignment="_fi" width="100%" height="100%" style="background:">
     </pe:container>
     <pe:container name="rt_container" alignment="_rt" style="background:url();">
         <input type="button" value='' onclick="ClosePage" style="width: 112px;height: 52px; margin-right:20px;margin-top:25px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/B2_112X52_32bits.png#0 0 112 52);" />
     </pe:container>
-    <pe:container alignment="_ct" style="margin-left:-532px;margin-top:-326px;width:1050px;height:640px;background:url();">
+    <pe:container alignment="_ct" style="margin-left:-532px;margin-top:-326px;width:1050px;height:740px;background:url();">
         <pe:if condition='<%=IsPPTCover()%>'>
             <div style="position: relative;margin-left: 0px;base-font-size:16px;font-size: 16px;">
                 <%=GetPPtStr()%>
@@ -183,9 +301,15 @@ end
         </pe:if>
         <pe:if condition='<%=not IsPPTCover()%>'>
             <div style="position: relative;margin-left: 0px;base-font-siez:28px;font-size: 28px;">
-                <div name="line" style="position: relative;margin-left: 476px;margin-top: 50px; background-color: #acacac;width: 1px;height: 520px;">
-                </div>
-                <div style="margin-top: 40px;margin-left: 0px; base-font-size:40px; font-size:40px;font-weight:bold;color: #212122; "><%=GetPPtTitle()%></div>
+                <pe:if condition='<%=UseMidTitle()%>'>
+                    <div style="margin-top: 40px;margin-left: 0px; base-font-size:20px; font-size:20px;font-weight:bold;color: #212122;text-align: center; "><%=GetPPtTitle()%></div>
+                </pe:if>
+                <pe:if condition="<%=not UseMidTitle()%>">
+                    <div name="line" style="position: relative;margin-left: 526px;margin-top: 50px; background-color: #acacac;width: 1px;height: 520px;">
+                    </div>
+                    <div style="margin-top: 40px;margin-left: 0px; base-font-size:40px; font-size:40px;font-weight:bold;color: #212122; "><%=GetPPtTitle()%></div>
+                </pe:if>
+
                 <%=GetPPtStr()%>
             </div>       
         </pe:if>        

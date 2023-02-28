@@ -217,7 +217,7 @@ function ParalifeContext:mouseReleaseEvent(event)
 			end
 			if(result and result.blockZ) then
 				if(result.physicalX) then
-					-- when clicking on physical mesh, we will only move if the point in close to horizontal plane. 
+					-- when clicking on physical mesh, we will only move if the point is close to horizontal plane. 
 					local x, y, z = result.physicalX, result.physicalY, result.physicalZ;
 					-- we also need to ensure that there is 4 meters free space above the click point. 
 					local entity, x1, y1, z1 = self:RayPickPhysicalLiveModel(x, y+4, z, 0, -1, 0, 10)

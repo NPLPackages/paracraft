@@ -158,6 +158,36 @@ function InfoWindow.UpdateInfo()
 	last_info.render_stats = string.format("FPS:%.0f Draw:%d Tri:%d Mem:%d VB:%d", engine_attr:GetField("FPS", 0), engine_attr:GetField("DrawCallCount", 0), engine_attr:GetField("TriangleCount", 0),
 		engine_attr:GetField("CurrentMemoryUse", 0)/1048576, engine_attr:GetField("VertexBufferPoolTotalBytes", 0)/1048576)
 
+	-- mouseX, mouseY + (dx, dy): show current mouse position, plus distance from last mouse hover position to measure distance of mouse movement. 
+	-- usage: hover until the + sign appears, and move and hover to show the distance between two hover positions. 
+	local mx, my = ParaUI.GetMousePosition();
+	local minHoverInterval = 1000;
+	local maxMeasureDistInterval = 3000;
+	if(last_info.lastUIX == mx and last_info.lastUIY == my) then
+		last_info.lastHoverTime = last_info.lastHoverTime or commonlib.TimerManager.GetCurrentTime();
+	else
+		if(last_info.lastHoverTime) then
+			-- at least hover for 1000 ms
+			if((commonlib.TimerManager.GetCurrentTime() - last_info.lastHoverTime) > minHoverInterval) then
+				last_info.lastHoverUIX, last_info.lastHoverUIY = last_info.lastUIX, last_info.lastUIY;
+				last_info.lastValidHoverTime = commonlib.TimerManager.GetCurrentTime();
+			end
+			last_info.lastHoverTime = nil;
+		end
+		last_info.lastUIX, last_info.lastUIY = mx, my;
+	end
+
+	if(last_info.lastHoverTime and last_info.lastHoverUIX and last_info.lastHoverUIY and mx >= last_info.lastHoverUIX and my >= last_info.lastHoverUIY and 
+		(last_info.lastHoverTime - (last_info.lastValidHoverTime or 0)) < maxMeasureDistInterval) then
+		last_info.uiPos = string.format("%d,%d (%d,%d)", mx, my, mx - last_info.lastHoverUIX, my - last_info.lastHoverUIY)	
+	else
+		last_info.uiPos = string.format("%d,%d",mx,my)	
+		if(((commonlib.TimerManager.GetCurrentTime() - (last_info.lastValidHoverTime or 0)) < (maxMeasureDistInterval - minHoverInterval)) or (last_info.lastHoverTime and (commonlib.TimerManager.GetCurrentTime() - last_info.lastHoverTime) > minHoverInterval)) then
+			last_info.uiPos = last_info.uiPos .. "+"
+		end
+	end
+
+	last_info.eyePos = {ParaCamera.GetEyePos()}
 	return last_info;
 end
 
@@ -188,4 +218,23 @@ function InfoWindow.OnTimer(timer)
 	page:SetUIValue("mousepos", info.mouseposText);
 	page:SetUIValue("relativemousepos", info.relativemouseposText);
 	page:SetUIValue("worldpos", info.worldpos);
+	page:SetUIValue("uiPos",info.uiPos)
+
+	local dist = math.floor(last_info.eyePos[1]*10)/10
+	local pitch = math.floor(last_info.eyePos[2]*100)/100
+	local yaw = math.floor(last_info.eyePos[3]*100)/100
+	local camx,camy,camz = ParaCamera.GetPosition();
+	local lookat_x,lookat_y,lookat_z = ParaCamera.GetLookAtPosition();
+	local dir = Direction.GetDirection3DFromCamera(camx,camy,camz, lookat_x,lookat_y,lookat_z);
+	
+	-- local dirDesc = {
+	-- 	[0] = "x负",
+	-- 	[1] = "x正",
+	-- 	[2] = "z负",
+	-- 	[3] = "z正",
+	-- 	[4] = "y负",
+	-- 	[5] = "y正",
+	-- }
+	-- local dirStr = string.format("%s(%s)",dir,dirDesc[dir] or "")
+	page:SetUIValue("eyePos",string.format("dist:%s,pitch:%s(%s°),yaw:%s(%s°)",dist,pitch,math.floor(pitch/3.14*180*10)/10,yaw,math.floor(yaw/3.14*180*10)/10))
 end

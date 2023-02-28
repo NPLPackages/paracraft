@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    local CourseEvaluation = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/CourseEvaluation/CourseEvaluation.lua");
+    CourseEvaluation.OnInit()
+    function ClosePage()
+        CourseEvaluation.ClosePage()
+    end
+
+    function GetCheckBg()
+        return 'Texture/Aries/Creator/keepwork/macro/xuanzhong_14x14_32bits.png;0 0 14 14'
+    end
+
+    function GetUnCheckBg()
+        return 'Texture/Aries/Creator/keepwork/macro/weixuanzhong_14x14_32bits.png;0 0 14 14'
+    end
+
+    function OnClickSuggest()
+        CourseEvaluation.OnClickSuggestion()
+    end
+
+    function OnSubmit()
+        CourseEvaluation.OnClickSubmit()
+    end
+
+    function onClickRadio1(value)
+        CourseEvaluation.OnClickInterst(value)
+    end
+    function onClickRadio2(value)
+        CourseEvaluation.OnClickDifficulty(value)
+    end
+    function onClickRadio3(value)
+        CourseEvaluation.OnClicKnowwell(value)
+    end
+
+    function CheckShowSuggest()
+        return CourseEvaluation.IsSubmitSuggest == true
+    end
+
+    function GetStyle()
+        local str = string.format([[<div zorder="-1" style="position: relative; width: 550px; height: %dpx; background: url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44);"></div>]],CourseEvaluation.IsSubmitSuggest == true and 540 or 380)
+        return str
+    end
+
+    function OnClickInterst(name)
+        local value = tonumber(string.match(name,"[%d]+$"))
+        if value and value > 0 then
+            CourseEvaluation.OnClickInterst(value)
+            CourseEvaluation.SetInterst()
+        end
+    end
+
+    function OnClickDifficulty(name)
+        local value = tonumber(string.match(name,"[%d]+$"))
+        if value and value > 0 then
+            CourseEvaluation.OnClickDifficulty(value)
+            CourseEvaluation.SetDifficulty()
+        end
+    end
+
+    function OnClickKnowwell(name)
+        local value = tonumber(string.match(name,"[%d]+$"))
+        if value and value > 0 then
+            CourseEvaluation.OnClicKnowwell(value)
+            CourseEvaluation.SetKnowwell()
+        end
+    end
+]]></script>
+<div  style=" width: 570px; height: 550px;">
+    <!-- title -->
+    <%=GetStyle()%>
+    <div style="position: relative;">
+        <div style="position: relative; font-size: 22px; base-font-size: 22px; margin-top: 5px; margin-left: 10px; color:#FCFCFC; font-weight: bold;" ><%=L"课程评价"%></div>
+        <input type="button" onclick="ClosePage" style="margin-top: 10px; margin-left: 510px; width: 22px; height: 22px; background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" />
+    </div>
+    <div align="center" style="margin-top: 50px; font-size: 14px; base-font-size: 14px; width: 414px; height: 22px; background: url(Texture/Aries/Creator/keepwork/macro/biaoti_414x22_32bits.png#0 0 414 22);"></div>
+    <div style="margin-top: 10px; font-size: 16px; base-font-size: 16px; color: #131313;">
+        <div style="margin-left: 25px;">
+            <div><%=L"1.你对这节课有兴趣吗？"%></div>
+            <div style="float:left;margin-left: 20px;">
+                <input type="radio" name="interst" value="10" onclick="onClickRadio1" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-top: 3px;" />
+                <div onclick="OnClickInterst" name="interst10" style="margin-left: 25px; margin-top:-18px;">十分有兴趣</div>
+            </div>
+            <div style="float:left;margin-left:70px">
+                <input type="radio" name="interst" value="5" onclick="onClickRadio1" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-top: 3px;" />
+                <div onclick="OnClickInterst" name="interst5" style="margin-left: 25px; margin-top:-18px;">有兴趣</div>
+            </div>
+            <div style="float:left;margin-left:70px">
+                <input type="radio" name="interst" value="1" onclick="onClickRadio1" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-top: 3px;" />
+                <div onclick="OnClickInterst" name="interst1" style="margin-left: 25px; margin-top:-18px;">没意思</div>
+            </div>
+        </div> 
+        <div style="margin-left: 25px; margin-top: 24px;">
+            <div><%=L"2.你觉得这节课难学吗？"%></div>
+            <div style="float:left;margin-left: 20px;">
+                <input type="radio" name="difficulty" value="10" onclick="onClickRadio2" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-top: 3px;" />
+                <div onclick="OnClickDifficulty" name="difficulty10" style="margin-left: 25px; margin-top:-18px;">简单易学</div>
+            </div>
+            <div style="float:left;margin-left:70px">
+                <input type="radio" name="difficulty" value="5" onclick="onClickRadio2" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-left: 15px; margin-top: 3px;" />
+                <div onclick="OnClickDifficulty" name="difficulty5" style="margin-left: 40px; margin-top:-18px;">适中</div>
+            </div>
+            <div style="float:left;margin-left:70px">
+                <input type="radio" name="difficulty" value="1" onclick="onClickRadio2" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-left: 18px; margin-top: 3px;" />
+                <div onclick="OnClickDifficulty" name="difficulty1" style="margin-left: 43px; margin-top:-18px;">太难了</div>
+            </div>
+        </div> 
+        <div style="margin-left: 25px;  margin-top: 24px;">
+            <div><%=L"3.你对这节课程知识点掌握的怎么样？"%></div>
+            <div style="float:left;margin-left: 20px;">
+                <input type="radio" name="knowwell" value="10"  onclick="onClickRadio3" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-top: 3px;" />
+                <div onclick="OnClickKnowwell" name="knowwell10" style="margin-left: 25px; margin-top:-18px;">全部掌握了</div>
+            </div>
+            <div style="float:left;margin-left:70px">
+                <input type="radio" name="knowwell" value="5" onclick="onClickRadio3" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-top: 3px;" />
+                <div onclick="OnClickKnowwell" name="knowwell5" style="margin-left: 25px; margin-top:-18px;">掌握了一部分</div>
+            </div>
+            <div style="float:left;margin-left:22px">
+                <input type="radio" name="knowwell" value="1" onclick="onClickRadio3" CheckedBG="<%=GetCheckBg()%>" UncheckedBG="<%=GetUnCheckBg()%>" style="margin-top: 3px;" />
+                <div onclick="OnClickKnowwell" name="knowwell1" style="margin-left: 25px; margin-top:-18px;">没学会</div>
+            </div>
+        </div>    
+    </div>
+    <div style="font-size: 14px; base-font-size:14px; color: #727272;  margin-top: 16px; margin-left: 25px;" ><%=L"另外也欢迎同学们给我们的课程提出宝贵的意见或建议:"%></div>
+    <input type="button" value= '<%=L"点击此处提出意见"%>' onclick="OnClickSuggest" style="margin-left: 366px; margin-top: -24px; width: 114px; height: 26px; font-size: 14px; base-font-size:14px; background: url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3); color: #5ca6f9; background-color: #5ca6f9;" />
+    <pe:if condition="<%=CheckShowSuggest()%>">
+        <pe:container SelfPaint="true" style="width: 508px; height: 150px;  margin-top: 10px;  margin-left: 25px; background: url(Texture/Aries/Creator/keepwork/macro/shurukuang_28x28_32bits.png#0 0 28 28:12 12 12 12);">
+            <input name="suggest" rows="16" height="227" language="npl" width="510" UseSystemControl="true"  enable_ime="true" EmptyText='<%=L"请输入您的意见和建议..."%>' CaretColor="#000000" style="margin-top: 2px; textcolor:#000000;font-family:Consolas;" lineheight="20" fontsize="14"/>
+        </pe:container>
+    </pe:if>
+    <input type="button" value="提交" style="margin-top: 14px; margin-left: 125px; width:128px;height:40px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huangse_32bits.png#0 0 38 64:16 16 16 16);" onclick="OnSubmit"/>
+    <input type="button" value="跳过" style="margin-left: 45px; margin-top: 14px; width:128px;height:40px;background: url(Texture/Aries/Creator/keepwork/Window/button/btn_huise_32bits.png#0 0 38 64:16 16 16 16);" onclick="ClosePage"/>
+</div>
+</pe:mcml>
+</body>
+</html>

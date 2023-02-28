@@ -1,0 +1,48 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.html" -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+        <script refresh="false" type="text/npl" src="World2In1.lua">
+            <![CDATA[
+            World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
+            World2In1.OnInit()
+
+            ]]>
+
+            function OnClick()
+
+            end
+        </script>
+        <pe:container alignment="_rt" style="position:relative;width:440px;height:260px;background:;">
+            <div style="margin-left:5px;width: 212px;margin-top:10px;height:113px;float: left;">
+                <pe:if condition='<%=World2In1.GetRegionType() == "creator"%>'>
+                    <div onclick="World2In1.ClickThemeBt" tooltip="更换主题" style="float: left;margin-top:1px;width:100px;height:113px;background:url(Texture/Aries/Creator/keepwork/map/010_100X113_32bits.png#0 0 100 113);">
+                    </div>
+                    <div onclick="World2In1.OnSaveWorld" tooltip="Ctrl+S保存作品" style="float: left;margin-left:7px;width:105px;height:111px;background:url(Texture/Aries/Creator/keepwork/map/009_105X111_32bits.png#0 0 105 111);">
+                    </div>
+                </pe:if>
+
+                <pe:if condition='<%=World2In1.GetRegionType() == "grade"%>'>
+                    <div onclick="World2In1.OpenStudentsWork" tooltip="同学作品" style="float: left;margin-left:47px;margin-top:22px;width:138px;height:95px;background:url(Texture/Aries/Creator/keepwork/map/008_138X95_32bits.png#0 0 138 95);">
+                    </div>
+                </pe:if>
+
+            </div>
+
+            <div style="float: left;width: 161px;height: 169px; background:url(Texture/Aries/Creator/keepwork/map/011_161X169_32bits.png#0 0 161 169);">
+                <div onclick="World2In1.OnEnterCourseRegion" tooltip="教学区" style="margin-left: 30; width: 80px;height: 69px;background:;"></div>
+                <div>
+                    <div onclick="World2In1.OnEnterCreatorRegion" tooltip="创作区" style="float: left;width: 80px;height: 69px;background:;"></div>
+                    <div onclick="World2In1.OpenStudentsWork" tooltip="同学作品" style="float: left;width: 80px;height: 69px;background:;"></div>
+                </div>
+            </div>
+        </pe:container>
+    </pe:mcml>
+</body>
+</html>
+

@@ -77,7 +77,11 @@ function block:OnActivated(x, y, z, entity)
 	if(data >=8) then
 		BlockEngine:SetBlockData(x,y,z, data-8);
 	else
-		BlockEngine:SetBlockData(x,y,z, data+8);
+		local data = data + 8
+		if data == 8 then --blockdata不能是8,从0开始
+			data = data + 1
+		end
+		BlockEngine:SetBlockData(x,y,z, data);
 	end
     BlockEngine:NotifyNeighborBlocksChange(x, y, z, self.id);
 

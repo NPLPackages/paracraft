@@ -200,16 +200,17 @@ end
                     onclick='OpenLink'
                     value='' />   
                 <!-- 小项目按钮 -->
-                <input type='button'
+                <!-- <input type='button'
                     class='opus_bar_button'
                     DefaultButton='true'
                     style='width: 65px; height: 70px; base-font-size: 20px; margin-top:11px;margin-right:19px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/xiaoxiangmu_65x70_32bits.png#0 0 65 70)'
                     name='open_project'
                     onclick='OpenLink'
-                    value='' />
+                    value='' /> -->
                 
                 <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 11, "ShowVip")%>
-                <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:26px;margin-top:10px;" />
+                <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:26px;margin-top:10px;","2D_course")%>
+                <!-- <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:26px;margin-top:10px;" /> -->
             </pe:container>
             <!--Close-->
             <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
@@ -229,7 +230,7 @@ end
                         <div style="float:left;margin-left:18px;margin-top:-25px;width:498px;height:615px;background:url();">
                             <div style="float:left;margin-top: 3px;margin-left:3px;width: 490px;height: 52px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/kuangtou_490x52_32bits.png#0 0 490 52);">
                                 <!--大标题：推荐课程-->
-                                <div style="margin-top: 6px;margin-left:10px;width:145px;height:40px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/meiriketang_145x40_32bits.png#0 0 145 40);" />
+                                <div style="margin-top: 6px;margin-left:10px;width:138px;height:36px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/meirijiqiao_138x36_32bits.png#0 0 138 36);" />
                             </div>
                             <div style="width:491px;height:556px;margin-top: 0px;margin-left:2px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/kuangdi_166x188_32bits.png#0 0 166 188:30 30 40 40);">
                                 <pe:gridview style="margin-left:8px;margin-top:24px;width:500px;height:512px;" name="item_gridview" CellPadding="2" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="16" AllowPaging="false" ItemsPerLine="5" DefaultNodeHeight="110"
@@ -302,9 +303,11 @@ end
                             <div style="width:750px;height:615px;">
                                 <div style="float:left;margin-left:15px;margin-top:10px;">
                                     <!--大标题：每日课堂-->
-                                    <div style="width:145px;height:40px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#81 54 145 40);" />
+                                    <div style="width:145px;height:40px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/tuijianneirong_94x23_32bits.png#0 0 145 40);"></div>
                                     <!--全部课程按钮-->
-                                    <input type='button' DefaultButton='true' style='width: 93px;height: 43px;margin-left:625px;margin-top: -40px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/quanbu_93x43_32bits.png#0 0 93 43);' name='open_word'onclick='open_all' />   
+                                    <pe:if condition='<%= not System.options.isChannel_430 %>'>
+                                        <input type='button' DefaultButton='true' style='width: 93px;height: 43px;margin-left:625px;margin-top: -40px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/quanbu_93x43_32bits.png#0 0 93 43);' name='open_word'onclick='open_all' />   
+                                    </pe:if>
                                 </div>
                                 <div style="width:712px;height:526px;margin-left: 19px;margin-top:18px;">
                                     <pe:gridview style="margin-left:0x;width:712px;height:526px;" name="item_gridview_courses" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="12" AllowPaging="false" ItemsPerLine="3" DefaultNodeHeight="175"

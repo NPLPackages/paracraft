@@ -630,12 +630,22 @@ function Actor:CheckInstallCodeEnv(painter, isPickingPass)
 	env.isPickingPass = isPickingPass;
 
 	if(not env.text) then
-
 		-- draw text
 		-- @param text: text to render with current font 
 		-- @param x,y: default to 0,0
 		-- @param width, height: can be nil, unless you want to center the text
-		-- @param alignment: only used when width is not nil
+		-- @param alignment: only used when width is not nil. default to 0x105 (noclip no word wrap), 
+		-- other values maybe 0x115 (centered with word break)
+		-- DT_TOP                      0x00000000
+		-- DT_LEFT                     0x00000000
+		-- DT_CENTER                   0x00000001
+		-- DT_RIGHT                    0x00000002
+		-- DT_VCENTER                  0x00000004
+		-- DT_BOTTOM                   0x00000008
+		-- DT_SINGLELINE			   0x00000020
+		-- DT_WORDBREAK                0x00000010
+		-- DT_NOCLIP				   0x00000100
+		-- DT_EXTERNALLEADING		   0x00000200
 		env.text = function(text, x, y, width, height, alignment)
 			if(text and text~="" ) then
 				x = x or 0;

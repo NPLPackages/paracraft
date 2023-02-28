@@ -236,6 +236,12 @@ end
 
 -- @param IsExpanded: nil to toggle. true or false to show expanded or not. false by default. 
 function CreatorDesktop.ShowNewPage(IsExpanded)
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+	if IsMobileUIEnabled then
+		local MobileCreatorPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileCreatorPage.lua")
+        MobileCreatorPage.ShowPage(IsExpanded)
+		return 
+	end
 	if(IsExpanded == nil) then
 		local isVisible = CreatorDesktop.IsVisible()
 		if(isVisible) then

@@ -236,7 +236,7 @@ function KeepWorkLogin.LoginAction(type)
 		    type = type,
         },
         headers = {
-            ["Authorization"] = " Bearer " .. System.User.keepworktoken or "",
+            ["Authorization"] = " Bearer " .. (System.User.keepworktoken or ""),
         },
     }, function(err, msg, data)
 		LOG.std(nil, "debug", "keepwork LoginAction err", err);

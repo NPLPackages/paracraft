@@ -1,0 +1,217 @@
+<!-- "script/apps/Aries/Creator/Game/Mobile/MobileCreateNewWorld.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+    <head>
+        <title>2009.8.2</title>
+    </head>
+    <body> 
+        <pe:mcml>
+            <style type="text/mcss">
+                {
+                    select_blue = {
+                        background = "Texture/Aries/Creator/keepwork/Mobile/create_new_world/frame_2_64x64_32bits.png#0 0 64 64: 20 20 20 20",
+                        ["font-size"] = 22,
+                    },
+                    normal_gray = {
+                        background = "Texture/Aries/Creator/keepwork/Mobile/create_new_world/frame_1_64x64_32bits.png#0 0 64 64: 20 20 20 20",
+                        ["font-size"] = 22,
+                    }
+                }
+            </style>
+            <script type="text/npl" refresh="false" src="CreateNewWorld.lua">
+                <![CDATA[
+                    local page = document:GetPageCtrl();
+                    local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+
+                    local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+                    CreateNewWorld.page = page;
+                    CreateNewWorld.OnInit();
+                    local cur_mode = CreateNewWorld.init_mode;
+
+                    function getBGStyle()
+                        return MyCompany.Aries.ExternalUserModule:GetConfig().game_login_bg or "";
+                    end
+
+                    function SelectedWorld(name,node)
+                        local world = node:GetPreValue("this", true);
+                        MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnSelectWorld(world,true);
+                        --local selected = item.selected;
+                    end
+
+                    function ReturnLastStep()
+                        if CreateNewWorld.is_only_close then
+                            page:CloseWindow();
+                            CreateNewWorld.LastWorldName = nil
+                            CreateNewWorld.is_only_close = nil
+                            return
+                        end
+                        page:CloseWindow();
+                        CreateNewWorld.LastWorldName = nil
+                        NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+                        local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+                        if(not WorldCommon.GetWorldInfo()) then
+                            MainLogin.state.IsLoadMainWorldRequested = nil;
+                            MainLogin:next_step();
+                        end
+                    end
+
+                    function GetAuthor(name)
+                        local s = L"制作者:";
+                        if(name) then
+                            s = s..name;
+                        end
+                        return s;
+                    end
+
+                    function GetGameStyleDescription() 
+                        local style = CreateNewWorld.cur_style;
+                        local des = style.description;
+                        return des;
+                    end
+
+                    function GetGameDifficultyDescription()
+                        local grade = CreateNewWorld.cur_difficulty;
+                        local des = grade.description;
+                        return des;
+                    end
+
+                    function GetGameTerrainDescription()
+                        local terrain = CreateNewWorld.cur_terrain;
+                        local des = terrain.description;
+                        return des;
+                    end
+
+
+
+                    function GetCurWorldAuthor() 
+                        --return cur_world.author;
+                        return "None";
+                    end
+
+                    function GetCurWorldIP() 
+                        return "127.0.0.1";
+                    end
+
+
+                    function OnClickModify(name,node)
+                        local item_tag = node:GetAttribute("param1");
+                        local item_index = node:GetAttribute("param2");
+                        local index = tonumber(item_index);
+                        local table_name = item_tag.."_info";
+                        local cur_item = "cur_"..item_tag;
+                        CreateNewWorld[cur_item] = CreateNewWorld[table_name][index];
+                        page:Rebuild();
+                    end
+
+                    function GetCurWorldMode()
+                        return CreateNewWorld.cur_style.show_value or "";
+                    end
+
+                    function GetCurWorldGrade() 
+                        return CreateNewWorld.cur_difficulty.show_value or "";
+                    end
+
+                    function GetTerrainBtnValue()
+                        return CreateNewWorld.cur_terrain.show_value or "";
+                    end
+
+                    function GetOneDayTimeBtnValue()
+                        return CreateNewWorld.cur_oneday_time.show_value or "";
+                    end
+
+                    CreateNewWorld.LastWorldName = CreateNewWorld.LastWorldName or CreateNewWorld.GetAvailableNewWorldName()
+                    function GetWorldName()
+                        return CreateNewWorld.LastWorldName;
+                    end
+
+                    function OnWorldNameChange()
+                        CreateNewWorld.LastWorldName = Page:GetUIValue("new_world_name", "");
+                    end
+
+                    function BtnBeSelected(item_name,index)
+                        local item = CreateNewWorld[item_name];
+                        if(item.index == index) then
+                            return "select_blue";
+                        else
+                            return "normal_gray";
+                        end
+                    end
+                ]]>
+            </script>
+            <mb:window width = "800" height = "642" bg_color = "black" title='<%=L"创建世界" %>' onclose = "ReturnLastStep">
+                <div style="margin-top: 80px;margin-left: 0px;height: 562px;width: 800px;" >
+                    <div style="float: left;margin-left: 24px;margin-top: 24px;width: 320px;height: 400px;background: url(Texture/Aries/Creator/keepwork/Mobile/create_new_world/xiankuang_32x32_32bits.png#0 0 32 32:8 8 8 8);">
+                        <pe:mc_player name="MyPlayer" miniscenegraphname="Avatar_Myself_Tab_Character" style="margin-left: 40px;margin-top: 70px;width:256px;height:256px;" IsInteractive="false" RenderTargetSize="256" DefaultCameraObjectDist="4" LookAtHeight="1" DefaultLiftupAngle="0"/>
+                    </div>
+                    <div style="float: left; margin-left: 48px;">
+                        <div style="margin-top: 24px;">
+                            <div style="float: left;
+                                        margin-top: 0px;
+                                        color: #FFFFFF;
+                                        font-weight: bold;
+                                        font-size: 28px;">
+                                <%= L"世界名称:" %>
+                            </div>
+                        </div>
+                        <div style="margin-top:8px;margin-left:0px;width:360px;height:64px;background: url(Texture/Aries/Creator/keepwork/Mobile/create_new_world/shurukuang_32x32_32bits.png#0 0 32 32:8 8 8 8);">
+                            <input type="text" SkipAutoBadWordFilter="true" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" onkeyup="OnWorldNameChange" style="font-weight: bold;text-align:left;margin-top:8px;margin-left:10px;width:340px;height:48px;font-size:28px;background: url();"/>
+                        </div>
+                        
+                        <!--<div style="margin-top:30px;">
+                            <div style="float:left;margin-left:28px;margin-top:2px;color:#ffffffff;font-weight:bold;font-size:14px;">
+                                <%=L"模式" %>
+                            </div>
+                            <input type="button" value='<%=L"创作" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_style",2) %>' onclick="OnClickModify" param1="style" param2="2"/>
+                            <input type="button" value='<%=L"生存" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_style",1) %>' onclick="OnClickModify" param1="style" param2="1"/>
+                        </div>-->
+                        <div style="margin-top: 24px;
+                                    color: #FFFFFF;
+                                    font-weight: bold;
+                                    font-size: 28px;">
+                            <%=L"初始地形:" %>
+                        </div>
+                        <div style="float:left;margin-top:10px;">
+                            <input type="button" uiname="CreateNewWorld.terrain_1" value='<%=L"超平坦" %>' style="width:104px;height:48px;float:left;margin-left:0px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",1) %>' onclick="OnClickModify" param1="terrain" param2="1"/>
+                            <input type="button" uiname="CreateNewWorld.terrain_2" value='<%=L"随机地形" %>' style="width:128px;height:48px;float:left;margin-left:12px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",2) %>' onclick="OnClickModify" param1="terrain" param2="2"/>
+                            <input type="button" uiname="CreateNewWorld.terrain_3" value='<%=L"空" %>' style="width:56px;height:48px;float:left;margin-left:12px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",3) %>' onclick="OnClickModify" param1="terrain" param2="3"/>
+                            <input type="button" uiname="CreateNewWorld.terrain_5" value='<%=L"迷你地块" %>' style="width:128px;height:48px;float:left;margin-top:12px;margin-left:0px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",5) %>' onclick="OnClickModify" param1="terrain" param2="5"/>
+                            <input type="button" uiname="CreateNewWorld.terrain_4" value='<%=L"并行世界" %>' style="width:128px;height:48px;float:left;margin-top:12px;margin-left:12px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",4) %>' onclick="OnClickModify" param1="terrain" param2="4"/>
+                        </div>
+                    </div>
+                    <pe:container alignment="_rt" style="position: relative; width: 292px; height: 130px; background:url();">
+                        <input type="button"
+                            uiname="CreateNewWorld.OnClickCreateWorld"
+                            value='<%= L"创建新世界" %>'
+                            style="spacing: 20px;
+                                    text-offset-y:-2;
+                                    margin-left: 0px;
+                                    margin-top: 48x;
+                                    height: 72px;
+                                    min-width: 244px;
+                                    font-size: 32px;
+                                    font-weight: bold;
+                                    color: #1a1a1a;
+                                    shadow-quality: 4;
+                                    shadow-color: #1a1a1a;
+                                    text-shadow:false;background: url(Texture/Aries/Creator/keepwork/Mobile/create_new_world/huangseanniu_488x152_32bits.png#0 0 488 152);"
+                            onclick="MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnClickCreateWorld"/>
+                    </pe:container>
+                    <!-- <div style="height: 45px;
+                                margin-top: 42px;
+                                margin-right: 48px;">
+                        <input type="button"
+                            uiname="CreateNewWorld.ReturnLastStep"
+                            value='<%=L"返回" %>'
+                            spacing="10"
+                            style="margin-left: 160px;
+                                    margin-top: 6px;
+                                    height: 32px;
+                                    min-width: 100px;"
+                            class="mc_light_grey_button_with_fillet"
+                            onclick="ReturnLastStep"/>
+                    </div> -->
+                </div>
+            </mb:window>
+        </pe:mcml>
+    </body>
+</html>

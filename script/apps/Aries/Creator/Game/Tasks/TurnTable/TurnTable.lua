@@ -18,6 +18,7 @@ NPL.load("(gl)script/ide/Transitions/Tween.lua");
 local ShowQuestionNum = 5
 local ActCode = "lamp"
 
+local page
 TurnTable.RewardData = {
     {exid = 30004, probility = 40, value = 0, bean_num = 10},
     {exid = 30006, probility = 12, value = 0, bean_num = 30},
@@ -47,7 +48,7 @@ function TurnTable.Show()
 end
 
 function TurnTable.ShowView()
-    if page and page:IsVisible() then
+    if page and page.IsVisible and page:IsVisible() then
         return
     end
     TurnTable.radian = nil

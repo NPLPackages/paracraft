@@ -20,35 +20,58 @@ or it can also be a [worldname].zip file that contains the world directory.
 @param OnProgressCallBack: nil or a function of function(percent) end, where percent is between [0,100]
 ]]
 function Map3DSystem.UI.LoadWorld.LoadWorldImmediate(worldpath, bPerserveUI, bHideProgressUI, OnProgressCallBack)
-	if(worldpath) then
+	if (worldpath) then
 		worldpath = string.gsub(worldpath, "[/\\]+$", "")
-	end	
-	if(string.find(worldpath, ".*%.zip$")~=nil or string.find(worldpath, ".*%.pkg$")~=nil) then
+	end
+
+	if (string.find(worldpath, ".*%.zip$") ~= nil or
+	    string.find(worldpath, ".*%.pkg$") ~= nil) then
 		-- open zip archive with relative path
-		if(Map3DSystem.World.worldzipfile and Map3DSystem.World.worldzipfile~= worldpath) then
+		if (Map3DSystem.World.worldzipfile and Map3DSystem.World.worldzipfile~= worldpath) then
 			ParaAsset.CloseArchive(Map3DSystem.World.worldzipfile); -- close last world archive
 		end
+
 		Map3DSystem.World.worldzipfile = worldpath;
 		
 		ParaAsset.OpenArchive(worldpath, true);
-
 		ParaIO.SetDiskFilePriority(-1);
-		local search_result = ParaIO.SearchFiles("","*.", worldpath, 0, 10, 0);
+
+		local search_result = ParaIO.SearchFiles("", "*.", worldpath, 0, 10, 0);
 		local nCount = search_result:GetNumOfResult();
-		if(nCount>0) then
+
+		if (nCount > 0) then
 			-- just use the first directory in the world zip file as the world name.
 			local WorldName = search_result:GetItem(0);
 			WorldName = string.gsub(WorldName, "[/\\]$", "");
-			worldpath = string.gsub(worldpath, "([^/\\]+)%.%w%w%w$", WorldName); -- get rid of the zip file extension for display 
+			worldpath = string.gsub(worldpath, "([^/\\]+)%.%w%w%w$", WorldName); -- get rid of the zip file extension for display
 		else
 			-- make it the directory path
-			worldpath = string.gsub(worldpath, "(.*)%.%w%w%w$", "%1"); -- get rid of the zip file extension for display 		
+
+			if (System.os.GetPlatform() == "android") then
+				local output = {};
+				local parentPath = worldpath:gsub('[^/\\]+$', '');
+				local realWorldName = "";
+
+				commonlib.Files.Find(output, '', 0, 10, ':worldconfig.txt', worldpath);
+
+				for key, item in ipairs(output) do
+					if string.match(item.filename, '[^/]+/worldconfig.txt') == item.filename then
+						realWorldName = item.filename:gsub("/worldconfig.txt", "");
+					end
+				end
+
+				worldpath = parentPath .. realWorldName;
+			else
+				worldpath = string.gsub(worldpath, "(.*)%.%w%w%w$", "%1"); -- get rid of the zip file extension for display
+			end
 		end
-		if(not ParaIO.DoesFileExist(worldpath, false)) then
+
+		if (not ParaIO.DoesFileExist(worldpath, false)) then
 			ParaIO.SetDiskFilePriority(0);
 		else
 			LOG.std(nil, "warn", "loadworld", "opening zip file while disk file already exist, use zip priority now");
 		end
+
 		Map3DSystem.World.readonly = true;
 		
 		NPL.load("(gl)script/ide/sandbox.lua");
@@ -59,7 +82,6 @@ function Map3DSystem.UI.LoadWorld.LoadWorldImmediate(worldpath, bPerserveUI, bHi
 		--local sandbox = ParaSandBox:GetSandBox("script/kids/pw_sandbox_file.lua");
 		--sandbox:Reset();
 		--ParaSandBox.ApplyToWorld(sandbox);
-		
 	else
 		if(Map3DSystem.World.worldzipfile) then
 			ParaAsset.CloseArchive(Map3DSystem.World.worldzipfile); 
@@ -78,13 +100,13 @@ function Map3DSystem.UI.LoadWorld.LoadWorldImmediate(worldpath, bPerserveUI, bHi
 	
 	Map3DSystem.world:UseDefaultFileMapping();
 	
-	if(ParaIO.DoesAssetFileExist(Map3DSystem.world.sConfigFile, true)) then
+	if (ParaIO.DoesAssetFileExist(Map3DSystem.world.sConfigFile, true)) then
 		if(Map3DSystem.UI.LoadWorld.LoadWorld(bPerserveUI, bHideProgressUI, OnProgressCallBack) == true) then
 			-- make adiministrator by default, one needs to set a different role after this function return.
 			Map3DSystem.User.SetRole("administrator");
 			return true;
 		else
-			return worldpath..L" failed loading the world."
+			return worldpath .. L" failed loading the world."
 		end
 	else
 		LOG.std(nil, "error", "LoadWorld", "unable to find file: %s", Map3DSystem.world.sConfigFile or "");

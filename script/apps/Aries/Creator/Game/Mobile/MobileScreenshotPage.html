@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="MobileScreenshotPage.lua" ><![CDATA[
+local KeepworkServiceWorld = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceWorld.lua')
+local ShareWorld = NPL.load('(gl)Mod/WorldShare/cellar/ShareWorld/ShareWorld.lua')
+local WorldExitDialog = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
+MobileScreenshotPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileScreenshotPage.lua")
+MobileScreenshotPage.OnInit()
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function OnScreenshoot()
+    MobileScreenshotPage.OnScreenshoot()
+end
+
+function OnScreenshootAgain()
+    MobileScreenshotPage.OnScreenshootAgain()
+end
+
+function OnSure()
+    MobileScreenshotPage.OnSure()
+end
+
+function test()
+end
+]]></script>
+<pe:if condition="<%=MobileScreenshotPage.page_type == 'show_screenshot'%>">
+    <pe:container onclick="test" alignment="_fi" width="100%" height="100%" style="background-color: #000000a5;">
+        <pe:container alignment="_ct" style="margin-left:-446px;margin-top:-308px;width: 892px;height:616px;background:;">
+            <div style="width: 892px;height: 510px;background: url(Texture/Aries/Creator/keepwork/Mobile/saveworld/bg1_128x128_32bits.png#0 0 128 128:40 40 40 40);">
+                <pe:container zorder="-2" style="position: relative; margin-left: 7px;margin-top: 6px;width: 877px;height: 498px;background-color: #ffffff;"></pe:container>
+                <img style="position: relative; margin-left: 7px;margin-top: 6px;" zorder="-1" name="WorldImage" width="877" height="498" />
+            </div>
+    
+            <div style="margin-top: 15px;">
+                <div style="float: left; margin-left: 447px;width: 224px;height: 80px;">
+                    <div onclick="OnScreenshootAgain" style="position: relative; width: 224px;height: 80px;background: url(Texture/Aries/Creator/keepwork/Mobile/saveworld/bt3_128x80_32bits.png#0 0 128 80:40 40 30 30)"></div>
+                    <pe:container ClickThrough="true" zorder="1" style="position: relative;width: 224px;height: 80px;background: ;">
+                        <div style="float: left;margin-left: 32px;margin-top: 24px; width: 32px;height: 32px;background: url(Texture/Aries/Creator/keepwork/Mobile/saveworld/icon4_32x32_32bits.png#0 0 32 32)"></div>
+                        <div style="float: left;margin-left: 16px;margin-top: 23px; width: 120px;height: 40px;font-size: 26px;base-font-size:26px;color: #000000;font-weight: bold;">重新截屏</div>
+                    </pe:container>
+                </div>
+                <div style="float: left; margin-left: 50px; width: 168px;height: 80px;">
+                    <div onclick="OnSure" style="position: relative;  width: 168px;height: 80px;background: url(Texture/Aries/Creator/keepwork/Mobile/saveworld/bt4_128x80_32bits.png#0 0 128 80:40 40 30 30);"></div>
+                    <pe:container ClickThrough="true" zorder="1" style="position: relative;width: 224px;height: 80px;background: ;">
+                        <div style="float: left;margin-left: 32px;margin-top: 25px; width: 32px;height: 32px;background: url(Texture/Aries/Creator/keepwork/Mobile/saveworld/icon5_32x32_32bits.png#0 0 32 32)"></div>
+                        <div style="float: left;margin-left: 12px;margin-top: 23px; width: 120px;height: 40px;font-size: 26px;base-font-size:26px;color: #000000;font-weight: bold;">确认</div>
+                    </pe:container>
+                </div>
+            </div>
+        </pe:container>
+    </pe:container>
+</pe:if>
+
+<pe:if condition="<%=MobileScreenshotPage.page_type == 'to_screenshot'%>">
+    <pe:container ClickThrough = true alignment="_fi" width="100%" height="100%" style="background:;">
+        <pe:container alignment="_rt" style="margin-right: 30px;margin-top: 26px; width: 40px;height:46px;background:;">
+            <div onclick="ClosePage" style="width: 40px;height: 46px;background: url(Texture/Aries/Creator/keepwork/Mobile/common/win_bt1_40x46_32bits.png#0 0 40 46);">
+            </div>
+        </pe:container>
+        <pe:container alignment="_ctb" style="margin-left:0px;margin-top:-68px;width: 186px;height: 96px;background:;">
+            <div style="width: 186px;height: 96px;">
+                <div onclick="OnScreenshoot" style="position: relative; width: 186px;height: 96px;background: url(Texture/Aries/Creator/keepwork/Mobile/saveworld/bt2_128x96_32bits.png#0 0 128 96:40 40 30 30);"></div>
+                <pe:container ClickThrough="true" zorder="1" style="position: relative;width: 186px;height: 96px;background: ;">
+                    <div style="float: left;margin-left: 40px;margin-top: 34px; width: 32px;height: 32px;background: url(Texture/Aries/Creator/keepwork/Mobile/saveworld/icon2_32x32_32bits.png#0 0 32 32)"></div>
+                    <div style="float: left;margin-left: 10px;margin-top: 30px; width: 60px;height: 40px;font-size: 28px;base-font-size:28px;color: #ffffff;">截屏</div>
+                </pe:container>
+            </div>
+        </pe:container>
+    </pe:container>
+</pe:if>
+</pe:mcml>
+</body>
+</html>

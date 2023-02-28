@@ -102,6 +102,17 @@ function isEmailRead(index)
     return false   
 end
 
+function isLessonEmail()
+    local num = #EmailManager.email_list
+    for i = 1,num do
+        local id = EmailManager.email_list[i].id
+        if id == Email.select_email_idx and EmailManager.IsTutorialEmail(id) then
+            return true
+        end
+    end 
+    return false  
+end
+
 function isEmailSelect(index)
     return Email.select_email_idx == index
 end
@@ -137,6 +148,7 @@ end
 cur_email_content = EmailManager.cur_email_content and EmailManager.cur_email_content[1] or {}
 function isShowContent()
     local isShow = cur_email_content~=nil and #EmailManager.cur_email_content>0 
+    --print("isShow==========",isShow)
     return isShow
 end
 
@@ -163,7 +175,7 @@ function getRewardIcon(gsId)
     return icon
 end
 
-function getEmailContent(index)
+function EmailContent(index)
     if index == nil then
         return #Email.conten_data
     else
@@ -189,6 +201,7 @@ function ClickName(name, mcmlNode)
         username = msg.authorUsername
     end
     if username and data.interaction_type ~= Email.InteractionType.wechat_like then
+        ClosePage()
         local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
         user_page.ShowUserInfoPage({username=username});
     end
@@ -208,6 +221,10 @@ function CanShowRedTip(type)
         return EmailManager.IsHaveNew()
     end
     return count > 0
+end
+
+function OnClickGoLesson()
+    Email.OnClickGoLesson()
 end
 
 ]]></script>
@@ -287,16 +304,18 @@ end
                                 <div style="margin-top: -20px;margin-left: 340px; font-size: 14px;base-font-size: 14px;color: #141717;"><%=getTime()%></div>
                                 <div style="width: 530px; height: 246px; margin-top: 7px;">
                                     <pe:gridview  ItemsPerLine="1" AllowPaging="false" CellPadding="0"  DefaultNodeHeight="160"
-                                        DataSource="<%=getEmailContent%>">
+                                        DataSource="<%=EmailContent%>">
                                         <Columns>
-                                            <div style="margin-top: 20px; min-height: 160px; margin-left: 36px;width: 466px;font-size: 14px;base-font-size: 14px;color: #141717;">
-                                                <%=getEx()%>
-                                            </div>           
+                                            <div style="margin-top: 20px; min-height: 160px; margin-left: 36px;width: 466px;">
+                                                <div style="position: relative; font-size: 14px;base-font-size: 14px;color: #141717;">
+                                                    <%=getEx()%>
+                                                </div> 
+                                            </div>
                                         </Columns>
                                     </pe:gridview>
                                 </div>
                             </div>
-                            <div style="width: 500px; height: 2px; margin-left: 516px; margin-top: 20px; background: url(Texture/Aries/Creator/keepwork/Email/fengexian_32bits.png#0 0 4 2:2 1 3 0);"></div>
+                            <div style="width: 500px; height: 2px; margin-left: 16px; margin-top: 20px; background: url(Texture/Aries/Creator/keepwork/Email/fengexian_32bits.png#0 0 4 2);"></div>
                             <div name ="email_reward" style="width: 466px; height: 100px; float: left;">
                                 <pe:gridview name="extra_reward_view" DataSource="<%=getReward%>" ItemsPerLine="6" AllowPaging="false" CellPadding="6"  DefaultNodeHeight="0">
                                     <Columns>
@@ -308,13 +327,19 @@ end
                                 </pe:gridview>
                             </div>
                             <div style="width: 466px; height: 100px;  margin-left: 40px;">
-                                <pe:if condition='<%=isShowEmailGet()%>'>
-                                    <input type="button" value="删除" onclick="OnClickDelete" style="margin-left: 170px;width: 134px; height: 54px; background: url(Texture/Aries/Creator/keepwork/Email/btn_lv_134X54_32bits.png#0 0 134 54);"/>
-                                    <input type="button" value="领取" onclick="OnClickGet" style="margin-left: 20px; width: 134px; height: 54px; background: url(Texture/Aries/Creator/keepwork/Email/btn_huang_134X54_32bits.png#0 0 134 54);"/>
+                                <pe:if condition="<%=isLessonEmail()%>">
+                                    <input onclick="OnClickGoLesson" type="button" value='<%="开始上课"%>' style="margin-left: 120px; margin-top: -40px; font-size: 22px; base-font-size: 22px; font-weight: bold; width: 211px; height: 69px; background: url(Texture/Aries/Creator/keepwork/Email/btn_huang_134X54_32bits.png#0 0 134 54:60 20 60 20); " />
                                 </pe:if>
-                                <pe:if condition='<%=not isShowEmailGet()%>'>
-                                    <input type="button" value="删除" onclick="OnClickDelete" style="margin-left: 170px;width: 134px; height: 54px; background: url(Texture/Aries/Creator/keepwork/Email/btn_lv_134X54_32bits.png#0 0 134 54);"/>
+                                <pe:if condition="<%=not isLessonEmail()%>">
+                                    <pe:if condition='<%=isShowEmailGet()%>'>
+                                        <input type="button" value="删除" onclick="OnClickDelete" style="margin-left: 170px;width: 134px; height: 54px; background: url(Texture/Aries/Creator/keepwork/Email/btn_lv_134X54_32bits.png#0 0 134 54);"/>
+                                        <input type="button" value="领取" onclick="OnClickGet" style="margin-left: 20px; width: 134px; height: 54px; background: url(Texture/Aries/Creator/keepwork/Email/btn_huang_134X54_32bits.png#0 0 134 54);"/>
+                                    </pe:if>
+                                    <pe:if condition='<%=not isShowEmailGet()%>'>
+                                        <input type="button" value="删除" onclick="OnClickDelete" style="margin-left: 170px;width: 134px; height: 54px; background: url(Texture/Aries/Creator/keepwork/Email/btn_lv_134X54_32bits.png#0 0 134 54);"/>
+                                    </pe:if>
                                 </pe:if>
+                                
                             </div>
                         </pe:if>                        
                     </div>

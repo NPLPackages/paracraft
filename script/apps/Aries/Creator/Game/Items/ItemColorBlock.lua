@@ -319,7 +319,7 @@ function ItemColorBlock:mousePressEvent(event)
 	if(not self:HasColorData()) then
 		return
 	end
-	if(event.alt_pressed and not event.shift_pressed and event:button() == "left") then
+	if(event.alt_pressed and not event.shift_pressed and not event.ctrl_pressed and event:button() == "left") then
 		event:accept();
 		self:PickPenColorAtMouse();
 	end

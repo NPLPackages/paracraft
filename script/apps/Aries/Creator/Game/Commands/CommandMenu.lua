@@ -107,7 +107,11 @@ Commands["menu"] = {
 				-- NPL.load("(gl)script/apps/Aries/Creator/Game/Login/InternetLoadWorld.lua");
 				-- local InternetLoadWorld = commonlib.gettable("MyCompany.Aries.Creator.Game.Login.InternetLoadWorld");
 				-- InternetLoadWorld.ShowPage(true);
-
+				if System.options.channelId_431 then
+					local EducateProjectList = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProjectList.lua")
+        			EducateProjectList.ShowPage()
+					return
+				end
 				GameLogic.GetFilters():apply_filters("cellar.opus.show");
 			elseif(name == "file.export") then
 				GameLogic.RunCommand("export");
@@ -203,6 +207,9 @@ Commands["menu"] = {
 			elseif(name == "window.friend") then
 				local FriendsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Friend/FriendsPage.lua");
 				FriendsPage.Show();
+			elseif(name == "window.email") then
+				local Email = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/Email.lua");
+				Email.Show();
 			elseif(name == "window.sharemod") then
 				local ShareBlocksPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ShareBlocksPage.lua");
 				ShareBlocksPage.ShowPage()
@@ -213,7 +220,7 @@ Commands["menu"] = {
 				SkinPage.ShowPage();
 				]]
 			elseif(name == "window.mall") then
-				local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPage.lua");
+				local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
 				KeepWorkMallPage.Show();
 			elseif(name == "window.userbag") then
 				local UserBagPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserBagPage.lua");
@@ -284,9 +291,12 @@ Commands["menu"] = {
 								else
 									-- RedSummerCampMainWorldPage.SetOpenFromCommandMenu(true)
 									-- RedSummerCampMainWorldPage.Show();
-								
 									RedSummerCampCourseScheduling.ShowView()
-									RedSummerCampPPtPage.OpenLastPPtPage(true)
+									if RedSummerCampPPtPage.last_course_data then
+										RedSummerCampPPtPage.SetIsReturnOpenPage(true)
+										RedSummerCampPPtPage.OpenLastPPtPage(true, true)
+									end
+	
 								end
 							end
 						end
@@ -331,6 +341,10 @@ Commands["menu"] = {
 			end
 		elseif(name == "share.panoramasharing") then
 			GameLogic.GetFilters():apply_filters("show_panorama");
+		elseif(name == "share.video_or_panorama") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/VideoSharingPage.lua");
+			local VideoSharingPage = commonlib.gettable("MyCompany.Aries.Game.Movie.VideoSharingPage");
+			VideoSharingPage.CheckShow();
 		elseif(name:match("^community")) then
 			local username = System.User.keepworkUsername
 			if(username) then

@@ -18,19 +18,19 @@ EditParentLinkPage.OnInit();
         <%=L"请输入骨骼名字:"%><%=EditParentLinkPage:GetLastSelectedBoneName()%>
     </div>
     <div>
-        <input type="text" uiname="EditParentLinkPage.target" name="target" style="height:25px;" EmptyText='<%=L"输入骨骼名字"%>' />
+        <input type="text" auto_virtual_keyboard="true" uiname="EditParentLinkPage.target" name="target" style="height:25px;" EmptyText='<%=L"输入骨骼名字"%>' />
     </div>
     <div style="margin-top:5px">
         <%=L"位置: x,y,z"%>
     </div>
     <div>
-        <input type="text" uiname="EditParentLinkPage.pos" name="pos" style="height:25px;" EmptyText="0,0,0" />
+        <input type="text" auto_virtual_keyboard="true" uiname="EditParentLinkPage.pos" name="pos" style="height:25px;" EmptyText="0,0,0" />
     </div>
     <div style="margin-top:5px">
         <%=L"旋转: roll,pitch,yaw"%>
     </div>
     <div>
-        <input type="text" uiname="EditParentLinkPage.rot" name="rot" style="height:25px;" EmptyText="0,0,0"/>
+        <input type="text" auto_virtual_keyboard="true" uiname="EditParentLinkPage.rot" name="rot" style="height:25px;" EmptyText="0,0,0"/>
     </div>
     <div style="margin-top:5px">
         <input type="checkbox" uiname="EditParentLinkPage.use_rot" name="use_rot" style="margin-top:2px;" checked="checked" /><div style="float:left;margin-left:5px;" for="use_rot"><%=L"跟随父节点旋转"%> </div>

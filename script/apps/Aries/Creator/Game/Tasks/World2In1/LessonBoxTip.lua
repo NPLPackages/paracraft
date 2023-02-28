@@ -27,7 +27,6 @@ local LessonBoxCompare = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Worl
 local World2In1 = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/World2In1.lua");
 local MovieManager = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieManager");
 local MovieClipTimeLine = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipTimeLine");
-local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
 
 NPL.load("(gl)script/apps/Aries/Creator/Game/Movie/MovieClipController.lua");
 local MovieClipController = commonlib.gettable("MyCompany.Aries.Game.Movie.MovieClipController");
@@ -160,12 +159,16 @@ function LessonBoxTip.ShowView()
             height = 0,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);
+    if params._page then
+        page = params._page
+    end
+    
     LessonBoxTip.UpdateCheckBtnScale()
     LessonBoxTip.RegisterEvent()
     commonlib.TimerManager.SetTimeout(function ()
         LessonBoxTip.InitTeacherPlayer()
     end, 100);
-    EscDock.ShowView(false)
+    GameLogic.GetFilters():apply_filters("update_dock",true);
     MovieClipController.OnClose()
 end
 
@@ -213,9 +216,14 @@ function LessonBoxTip.InitTeacherPlayer()
                 player:SetField("HeadUpdownAngle", 0.3);
                 player:SetField("HeadTurningAngle", 0);
 
-                local file = "character/CC/02human/paperman/principal.x"
-                if lessonConfig.lesson_type == "anim" then
-                    file = "character/CC/artwar/movie/girl_ground_service.x"
+                local file = ""
+                if lessonConfig.teacher_asset_file then
+                    file = lessonConfig.teacher_asset_file or ""
+                else
+                    file = "character/CC/02human/paperman/principal.x"
+                    if lessonConfig.lesson_type == "anim" then
+                        file = "character/CC/02human/paperman/Female_teachers.x"
+                    end
                 end
                 player:SetField("assetfile",file)
             end
@@ -256,7 +264,7 @@ function LessonBoxTip.AddOperateCount(count)
     LessonBoxTip.m_nCreateBoxCount = LessonBoxTip.m_nCreateBoxCount + 1
 end
 --/select 18870,13,19151(-19,1,-19)
-function LessonBoxTip.InitLessonConfig(config)
+function LessonBoxTip.InitLessonConfig(config, is_only_init)
     if config then
         lessonConfig = commonlib.copy(config)
         LessonBoxTip.is_pass_lesson = config.is_pass_lesson
@@ -284,7 +292,7 @@ function LessonBoxTip.InitLessonConfig(config)
         
         -- echo(lessonConfig.taskCnf,true)
         -- print("maxstage============",LessonBoxTip.m_nMaxStageIndex,#lessonConfig.taskCnf)
-        LessonBoxTip.PrepareStageScene()
+        LessonBoxTip.PrepareStageScene(is_only_init)
     end
 end
 
@@ -300,7 +308,7 @@ end
 local Isprepare = false
 local isStopMovieBySelf = false
 --18663,12,19336(49,1,20)
-function LessonBoxTip.PrepareStageScene()
+function LessonBoxTip.PrepareStageScene(is_only_init)
     if not lessonConfig then
         GameLogic.AddBBS(nil,"课程初始化失败")
         return 
@@ -309,10 +317,13 @@ function LessonBoxTip.PrepareStageScene()
     isFinishStage = false
     isStopMovieBySelf = false
     LessonBoxTip.EndTip()
+    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
+    local moivePos = taskCnf.moviePos
+
     local stagePos = lessonConfig.teachStage
-    if stagePos[1] then
+    if stagePos[1] and moivePos[1] then
         GameLogic.GetPlayer():MountEntity(nil);
-    GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
+        GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
     end
     local lookPos = lessonConfig.lookPos
     if lookPos then
@@ -323,14 +334,15 @@ function LessonBoxTip.PrepareStageScene()
     -- print("runcommand showMask===============start")
     GameLogic.RunCommand("/sendevent showMask")
     -- print("runcommand showMask===============end")
-    local taskCnf = lessonConfig.taskCnf[LessonBoxTip.m_nCurStageIndex]
-    local moivePos = taskCnf.moviePos
+
     -- if moivePos[1] then
 
-    -- end
-    GameLogic.RunCommand("/sendevent hideNpc")
-    GameLogic.GetCodeGlobal():BroadcastTextEvent("playstagemovie", {config = taskCnf});
-    GameLogic.RunCommand("/ggs user hidden");
+    -- end 
+    if not is_only_init then
+        GameLogic.RunCommand("/sendevent hideNpc")
+        GameLogic.GetCodeGlobal():BroadcastTextEvent("playstagemovie", {config = taskCnf});
+        GameLogic.RunCommand("/ggs user hidden");
+    end
 end
 
 
@@ -369,6 +381,10 @@ function LessonBoxTip.StartCurStage()
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posMy[1],posMy[2],posMy[3],startTemp))
         GameLogic.RunCommand(string.format("/loadtemplate %d,%d,%d %s",posTeacher[1],posTeacher[2],posTeacher[3],endTemp))
         local stagePos = lessonConfig.myStage
+        if lessonConfig.is_lx and lessonConfig.myLxStage then
+            stagePos = lessonConfig.myLxStage
+        end
+
         if stagePos[1] then
             GameLogic.GetPlayer():MountEntity(nil);
             GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
@@ -467,7 +483,7 @@ function LessonBoxTip.RegisterHooks()
 	GameLogic.events:AddEventListener("CreateBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip, "LessonBoxTip");
     GameLogic.events:AddEventListener("CreateDiffIdBlockTask", LessonBoxTip.OnCreateBlockTask, LessonBoxTip, "LessonBoxTip");
     GameLogic.events:AddEventListener("DestroyBlockTask", LessonBoxTip.OnDestroyBlockTask, LessonBoxTip, "LessonBoxTip");
-    GameLogic.GetFilters():add_filter("lessonbox_change_region_blocks",function(blocks)
+    GameLogic.GetFilters():add_filter("lessonbox_change_region_blocks",function(blocks, is_delete)
         -- echo(commonlib.debugstack(),true)
         -- print("block num changes============",blocks and #blocks or 0)
         -- echo(blocks)
@@ -477,6 +493,7 @@ function LessonBoxTip.RegisterHooks()
             LessonBoxTip.AddOperateCount(#blocks)
         end
         
+        return blocks, is_delete
     end)
 end
 
@@ -872,9 +889,10 @@ function LessonBoxTip.ReplayMovie()
         if lookPos then
             GameLogic.RunCommand(string.format("/lookat %d,%d,%d",lookPos[1],lookPos[2],lookPos[3]))
         end
-        GameLogic.GetCodeGlobal():BroadcastTextEvent("playstagemovie", {config = taskCnf,isOnlyPlay = true});
+        GameLogic.GetCodeGlobal():BroadcastTextEvent("playstagemovie", {config = taskCnf,isOnlyPlay = true, isInLesson=true});
     end
 end
+
 --请按照园长的讲解，在自己的区域也练习一遍吧！
 function LessonBoxTip.ResumeLessonUI()
     
@@ -886,6 +904,9 @@ function LessonBoxTip.ResumeLessonUI()
     GameLogic.RunCommand("/sendevent showNpc")
     GameLogic.RunCommand("/sendevent showMask")
     local stagePos = lessonConfig.myStage
+    if lessonConfig.is_lx and lessonConfig.myLxStage then
+        stagePos = lessonConfig.myLxStage
+    end
     if stagePos[1] then
         GameLogic.RunCommand(string.format("/goto %d,%d,%d",stagePos[1],stagePos[2],stagePos[3]))
     end
@@ -1213,18 +1234,26 @@ function LessonBoxTip.SetErrBlockTip()
     local posSrc = LessonBoxTip.SrcBlockOrigin
     local block = LessonBoxTip.NeedChangeBlocks[checkIndex]
     local startPos = posSrc or lessonConfig.regionOther.pos
+    local myRegionPos = LessonBoxTip.CreatePos or lessonConfig.regionMy.pos
     if block then
         if page then
             page:SetValue("role_tip", "");
         end
         local x,y,z = startPos[1]+block[1],startPos[2]+block[2],startPos[3]+block[3]
+        -- 我模板中的方块位置
+        local my_block_x,my_block_y,my_block_z = myRegionPos[1]+block[1],myRegionPos[2]+block[2],myRegionPos[3]+block[3]
         local blockId,blockData = BlockEngine:GetBlockIdAndData(x,y,z)
+        local myblockId,myblockData = BlockEngine:GetBlockIdAndData(my_block_x,my_block_y,my_block_z)
 
         -- print("blockId========",blockId,type(blockId),x,y,z)
         local block_item = ItemClient.GetItem(blockId);
-        if blockId == 0 or block_item == nil then
+        if blockId == 0 or block_item == nil or blockId == myblockId then
             -- GameLogic.RunCommand(string.format("/goto %d %d %d",x,y,z))
             local strErrTip = string.format("红色方框里面不应该有方块，请将其清除。")
+            if blockId ~= 0 and blockId == myblockId then
+                strErrTip = "红色方框中的方块是正确的，但是它的颜色、方向或者状态不对，请仔细观察并调整"
+            end
+            
             LessonBoxTip.PlayTextByTeacher(strErrTip)
             local txtErrTip = ParaUI.GetUIObject("lessonbox_err_text")
             if not txtErrTip:IsValid() then
@@ -1434,6 +1463,20 @@ function LessonBoxTip.PlayLessonMusic(strType)
     end
 end
 
+function LessonBoxTip.DelayUpdateTeacherSay()
+    if(LessonBoxTip.teacher_say_timer) then
+        LessonBoxTip.teacher_say_timer:Change();
+    end
+
+    LessonBoxTip.teacher_say_timer = LessonBoxTip.teacher_say_timer or commonlib.Timer:new({callbackFunc = function(timer)
+        if lessonConfig then
+            local str = lessonConfig.teacher_say or ""
+            -- local str = string.format(LessonBoxTip.NomalTip.movietarget, lesson_desc)
+            LessonBoxTip.SetTaskTip(nil, str)
+        end
+	end})
+	LessonBoxTip.teacher_say_timer:Change(4000, nil);
+end
 
 function LessonBoxTip.SetAnimErrorTip()
     local result_list = LessonBoxTip.CompareMovieResult
@@ -1447,6 +1490,7 @@ function LessonBoxTip.SetAnimErrorTip()
     if result_list["actor_parent"] then
         say_text = string.format("【%s】设定错误", LessonBoxTip.CompareTypeToDesc["actor_parent"])
         page:SetValue("role_tip", say_text)
+        LessonBoxTip.DelayUpdateTeacherSay()
         return
     end
 
@@ -1501,6 +1545,7 @@ function LessonBoxTip.SetAnimErrorTip()
 
     if say_text then
         page:SetValue("role_tip", say_text)
+        LessonBoxTip.DelayUpdateTeacherSay()
     end
 end
 
@@ -1609,5 +1654,9 @@ end
 function LessonBoxTip.PlayTextByTeacher(text)
     local lesson_type = lessonConfig.lesson_type or ""
     local voice_type = VoiceType[lesson_type] or 10006
+    if lessonConfig.voice_type then
+        voice_type = lessonConfig.voice_type
+    end
+    
     SoundManager:PlayText(text,voice_type)
 end

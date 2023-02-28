@@ -75,6 +75,7 @@ function EnterTextDialog.ShowPage(text, OnClose, default_text, type_, options, s
 	end
 	EnterTextDialog.options = options;
 	showParams = showParams or {};
+	EnterTextDialog.auto_virtual_keyboard = showParams.auto_virtual_keyboard
 	local params = {
 		url = showParams.url or "script/apps/Aries/Creator/Game/GUI/EnterTextDialog.html", 
 		name = "EnterTextDialog.ShowPage", 

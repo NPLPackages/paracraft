@@ -1,7 +1,8 @@
 --[[
 Title: The quick word menu for keepwork
-Author(s): leio
-Date: 2020/5/6
+Author(s): leio, big
+CreateDate: 2020.5.6
+ModifyDate: 2022.8.19
 Desc:  
 Use Lib:
 -------------------------------------------------------
@@ -130,24 +131,30 @@ end
 
 -- send quick word
 function KpQuickWord.SendQuickword(node)
-    if(KpChatChannel.worldId)then
+    if (KpChatChannel.worldId) then
         local channel;
+
         if(node.RawNode and node.RawNode.attr and node.RawNode.attr.channel)then
             channel = ChatChannel.EnumChannels[node.RawNode.attr.channel] or channel;
         end
-        local txt;
-        if(channel == ChatChannel.EnumChannels.KpBroadCast)then
 
-            KpQuickWord.ShowPage(node.Text,function(id)
-                txt = string.format("%sID:%s",node.Text,tostring(id));
-	            ChatChannel.SendMessage(channel, nil, nil, txt, false, ChatChannel.InputTypes.FromQuickWord);
-            end)
+        local txt;
+
+        if (channel == ChatChannel.EnumChannels.KpBroadCast) then
+            KpQuickWord.ShowPage(
+				node.Text,
+				function(id)
+					txt = string.format("%sID:%s", node.Text, tostring(id));
+					ChatChannel.SendMessage(channel, nil, nil, txt, false, ChatChannel.InputTypes.FromQuickWord, id);
+            	end
+			)
         else
-            txt = string.format("%s",node.Text);
+            txt = string.format("%s", node.Text);
 	        ChatChannel.SendMessage(ChatChannel.EnumChannels.KpNearBy, nil, nil, txt, false, ChatChannel.InputTypes.FromQuickWord);
         end
     end
 end
+
 function KpQuickWord.ShowPage(words,callback)
     KpQuickWord.words = words;
     KpQuickWord.project_id = nil;

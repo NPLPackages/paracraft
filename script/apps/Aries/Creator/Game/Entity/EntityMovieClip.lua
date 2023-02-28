@@ -187,7 +187,7 @@ function Entity:FindFile(text, bExactMatch)
 					for i = 1, #(data) do
 						-- skip default actor
 						if(data[i] ~= "actor") then
-							if((bExactMatch and (data[i] == text)) or (not bExactMatch and data[i]:find(text))) then
+							if((bExactMatch and (data[i] == text)) or (not bExactMatch and data[i]:find(text, 1, true))) then
 								filename, filenames = AddToSearchResult(i, data[i], filename, filenames)
 							end
 						end
@@ -301,6 +301,22 @@ function Entity:CreateNPC()
 	end
 end
 
+--ItemStack:new():Init(block_types.names.TimeSeriesNPC, 1);
+--ItemStack:new():Init(block_types.names.TimeSeriesNPC, 1,serverdata);
+function Entity:CreateNpcByItemStack(itemStack)
+	if not itemStack or itemStack.id ~= block_types.names.TimeSeriesNPC then
+		return 
+	end
+	if(self.inventory:IsFull()) then
+		self.inventory:SetSlotCount(self.inventory:GetSlotCount()+5);
+		self:GetInventoryView():UpdateFromInventory();
+	end
+	local bAdded, slot_index = self.inventory:AddItem(itemStack, nil, nil, true);
+	if(slot_index) then
+		return self.inventory:GetItem(slot_index);
+	end
+end
+
 function Entity:CreateCamera()
 	local item = ItemStack:new():Init(block_types.names.TimeSeriesCamera, 1);
 	local bAdded, slot_index = self.inventory:AddItem(item, nil, nil, true);
@@ -392,6 +408,7 @@ function Entity:OpenEditor(editor_name, entity)
 			MovieClipEditors.SetDefaultMovieClipPlayer()
 		end
 		MovieManager:SetActiveMovieClip(movieClip);
+		GameLogic.GetFilters():apply_filters("MovieClipEditorOpened",movieClip)	
 	end)
 
 	return true;
@@ -1229,7 +1246,8 @@ function Entity:ComparePosition(entity)
 			local timeseries1 = itemStack.serverdata.timeseries
 			local timeseries2 = itemStack2.serverdata.timeseries
 			if (not timeseries1 and timeseries2) or (timeseries2 and not timeseries2)  then
-				return false				
+				diff_num = diff_num + 1
+				result[i] = 1				
 			end
 			if itemStack.id == 10061 then
 				for k,v in pairs(tempCmpKey) do
@@ -1253,7 +1271,8 @@ function Entity:ComparePosition(entity)
 								end						
 							end
 							if not isSame then
-								return isSame
+								diff_num = diff_num + 1
+								result[i] = 1
 							end
 						end
 					end						
@@ -1429,7 +1448,8 @@ function Entity:CompareActorBones(entity)
 	end
 	local diff_num = 0
 	local result = {}
-	for i=1, self.inventory:GetSlotCount() do
+	local slotCount = self.inventory:GetSlotCount()
+	for i=1, slotCount do
 		local itemStack = self.inventory:GetItem(i);
 		local itemStack2 = entity.inventory:GetItem(i)
 		if(itemStack and itemStack.count > 0 and itemStack.serverdata) and (itemStack2 and itemStack2.count > 0 and itemStack2.serverdata) then
@@ -1456,8 +1476,8 @@ function Entity:CompareActorBones(entity)
 						keys[#keys] = k
 					end
 					local num = #keys
-					for i=1,num do
-						local curKey = keys[i]
+					for j=1,num do
+						local curKey = keys[j]
 						local myBoneDts = myCnf[curKey].data
 						local otherBoneDts = otherCnf[curKey].data
 						if string.find(curKey,"rot") then
@@ -1465,15 +1485,38 @@ function Entity:CompareActorBones(entity)
 							local mathlib = commonlib.gettable("mathlib");
 							NPL.load("(gl)script/ide/math/Quaternion.lua");
 							local Quaternion = commonlib.gettable("mathlib.Quaternion");
-							local temp1,temp2,temp3 = mathlib.QuatToEuler(myBoneDts) --Quaternion:new(myBoneDts):ToEulerAngles()
+							local temp1,temp2,temp3 = mathlib.QuatToEuler(myBoneDts)
 							myBoneDts = {temp1,temp2,temp3 }
-							temp1,temp2,temp3 = mathlib.QuatToEuler(otherBoneDts) --Quaternion:new(otherBoneDts):ToEulerAngles()
+							temp1,temp2,temp3 = mathlib.QuatToEuler(otherBoneDts)
 							otherBoneDts = {temp1,temp2,temp3}
 							local dataNum = #myBoneDts
 							for dataIndex = 1,dataNum do 
 								local rotDis = myBoneDts[dataIndex] - otherBoneDts[dataIndex]
 								rotDis = rotDis * 180 /math.pi
-								if rotDis > 35 or rotDis < -35 then
+								if math.abs(rotDis) > 35 then
+									diff_num = diff_num + 1
+									result[i] = 1
+								end
+							end
+						end
+						if string.find(curKey,"scale") then
+							local dataNum = #myBoneDts
+							for dataIndex = 1,dataNum do 
+								local scaleDis = myBoneDts[dataIndex] - otherBoneDts[dataIndex]
+								if math.abs(scaleDis) > 0.1 then
+									diff_num = diff_num + 1
+									result[i] = 1
+								end
+							end
+						end
+						if string.find(curKey,"trans") then
+							local tranDis = 0.5
+							local dataNum = #myBoneDts
+							for dataIndex = 1,dataNum do 
+								local trans1 = myBoneDts[dataIndex] 
+								local trans2 = otherBoneDts[dataIndex]
+								--x,y,z
+								if math.abs(trans1[1] - trans2[1]) > tranDis or math.abs(trans1[2] - trans2[2]) > tranDis or math.abs(trans1[3] - trans2[3]) > tranDis then
 									diff_num = diff_num + 1
 									result[i] = 1
 								end
@@ -1719,14 +1762,13 @@ end
 function Entity:CheckRad(rad_1, rad_2) 
 
 	-- 先转成正的
-	if rad_1 < 0 then
+	if rad_1 <= 0 then
 		rad_1 = math.pi * 2 + rad_1
 	end
 
-	if rad_2 < 0 then
+	if rad_2 <= 0 then
 		rad_2 = math.pi * 2 + rad_2
 	end
-
 	local max_value = rad_1 + 0.3
 	local min_value = rad_1 - 0.3
 	if rad_2 >= min_value and rad_2 <= max_value then
@@ -1876,9 +1918,9 @@ function Entity:CompareActorParent(entity)
 								isSame = false
 								break
 							end
-							if isSame and  (math.abs(myCnf[i].pos[1] - otherCnf[i].pos[1]) > 3 
-								or math.abs(myCnf[i].pos[2] - otherCnf[i].pos[2]) > 3  
-								or math.abs(myCnf[i].pos[3] - otherCnf[i].pos[3]) > 3) then
+							if isSame and  (math.abs(myCnf[i].pos[1] - otherCnf[i].pos[1]) > 0.2 
+								or math.abs(myCnf[i].pos[2] - otherCnf[i].pos[2]) > 0.2  
+								or math.abs(myCnf[i].pos[3] - otherCnf[i].pos[3]) > 0.2) then
 								isSame = false
 								break
 							end

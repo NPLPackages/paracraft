@@ -36,3 +36,14 @@ HttpWrapper.default_prepFunc,
 -- Post Processor
 HttpWrapper.default_postFunc
 )
+
+
+-- 用户个人网盘上传token
+HttpWrapper.Create("keepwork.privateToken.getToken", "%MAIN%/ts-storage/files/:id/token", "GET", true, nil,
+-- PreProcessor
+HttpWrapper.default_prepFunc,
+-- Post Processor
+HttpWrapper.default_postFunc
+)
+
+HttpWrapper.Create("keepwork.rawUrlById.get", "%MAIN%/ts-storage/files/:id/rawurl", "GET", true)

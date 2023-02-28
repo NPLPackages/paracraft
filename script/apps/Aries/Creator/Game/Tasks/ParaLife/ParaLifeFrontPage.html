@@ -1,0 +1,42 @@
+<pe:mcml>
+<script type="text/npl" refresh="false" src="ParaLifeFrontPage.lua">
+ParaLife = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLife")
+ParaLifeFrontPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeFrontPage")
+ParaLifeFrontPage.OnInit()
+function dummy()
+end
+function GetBackgroundImageStyle()
+    local filename = ParaLifeFrontPage.GetFrontPageImageFilename()
+    if(filename) then
+        return format("background:url(%s)", filename)
+    else
+        return "background-color:#000000a0"
+    end
+end
+</script>
+<pe:container name="frontpage" onclick="dummy" style="position:relative;background:;" alignment="_fi" width="100%" height="100%">
+    <pe:container zorder ="-1" style='<%=format("position:relative;%s", GetBackgroundImageStyle())%>' alignment="_fi" width="100%" height="100%" />
+    <pe:container alignment="_ct" style="width:512px;height:200px;background:;margin-left:-190px;margin-top:-100px;" >
+        <pe:if condition="<%=ParaLife:IsNoEdit() %>">
+            <div style="margin-left:130px;margin-top:70px;">
+                <div style="position:relative;margin-left:48px;background:url(Texture/Aries/Creator/paralife/title_32bits.png:37 20 24 40);font-weight:bold;min-width:100px;height:64px;color:#ffffff;font-size:18px;padding-left:40px;padding-top:7px;padding-right:40px;margin-top:-64px;">play</div>
+                <input type="button" name="play" onclick="ParaLifeFrontPage.OnClickPlay" style="width:128px;height:128px;background:url(Texture/Aries/Creator/paralife/play_32bits.png)"/>
+            </div>
+        </pe:if>
+        <pe:if condition="<%= not ParaLife:IsNoEdit() %>">
+            <div style="margin-left:100px;margin-top:70px;">
+                <div style="position:relative;margin-left:48px;background:url(Texture/Aries/Creator/paralife/title_32bits.png:37 20 24 40);font-weight:bold;min-width:100px;height:64px;color:#ffffff;font-size:18px;padding-left:40px;padding-top:7px;padding-right:40px;margin-top:-64px;">play</div>
+                <input type="button" name="play" onclick="ParaLifeFrontPage.OnClickPlay" style="width:128px;height:128px;background:url(Texture/Aries/Creator/paralife/play_32bits.png)"/>
+                <input type="button" name="create" onclick="ParaLifeFrontPage.OnClickCreate" style="margin-left:48px;width:128px;height:128px;background:url(Texture/Aries/Creator/paralife/create_32bits.png)"/>
+            </div>
+        </pe:if>
+    </pe:container>
+    <pe:container alignment="_rb" style="margin:10px;width:128px;height:128px;background:;" >
+        <!--<div style="position:relative;margin-left:-210px;margin-top:86px;width:200px;background-color:#00000060;color:#ffffff;font-size:14px;padding-left:10px;padding-right:10px">See More Apps Created by Paracraft</div>-->
+        <input type="button" onclick="ParaLifeFrontPage.OnClickShowMoreApps" name="moreApps" style="width:128px;height:128px;background:url(Texture/Aries/Creator/paralife/paraicon_32bits.png)"/>
+    </pe:container>
+    <pe:container alignment="_lb" style="margin:10px;width:300px;background:;" >
+        <div style="text-shadow:true;color:#ffffff;font-size:14px;padding-left:10px;padding-right:10px">ver 1.0 Powered by Paracraft/NPL</div>
+    </pe:container>
+</pe:container>
+</pe:mcml>

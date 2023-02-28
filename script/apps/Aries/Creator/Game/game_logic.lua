@@ -172,6 +172,14 @@ function GameLogic:ctor()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Common/UserJobStatistics.lua");
 	local UserJobStatistics = commonlib.gettable("MyCompany.Aries.Game.Common.UserJobStatistics")
 	UserJobStatistics.OnInit()
+
+	-- if GameLogic.Macros.IsDevMode() then
+	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildReplay/ReplayManager.lua");
+	local ReplayManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildReplay.ReplayManager");
+	ReplayManager:Init()
+	-- end
+
+	NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWork.lua");
 end
 
 
@@ -187,7 +195,7 @@ function GameLogic:InitAPIPath()
 
 	
 	GameLogic.DockManager = DockManager:InitSingleton()
-
+	GameLogic.DockManager:OnInit()
 	_G["GameLogic"] = GameLogic; 
 
 
@@ -880,7 +888,7 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 	end
 	NeuronManager.SaveToFile(bSaveToLastSaveFolder);
 	EntityManager.SaveToFile(bSaveToLastSaveFolder==true);
-	BroadcastHelper.PushLabel({id="GameLogic", label = format(L"保存成功 [版本:%d]", GameLogic.options:GetRevision()), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+	BroadcastHelper.PushLabel({id="GameLogic", label = format(L"本地保存成功 [版本:%d]", GameLogic.options:GetRevision()), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	-- DailyTaskManager.AchieveTask(DailyTaskManager.task_id_list.UpdataWorld)
 
 	ModManager:OnWorldSave();
@@ -888,6 +896,7 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 	GameLogic:WorldSaved(); -- signal
 
 	GameLogic.GetFilters():apply_filters("OnSaveWrold");
+	-- GameLogic.SysncHomeWorkWorld()
 end
 
 -- let a given character to play an animation. 
@@ -1694,18 +1703,6 @@ end
 -- toggle desktop view
 function GameLogic.ToggleDesktop(name)
 	if(name == "esc") then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldLoginAdapter.lua");
-		local ParaWorldLoginAdapter = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaWorld.ParaWorldLoginAdapter");
-		local projectId = GameLogic.options:GetProjectId();
-
-		-- if (projectId and tonumber(projectId) == ParaWorldLoginAdapter.MainWorldId and GameLogic.IsReadOnly()) then
-		-- 	ParaWorldLoginAdapter.ShowExitWorld(true);
-		-- else
-		-- 	NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
-		-- 	local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
-		-- 	EscFramePage.ShowPage();
-		-- end
-
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
 		local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
 		EscFramePage.ShowPage();
@@ -1889,6 +1886,10 @@ end
 
 --没有VIP不能打开功能，进行提示跳转到VIP充值界面
 function GameLogic.ShowVipGuideTip(authName)
+	if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip')==true then
+		return
+	end
+
 	local desc = L"您需要登录并成为VIP用户，才能使用此功能"
 	if authName=="UnlimitWorldsNumber" then 
 		-- L'操作被禁止了，免费用户最多只能拥有3个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。'
@@ -1900,7 +1901,7 @@ function GameLogic.ShowVipGuideTip(authName)
 			VipPage.ShowPage("create_world_guide");
 		end
 	   
-	end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right, nil, nil, nil, nil, {cancel="取消",ok="开通会员"});
+	end, _guihelper.MessageBoxButtons.OKCancel_CustomLabel_Highlight_Right, nil, nil, nil, nil, {cancel=L"取消",ok=L"开通会员"});
 end
 
 -- if the current world is social, where the current player maintains its social outfit. 
@@ -1912,7 +1913,11 @@ local errorCount = 1;
 function GameLogic.OnCodeError(errorMessage, stackInfo)
 	errorCount=errorCount+1;
 	if(errorMessage and errorCount < 10000) then
-		GameLogic.AddBBS("nplError"..(errorCount%3), errorMessage:sub(1, 100), 5000, "255 0 0");
+		if GameLogic.Macros.IsDevMode() then
+			GameLogic.AddBBS("nplError"..(errorCount%3), errorMessage:sub(1, 100), 5000, "255 0 0");
+		else
+			GameLogic.AddBBS("nplError"..(errorCount%3), L"遇到一个未知错误，请稍后再尝试", 5000, "255 0 0");
+		end
 		local date_str, time_str = commonlib.log.GetLogTimeString();
 		GameLogic.AppendChat(format("Error %d: %s %s", errorCount, date_str, time_str));
 		GameLogic.AppendChat(errorMessage);
@@ -2116,3 +2121,63 @@ function GameLogic.CheckCanLearn(type)
 	return true
 end
 
+function GameLogic.SysncHomeWorkWorld(callback,isModified)
+	local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
+	if not isHomeWorkWorld then
+		return
+	end
+	if not WorldCommon.IsModified() and not isModified then --没有修改的话，直接退出
+		if callback then
+			callback(false)
+		end
+		return
+	end
+
+	if not GameLogic.GetFilters():apply_filters('is_signed_in') then
+		GameLogic.GetFilters():apply_filters('check_signed_in', "请先登录", function(result)
+			if result == true then
+				GameLogic.SysncHomeWorkWorld(callback)
+			end
+		end)
+
+		return
+	end
+
+	local version = GameLogic.options:GetRevision()
+
+	local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
+	local curProjectId = world_data and world_data.kpProjectId
+	GameLogic.GetFilters():apply_filters('store_set', "world/currentRevision",version or 1);
+	GameLogic.AddBBS(nil,"正在提交作业")
+	if curProjectId and tonumber(curProjectId) and tonumber(curProjectId) > 0 then
+		GameLogic.GetFilters():apply_filters(
+			'service.keepwork_service_world.set_world_instance_by_pid',
+			tonumber(curProjectId),
+			function()
+				GameLogic.GetFilters():apply_filters(
+					'service.sync_to_data_source.init',
+					function(result, option)
+						if option.method == 'UPDATE-PROGRESS-FINISH' then
+							GameLogic.AddBBS(nil,"提交作业成功")
+							if callback then
+								callback(true)
+							end
+						end
+
+					end)
+			end
+		)
+	else
+		GameLogic.GetFilters():apply_filters(
+			'service.sync_to_data_source.init',
+			function(result, option)
+				if option.method == 'UPDATE-PROGRESS-FINISH' then
+					GameLogic.AddBBS(nil,"提交作业成功")
+					if callback then
+						callback(true)
+					end
+				end
+			end)
+	end
+
+end

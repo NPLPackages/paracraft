@@ -65,7 +65,7 @@ function HelpPage.ShowView()
         zorder = 2,
         -- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
         directPosition = true,
-        
+        isTopLevel = true,
         align = "_ct",
         x = -632/2,
         y = -352/2,

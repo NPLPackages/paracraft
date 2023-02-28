@@ -8,7 +8,6 @@ Use Lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyEncodePage.lua").Show();
 --]]
 local WorldKeyEncodePage = NPL.export();
-local KeepworkServiceProject = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/Project.lua")
 local WorldKeyManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/WorldKey/WorldKeyManager.lua")
 local page
 
@@ -25,9 +24,8 @@ end
 function WorldKeyEncodePage.Show(projectId)
     WorldKeyEncodePage.projectId = projectId or GameLogic.options:GetProjectId()
     local projectId = WorldKeyEncodePage.projectId
-    KeepworkServiceProject:GetProject(projectId, function(data, err)
-
-        if type(data) == 'table' then
+    GameLogic.GetFilters():apply_filters("service.keepwork_service_project.get_project",projectId,function(data,err)
+		if type(data) == 'table' then
             if WorldKeyEncodePage.DefaultData.txt_file_path == nil then
                 WorldKeyEncodePage.DefaultData.txt_file_path = string.gsub(ParaIO.GetWritablePath().."temp/Key", "/", "\\")
             end
@@ -35,8 +33,7 @@ function WorldKeyEncodePage.Show(projectId)
             WorldKeyEncodePage.world_data = data
             WorldKeyEncodePage.ShowView()
         end
-    end)
-    
+	end);    
 end
 
 function WorldKeyEncodePage.ShowView()

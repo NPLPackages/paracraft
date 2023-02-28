@@ -557,7 +557,7 @@ function LessonBoxCompare.CompareMovieAll(entitySrc,entityDest, compare_list)
 	compare_list = compare_list or MoviceCompareType
 	for key, v in pairs(compare_list) do
 		local diff_num, result = LessonBoxCompare.CompareMovie(entitySrc,entityDest,v)
-		if diff_num > 0 then
+		if type(diff_num) == "number" and diff_num > 0 then
 			result_list[v] = result
 		end
 	end

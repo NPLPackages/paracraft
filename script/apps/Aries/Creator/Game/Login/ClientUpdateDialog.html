@@ -13,8 +13,8 @@ function OnClose()
     Page:CloseWindow();
 end
 function OnClickExit()
-    if System.options.channelId=="430" then
-        ParaGlobal.ShellExecute("open", "ParaCraft.exe", "isFixMode=true", "", 1);
+    if System.options.isChannel_430 then
+        ParaGlobal.ShellExecute("open", System.options.launcherExeName, "isFixMode=true", "", 1);
     end
     commonlib.TimerManager.SetTimeout(function()  
         ParaGlobal.ExitApp();
@@ -28,6 +28,7 @@ end
 latestVersion = Page:GetRequestParam("latestVersion")
 curVersion = Page:GetRequestParam("curVersion")
 curGame = Page:GetRequestParam("curGame")
+allowSkip = Page:GetRequestParam("allowSkip")=="true"
 
 function OnClickUpdate()
     ClientUpdateDialog.OnClickUpdate()
@@ -36,6 +37,11 @@ end
 function GetBtnText()
     return ClientUpdateDialog._isDownloadFinished and "安装" or L"更新"
 end
+
+function OnClickSkip()
+    OnClose()
+end
+
 ]]></script>
 <aries:window mode="thin" width="420" title='<%=format(L"关于%s", curGame)%>' >
     <div class="default" style="margin:20px">
@@ -45,16 +51,30 @@ end
         <div style="margin-top:5px">
             <%=L"您的版本为:"%><%=Eval("curVersion")%>
         </div>
-        <div style="margin-top:10px;color:#ff6a00">
-            <div>只有最新版才能进入，请点击【更新】按钮，完成更新</div>
-            <div>或先点【退出】， 再重新启动登录器更新</div>
-        </div>
+        <pe:if condition='<%= allowSkip %>'>
+            <div style="margin-top:10px;color:#ff6a00">
+                <div>新版本更加稳定，推荐您使用最新版。</div>
+                <div>点击【更新】按钮，即可完成更新</div>
+            </div>
+        </pe:if>
+        <pe:if condition='<%= not allowSkip %>'>
+            <div style="margin-top:10px;color:#ff6a00">
+                <div>只有最新版才能进入，请点击【更新】按钮，完成更新</div>
+                <div>或先点【退出】， 再重新启动登录器更新</div>
+            </div>
+        </pe:if>
     </div>
     <hr />
     <div style="margin-top:30px;margin-bottom:30px;" class="default">
         <input type="button" value='<%=L"更新日志..." %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:100px;height:28px;" onclick="OnClickChangeLog" />    
         <pe:if condition='<%= not ClientUpdateDialog._isDownloadFinished %>'>
-            <input type="button" value='<%=L"退出" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:70px;height:28px;" onclick="OnClickExit" />
+            <pe:if condition='<%= allowSkip %>'>
+                <input type="button" value='<%=L"跳过" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:70px;height:28px;" onclick="OnClickSkip" />
+            </pe:if>
+            <pe:if condition='<%= not allowSkip %>'>
+                <input type="button" value='<%=L"退出" %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:70px;height:28px;" onclick="OnClickExit" />
+            </pe:if>
+            
         </pe:if>
         <input type="button" value='<%=GetBtnText() %>' class="mc_yellow_button_with_fillet" align="right" style="margin-right:20px;min-width:70px;height:28px;" onclick="OnClickUpdate"/>
     </div>

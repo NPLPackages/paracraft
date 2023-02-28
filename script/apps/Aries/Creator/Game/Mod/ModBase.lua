@@ -170,6 +170,12 @@ function ModBase:SetWorldData(key, data, worldpath)
 
 	local bIsExist = false;
 
+	if (not self.worldData or
+		type(self.worldData[1]) ~= 'table' or
+		not self.worldData[1]) then
+		return;
+	end
+
 	for Wkey, WItem in pairs(self.worldData[1]) do
 		if (type(WItem) == 'table' and WItem.name == key) then
 			if type(data) == 'table' then
@@ -223,6 +229,12 @@ function ModBase:GetWorldData(key, worldpath)
 	end
 
 	if (self.worldData) then
+		if (not self.worldData or
+			type(self.worldData[1]) ~= 'table' or
+			not self.worldData[1]) then
+			return;
+		end
+
 		for WKey, WValue in pairs(self.worldData[1]) do
 			if(WValue.name == key) then
 				if(WValue.attr.type == "table") then

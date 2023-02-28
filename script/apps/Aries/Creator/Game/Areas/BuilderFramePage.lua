@@ -74,14 +74,12 @@ function BuilderFramePage.OnInit(uiversion)
 	BuilderFramePage.OneTimeInit(uiversion);
 	page = document:GetPageCtrl();
 	BuilderFramePage.OnChangeCategory(nil, false);
-	GameLogic.GetFilters():remove_filter("bulid_frame_page_refresh",BuilderFramePage.RefreshPage)
-	GameLogic.GetFilters():add_filter("bulid_frame_page_refresh",BuilderFramePage.RefreshPage)
 end
 
 function BuilderFramePage.RefreshPage()
 	if(page) then
 		BlockTemplatePage.GetAllTemplatesDS(true)
-		page:Refresh(0)
+		page:Refresh(0.01)
 	end
 end
 
@@ -147,10 +145,15 @@ function BuilderFramePage.OnChangeCategory(index, bRefreshPage)
 	if(category) then
 		BuilderFramePage.Current_Item_DS = ItemClient.GetBlockDS(category.name);
 		BuilderFramePage.category_name = category.name;
+		if System.options.channelId_431 then
+			BuilderFramePage.Current_Item_DS = commonlib.filter(BuilderFramePage.Current_Item_DS,function (block)
+				return block.block_id ~= 10516 and block.block_id ~= 10517 and block.block_id ~= 10518 and block.block_id ~= 10519 and block.block_id ~= 10073
+			end)
+		end
 	end
 
 	BuilderFramePage.isSearching = false;
-	if(page) then
+	if(bRefreshPage~=false and page) then
 		page:Refresh(0);
 	end
 

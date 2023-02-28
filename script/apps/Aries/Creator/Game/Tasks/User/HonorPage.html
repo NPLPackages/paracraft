@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    HonorPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/HonorPage.lua");
+    HonorPage.OnInit()
+    function ClosePage()
+        Page:CloseWindow();
+    end
+
+    function GetCertStyle()
+        return string.format("background:url(%s#0 0 512 368);margin-top:1px;margin-left:10px;height:368;width:512;", HonorPage.honorInfo.certurl); 
+    end 
+
+    function IsShowTime()
+        return HonorPage.honorInfo.createdAt and HonorPage.honorInfo.createdAt ~= ""
+    end
+
+    function GetTime()
+        return HonorPage.honorInfo.createdAt and os.date("%Y-%m-%d", commonlib.timehelp.GetTimeStampByDateTime(HonorPage.honorInfo.createdAt)) or ""
+    end
+
+    function GetNickName(width)
+        if not width then
+            return HonorPage.honorInfo.username
+        end
+        local width = tonumber(width) or 60
+        return HonorPage.TrimNormUtf8TextByWidth(HonorPage.honorInfo.username, width, System.DefaultFontString)
+
+    end
+
+    function GetToolTip()
+        local isWidth =  HonorPage.IsWidthNickName()
+        local username = HonorPage.honorInfo.username or ""
+        local realNameWidth = _guihelper.GetTextWidth(username, System.DefaultFontString)
+        local maxWidth = isWidth and 108 or 56
+        return realNameWidth > maxWidth and username or ""
+    end
+
+    function GetLimitStyle()
+        local baseWidth = 60
+        local baseLeft = 72
+        local username = HonorPage.honorInfo.username or ""
+        local realNameWidth = _guihelper.GetTextWidth(username, System.DefaultFontString)
+        local maxwidth = 128
+        local disWidth = realNameWidth - baseWidth < 40 and realNameWidth - baseWidth or 40
+        if disWidth <= 0 then
+            return string.format([[<div style="position:relative;margin-top:153px;margin-left:72px;height:20px;width:60px; text-align: center;">]])..[[<%=GetNickName()%></div>]]
+        else
+            local width = baseWidth + disWidth
+            local str = string.format([[<div style="position:relative;margin-top:153px;margin-left:%dpx;height:20px;width:%dpx; text-align: center;">]],baseLeft - disWidth - 6 ,width)..[[<%=GetNickName(]]..width..[[)%></div>]]
+            return str
+        end
+    end
+
+    function GetWidthStyle()
+        local baseWidth = 110
+        local baseLeft = 68
+        local username = HonorPage.honorInfo.username or ""
+        local realNameWidth = _guihelper.GetTextWidth(username, System.DefaultFontString)
+        local disWidth = realNameWidth - baseWidth < 28 and realNameWidth - baseWidth or 28
+        if disWidth <= 0 then
+            return string.format([[<div style="position:relative;margin-top:154px;margin-left:68px;height:20px;width:110px; text-align: center;">]])..[[<%=GetNickName()%></div>]]
+        else
+            local width = baseWidth + disWidth
+            local str = string.format([[<div style="position:relative;margin-top:153px;margin-left:%dpx;height:20px;width:%dpx; text-align: center;">]],baseLeft - disWidth - 6 ,width)..[[<%=GetNickName(]]..width..[[)%></div>]]
+            return str
+        end
+    end
+
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#00000088"> 
+    <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="position: relative; margin-left:80px;margin-top:80px;" />    
+    <pe:container alignment="_ct" style="margin-left:-256px;margin-top:-184px;background:url() ;">
+        <div style="<%=GetCertStyle()%>">
+            <div style="position:relative; margin-top:250px;margin-left:352px;height:77;width:77;background:url(Texture/Aries/Creator/keepwork/ggs/user/zhang_77X77_32bits.png#0 0 77 77);"></div>
+            <pe:if condition="<%=HonorPage.IsWidthNickName()%>">
+                <!-- <div tooltip="<%=GetToolTip()%>" style="position:relative;margin-top:154px;margin-left:68px;height:20px;width:110px; text-align: center;"><%=GetNickName(110)%></div> -->
+                <%=GetWidthStyle()%>
+            </pe:if>
+            <pe:if condition="<%=not HonorPage.IsWidthNickName()%>">
+                <%=GetLimitStyle()%>
+            </pe:if>
+            <pe:if condition="<%=IsShowTime()%>">
+                <div style="position:relative; margin-top:291px;margin-left:352px;height:30;width:200;"><%=GetTime()%></div>
+            </pe:if>
+        </div>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

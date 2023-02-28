@@ -36,7 +36,8 @@
             <!--Vip-->
             <pe:container alignment="_rt" style="background:url();">
                 <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div', 7, "ShowVip")%>
-                <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" />
+                <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:20px;margin-top:5px;","charge_detail")%>
+                <!-- <input type="button" value='' onclick="ShowVip" class="red_summer_camp_open_vip_btn" style="margin-right:20px;margin-top:5px;" /> -->
             </pe:container>
             <!--Close-->
             <pe:container alignment="_lt" style="width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
@@ -79,7 +80,210 @@
                                         ——会员权益<br/>
                                         《帕拉卡》会员服务分为家庭个人用户以及面向课外兴趣班的机构用户两种。如果您喜爱《帕拉卡》，并希望为自己孩子的作品建立专属终身保护，我们强烈建议您升级成为《帕拉卡》独立会员。<br/>
                                     </div>
-                                    <div style="margin-left: 200px;margin-top: 20px; width: 750px; height: 680px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/huiyuanquanyi_750x680_32bits.png#0 0 750 680);"></div>
+                                    <!-- <div style="margin-left: 200px;margin-top: 20px; width: 750px; height: 680px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/parent/huiyuanquanyi_750x680_32bits.png#0 0 750 680);"></div> -->
+                                    <pe:table style=" margin-left: 200px;margin-top: 20px; width:750px; height:720px;" >
+                                        <tr style="height:80px;">
+                                            <td style="margin-top: 10px;width:750px;text-align:center;font-size: 40px;font-weight:bold;color:#000000;">帕拉卡(Paracraft)会员权益详情</td>
+                                        </tr>
+                                        <tr style="height:50px;background-color: #000000;">
+                                            <td style="margin-top: 8px;text-align:center;font-size: 25px;font-weight:bold;color:#ffffff;">类型</td>
+                                            <td style="margin-top: 8px;text-align:center;font-size: 25px;font-weight:bold;color:#ffffff;">功能</td>
+                                            <td style="margin-top: 8px;text-align:center;font-size: 25px;font-weight:bold;color:#ffffff;">免费账号</td>
+                                            <td style="margin-top: 8px;text-align:center;font-size: 25px;font-weight:bold;color:#ffffff;">会员账号</td>
+                                        </tr>
+                                        <tr style = "height:138px;">
+                                            <td style = "width:170px;text-align:center;margin-top: 56x;font-weight:bold;">创作功能</td>
+                                            <td style = "width:220px;text-align:left;">
+                                                <pe:table style="width:220px; height:138px;">
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">方块搭建</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">3D动画</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">3D编程</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:138px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#1da720">√</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#d21b1b">×</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#d21b1b">×</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:138px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">全部</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">全部</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#1da720">√</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                        </tr>
+                                        <tr style = "height:138px;">
+                                            <td style = "width:170px;text-align:center;margin-top: 56x;font-weight:bold;">作品存储</td>
+                                            <td style = "width:220px;text-align:left;">
+                                                <pe:table style="width:220px; height:138px;">
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">作品世界</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">单个作品大小</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">个人云存储空间</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:138px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">仅限3个</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">低于20M</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">0.5GB</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:138px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">不限</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">不限</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">5GB</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                        </tr>
+                                        <tr style = "height:92px;">
+                                            <td style = "width:170px;text-align:center;margin-top: 30x;font-weight:bold;">作品查看</td>
+                                            <td style = "width:220px;text-align:left;">
+                                                <pe:table style="width:220px; height:92px;">
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">系统推荐作品</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">访问其他用户作品</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:92px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#1da720">√</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#d21b1b">×</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:92px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#1da720">√</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#1da720">√</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                        </tr>
+                                        <tr style = "height:184px;">
+                                            <td style = "width:170px;text-align:center;margin-top: 74x;font-weight:bold;">资源素材</td>
+                                            <td style = "width:220px;text-align:left;">
+                                                <pe:table style="width:220px; height:184px;">
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">角色换装</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">模型资源</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">角色素材</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">代码范例</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:184px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">部分免费</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">部分免费</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">部分免费</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">试用部分</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:184px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">全部免费</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">全部免费</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">全部免费</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;">全部</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                        </tr>
+                                        <tr style = "height:46px;">
+                                            <td style = "width:170px;text-align:center;margin-top: 8x;font-weight:bold;">特殊功能</td>
+                                            <td style = "width:220px;text-align:left;">
+                                                <pe:table style="width:220px; height:46px;">
+                                                    <tr>
+                                                        <td style="margin-left: 10px;margin-top: 8px;">飞行</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:46px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#d21b1b">×</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                            <td style = "width:180px;text-align:center;">
+                                                <pe:table style="width:180px; height:46px;">
+                                                    <tr>
+                                                        <td style="text-align:center;margin-top: 8px;color:#1da720">√</td>
+                                                    </tr>
+                                                </pe:table>
+                                            </td>
+                                        </tr>
+                                    </pe:table>
                                     <div style="margin-top: 40px;">
                                         --加入会员<br/>
                                     </div>

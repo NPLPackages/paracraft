@@ -231,12 +231,16 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
 	commonlib.setfield(fullname, o);
 end
 function HttpWrapper.ShowErrorTip(err)
+    NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
+    local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+    if err == 401 then
+        GameLogic.AddBBS("desktop", L"用户凭据失效", 3000, "255 0 0"); 
+    end
     if(err ~= 0)then
         return
     end
-    NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
-    local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
     GameLogic.AddBBS("desktop", L"网络异常", 3000, "255 0 0"); 
+    
 end
 
 -- get cache from localserver

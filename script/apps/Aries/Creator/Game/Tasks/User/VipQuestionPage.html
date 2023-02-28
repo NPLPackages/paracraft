@@ -1,0 +1,93 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/User/VipQuestionPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<style type="text/mcss">
+{
+    text_size_big = {
+            ["base-font-size"] = 17,
+            ["font-size"] = 17,
+            ["font-weight"] = "bold",
+            ["margin-top"] = 22,
+        },
+        text_size_small = {
+            ["base-font-size"] = 15,
+            ["font-size"] = 15,
+            ["margin-top"] = 6,
+        },
+}
+</style>
+<script refresh="false" type="text/npl" src="VipQuestionPage.lua">
+    <![CDATA[
+        local VipQuestionPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipQuestionPage.lua");
+        function ClosePage()
+            Page:CloseWindow();
+        end
+
+        function GridDs(index)
+            if(index == nil) then    
+                return #VipQuestionPage.GridDs
+            else
+                return VipQuestionPage.GridDs[index];
+            end
+        end
+    ]]>
+</script>
+<kp:window class="default" mode="lite" width="647" height="437" icon="" onclose="ClosePage">
+    <div style="position: relative; margin-left: 8px; margin-top: 8px; width: 96px; height: 25px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/UserVip/changjianwenti_96x25_32bits.png#0 0 96 25);">
+    </div>
+    <div style="min-width: 640px;height: 390px;position: relative; margin-top: 33px;">
+        <pe:gridview name="vip_question_page_gridview" uiname="vip_question_page_gridview.gridview" RememberScrollPos="true" CellPadding="0" AllowPaging="false" ItemsPerLine="1 " DefaultNodeHeight="540" DataSource='<%=GridDs%>' >
+            <Columns>
+                <div style="width:580px;height:540px">
+                    <div style="margin-left: 27px;">
+                        <div class="text_size_big">
+                            1、免费账号和会员账号之间有什么区别？
+                        </div>
+                        <div class="text_size_small">
+                            帕拉卡平台免费账号只有基础搭建功能可以体验使用，会员账号可以使用3D电影动画创作、3D编程创作、CAD编程三维设计等学习创作功能和海量创作素材资源和云存储空间，并享有个人主体(自然人身份)的商用授权保障。
+                        </div>
+
+                        <div class="text_size_big">
+                            2、是否有用于校园和校外教培机构教学使用的账号，如何升级到校园账号/教培机构账号？
+                        </div>
+                        <div class="text_size_small">
+                            有，如学校在校园内使用或者校外教培机构教学使用，联系帕拉卡市场童老师（电话：13058184926）协助处理。
+                        </div>
+
+                        <div class="text_size_big">
+                            3、购买会员后是否可以退款？
+                        </div>
+                        <div class="text_size_small">
+                            会员账号充值提供的付费服务属于虚拟产品，请您在购买前确认服务内容、功能和条款，非故障情况，一经生效后不支持退订和退款，请您谅解。
+                        </div>
+
+                        <div class="text_size_big">
+                            4、是否可以开发票？在哪里开？提供什么类型发票？
+                        </div>
+                        <div class="text_size_small">
+                            帕拉卡平台购买充值会员等均可申请开发票，我们将提供电子发票形式的增值税普通发票，在2个工作日内发送至您填写的联系人邮箱内，开票请联系客服QQ：2850955888。
+                        </div>
+
+                        <div class="text_size_big">
+                            5、如何查看我的会员到期时间？
+                        </div>
+                        <div class="text_size_small">
+                            点击开通会员页面顶部即显示您的会员账号到期时间。
+                        </div>
+                    </div>
+
+                </div>
+            </Columns>
+        </pe:gridview>                
+    </div>
+</kp:window>
+</pe:mcml>
+</body>
+</html>
+

@@ -27,7 +27,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/RegionContainer.lua");
 NPL.load("(gl)script/ide/math/bit.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/ChunkLocation.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityPool.lua");
-
+NPL.load("(gl)script/ide/System/Util/Iterators.lua");
+local Iterators = commonlib.gettable("System.Util.Iterators");
 local EntityPool = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityPool");
 local ChunkLocation = commonlib.gettable("MyCompany.Aries.Game.Common.ChunkLocation");
 local RegionContainer = commonlib.gettable("MyCompany.Aries.Game.EntityManager.RegionContainer");
@@ -872,7 +873,9 @@ end
 function EntityManager.FrameMoveQueueThisFrame(deltaTime, cur_time, destroy_list)
 	for i=1, framemove_queue_size do
 		local entity = framemove_queue[i];
-		entity:CheckFrameMove(deltaTime, cur_time, true);
+		if entity then
+			entity:CheckFrameMove(deltaTime, cur_time, true);
+		end
 	end
 	framemove_queue_size = 0;
 end
@@ -986,11 +989,13 @@ function EntityManager.FrameMoveSentientList(deltaTime, cur_time, destroy_list)
 end
 
 -- filter entity by params
--- @param params: {name, type, nontype, mname, count}
+-- @param params: {name, type, nontype, tag, tagName, mname, count}
 -- name: only entities with given name.
 -- mname: match regular expression of the given name
 -- type: only entities of given type. 
 -- nontype: only entities not of the given type
+-- tagName: if nil, entity:GetTag() is used to compare with tag, otherwise entity:GetTag(tagName) is compared with tag. 
+-- tag: tag Value of entity's GetTag() field. 
 -- r: get entities only less than r blocks from the origin
 -- rm: get entities only more than rm blocks from the origin.
 -- count: return as most this number of objects, usually in order of distance from the origin.
@@ -1009,6 +1014,10 @@ function EntityManager.FilterEntity(entity, params, entities)
 	if(params.mname and not entity:GetName():match(params.mname)) then
 		return;
 	end
+	if(params.tag and entity:GetTag(params.tagName) ~= params.tag) then
+		return
+	end
+	
 	local distSq = 0;
 	if(params.x) then
 		distSq = entity:DistanceSqTo(params.x, params.y, params.z)
@@ -1035,7 +1044,7 @@ function EntityManager.FilterEntity(entity, params, entities)
 end
 
 -- find entities by a number of matching parameters
--- @param params: {category, type, nontype, name, x,y,z,dz,dy,dz,r,rm, count}
+-- @param params: {category, type, nontype, name, tag, x,y,z,dz,dy,dz,r,rm, count}
 -- category: "e" all entities except block entities (if nil, it default to "e"),"p" for nearest player, "r" random player, "a" all players
 -- "all" for all entities including block entities
 -- "b" for block entities
@@ -1043,6 +1052,8 @@ end
 -- name: only entities with given name.
 -- type: only entities of given type. 
 -- nontype: only entities not of the given type
+-- tagName: if nil, entity:GetTag() is used to compare with tag, otherwise entity:GetTag(tagName) is compared with tag. 
+-- tag: tag Value of entity's GetTag() field. 
 -- x,y,z: center of origin to selects entities. 
 -- r: get entities only less than r blocks from the origin
 -- rm: get entities only more than rm blocks from the origin.
@@ -1056,21 +1067,14 @@ function EntityManager.FindEntities(params)
 		if(params.x) then
 			if(params.r) then
 				local radius = params.r;
-				local min_x, min_y, min_z = params.x-radius, params.y-radius, params.z-radius;
-				local max_x, max_y, max_z = params.x+radius, params.y+radius, params.z+radius;
-			
-				for x = min_x, max_x do
-					for z = min_z, max_z do
-						if(((x - params.x)^2 + (z - params.z)^2) <= radius*radius ) then
-							for y = min_y, max_y do
-								local entities = EntityManager.GetEntitiesInBlock(x, y, z);
-								if(entities) then
-									for entity,_ in pairs(entities) do
-										if(not entity:IsBlockEntity() and EntityManager.FilterEntity(entity, params, output)) then
-											output = output or {};
-											output[#output+1] = entity;
-										end
-									end
+				for dx, dz in Iterators.SpiralCircle(radius) do
+					for y = params.y-radius, params.y+radius do
+						local entities = EntityManager.GetEntitiesInBlock(params.x + dx, y, params.z + dz);
+						if(entities) then
+							for entity,_ in pairs(entities) do
+								if(not entity:IsBlockEntity() and EntityManager.FilterEntity(entity, params, output)) then
+									output = output or {};
+									output[#output+1] = entity;
 								end
 							end
 						end
@@ -1166,12 +1170,29 @@ function EntityManager.FindEntities(params)
 		end
 	elseif(params.category == "searchable") then
 		-- "searchable" for all searchable entities including block entities 
-		for _, entities in pairs(chunk_column_entities) do
-			for i=1, #entities do
-				local entity = entities[i];
-				if(entity and entity:IsSearchable() and EntityManager.FilterEntity(entity, params)) then
-					output = output or {};
-					output[#output+1] = entity;
+		if(params.r) then
+			local radius = params.r;
+			for dx, dz in Iterators.SpiralCircle(radius) do
+				for y = params.y-radius, params.y+radius do
+					local entities = EntityManager.GetEntitiesInBlock(params.x + dx, y, params.z + dz);
+					if(entities) then
+						for entity,_ in pairs(entities) do
+							if(entity:IsSearchable() and EntityManager.FilterEntity(entity, params, output)) then
+								output = output or {};
+								output[#output+1] = entity;
+							end
+						end
+					end
+				end
+			end
+		else
+			for _, entities in pairs(chunk_column_entities) do
+				for i=1, #entities do
+					local entity = entities[i];
+					if(entity and entity:IsSearchable() and EntityManager.FilterEntity(entity, params)) then
+						output = output or {};
+						output[#output+1] = entity;
+					end
 				end
 			end
 		end

@@ -9,27 +9,31 @@ NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.vip.lua");
 ]]
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 
--- »ñÈ¡ÉÌÆ·ĞÅÏ¢
+-- è·å–å•†å“ä¿¡æ¯
 --http://yapi.kp-para.cn/project/32/interface/api/3687
 -- post
 HttpWrapper.Create("keepwork.pay.searchVipProducts", "%MAIN%/core/v0/pay/systemProducts/search", "POST", true)
 
 
--- »ñÈ¡¶©µ¥¶ÔÏó
--- ·¢ÆğÖ§¸¶Íê³Éºó£¬ÒªÂÖÑ¯È¥»ñÈ¡¶©µ¥µÄ×´Ì¬£¬µ±¶©µ¥µÄ×´Ì¬ state µÈÓÚ 2 »òÕß3Ê±¼´ÈÏÎªÖ§¸¶³É¹¦£¬Ç°¶ËÔÙ×öºóĞøµÄ´¦Àí
+-- è·å–è®¢å•å¯¹è±¡
+-- å‘èµ·æ”¯ä»˜å®Œæˆåï¼Œè¦è½®è¯¢å»è·å–è®¢å•çš„çŠ¶æ€ï¼Œå½“è®¢å•çš„çŠ¶æ€ state ç­‰äº 2 æˆ–è€…3æ—¶å³è®¤ä¸ºæ”¯ä»˜æˆåŠŸï¼Œå‰ç«¯å†åšåç»­çš„å¤„ç†
 --http://yapi.kp-para.cn/project/32/interface/api/1512
 -- get
 HttpWrapper.Create("keepwork.pay.systemOrders", "%MAIN%/core/v0/pay/systemOrders/:id", "GET", true)
 
--- ¹ºÂòc¶Ëvip
+-- è´­ä¹°cç«¯vip
 --http://yapi.kp-para.cn/project/32/interface/api/1527
 -- post
 HttpWrapper.Create("keepwork.pay.clientVip", "%MAIN%/core/v0/pay/clientVip", "POST", true)
 
 
--- ÇëÇó¶şÎ¬ÂëµÄÊäÈë²ÎÊı
+-- è¯·æ±‚äºŒç»´ç çš„è¾“å…¥å‚æ•°
 --http://yapi.kp-para.cn/project/88/interface/api/4302
--- Éú³É¶şÎ¬Âë
+-- ç”ŸæˆäºŒç»´ç 
 --http://yapi.kp-para.cn/project/32/interface/api/3682
 -- post 
 HttpWrapper.Create("keepwork.pay.generateQR", "%MAIN%/core/v0/keepworks/generateQR", "POST", true)
+
+-- éªŒè¯æ˜¯å¦é»„ç ï¼ˆé»„ç å¼¹é˜»æ–­çª—å£ï¼Œæç¤ºä¸å…è®¸éæˆæƒå•†ä¸šåŒ–ä½¿ç”¨å¸•æ‹‰å¡ï¼‰
+--http://yapi.kp-para.cn/project/165/interface/api/5351
+HttpWrapper.Create("keepwork.checkYellowCodeLimit", "%MAIN%/push-manage/v0/yellowRecordLimit", "GET", true)

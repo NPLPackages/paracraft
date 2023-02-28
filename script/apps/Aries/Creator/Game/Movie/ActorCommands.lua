@@ -218,7 +218,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value);
+		end,old_value,nil,nil, {auto_virtual_keyboard=true});
 	elseif(keyname == "blocks") then
 		self.actor_blocks:AddKeyFrameOfSelectedBlocks();
 		if(callbackFunc) then
@@ -264,7 +264,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 					callbackFunc(true);
 				end
 			end
-		end,old_value,true); 
+		end,old_value,true,nil, {auto_virtual_keyboard=true}); 
 	end
 end
 

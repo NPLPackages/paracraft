@@ -35,11 +35,14 @@ function mcml_controls.register_all()
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_redtip.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_usertag.lua");
     NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/kp_window.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/mb_window.lua");
 
 	-- lessons ppt
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/step.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/action.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/notes.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/difficult.lua");
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/lessons_ppt/coverplayer.lua");
 
 	-- mc tags
 	Map3DSystem.mcml_controls.RegisterUserControl("pe:mc_player", MyCompany.Aries.Game.mcml.pe_mc_player);
@@ -54,9 +57,12 @@ function mcml_controls.register_all()
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:redtip", MyCompany.Aries.Game.mcml.kp_redtip);
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:usertag", MyCompany.Aries.Game.mcml.kp_usertag);
 	Map3DSystem.mcml_controls.RegisterUserControl("kp:window", MyCompany.Aries.Game.mcml.kp_window);
+	Map3DSystem.mcml_controls.RegisterUserControl("mb:window", MyCompany.Aries.Game.mcml.mb_window);
     local pe_nplbrowser = commonlib.gettable("NplBrowser.pe_nplbrowser");
     Map3DSystem.mcml_controls.RegisterUserControl("pe:nplbrowser", pe_nplbrowser);
 	Map3DSystem.mcml_controls.RegisterUserControl("step", MyCompany.Aries.Game.mcml.lessons_ppt.step);
 	Map3DSystem.mcml_controls.RegisterUserControl("action", MyCompany.Aries.Game.mcml.lessons_ppt.action);
 	Map3DSystem.mcml_controls.RegisterUserControl("notes", MyCompany.Aries.Game.mcml.lessons_ppt.notes);
+	Map3DSystem.mcml_controls.RegisterUserControl("difficult", MyCompany.Aries.Game.mcml.lessons_ppt.difficult);
+	Map3DSystem.mcml_controls.RegisterUserControl("coverplayer", MyCompany.Aries.Game.mcml.lessons_ppt.coverplayer);
 end

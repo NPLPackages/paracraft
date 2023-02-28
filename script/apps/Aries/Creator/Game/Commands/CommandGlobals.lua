@@ -376,6 +376,11 @@ Commands["maxrenderdist"] = {
 	quick_ref="/maxrenderdist [64-1024]", 
 	desc=[[max renderdist allowed. this will greatly skill framerate if set too large. 
 /maxrenderdist 512
+
+Usually we need to increase memory limit and then maxrenderdist and renderdist
+/memlimit -v 1000
+/maxrenderdist 1024
+/renderdist 500
 ]], 
 	mode_deny = "",
 	mode_allow = "",
@@ -694,9 +699,11 @@ e.g.
 
 Commands["vip"] = {
 	name="vip", 
-	quick_ref="/vip", 
+	quick_ref="/vip show [-key=a] [-desc=b]", 
 	desc=[[show vip window
-e.g.
+@param key: 
+@param desc: 
+e.g. /vip show -key=2D_main
 /vip
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
@@ -704,10 +711,17 @@ e.g.
 		cmdName, cmd_text = CmdParser.ParseString(cmd_text);		
 		cmdName = cmdName or "show";
 		if(cmdName == "show") then
-			local category_name
-			category_name, cmd_text = CmdParser.ParseString(cmd_text);
+			local opts = CommonLib.ParseOptions(cmd_text);
+			local key = opts.key
+			local desc = opts.desc
+			if key=="" or key==nil then
+				key = "vip_command"
+			end
+			if desc=="" then
+				desc = nil
+			end
 			local VipPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipPage.lua");
-			VipPage.ShowPage("vip_command");
+			VipPage.ShowPage(key,desc);
 		end
 	end,
 };
@@ -843,5 +857,45 @@ e.g.
 			print("file not exit:",filepath)
 		end
 		return false
+	end,
+};
+
+Commands["worldprofile"] = {
+	name="worldprofile", 
+	quick_ref="", 
+	desc=[[generate world info
+e.g.
+/worldprofile start/stop
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local option;
+		option, cmd_text = CmdParser.ParseString(cmd_text);		
+		if option == "start" then
+			GameLogic.DockManager.StartTimer()
+		end
+
+		if option == "stop" then
+			GameLogic.DockManager.WriteInfo()
+		end
+	end,
+};
+
+Commands["videoTask"] = {
+	name="videoTask", 
+	quick_ref="", 
+	desc=[[打开本地视频录制窗口
+e.g.
+/videoTask local
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params)
+		local option;
+		option, cmd_text = CmdParser.ParseString(cmd_text);		
+		if option == "local" then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BuildReplay/LocalVideoTaskSetting.lua");
+			local LocalVideoTaskSetting = commonlib.gettable("MyCompany.Aries.Game.Tasks.BuildReplay.LocalVideoTaskSetting");
+
+			LocalVideoTaskSetting.CheckShow()
+		end
+
 	end,
 };

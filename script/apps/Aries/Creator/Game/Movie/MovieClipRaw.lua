@@ -187,6 +187,15 @@ function MovieClipRaw:FindActor(name)
 	end
 end
 
+-- find first NPC actor
+-- @return actor or nil.
+function MovieClipRaw:FindFirstNPCActor()
+	for i, actor in pairs(self.actors) do
+		if(actor.class_name == "ActorNPC") then
+			return actor;
+		end
+	end
+end
 -- get the actor for a given itemstack. return nil if not exist
 function MovieClipRaw:GetActorFromItemStack(itemStack, bCreateIfNotExist)
 	if(itemStack) then

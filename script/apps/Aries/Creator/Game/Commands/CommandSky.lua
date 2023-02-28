@@ -254,7 +254,7 @@ Commands["snow"] = {
 			local _, s = cmd_text:match("(%d*)[%s,]+(%d*)");
 			if (s) then
 				speed = tonumber(s);
-				if (speed < 1 or speed > 100) then
+				if (speed and (speed < 1 or speed > 100)) then
 					speed = 1;
 				end
 			end
@@ -295,6 +295,9 @@ Example:
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		if(cmd_text) then
+			if GameLogic.GetSim()==nil then
+				return 0
+			end
 			local now;
 			now, cmd_text = CmdParser.ParseText(cmd_text, "now");
 			if(now) then

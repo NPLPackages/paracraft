@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    RedSummerCampCourseSchedulingHelp = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseSchedulingHelp.lua") 
+    RedSummerCampCourseSchedulingHelp.OnInit()
+    function ClosePage()
+        RedSummerCampCourseSchedulingHelp.ClosePage()
+    end
+
+    function OnClick()
+        RedSummerCampCourseSchedulingHelp.m_help_index = RedSummerCampCourseSchedulingHelp.m_help_index + 1
+        if RedSummerCampCourseSchedulingHelp.m_help_index > 2 then
+            RedSummerCampCourseSchedulingHelp.m_help_index = 1
+        end
+        RedSummerCampCourseSchedulingHelp.RefreshPage()
+    end
+
+    function GetContent()
+        return RedSummerCampCourseSchedulingHelp.helpCnf[RedSummerCampCourseSchedulingHelp.m_help_index].content
+    end
+
+    function GetIcon()
+        local icon = RedSummerCampCourseSchedulingHelp.helpCnf[RedSummerCampCourseSchedulingHelp.m_help_index].icon
+        return string.format([[<div style="margin-top: 10px; margin-left: 26px; width:567px; height:222px;background:url(%s);"></div> ]],icon)
+    end
+
+    function GetTitle()
+        return RedSummerCampCourseSchedulingHelp.helpCnf[RedSummerCampCourseSchedulingHelp.m_help_index].title
+    end
+
+]]></script>
+<pe:container uiname="helpBg" alignment="_fi" width="100%" height="100%" style="background-color:#00000088" > 
+    <div align="center" valign="center" style=" width: 620px; height: 440px; background: url(Texture/Aries/Creator/keepwork/Window/dakuang2_32bits.png#0 0 64 69:26 44 24 22);">
+        <div style="width: 600x; height: 30px;">
+            <div style="position: relative; width: 70px; height: 48px; margin-top: -10px; margin-left: 10px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/tishi_70x48_32bits.png#0 0 70 48);"></div>
+            <input type="button" style="margin-left: 590px; margin-top: 10px; width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Window/guanbi_32bits.png#0 0 22 22);" onclick="ClosePage()"/>
+        </div>
+        <%=GetIcon()%>
+        <div style="margin-left: 36px; font-size: 18px; base-font-size: 18px; font-weight: bold; margin-top: -10px;"><%=GetTitle()%></div>
+        <div style="width: 560px; height: 120px; margin-left: 32px;font-size: 16px; base-font-size: 16px; color: #333333;"><%=GetContent()%></div>
+        <div onclick="OnClick()" align="center"  style="margin-top: 8px; width: 200px; height: 34px; ">
+            <pe:if condition="<%=RedSummerCampCourseSchedulingHelp.m_help_index == 1%>">
+                <input type="button" align="center" onclick="OnClick()" style="width:49px;height:16px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/diyiyexuanzhong_49x16_32bits.png#0 0 49 16);" />
+            </pe:if>
+            <pe:if condition="<%=RedSummerCampCourseSchedulingHelp.m_help_index == 2%>">
+                <input type="button" align="center" onclick="OnClick()" style="width:49px;height:16px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/dieryexuanzhong_49x16_32bits.png#0 0 49 16);" />
+            </pe:if>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

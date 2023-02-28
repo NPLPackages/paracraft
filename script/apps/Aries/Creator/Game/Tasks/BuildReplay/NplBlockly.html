@@ -1,0 +1,48 @@
+
+<template class="container">
+    <div style="position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px;">
+        <Blockly ref="blockly" v-bind:language="Language or 'SystemNplBlock'" style="width: 100%; height: 100%;"></Blockly>
+    </div>
+</template>
+
+<script type="text/lua">
+local BlocklyEl = nil;
+-- 组件解析完成
+function OnReady()
+    BlocklyEl = GetRef("blockly");
+    BlocklyEl:LoadFromXmlNodeText(_G.xmltext);
+
+    _G.GetMacroCode = function()
+        local contextmenu = BlocklyEl:GetContextMenu()
+        if contextmenu then
+            local text = contextmenu:ExportMacroCode(true)
+            return text
+        end
+        return "";
+    end
+
+    _G.GetBlockNum = function()
+        local num = 1
+        local blocks = BlocklyEl:GetBlocks()
+        for _, block in ipairs(blocks) do
+            local nextBlock = block;
+            while (nextBlock) do
+                blockCode = blockCode .. nextBlock:GetCode();
+                nextBlock = nextBlock:GetNextBlock();
+                num = num + 1
+            end
+        end
+        return num
+    end
+end
+</script>
+
+<style>
+.container {
+    height: 100%; 
+    width: 100%; 
+    padding: 0px 2px 2px 2px;
+    background-color: #cccccc;
+    /* background: url(Texture/Aries/Creator/keepwork/Window/dakuang_32bits.png#0 0 440 93:378 43 33 44); */
+}
+</style>

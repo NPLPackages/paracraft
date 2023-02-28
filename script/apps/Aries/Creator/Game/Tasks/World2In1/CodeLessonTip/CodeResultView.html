@@ -29,7 +29,13 @@ end
                 <div onclick="CodeResultView.ClickLeftBt" style="position: relative; margin-left: 72px; width: 92px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/chongxinkaishi_92x36_32bits.png#0 0 92 36);"></div>
             </pe:if>
 
-            <div onclick="CodeResultView.ClickRightBt" style="position: relative; margin-left: 274px; width: 92px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/fanhuidatin_92x36_32bits.png#0 0 92 36);"></div>
+            <pe:if condition='<%=CodeResultView.is_return_area%>'>
+                <div onclick="CodeResultView.ClickRightBt" style="position: relative; margin-left: 274px; width: 92px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/fanhuidatin_92x36_32bits.png#0 0 92 36);"></div>
+            </pe:if>
+            <pe:if condition='<%=not CodeResultView.is_return_area%>'>
+                <div onclick="CodeResultView.ClickRightBt" style="position: relative; margin-left: 250px; width: 102px;height: 36px;background: url(Texture/Aries/Creator/keepwork/macro/code/16_171X49_32bit.png#0 0 171 49);"></div>
+            </pe:if>
+            
         </div>
     </pe:container>
 </pe:container>

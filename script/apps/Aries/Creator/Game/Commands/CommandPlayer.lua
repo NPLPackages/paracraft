@@ -111,6 +111,9 @@ e.g.
 				local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 				local filename = serverdata and serverdata.tooltip or nil
 				if filename ~=nil and filename ~="" and itemStack.id == block_types.names.LiveModel then
+					if filename:match("^temp/onlinestore/") then
+						filename = "onlinestore/"..filename:match("[^/\\]+$")
+					end
 					local path = Files.GetTempPath()..commonlib.Encoding.Utf8ToDefault(filename)
 					local xmlRoot = ParaXML.LuaXML_ParseFile(path);
 					if xmlRoot then

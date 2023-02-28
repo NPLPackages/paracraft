@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src=".lua" ><![CDATA[
+    RedSummerCampCourseScheduling = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCourseSchedulingV2.lua");
+    RedSummerCampCourseScheduling.OnInit()
+    ClassSchedule = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/ClassSchedule/ClassSchedule.lua") 
+    local path = "Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/"
+    function ClosePage()
+        RedSummerCampCourseScheduling.SetScheduleVisible(false)
+        Page:CloseWindow();
+    end
+    function GetDateStr()
+        return RedSummerCampCourseScheduling.GetDateStr()
+    end
+
+    function OnClickNextMonth()
+        RedSummerCampCourseScheduling.OnClickNextMonth()
+    end
+
+    function OnClickPreMonth()
+        RedSummerCampCourseScheduling.OnClickPreMonth()
+    end
+
+    function GetItemIcon(code)
+        local code = tostring(code)
+        local data = RedSummerCampCourseScheduling.GetCouseDataByName(code) 
+        if data then
+            local icon = data.icon
+            local key = data.code
+            local tip = data.description
+            local html="" 
+            if not string.find(icon,"http") then
+                icon = path..icon.."#0 0 211 106"
+            else
+                icon = icon.."#0 0 211 106"
+            end
+            html =string.format([[<img src="%s" style="position:relative; margin-top:10px; margin-left:10px; width:211px;height:106px"/>]],icon)
+            if tip and tip ~= "" then
+                html =string.format([[<img src="%s" style="position:relative;margin-top:10px; margin-left:10px;width:211px;height:106px"/>]],icon,tip)
+            end
+            return html
+        end
+    end
+
+    function OnClickLesson(name)
+        local code = tostring(name)
+        if code and code ~= "" then
+            RedSummerCampCourseScheduling.HideTip()
+            RedSummerCampCourseScheduling.OnClickLesson(code)
+        end
+    end
+
+    function GetClassesData()
+        return RedSummerCampCourseScheduling.show_lesson_classes
+    end
+
+    function GetOtherClasses()
+        return RedSummerCampCourseScheduling.other_lesson_classes
+    end
+
+    function GetTipByLessonkey(key)
+        if RedSummerCampCourseScheduling.show_lesson_list then
+            for i,v in ipairs (RedSummerCampCourseScheduling.show_lesson_list) do
+                if v.code == key then
+                    return v.description or ""
+                end
+            end
+        end
+    end
+
+    function CheckCanLearn(key)
+        return RedSummerCampCourseScheduling.CheckCanLearn(key)
+    end
+
+    function OnClickExchange()
+        local VipCodeExchange = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/VipToolTip/VipCodeExchange.lua") 
+        VipCodeExchange.ShowView()
+    end
+
+    function OnClickCourseClass(name) 
+        RedSummerCampCourseScheduling.SetScheduleVisible(false)
+        RedSummerCampCourseScheduling.OnClickCourseClass(name)        
+    end
+
+    function GetButton(index)
+        local index = tonumber(index)
+        local data = RedSummerCampCourseScheduling.show_lesson_classes[index]
+        if data then
+            local id = data.id
+            local name = data.name
+            if id == 999 then
+                if RedSummerCampCourseScheduling.m_select_index == index and not RedSummerCampCourseScheduling.isShowSchedule then
+                    return string.format([[<input type="button" value="%s" name="%s" onclick="OnClickCourseClass" style="text-offset-y:-2; width: 108px; height: 44px; font-size:16px; base-font-size:16px; font-weight:bold; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/wodekebao_108x44_32bits.png#0 0 108 44);" />]],name,id)
+                else
+                    return string.format([[<input type="button" value="%s" name="%s" onclick="OnClickCourseClass" style="text-offset-y:-2; width: 108px; height: 44px; font-size:16px; base-font-size:16px; font-weight:bold; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/wodekebao(hui)_108x44_32bits.png#0 0 108 44);" />]],name,id)
+                end
+            else
+                if RedSummerCampCourseScheduling.m_select_index == index and not RedSummerCampCourseScheduling.isShowSchedule then
+                    return string.format([[<input type="button" value="%s" name="%s" onclick="OnClickCourseClass" style="text-offset-y:-2; width: 88px; height: 44px; font-size:16px; base-font-size:16px; font-weight:bold; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/xiaoanniu_88x44_32bits.png#0 0 88 44);" />]],name,id)
+                else
+                    return string.format([[<input type="button" value="%s" name="%s" onclick="OnClickCourseClass" style="text-offset-y:-2; width: 88px; height: 44px; font-size:16px; base-font-size:16px; font-weight:bold; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/xiaoanniu(hui)_88x44_32bits.png#0 0 88 44);" />]],name,id)
+                end
+            end
+        end
+    end
+
+    function GetClassBtnDiv()
+        if RedSummerCampCourseScheduling.isShowSchedule then 
+            return [[
+            <input zorder="3" type="button" value='<%= _guihelper.TrimUtf8TextByWidth(RedSummerCampCourseScheduling.curClassName or L"班级课表", 110) %>' uiname="btn_drop_allclasses" onclick="RedSummerCampCourseScheduling.OnClickExpandAllClass()" style="position: relative; text-offset-y:-2;text-offset-x:15;text-align:left; width: 182px; height: 44px; font-size:16px; base-font-size:16px; font-weight:bold; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/xiaoanniu_88x44_32bits.png#0 0 88 44:20 20 20 20)" />
+            ]]
+        else 
+            return [[
+            <input zorder="3" type="button" value='<%= _guihelper.TrimUtf8TextByWidth(RedSummerCampCourseScheduling.curClassName or L"班级课表", 110) %>' uiname="btn_drop_allclasses" onclick="RedSummerCampCourseScheduling.OnClickExpandAllClass()" style="position: relative; text-offset-y:-2;text-offset-x:15;text-align:left; width: 182px; height: 44px; font-size:16px; base-font-size:16px; font-weight:bold; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/xiaoanniu(hui)_88x44_32bits.png#0 0 88 44:20 20 20 20);" />
+            ]]
+        end
+    end
+
+    function GetOtherButton(index)
+        local index = tonumber(index)
+        local data = RedSummerCampCourseScheduling.other_lesson_classes[index]
+        if data then
+            local id = data.id
+            local name = data.name
+            if RedSummerCampCourseScheduling.m_select_index - 5 == index then
+                return string.format([[<input type="button" value="%s" name="%s" onclick="OnClickCourseOtherClass" style="width: 88px; height: 44px;color:#ffffff;  font-size:16px; base-font-size:16px; font-weight:bold; background: url();" />]],name,id)
+            else
+                return string.format([[<input type="button" value="%s" name="%s" onclick="OnClickCourseOtherClass" style="width: 82px; height: 40px;color:#ffffff;  font-size:16px; base-font-size:16px; font-weight:bold; background: url();" />]],name,id)
+            end
+        end
+    end
+
+    function OnClickCourseOtherClass(name)
+        RedSummerCampCourseScheduling.SetScheduleVisible(false)
+        RedSummerCampCourseScheduling.OnClickCourseOtherClass(name)
+    end
+
+    function OnOtherMouseEnter()
+        local uiObj = ParaUI.GetUIObject("otherBg")
+        uiObj.visible = true
+    end
+
+    function GetLessonPPT(index)
+        if index == nil then
+            return #RedSummerCampCourseScheduling.show_lesson_list
+        else
+            return RedSummerCampCourseScheduling.show_lesson_list[index]
+        end
+    end
+
+    function IsShowOther()
+        return RedSummerCampCourseScheduling.other_lesson_classes and #RedSummerCampCourseScheduling.other_lesson_classes > 0
+    end
+
+    function OnClickDetail()
+        RedSummerCampCourseScheduling.ShowCourseHelpPage()
+    end
+
+    function GetUserName()
+        local name =  (System.User.NickName and System.User.NickName~="") and System.User.NickName or "同学"
+        return "欢迎你，"..name
+    end
+
+    function OnClickShowMore()
+        RedSummerCampCourseScheduling.ShowCourseReferencePage()
+    end
+
+    function OnClickShowClassSchedule_new()
+        local ClassSchedule_new = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/ClassSchedule/ClassSchedule_new.lua") 
+        ClassSchedule_new.ShowPage()
+    end
+
+    function CheckHasLearn(key)
+        return RedSummerCampCourseScheduling.IsLearn(key)
+    end
+
+    function OnMouseEnter(name,mcmlNode)
+        local code = tostring(name)
+        local data = RedSummerCampCourseScheduling.GetCouseDataByName(code) 
+        local isShow = true
+        if data then
+            isShow = RedSummerCampCourseScheduling.CheckCanLearn(code) 
+        end
+        local name = "lesson_"..name
+        RedSummerCampCourseScheduling.SetControlVisible(name, isShow)
+        RedSummerCampCourseScheduling.ShowTip(data)
+    end
+
+    function OnMouseLeave(name,mcmlNode)
+        local name = "lesson_"..name
+        RedSummerCampCourseScheduling.SetControlVisible(name, false)
+        RedSummerCampCourseScheduling.HideTip()
+    end
+
+    function class_ds()
+        local ds = RedSummerCampCourseScheduling.DS_classes()
+        return ds
+    end
+    
+    function getStyle_classlist_bg()
+        local ds = class_ds()
+
+        local num = #ds
+        local height = 10+24*math.min(num,10)+35+5
+        local ret = string.format("position: relative;margin-top: 30px;padding-top: 10px; margin-left: 5px; width: 172px; height: %spx; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/classes/xialakuang_30x24_32bits.png#0 0 30 24:10 10 10 10);",height)
+        return ret
+    end
+
+    function get_class_list_xml()
+        local str = [[
+        <pe:container zorder="2" uiname="classlist_bg" style='<%= getStyle_classlist_bg() %>'>
+            <pe:gridview style='<%= string.format("margin:0px;width:172px;height:%spx;",24*math.min(#(RedSummerCampCourseScheduling.DS_classes()),10)) %>' name="item_gridview" CellPadding="0" VerticalScrollBarStep="36" VerticalScrollBarOffsetX="8" AllowPaging="false" ItemsPerLine="1" DefaultNodeHeight = "24" 
+                DataSource='<%= RedSummerCampCourseScheduling.DS_classes() %>'>
+                <Columns>
+                    <input 
+                        type="button" 
+                        class="listbutton_unselected" 
+                        value='<%= RedSummerCampCourseScheduling.GetClassName(Eval("index")) %>' 
+                        name='<%=Eval("index")%>'
+                        onclick='RedSummerCampCourseScheduling.OnClickSelectClass()'
+                        style="text-offset-x:12;width:172px;height:24px;text-align:left;color:#cccccc;" 
+                        MouseOver_BG="Texture/alphadot.png"
+                    />
+                </Columns>
+                <EmptyDataTemplate>
+                </EmptyDataTemplate>
+            </pe:gridview>
+            <div>
+                <input zorder="2" type="button" value="+ 添加班级" uiname="btn_addclass" onclick="RedSummerCampCourseScheduling.OnClickAddClass()" align="center" style="position: relative;float: left; margin-top: 5px; text-offset-y:-1; text-offset-x:0; text-align:center; width: 148px; height: 29px; font-size:12px; base-font-size:16px; font-weight:bold; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/classes/anniu_30x30_32bits.png#0 0 30 30:10 10 10 10);" />
+            </div>
+        </pe:container>
+        ]]
+
+        return str
+    end
+
+    function OnClickSearch()
+        local searchText = Page:GetValue("search_input")
+        if searchText then
+            RedSummerCampCourseScheduling.SearchLesson(searchText)
+        end
+    end
+
+    function OnKeyUp()
+        if(virtual_key == Event_Mapping.EM_KEY_RETURN or virtual_key == Event_Mapping.EM_KEY_NUMPADENTER) then
+            OnClickSearch()
+        end
+    end
+]]></script>
+<pe:container alignment="_fi" width="100%" height="100%" style="background-color:#dcdcdc"> </pe:container>
+<pe:container alignment="_fi" width="100%" height="100%" class="red_summer_camp_bg">
+    <!--Close-->
+    <pe:container alignment="_lt" style="width: 400px; height: 60px; background:;">
+        <div style="position: relative; width:171px;height:58px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#7 248 171 58);">
+            <pe:if condition='<%=Game.is_started %>'>
+                <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:7px;margin-top:10px;float: left;" />
+                <div style="width: 67px;height: 37px; margin-left:7px;margin-top:12px;float: left;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/kechengshijie_37x67_32bits.png#0 0 67 37);"></div>
+            </pe:if>
+
+            <pe:if condition='<%=not Game.is_started %>'>
+                <input type="button" onclick="ClosePage" class="red_summer_camp_back_arrow" style="margin-left:30px;margin-top:10px;" />
+            </pe:if>
+        </div>
+        <!-- LOGO -->
+        <div >
+            <div style="position: relative; margin-top: 10px; margin-left: 159px; width: 146px; height: 47px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/chuangyilogo_146x47_32bits.png#0 0 146 47);"> </div>
+            <div onclick="OnClickDetail" style="margin-left: 280px;  width: 80px; height: 60px; ">
+                <div  zorder="2" onclick="OnClickDetail" style="width: 27px; height: 27px; margin-left: 18px; margin-top: 20px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/shuoming_27x27_32bits.png);"></div>
+            </div>
+        </div>
+    </pe:container>
+    
+    <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">
+        <!--背景水印-->
+        <div style="position: relative; margin-top: -20px;">
+            <div zorder="-1" style="position:relative;margin-left:24px;margin-top:104px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            <div zorder="-1" style="position:relative;margin-left:557px;margin-top:26px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            <div zorder="-1" style="position:relative;margin-left:103px;margin-top:282px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            <div zorder="-1" style="position:relative;margin-left:879px;margin-top:311px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+            <div zorder="-1" style="position:relative;margin-left:438px;margin-top:477px;width:512px;height:256px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/watermark_bg_32bits.png);" ></div>
+        </div>
+       
+        <!-- RIGHT -->
+        <div style="float:left;margin-left:40px;margin-top:16px;width:1206px;height:553px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/courses_32bits.png#4 53 72 135 : 30 60 30 60);">
+            <div style="position: relative; margin-top: 16px; margin-left: 21px; width: 35px; height: 35px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/kechengtubiao_35x35_32bits.png#0 0 35 35);">
+                <div style="position: relative; margin-left: 50px; margin-top: 3px; font-size: 18px; base-font-size: 18px; color: #ffffff; font-weight: bold; width: 300px;"><%=GetUserName()%></div>
+            </div>
+            <pe:if condition='<%= ParaEngine.GetAppCommandLineByParam("is_430_race","") ~="true" %>'>
+                <div style="position: relative;float:left;height: 35px;">
+                    <pe:if condition="<%= not System.options.isHideVip %>">
+                        <input type="button" align="right" value="使用激活码" onclick="OnClickExchange" style="position: relative;margin-top: 14px; margin-right: 30px; width: 110px; height: 26px; font-size: 20px; base-font-size:20px;font-weight: bold; background: url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3); color: #1caef1; background-color: #1caef1;" />
+                    </pe:if>
+                </div>
+            </pe:if>
+            
+            <div style="margin-left: 25px;">
+                <!-- 列表 横向-->
+                <div style="position: relative; width: 1160px; height: 44px; margin-top: 82px; margin-left: 3px;">
+                    <pe:repeat DataSource="<%=GetClassesData()%>">
+                        <pe:repeatitem>
+                            <%=GetButton(Eval("index"))%>
+                        </pe:repeatitem>
+                    </pe:repeat>     
+                </div>
+                <pe:if condition="<%=IsShowOther()%>">
+                    <!-- 其他 -->
+                    <input type="button" zorder="3" value="其他" onmouseenter="OnOtherMouseEnter" style="position: relative; font-size:16px; base-font-size:16px; font-weight:bold;margin-left: 472px; margin-top: 72px; width: 88px; height: 44px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/xiaoanniu(hui)_88x44_32bits.png#0 0 88 44);" />
+                    <pe:container zorder="2" uiname="otherBg" style="position: relative; margin-left: 475px; margin-top: 72px; padding-top: 40px; padding-bottom: 0px; width: 82px;  background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/erjilandi_80x37_32bits.png#0 0 80 37:38 18 38 18);">
+                        <pe:repeat DataSource="<%=GetOtherClasses()%>">
+                            <pe:repeatitem>
+                                <%=GetOtherButton(Eval("index"))%>
+                            </pe:repeatitem>
+                        </pe:repeat>   
+                    </pe:container>
+                </pe:if>
+                <!-- <pe:if condition='<%= #class_ds()==0 %>'>
+                    <div style="position: relative;width: 182px; height:44px;margin-top:83px;margin-right: 77px;" align="right">
+                        <input zorder="2" type="button" value="加入班级" uiname="btn_addclass" onclick="RedSummerCampCourseScheduling.OnClickAddClass()" align="center" style="position: relative;float: left; margin-top: 0px; text-offset-y:-2; text-offset-x:0; text-align:center; width: 182px; height: 44px; font-size:16px; base-font-size:16px; font-weight:bold; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/xiaoanniu(hui)_88x44_32bits.png#0 0 88 44:20 20 20 20);" />
+                    </div>
+                </pe:if> -->
+                <!-- <pe:if condition='<%= #class_ds()>0 %>'>
+                    <div style="position: relative;width: 182px; height:44px;margin-top:83px;margin-right: 77px;" align="right" >
+                        <%= GetClassBtnDiv()%>
+                        <pe:if condition='<%= RedSummerCampCourseScheduling._isExpland %>'>
+                            <div zorder="4" uiname="icon_unexpand" style="position: relative;float: left;margin-top: 14px; margin-left: 144px;width: 14px;height: 9px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/classes/jiantoushang_14x9_32bits.png#0 0 14 9);"></div>
+                        </pe:if>
+                        <pe:if condition='<%= not RedSummerCampCourseScheduling._isExpland %>'>
+                            <div zorder="4" uiname="icon_expand" style="position: relative;float: left;margin-top: 14px; margin-left: 144px;width: 14px;height: 9px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/classes/jiantouxia_14x9_32bits.png#0 0 14 9);"></div>
+                        </pe:if>
+                        <pe:if condition='<%=RedSummerCampCourseScheduling._isExpland%>'>
+                            <%=get_class_list_xml()%>
+                            
+                            <pe:container zorder="1" onclick="RedSummerCampCourseScheduling.OnClickExpandAllClass()" style="position:absolute;margin-top: -720px; margin-left: -1280px; width: 2560px;height: 1440px; background:url()"></pe:container>
+                        </pe:if>
+                    </div>
+                </pe:if> -->
+                <div style="position: relative;width: 182px; height:44px;margin-top:83px;margin-right: 77px;" align="right">
+                    <div style="margin-top: 0px; margin-left: 0px;width: 171px;height:36px;background:url(Texture/Aries/Creator/keepwork/vip/shuzishuru_32X32_32bits.png#0 0 32 32:14 14 14 14);">
+                        <input type="text" EmptyText='<%=L"请输入课程名"%>' onkeyup="OnKeyUp" SkipAutoBadWordFilter="true" name="search_input" uiname="search_input" CaretColor="#FF000000" textcolor="#000000" style="position: relative; font-size:12px;margin-left:5px;margin-top: 8px; width: 120px; height:28px;background:url();" />
+                        <input type="button" name="OK" uiname="course.OK" onclick="OnClickSearch" style="margin-left: 124px; margin-top: -36px; width: 48px; height: 37px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/sousuo_48x37_32bits.png#0 0 48 37);  " />
+                    </div>
+                </div>
+                
+                <pe:container visible='<%= not RedSummerCampCourseScheduling.isShowSchedule %>' uiname="course_list" style= "position: relative; margin-top: 126px;width: 1180px; height: 452px; margin-left: -10; background:url()">
+                    <pe:gridview name="lessonppt" DataSource="<%=GetLessonPPT%>"  CellPadding="40" ItemsPerLine="4" AllowPaging="false" DefaultNodeHeight="146" >
+                        <Columns>
+                            <div style="width: 231px; height: 145px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/weixuanzhon_231x145_32bits.png#0 0 231 145);">  
+                                <pe:container name='<%= "lesson_" .. Eval("code")%>' visible='false' style="position:relative; width: 231px;height: 145px; background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/xuanzhon_231x145_32bits.png#0 0 231 145);" />
+                                <%=GetItemIcon(Eval("code"))%>
+                                <div style="position:relative; text-align: center; width: 231px; margin-top: 116px; font-size: 16px; base-font-size: 16px; font-weight: bold; color: #000000;"><%=Eval("name")%></div>
+                                <pe:if condition='<%=not CheckCanLearn(Eval("code"))%>'>
+                                    <img name='<%=Eval("code")%>' style="position:relative; margin-left: 202px;margin-top: 2px; width: 28px; height: 31px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/suo_28x31_32bits.png#0 0 28 31);" />
+                                </pe:if>
+                                <pe:if condition='<%=CheckHasLearn(Eval("code"))%>'>
+                                    <div zorder="2" style="position:relative; margin-left: 2px; margin-top: 1px; width: 66px; height: 36px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zuijinlogo_66x36_32bits.png#0 0 66 36);"></div>
+                                </pe:if>
+                                <input type="button" onmouseenter="OnMouseEnter" onmouseleave="OnMouseLeave"   onclick="OnClickLesson" name='<%=Eval("code")%>' style="position: relative; width: 231px;height: 145px; background:;"/>
+                            </div>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <div style="margin-left: 400px; margin-top:30px;">
+                                <div style="float: left; width: 184px; height: 177px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/zanwuziyuan_184x177_32bits.png#0 0 184 177);"></div>
+                                <div style="float: left;color: #dddddd; margin-top: 90px; font-size: 32px; base-font-size: 32px; font-weight: bold;"><%=L"暂无课包"%></div>
+                            </div>
+                        </EmptyDataTemplate>
+                    </pe:gridview>
+                </pe:container>
+
+                <pe:container visible='<%= not (not RedSummerCampCourseScheduling.isShowSchedule)%>' uiname="schedule_contentframe" style="position: relative;float:left;margin-left:4px;margin-top:130px;background:url()"  width="1160" height="406"> 
+                    <iframe src="script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/ClassSchedule/ClassSchedule.html"/>
+                </pe:container>
+            </div>
+
+        </div>
+    </pe:container>
+    <div onclick="OnClickShowClassSchedule_new" valign="bottom" style="margin-left: 40px; margin-bottom: 25px;  width: 142px; height: 54px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/courses/banjikebiao_141x55_32bits.png#0 0 141 55);"></div>
+    <div onclick="OnClickShowMore" valign="bottom" style="margin-left: 210px; margin-bottom: 25px;  width: 142px; height: 54px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/lessonppt/cankaoziliao_142x54_32bits.png#0 0 142 54);"></div>
+    
+
+</pe:container>
+</pe:mcml>
+</body>
+</html>

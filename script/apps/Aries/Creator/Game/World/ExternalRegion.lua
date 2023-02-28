@@ -160,6 +160,7 @@ function ExternalRegion:Save()
 		ParaIO.CreateDirectory(self.regionRawFilename)
 	end
 	local attrRegion = self:GetRegionAttr()
+	attrRegion:SetField("IsModified", true);
 	attrRegion:SetField("SaveToFile", self.regionRawFilename);
 	self.regionContainer:SaveToFile();
 	-- TODO: we need to find a way to save bmax files to dest directory during Block template saving

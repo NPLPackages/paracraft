@@ -72,7 +72,8 @@ function ItemTimeSeriesNPC:DrawIcon(painter, width, height, itemStack)
 	local filename = self:GetModelFileName(itemStack);
 	if(filename and filename~="") then
 		local skin = self:GetModelSkin(itemStack)
-		filename = PlayerAssetFile:GetFilenameByName(filename)
+		filename = PlayerAssetFile:GetBuildInFilenameByName(filename)
+		filename = EntityManager.Entity:GetModelDiskFilePath(filename)
 		if(filename) then
 			itemStack.renderedTexturePath = ModelTextureAtlas:CreateGetModel(filename, skin)
 		end

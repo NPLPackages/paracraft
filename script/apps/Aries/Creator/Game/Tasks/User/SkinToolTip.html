@@ -1,0 +1,83 @@
+<!-- "script/apps/Aries/Desktop/QuestArea/QuestArea.tooltip.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<body>
+<pe:mcml>
+<script type="text/npl" ><![CDATA[
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/CustomCharItems.lua");
+    local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems");
+    local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+    local page = document:GetPageCtrl();
+    local skinId = page:GetRequestParam("s");
+    local data = CustomCharItems:GetItemById(skinId);
+    --echo(data,true)
+    local curDateTime = os.time()
+    function GetGetStr()
+        if data.type == SKIN_ITEM_TYPE.FREE then
+            return "系统赠送"
+        end
+        if data.type == SKIN_ITEM_TYPE.VIP then
+            return "开通会员"
+        end
+        if data.type == SKIN_ITEM_TYPE.ONLY_BEANS_CAN_PURCHASE then
+            if GameLogic.IsVip() then
+                return "会员"
+            end
+            return (data.price or 100) .. "知识豆"
+        end
+        if data.type == SKIN_ITEM_TYPE.ACTIVITY_GOOD then
+            return UserInfoPage.GetActivityName(data.gsid)
+        end
+    end
+
+    function GetTimeDeadLine()
+        if data.type == SKIN_ITEM_TYPE.FREE then
+            return "永久使用"
+        end
+        if data.type == SKIN_ITEM_TYPE.VIP and GameLogic.IsVip() then
+            return UserInfoPage.GetVipDeadlineStr()
+        end
+        if data.type == SKIN_ITEM_TYPE.ONLY_BEANS_CAN_PURCHASE then
+            if GameLogic.IsVip() then
+                return UserInfoPage.GetVipDeadlineStr()
+            end
+            if UserInfoPage.CheckSkinIsValid(data.id) then
+                return UserInfoPage.GetPurchaseTime(data.id).."天"
+            end
+        end
+        if data.type == SKIN_ITEM_TYPE.ACTIVITY_GOOD then
+            if UserInfoPage.CheckSkinIsValid(data.id) then
+                return "永久使用"
+            end
+        end
+    end
+
+    function GetSkinStatus()
+        return UserInfoPage.CheckSkinIsValid(data.id) and "已获得" or "未获得"
+    end
+    
+    local strTip = ""
+    if data then
+        local nameStr = "名称：  "..(data.name or "")
+        local huoquStr = "获取方式：  "..GetGetStr()
+        local statuStr = "状态： "..GetSkinStatus()
+        local yxqStr = "有效期： ".. (GetTimeDeadLine() or "")
+        strTip = nameStr .. "<br/>"..huoquStr.."<br/>"..statuStr.."<br/>"
+        if GetTimeDeadLine() and GetTimeDeadLine() ~= "" then
+            strTip = strTip .. yxqStr
+        end
+    end
+    function getStr()
+        return strTip
+    end
+    
+
+]]></script>
+<div>
+    <div class="kp_tooltip_bg" style="padding:10px;padding-bottom:15px;margin-top:-7px;width:200px;color: #ffffff;font-size: 14px;">
+        <%=getStr() %>
+    </div>
+</div>
+</pe:mcml> 
+</body>
+</html>

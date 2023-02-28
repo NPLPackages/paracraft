@@ -70,6 +70,7 @@ say("above all 3d objects", -1, true)
 say("Hello!")
 wait(1)
 say("")
+say("above all 3d objects", -1, true)
 ]]}},
 },
 {
@@ -539,6 +540,34 @@ for i=1, 100 do
     wait(0.05)
 end
 ]]}},
+},
+
+{
+	type = "get_camera", 
+	message0 = L"摄影机 %1",
+	arg0 = {
+		{
+			type = "field_dropdown",
+			name = "TYPE",
+			text = "dist",
+			options = {{"距离", "dist"}, {"角度", "pitch"}, {"朝向","facing"}, {"全部", "all"}}
+		}
+	},
+	output = {type = "field_number",},
+	category = "Looks", 
+	helpUrl = "", 
+	canRun = false,
+	funcName = "getCamera",
+	func_description = 'getCamera("%s")',
+	ToNPL = function(self)
+		return string.format('getCamera("%s")', self:getFieldAsString('TYPE'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+say(getCamera("dist"));
+say(getCamera("pitch"));
+say(getCamera("facing"));
+]]},
+},
 },
 
 {

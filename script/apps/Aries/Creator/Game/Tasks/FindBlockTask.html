@@ -12,13 +12,13 @@ GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 FindBlockTask = commonlib.gettable("MyCompany.Aries.Game.Tasks.FindBlockTask")
 FindBlockTask.OnInit();
 ]]></script>
-<aries:window style="width:512px;" title='<%=L"搜索"%>' mode="thin" uiname_onclose="FindBlockTask.OnClose" onclose="FindBlockTask.OnClose">
+<aries:window style="width:512px;" title='<%=L"搜索"..L": 左键传送，右键预览，Alt吸取，Ctrl编辑"%>' mode="thin" uiname_onclose="FindBlockTask.OnClose" onclose="FindBlockTask.OnClose">
     <div style="margin:10px;color:#ffffff;font-size:14px;">
         <div class="mc_paper_panel">
             <pe:treeview name="result" style="background:;height:256px;" VerticalScrollBarStep="20" DefaultNodeHeight="20" DataSource='<%=FindBlockTask.GetDataSource()%>' ItemToggleSize="0" ItemToggleRightSpacing="0" ShowIcon="true" DefaultIndentation="0">
                 <NodeTemplates>
                     <NodeTemplate DataType="block">
-                        <pe:treenode icon='<%=XPath("this|icon")%>' selected='<%=FindBlockTask.GetSelectedResultIndex() == XPath("this|index")%>' OnClick="FindBlockTask.OnClickItem" uiname='<%="FindBlockTask.sel_"..XPath("this|index")%>' text='<%=format("%s", XPath("this|name") or "")%>' ></pe:treenode>
+                        <pe:treenode icon='<%=XPath("this|icon")%>' icon_tooltip='<%=XPath("this|class_name")%>' selected='<%=FindBlockTask.GetSelectedResultIndex() == XPath("this|index")%>' OnClick="FindBlockTask.OnClickItem" uiname='<%="FindBlockTask.sel_"..XPath("this|index")%>' text='<%=format("%s", XPath("this|name") or "")%>' ></pe:treenode>
                     </NodeTemplate>
                 </NodeTemplates>
             </pe:treeview>

@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ExamCommitConfirm.lua"><![CDATA[
+PrepareApp = commonlib.gettable("MyCompany.Aries.Game.PrepareApp");
+local page = document:GetPageCtrl();
+
+tip = page:GetRequestParam("tip") or "";
+
+function ClosePage()
+    page:CloseWindow();
+end
+
+function onContirm()
+    ParaGlobal.ExitApp()
+    ParaGlobal.ExitApp()
+end
+
+]]></script>
+    <pe:container width="100%" height="100%" style="background:url(Texture/bg_mini_dlg_488x233_32bits.png#0 0 488 233)">
+        <div style="margin-top: 3px;margin-left: 10px; position: relative;">
+            <label value='<%= L"提示" %>' style=" height: 30px; font-size:16px; font-weight:bold;color:#ffffff;"></label>
+        </div>
+        <div style="margin-top: 90px;margin-left: 0px; position: relative;">
+            <label value='<%= tip %>' style="text-align: center; height: 30px; font-size:16px; font-weight:normal;color:#333333;"></label>
+        </div>
+
+        <div style="margin-top: 170px;margin-left: -10px;" width="247px" align="center" valign="bottom" >
+            <div zorder="-1" style="background:url(Texture/btn_yellow_128x45_32bits.png#0 0 128 45)"  width="128" height="45" align="center" name="confirm" onclick="onContirm">
+                <label value='<%= L"退出" %>' style="text-align: center;margin-top: 8px; height: 30px; font-size:16px; font-weight:bold;color:#000000;"></label>
+            </div>
+        </div>
+    </pe:container>
+
+</pe:mcml>
+</body>
+</html>

@@ -40,6 +40,38 @@ function BlockSound:Init(filename, volume, pitch)
 	return self;
 end
 
+function BlockSound:setSound(sound)
+	for i=1,self.count do
+		local audio = self[i];
+		if audio then
+			audio:SetFileName(sound)
+		end
+	end
+end
+
+function BlockSound:saveSoundFiles()
+	self.soundFiles = {}
+	local count = self.count
+	for i = 1 ,count do
+		local audio = self[i]
+		if audio then
+			table.insert(self.soundFiles , audio.file)
+		end
+	end
+end
+
+function BlockSound:recoverySoundFiles()
+	if self.soundFiles then
+		for i,v in ipairs(self.soundFiles) do
+			local audio = self[i]
+			if audio then
+				audio:SetFileName(v)
+			end
+		end
+		self.soundFiles = nil
+	end
+end
+
 function BlockSound:play2d(volume, pitch)
 	if(self.count >= 1) then
 		self.index = self.index % self.count + 1;

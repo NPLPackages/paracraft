@@ -28,6 +28,7 @@ function WorldInfo:ctor()
 	self.totalClicks = 0;
 	self.totalKeyStrokes = 0;
 	self.totalSingleBlocks = 0;
+	self.editCodeLine = 0
 end
 
 function WorldInfo:LoadFromXMLNode(node)
@@ -45,8 +46,19 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.totalClicks = tonumber(self.totalClicks) or 0;
 		self.totalKeyStrokes = tonumber(self.totalKeyStrokes) or 0;
 		self.totalSingleBlocks = tonumber(self.totalSingleBlocks) or 0;
-
-		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
+		self.editCodeLine = tonumber(self.editCodeLine) or 0; 
+		self.model_entity_num = tonumber(self.model_entity_num) or 0;
+		self.totalWorkScore_bak = tonumber(self.totalWorkScore_bak) or 0;
+		self.player_skin = self.player_skin or "";
+		self.isHomeWorkWorld = self.isHomeWorkWorld == "true" or self.isHomeWorkWorld == true;
+		self.platform = self.platform or "paracraft";
+		-- web课程相关
+		self.lessonPackageName = self.lessonPackageName or ""
+		self.lessonName = self.lessonName or ""
+		self.materialName = self.materialName or ""
+		self.classroomId = self.classroomId or ""
+		self.sectionContentId = self.sectionContentId or ""
+		-- web课程相关 end		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
 	end
 end
 
@@ -83,6 +95,8 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		totalSingleBlocks = tonumber(self.totalSingleBlocks) or 0,--创建的总方块数，只计算单击鼠标创建的方块数。复制粘贴，拉伸等不算。 例外，shift+右键算1个方块。 这里需要在鼠标事件的地方截取数据，程序生成的不算。
 
 		totalWorkScore = self:GetTotalWorkScore(),
+		totalWorkScore_bak = self.totalWorkScore_bak or 0, --备份
+
 		superrenderdist = self.superrenderdist or "",
 		hide_player = self.hide_player or "", --隐藏角色（设置界面）
 		stereoMode = self.stereoMode or "", --立体输出
@@ -90,8 +104,23 @@ function WorldInfo:SaveToXMLNode(node, bSort)
 		lightcolor = self.lightcolor or "", --光源颜色
 		timesAutoGo = self.timesAutoGo or "true", --自动昼夜交替
 		frozendaytime = self.frozendaytime or "", --关闭自动昼夜交替后，固定在在哪个时间
+		lastdaytime = self.lastdaytime or "",--自动昼夜交替生效时，退出世界自动保存时间
 		eyeBrightness = self.eyeBrightness or "",--亮度
 		cloudThickness = self.cloudThickness or "",--云量
+		editCodeLine = tonumber(self.editCodeLine) or 0, 
+		model_entity_num = tonumber(self.model_entity_num) or 0, --模型实体数量
+
+		isHomeWorkWorld = self.isHomeWorkWorld, --是否课程作业世界
+
+		-- web课程相关
+		lessonPackageName = self.lessonPackageName or "",
+		lessonName = self.lessonName or "",
+		materialName = self.materialName or "",
+		classroomId = self.classroomId or "",
+		sectionContentId = self.sectionContentId or "",
+
+		player_skin = self.player_skin or "",
+		platform = self.platform or "paracraft", -- from which client.
 	};
 
 	GameLogic.GetFilters():apply_filters("save_world_info", self, node);
@@ -100,7 +129,7 @@ end
 
 --(作品体量总分 ) = (totalEditSeconds/20 + totalClicks + totalKeyStrokes * 2 + totalSingleBlocks * 3)/ 1000 （取整数）
 function WorldInfo:GetTotalWorkScore()
-	return math.floor((self.totalEditSeconds/20 + self.totalClicks + self.totalKeyStrokes * 2 + self.totalSingleBlocks * 3)/ 1000)
+	return math.floor((self.totalEditSeconds/20 + self.totalClicks + self.totalKeyStrokes * 2 + self.totalSingleBlocks * 3 + self.editCodeLine*5 + (self.model_entity_num or 0)*5)/ 1000)
 end
 
 function WorldInfo:GetTerrainType()

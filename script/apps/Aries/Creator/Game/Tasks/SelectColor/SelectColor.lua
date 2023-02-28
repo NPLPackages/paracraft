@@ -82,17 +82,29 @@ function SelectColor:OnExit()
 	cur_instance = nil;
 end
 
+function SelectColor.GetInstance()
+	return cur_instance;
+end
 
 function SelectColor:ShowPage()
 	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
 	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
 	local viewport = ViewportManager:GetSceneViewport();
 	local parent = viewport:GetUIObject(true)
-
+	local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
 	local window = self:CreateGetToolWindow();
+	if IsMobileUIEnabled then
+		window:Show({
+			name="SelectColor", 
+			url="script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.html",
+			alignment="_ctb", left=38, top= -110, width = 450, height = 96, parent = parent,
+		});
+		window:SetUIScaling(1.5,1.5)
+		return
+	end
 	window:Show({
 		name="SelectColor", 
 		url="script/apps/Aries/Creator/Game/Tasks/SelectColor/SelectColor.html",
-		alignment="_ctb", left=0, top=-55, width = 300, height = 64, parent = parent,
+		alignment="_ctb", left=0, top= -55, width = 300, height = 64, parent = parent,
 	});
 end

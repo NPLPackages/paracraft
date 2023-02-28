@@ -31,3 +31,7 @@ HttpWrapper.Create("keepwork.activateCodes.activate", "%MAIN%/core/v0/activateCo
 -- 兑换机构激活码
 -- http://yapi.kp-para.cn/project/130/interface/api/3047
 HttpWrapper.Create("keepwork.orgActivateCode.activate", "%MAIN%/accounting/orgActivateCode/activate", "POST", true)
+
+-- 用户已经激活的激活码
+-- http://10.28.18.44:3001/project/32/interface/api/4957
+HttpWrapper.Create("keepwork.activateCodes.codehistroy", "%MAIN%/core/v0/activateCodes/userActivate", "POST", true)

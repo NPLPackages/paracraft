@@ -21,6 +21,87 @@ local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager")
 
 local OpenCommand = {};
 
+local function isHaveGoogleChrome()
+	if System.os.GetPlatform()~="win32" or System.os.IsWindowsXP() then
+		return false
+	end
+	local key1 = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Google Chrome" --HKEY_CURRENT_USER
+	local key2 = "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe" --HKEY_LOCAL_MACHINE
+	local key3 = "SOFTWARE\\Clients\\StartMenuInternet\\Google Chrome" --HKEY_LOCAL_MACHINE
+	local key4 = "SOFTWARE\\WOW6432Node\\Clients\\StartMenuInternet\\Google Chrome" --HKEY_LOCAL_MACHINE
+	local data = {
+		{key=key1,value="HKEY_CURRENT_USER"},
+		{key=key2,value="HKEY_LOCAL_MACHINE"},
+		{key=key3,value="HKEY_LOCAL_MACHINE"},
+		{key=key4,value="HKEY_LOCAL_MACHINE"},
+		{key="Software\\Google\\Chrome\\BLBeacon",value="HKEY_CURRENT_USER"},
+		
+	}
+	for k,v in pairs(data) do
+		local isHave = ParaGlobal.ReadRegStr(v.value, v.key, "");
+		if isHave ~= nil then
+			return true
+		end
+	end
+	return false
+end
+
+local function openUrl(url)
+	if System.os.GetPlatform()~="win32" or System.os.IsWindowsXP() then
+        if System.os.GetPlatform() == 'android' then
+            NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+            local Screen = commonlib.gettable("System.Windows.Screen");
+
+            local width,height = Screen:GetWindowSolution()
+            local x = math.min(width*0.3/2,200)
+            width = width - x*2
+
+            local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
+            params = {
+                x = x,y = 0,
+                width = width,
+                height = height,
+                alpha = 0.95,
+                url = url,
+                withTouchMask = true,
+            }
+            
+            PlatformBridge.open_webview(params)
+
+            return
+        end
+        ParaGlobal.ShellExecute("open", url, "", "", 1);
+        return
+    end
+	local defaultBroswerKey ="SOFTWARE\\Microsoft\\Windows\\shell\\Associations\\UrlAssociations\\http\\UserChoice"
+	local isHave = ParaGlobal.ReadRegStr("HKCU", defaultBroswerKey, "");
+	if isHave and isHave == "" then
+		local propId = ParaGlobal.ReadRegStr("HKCU", defaultBroswerKey, "ProgId");
+		if propId then
+			if string.find(propId,"IE.HTTP") then
+				if isHaveGoogleChrome() then
+					ParaGlobal.ShellExecute("open", "chrome.exe", url, nil, 1);
+				else
+					_guihelper.MessageBox(L"你确定要使用默认的IE浏览器打开吗？打开此链接可能会出错，推荐你使用google浏览器", function()
+						ParaGlobal.ShellExecute("open", url, "", "", 1);
+					end)
+				end
+				
+			else
+				ParaGlobal.ShellExecute("open", url, "", "", 1);
+			end
+		end
+		return
+	end
+	if url and url ~= "" then
+		if(isHaveGoogleChrome()) then
+			ParaGlobal.ShellExecute("open", "chrome.exe", url, nil, 1);
+			return
+		end
+		ParaGlobal.ShellExecute("open", url, "", "", 1);
+	end
+end
+
 local mcml2_window = nil;
 
 Commands["open"] = {
@@ -134,10 +215,11 @@ Examples:
 					ParaGlobal.ShellExecute("openExternalBrowser", url, "", "", 1);
 				elseif (options.p) then
 					_guihelper.MessageBox(L"你确定要打开:"..url, function()
-						ParaGlobal.ShellExecute("open", url, "", "", 1);
+						-- ParaGlobal.ShellExecute("open", url, "", "", 1);
+						openUrl(url)
 					end)
 				elseif (not options.width and not options.height) then
-					ParaGlobal.ShellExecute("open", url, "", "", 1);
+					openUrl(url)
 				else
 					-- only when width or height is specified, we will use NPL cef browser
                     NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
@@ -146,7 +228,7 @@ Examples:
                     local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
                     NplBrowserLoaderPage.Check()
                     if(not NplBrowserLoaderPage.IsLoaded())then
-					    ParaGlobal.ShellExecute("open", url, "", "", 1);
+						openUrl(url)
                     else
                         local name = options.name;
                         local title = options.title;

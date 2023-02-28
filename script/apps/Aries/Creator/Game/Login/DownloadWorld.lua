@@ -44,7 +44,7 @@ function DownloadWorld.OnDownloadFileNotify(state, text, currentFileSize, totalF
 end
 
 -- show page
-function DownloadWorld.ShowPage(url)
+function DownloadWorld.ShowPage(url,zorder)
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
 	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_download_world", "show", url);
@@ -60,8 +60,8 @@ function DownloadWorld.ShowPage(url)
 			isShowTitleBar = false,
 			DestroyOnClose = true,
 			style = CommonCtrl.WindowFrame.ContainerStyle,
-			zorder = 10,
-			allowDrag = true,
+			zorder = zorder or 10,
+			allowDrag = false,
 			isTopLevel = true,
 			directPosition = true,
 			align = "_ct",

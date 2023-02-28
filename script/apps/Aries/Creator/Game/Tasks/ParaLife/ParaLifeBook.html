@@ -1,0 +1,63 @@
+<!--script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeBook.html-->
+<pe:mcml>
+<script type="text/npl" refresh="false" src="ParaLifeBook.lua"><![CDATA[
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaLife/ParaLifeBook.lua");
+local ParaLifeBook = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParaLifeBook")
+ParaLifeBook.OnInit()
+
+function ClosePage()
+    ParaLifeBook.ClosePage()
+end
+
+function ClickPre()
+    ParaLifeBook.GoNextPage(-1)
+end
+
+function ClickNext()
+    ParaLifeBook.GoNextPage(1)
+end
+
+function GetLeftPageIndex()
+    return ParaLifeBook.GetLeftPageIndex()
+end
+
+function GetRightPageIndex()
+    return ParaLifeBook.GetRightPageIndex()
+end
+
+function GetLeftPageHtml()
+    return ParaLifeBook.GetLeftPageHtml()
+end
+
+function GetRightPageHtml()
+    return ParaLifeBook.GetRightPageHtml()
+end
+function OnClickBook()
+end
+]]></script>
+<input type="button" zorder="1" onclick="ClosePage" style="position:relative;margin-left:910px;margin-top:20px;width:32px;height:32px;background:Texture/Aries/Books/close_32bits.png;"/>
+<pe:container onclick="OnClickBook" style="width:1024px;height:720px;padding-left:80px;padding-top:56px;padding-bottom:10px;background:url(Texture/Aries/Books/orange_bg_32bits.png#0 0 878 256: 100 60 100 120);">
+    <pe:container style="width: 866px; height: 600px; background:;">
+        <pe:container  name = "leftcontent" onclick="ClickPre" style="position:relative;width: 420px; height: 610px; margin-top: 10px; background:;">
+            <pe:treeview style="margin:2px;margin-right:7px;background:;">
+                <pe:markdown markdown_text="<%=GetLeftPageHtml()%>">
+                </pe:markdown> 
+            </pe:treeview>
+        </pe:container>
+        <pe:container alignment="_rt" name = "rightcontent" onclick="ClickNext" style="position:relative; width: 420px; height: 610px; background:;">
+            <pe:treeview style="margin:2px;margin-right:7px;background:;">
+                <pe:markdown markdown_text="<%=GetRightPageHtml()%>">
+                </pe:markdown>  
+            </pe:treeview>
+        </pe:container>
+    </pe:container>
+    <input type="button" name="pre" onclick="ClickPre"   style="position:relative;margin-left:0px;margin-top:10px;width:39px;height:39px;background:Texture/Aries/Books/left_arrow_32bits.png;"/>
+    <input type="button" name="next" onclick="ClickNext"   style="position:relative;margin-left:840px;margin-top:10px;width:39px;height:39px;background:Texture/Aries/Books/right_arrow_32bits.png;"/>
+    <div style="position:relative;font-size: 20px; base-font-size: 20px; margin-left: 200px; margin-top: 10px;">
+        <%=GetLeftPageIndex()%>
+    </div>
+    <div style="position:relative;font-size: 20px; base-font-size: 20px; margin-left: 650px; margin-top: 10px;">
+        <%=GetRightPageIndex()%>
+    </div>
+</pe:container>
+</pe:mcml>

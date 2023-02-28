@@ -372,7 +372,10 @@ end
 function Actor:SetBlockPos(bx, by, bz)
 	local entity = self:GetEntity();
 	if(entity) then	
-		entity:SetDummy(true);
+		if(not entity.isDynamicPhysicsEnabled) then
+			entity:SetDummy(true);
+		end
+		
 		-- we will move using real position which fixed a bug that moveTo() does not work 
 		-- when we are already inside the target block
 		bx, by, bz = BlockEngine:real_min(bx+0.5, by, bz+0.5);
@@ -390,7 +393,9 @@ end
 function Actor:SetPosition(targetX,targetY,targetZ)
 	local entity = self:GetEntity();
 	if(entity) then	
-		entity:SetDummy(true);
+		if(not entity.isDynamicPhysicsEnabled) then
+			entity:SetDummy(true);
+		end
 		entity:SetPosition(targetX,targetY,targetZ);
 	end
 end
@@ -576,18 +581,14 @@ end
 
 function Actor:GetAssetFile()
 	local entity = self:GetEntity();
-	return entity and entity:GetMainAssetPath();
+	return entity and entity:GetModelFile();
 end
 
 function Actor:SetAssetFile(filename)
 	local entity = self:GetEntity();
 	if(entity) then	
 		filename = PlayerAssetFile:GetFilenameByName(filename)
-		if(entity.SetModelFile) then
-			entity:SetModelFile(filename);
-		else
-			entity:SetMainAssetPath(filename);
-		end
+		entity:SetModelFile(filename);
 	end
 end
 
@@ -731,6 +732,7 @@ end
 -- if number it is the actor index in movie block, if string, it is its actor name
 function Actor:SetMovieActor(actorName)
 	actorName = actorName or 1;
+	self.movie_actor_name = actorName;
 	local movie_entity = self:GetMovieClipEntity();
 	if(not movie_entity) then
 		return
@@ -760,6 +762,10 @@ function Actor:SetMovieActor(actorName)
 			end 
 		end
 	end
+end
+
+function Actor:GetMovieActor(actorName)
+	return self.movie_actor_name;
 end
 
 function Actor:SetMovieBlockPosition(pos)
@@ -1027,6 +1033,11 @@ function Actor:SetParentOffset(pos)
 	end
 end
 
+function Actor:GetParentOffset()
+	local parentInfo = self:GetParentInfo()
+	return parentInfo and parentInfo.pos;
+end 
+
 function Actor:SetParentRot(rot)
 	local parentInfo = self:GetParentInfo()
 	if(parentInfo) then
@@ -1038,6 +1049,24 @@ function Actor:SetParentRot(rot)
 		end
 	end
 end
+
+function Actor:GetParentRot()
+	local parentInfo = self:GetParentInfo()
+	return parentInfo and parentInfo.rot;
+end
+--function Actor:SetPersistent(bPersistent)
+--	if(self.entity) then
+--		if(not self.entity:GetAgent("CodeActorAgent")) then
+--			local itemStack = ItemStack:new():Init(block_types.names.AgentItem, 1, {name="CodeActorAgent", actorName = self:GetName()});
+--			self.entity:AddAgent("CodeActorAgent", itemStack)
+--		end
+--		self.entity:SetPersistent(bPersistent==true)
+--	end
+--end
+--
+--function Actor:IsPersistent()
+--	return self.entity and self.entity:IsPersistent();
+--end
 
 local internalValues = {
 	["name"] = {setter = Actor.SetName, getter = Actor.GetName, isVariable = true}, 
@@ -1059,12 +1088,13 @@ local internalValues = {
 	["opacity"] = {setter = Actor.SetOpacity, getter = Actor.GetOpacity, isVariable = false}, 
 	["selectionEffect"] = {setter = Actor.SetSelectionEffect, getter = Actor.GetSelectionEffect, isVariable = false}, 
 	["isAgent"] = {setter = function() end, getter = Actor.IsAgent, isVariable = false}, 
+	--["isPersistent"] = {setter = Actor.SetPersistent, getter = Actor.IsPersistent, isVariable = false}, 
 	["isRelativePlay"] = {setter = Actor.SetRelativePlay, getter = Actor.IsRelativePlay, isVariable = false}, 
 	["isIgnoreSkinAnim"] = {setter = Actor.SetIgnoreSkinAnim, getter = Actor.IsIgnoreSkinAnim, isVariable = false}, 
 	["assetfile"] = {setter = Actor.SetAssetFile, getter = Actor.GetAssetFile, isVariable = false}, 
 	["playSpeed"] = {setter = Actor.SetPlaySpeed, getter = Actor.GetPlaySpeed, isVariable = false}, 
 	["movieblockpos"] = {setter = Actor.SetMovieBlockPosition, getter = Actor.GetMovieBlockPosition, isVariable = false}, 
-	["movieactor"] = {setter = Actor.SetMovieActor, isVariable = false}, 
+	["movieactor"] = {setter = Actor.SetMovieActor, getter = Actor.GetMovieActor, isVariable = false}, 
 
 	["walkSpeed"] = {setter = Actor.SetWalkSpeed, getter = Actor.GetWalkSpeed, isVariable = false}, 
 	["billboarded"] = {setter = Actor.SetBillboarded, getter = Actor.IsBillboarded, isVariable = false},
@@ -1074,15 +1104,15 @@ local internalValues = {
 	["dummy"] = {setter = Actor.SetDummy, getter = Actor.IsDummy, isVariable = false}, 
 	["gravity"] = {setter = Actor.SetGravity, getter = Actor.GetGravity, isVariable = false}, 
 	["velocity"] = {setter = Actor.SetVelocity, getter = Actor.GetVelocity, isVariable = false}, 
-	["addVelocity"] = {setter = Actor.AddVelocity, isVariable = false}, 
+	["addVelocity"] = {setter = Actor.AddVelocity, getter = function() end, isVariable = false}, 
 	["surfaceDecay"] = {setter = Actor.SetSurfaceDecay, getter = Actor.GetSurfaceDecay, isVariable = false}, 
 	["airDecay"] = {setter = Actor.SetAirDecay, getter = Actor.GetAirDecay, isVariable = false}, 
 
-	["initParams"] = {getter = Actor.GetInitParams, isVariable = false},
-	["userData"] = {getter = Actor.GetCustomUserData, isVariable = false},
-	["parent"] = {getter = Actor.GetParentActor, isVariable = false},
-	["parentOffset"] = {setter = Actor.SetParentOffset, isVariable = false},
-	["parentRot"] = {setter = Actor.SetParentRot, isVariable = false},
+	["initParams"] = {setter = function() end, getter = Actor.GetInitParams, isVariable = false},
+	["userData"] = {setter = function() end, getter = Actor.GetCustomUserData, isVariable = false},
+	["parent"] = {setter = function() end, getter = Actor.GetParentActor, isVariable = false},
+	["parentOffset"] = {setter = Actor.SetParentOffset, getter = Actor.GetParentOffset, isVariable = false},
+	["parentRot"] = {setter = Actor.SetParentRot, getter = Actor.GetParentRot, isVariable = false},
 }
 
 function Actor:GetActorValue(name)
@@ -1204,6 +1234,9 @@ function Actor:ComputeBoneWorldPosAndRot(boneName, localPos, localRot, bUseParen
 		end 
 		if(bFoundTarget) then
 			local parentObj = entity:GetInnerObject();
+			if(not parentObj) then
+				return;
+			end
 			local parentScale = parentObj:GetScale() or 1;
 			local dx,dy,dz = 0,0,0;
 			if(not bUseParentRotation and localPos) then

@@ -1,0 +1,390 @@
+<!-- "script/apps/Aries/Creator/Game/Educate/Other/CreateNewWorld.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+    <head>
+        <title>2009.8.2</title>
+    </head>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl" refresh="false" src="CreateNewWorld.lua">
+                <![CDATA[
+                    local page = document:GetPageCtrl();
+                    local MainLogin = commonlib.gettable("MyCompany.Aries.Game.MainLogin");
+                    
+                    local CreateNewWorld = commonlib.gettable("MyCompany.Aries.Game.MainLogin.CreateNewWorld")
+                    CreateNewWorld.page = page;
+                    CreateNewWorld.GetUserName()
+                    CreateNewWorld.OnInit();
+
+                    local cur_mode = CreateNewWorld.init_mode;
+
+                    function getBGStyle()
+                        return MyCompany.Aries.ExternalUserModule:GetConfig().game_login_bg or "";
+                    end
+
+                    function SelectedWorld(name,node)
+                        local world = node:GetPreValue("this", true);
+                        MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnSelectWorld(world,true);
+                        --local selected = item.selected;
+                    end
+
+                    function ReturnLastStep()
+                        if CreateNewWorld.is_only_close then
+                            page:CloseWindow();
+                            CreateNewWorld.LastWorldName = nil
+                            CreateNewWorld.is_only_close = nil
+                            return
+                        end
+                        page:CloseWindow();
+                        CreateNewWorld.LastWorldName = nil
+                        NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+                        local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+                        if(not WorldCommon.GetWorldInfo()) then
+                            MainLogin.state.IsLoadMainWorldRequested = nil;
+                           MainLogin:next_step();
+                        end
+                    end
+
+                    function OnClickBack()
+                        page:CloseWindow();
+                        CreateNewWorld:SetWorldScope("mini")
+                        SetCurrentTerrainInfo(5)
+                        CreateNewWorld.LastWorldName = nil
+                        CreateNewWorld.is_only_close = nil
+                    end
+
+                    function GetAuthor(name)
+                        local s = L"制作者:";
+                        if(name) then
+                            s = s..name;
+                        end
+                        return s;
+                    end
+
+                    function GetGameStyleDescription() 
+                        local style = CreateNewWorld.cur_style;
+                        local des = style.description;
+                        return des;
+                    end
+
+                    function GetGameDifficultyDescription()
+                        local grade = CreateNewWorld.cur_difficulty;
+                        local des = grade.description;
+                        return des;
+                    end
+
+                    function GetGameTerrainDescription()
+                        local terrain = CreateNewWorld.cur_terrain;
+                        local des = terrain.description;
+                        return des;
+                    end
+
+
+
+                    function GetCurWorldAuthor() 
+                        --return cur_world.author;
+                        return "None";
+                    end
+
+                    function GetCurWorldIP() 
+                        return "127.0.0.1";
+                    end
+
+
+                    function OnClickModify(name,node)
+                        local item_tag = node:GetAttribute("param1");
+                        local item_index = node:GetAttribute("param2");
+                        local index = tonumber(item_index);
+                        local table_name = item_tag.."_info";
+                        local cur_item = "cur_"..item_tag;
+                        CreateNewWorld[cur_item] = CreateNewWorld[table_name][index];
+                        page:Rebuild();
+                    end
+
+                    function GetCurWorldMode()
+                        return CreateNewWorld.cur_style.show_value or "";
+                    end
+
+                    function GetCurWorldGrade() 
+                        return CreateNewWorld.cur_difficulty.show_value or "";
+                    end
+
+                    function GetTerrainBtnValue()
+                        return CreateNewWorld.cur_terrain.show_value or "";
+                    end
+
+                    function GetOneDayTimeBtnValue()
+                        return CreateNewWorld.cur_oneday_time.show_value or "";
+                    end
+
+                    function GetWorldName()
+                        return CreateNewWorld.LastWorldName;
+                    end
+
+                    function OnWorldNameChange()
+                        CreateNewWorld.LastWorldName = Page:GetUIValue("new_world_name", "");
+                    end
+
+                    function BtnBeSelected(item_name,index)
+                        local item = CreateNewWorld[item_name];
+                        if(item.index == index) then
+                            return "mc_blue_button_with_fillet";
+                        else
+                            return "mc_light_grey_button_with_fillet";
+                        end
+                    end
+
+                    function OnWorldScopeChange()
+                        local isMini = CreateNewWorld:IsMiniWorldScope()
+                        if isMini then
+                            CreateNewWorld:SetWorldScope("big")
+                            local isNormal = CreateNewWorld:IsNormalTerrain()
+                            if isNormal then
+                                SetCurrentTerrainInfo(1)
+                            else
+                                SetCurrentTerrainInfo(2)
+                            end
+                        else
+                            CreateNewWorld:SetWorldScope("mini")
+                            SetCurrentTerrainInfo(5)
+                        end
+                        page:Refresh(0);
+                    end
+
+                    function SetCurrentTerrainInfo(index)
+                        CreateNewWorld.cur_terrain = CreateNewWorld.terrain_info[index]
+                    end
+
+                    function IsMiniWorldScope()
+                        return CreateNewWorld:IsMiniWorldScope()
+                    end
+
+                    function IsNormalTerrain()
+                        return CreateNewWorld:IsNormalTerrain()
+                    end
+
+                    function OnWorldTerrainChange()
+                        local isNormal = CreateNewWorld:IsNormalTerrain()
+                        if isNormal then
+                            CreateNewWorld:SetWorldTerrain("random")
+                            SetCurrentTerrainInfo(2)
+                        else
+                            CreateNewWorld:SetWorldTerrain("normal")
+                            SetCurrentTerrainInfo(1)
+                        end
+                        page:Refresh(0);
+                    end
+                    
+                    function GetImg()
+                        local isMini = CreateNewWorld:IsMiniWorldScope()
+                        if isMini then
+                            return "Texture/Aries/Creator/paracraft/Educate/CreateWorld/xiaoxin_400x330_32bits.png#0 0 330 400"
+                        else
+                            local isNormal = CreateNewWorld:IsNormalTerrain()
+                            if isNormal then
+                                return "Texture/Aries/Creator/paracraft/Educate/CreateWorld/pingtan_400x330_32bits.png#0 0 330 400"
+                            else
+                                return "Texture/Aries/Creator/paracraft/Educate/CreateWorld/suiji_400x330_32bits.png#0 0 330 400"
+                            end
+                        end
+                    end
+
+                    function OnClickCreateWorld()
+                        local isMini = CreateNewWorld:IsMiniWorldScope()
+                        local isNormal = CreateNewWorld:IsNormalTerrain()
+                        CreateNewWorld.HideMiniCreateModul = isMini
+                        CreateNewWorld.OnClickCreateWorld()
+                    end
+
+                    local isMini = CreateNewWorld:IsMiniWorldScope()
+                    if isMini then
+                        SetCurrentTerrainInfo(5)
+                    else
+                        local isNormal = CreateNewWorld:IsNormalTerrain()
+                        if isNormal then
+                            SetCurrentTerrainInfo(1)
+                        else
+                            SetCurrentTerrainInfo(2)
+                        end
+                    end
+                ]]>
+            </script>
+            <pe:container alignment="_fi" width="100%" height="100%" style="background-color:#E3EEFD; ">
+                <pe:container alignment="_ct" style="margin-left:-640px;margin-top:-360px;width:1280px;height:720px;background:url();">   
+                    <div style="position: relative; margin-left:24px;margin-top:40px;width:1232px;height:640px;background:url(Texture/Aries/Creator/paracraft/Educate/beijingdi_50x50_32bits.png#0 0 50 50 :24 24 24 24);">
+                        <div style="position: relative; width: 320px; height: 112px; background: url(Texture/Aries/Creator/paracraft/Educate/biaotidiban_320x112_32bits.png#0 0 320 112);"></div>
+                        
+                    </div>
+
+                    <div style="position: relative; margin-left: 24px;margin-top:40px;background-color:#00000000">
+                        <pe:container style="width:1232px;height:640px;background-color:#00000000;">
+                            <div style="margin-left:0px;margin-top:0px;width:1232px;height:640px;background-color:#00ff0000;">
+                                <div onclick="OnClickBack" uiname="CreateNewWorld.ReturnLastStep" style="position:relative;margin-top: 43px;margin-left: 0px;width:320px;height:34px;background-color:#00000000;">
+                                    <input type="button"
+                                                style="float:left;
+                                                        margin-top: 0px;
+                                                        margin-left: 104px;
+                                                        margin-top: 0px;
+                                                        height: 26px;
+                                                        width: 34px;
+                                                        background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/fanhui_34x26_32bits.png#0 0 34 26)"/>
+                                    <div style="float: left;
+                                            margin-left: 24px;
+                                            color: #0e1627;
+                                            font-weight: bold;
+                                            font-size: 16px;">
+                                         <%=L"新建世界"%>
+                                    </div>
+                                </div>
+                                <div style = "width:1232px;background-color:#fff60000">
+                                    <div style="float:left;margin-top: 134px;
+                                                margin-left: 0px;
+                                                height: 400px;
+                                                width: 390px;
+                                                background-color:#ff00ff00">
+                                        <img style="margin-top: 0px;
+                                            margin-left: 80px;
+                                            height: 400px;
+                                            width: 330px;" src='<%= GetImg()%>' />
+                                    </div>
+                                    <div style="float: left; width: 742px;background-color: #1f4eb300;">
+                                        <div style="margin-left: 78px;margin-top: 202px;">
+                                            <div style="float: left;
+                                                        margin-top: 0px;
+                                                        color: #0e1627;
+                                                        font-weight: bold;
+                                                        font-size: 16px;">
+                                                <%= L"世界名称" %>
+                                            </div>
+                                            <div style="float: left;width: 2px;height:25px;margin-left: 32px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/fengexian_2x25_32bits.png#0 0 2 25)"/>
+                                            <div style = "float: left;margin-left:32px;margin-top:-11px;width:303px;height:46px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/shurukuang_46x46_32bits.png#0 0 46 46:16 16 16 16);">
+                                                <input type="text" SkipAutoBadWordFilter="true" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" EmptyText='<%= L"给你的世界取个名字吧" %>' onkeyup="OnWorldNameChange" style="margin-top:11px;margin-left:14px;width:300px;height:25px;font-size: 16px;font-weight: bold;color:#0e1627;background: url()"/>
+                                            </div>
+                                        </div>
+                                        <div style="margin-left: 78px;margin-top: 40px;">
+                                            <div style="float: left;
+                                                        margin-top: 0px;
+                                                        color: #0e1627;
+                                                        font-weight: bold;
+                                                        font-size: 16px;">
+                                                <%= L"世界规模" %>
+                                            </div>
+                                            <div style="float: left;width: 2px;height:25px;margin-left: 32px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/fengexian_2x25_32bits.png#0 0 2 25)"/>
+                                            <div style = "float: left;margin-left:32px;margin-top:-11px;width:303px;height:46px;background-color: #0e162700;">
+                                                <input type="checkbox" checked="<%=IsMiniWorldScope()%>" onclick="OnWorldScopeChange" 
+                                                style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
+                                                <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                                    <%= L"小型" %>
+                                                </div>
+            
+                                                <input type="checkbox" checked="<%=not IsMiniWorldScope()%>" onclick="OnWorldScopeChange" 
+                                                style="float: left;margin-left: 70px;;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
+                                                <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                                    <%= L"大型" %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-left: 78px;margin-top: 40px;">
+                                            <div style="float: left;
+                                                        margin-top: 0px;
+                                                        color: #0e1627;
+                                                        font-weight: bold;
+                                                        font-size: 16px;">
+                                                <%= L"世界地形" %>
+                                            </div>
+                                            <div style="float: left;width: 2px;height:25px;margin-left: 32px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/fengexian_2x25_32bits.png#0 0 2 25)"/>
+                                            <pe:if condition = "<%=IsMiniWorldScope()%>">
+                                                <div style = "float: left;margin-top: -11px;margin-left:32px;margin-top:-11px;width:303px;height:46px;background-color: #0e162700;">
+                                                    <input type="checkbox" checked="true" onclick="OnWorldTerrainChange" 
+                                                    style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
+                                                    <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                                        <%= L"平坦" %>
+                                                    </div>
+                                                </div>
+                                            </pe:if>
+                                            <pe:if condition = "<%=not IsMiniWorldScope()%>">
+                                                <div style = "float: left;margin-top: -11px;margin-left:32px;margin-top:-11px;width:303px;height:46px;background-color: #0e162700;">
+                                                    <input type="checkbox" checked="<%=IsNormalTerrain()%>" onclick="OnWorldTerrainChange" 
+                                                    style="float: left;margin-top: 11px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
+                                                    <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                                        <%= L"平坦" %>
+                                                    </div>
+            
+                                                    <input type="checkbox" checked="<%=not IsNormalTerrain()%>" onclick="OnWorldTerrainChange" 
+                                                    style="float: left;margin-top: 11px;margin-left: 70px;width:24px;height:24px;" UncheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/weixuanze_24x24_32bits.png;0 0 24 24" CheckedBG="Texture/Aries/Creator/paracraft/Educate/CreateWorld/xuanze_24x24_32bits.png;0 0 24 24" name="auto_times_go"/>
+                                                    <div style="float: left;margin-left: 10px;margin-top: 11px;color: #0e1627;font-weight: bold;font-size: 16px;">
+                                                        <%= L"随机" %>
+                                                    </div>
+                                                </div>
+                                            </pe:if>
+                                        </div>
+                                        <div style="margin-left: 198px;margin-top: 158px;background-color: #00000000;">
+                                            <input type="button"
+                                            uiname="CreateNewWorld.OnClickCreateWorld"
+                                            value='<%= L"确 定" %>'
+                                            style="spacing: 20px;
+                                                    margin-left: 420px;
+                                                    height: 60px;
+                                                    min-width: 160px;
+                                                    font-size: 20px;
+                                                    font-weight: bold;
+                                                    color: #ffffff;
+                                                    shadow-quality: 0;
+                                                    shadow-color: #80133f48;
+                                                    text-shadow:true;
+                                                    background:url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/daquedin_46x46_32bits.png#0 0 46 46:16 16 16 16)"
+                                            onclick="OnClickCreateWorld"/>
+                                        </div>
+                                        <!-- <div style="margin-top:30px;">
+                                            <div style="float: left;
+                                                        margin-top: 2px;
+                                                        color: #FFFFFF;
+                                                        font-weight: bold;
+                                                        font-size: 14px;">
+                                                <%=L"初始地形" %>
+                                            </div>
+                                            <input type="button" uiname="CreateNewWorld.terrain_1" value='<%=L"超平坦" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",1) %>' onclick="OnClickModify" param1="terrain" param2="1"/>
+                                            <input type="button" uiname="CreateNewWorld.terrain_2" value='<%=L"随机地形" %>' style="float:left;margin-left:10px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",2) %>' onclick="OnClickModify" param1="terrain" param2="2"/>
+                                            <input type="button" uiname="CreateNewWorld.terrain_3" value='<%=L"空" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",3) %>' onclick="OnClickModify" param1="terrain" param2="3"/>
+                                            <input type="button" uiname="CreateNewWorld.terrain_5" value='<%=L"迷你地块" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",5) %>' onclick="OnClickModify" param1="terrain" param2="5"/>
+                                            <input type="button" uiname="CreateNewWorld.terrain_4" value='<%=L"并行世界" %>' style="float:left;margin-left:8px;color:#ffffff;" class='<%=BtnBeSelected("cur_terrain",4) %>' onclick="OnClickModify" param1="terrain" param2="4"/> -->
+                                        </div>
+                                    </div>
+                                    <!-- <div style="height: 45px;
+                                                margin-top: 8px;
+                                                margin-bottom: 10px;">
+                                        <input type="button"
+                                            uiname="CreateNewWorld.OnClickCreateWorld"
+                                            value='<%= L"创建新世界" %>'
+                                            style="spacing: 20px;
+                                                    margin-left: 180px;
+                                                    height: 40px;
+                                                    min-width: 120px;
+                                                    font-size: 18px;
+                                                    font-weight: bold;
+                                                    color: #ffffff;
+                                                    shadow-quality: 8;
+                                                    shadow-color: #80133f48;
+                                                    text-shadow:true;"
+                                            class="mc_light_orange_button_with_fillet"
+                                            onclick="MyCompany.Aries.Game.MainLogin.CreateNewWorld.OnClickCreateWorld"/>
+                                        <input type="button"
+                                            uiname="CreateNewWorld.ReturnLastStep"
+                                            value='<%=L"返回" %>'
+                                            spacing="10"
+                                            style="margin-left: 160px;
+                                                    margin-top: 6px;
+                                                    height: 32px;
+                                                    min-width: 100px;"
+                                            class="mc_light_grey_button_with_fillet"
+                                            onclick="ReturnLastStep"/>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </pe:container>
+                    </div>
+                </pe:container>
+            </pe:container>
+        </pe:mcml>
+    </body>
+</html>

@@ -53,14 +53,40 @@ end
 -- @param channel_name: channelname or filename, where filename can be relative to current world or a predefined name
 function env_imp:playSoundAndWait(channel_name, filename, from_time, volume, pitch)
 	filename = filename or channel_name;
-	SoundManager:PlaySound(channel_name, filename, from_time or 0, volume, pitch);	
-	local sound = AudioEngine.CreateGet(channel_name);
-	if(sound) then
-		local src = sound:GetSource()
-		if(src) then
-			local total_time = tonumber(src.TotalAudioTime);
-			env_imp.wait(self, total_time);
+	local playSoundAndWaitImp = function()
+		SoundManager:PlaySound(channel_name, filename, from_time or 0, volume, pitch);	
+		local sound = AudioEngine.CreateGet(channel_name);
+		if(sound) then
+			local src = sound:GetSource()
+			if(src) then
+				local total_time = tonumber(src.TotalAudioTime);
+				env_imp.wait(self, total_time);
+			end
 		end
+	end
+
+	if(filename and filename:match("^http")) then
+		local bWait = true;
+		local watiTime = 0;
+		local bSuccess = false;
+		NPL.load("(gl)script/apps/Aries/Creator/Game/Common/HttpFiles.lua");
+		local HttpFiles = commonlib.gettable("MyCompany.Aries.Game.Common.HttpFiles");
+		HttpFiles.GetHttpFilePath(filename, function(err, diskfilename) 
+			if(diskfilename) then
+				filename = diskfilename;
+				bSuccess = true;
+			end
+			bWait = false;
+		end)
+		while(bWait and watiTime < 10) do
+			env_imp.wait(self, 0.1);
+			watiTime = watiTime + 0.1;
+		end
+		if (bSuccess) then
+			playSoundAndWaitImp();
+		end
+	else
+		playSoundAndWaitImp();
 	end
 end
 
@@ -82,15 +108,24 @@ end
 
 -- play a text 
 -- @param text: the text to play
+-- @param duration: if -1, we will play until text is finished. Otherwise it is milliseconds to wait after playing text. 
 -- @param voiceNarrator: the narrator of the voice
 function env_imp:playText(text, duration, voiceNarrator)
 	if text == nil or text == "" then
 		SoundManager:StopPlayText()
 	else
-		SoundManager:PlayText(text, voiceNarrator);	
+		if(duration ~= -1) then
+			SoundManager:PlayText(text, voiceNarrator);	
+		else
+			-- load text timeout is 8 seconds
+			SoundManager:PlayText(text, voiceNarrator, 8, nil, nil, self.co:MakeCallbackFuncAsync(function()
+				env_imp.resume(self)
+			end))
+			env_imp.yield(self);
+		end
 	end
 	
-	if duration then
+	if duration and duration>0 then
 		env_imp.wait(self, duration);
 	end
 end

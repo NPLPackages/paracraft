@@ -131,56 +131,73 @@ function NplBrowserPlugin.RunNextCmd()
 	    LOG.std(nil, "info", "NplBrowserPlugin.RunNextCmd", "running:%s %s", cmd.cmd,cmd.id);
         LOG.std(nil, "info", "NplBrowserPlugin.RunNextCmd activate", cmd);
 
-        if System.os.GetPlatform() == 'win32' then
+        if (System.os.GetPlatform() == 'win32') then
             local dll_name = cmd.dll_name or default_dll_name;
             NPL.activate(dll_name, cmd); 
         end
 
-        if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then
-            if cmd.cmd == 'Show' then
-                local p = NplBrowserPlugin.GetCache(cmd.id)
+        if (System.os.GetPlatform() == 'mac' or
+            System.os.GetPlatform() == 'ios' or
+            System.os.GetPlatform() == 'android') then
+            local p = NplBrowserPlugin.GetCache(cmd.id);
 
-                if cmd.visible then
-                    if not p.isLoadWebview then
-                        local x
-                        local y
-                        local width
-                        local height
+            local x, y = p.x, p.y;
+            local width, height = p.width, p.height;
 
-                        if System.os.GetPlatform() == 'ios' then
-                            local uiScales = System.Windows.Screen:GetUIScaling();
+            if (System.os.GetPlatform() == "android") then
+                local uiScales = System.Windows.Screen:GetUIScaling();
 
-                            if(uiScales[1] ~= 1 or uiScales[2] ~= 1) then
-                                x = math.floor((p.x - 55) / uiScales[1]);
-                                y = math.floor(p.y / uiScales[2]);
-                                width = math.floor((p.width - 55) / uiScales[1]);
-                                height = math.floor(p.height / uiScales[2]);
-                            end
-                        else
-                            x = p.x
-                            y = p.y
-                            width = p.width
-                            height = p.height
-                        end
+                if (uiScales[1] ~= 1 or uiScales[2] ~= 1) then
+                    x = math.floor(x  * uiScales[1]);
+                    y = math.floor(y * uiScales[2]);
+                    width = math.floor(width * uiScales[1]);
+                    height = math.floor(height * uiScales[2]);
+                end
+            end
+
+            if (System.os.GetPlatform() == "ios" or
+                System.os.GetPlatform() == "mac") then
+                x = math.floor(x / System.options.default_ui_scaling[1]);
+                y = math.floor(y / System.options.default_ui_scaling[2]);
+                width = math.floor(width / System.options.default_ui_scaling[1]);
+                height = math.floor(height / System.options.default_ui_scaling[2]);
+            end
+
+            if (cmd.cmd == 'Show') then
+                if (cmd.visible) then
+                    if (not p.isLoadWebview) then
                         NplBrowserPlugin.webview = WebView:new():init(x, y, width, height, true);
-
+                        NplBrowserPlugin.webview:IgnoreCloseWhenClickBack(true)
                         NplBrowserPlugin.webview:loadUrl(p.url);
+                        NplBrowserPlugin.webview._url = p.url;
                         p.isLoadWebview = true
                     else
-                        NplBrowserPlugin.webview:move(p.x, p.y);
-                        NplBrowserPlugin.webview:resize(p.width, p.height);
+                        if not (System.os.GetPlatform() == 'android') then
+                            NplBrowserPlugin.webview:move(x, y);
+                            NplBrowserPlugin.webview:resize(width, height);
+                        end
+
+                        if (NplBrowserPlugin.webview._url ~= p.url) then
+                            NplBrowserPlugin.webview:loadUrl(p.url);
+                            NplBrowserPlugin.webview._url = p.url;
+                        end
+
+                        NplBrowserPlugin.webview:setVisible(cmd.visible);
                     end
                 else
                     NplBrowserPlugin.webview:setVisible(cmd.visible);
-                    NplBrowserPlugin.webview:loadUrl("");
-                    p.isLoadWebview = false
+                    --NplBrowserPlugin.webview:loadUrl("");
                 end
             end
 
             if cmd.cmd == 'ChangePosSize' then
                 local p = NplBrowserPlugin.GetCache(cmd.id)
-                NplBrowserPlugin.webview:move(p.x, p.y);
-                NplBrowserPlugin.webview:resize(p.width, p.height);
+
+                if p.isLoadWebview then
+                    NplBrowserPlugin.webview:move(x, y);
+                    NplBrowserPlugin.webview:resize(width, height);
+                    NplBrowserPlugin.webview:bringToTop();
+                end
             end
 
             if cmd.cmd == 'Zoom' then
@@ -188,7 +205,13 @@ function NplBrowserPlugin.RunNextCmd()
             end
 
             if cmd.cmd == 'Open' then
-                -- // TODO
+                NplBrowserPlugin.webview:setVisible(cmd.visible);
+
+                if not (System.os.GetPlatform() == 'android') then
+                    NplBrowserPlugin.webview:move(x, y);
+                    NplBrowserPlugin.webview:resize(width, height);
+                end
+                -- NplBrowserPlugin.webview:loadUrl(p.url);
             end
         end
 
@@ -288,14 +311,14 @@ end
 
 -- create a cef window
 function NplBrowserPlugin.Start(p)
-    if System.os.GetPlatform() == 'win32' then
+    if (System.os.GetPlatform() == 'win32') then
 		NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
 		local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
         NplBrowserLoaderPage.Check(function()
             -- TODO: refresh page after download cef3
         end)
     
-        if not NplBrowserLoaderPage.IsLoaded() then
+        if (not NplBrowserLoaderPage.IsLoaded()) then
             return false
         end
     end
@@ -371,6 +394,7 @@ function NplBrowserPlugin.Start(p)
             -parent_handle="%s"
             -cefclient_config_filename="%s"
             -pid="%s"
+            -autoplay-policy=no-user-gesture-required
         ]],
         window_title,
         id,
@@ -406,7 +430,7 @@ function NplBrowserPlugin.Start(p)
         NPL.activate(dll_name, input);
     end
 
-    if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then
+    if System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' or System.os.GetPlatform() == 'android' then
         NplBrowserPlugin.ClearPendingWindow(id);
         NplBrowserPlugin.SetWindowExisted(id, true);
     end
@@ -451,22 +475,18 @@ function NplBrowserPlugin.ChangePosSize(p, bActivedMode)
         callback_file = callback_file,
     }
 
-    if bActivedMode then
-        if System.os.GetPlatform() == 'win32' then
+    if (bActivedMode) then
+        if (System.os.GetPlatform() == 'win32') then
             NPL.activate(dll_name, input);
-        end
-
-        if System.os.GetPlatform() == 'mac' then
-            if not NplBrowserPlugin.webview then
-                return false;
-            end
-
-            NplBrowserPlugin.webview:move(input.x, input.y);
-            NplBrowserPlugin.webview:resize(input.width, input.height);
         end
 
         NplBrowserPlugin.UpdateCache(id, input)
     else
+        if (System.os.GetPlatform() == "mac" or
+            System.os.GetPlatform() == "ios") then
+            NplBrowserPlugin.UpdateCache(id, input);
+        end
+
         NplBrowserPlugin.PushBack(input);
     end
 end
@@ -544,6 +564,7 @@ function NplBrowserPlugin.CheckCefWindow(p)
         callback_file = callback_file,
         client_name = client_name,
         cefclient_config_filename = cefclient_config_filename,
+        cmdline = "-autoplay-policy=no-user-gesture-required",
         pid = tostring(System.os.GetCurrentProcessId()),
     }
     NPL.activate(dll_name, input); 
@@ -564,7 +585,7 @@ function NplBrowserPlugin.OsSupported()
                     NplBrowserPlugin.isSupported = false;
                 end
             end
-        elseif System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' then
+        elseif System.os.GetPlatform() == 'mac' or System.os.GetPlatform() == 'ios' or System.os.GetPlatform() == 'android' then
             NplBrowserPlugin.isSupported = true;
         else
             NplBrowserPlugin.isSupported = false;

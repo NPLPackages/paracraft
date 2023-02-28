@@ -43,6 +43,10 @@ end
 
 -- @param callbackFunc: called when started. function(bSucceed) end
 function VideoSharing.BeginCapture(callbackFunc)
+	if(VideoSharing.pluginNeedRestart) then
+		_guihelper.MessageBox(L"插件安装完成, 需要重新启动客户端才能使用");
+		return
+	end
 	function startCapture()
 		VideoSharing.output = nil;
 		AudioEngine.SetGarbageCollectThreshold(99999);
@@ -110,6 +114,9 @@ function VideoSharing.BeginCapture(callbackFunc)
 				VideoRecorder.InstallPlugin(function(bSucceed)
 					if(bSucceed) then
 						_guihelper.MessageBox(nil);
+						if(not VideoRecorder.HasFFmpegPlugin()) then
+							VideoSharing.pluginNeedRestart = true
+						end
 						VideoSharing.BeginCapture(callbackFunc)
 					else
 						_guihelper.MessageBox(L"安装失败了");
@@ -135,28 +142,11 @@ function VideoSharing.EndCapture(showUpload)
 	end
 end
 
---宇哥的需求，录制模式下不显示esc，记录原有的esc状态
-VideoSharing.IsShowEscDock = nil
-function VideoSharing.UpdateEscDock(bShow)
-	local EscDock = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/EscDock.lua") 
-	if VideoSharing.IsShowEscDock  == nil then
-		VideoSharing.IsShowEscDock = EscDock.IsVisible() == true
-	end
-	if bShow then
-		EscDock.ShowView(not bShow)
-	else
-		local isShow = VideoSharing.IsShowEscDock ~= nil and VideoSharing.IsShowEscDock or false
-		EscDock.ShowView(isShow)
-		VideoSharing.IsShowEscDock = nil
-	end
-end
-
-
 function VideoSharing.ShowRecordingArea(bShow)
 	NPL.load("(gl)script/kids/3DMapSystemApp/Assets/AsyncLoaderProgressBar.lua");
 	local AsyncLoaderProgressBar = commonlib.gettable("Map3DSystem.App.Assets.AsyncLoaderProgressBar");
 	if(VideoRecorder.HasFFmpegPlugin()) then
-		VideoSharing.UpdateEscDock(bShow)
+		GameLogic.GetFilters():apply_filters("update_dock",bShow);
 		local _parent = ParaUI.GetUIObject("ShareSafeArea");
 		if(not bShow) then
 			if(AsyncLoaderProgressBar.GetDefaultAssetBar()) then
@@ -293,7 +283,7 @@ function VideoSharing.ShowRecordingArea(bShow)
 					VideoSharing.EndCapture(true);
 				end
 			end})
-			if (VideoSharingSettings.total_time == 10 or VideoSharingSettings.total_time == 30) then
+			if (VideoSharingSettings.total_time == 10 or VideoSharingSettings.total_time == 30 or VideoSharingSettings.total_time == 20) then
 				VideoSharing.title_timer:Change(1000,500);
 			end
 

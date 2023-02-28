@@ -41,17 +41,19 @@ function OpenFileDialog.GetFilters(filterName)
 	if(filterName == "model") then
 		return {
 			-- {L"全部文件(*.fbx,*.x,*.bmax,*.xml)",  "*.fbx;*.x;*.bmax;*.xml", exclude="*.blocks.xml"},
-			{L"全部文件(*.fbx,*.FBX,*.x,*.bmax)",  "*.fbx;*.FBX;*.x;*.bmax", exclude="*.blocks.xml"},
+			{L"全部文件(*.fbx,*.FBX,*.x,*.bmax,*.glb,*.gltf)",  "*.fbx;*.FBX;*.x;*.bmax;*.glb;*.gltf", exclude="*.blocks.xml"},
 			{L"FBX模型(*.fbx)",  "*.fbx"},
 			{L"bmax模型(*.bmax)",  "*.bmax"},
 			{L"ParaX模型(*.x,*.xml)",  "*.x;*.xml"},
 			{L"block模版(*.blocks.xml)",  "*.blocks.xml"},
 		};
 	elseif(filterName == "bmax") then
+		OpenFileDialog.bBanChinese = true
 		return {
 			{L"bmax模型(*.bmax)",  "*.bmax"},
 		};
 	elseif(filterName == "x") then
+		OpenFileDialog.bBanChinese = true
 		return {
 			{L"ParaX模型(*.x)",  "*.x"},
 		};
@@ -98,6 +100,14 @@ function OpenFileDialog.GetFilters(filterName)
 		return {
 			{L"Paracraft世界",  "*", searchPath = LocalLoadWorld.GetDefaultSaveWorldPath().."/", searchLevel=0, filterFunc = "*."},
 		};
+	elseif(filterName == "video") then
+		return {
+			{L"全部文件(*.mp4,*.3gp,*.avi,*.rmvb)",  "*.mp4;*.3gp;*.avi;*.rmvb"},
+			{L"mp4(*.mp4)",  "*.mp4"},
+			{L"3gp(*.3gp)",  "*.3gp"},
+			{L"rmvb(*.rmvb)",  "*.rmvb"},
+			{L"avi(*.avi)",  "*.avi"},
+		};
 	end
 end
 
@@ -105,7 +115,7 @@ end
 -- @param filters: "model", "bmax", "audio", "texture", "xml", "x", nil for any file, or filters table
 -- @param editButton: this can be nil or a function(filename) end or {text="edit", callback=function(filename) end}
 -- the callback function can return a new filename to be displayed. 
-function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, IsSaveMode, editButton)
+function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, IsSaveMode, editButton, auto_virtual_keyboard)
 	OpenFileDialog.result = nil;
 	OpenFileDialog.text = text;
 	OpenFileDialog.title = title;
@@ -114,9 +124,9 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 	end
 	OpenFileDialog.filters = filters;
 	OpenFileDialog.editButton = editButton;
+	OpenFileDialog.auto_virtual_keyboard = auto_virtual_keyboard;
 	OpenFileDialog.IsSaveMode = IsSaveMode == true;
 	OpenFileDialog.UpdateExistingFiles();
-
 	local params = {
 			url = "script/apps/Aries/Creator/Game/GUI/OpenFileDialog.html", 
 			name = "OpenFileDialog.ShowPage", 
@@ -141,6 +151,7 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 
 	if(default_text) then
 		params._page:SetUIValue("text", commonlib.Encoding.DefaultToUtf8(default_text));
+		OpenFileDialog.OnTextChange(name, mcmlNode)
 	end
 	params._page.OnClose = function()
 		if(OnClose) then
@@ -157,6 +168,7 @@ function OpenFileDialog.ShowPage(text, OnClose, default_text, title, filters, Is
 				if(fileItem and fileItem.relativeToWorldPath) then
 					local filename = fileItem.relativeToWorldPath;
 					params._page:SetValue("text", commonlib.Encoding.DefaultToUtf8(filename));
+					OpenFileDialog.OnTextChange(name, mcmlNode)
 				end
 			end
 			
@@ -487,27 +499,32 @@ function OpenFileDialog.RefreshFileTreeView()
 end
 
 function OpenFileDialog.OnTextChange(name, mcmlNode)
-	local text = mcmlNode:GetUIValue()
-	local patt = "[^a-zA-Z0-9_%.]"
-	if text and string.match(text,patt) then
-		text = string.gsub(text,patt,"")
-		page:SetUIValue("text",text)
-	end
+	-- if not OpenFileDialog.bBanChinese then --禁止中文名称
+	-- 	return
+	-- end
+	-- local text = page:GetUIValue("text")
 	
-	if(text and text:match("^[/?]")) then
-		OpenFileDialog.searchTimer = OpenFileDialog.searchTimer or commonlib.Timer:new({callbackFunc = function(timer)
-			if(page) then
-				local text = page:GetUIValue("text") or ""
-				local searchText = text:match("^[/?](.+)")
-				if(OpenFileDialog.SetSearchText(searchText)) then
-					OpenFileDialog.RefreshFileTreeView()
-				end
-			end
-		end})
-		OpenFileDialog.searchTimer:Change(500);
-	else
-		if(OpenFileDialog.SetSearchText()) then
-			OpenFileDialog.RefreshFileTreeView()
-		end
-	end
+	-- local patt = "[^a-zA-Z0-9_%./\\%(%)%-%+]"
+	-- if text and string.match(text,patt) then
+	-- 	text = string.gsub(text,"%s","")
+	-- 	text = string.gsub(text,patt,"x")
+	-- 	page:SetUIValue("text",text)
+	-- end
+	
+	-- if(text and text:match("^[/?]")) then
+	-- 	OpenFileDialog.searchTimer = OpenFileDialog.searchTimer or commonlib.Timer:new({callbackFunc = function(timer)
+	-- 		if(page) then
+	-- 			local text = page:GetUIValue("text") or ""
+	-- 			local searchText = text:match("^[/?](.+)")
+	-- 			if(OpenFileDialog.SetSearchText(searchText)) then
+	-- 				OpenFileDialog.RefreshFileTreeView()
+	-- 			end
+	-- 		end
+	-- 	end})
+	-- 	OpenFileDialog.searchTimer:Change(500);
+	-- else
+	-- 	if(OpenFileDialog.SetSearchText()) then
+	-- 		OpenFileDialog.RefreshFileTreeView()
+	-- 	end
+	-- end
 end

@@ -35,10 +35,10 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 			{
 				{text = L"新建...".."  Ctrl+N",name = "file.createworld",onclick=nil},
 				{text = L"打开...".."  Ctrl+O",name = "file.loadworld",onclick=nil},
-				{text = L"快速保存".."  Ctrl+S",name = "file.saveworld",onclick=nil, cmd="/save"},
+				{text = System.options.channelId_431 and L"临时保存".."  Ctrl+S" or L"快速保存".."  Ctrl+S",name = "file.saveworld",onclick=nil, cmd="/save"},
 				{text = L"另存为...",name = "file.saveworldas",onclick=nil},
 				{Type = "Separator"},
-				{text = L"分享上传...",name = "file.uploadworld",onclick=nil},
+				{text = System.options.channelId_431 and L"保存世界" or L"上传世界",name = "file.uploadworld",onclick=nil},
 				{text = L"本地历史版本...",name = "file.openbackupfolder",onclick=nil},
 				{text = L"生成独立应用程序...",name = "file.makeapp", cmd="/makeapp UImode"},
 				{text = L"备份...",name = "file.worldrevision",onclick=nil},
@@ -59,6 +59,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{Type = "Separator"},
 				{text = L"方块跳转...".."  Ctrl+F",name = "window.find",onclick=nil},
 				{text = L"全文搜索...".."  Ctrl+Shift+F",name = "window.findfile", cmd="/findfile", onclick=nil},
+				{text = L"代码跳转...".."  Ctrl+P",name = "window.findcodeblock", cmd="/findfile -codeblock",onclick=nil},
 				{text = L"跳到上一层".."  Tab",name = "edit.upstairs",onclick=nil},
 				{text = L"跳到下一层".."  Shift+Tab",name = "edit.downstairs",onclick=nil},
 				{text = L"跳转点",name = "edit.bookmarks", onclick=nil, children = 
@@ -103,6 +104,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				{text = L"视频录制...".."  F9",name = "window.videorecoder", cmd="/record"},
 				{text = L"音频录制...",name = "window.soundrecoder", cmd="/recordsound"},
 				{text = L"好友...",name = "window.friend",onclick=nil},
+				{text = L"邮件...",name = "window.email",onclick=nil},
 				--{text = L"视频分享...",name = "window.videosharing", cmd="/share"},
 				{Type = "Separator"},
 				{text = L"信息".."  F3",name = "window.info",onclick=nil},
@@ -112,8 +114,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = "NPL Debugger... (Ctrl+Alt+I)",name = "window.debugger", cmd="/open npl://debugger"},
 				{text = L"MOD插件管理...".."  Ctrl+M",name = "window.mod",cmd="/show mod"},
 				{Type = "Separator"},
-				{text = L"短视频分享...",name = "share.videosharing", cmd="/share"},
-				{text = L"全景图分享...",name = "share.panoramasharing", onclick=nil},
+				{text = L"分享...",name = "share.video_or_panorama", onclick=nil},
 			},
 		},
 		{text = L"帮助", order=7, name = "help",children = 
@@ -154,6 +155,36 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 	};
 	-- apply filter
 	menu_items = GameLogic.GetFilters():apply_filters("desktop_menu", menu_items);
+	if System.options.isChannel_430 then
+		for _, menuItem in ipairs(menu_items) do
+			if(menuItem.children and menuItem.name =="help") then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					return item.name ~= "help.learn"
+				end)
+			end
+		end
+	end
+	if System.options.channelId_431 then
+		for _, menuItem in ipairs(menu_items) do
+			if(menuItem.children and menuItem.name =="help") then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					return item.name ~= "help.learn" and item.name ~= "help.userintroduction" and item.name ~= "help.dailycheck" and item.name ~= "help.creativespace" and item.name ~= "help.ask" and item.name ~= "help.bug"
+				end)
+			elseif(menuItem.children and menuItem.name =="file")then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					return item.name ~= "file.saveworldas" and item.name ~= "file.openbackupfolder" and item.name ~= "file.worldrevision"
+				end)
+			elseif(menuItem.children and menuItem.name =="edit")then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					return item.name ~= "window.macro"
+				end)
+			elseif(menuItem.children and menuItem.name =="window")then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					return item.name ~= "window.explore" and item.name ~= "window.role"  and item.name ~= "window.schoolcenter" and item.name ~= "window.userbag" and item.name ~= "window.friend" and item.name ~= "window.email" and item.name ~= "window.console" and item.name ~= "window.mod"
+				end)
+			end
+		end
+	end
 	edit_mode_menu = {};
 	game_mode_menu = {};
 	for _, menuItem in ipairs(menu_items) do

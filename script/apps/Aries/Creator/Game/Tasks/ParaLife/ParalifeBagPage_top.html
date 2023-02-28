@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="ParalifeBagPage.lua"><![CDATA[
+ParalifeBagPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.ParaLife.ParalifeBagPage");
+ParalifeBagPage.OnInit()
+local pageCtrl = document:GetPageCtrl();
+itemPadding = 12
+margin_bottom = 12
+function ClosePage()
+    Page:CloseWindow();
+end
+function getPageItemCount()
+    return ParalifeBagPage.PAGE_SIZE
+end
+function getIdxInPage()
+    return (Eval("index")-1) % getPageItemCount() + 1
+end
+function getPanelWidth()
+    local width = ParalifeBagPage.ITEM_SIZE*getPageItemCount() + itemPadding*(getPageItemCount()-1)
+    return width
+end
+
+function getItemSize()
+    return ParalifeBagPage.ITEM_SIZE
+end
+
+function ds() --只取前面ParalifeBagPage.PAGE_SIZE个
+    local _itemList = ParalifeBagPage.GetDataSource()
+    if #_itemList>ParalifeBagPage.PAGE_SIZE then
+    _itemList = {}
+    for i=1,ParalifeBagPage.PAGE_SIZE do
+        _itemList[i] = ParalifeBagPage._itemList[i]
+    end
+    end
+    return _itemList
+end
+
+function getCanvas3dContainerXmlStrs()
+    local str = ""
+    for i=1,ParalifeBagPage.PAGE_SIZE do
+        local xml = [[
+        <pe:container visible='false' ClickThrough="true" style='<%%= string.format("width: %%spx; height: %%spx;background:url();",getItemSize(),getItemSize()) %%>'>
+            <pe:canvas3d name='item_canvas3d_%s' DefaultRotY='-1.57' IsInteractive="false" autoRotateSpeed="0" miniscenegraphname='item_canvas3d_%s' RenderTargetSize="64" 
+                        value='<%%= nil %%>' style='<%%= string.format("width:%%spx;height:%%spx;margin-top: 4px;margin-left: 4px;",getItemSize()-8,getItemSize()-8)%%>' />
+        </pe:container>
+        ]]
+        xml = string.format(xml,i,i)
+        str = str..xml
+    end
+    return str
+end
+]]></script>
+<pe:container uiname="paralife_back" ClickThrough="true" alignment="_fi" width="100%" height="100%" style="background:;">
+    <pe:container alignment="_fi" zorder="-10" name="screen_bg" uiname="ui_screen_bg" width="100%" height="100%" style="position: relative; background:url()" >
+    <pe:container uiname="page_bg" alignment="_ctt" style="background:url()">
+        <div style='<%= string.format("background:url();margin-bottom: %spx;margin-top: 10px",margin_bottom) %>'>
+            <pe:repeat DataSource='<%= ds()%>'>
+                <pe:repeatitem>
+                    <pe:container ClickThrough="true" style='<%= string.format("float:left;background:url();padding-left: %spx;padding-right: %spx;",itemPadding*0.5,itemPadding*0.5) %>'>
+                        <pe:container ClickThrough="true" style='<%= string.format("width: %spx; height: %spx;background:url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/weixuanzhong_81x81_32bits.png#0 0 81 81)",getItemSize(),getItemSize()) %>'>
+                            <pe:container ClickThrough="true" uiname='<%= "item_"..(getIdxInPage())%>' name='<%= "item_"..(getIdxInPage())%>' realIdx='<%=Eval("index")%>' style='<%= string.format("background:url();width: %spx; height: %spx;",getItemSize(),getItemSize()) %>'>
+                                
+                            </pe:container>
+                        </pe:container>
+                    </pe:container>
+                </pe:repeatitem>
+            </pe:repeat>
+        </div>
+        
+    </pe:container>
+    <pe:container alignment="_fi" zorder="1" ClickThrough="true" width="100%" height="100%" style="position: relative; background:url()" >
+        <pe:container visible="false" zorder="1" style="width: 64px; height: 64px;background:url()">
+            <pe:canvas3d name='draged_canvas3d' DefaultRotY="-1.57" IsInteractive="true" autoRotateSpeed="0" miniscenegraphname='draged_canvas3d' RenderTargetSize="64" 
+                value='<%= nil %>'  style="width:64px;height:64px;margin-top: 0px;" />
+        </pe:container>
+        
+        <%= getCanvas3dContainerXmlStrs()%>
+    </pe:container>
+</pe:container>
+</pe:mcml>
+</body>
+</html>

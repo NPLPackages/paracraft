@@ -84,6 +84,10 @@ function EscFramePage.ShowPage_Mobile()
 	GameLogic.RunCommand("/menu file.exit");
 end
 
+function EscFramePage.IsVisible()
+	return page and page:IsVisible()
+end
+
 function EscFramePage.ShowPage(bShow)
 	GameLogic.GetFilters():apply_filters("OnShowEscFrame", bShow);
 	if(System.options.IsMobilePlatform) then
@@ -92,19 +96,27 @@ function EscFramePage.ShowPage(bShow)
 		local isCustomShow = GameLogic.GetFilters():apply_filters('EscFramePage.ShowPage', false, bShow)
 		if not isCustomShow then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
 			local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
-				
+			local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
+			local isMobile = MobileUIRegister.GetMobileUIEnabled()
+			if isMobile then
+				EscFramePage.GetProfile()
+			end
 			local bActivateMenu = true;
 			if(bShow ~= false) then
-				if(page and page:IsVisible()) then
+				if(EscFramePage.IsVisible()) then
 					bActivateMenu = false;
 				end
-				DesktopMenuPage.ActivateMenu(bActivateMenu);
+				 DesktopMenuPage.ActivateMenu(bActivateMenu);
 			end
 			EscFramePage.bForceHide = bShow == false;
-
+			local url = "script/apps/Aries/Creator/Game/Areas/EscFramePage.html"
+			if System.options.channelId_431 then
+				url = "script/apps/Aries/Creator/Game/Educate/Other/EscFramePage.431.html"
+			end
 			local params = {
-					url = "script/apps/Aries/Creator/Game/Areas/EscFramePage.html", 
+					url = url,
 					name = "EscFramePage.ShowPage", 
 					isShowTitleBar = false,
 					DestroyOnClose = true,
@@ -125,10 +137,12 @@ function EscFramePage.ShowPage(bShow)
 					-- DesignResolutionWidth = 1280,
 					-- DesignResolutionHeight = 720,
 				};
+			params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"EscFramePage");
 			System.App.Commands.Call("File.MCMLWindowFrame", params);
 			if(bShow ~= false) then
 				params._page.OnClose = function()
 					if(not EscFramePage.bForceHide) then
+						GameLogic.GetFilters():apply_filters("OnEscFrameClose");
 						DesktopMenuPage.ActivateMenu(false);
 						page = nil
 					end
@@ -136,4 +150,51 @@ function EscFramePage.ShowPage(bShow)
 			end
 		end
 	end
+end
+
+function EscFramePage.GetProfile()
+	local function handle()
+		if(page) then
+			page:Refresh(0.01);
+		end
+	end
+	if EscFramePage.profile == nil then
+		local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/KeepWorkItemManager.lua");
+		local profile = KeepWorkItemManager.GetProfile()
+		if (profile.username == nil or profile.username == "") then
+		    KeepWorkItemManager.LoadProfile(true, function(err, msg, data)
+		        if(err ~= 200)then
+		            return
+		        end
+		        if data.username and data.username ~= "" then
+					EscFramePage.profile = data
+		           handle()
+		        end
+		    end)
+		else    
+		    EscFramePage.profile = profile
+		    handle()
+		end
+	else
+		handle()
+	end
+end
+
+function EscFramePage.GetUserName()
+	if EscFramePage.profile then
+		return EscFramePage.profile.username
+	end
+end
+
+function EscFramePage.GetNickName()
+	if EscFramePage.profile then
+		return EscFramePage.profile.nickname
+	end
+end
+
+function EscFramePage.GetSchoolName()
+	if EscFramePage.profile and EscFramePage.profile.school then
+		return EscFramePage.profile.school.name
+	end
+	return ""
 end

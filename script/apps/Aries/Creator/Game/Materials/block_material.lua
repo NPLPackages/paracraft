@@ -72,6 +72,13 @@ function Materials.RegisterAllMaterials()
 	Materials.cornergrass = Material:new():Init():setNoPushMobility();
 	Materials.carpet = Material:new():Init():setReplaceable();
 	Materials.glass_carpet = Material:new():Init():setReplaceable();
+
+	Materials.ice.physicsProperty = {Friction = 0.5};
+	Materials.glass.physicsProperty = {Friction = 0.5};
+	Materials.wood.physicsProperty = {Friction = 2.5};
+	Materials.sand.physicsProperty = {Friction = 1.5};
+	Materials.snow.physicsProperty = {Friction = 1.0};
+	Materials.carpet.physicsProperty = {Friction = 2.0};
 end
 
 function Material:ctor()
@@ -175,4 +182,61 @@ end
 -- Returns true if blocks with self material can always be mined in adventure mode.
 function Material:isAdventureModeExempt()
     return self.isAdventureModeExempt;
+end
+
+-- block_types.xml => physicsProperty = "{Friction = 3}"
+function Material:getPhysicsProperty()
+	if(not self.physicsProperty) then
+		self.physicsProperty = {
+			-- Mass = 1.0,   -- 质量
+			-- Friction = 1.0, -- 摩擦力
+
+			-- 惯性
+			-- LocalInertiaX = 0,
+			-- LocalInertiaY = 0,
+			-- LocalInertiaZ = 0,
+
+			-- 重力
+			-- GravityX = 0,
+			-- GravityY = 0,
+			-- GravityZ = 0,
+
+			-- 线性衰减
+			-- LinearDamping = 0,
+			-- AngularDamping = 0,
+
+			-- LinearFactorX = 0,
+			-- LinearFactorY = 0,
+			-- LinearFactorZ = 0,
+
+			-- AngularFactorX = 0,
+			-- AngularFactorY = 0,
+			-- AngularFactorZ = 0,
+
+			-- LinearVelocityX = 0,
+			-- LinearVelocityY = 0,
+			-- LinearVelocityZ = 0,
+
+			-- AngularVelocityX = 0,
+			-- AngularVelocityY = 0,
+			-- AngularVelocityZ = 0,
+
+			-- Flags = 0,
+			-- ActivationState = 0,
+			-- DeactivationTime = 0,
+			-- Restitution = 0,
+			-- Friction = 0,
+			-- RollingFriction = 0,
+			-- SpinningFriction = 0,
+			-- ContactStiffness = 0,
+			-- ContactDamping = 0,
+			-- IslandTag = 0,
+			-- CompanionId = 0,
+			-- HitFraction = 0,
+			-- CollisionFlags = 0,
+			-- CcdSweptSphereRadius = 0,
+			-- CcdMotionThreshold = 0,
+		}
+	end
+	return self.physicsProperty;
 end

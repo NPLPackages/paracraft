@@ -22,6 +22,12 @@ function ShareWorldPage.ShowPage()
 	-- FIXME World share mod take control of the share actions
 	-- GameLogic.GetFilters():apply_filters("user_event_stat", "world", "share."..tostring(GameLogic.world.seed), 10, nil);
 
+	if System.options.channelId_431 then
+		local ShareWorld = NPL.load('(gl)script/apps/Aries/Creator/Game/Educate/Other/ShareWorld.lua')
+		ShareWorld.ShowPage()
+		return false
+	end
+
 	if(not GameLogic.GetFilters():apply_filters("SaveWorldPage.ShowSharePage", true)) then
 		return false;
 	end

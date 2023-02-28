@@ -149,6 +149,30 @@ function block:GetMetaDataFromEnv(blockX, blockY, blockZ, side, side_region, cam
     return blockData;
 end
 
+local MirrorBlockData = {
+	x = {[3] = 4, [4] = 3, [5] = 6, [6] = 5, [7] = 9, [9] = 7},
+	y = {[7] = 9, [8] = 10, [9] = 7, [10] = 8},
+	z = {[3] = 6, [4] = 5, [5] = 4, [6] = 3,[8] = 10, [10] = 8},
+}
+function block:MirrorBlockData(blockData, mirror_axis)
+	local shapData = blockData
+	if blockData > 16 then
+		shapData = shapData - 16
+	end
+	local mirror_data = MirrorBlockData[mirror_axis]
+	if mirror_data then
+		local data = mirror_data[shapData]
+		if data then
+			if self:CanHasPower() and blockData > 16 then
+				data = data + 16
+			end
+			return data 
+		end
+	end
+
+	return blockData
+end
+
 -- Completely recalculates the track shape based on neighboring tracks
 function block:RefreshTrackShape(x,y,z, bForceUpdate)
 	if(not GameLogic.isRemote and not BlockEngine:IsUpdatingBlocks()) then
@@ -166,7 +190,6 @@ function block:RefreshTrackShape(x,y,z, bForceUpdate)
 				new_data = shapeData + 16;
 			end
 		end
-	
 		if(new_data ~= last_data) then
 			BlockEngine:SetBlockData(x,y,z, new_data, 3);
 		end 

@@ -147,6 +147,7 @@ end
 
 function CodeLessonTip.OnClose()
     
+    GameLogic.GetCodeGlobal():BroadcastTextEvent("CodeLessonTipVisibleChange");
     GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", CodeLessonTip.CodeWinChangeVisible, CodeLessonTip);
 end
 
@@ -166,7 +167,7 @@ end
 
 --lesson_config 课程配置
 --lesson_index 第几节课
-function CodeLessonTip.ShowView(lesson_config, lesson_index)
+function CodeLessonTip.ShowView(lesson_config, lesson_index, is_show_lt_Bt)
     if not lesson_config or not lesson_index then
         return
     end
@@ -175,6 +176,10 @@ function CodeLessonTip.ShowView(lesson_config, lesson_index)
     CodeLessonTip.lx_index = (CodeLessonTip.lesson_index - math.floor(CodeLessonTip.lesson_index)) * 10
     CodeLessonTip.IsShowCodeWin = CodeLessonTip.IsEditorOpen()
     CodeLessonTip.ClickDifficultTimes = 0
+    CodeLessonTip.IsShowLTBt = true
+    if is_show_lt_Bt ~= nil then
+        CodeLessonTip.IsShowLTBt = is_show_lt_Bt
+    end
 
     local params = {
         url = "script/apps/Aries/Creator/Game/Tasks/World2In1/CodeLessonTip/CodeLessonTip.html",
@@ -211,7 +216,7 @@ function CodeLessonTip.ShowView(lesson_config, lesson_index)
     --     enable_esc_key = true,
 	-- 	alignment="_lt", left=0, top=0, width = 600, height = 500, zorder = 0,
 	-- });
-    GameLogic.GetFilters():apply_filters("esc_codelesson",true);
+    GameLogic.GetFilters():apply_filters("update_dock",true);
     if not CodeLessonTip.Bind then
         CodeLessonTip.Bind = true
         local viewport = ViewportManager:GetSceneViewport();
@@ -242,13 +247,21 @@ function CodeLessonTip.RefreshNodeVisible()
 
     local node = page:FindControl("bt_return")
     if node and node:IsValid() then
-        node.visible = not CodeLessonTip.IsShowCodeWin
+        if CodeLessonTip.lesson_config.return_bt_visible ~= nil then
+            node.visible = CodeLessonTip.lesson_config.return_bt_visible
+        else
+            node.visible = not CodeLessonTip.IsShowCodeWin
+        end
     end
     
-    node = page:FindControl("bottom_node")
-    if node and node:IsValid() then
-        node.visible = CodeLessonTip.IsShowCodeWin == true
-    end
+    -- node = page:FindControl("bottom_node")
+    -- if node and node:IsValid() then
+    --     node.visible = CodeLessonTip.IsShowCodeWin == true
+    -- end
+end
+
+function CodeLessonTip.IsShow()
+    return page and page:IsVisible()
 end
 
 function CodeLessonTip.RefreshSize()
@@ -271,6 +284,7 @@ function CodeLessonTip.GetTargetDesc()
     return target_desc_list[CodeLessonTip.lesson_index] or ""
 end
 
+-- 目标介绍
 function CodeLessonTip.ClickTargetIntroduce()
     GameLogic.GetCodeGlobal():BroadcastTextEvent("playCodeTargetMovice");
     if CodeLessonTip.lx_index == 0 then
@@ -296,17 +310,18 @@ function CodeLessonTip.ClickSub()
     GameLogic.options:SetCameraObjectDistance(dist + 1)
 end
 
+function CodeLessonTip.ExitLesson()
+    if page then
+        page:CloseWindow();
+    end
+    CodeLessonTip.CloseCodeGoodView()
+    CodeLessonTip.CloseCodeDiffView()
+    GameLogic.GetFilters():apply_filters("update_dock",false);
+    GameLogic.GetCodeGlobal():BroadcastTextEvent("clickCodeExit");
+end
 -- 点击退出
 function CodeLessonTip.ClickExit()
-    _guihelper.MessageBox("确定退出当前课程？",function()
-        if page then
-            page:CloseWindow();
-        end
-        CodeLessonTip.CloseCodeGoodView()
-        CodeLessonTip.CloseCodeDiffView()
-        GameLogic.GetFilters():apply_filters("esc_codelesson",false);
-        GameLogic.GetCodeGlobal():BroadcastTextEvent("clickCodeExit");
-    end)
+    _guihelper.MessageBox("确定退出当前课程？",CodeLessonTip.ExitLesson)
 end
 
 -- 点击返回
@@ -384,15 +399,18 @@ function CodeLessonTip.ShowCodeDiffView(index)
     CodeLessonTip.cur_diff_index = tonumber(index)
     
     local knowledge_config = CodeLessonTip.lesson_config.knowledge_config
-    local knowledge = knowledge_config.knowledge
-    local config = knowledge[CodeLessonTip.cur_diff_index] or {}
-    local content = config.content
-    content = string.format("是否开始讲解难点“%s”", content)
+    if knowledge_config then
+        local knowledge = knowledge_config.knowledge
+        local config = knowledge[CodeLessonTip.cur_diff_index] or {}
+        local content = config.content
+        content = string.format("是否开始讲解难点“%s”", content)
+    
+        CodeDifficultView.ShowView(content,function()
+            GameLogic.GetCodeGlobal():BroadcastTextEvent("clickDifficult", {diff_index=tonumber(CodeLessonTip.cur_diff_index)});
+            CodeLessonTip.ShowVisible(false)
+        end, root)
+    end
 
-    CodeDifficultView.ShowView(content,function()
-        GameLogic.GetCodeGlobal():BroadcastTextEvent("clickDifficult", {diff_index=tonumber(CodeLessonTip.cur_diff_index)});
-        CodeLessonTip.ShowVisible(false)
-    end, root)
 end
 
 -- 关闭“难点讲解”or"完整解答"确定界面
@@ -414,7 +432,7 @@ end
 
 -- 通关成功or失败界面
 -- 打开“难点讲解”确定界面
-function CodeLessonTip.ShowResultView(is_success)
+function CodeLessonTip.ShowResultView(is_success, is_new_save_way, is_return_area)
     local content = "你没通关成功，请再接再厉！"
     if is_success then
         local desc = "你已完成了第%s课(%s)"
@@ -450,10 +468,12 @@ function CodeLessonTip.ShowResultView(is_success)
     end
 
     local is_last_lesson = CodeLessonTip.lesson_config.is_last_lesson or CodeLessonTip.lx_index > 0
-    CodeResultView.ShowView(is_success, content, left_bt_cb, right_bt_cb, is_last_lesson)
+    CodeResultView.ShowView(is_success, content, left_bt_cb, right_bt_cb, is_last_lesson, is_return_area)
 
     if is_success then
-        GameLogic.QuestAction.SetDongaoLessonState("code", CodeLessonTip.lesson_index, true)
+        if not is_new_save_way then
+            GameLogic.QuestAction.SetDongaoLessonState("code", CodeLessonTip.lesson_index, true)
+        end
         GameLogic.GetCodeGlobal():BroadcastTextEvent("refreshCodeNpcSay");
     end
 end
@@ -469,4 +489,39 @@ function CodeLessonTip.ShowVisible(visible)
         parent.visible = visible
         CodeLessonTip.RefreshSize()
     end
+
+    GameLogic.GetCodeGlobal():BroadcastTextEvent("CodeLessonTipVisibleChange");
+end
+
+function CodeLessonTip.GetVisible()
+    if not page then
+        return false
+    end
+
+    local parent = page:GetParentUIObject()
+    if parent then
+        return parent.visible
+    end
+
+    return false
+end
+
+function CodeLessonTip.OnLeaveWorld()
+    local titlename = System.options.channelId_431 and GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡智慧教育") or GameLogic.GetFilters():apply_filters('GameName', L"帕拉卡 Paracraft")
+    local desc = GameLogic.GetFilters():apply_filters('GameDescription', L"3D动画编程创作工具")
+
+    System.options.WindowTitle = System.options.channelId_431 and titlename or string.format("%s -- ver %s", titlename, GameLogic.options.GetClientVersion());
+    if System.options.channelId_431 then
+		ParaEngine.SetWindowText(System.options.WindowTitle);
+	else
+		ParaEngine.SetWindowText(format("%s : %s", System.options.WindowTitle, desc));
+	end
+
+    Mod.WorldShare.Store:Set('world/isShowExitPage', true)
+    local RedSummerCampMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampMainPage.lua");
+    RedSummerCampMainPage.Show()
+
+    Mod.WorldShare.Store:Remove('world/currentWorld')
+    Mod.WorldShare.Store:Remove('world/currentEnterWorld')
+    Mod.WorldShare.Store:Remove('world/isEnterWorld')
 end

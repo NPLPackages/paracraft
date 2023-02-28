@@ -244,7 +244,7 @@ function Entity:HasCollision()
 end
 
 function Entity:Destroy()
-	self:beforeDestroyed();
+	self:beforeDestroyed(self);
 	if(not self:HasCollision()) then
 		ParaCamera.GetAttributeObject():SetField("EnableBlockCollision", true);	
 	end
@@ -319,6 +319,11 @@ end
 
 function Entity:GetTarget()
 	return self.m_target;
+end
+
+-- return true if we can take control of this entity by external agent like movie or code block.
+function Entity:CanBeAgent()
+	return true;
 end
 
 -- @param actor: the parent ActorNPC

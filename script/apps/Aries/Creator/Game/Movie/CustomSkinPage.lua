@@ -63,7 +63,11 @@ end
 -- @param skinIdString: optional skin string
 function CustomSkinPage.ShowPage(OnClose, skinIdString)
 	currentModelFile = CustomCharItems.defaultModelFile;
-	currentSkin = skinIdString or CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString);
+	currentSkin = CustomCharItems:SkinStringToItemIds(CustomCharItems.defaultSkinString);
+	if skinIdString and skinIdString ~= "" then
+		currentSkin = skinIdString
+	end
+
 	CustomSkinPage.category_index = 2;
 	CustomSkinPage.model_index = 1;
 	CustomSkinPage.Current_Item_DS = {};
@@ -126,7 +130,7 @@ function CustomSkinPage.ShowPage(OnClose, skinIdString)
 			end
 
 		--else
-			--CustomSkinPage.Current_Model_DS[1] = {asset = currentModelFile, skin = currentSkin};
+			-- CustomSkinPage.Current_Model_DS[1] = {asset = currentModelFile, skin = currentSkin};
 		end
 		CustomSkinPage.OnChangeCategory(CustomSkinPage.category_index);
 	end);
@@ -256,11 +260,15 @@ end
 function CustomSkinPage.OnClickOK()
 	currentSkin = CustomCharItems:ChangeSkinStringToItems(currentSkin);
 	CustomSkinPage.OnClickSave();
-	GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
-		if(isVip) then
-			page:CloseWindow();
-		end
-	end)
+	if GameLogic.Macros:IsPlaying() then
+		page:CloseWindow();
+	else
+		GameLogic.IsVip("ChangeAvatarSkin", true, function(isVip) 
+			if(isVip) then
+				page:CloseWindow();
+			end
+		end)
+	end
 end
 
 function CustomSkinPage.OnClose()

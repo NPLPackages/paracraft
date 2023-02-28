@@ -20,7 +20,6 @@ local SearchIdList = {}
 
 function AddFriendsPage.OnInit()
     page = document:GetPageCtrl();
-    page.OnClose = AddFriendsPage.CloseView
 end
 
 function AddFriendsPage.Show(user_data)
@@ -41,7 +40,7 @@ function AddFriendsPage.Show(user_data)
             enable_esc_key = true,
             --app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
             directPosition = true,
-            
+            zorder = 1,
             align = "_lt",
             x = oldsize[1]/2 - 560/2,
             y = oldsize[2]/2 - 207/2,
@@ -207,8 +206,11 @@ function AddFriendsPage.UpdataFoucsList(updata_cb)
 end
 
 function AddFriendsPage.CloseView()
-    print("AddFriendsPage.CloseView()")
     AddFriendsPage.ClearData()
+    if page then
+        page:CloseWindow()
+        page = nil
+    end
 end
 
 function AddFriendsPage.ClearData()
