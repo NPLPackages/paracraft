@@ -498,7 +498,7 @@
 
                                 KeepworkServiceSession:CheckPhonenumberExist(phone_number, function(be_exist)
                                     if be_exist then
-                                        MainLogin:AndroidLoginWithPhoneNumber(phone_number, phone_captcha, function(be_succeed, reason, message)
+                                        MainLogin:MobileLoginWithPhoneNumber(phone_number, phone_captcha, function(be_succeed, reason, message)
                                             if not be_succeed then
                                                 get_page():SetUIValue('phone_field_error_msg', message)
                                                 get_page():FindControl('phone_field_error').visible = true

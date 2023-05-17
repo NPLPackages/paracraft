@@ -497,8 +497,7 @@ function DockPage.OnClickDock(id)
             local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
             UserInfoPage.ShowPage(System.User.keepworkUsername)
         else
-            local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-            page.ShowUserInfoPage({username = System.User.keepworkUsername});
+            GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
         end
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.character");
     elseif(id == "work")then
@@ -586,7 +585,7 @@ function DockPage.OnClickDock(id)
 end
 
 function DockPage.OnClickLeftTop(id)
-    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+    local Page = NPL.load("script/ide/System/UI/Page.lua");
     local idCnf = {
         winter_camp ="tiyujinsai",
         papa="quweibiancheng",

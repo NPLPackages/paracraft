@@ -277,7 +277,7 @@ function FindBlockTask.SetResults(entities)
 		local regions = {};
 		for i, entity in ipairs(entities) do
 			local item = entity:GetItemClass()
-			local name = entity:GetDisplayName() or "";
+			local name = tostring(entity:GetDisplayName() or "");
 			if(name == "") then
 				-- tricky: for unnamed, yet powered code block, we will list them
 				if(entity.isPowered) then

@@ -360,17 +360,24 @@ end
 
 -- when the user clicks the close button on the window title. 
 function Desktop.OnExit(bForceExit, bRestart)
+	bForceExit = bForceExit == true;
 	if(ModManager:OnClickExitApp(bForceExit, bRestart)) then
 		return
 	end
-
+	if not Game.is_started and System.options.isPapaAdventure then
+		GameLogic.GetFilters():apply_filters("OnCloseAppWindow");
+	end
+	GameLogic.GetFilters():apply_filters("ShowTopWindow", nil, "Desktop.OnExit")
 	if(GameLogic.IsReadOnly()) then
 		if(bForceExit or Desktop.is_exiting) then
-			-- double click to exit without saving. 
+			-- double click to exit without saving.
 			if (not System.options.isCodepku) then
-				GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
+				local res = GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
 					Desktop.ForceExit();
 				end);
+				if(res ~= nil) then
+					Desktop.ForceExit();
+				end
 			else
 				Desktop.ForceExit();
 			end
@@ -400,27 +407,33 @@ function Desktop.OnExit(bForceExit, bRestart)
 					end
 				end
 			};
-
-			local CourseEvaluation = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/CourseEvaluation/CourseEvaluation.lua") 
-			CourseEvaluation.ShowView(function()
+			local func = function()
 				local dialog = GameLogic.GetFilters():apply_filters("ShowExitDialog", dialog, bRestart);			
 				if(dialog and dialog.callback and dialog.text) then
 					_guihelper.MessageBox(dialog.text, 
 						dialog.callback,dialog.messageBoxButton or _guihelper.MessageBoxButtons.YesNoCancel);
 				end
-			end)
-			
+			end
+
+			local CourseEvaluation = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Lesson/CourseEvaluation/CourseEvaluation.lua") 
+			if CourseEvaluation then
+				CourseEvaluation.ShowView(function()
+					func()
+				end)
+				return
+			end
+			func()
 		end
 	else
 		if(bForceExit or Desktop.is_exiting) then
 			-- double click to exit without saving. 
-			if(Desktop.is_exiting) then
-				-- GameLogic.QuickSave();
-			end
 			if (not System.options.isCodepku) then
-				GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
+				local res = GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
 					Desktop.ForceExit();
 				end);
+				if(res ~= nil) then
+					Desktop.ForceExit();
+				end
 			else
 				Desktop.ForceExit();
 			end
@@ -434,21 +447,26 @@ function Desktop.OnExit(bForceExit, bRestart)
 				text = string.format(L"%d秒内您没有保存过世界. <br/>退出前, 是否保存世界？", GameLogic.options:GetElapsedUnSavedTime()/1000), 
 				callback = function(res)
 					Desktop.is_exiting = false;
-
 					if (res and res == _guihelper.DialogResult.Yes) then
 						GameLogic.QuickSave();
 						if (not System.options.isCodepku) then
-							GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
+							local res = GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
 								ParaWorldLoginAdapter:EnterWorld(true);
 							end);
+							if(res ~= nil) then
+								Desktop.ForceExit(bRestart);
+							end
 						else
 							Desktop.ForceExit(bRestart);
 						end
 					elseif (res and res == _guihelper.DialogResult.No) then
 						if (not System.options.isCodepku) then
-							GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
+							local res = GameLogic.GetFilters():apply_filters('on_exit', bForceExit, bRestart, function()
 								ParaWorldLoginAdapter:EnterWorld(true);
 							end);
+							if(res ~= nil) then
+								Desktop.ForceExit(bRestart);
+							end
 						else
 							Desktop.ForceExit(bRestart);
 						end
@@ -461,7 +479,7 @@ function Desktop.OnExit(bForceExit, bRestart)
 			
 			local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 			local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
-			if Game.is_started and isHomeWorkWorld then
+			if Game.is_started and isHomeWorkWorld and not System.options.isPapaAdventure  then
 				local MobileSaveWorldPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileSaveWorldPage.lua")
 				MobileSaveWorldPage.ClosePage()
 				MobileSaveWorldPage.ShowPage("exit_world", dialog.callback)

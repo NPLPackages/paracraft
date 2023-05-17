@@ -63,7 +63,7 @@ function KeepWorkRealname.ExitGame()
 	KeepWorkRealname.SaveGameTime()
 end
 
-function KeepWorkRealname.ChekLimitGameTime()
+function KeepWorkRealname.CheckLimitGameTime()
 	if KeepWorkRealname.IsLimitTime() then
 		return true
 	end
@@ -115,9 +115,10 @@ function KeepWorkRealname.CheckCanEnterGame()
         return false
     end
 
-    if KeepWorkRealname.ChekLimitGameTime() then
-        _guihelper.MessageBox("你今天的游戏时长已超"..KeepWorkRealname.GetHourNum().."小时，请在明天8点到22点时间段内登录游戏")
-        return false
+    if KeepWorkRealname.CheckLimitGameTime() then
+		-- Disable this 2023.2.24
+        --_guihelper.MessageBox("你今天的游戏时长已超"..KeepWorkRealname.GetHourNum().."小时，请在明天8点到22点时间段内登录游戏")
+        --return false
     end
     return true
 end

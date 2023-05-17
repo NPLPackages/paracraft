@@ -323,7 +323,7 @@ function WorldBlocksExporter:ExportRegion(region_x, region_z, callback)
 	end
 	]]
 	-- export textures
-	ParaAsset.SetAssetServerUrl("http://cdn.keepwork.com/update61/assetdownload/update/");
+	ParaAsset.SetAssetServerUrl("https://cdn.keepwork.com/update61/assetdownload/update/");
 	WorldBlocksExporter.loadAssetFile(self.textures, function()
 		WorldBlocksExporter.copyFiles(self.textures, out_world_dir);
 		if(callback)then

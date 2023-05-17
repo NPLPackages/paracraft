@@ -1,0 +1,95 @@
+<lesson>
+  <content key ="projects_s1"/>
+  <content name="项目学习S1"/>
+  <content icon= "xiangmuS1_94x94_32bits.png"/>
+  <content num = "16节"/>
+  <content auth="LP_CommunityCourses"/>
+</lesson>
+<lesson>
+    <content key="ppt_L1"/>
+    <content name="机构课(L1)"/>
+    <content icon= "i1_94X94_32bits.png"/>
+    <content num = "24节"/>
+    <content auth="LP_OrgCourses"/>
+</lesson>
+<lesson>
+    <content key="ppt_L2"/>
+    <content name="机构课(L2)"/>
+    <content icon= "i6_94x94_32bits.png"/>
+    <content num = "24节"/>
+    <content auth="LP_OrgCourses"/>
+</lesson>
+<lesson>
+    <content key ="ppt_S1"/>
+    <content name="交互课:征程"/>
+    <content icon= "i5_94X94_32bits.png"/>
+    <content num = "16节"/>
+    <content auth="LP_CommunityCourses"/>
+</lesson>
+<lesson>
+    <content key ="club_S2_longMarch"/>
+    <content name="交互课:七律长征"/>
+    <content icon= "shetuankes2_94x94_32bits.png"/>
+    <content num = "16节"/>
+    <content auth="LP_CommunityCourses"/>
+</lesson>
+<lesson>
+    <content key ="ppt_X1"/>
+    <content name="校园课(X1)"/>
+    <content icon= "i3_94X94_32bits.png"/>
+    <content num = "16节"/>
+    <content auth="LP_SchoolCourses"/>
+</lesson>
+<lesson>
+    <content key ="ppt_Z1"/>
+    <content name="试听课"/>
+    <content icon= "i4_94X94_32bits.png"/>
+    <content num = "3节"/>
+</lesson>
+<lesson>
+    <content key ="campus_X2"/>
+    <content name="校园课(X2)"/>
+    <content icon= "xiaoyuan_94x94_32bits.png"/>
+    <content num = "16节"/>
+    <content auth="LP_SchoolCourses"/>
+</lesson>
+<lesson>
+    <content key ="holiday"/>
+    <content name="寒假课"/>
+    <content icon= "jiaqi_94x94_32bits.png"/>
+    <content num = "10节"/>
+</lesson>
+<lesson>
+    <content key ="superAnimal"/>
+    <content name="初中社团课(1)"/>
+    <content icon= "dongwuke_94x94_32bits.png"/>
+    <content num = "16节"/>
+    <content auth="LP_SchoolCourses"/>
+</lesson>
+<lesson>
+    <content key ="Jiangxi_lessons"/>
+    <content name="江西红色课"/>
+    <content icon= "jiangxi2_94x94_32bits.png"/>
+    <content num = "32节"/>
+</lesson>
+<lesson>
+  <content key ="winterOlympicbuild"/>
+  <content name="动物运动会(建造)"/>
+  <content icon= "building_94x94_32bits.png"/>
+  <content num = "10节"/>
+  <content auth="LP_CommunityCourses"/>
+</lesson>
+<lesson>
+    <content key ="winterOlympicanimation"/>
+    <content name="动物运动会(动画)"/>
+    <content icon= "donghua_94x94_32bits.png"/>
+    <content num = "10节"/>
+    <content auth="LP_CommunityCourses"/>
+</lesson>
+<lesson>
+    <content key ="winterOlympiccode"/>
+    <content name="动物运动会(编程)"/>
+    <content icon= "biancheng_94x94_32bits.png"/>
+    <content num = "10节"/>
+    <content auth="LP_CommunityCourses"/>
+</lesson>

@@ -393,7 +393,7 @@ end
 -- virtual function: right click to edit. 
 function Entity:OpenEditor(editor_name, entity)
 	-- 没权限的话 不允许编辑电影方块
-	UserPermission.CheckCanEditBlock("click_movie_block", function()
+	local function open_editor()
 		local movieClip = self:GetMovieClip();
 		if(movieClip) then
 			movieClip:Stop();
@@ -409,8 +409,22 @@ function Entity:OpenEditor(editor_name, entity)
 		end
 		MovieManager:SetActiveMovieClip(movieClip);
 		GameLogic.GetFilters():apply_filters("MovieClipEditorOpened",movieClip)	
-	end)
+		GameLogic.SetModified();
+	end
 
+	local function open_editor_wrap()
+		if (System.User.isAnonymousWorld) then
+			GameLogic.CheckSignedIn(L"请先登录！", function()
+				if (System.User.isAnonymousWorld) then return end
+				open_editor();
+			end);
+		else
+			open_editor();
+		end
+	end
+	
+	UserPermission.CheckCanEditBlock("click_movie_block", open_editor_wrap)
+	
 	return true;
 end
 

@@ -215,7 +215,7 @@ function QuestAction.OpenPage(name)
         end)
     elseif name == 'region' then
         local profile = KeepWorkItemManager.GetProfile()
-        local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+        local Page = NPL.load("script/ide/System/UI/Page.lua");
         Page.Show({
             UserRegion = profile.region,
             userId = profile.id,
@@ -238,8 +238,7 @@ function QuestAction.OpenPage(name)
     elseif name == 'ai_course' then
         NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAllCourse.lua").Show();
     elseif name == 'user' then
-        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-        page.ShowUserInfoPage({username = System.User.keepworkUsername});
+        GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
     end
 end
 

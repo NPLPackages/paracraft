@@ -22,20 +22,26 @@ function OnReExamine()
     page:CloseWindow();
 end
 
+function showScore()
+    return ExamPaperPage.showScore
+end
+
 ]]></script>
     <pe:container width="100%" height="100%" style="background: url(Texture/Aries/Creator/keepwork/Window/dikuang_opaque_64x69_32bits.png#0 0 64 69:26 44 24 22);">
         <input type="button" zorder="10" value="" onclick="ClosePage" align="right" style="position: relative; margin-top: 8px; margin-right:13px;width:22px;height:22px;background: url(Texture/Aries/Creator/keepwork/Paralife/tocaModels/guanbi_34x34_32bits.png#0 0 34 34);"/>
         <div style="margin-top: 60px;margin-left: 30px; position: relative;">
             <label value='<%= tip or L"考试成绩已成功上传" %>' style="height: 30px; font-size:16px; font-weight:normal;color:#333333;"></label>
         </div>
-        <div style="margin-top: 90px;margin-left: 30px; position: relative;">
-            <div style="position: relative;">
-                <label value='<%= L"您的成绩为: " %>' style="float: left;height: 30px; font-size:16px; font-weight:normal;color:#333333;"></label>
+        <pe:if condition='<%= showScore()%>'>
+            <div style="margin-top: 90px;margin-left: 30px; position: relative;">
+                <div style="position: relative;">
+                    <label value='<%= L"您的成绩为: " %>' style="float: left;height: 30px; font-size:16px; font-weight:normal;color:#333333;"></label>
+                </div>
+                <div style="margin-top: 0px;margin-left: 90px;">
+                    <label value='<%= score..L"分" %>' style="float: left; height: 30px; font-size:16px; font-weight:normal;color:#ff0000;"></label>
+                </div>
             </div>
-            <div style="margin-top: 0px;margin-left: 90px;">
-                <label value='<%= score..L"分" %>' style="float: left; height: 30px; font-size:16px; font-weight:normal;color:#ff0000;"></label>
-            </div>
-        </div>
+        </pe:if>
 
         <pe:if condition='<%= ExamPaperPage.CheckCanReExamine() %>'>
             <div style="margin-top: 272px;margin-left: -10px;"  align="center" >

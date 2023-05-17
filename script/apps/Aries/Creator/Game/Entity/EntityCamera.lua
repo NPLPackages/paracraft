@@ -16,6 +16,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Items/InventoryBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Items/ContainerView.lua");
 NPL.load("(gl)script/ide/math/math3d.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/TimeSeries.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityMovable.lua");
 local TimeSeries = commonlib.gettable("MyCompany.Aries.Game.Common.TimeSeries");
 local CameraController = commonlib.gettable("MyCompany.Aries.Game.CameraController")
 local ContainerView = commonlib.gettable("MyCompany.Aries.Game.Items.ContainerView");

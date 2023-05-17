@@ -51,6 +51,7 @@ local s_env_methods = {
 	"List_Insert",
 	"List_Remove",
 	"List_Length",
+	"getUrl",
 
 	-- operator
 	"string_length",
@@ -272,10 +273,11 @@ end
 
 -- @param duration: wait for this seconds. default to 1.
 function env_imp:checkstep(duration)
+	-- 不进行检查 否则条件不对就进入死循环
 	-- 图块模式直接跳过
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
-	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
-	if (CodeBlockWindow.IsSupportNplBlockly()) then return end
+	-- NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	-- local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	-- if (CodeBlockWindow.IsSupportNplBlockly()) then return end
 
 	local locationInfo = commonlib.debug.locationinfo(2)
 	if(locationInfo) then
@@ -285,11 +287,12 @@ function env_imp:checkstep(duration)
 end
 
 function env_imp:checkstep_nplblockly(blockid, before, duration)
-	NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
-	local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
-	local entity = CodeBlockWindow.GetCodeEntity()
-	if(not entity or not entity:IsStepMode()) then return end 
-	if (not CodeBlockWindow.IsSupportNplBlockly()) then return end
+	-- 不进行检查 否则条件不对就进入死循环
+	-- NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CodeBlockWindow.lua");
+	-- local CodeBlockWindow = commonlib.gettable("MyCompany.Aries.Game.Code.CodeBlockWindow");
+	-- local entity = CodeBlockWindow.GetCodeEntity()
+	-- if(not entity or not entity:IsStepMode()) then return end 
+	-- if (not CodeBlockWindow.IsSupportNplBlockly()) then return end
 
 	if (before) then   -- 代码执行前
 		GameLogic.GetFilters():apply_filters("OnCodeBlockNplBlocklyLineStep", blockid);

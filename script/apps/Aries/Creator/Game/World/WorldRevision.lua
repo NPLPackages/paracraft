@@ -17,7 +17,8 @@ end
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/SaveWorldPage.lua");
 NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
-NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
 local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local Desktop = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop");
 local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
@@ -82,6 +83,13 @@ end
 function WorldRevision:SetModified()
 	self.isModified = true;
 	self.isModifiedAndNotBackedup = true;
+	self.isModifiedAndNotAutoSaved = true;
+end
+
+function WorldRevision:SetUnModified()
+	self.isModified = false;
+	self.isModifiedAndNotBackedup = false;
+	self.isModifiedAndNotAutoSaved = false;
 end
 
 function WorldRevision:IsModified()
@@ -92,13 +100,16 @@ function WorldRevision:IsModifiedAndNotBackedup()
 	return self.isModifiedAndNotBackedup;
 end
 
+function WorldRevision:IsModifiedAndNotAutoSaved()
+	return self.isModifiedAndNotAutoSaved;
+end
+
 -- @param bForceCommit: if true, it will commit using current version regardless of conflict. 
 -- return true if commited successfully. 
 function WorldRevision:Commit(bForceCommit)
 	if(bForceCommit or not self:HasConflict()) then
 		self.current_revision = self:GetRevision() + 1;
-		self:SetModified();
-
+		self:SetUnModified();
 		self:SaveRevision();
 		return true
 	end
@@ -286,4 +297,160 @@ end
 -- ticks every second
 function WorldRevision:Tick()
 	
+end
+
+function WorldRevision:DeleteStagedChangesInFolder(autoSaveFolder)
+	-- get current directory
+	autoSaveFolder = autoSaveFolder or self:GetAutoSaveFolderName()
+	commonlib.Files.DeleteFolder(autoSaveFolder)
+end
+
+-- stage changes and generate staged files to auto save for the current world.
+-- @param autoSaveFolder: if nil, default to current world and current user under /temp/autosave/ folder. 
+-- @param bSaveAsMode: if true, we will not delete dest folder and generate auto save file
+function WorldRevision:StageChangesToFolder(autoSaveFolder, bSaveAsMode)
+	-- get current directory
+	autoSaveFolder = autoSaveFolder or self:GetAutoSaveFolderName()
+	if(not bSaveAsMode) then
+		commonlib.Files.DeleteFolder(autoSaveFolder)
+	end
+	ParaIO.CreateDirectory(autoSaveFolder);
+
+	-- stage all changed entity files
+	EntityManager.SaveToFile(autoSaveFolder)
+
+	-- save modified raw files
+	BlockEngine:SaveToDirectory(autoSaveFolder)
+
+	-- finally write the autosave.xml to disk
+	if(not bSaveAsMode) then
+		local file = ParaIO.open(autoSaveFolder.."autosave.xml", "w");
+		if(file and file:IsValid()) then
+			local data = {}
+			data.date_time = ParaGlobal.GetDateFormat("yyyy-MM-dd").." "..ParaGlobal.GetTimeFormat("HH:mm:ss");
+			data.revision = self:GetRevision();
+			data.filename = autoSaveFolder;
+			file:WriteString(commonlib.serialize(data, true))
+			file:close();
+		end
+	end
+	self.isModifiedAndNotAutoSaved = false;
+	LOG.std(nil, "info", "WorldRevision", "staged changes to %s", autoSaveFolder); 
+end
+
+function WorldRevision:GetAutoSaveFolderName(worldDir)
+	worldDir = worldDir or GameLogic.GetWorldDirectory();
+	local userName, worldName = string.match(worldDir, "([^/\\]+)[/\\]([^/\\]+)[/\\]?$");
+	userName = userName or "no_user"
+	worldName = worldName or "no_world"
+	local autoSaveFolder = ParaIO.GetWritablePath().. ("temp/AutoSave/"..userName.."_"..worldName.."/");
+	return autoSaveFolder;
+end
+
+-- apply last staged auto save files to the current world and change disk file.
+-- please note this is a dangerous operation as it will overwrite existing files in current world
+-- please note if the revision is bigger, we will ignore the operation. 
+-- @param autoSaveFolder: if nil, default to current world and current user under /temp/autosave/ folder. 
+-- @param worldDir: if nil, default to current world folder.
+function WorldRevision:ApplyChangesFromFolderToWorldDir(autoSaveFolder, worldDir)
+	-- get current directory
+	autoSaveFolder = autoSaveFolder or self:GetAutoSaveFolderName()
+	worldDir = worldDir or GameLogic.GetWorldDirectory();
+	local isCurrentWorld = worldDir == GameLogic.GetWorldDirectory();
+
+	-- copy all files from autoSaveFolder to worldDir
+	local result = commonlib.Files.Find({}, autoSaveFolder, 2, 500, "*.*")
+	for i, item in ipairs(result) do
+		local filename = item.filename;
+		ParaIO.CopyFile(autoSaveFolder..filename, worldDir..filename, true);
+	end
+end
+
+-- return true if staged change has revision equal to the current world's revision.
+function WorldRevision:CheckStageFolderVersion(autoSaveFolder)
+	autoSaveFolder = autoSaveFolder or self:GetAutoSaveFolderName()
+	
+	local autosave = commonlib.LoadTableFromFile(autoSaveFolder.."autosave.xml")
+	if(autosave and autosave.revision) then
+		return (self:GetRevision() == autosave.revision) 
+	end
+end
+
+-- return nil or a table of {revision, date_time, }
+function WorldRevision:GetStagedFolderInfo(autoSaveFolder)
+	autoSaveFolder = autoSaveFolder or self:GetAutoSaveFolderName()
+	
+	local autosave = commonlib.LoadTableFromFile(autoSaveFolder.."autosave.xml")
+	return autosave
+end
+
+-- apply last staged auto save files to the current world in memory without changing any disk file.
+-- @param autoSaveFolder: if nil, default to current world and current user under /temp/autosave/ folder. 
+function WorldRevision:ApplyChangesFromFolder(autoSaveFolder)
+	autoSaveFolder = autoSaveFolder or self:GetAutoSaveFolderName()
+
+	local result = commonlib.Files.Find({}, autoSaveFolder, 2, 500, "*.*")
+	local regions = {}
+	for i, item in ipairs(result) do
+		local filename = autoSaveFolder..item.filename;
+		local regionX, regionZ = filename:match("(%d+)_(%d+)%.region%.xml$")
+		if(regionX) then
+			local key = regionX.."_"..regionZ;
+			regions[key] = regions[key] or {};
+			local region = regions[key];
+			region.x = tonumber(regionX);
+			region.z = tonumber(regionZ);
+			region.regionEntityFile = filename;
+		else
+			regionX, regionZ = filename:match("(%d+)_(%d+)%.raw$")
+			if(regionX) then
+				local key = regionX.."_"..regionZ;
+				regions[key] = regions[key] or {};
+				local region = regions[key];
+				region.x = tonumber(regionX);
+				region.z = tonumber(regionZ);
+				region.regionRawFile = filename
+			end
+		end
+	end
+
+	for _, region in pairs(regions) do
+		local x, z = region.x, region.z;
+		if(region.regionRawFile) then
+			local regionContainer;
+			if(region.regionEntityFile) then
+				regionContainer = EntityManager.GetRegionContainer(x*512, z*512)
+				regionContainer:SetRegionFileName(region.regionEntityFile);
+				regionContainer:SetModified();
+			end
+
+			BlockEngine:GetRegionAttr(x, z, function(attrRegion)
+				BlockEngine:ClearRegion(x, z)
+				attrRegion:SetField("LoadFromFile", region.regionRawFile);
+				if(regionContainer) then
+					if(not BlockEngine.IsRegionLoaded(x, z)) then
+						local lastId = BlockEngine:GetSessionId()
+						local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+							if(lastId == BlockEngine:GetSessionId()) then
+								if(BlockEngine.IsRegionLoaded(x, z)) then
+									timer:Change()
+									regionContainer:SetRegionFileName(nil);
+								end
+							else
+								timer:Change()
+							end
+						end})
+						mytimer:Change(50, 100)
+					else
+						regionContainer:SetRegionFileName(nil);
+					end
+				end
+			end)
+		elseif(region.regionEntityFile) then
+			local regionContainer = EntityManager.GetRegionContainer(x*512, z*512)
+			regionContainer:RemoveAll();
+			regionContainer:SetModified();
+			regionContainer:LoadFromFile(region.regionEntityFile);
+		end
+	end
 end

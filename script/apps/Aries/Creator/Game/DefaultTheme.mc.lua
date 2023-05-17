@@ -52,8 +52,8 @@ function DefaultTheme:Load()
 	System.options.tradable_bag_family = {0,1,3,23,25,12,13,14};
 
 	local version = commonlib.getfield("System.options.version");
-    System.options.haqi_RMB_Currency="ħ��";
-    System.options.haqi_GameCurrency="�涹";
+    System.options.haqi_RMB_Currency="魔豆";
+    System.options.haqi_GameCurrency="奇豆";
 
 	-- how many minutes are there in a day.
 	-- ParaScene.SetDayLength(900);
@@ -951,26 +951,6 @@ function DefaultTheme:Load()
 		resizer_bg = "Texture/3DMapSystem/WindowFrameStyle/1/resizer.png",
 	};
 	
-	
-	-- change the loader UI, remove following lines if u want to use default paraworld loader ui.
-	--[[NPL.load("(gl)script/kids/3DMapSystemUI/InGame/LoaderUI.lua");
-	System.UI.LoaderUI.items = {
-		{name = "Aries.UI.LoaderUI.bg", type="container",bg="Texture/Aries/Login/UserSelect_BG2_32bits.png;0 0 1020 680", alignment = "_fi", left=0, top=0, width=0, height=0, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_motion.xml"},
-		
-		{name = "Aries.UI.LoaderUI.bg", type="container",bg="Texture/Aries/Loader/loading_bg_32bits.png;0 0 1020 680", alignment = "_fi", left=0, top=0, width=0, height=0, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_motion.xml"},
-		{name = "Aries.UI.LoaderUI.logoTxt", type="container",bg="", alignment = "_rb", left=-320-20, top=-20-5, width=320, height=20, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
-		{name = "Aries.UI.LoaderUI.logo", type="container",bg="", alignment = "_ct", left=-512/2, top=-290/2, width=512, height=128, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
-		{name = "Aries.UI.LoaderUI.progressbar_bg", type="container",bg="Texture/Aries/Loader/loading_panel_32bits.png: 60 60 60 60", alignment = "_ct", left=-240, top=-90, width=480, height=128, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
-		{name = "Aries.UI.LoaderUI.text", type="text", text="���ڼ��ع���С��...", color = "255 255 255", alignment = "_ct", left=-100+10, top=28, width=200, height=20, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
-		{name = "Aries.UI.LoaderUI.gossip", type="text", texts={
-			"dummy",
-
-
-			}, alignment = "_ct", left=-200+10, top=-36, width=400, height=20, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
-		-- this is a progressbar that increases in length from width to max_width
-		{IsProgressBar=true, name = "Aries.UI.LoaderUI.progressbar_filled", type="container", bg="Texture/Aries/Loader/loading_slot_32bits.png;0 0 64 13: 20 6 20 6", alignment = "_ct", left=-204, top=-70, width=40, max_width=408, height=13, anim="script/kids/3DMapSystemUI/InGame/LoaderUI_2_motion.xml"},
-	}]]
-
 	self:LoadHeadDisplayStyle();
 	NPL.load("(gl)script/kids/3DMapSystemUI/MiniGames/SwfLoadingBarPage.lua");
 	Map3DSystem.App.MiniGames.SwfLoadingBarPage.url="script/apps/Aries/Creator/Game/Login/SwfLoadingBarPage.mc.html";

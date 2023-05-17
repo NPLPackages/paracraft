@@ -44,37 +44,25 @@ function WisidomEducate.EnterWorld()
         WisidomEducate.toWorldPath = nil
         if to_path then
             GameLogic.RunCommand(string.format('/loadworld %s', to_path))
-            commonlib.TimerManager.SetTimeout(function ()
-                local tag = LocalService:GetTag(to_path)
-                if not tag and type(tag) ~= 'table' then
-                    return
-                end
-                if WisidomEducate.toWorldData then
-                    tag.classroomId = WisidomEducate.toWorldData.classroomId or ""
-                    tag.lessonName = WisidomEducate.toWorldData.lessonName or ""
-                    tag.lessonPackageName = WisidomEducate.toWorldData.lessonPackageName or ""
-                    tag.materialName = WisidomEducate.toWorldData.materialName or ""
-                    tag.sectionContentId = WisidomEducate.toWorldData.sectionContentId or ""
-                    tag.isHomeWorkWorld = WisidomEducate.toWorldData.isHomeWorkWorld or true
-                    LocalService:SetTag(to_path, tag)
-                end
-                WisidomEducate.toWorldData = nil
-            end,0)
         end
+        WisidomEducate.UpdateWorldTag(to_path)
     end
 end
 
 function WisidomEducate.RunEduCommands(cmdLineWorld)
     local preCmd = cmdLineWorld
     cmdLineWorld = cmdLineWorld:gsub("edu_do_works/","")
+    if cmdLineWorld:find('single="true"') then
+        cmdLineWorld = cmdLineWorld:gsub('single="true"','')
+    end
     local jsonStr = commonlib.Encoding.unbase64(cmdLineWorld)
     local workData = commonlib.Json.Decode(jsonStr)
     if type(workData) == "table" then
         WisidomEducate.SetWorldData(workData)
         local createTime = workData.classAt or "2023-01-13T02:21:26.552Z"
         local sectionContentId = workData.sectionContentId or 1
-        local fromProjectId = tonumber(workData.forkProjectId) or 0
-        local year, month, day, hour, min, min = createTime:match("^(%d+)%D(%d+)%D(%d+)%D(%d+)%D(%d+)%D(%d+)") 
+        local fromProjectId = tonumber((workData.forkProjectId or 0)) or 0
+        local year, month, day, hour, min, sec = createTime:match("^(%d+)%D(%d+)%D(%d+)%D(%d+)%D(%d+)%D(%d+)") 
         local worldName = year..string.format("%.2d",month)..string.format("%.2d",day).."_"..string.format("%.2d",hour)..string.format("%.2d",min).."_"..string.format("%.2d",sectionContentId)
         if fromProjectId and fromProjectId > 0 then
             ---/createworld -name "默认名字26666" -parentProjectId 0 -update -fork 73304
@@ -89,26 +77,71 @@ function WisidomEducate.RunEduCommands(cmdLineWorld)
                 print("worldName======",worldName,fromProjectId)
             end
             GameLogic.RunCommand(str)
-            
+            local project_file_path
+            if GameLogic.GetFilters():apply_filters('is_signed_in') then
+                project_file_path = GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path')
+            else
+                project_file_path = "worlds/DesignHouse"
+            end
+            local name = commonlib.Encoding.Utf8ToDefault(worldName)
+            local world_path = project_file_path .. "/" .. name
+            WisidomEducate.SetWorldPath(world_path)
+        elseif fromProjectId == 0 then
+            WisidomEducate.CreatePlatWorld(worldName)
         end
-        local project_file_path
-        if GameLogic.GetFilters():apply_filters('is_signed_in') then
-            project_file_path = GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path')
-        else
-            project_file_path = "worlds/DesignHouse"
-        end
-
-        local name = commonlib.Encoding.Utf8ToDefault(worldName)
-        local world_path = project_file_path .. "/" .. name
-        WisidomEducate.SetWorldPath(world_path)
     end
     System.options.cmdline_world = nil
 end
 
+--20230314_1002_876 20230314_1029_876 20230314_1053_876
+function WisidomEducate.CreatePlatWorld(worldName)
+    if not worldName or worldName == "" then
+        return 
+    end
+    local CreateWorld = NPL.load('(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua')
+    local project_file_path = "worlds/DesignHouse"
+    if GameLogic.GetFilters():apply_filters('is_signed_in') then
+        project_file_path = GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path')
+    end
+    local name = commonlib.Encoding.Utf8ToDefault(worldName)
+    local world_path = project_file_path .. "/" .. name
+    local full_path = ParaIO.GetWritablePath()..world_path
+    full_path = string.gsub(full_path, "[/\\%s+]+$", "")
+    full_path = string.gsub(full_path, "%s+", "")
+    local is_file_exist = ParaIO.DoesFileExist(full_path, true)
+    if is_file_exist then
+        GameLogic.RunCommand(string.format('/loadworld %s', project_file_path .. "/" .. worldName))
+        return
+    end
+    WisidomEducate.SetWorldPath(world_path)
+    local CreateWorld = NPL.load('(gl)Mod/WorldShare/cellar/CreateWorld/CreateWorld.lua')
+    CreateWorld:CreateWorldByName(worldName, "superflat",true)
+end
+
+function WisidomEducate.UpdateWorldTag(worldPath)
+    commonlib.TimerManager.SetTimeout(function ()
+        local tag = LocalService:GetTag(worldPath)
+        if not tag and type(tag) ~= 'table' then
+            return
+        end
+        if WisidomEducate.toWorldData then
+            tag.classroomId = WisidomEducate.toWorldData.classroomId or ""
+            tag.lessonName = WisidomEducate.toWorldData.lessonName or ""
+            tag.lessonPackageName = WisidomEducate.toWorldData.lessonPackageName or ""
+            tag.materialName = WisidomEducate.toWorldData.materialName or ""
+            tag.sectionContentId = WisidomEducate.toWorldData.sectionContentId or ""
+            tag.isHomeWorkWorld = false
+            LocalService:SetTag(worldPath, tag)
+        end
+        WisidomEducate.toWorldData = nil
+    end,0)
+end
+
 function WisidomEducate.UpdateEduData()
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
     local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-    local classroomId = tonumber(WorldCommon.GetWorldTag("classroomId"))
-    local sectionContentId = tonumber(WorldCommon.GetWorldTag("sectionContentId"))
+    local classroomId = tonumber((WorldCommon.GetWorldTag("classroomId") or 0))
+    local sectionContentId = tonumber((WorldCommon.GetWorldTag("sectionContentId") or 0))
     local project_id = 0
     local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
     if world_data and world_data.kpProjectId and world_data.kpProjectId ~= 0 then

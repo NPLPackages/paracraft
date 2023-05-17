@@ -711,7 +711,7 @@ e.g. /vip show -key=2D_main
 		cmdName, cmd_text = CmdParser.ParseString(cmd_text);		
 		cmdName = cmdName or "show";
 		if(cmdName == "show") then
-			local opts = CommonLib.ParseOptions(cmd_text);
+			local opts = CmdParser.ParseOptionsNameValue(cmd_text);
 			local key = opts.key
 			local desc = opts.desc
 			if key=="" or key==nil then

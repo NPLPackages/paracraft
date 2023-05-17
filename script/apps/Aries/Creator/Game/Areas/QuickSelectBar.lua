@@ -304,7 +304,7 @@ function QuickSelectBar.ShowPage(bShow)
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = false,
 			bShow = bShow,
-			zorder = -5,
+			zorder = -6,
 			click_through = true, 
 			directPosition = true,
 				align = "_ctb",

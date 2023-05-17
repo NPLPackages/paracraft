@@ -1,0 +1,130 @@
+<html>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl">
+                <![CDATA[
+                    page = document.GetPageCtrl();
+
+                    function get_title()
+                        if (page.dialogOptions and page.dialogOptions.title) then
+                            return page.dialogOptions.title;
+                        else
+                            return "";
+                        end
+                    end
+
+                    function get_desc()
+                        if (page.dialogOptions and page.dialogOptions.desc) then
+                            return page.dialogOptions.desc;
+                        else
+                            return "";
+                        end
+                    end
+
+                    function get_yes_button()
+                        if (page.dialogOptions and page.dialogOptions.yes) then
+                            return page.dialogOptions.yes;
+                        else
+                            return "确定";
+                        end
+                    end
+
+                    function get_no_button()
+                        if (page.dialogOptions and page.dialogOptions.no) then
+                            return page.dialogOptions.no;
+                        else
+                            return "取消";
+                        end
+                    end
+
+                    function close()
+                        page:CloseWindow();
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    ["dialog-container"] = {
+                        width = 400,
+                        height = 262,
+                        ["margin-left"] = -200,
+                        ["margin-top"] = -131,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/lesson_dialog_bg_400x262_32bits.png#0 0 400 262:45 45 45 45"
+                        position = "relative",
+                    },
+                    ["dialog-title"] = {
+                        ["font-size"] = 20,
+                        ["base-font-size"] = 20,
+                        width = 400,
+                        ["text-align"] = "center",
+                        ["margin-top"] = 22,
+                    },
+                    ["dialog-desc"] = {
+                        width = 400,
+                        ["padding-left"] = 55,
+                        ["padding-right"] = 55,
+                        ["margin-top"] = 18,
+                        ["text-align"] = "left",
+                        color = "#7d7c92",
+                        ["font-size"] = 15,
+                        ["base-font-size"] = 14,
+                    },
+                    ["dialog-yes-button"] = {
+                        width = 240,
+                        height = 36,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/lesson_submit_63x36_32bits.png#0 0 63 36:25 13 13 25",
+                        ["text-offset-y"] = -2,
+                        border = "none",
+                        color = "#ffffff",
+                        ["font-size"] = 15,
+                    },
+                    ["dialog-no-button"] = {
+                        width = 240,
+                        height = 36,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/lesson_submit_button1_66x36_32bits.png#0 0 66 36:20 13 13 20",
+                        border = "none",
+                        ["text-offset-y"] = -1,
+                        ["font-size"] = 15,
+                        color = "#FF8A2E",
+                    },
+                    ["dialog-close-button"] = {
+                        width = 32,
+                        height = 32,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/lesson_submit-close_64x64_32bits.png",
+                    }
+                }
+            </style>
+            <pe:container alignment="_ct"
+                          class="dialog-container">
+                <div align="right"
+                     style="width: 32px;
+                            height: 32px;
+                            top: 12px;
+                            margin-right: 12px;
+                            position: absolute;">
+                    <input type="button" class="dialog-close-button" onclick="close()"/>
+                </div>
+                <div align="center"
+                     style="width: 240px;
+                            margin-top: 103px;
+                            top: 58px;
+                            position: absolute;">
+                    <input type="button"
+                           class="dialog-yes-button"
+                           value="<%= get_yes_button() %>" />
+                </div>
+                <div align="center"
+                     style="width: 240px;
+                            margin-top: 151px;
+                            top: 58px;
+                            position: absolute;">
+                    <input type="button"
+                           class="dialog-no-button"
+                           value="<%= get_no_button() %>" />
+                </div>
+                <div class="dialog-title"><%= get_title() %></div>
+                <div class="dialog-desc"><%= get_desc() %></div>
+            </pe:container>
+        </pe:mcml>
+    </body>
+</html>

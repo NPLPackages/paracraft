@@ -1,7 +1,7 @@
 --[[
 Title: MainToolBar.html code-behind script
-Author(s): LiXizhi
-Company: ParaEnging
+Author(s): 
+Company: ParaEngine
 Date: 2010/1/24
 Desc: This is the main file for Aries Creator project. It contains entry functions for creator mode. 
 use the lib:
@@ -46,10 +46,6 @@ function MainToolBar.EnterEditMode()
 	if(type(commonlib.getfield("Map3DSystem.App.HomeLand.HomeLandGateway.GoWorld")) == "function") then
 		Map3DSystem.App.HomeLand.HomeLandGateway.GoWorld();
 	end
-	
-	-- find a better way to change modified status. Currently, we will always mark as modified when switched to edit mode. 
-	-- and mark unmodified when leaving. 
-	WorldCommon.SetModified(true);
 	
 	MainToolBar.ReturnToEditMode(true);
 	

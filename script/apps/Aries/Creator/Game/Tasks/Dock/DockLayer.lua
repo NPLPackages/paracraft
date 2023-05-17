@@ -1,9 +1,14 @@
 --[[
-    author:{author}
-    time:2022-05-23 09:54:50
-    use lib:
-    local DockLayer = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockLayer.lua")
+Title: DockLayer
+Author(s): pengbinbin
+Date: 2022-05-23 09:54:50
+Desc: 
+------------------------------------------------------------
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockLayer.lua")
+local DockLayer = commonlib.gettable("MyCompany.Aries.Game.Tasks.DockLayer")
+-------------------------------------------------------
 ]]
+
 NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockItem.lua") 
 NPL.load("(gl)script/ide/System/Windows/Screen.lua");
@@ -54,7 +59,7 @@ function DockLayer:RegisterEvent()
         self:ShowEsc(true)
     end);
     GameLogic.GetFilters():add_filter("OnWorldTageChange", function(tagName)
-        if tagName and tagName == "isHomeWorkWorld" then
+        if tagName and tagName == "isHomeWorkWorld" and not System.options.isPapaAdventure then
             local dockKey = self:GetDockCfgKeyByWorldInfo()
             self:ChangeCfgKey(dockKey)
         end
@@ -169,23 +174,37 @@ end
 
 function DockLayer:OnWorldLoaded()
     commonlib.TimerManager.SetTimeout(function()
-        self.m_bShowEsc = true
-        self.m_current_dockkey = self:GetDockCfgKeyByWorldInfo()
-        local dockCfg = _G.DOCK_CONFIG[self.m_current_dockkey]
-        if dockCfg then
-            -- print("current=============",self.m_current_dockkey)
-            -- echo(dockCfg,true)
-            local curDockCfg = commonlib.copy(dockCfg)
-            if self.m_current_dockkey == "E_DOCK_TUTORIAR" and GameLogic.IsReadOnly() then
-                for k,v in pairs(curDockCfg) do
-                    if v and v.name == "save" then
-                        v.enabled = false
+        self.m_bShowEsc = true;
+        self.m_current_dockkey = self:GetDockCfgKeyByWorldInfo();
+        local dockCfg = _G.DOCK_CONFIG[self.m_current_dockkey];
+
+        if (System.User.isAnonymousWorld) then
+            dockCfg = {
+                {
+                    name = "mini_map",
+                    width = 210,
+                    enabled = true,
+                    height = 248,
+                    type = "special"
+                }
+            };
+        end
+
+        if (dockCfg) then
+            local curDockCfg = commonlib.copy(dockCfg);
+
+            if (self.m_current_dockkey == "E_DOCK_TUTORIAR" and
+                GameLogic.IsReadOnly()) then
+                for k,v in pairs (curDockCfg) do
+                    if (v and v.name == "save") then
+                        v.enabled = false;
                     end
                 end
             end
-            DockLayer:ShowDockByCfg(curDockCfg)
+
+            DockLayer:ShowDockByCfg(curDockCfg);
         end    
-    end,1000)
+    end, 1000);
 end
 
 function DockLayer:OnWorldUnloaded()
@@ -194,13 +213,30 @@ function DockLayer:OnWorldUnloaded()
     self.m_tblDockCfg = nil
 end
 
+function DockLayer.IsPapaCreate()
+    local PapaUtils = NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaUtils.lua");
+	return PapaUtils.IsPapaCreate()
+end
+
 function DockLayer:ShowDockByCfg(dockCfg)
     if not dockCfg then
         return
     end
+
+    if System.options.isPapaAdventure then
+        local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
+        if (isHomeWorkWorld and not GameLogic.IsReadOnly()) or DockLayer.IsPapaCreate() then
+            return
+        end
+    end
+
+    if self.m_current_dockkey == "E_DOCK_LESSON" and System.options.channelId_431 then
+        dockCfg = commonlib.filter(dockCfg,function (item)
+            return item.name ~= "create_spage"
+        end)
+    end
     local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
     if IsMobileUIEnabled and self.m_current_dockkey ~= "E_DOCK_TUTORIAR" then
-        -- print("ddddddddddddd",IsMobileUIEnabled,self.m_current_dockkey)
         return
     end
     if self.m_tblDockCfg then
@@ -265,6 +301,9 @@ end
 
 function DockLayer:GetDockCfgKeyByWorldInfo()
     local project_id = GameLogic.options:GetProjectId()
+    if System.options.isPapaAdventure then
+        return "E_DOCK_PAPA"
+    end
     if DockConfig.IsWinterCampWorld(project_id) then
         return "E_DOCK_DONGAO"
     end
@@ -274,6 +313,9 @@ function DockLayer:GetDockCfgKeyByWorldInfo()
     end
 
     if DockConfig.IsMiniWorld() then
+        if System.options.channelId_431 then
+            return "E_DOCK_NORMAL"
+        end
         return "E_DOCK_MINI"
     end
     if DockConfig.IsTutorialUser() then
@@ -335,7 +377,7 @@ function DockLayer:GetParentLayer()
     self.parent  = ParaUI.CreateUIObject("container", "DockLayer.bgContainer", "_fi", 0, 0, 0, 0);
     self.parent.background = "";
     self.parent:GetAttributeObject():SetField("ClickThrough", true);
-    self.parent.zorder = -200;
+    self.parent.zorder = -3;
     self.parent:AttachToRoot()
     return self.parent
 end

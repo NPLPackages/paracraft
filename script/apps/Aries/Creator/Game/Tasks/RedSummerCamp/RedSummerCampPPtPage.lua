@@ -20,6 +20,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/HelpPage.lua");
 local HelpPage = commonlib.gettable("MyCompany.Aries.Game.Tasks.HelpPage");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local Lan
 -- 存储所有课程数据
 RedSummerCampPPtPage.LessonsPPtData = {}
@@ -30,7 +31,8 @@ local page
 RedSummerCampPPtPage.DiskFolder = nil
 RedSummerCampPPtPage.SplitKey = "_pptindex_"
 RedSummerCampPPtPage.ProjectIdToProjectData = {}
-RedSummerCampPPtPage.ForbidVideoFunction = false
+-- only set to true, if local server is not running properly. if false,it means that we have at least succeed once and we will remember it. 
+RedSummerCampPPtPage.forceUsingExternalWebview = nil
 
 local key_to_report_name = {
 	["ppt_L1"] = "org",		-- 机构课L1
@@ -44,6 +46,7 @@ function RedSummerCampPPtPage.OnInit()
 	page.OnLoad = RedSummerCampPPtPage.OnLoad
 	page.OnCreate = RedSummerCampPPtPage.OnCreate
 	page.OnClose = RedSummerCampPPtPage.OnClose
+	NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
 end
 
 function RedSummerCampPPtPage.OnLoad()
@@ -103,7 +106,7 @@ function RedSummerCampPPtPage.onNplbrowserChecked()
 			return
 		end
 		if page then
-			RedSummerCampPPtPage.ForbidVideoFunction = false
+			RedSummerCampPPtPage.forceUsingExternalWebview = nil
 			GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
 			
 			RedSummerCampPPtPage.RefreshPage()
@@ -359,14 +362,13 @@ function RedSummerCampPPtPage.Show(course_data, pptIndex, is_show_exit_bt, serve
 end
 
 function RedSummerCampPPtPage.ShowPage(course_name, pptIndex, server_index)
-	GameLogic.GetFilters():apply_filters("OnShowPPTPage", bShow);
+	GameLogic.GetFilters():apply_filters("ShowTopWindow", nil, "RedSummerCampPPtPage")
 	if not RedSummerCampPPtPage.OpenPageTimeStamp then
 		RedSummerCampPPtPage.OpenPageTimeStamp = QuestAction.GetServerTime()
 	end
 	
 	if course_name == nil then
 		course_name = RedSummerCampPPtPage.CurCourseName or "ppt_X1"
-		
 	end
 
 	if pptIndex == nil then
@@ -437,6 +439,7 @@ function RedSummerCampPPtPage.ShowPage(course_name, pptIndex, server_index)
 		RedSummerCampPPtPage.BindFilter = true
 		GameLogic.GetFilters():add_filter("OnSaveWrold", RedSummerCampPPtPage.OnSaveWrold);
 		GameLogic.GetFilters():add_filter("SyncWorldFinish", RedSummerCampPPtPage.OnSyncWorldFinish);
+		GameLogic.GetFilters():add_filter("SyncWorldFinishBegin", RedSummerCampPPtPage.SyncWorldFinishBegin);
 		GameLogic.GetFilters():add_filter("lessonbox_change_region_blocks",RedSummerCampPPtPage.ReportCreateBlockInCourse)
 		GameLogic.GetFilters():add_filter("OnBeforeLoadWorld",RedSummerCampPPtPage.OnBeforeLoadWorld)
 
@@ -510,9 +513,9 @@ function RedSummerCampPPtPage.CreateWorldCallback(_, event)
     if not page or not page:IsVisible() then
         return
     end
-	local CreateWorldLoadingPgae = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/CreateWorldLoadingPgae.lua")
-	if CreateWorldLoadingPgae.IsOpen() then
-		CreateWorldLoadingPgae.SetSpecialFlag(true);
+	local CreateWorldLoadingPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/CreateWorldLoadingPage.lua")
+	if CreateWorldLoadingPage.IsOpen() then
+		CreateWorldLoadingPage.SetSpecialFlag(true);
 	end
 	
 	-- GameLogic.RunCommand(string.format('/loadworld %s', commonlib.Encoding.DefaultToUtf8(event.world_path)))
@@ -859,7 +862,7 @@ function RedSummerCampPPtPage.SelectLesson(index)
 
 	if RedSummerCampPPtPage.IsLock(index) then
 		local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
-		local config = NplBrowserPlugin.GetCache("nplbrowser_pptvideo");
+		local config = NplBrowserPlugin.GetWindowState("nplbrowser_pptvideo");
 		local need_return_video = config and config.visible
 		RedSummerCampPPtPage.ChangeVideoVisible(false)
 		if System.options.isDevEnv or System.options.isDevMode or System.options.isAB_SDK or KeepWorkItemManager.IsTeacher() then
@@ -874,7 +877,6 @@ function RedSummerCampPPtPage.SelectLesson(index)
 			return
 		end
 	end
-
 	RedSummerCampPPtPage.SelectLessonIndex = index
 	RedSummerCampPPtPage.SelectPPtData = RedSummerCampPPtPage.LessonsPPtData[RedSummerCampPPtPage.SelectLessonIndex]
 	RedSummerCampPPtPage.CurCourseKey = RedSummerCampPPtPage.CurCourseName .. RedSummerCampPPtPage.SplitKey .. RedSummerCampPPtPage.SelectLessonIndex
@@ -1198,6 +1200,40 @@ function RedSummerCampPPtPage.OnSaveWrold()
 	-- end
 end
 
+function RedSummerCampPPtPage.SyncWorldFinishBegin()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWork.lua");
+	local KeepWork = commonlib.gettable("MyCompany.Aries.Game.GameLogic.KeepWork")
+	local project_id = 0
+	local world_data = GameLogic.GetFilters():apply_filters('store_get', 'world/currentWorld')
+	if world_data and world_data.kpProjectId and world_data.kpProjectId ~= 0 then
+		project_id = world_data.kpProjectId
+	end
+	local course_data = RedSummerCampPPtPage.GetLastCourseData()
+	-- echo(course_data,true)
+
+	if project_id and tonumber(project_id) >= 0 and course_data and course_data.code and course_data.code:find("yyz") then
+		local key = "assess"..RedSummerCampPPtPage.SelectLessonIndex
+		local baseUrl = "https://keepwork.com/deng123456/assessment/"
+		local url = baseUrl..key
+		KeepWork.GetRawFile(url, function(err, msg, data)
+            if err == 200 then
+				if System.options.isDevMode then
+					print("GetRawFile==============",err,data ~= nil and data ~= "")
+				end
+                local assessmentCode  = data
+                if assessmentCode then
+					NPL.DoString(assessmentCode);
+				end
+            end
+        end)
+	end
+	
+end
+
+function RedSummerCampPPtPage.SetAssessmentData(assessmentData)
+	RedSummerCampPPtPage.assessmentData = assessmentData
+end
+
 function RedSummerCampPPtPage.OnSyncWorldFinish()
 	local step_value = RedSummerCampPPtPage.SyncWorldStepValue
 	if step_value then
@@ -1225,6 +1261,16 @@ function RedSummerCampPPtPage.OnSyncWorldFinish()
 		if tonumber(project_id) > 0  then
 			RedSummerCampPPtPage.StartTask("share",2,project_id)
 			RedSummerCampPPtPage.ReportFinishCurTask()
+
+			if RedSummerCampPPtPage.assessmentData then
+				RedSummerCampPPtPage.assessmentData.project_id = project_id
+				local action = string.format("automatic_rate-%s-%s",RedSummerCampPPtPage.CurCourseName, RedSummerCampPPtPage.SelectLessonIndex)
+				if System.options.isDevMode then
+					echo(RedSummerCampPPtPage.assessmentData,true)
+				end
+				GameLogic.GetFilters():apply_filters("user_behavior", 1, action, { assessmentData = RedSummerCampPPtPage.assessmentData});
+				RedSummerCampPPtPage.assessmentData = nil
+			end
 		end
 	end
 end
@@ -2132,11 +2178,11 @@ function RedSummerCampPPtPage.IsShetuanCourse()
 end
 
 function RedSummerCampPPtPage.IsSupportVideo()
-	if RedSummerCampPPtPage.ForbidVideoFunction then
+	if RedSummerCampPPtPage.forceUsingExternalWebview then
 		return false
 	end
 
-	if (System.os.GetPlatform() == "win32" or
+	if (System.os.GetPlatform() == "win32" or System.os.IsEmscripten() or
 	    System.os.GetPlatform() == "mac") then
 		return true
 	end
@@ -2161,7 +2207,11 @@ function RedSummerCampPPtPage.UseVideoPage()
 	return ppt_data.IsUseVideoPage and RedSummerCampPPtPage.IsSupportVideo()
 end
 
+-- OBSOLETED: this function should be deprecated, we will use the pe_nplbrowser's buildin resize function. 
 function RedSummerCampPPtPage.RefreshVideoSize()
+	if(NplBrowserPlugin.IsSupportFullWebView()) then
+		return
+	end
 	if RedSummerCampPPtPage.IsFullPage then
 		RedSummerCampPPtFullPage.RefreshVideoSize()
 		return
@@ -2199,7 +2249,7 @@ function RedSummerCampPPtPage.ChangeVideoVisible(flag)
 	flag = flag or false
 	if not page or not page:IsVisible() then
 		local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
-		local config = NplBrowserPlugin.GetCache("nplbrowser_pptvideo");
+		local config = NplBrowserPlugin.GetWindowState("nplbrowser_pptvideo");
 		if config then
 			config.visible = visible;
 			NplBrowserPlugin.Show(config);
@@ -2234,8 +2284,8 @@ function RedSummerCampPPtPage.CreateWorld(node_name, mcml_node)
 
 	commonlib.TimerManager.SetTimeout(function()
 		-- local title  = string.gsub(RedSummerCampPPtPage.GetPPtTitle(), "%s+", "")
-		local worldname = mcml_node:GetString("worldname")
-		local fork_project_id = mcml_node:GetString("fork_project_id")
+		local worldname = mcml_node and mcml_node:GetString("worldname")
+		local fork_project_id = mcml_node and mcml_node:GetString("fork_project_id")
 		local titleStr = worldname or RedSummerCampPPtPage.GetCourseTitle()
 		local project_name = titleStr .. "作业世界"
 	
@@ -2309,11 +2359,11 @@ function RedSummerCampPPtPage.CreateWorld(node_name, mcml_node)
 		local action = string.format("crsp.course.progress.start-%s-%s-creatworld", RedSummerCampPPtPage.CurCourseName, RedSummerCampPPtPage.SelectLessonIndex)
 		GameLogic.GetFilters():apply_filters('user_behavior', 1, action, RedSummerCampPPtPage.GetReportData({section = RedSummerCampPPtPage.SelectLessonIndex}))
 		
-		local CreateWorldLoadingPgae = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/CreateWorldLoadingPgae.lua")
-		CreateWorldLoadingPgae.ShowView(loading_end_callback, desc_list);
+		local CreateWorldLoadingPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/CreateWorldLoadingPage.lua")
+		CreateWorldLoadingPage.ShowView(loading_end_callback, desc_list);
 		if not is_file_exist and fork_project_id then
 			GameLogic.RunCommand(string.format([[/createworld -name "%s" -update -fork %d]], project_name, fork_project_id))			
-			CreateWorldLoadingPgae.SetSpecialFlag(false);
+			CreateWorldLoadingPage.SetSpecialFlag(false);
 		end
 	end, 50);
 
@@ -2354,7 +2404,7 @@ function RedSummerCampPPtPage.OnPageClose()
 		if RedSummerCampPPtPage.IsTopPage() and RedSummerCampPPtPage.UseVideoPage() and not RedSummerCampPPtPage.InCloseAnim and RedSummerCampPPtPage.IsOpen() then
 			RedSummerCampPPtPage.ChangeVideoVisible(true)
 		end
-	end, 10);
+	end, 1000);
 end
 
 function RedSummerCampPPtPage.IsTopPage()
@@ -2371,22 +2421,40 @@ function RedSummerCampPPtPage.IsTopPage()
 	return false
 end
 
+
+function RedSummerCampPPtPage.ShowLoadingVideoWindow()
+	NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserLoaderPage.lua");
+	local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
+	NplBrowserLoaderPage.Check(function(result)
+		if(result) then
+			GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在加载视频中，请稍候....", 180000);
+		end
+	end);
+end
+
 function RedSummerCampPPtPage.CheckVideo()
 	local ppt_data = RedSummerCampPPtPage.LessonsPPtData[RedSummerCampPPtPage.SelectLessonIndex] or {}
 	if not ppt_data.IsUseVideoPage then
 		return
 	end
+	
+	NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserPlugin.lua");
+	local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
+	
+	if(NplBrowserPlugin.IsSupportFullWebView()) then
+		return 
+	end
 
 	local NplBrowserLoaderPage = commonlib.gettable("NplBrowser.NplBrowserLoaderPage");
 	if not NplBrowserLoaderPage.IsLoaded() and not RedSummerCampPPtPage.isLoadVideo then
-		GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在加载视频中，请稍候....", 180000);
+		RedSummerCampPPtPage.ShowLoadingVideoWindow()
 		return
 	end
 
-	if not RedSummerCampPPtPage.ForbidVideoFunction and NplBrowserLoaderPage.IsLoaded() then
+	if RedSummerCampPPtPage.forceUsingExternalWebview == nil and NplBrowserLoaderPage.IsLoaded() then
 		RedSummerCampPPtPage.isLoadVideo = false;
 		RedSummerCampPPtPage.loadVideoStartTime = commonlib.TimerManager.GetCurrentTime();
-		GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在加载视频中，请稍候...", 15000);
+		RedSummerCampPPtPage.ShowLoadingVideoWindow()
 	
 
 		if not RedSummerCampPPtPage.videoTimer then
@@ -2397,6 +2465,7 @@ function RedSummerCampPPtPage.CheckVideo()
 						-- local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 						-- NplBrowserPlugin.Show({ id = "nplbrowser_pptvideo", visible = true });
 						RedSummerCampPPtPage.videoTimer:Change(nil, nil);
+						RedSummerCampPPtPage.forceUsingExternalWebview = false;
 					else
 						local curLoadingTime = commonlib.TimerManager.GetCurrentTime();
 		
@@ -2407,7 +2476,7 @@ function RedSummerCampPPtPage.CheckVideo()
 							local videoUrl = string.match(ppt_data.div_str, 'href=%"([^"]*)%"');
 							ParaGlobal.ShellExecute("open", videoUrl, "", "", 1);
 							GameLogic.GetFilters():apply_filters("cellar.common.msg_box.close");
-							RedSummerCampPPtPage.ForbidVideoFunction = true
+							RedSummerCampPPtPage.forceUsingExternalWebview = true
 							RedSummerCampPPtPage.RefreshPage()
 		
 							-- 上报
@@ -2425,7 +2494,13 @@ function RedSummerCampPPtPage.CheckVideo()
 			});
 		end
 
-	
 		RedSummerCampPPtPage.videoTimer:Change(100, 100)
+	end
+end
+
+function RedSummerCampPPtPage.GetVideoParams()
+	local userId = Mod.WorldShare.Store:Get("user/userId")
+	if userId then
+		return string.format("&userId=%s&code=%s&courseIndex=%s",userId,RedSummerCampPPtPage.CurCourseName,RedSummerCampPPtPage.SelectLessonIndex)
 	end
 end

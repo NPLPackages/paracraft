@@ -24,6 +24,7 @@ HttpWrapper.keepworkServerList = {
     LOCAL = "http://api-dev.kp-para.cn",
 }
 HttpWrapper.api_host = nil;
+
 -- get version for loading different development environment
 -- return 
 -- "ONLINE" or 
@@ -31,9 +32,11 @@ HttpWrapper.api_host = nil;
 -- "RELEASE" or 
 -- "LOCAL" or 
 function HttpWrapper.GetDevVersion()
-    local httpwrapper_version = ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE");
-    httpwrapper_version = string.upper(httpwrapper_version);
-    return httpwrapper_version;
+    if(not HttpWrapper.httpwrapper_version) then
+        HttpWrapper.httpwrapper_version = ParaEngine.GetAppCommandLineByParam("http_env", "ONLINE");
+        HttpWrapper.httpwrapper_version = string.upper(HttpWrapper.httpwrapper_version);
+    end
+    return HttpWrapper.httpwrapper_version;
 end
 function HttpWrapper.GetUrl(key)
     key = key or "keepworkServerList";
@@ -207,7 +210,7 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
         if(not res)then
             LOG.std(nil, "debug","HttpWrapper input", input);
             System.os.GetUrl(input, function(err, msg, data)
-                HttpWrapper.ShowErrorTip(err);      
+				HttpWrapper.ShowErrorTip(err, input);  
                 -- only cache method == "GET"
                 if(method == "GET" and postFunc)then
                     postFunc(self, err, msg, data);
@@ -230,17 +233,18 @@ function HttpWrapper.Create(fullname, url, method, tokenRequired, configs, prepF
 	});
 	commonlib.setfield(fullname, o);
 end
-function HttpWrapper.ShowErrorTip(err)
+
+-- should follow rule of silence, only write to log
+function HttpWrapper.ShowErrorTip(err, input)
     NPL.load("(gl)script/apps/Aries/Creator/Game/game_logic.lua");
     local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
     if err == 401 then
-        GameLogic.AddBBS("desktop", L"用户凭据失效", 3000, "255 0 0"); 
+		LOG.std(nil, "info", "HttpWrapper input", "用户凭据失效 for %s", input and input.url or "");
     end
     if(err ~= 0)then
         return
     end
-    GameLogic.AddBBS("desktop", L"网络异常", 3000, "255 0 0"); 
-    
+	LOG.std(nil, "info", "HttpWrapper input", "网络异常 for %s", input and input.url or "");
 end
 
 -- get cache from localserver

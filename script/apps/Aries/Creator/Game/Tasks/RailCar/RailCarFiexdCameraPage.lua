@@ -123,7 +123,7 @@ function RailCarFiexdCameraPage.TimeInputOnChange()
 
     value = tonumber(value)
 
-    if value <= 0 then
+    if value and value <= 0 then
         GameLogic.AddBBS(nil, L"请输入一个大于0的数字", 5000, "255 0 0");
         page:SetValue("time_input", RailCarFiexdCameraPage.SettingData.change_time)
         return

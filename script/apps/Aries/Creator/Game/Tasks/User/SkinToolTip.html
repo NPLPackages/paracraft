@@ -59,8 +59,8 @@
     local strTip = ""
     if data then
         local nameStr = "名称：  "..(data.name or "")
-        local huoquStr = "获取方式：  "..GetGetStr()
-        local statuStr = "状态： "..GetSkinStatus()
+        local huoquStr = "获取方式：  "..(GetGetStr() or "")
+        local statuStr = "状态： "..(GetSkinStatus() or "")
         local yxqStr = "有效期： ".. (GetTimeDeadLine() or "")
         strTip = nameStr .. "<br/>"..huoquStr.."<br/>"..statuStr.."<br/>"
         if GetTimeDeadLine() and GetTimeDeadLine() ~= "" then

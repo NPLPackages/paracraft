@@ -96,6 +96,14 @@ function RegionContainer:SetRegionFileName(filename)
 	self.filename = filename;
 end
 
+-- compute region filepath 
+function RegionContainer:ComputeRegionFilepath(worldDirectory, regionX, regionZ)
+	worldDirectory = worldDirectory or ParaWorld.GetWorldDirectory()
+	regionX = regionX or self.region_x
+	regionZ = regionZ or self.region_z
+	return format("%sblockWorld.lastsave/%d_%d.region.xml", worldDirectory, regionX, regionZ)
+end
+
 function RegionContainer:GetRegionFileName()
 	if(not self.filename) then
 		self.filename = format("%sblockWorld.lastsave/%d_%d.region.xml", ParaWorld.GetWorldDirectory(), self.region_x, self.region_z);
@@ -180,9 +188,9 @@ function RegionContainer:SaveToAnotherRegion(filename, regionX, regionY)
 	return bSucceed;
 end
 
+-- @param filename: should be nil, unless you want to save to external folder
 function RegionContainer:SaveToFile(filename)
 	filename = filename or self:GetRegionFileName();
-	local filename = self:GetRegionFileName();
 	
 	if(not next(self.entities)) then
 		if(not ParaIO.DoesAssetFileExist(filename, true))then

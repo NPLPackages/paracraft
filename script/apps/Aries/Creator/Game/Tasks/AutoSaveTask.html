@@ -1,0 +1,28 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/AutoSaveTask.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="false" type="text/npl" src="AutoSaveTask.lua">
+<![CDATA[
+AutoSave = commonlib.gettable("MyCompany.Aries.Game.Tasks.AutoSave")
+AutoSave.OnInit();
+function GetStagedTime()
+    local info = GameLogic.world_revision:GetStagedFolderInfo()
+    return info and info.date_time or "";
+end
+]]></script>
+<pe:container alignment="_fi" style="background-color:#cc3300;">
+    <div style="color: #ffffff;margin-left:15px; margin-top: 10px;">
+        <%=format(L"当前世界在%s被编辑过但没有存盘，是否要恢复没有存盘的备份？", GetStagedTime())%>
+        <input class="mc_button_orange" style="margin-left:20px; min-width: 80px" type="button" name="apply" value='<%=L"恢复"%>' tooltip='<%=L"恢复后如果不是预期的结果，可以不存盘，否则建议尽快存盘"%>' onclick="AutoSave.DoApplyStagedChanges" />
+        <input class="mc_button_grey" style="margin-left: 20px; min-width: 80px" type="button" name="cancel" value='<%=L"取消"%>' tooltip='<%=L"取消后将删除自动存盘的数据。"%>' onclick="AutoSave.DoNotApplyStagedChanges" />
+    </div>
+</pe:container>
+</pe:mcml> 
+</body>
+</html>

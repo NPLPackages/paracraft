@@ -27,7 +27,7 @@ end
 function QuestItem:OnInit(id, value, template, parent)
     self.id = id;
     self.value = value;
-    self.finished_value = template.finished_value;
+    self.finished_value = template and template.finished_value or 0;
     self.template = template;
     self.parent = parent;
     return self;

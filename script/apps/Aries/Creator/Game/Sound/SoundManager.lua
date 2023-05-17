@@ -437,7 +437,10 @@ function SoundManager:PlayText(text,  voiceNarrator, nTimeoutSeconds, channel, p
 		return
 	end
 	voiceNarrator = voiceNarrator or 10012
-	voiceNarrator = tonumber(voiceNarrator)
+	voiceNarrator = tonumber(voiceNarrator) or 0
+	if(voiceNarrator < 0) then
+		voiceNarrator = 0;
+	end
 	nTimeoutSeconds = nTimeoutSeconds or 7
 
 	-- 一部分参数转变

@@ -242,14 +242,16 @@ function QuestPage.OnGridViewCreate()
 			end
 
 			local tree_view = page:GetNode("item_gridview"):GetChild("pe:treeview")
-			local owl_item = tree_view[owl_item_index]
-			local button = owl_item:GetChildWithAttribute("name", "item_root"):GetChildWithAttribute("name", "canvas")
+			if tree_view then
+				local owl_item = tree_view[owl_item_index]
+				local button = owl_item:GetChildWithAttribute("name", "item_root"):GetChildWithAttribute("name", "canvas")
 
-			local QuestItemToolTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestItemToolTip.lua");
-			local desc_data = {
-				"如果家里电脑没有安装帕拉卡，让爸爸妈妈百度搜索<div style='color: #ffff00 ;float: left;'>帕拉卡</div>帮你下载安装哦。",
-			}
-			QuestItemToolTip.Show(button.uiobject_id, desc_data)
+				local QuestItemToolTip = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestItemToolTip.lua");
+				local desc_data = {
+					"如果家里电脑没有安装帕拉卡，让爸爸妈妈百度搜索<div style='color: #ffff00 ;float: left;'>帕拉卡</div>帮你下载安装哦。",
+				}
+				QuestItemToolTip.Show(button.uiobject_id, desc_data)
+			end
 		end, 10)
 	end
 
@@ -355,8 +357,8 @@ function QuestPage.HandleTaskData(data)
 			local index = #QuestPage.TaskData + 1
 			local task_data = {}
 			local exchange_data = KeepWorkItemManager.GetExtendedCostTemplate(exid)
-			local name = exchange_data.name
-			local desc = exchange_data.desc
+			local name = exchange_data and exchange_data.name or ""
+			local desc = exchange_data and exchange_data.desc or ""
 	
 			task_data.name = name
 			task_data.task_id = v.exid
@@ -374,10 +376,12 @@ function QuestPage.HandleTaskData(data)
 			-- task_data.questItemContainer = v.questItemContainer
 
 			task_data.goods_data = {}
-			for i2, v2 in ipairs(exchange_data.exchangeTargets[1].goods) do
-				if v2.goods.gsId < 60001 or v2.goods.gsId > 70000 then
-					if #task_data.goods_data < 3 then
-						task_data.goods_data[#task_data.goods_data + 1] = v2
+			if exchange_data then
+				for i2, v2 in ipairs(exchange_data.exchangeTargets[1].goods) do
+					if v2.goods.gsId < 60001 or v2.goods.gsId > 70000 then
+						if #task_data.goods_data < 3 then
+							task_data.goods_data[#task_data.goods_data + 1] = v2
+						end
 					end
 				end
 			end

@@ -163,7 +163,7 @@ end
             <select uiname="EditModelProperty.canDrag" name="canDrag" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetCanDragDS()%>'>
             </select>
         </div>
-        <div style="float: left; margin-left: 20px;">
+        <div style="float: left; margin-left: 20px;min-width:100px;">
             <input uiname="EditModelProperty.enableDropFall"  type="checkbox" name="enableDropFall" checked="checked" style="margin-top:3px;"/>
             <div style="float:left" for="enableDropFall"><%=L"拖动后掉落"%></div>
         </div>
@@ -217,11 +217,11 @@ end
         </div>
         <div style="float: left; margin-left: 20px;">
             <div style="float:left"><%=L"自定义标签:"%></div>
-            <input type="text" uiname="EditModelProperty.tag" name="tag" style="width:200px;height:24px;"/>
+            <input type="text" uiname="EditModelProperty.tag" name="tag" style="max-width:200px;height:24px;"/>
         </div>
     </div>
     <div style="margin-top: 5px;">
-        <div style="float:left;min-width:90px;">
+        <div style="float:left;width:90px;">
             <div tooltip='<%=L"sit,lie,eat"%>'><%=L"插件点名称:"%></div>
         </div>
         <div style="float:left;width:280px;height:50px;">
@@ -256,14 +256,16 @@ end
                 <div class="link_button" uiname="EditModelProperty.onHoverEventMore" name="onHoverEventMore" onclick="EditModelProperty.OnClickBuildinFunctions"  tooltip='<%=L"悬停事件:".."\n".."/sendevent __entity_onhover {x,y,z,name, hoverEntityName}"%>'><%=L"悬停:"%></div>
                 <input type="text" uiname="EditModelProperty.onHoverEvent" name="onHoverEvent" style="width:150px;height:24px;"/>
             </div>
-            <div style="float:left; margin-left:10px;">
-                <div class="link_button" uiname="EditModelProperty.onTickEventMore" name="onTickEventMore" onclick="EditModelProperty.OnClickBuildinFunctions"  tooltip='<%=L"心跳事件:".."\n".."msg={x,y,z,name}"%>'><%=L"心跳:"%></div>
-                <input type="text" uiname="EditModelProperty.onTickEvent" name="onTickEvent" style="width:100px;height:24px;"/>
-            </div>
-            <div style="float:left;margin-left:2px;">
-                <select tooltip='<%=L"多少秒心跳一次"%>' uiname="EditModelProperty.framemove_interval" name="framemove_interval" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFrameMoveIntervalDS()%>'>
-                </select>
-                <div style="float:left;margin-left:2px;" tooltip='<%=L"多少秒心跳一次"%>'><%=L"秒"%></div>
+            <div style="float: left; min-width: 220px;">
+                <div style="float: left; margin-left: 10px;">
+                    <div class="link_button" uiname="EditModelProperty.onTickEventMore" name="onTickEventMore" onclick="EditModelProperty.OnClickBuildinFunctions" tooltip='<%=L"心跳事件:".."\n".."msg={x,y,z,name}"%>'><%=L"心跳:"%></div>
+                    <input type="text" uiname="EditModelProperty.onTickEvent" name="onTickEvent" style="width:100px;height:24px;" />
+                </div>
+                <div style="float:left;margin-left:2px;">
+                    <select tooltip='<%=L"多少秒心跳一次"%>' uiname="EditModelProperty.framemove_interval" name="framemove_interval" AllowUserEdit="true" style="height:24px;" DataSource='<%=GetFrameMoveIntervalDS()%>'>
+                    </select>
+                    <div style="float:left;margin-left:2px;" tooltip='<%=L"多少秒心跳一次"%>'><%=L"秒"%></div>
+                </div>
             </div>
         </div>
         <div>
@@ -277,7 +279,7 @@ end
             </div>
             <div style="float: left; margin-left: 10px;">
                 <div class="link_button" uiname="EditModelProperty.onEndDragEventMore" name="onEndDragEventMore" onclick="EditModelProperty.OnClickBuildinFunctions" tooltip='<%=L"结束拖动事件:".."\n".."/sendevent __entity_onenddrag {x,y,z,name,targetName}\nreturn true to restore drop location."%>'><%=L"结束拖动:"%></div>
-                <input type="text" uiname="EditModelProperty.onEndDragEvent" name="onEndDragEvent" style="width:120px;height:24px;"/>
+                <input type="text" uiname="EditModelProperty.onEndDragEvent" name="onEndDragEvent" style="min-width:50px;max-width:120px;height:24px;"/>
             </div>
         </div>
     </div>

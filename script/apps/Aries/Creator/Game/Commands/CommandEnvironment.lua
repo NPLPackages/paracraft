@@ -39,7 +39,7 @@ Examples:
 ]], 
     handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
         local options;
-        local options = CommonLib.ParseOptions(cmd_text);
+        local options = CmdParser.ParseOptionsNameValue(cmd_text);
         if options.weather then
             GameLogic.options:SetWeather(options.weather)
         end

@@ -973,7 +973,7 @@ function Actor:CreateKeyFromUI(keyname, callbackFunc)
 						local facing = entity:GetFacing()
 						local scaling = entity:GetScaling()
 						local assetfile = entity.GetModelFile and entity:GetModelFile() or entity:GetMainAssetPath();
-						local skin = entity:GetSkin();
+						local skin = entity.GetSkin and entity:GetSkin()
 						self:BeginUpdate();
 						self:AddKeyFrameByName("x", 0, x);
 						self:AddKeyFrameByName("y", 0, y);
@@ -1125,7 +1125,7 @@ function Actor:FrameMoveRecording(deltaTime)
 	end
 	entity:UpdatePosition();
 	local x,y,z = entity:GetPosition();
-	local skin = entity:GetSkin();
+	local skin = entity.GetSkin and entity:GetSkin() or "";
 	
 	self:BeginUpdate();
 

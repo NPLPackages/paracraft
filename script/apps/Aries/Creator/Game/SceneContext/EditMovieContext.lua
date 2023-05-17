@@ -316,7 +316,9 @@ end
 -- whether to use a free camera rather than a actor focused camera. 
 function EditMovieContext:SetUseFreeCamera(bUseFreeCamera)
 	local cameraEntity = GameLogic.GetFreeCamera();
-
+	if not cameraEntity then
+		return 
+	end
 	local actor = self:GetActor();
 
 	if(bUseFreeCamera) then
@@ -681,7 +683,9 @@ function EditMovieContext:HighlightPickEntity(result)
 		if(result.entity) then
 			obj = result.entity:GetInnerObject()
 		end
-		ParaSelection.AddObject(obj, 1);
+		if obj then
+			ParaSelection.AddObject(obj, 1);
+		end
 	elseif(click_data.last_select_entity) then
 		click_data.last_select_entity = nil;
 		ParaSelection.ClearGroup(1);

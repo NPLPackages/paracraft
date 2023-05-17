@@ -54,6 +54,17 @@ function IsChinaStory()
     return RedSummerCampCommonPage.IsChinaStory()
 end
 
+function IsAnimationRace()
+    return RedSummerCampCommonPage.name == "animation_race"
+end
+
+function OnRaceNetClick()
+	 GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.race.detail", {
+        useNoId = true
+    });
+    GameLogic.RunCommand(format('/open  %s', "https://ceic.kpcb.org.cn/cms/cssc/7872.htm"))
+end
+
 function ClickCustomerService()
     --GameLogic.AddBBS(nil, L"敬请期待");
     ParaGlobal.ShellExecute('open', L'https://wpa1.qq.com/TxyKupLK?_type=wpa&qidian=true', '', '', 1)
@@ -164,6 +175,9 @@ end
                     <input type="button" value='<%=GetData("rb_bt_desc")%>' onclick="ClickRBBt" class="yellon_button" style="position: relative; margin-left:1010px;margin-top:15px;" />
                     <pe:if condition="<%=IsChinaStory()%>">
                         <input type="button" value='大赛详情' onclick="ClickRBBt" class="yellon_button" style="margin-left:830px;margin-top:15px;" />
+                    </pe:if>
+                    <pe:if condition="<%=IsAnimationRace()%>">
+                        <input type="button" value='大赛详情' onclick="OnRaceNetClick" class="yellon_button" style="margin-left:830px;margin-top:15px;" />
                     </pe:if>
                 </div>
             </pe:if>

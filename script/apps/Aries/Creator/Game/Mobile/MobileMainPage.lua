@@ -92,7 +92,7 @@ function MobileMainPage.ShowPage(bShow)
         style = CommonCtrl.WindowFrame.ContainerStyle,
         allowDrag = false,
         enable_esc_key = false,
-        zorder = -10,
+        zorder = -3,
         directPosition = true,
         DesignResolutionWidth = 1280,
         DesignResolutionHeight = 720,

@@ -416,6 +416,7 @@ function OpenRailCarFileDialog.OnTakeSnapShot()
 	local ctl = page and page:FindControl("AssetPreview");
 	if(ctl) then
 		local text = commonlib.Encoding.Utf8ToDefault(OpenRailCarFileDialog.select_file_name)
+		text = text or "default"
 		text = text:match("[^/\\]+$") or "default";
 		text = text:match("^[^%.]+") or text;
 		text = text..".png"

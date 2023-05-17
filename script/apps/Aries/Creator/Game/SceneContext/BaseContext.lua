@@ -1094,7 +1094,7 @@ function BaseContext:handlePlayerKeyEvent(event)
 			GameLogic.ToggleCamera();
 			event:accept();
 
-			if(curPlayer.petObj) then
+			if(curPlayer and curPlayer.petObj) then
 				if(GameLogic.IsFPSView) then
 					curPlayer.petObj:SetVisible(false)
 				else
@@ -1278,19 +1278,45 @@ function BaseContext:HandleGlobalKey(event)
 	elseif(dik_key == "DIK_RETURN") then
 		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyByRETURN") then
 			if(GameLogic.GameMode:CanChat() and GameLogic.options:IsShowChatWnd()) then
-				--System.App.Commands.Call(System.App.Commands.GetDefaultCommand("EnterChat"));
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-				MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
-				event:accept();
+				if (System.User.isAnonymousWorld == false) then
+					-- System.App.Commands.Call(System.App.Commands.GetDefaultCommand("EnterChat"));
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+					MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+					event:accept();
+				else
+					GameLogic.CheckSignedIn(L"请先登录！", function()
+						if (System.User.isAnonymousWorld) then
+							LOG.std(nil, "info", "BaseContext:HandleGlobalKey", "User cannot use command line.");
+							return;
+						end
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+						MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+						event:accept();
+					end);
+				end
 			end
 		end
 	elseif(dik_key == "DIK_SLASH") then
 		if not GameLogic.GetFilters():apply_filters("HandleGlobalKeyBySLASH") then
-			if(GameLogic.GameMode:CanChat() and GameLogic.options:IsShowChatWnd()) then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
-				MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
-				MyCompany.Aries.ChatSystem.ChatEdit.SetText("/");
-				event:accept();
+			if (GameLogic.GameMode:CanChat() and GameLogic.options:IsShowChatWnd()) then
+				if (not System.User.isAnonymousWorld) then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+					MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+					MyCompany.Aries.ChatSystem.ChatEdit.SetText("/");
+					event:accept();
+				else
+					GameLogic.CheckSignedIn(L"请先登录！", function()
+						if (System.User.isAnonymousWorld) then
+							LOG.std(nil, "info", "BaseContext:HandleGlobalKey", "User cannot use command line.");
+							return;
+						end
+	
+						NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ChatWindow.lua");
+						MyCompany.Aries.ChatSystem.ChatWindow.ShowAllPage(true);
+						MyCompany.Aries.ChatSystem.ChatEdit.SetText("/");
+						event:accept();
+					end);
+				end
 			end
 		end
 	elseif(dik_key == "DIK_GRAVE") then

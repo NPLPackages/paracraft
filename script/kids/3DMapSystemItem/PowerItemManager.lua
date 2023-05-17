@@ -705,7 +705,7 @@ end
 -- @param gsids: global store id
 -- @return: item template, nil if not found in memory
 function PowerItemManager.GetGlobalStoreItemInMemory(gsid)
-	return globalstore_templates[gsid];
+	return globalstore_templates and globalstore_templates[gsid];
 end
 
 -- one time sync with the db server

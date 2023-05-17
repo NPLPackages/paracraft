@@ -39,7 +39,10 @@ end
 function pe_mc_block:OnLoadComponentBeforeChild(parentElem, parentLayout, css)
 	local _this = self.control;
 	if(_this) then
-		local contView = self:GetAttributeWithCode("ContainerView", nil, true) or EntityManager.GetPlayer():GetInventoryView();
+		local contView = self:GetAttributeWithCode("ContainerView", nil, true) 
+		if not contView and EntityManager.GetPlayer() then
+			contView = EntityManager.GetPlayer():GetInventoryView();
+		end
 		local bagpos = self:GetAttributeWithCode("bagpos", nil, true);
 
 		if(bagpos and contView) then

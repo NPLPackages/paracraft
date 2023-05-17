@@ -91,7 +91,7 @@ function OnlineStore:ShowPage(bShow, name)
 				OnlineStore.portNumber = site_url:match("%:(%d+)") or OnlineStore.portNumber;
 
 				GameLogic.GetFilters():add_filter("OnShowEscFrame", OnlineStore.OnShowEscFrame);
-				GameLogic.GetFilters():add_filter("ShowExitDialog", OnlineStore.OnClose);
+				GameLogic.GetFilters():add_filter("OnShowTopWindow", OnlineStore.OnClose);
 				GameLogic.GetFilters():add_filter("OnInstallModel", OnlineStore.OnClose);
 
 				NPL.load("(gl)script/ide/System/Windows/Screen.lua");

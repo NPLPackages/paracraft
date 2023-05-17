@@ -65,7 +65,7 @@ end
 
 function MsgTip.AddMsgDock()
     local dockKey = GameLogic.DockManager:GetDockKey()
-    if dockKey == "E_DOCK_TUTORIAR" then
+    if dockKey == "E_DOCK_TUTORIAR" or System.options.channelId_431 or System.options.isPapaAdventure then
         return
     end
     local isLittle,dockCnf = MsgTip.GetMsgTipConfig(dockKey)

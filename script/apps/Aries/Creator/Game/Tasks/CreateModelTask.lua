@@ -44,6 +44,7 @@ function CreateModel:Run()
 	
 	if(add_to_history) then
 		UndoManager.PushCommand(self);
+		GameLogic.SetModified();
 	end
 end
 

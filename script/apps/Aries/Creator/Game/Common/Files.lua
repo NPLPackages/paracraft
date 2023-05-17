@@ -528,7 +528,7 @@ end
 ]]
 
 --获取资源路径
-function Files.GetFilePathIgnoewEncodeMode(filename)
+function Files.GetFilePathTryMultipleEncodings(filename)
 	local ret = Files.GetFilePath(filename) --移动端传utf8中文路径，直接能找到；windows端旧的电影方块存盘的数据是default（已纠正，新的没问题），也走这里
 	if ret then
 		return ret
@@ -546,7 +546,7 @@ function Files.GetFilePathIgnoewEncodeMode(filename)
 end
 
 
--- find a given file by its file path. 
+-- find a given file by its file path. This funcition return original url if file is a http texture. 
 -- see also: Files.GetCachedFilePath()
 -- it will search filename, [worldpath]/filename,  replace [worlds/DesignHouse/last] with current one. 
 -- internally it will use a cache which only last for the current world, to accelerate for repeated calls. 
@@ -575,8 +575,13 @@ function Files.FindFile(filename, searchpaths)
 	if(filepath) then
 		return filepath;
 	else
-		-- cache non-exist
-		Files:AddFileToCache(filename, false);
+		if(filename:match("^https?://")) then
+			-- do nothing for http textures. 
+			Files:AddFileToCache(filename, filename);
+		else
+			-- cache non-exist
+			Files:AddFileToCache(filename, false);
+		end
 	end
 end
 

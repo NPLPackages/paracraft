@@ -616,8 +616,9 @@ end
 function ChatEdit.SelectChannel(index, bIgnoreText, channel_name)
 	index = tonumber(index);
 	ChatEdit.selected_channel = index;
-	ChatEdit.page:SetValue("channelselect2", channel_name or ChatChannel.GetChannelName(index));
-
+	if ChatEdit.page then
+		ChatEdit.page:SetValue("channelselect2", channel_name or ChatChannel.GetChannelName(index));
+	end
 	local channel = ChatChannel.GetChannel(ChatEdit.selected_channel);
 	if(channel) then
 		local input = ChatEdit.GetInputControl();

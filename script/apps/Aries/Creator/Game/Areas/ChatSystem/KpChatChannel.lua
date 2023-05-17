@@ -294,7 +294,7 @@ function KpChatChannel.HasUserName(usernames_str, name)
 	end
 end
 function KpChatChannel.OnMsg(self, msg)
-	LOG.std("KpChatChannel", "debug", "KpChatChannel OnMsg", msg);
+	-- LOG.std("KpChatChannel", "debug", "KpChatChannel OnMsg", msg);
 
     if (not msg or not msg.data) then
         return
@@ -660,7 +660,9 @@ function KpChatChannel.LeaveWorld(worldId)
     end
     local room = KpChatChannel.GetRoom();
 	LOG.std(nil, "info", "KpChatChannel", "try to leave world %s", room);
-    KpChatChannel.client:Send("app/leave",{ rooms = { room }, });
+	if(KpChatChannel.client) then
+		KpChatChannel.client:Send("app/leave",{ rooms = { room }, });
+	end
     KpChatChannel.Clear();
 end
 function KpChatChannel.IsConnected()

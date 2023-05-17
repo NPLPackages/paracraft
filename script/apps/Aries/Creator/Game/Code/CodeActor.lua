@@ -65,9 +65,11 @@ function Actor:Init(itemStack, movieclipEntity, isReuseActor, name)
 		return;
 	end
 	local entity = self.entity;
-	entity:Connect("clicked", self, self.OnClick);
-	entity:Connect("collided", self, self.OnCollideWithEntity);
-	entity:Connect("valueChanged", self, self.OnEntityPositionChange);
+	if entity then
+		entity:Connect("clicked", self, self.OnClick);
+		entity:Connect("collided", self, self.OnCollideWithEntity);
+		entity:Connect("valueChanged", self, self.OnEntityPositionChange);
+	end
 	return self;
 end
 

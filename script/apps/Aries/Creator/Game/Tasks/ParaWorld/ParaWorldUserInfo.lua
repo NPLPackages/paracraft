@@ -217,8 +217,7 @@ function ParaWorldUserInfo.OnClickUnFavorite()
 end
 
 function ParaWorldUserInfo.OnClickUserInfo()
-	local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-	page.ShowUserInfoPage({userId = currentId});
+	GameLogic.ShowUserInfoPage({userId = currentId});
 	GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.home.click_avatar");
 end
 

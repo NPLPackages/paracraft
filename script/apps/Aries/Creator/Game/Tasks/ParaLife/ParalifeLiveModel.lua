@@ -960,10 +960,13 @@ function ParalifeLiveModel.InitPlayerControl()
 				createdEntity = nil
 			else
 				local event = MouseEvent:init("mouseReleaseEvent")
-				local capturedEntity = GameLogic.GetSceneContext():GetMouseCaptureEntity(event)
-				ParaLifeTouchController.handleMouseEvent(event);
-				if(capturedEntity and capturedEntity:isa(EntityManager.EntityLiveModel)) then
-					ParalifeLiveModel.TryDropPlayerEntityToRoleDock(capturedEntity, event)
+				local context = GameLogic.GetSceneContext()
+				if context then
+					local capturedEntity = context:GetMouseCaptureEntity(event)
+					ParaLifeTouchController.handleMouseEvent(event);
+					if(capturedEntity and capturedEntity:isa(EntityManager.EntityLiveModel)) then
+						ParalifeLiveModel.TryDropPlayerEntityToRoleDock(capturedEntity, event)
+					end
 				end
 			end
 			touchScreen.zorder = -1;
@@ -1010,10 +1013,14 @@ end
 function ParalifeLiveModel.CreateCanvasNode(parent,index,pWidth,pHeight)
 	if parent and parent:IsValid() then
 		local data = ParalifeLiveModel.role_data[index]
+		if(not data) then
+			return
+		end
 		local name = "livenode"..index
 		local size,DefaultCameraObjectDist,LookAtHeight = 300,6,1.57
 		local top = (pHeight-size)
 		local y = 0
+
 		if data.isNotHuman then
 			size = math.max(pWidth,pHeight)
 			DefaultCameraObjectDist = nil
@@ -1190,13 +1197,22 @@ function ParalifeLiveModel.MoveAction(movedis,time,callback_func)
 end
 
 function ParalifeLiveModel.CreateEntity(index,data) --创建livemodel
+	local context = GameLogic.GetSceneContext()
+	if not context then
+		LOG.std(nil,"info","ParalifeLiveModel","create livemodel in paralife context is Error")
+		return
+	end
 	local event = MouseEvent:init("mousePressEvent")
-	local result, targetEntity = GameLogic.GetSceneContext():CheckMousePick(event);
+	local result, targetEntity = context:CheckMousePick(event);
 	local bx,by,bz
 	if result then
 		bx,by,bz = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
 	else
 		bx,by,bz = GameLogic.GetPlayer():GetBlockPos()
+	end
+	if not by or not bx or not bz then
+		LOG.std(nil,"info","ParalifeLiveModel","create livemodel in paralife pos is Error")
+		return
 	end
 	local facing = Direction.GetFacingFromCamera()
 	facing = Direction.NormalizeFacing(facing)

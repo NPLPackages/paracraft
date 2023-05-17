@@ -1,0 +1,373 @@
+<html>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl">
+                <![CDATA[
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/Lessons/Creation.lua");
+                    local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
+
+                    local page = document.GetPageCtrl();
+
+                    function close()
+                        click_background();
+
+                        Creation:ShowDialog({
+                            title = "确定退出课程吗",
+                            desc = "再努力学一会儿就可以完成了哦～ 确定要退出课程吗？",
+                            yes = "继续学习",
+                            no = "退出"
+                        });
+                    end
+
+                    function progress()
+                        local progressContainer = page:FindControl("progress-container");
+                        local backgroundContainer = page:FindControl("background-container");
+
+                        if (progressContainer and backgroundContainer) then
+                            if (progressContainer.visible) then
+                                progressContainer.visible = false;
+                                backgroundContainer.visible = false;
+                            else
+                                progressContainer.visible = true;
+                                backgroundContainer.visible = true;
+
+                                Creation:CreateProgressLine(progressContainer);
+                            end
+                        end
+
+                        click_background('progress');
+                    end
+
+                    function target()
+                        local targetContainer = page:FindControl("target-container");
+                        local backgroundContainer = page:FindControl("background-container");
+
+                        if (targetContainer and backgroundContainer) then
+                            if (targetContainer.visible) then
+                                targetContainer.visible = false;
+                                backgroundContainer.visible = false;
+                            else
+                                targetContainer.visible = true;
+                                backgroundContainer.visible = true;
+                            end
+                        end
+
+                        click_background('target');
+                    end
+
+                    function reset()
+                        click_background();
+
+                        Creation:ShowDialog({
+                            title = "重置进度",
+                            desc = "重置后将会清除之前的操作所有进度，确定吗？",
+                        });
+                    end
+
+                    function submit()
+                        click_background();
+
+                        Creation.submitType = 1;
+                        Creation:ShowOpusSubmitPage();
+                    end
+
+                    function click_background(from)
+                        if (from == "background-container") then
+                            from = nil;
+                        end
+
+                        local backgroundContainer = page:FindControl("background-container");
+
+                        if (backgroundContainer and not from) then
+                            backgroundContainer.visible = false;
+                        end
+
+                        local progressContainer = page:FindControl("progress-container");
+
+                        if (progressContainer and from ~= "progress") then
+                            progressContainer.visible = false;
+                        end
+
+                        local targetContainer = page:FindControl("target-container");
+
+                        if (targetContainer and from ~= "target") then
+                            targetContainer.visible = false;
+                        end
+                    end
+
+                    function task_items()
+                        local item_height = 60;
+
+                        if (Creation.curTaskContents and #Creation.curTaskContents > 1) then
+                            item_height = 50;
+                        end
+
+                        for key, item in ipairs(Creation.curTaskContents) do
+                            return format([[
+                                <pe:container style="width: 100px;
+                                                    height: %dpx;
+                                                    background: url();"
+                                            onclick="select()">
+                                    <div class="progress-item-finished" align="right"></div>
+                                    <div class="progress-item">
+                                        %s
+                                    </div>
+                                </pe:container>
+                            ]], item_height, item.name);
+                        end
+                    end
+
+                    function minimize()
+                        if (page.is_minimize == nil) then
+                            page.is_minimize = false;
+                        end
+
+                        page.is_minimize = not page.is_minimize;
+
+                        if (page.is_minimize) then
+                            page:CallMethod(Creation.browserId, "SetVisible", false);
+                        else
+                            page:CallMethod(Creation.browserId, "SetVisible", true);
+                        end
+
+                        page:Refresh(0.01)
+                    end
+
+                    function is_minimize()
+                        return page.is_minimize;
+                    end
+
+                    function next()
+                        Creation:NextStep();
+                    end
+
+                    function has_next_step()
+                        if (Creation.hasNextStep) then
+                            return true;
+                        else
+                            return false;
+                        end
+                    end
+
+                    function hasSection()
+                        return Creation.curSection ~= nil
+                    end
+
+                    function isHomeWork()
+                        NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+                        local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
+                        local isHomeWorkWorld = WorldCommon.GetWorldTag('isHomeWorkWorld')
+                        return isHomeWorkWorld == true or isHomeWorkWorld == "true"
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    ["top-menu-left"] = {
+                        ["padding-top"] = 25,
+                        ["padding-left"] = 25,
+                    },
+                    ["top-menu-close"] = {
+                        width = 48,
+                        height = 48,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/button_exit_96x96_32bits.png;0 0 96 96",
+                        float = "left",
+                    },
+                    ["top-menu-progress"] = {
+                        width = 126,
+                        height = 48,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/button_progress_252x100_32bits.png;0 0 252 100",
+                        float = "left",
+                        ["margin-left"] = 14,
+                    },
+                    ["progress-container"] = {
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/progress-container_140x77_32bits.png;0 0 140 77:25 35 25 25",
+                        width = 140, 
+                        ["margin-left"] = 62,
+                        ["margin-top"] = 7,
+                        position = "absolute",
+                        ["padding-top"] = 22,
+                        ["padding-left"] = 10,
+                    },
+                    ["progress-item"] = {
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/progress-item_200x80_32bits.png;0 0 200 80",
+                        width = 100,
+                        height = 40,
+                        ["font-size"] = 16,
+                        ["base-font-size"] = 16,
+                        ["line-height"] = "32",
+                        ["text-align"] = "center",
+                        ["margin-bottom"] = 10,
+                    },
+                    ["progress-item-finished"] = {
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/progress-item-finished_48x48_32bits.png;0 0 48 48",
+                        width = 14,
+                        height = 14,
+                        position = "absolute",
+                        top = 13,
+                        ["margin-right"] = -22,
+                    },
+                    ["top-menu-target"] = {
+                        width = 126,
+                        height = 50,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/button_target_252x100_32bits.png;0 0 252 100",
+                        float = "left",
+                        ["margin-left"] = 14,
+                    },
+                    ["target-container"] = {
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/target-container_314x128_32bits.png;0 0 314 128:100 50 40 40",
+                        width = 314,
+                        height = 131,
+                        ["margin-left"] = 202,
+                        ["margin-top"] = 7,
+                    },
+                    ["top-menu-right"] = {
+                        ["padding-top"] = 25,
+                        ["padding-right"] = 25,
+                    },
+                    ["top-menu-submit"] = {
+                        width = 166,
+                        height = 52,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/button_submit_336x104_32bits.png",
+                        position = "absolute",
+                    },
+                    ["top-menu-next"] = {
+                        width = 166,
+                        height = 52,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/lesson_next_step_336x104_32bits.png",
+                    },
+                    ["top-menu-reset"] = {
+                        width = 126,
+                        height = 50,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/button_reset_252x100_32bits.png",
+                        position = "absolute",
+                        ["margin-right"] = 180,
+                    },
+                    ["bottom-PiP"] = {
+                        position = "relative",
+                        background = "",
+                        width = 367,
+                        height = 271,
+                        ["padding-right"] = 27,
+                        ["padding-bottom"] = 27,
+                    },
+                    ["PiP-container"] = {
+                        width = 340,
+                        height = 244,
+                    },
+                    ["PiP-container-control-bar"] = {
+                        width = 340,
+                        height = 44,
+                        ['background-color'] = "#67686a77",
+                    },
+                    ["PiP-continue"] = {
+                        width = 84,
+                        height = 28,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/button_PiP_continue_168x56_32bits.png;0 0 168 56",
+                        position = "relative",
+                        left = 8,
+                        top = 8,
+                    }
+                    ["PiP-maximize"] = {
+                        width = 28,
+                        height = 28,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/button_PiP_maximize_56x56_32bits.png;0 0 56 56",
+                        position = "relative",
+                        top = 8,
+                        ["margin-right"] = 8,
+                    },
+                    ["PiP-minimize"] = {
+                        width = 28,
+                        height = 28,
+                        background = "Texture/Aries/Creator/Game/PapaAdventures/button_PiP_minimize_56x56_32bits.png;0 0 56 56",
+                        position = "relative",
+                        top = 8,
+                        ["margin-right"] = 43,
+                    }
+                    ["PiP-container-browser"] = {
+                    },
+                }
+            </style>
+            <pe:container alignment="_fi"
+                          name="background-container"
+                          style="background: url();"
+                          onclick="click_background()"
+                          zorder="-1"
+                          visible="false">
+            </pe:container>
+            <!-- <pe:container alignment="_lt"
+                          ClickThrough="true"
+                          class="top-menu-left"
+                          style="position: relative;
+                                 background: url();
+                                 width: 354px;
+                                 height: 500px;">
+                <div class="top-menu-close" onclick="close()"></div>
+                <div class="top-menu-progress" onclick="progress()"></div>
+                <div class="top-menu-target" onclick="target()"></div>
+                <pe:container alignment="_lt"
+                              name="progress-container"
+                              class="progress-container"
+                              visible="false">
+                    <%= task_items() %>
+                </pe:container>
+                <pe:container alignment="_lt"
+                              name="target-container"
+                              class="target-container"
+                              visible="false">
+                </pe:container>
+            </pe:container> -->
+            <pe:container alignment="_rt"
+                          ClickThrough="false"
+                          class="top-menu-right"
+                          style="position: relative;
+                                 background: url();
+                                 width: 331px;
+                                 height: 73px;">
+                <pe:if condition="<%= hasSection()%>">
+                    <pe:if condition="<%= has_next_step() %>">
+                        <div class="top-menu-next" align="right" onclick="next()"></div>
+                    </pe:if>
+                    <pe:if condition="<%= not has_next_step() %>">
+                        <div class="top-menu-submit" align="right" onclick="submit()"></div>
+                    </pe:if>
+                </pe:if>
+                <pe:if condition="<%= not hasSection() and isHomeWork() and not GameLogic.IsReadOnly() %>">
+                    <div class="top-menu-submit" align="right" onclick="submit()"></div>
+                </pe:if>
+                
+                <!-- <div class="top-menu-reset" align="right" onclick="reset()"></div> -->
+            </pe:container>
+            <pe:if condition="<%= is_minimize() %>">
+                <pe:container alignment="_rb"
+                          ClickThrough="false"
+                          style="height: 71px;"
+                          class="bottom-PiP">
+                    <div class="PiP-container" align="right">
+                        <div class="PiP-container-control-bar">
+                            <div class="PiP-continue" onclick="go_on()"></div>
+                            <input type="button"
+                                   class="PiP-minimize"
+                                   style="margin-top: 8px;"
+                                   name="PiP-minimize"
+                                   align="right"
+                                   onclick="minimize()" />
+                            <div class="PiP-maximize" align="right" onclick="maximize()"></div>
+                        </div>
+                    </div>
+                </pe:container>
+            </pe:if>
+            <script type="text/npl">
+                <![CDATA[
+                    local page = document.GetPageCtrl();
+                    local PiP_minimize = page:FindControl("PiP-minimize");
+
+                    if (page.is_minimize and PiP_minimize) then
+                        local x, y = PiP_minimize:GetAbsPosition()
+                        PiP_minimize.rotation = 3.14
+                    end
+                ]]>
+            </script>
+        </pe:mcml>
+    </body>
+</html>

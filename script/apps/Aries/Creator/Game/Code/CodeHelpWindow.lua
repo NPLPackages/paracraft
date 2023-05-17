@@ -135,7 +135,7 @@ function CodeHelpWindow.OnClickLearn()
 	if(CodeHelpWindow.lastLangConfig and CodeHelpWindow.lastLangConfig.OnClickLearn) then
 		CodeHelpWindow.lastLangConfig.OnClickLearn()
 	else
-		local url = L"https://keepwork.com/official/paracraft/codeblock"
+		local url = L"https://keepwork.com/official/docs/UserGuide/coding/codeblock"
 		if(CodeHelpWindow.codeLanguageType == "python") then
 			url = L"https://github.com/tatfook/CodeBlockDemos/wiki/learn_python"
 		end

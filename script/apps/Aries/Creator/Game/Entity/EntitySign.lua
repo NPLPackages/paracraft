@@ -256,6 +256,7 @@ function Entity:OpenEditor(editor_name, entity)
 	else
 		self:OpenHtmlEditor()
 	end
+	GameLogic.SetModified();
 end
 
 function Entity:OpenHtmlEditor()

@@ -120,6 +120,7 @@ function ParaWorldChunkGenerator:OnLoadWorld()
 		keepwork.world.myschoolParaWorld({}, function(err, msg, data)
 			if (data and data.schoolParaWorld and tostring(data.schoolParaWorld.projectId) == GameLogic.options:GetProjectId()) then
 			else
+				if System.options.isPapaAdventure then return end
 				local ParaWorldSchools = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ParaWorld/ParaWorldSchools.lua");
 				ParaWorldSchools.ShowPage(function(projectId)
 					if (projectId) then

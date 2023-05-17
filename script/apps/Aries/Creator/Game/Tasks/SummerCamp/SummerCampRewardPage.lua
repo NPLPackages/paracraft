@@ -118,15 +118,8 @@ function SummerCampRewardPage.OnClickGetReward(index)
             GameLogic.AddBBS("summer_reward", L"领取成功", 5000, "0 255 0");
             SummerCampRewardPage.InitData()
             page:Refresh(0)
-
             if index == #SummerCampRewardPage.RewardData then
-                if true then
-                    local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
-                    UserInfoPage.ShowPage(System.User.keepworkUsername)
-                else
-                    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-                    page.ShowUserInfoPage({username = System.User.keepworkUsername});
-                end
+				GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
             end
         end)
     end) 

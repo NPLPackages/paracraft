@@ -210,8 +210,7 @@ function StudentPage.OpenHistoryWork()
 end
 
 function StudentPage.OpenMyProject()
-    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-    last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="works", username = System.User.keepworkUsername});
+    GameLogic.ShowUserInfoPage({HeaderTabIndex="works", username = System.User.keepworkUsername});
 end
 
 function StudentPage.OpenPersonalDataStatistics()
@@ -252,7 +251,7 @@ function StudentPage.OpenCompleClassInfo()
         return
    end
 
-    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+    local Page = NPL.load("script/ide/System/UI/Page.lua");
     Page.Show({OnFinish = function()
         GameLogic.AddBBS(nil, L"加入班级成功", 3000, "0 255 0")
         page:Refresh(0.01)

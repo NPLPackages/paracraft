@@ -870,7 +870,7 @@ function Entity:SetSkinIn431Platform(skin)
 	-- else
 	-- 	skin = "80001;82029;84012;81070;85009"
 	-- end
-	local skin = "80001;82029;84012;81070;85009"
+	local skin = "80001;82011;84012;81018;85009"
 	if(self.skin ~= skin) then
 		if(skin) then
 			skin = tostring(skin)

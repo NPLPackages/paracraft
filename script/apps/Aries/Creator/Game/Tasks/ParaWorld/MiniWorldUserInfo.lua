@@ -215,8 +215,7 @@ function MiniWorldUserInfo.OnClickUnFavorite()
 end
 
 function MiniWorldUserInfo.OnClickUserInfo()
-	local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-	page.ShowUserInfoPage({userId = currentId});
+	GameLogic.ShowUserInfoPage({userId = currentId});
 end
 
 function MiniWorldUserInfo.TemporaryHide()

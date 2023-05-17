@@ -146,10 +146,11 @@ function SystemSettingsPage.OnInit()
 	page:SetValue("comboShader",  tostring(math.min(math.max(1, nRenderMethod), 4)) );
 
 	SystemSettingsPage.stereoMode_ds = {
-		{value="0",idx=1, text=L"Off"},
-		{value="2",idx=2, text=L"Left/Right"},
-		{value="5",idx=3, text=L"Red/Blue"},
-		{value="8",idx=4, text=L"ODS SingleEye"},
+		{value="0",idx=1, text=L"关闭"},
+		{value="2",idx=2, text=L"左/右眼"},
+		{value="5",idx=3, text=L"红/蓝眼镜"},
+		{value="8",idx=4, text=L"360全景(单眼ods)"},
+		-- <option value="7">SingleEye old</option>
 	}
 	
 	local stereoMode = GameLogic.options:GetStereoMode() or 0
@@ -210,7 +211,19 @@ local function UpdateCheckBox(name, bChecked)
 	if(page) then
 		bChecked = bChecked == true or bChecked == "true";
 		if (useDefaultStyle or useDefaultStyle == nil) then
-			page:CallMethod(name, "SetUIBackground", bChecked and "Texture/Aries/Creator/keepwork/setting/qiehuan1_108X29_32bits.png;0 0 108 29" or "Texture/Aries/Creator/keepwork/setting/qiehuan2_108X29_32bits.png;0 0 108 29");
+			local switchA = "Texture/Aries/Creator/keepwork/setting/qiehuan1_108X29_32bits.png;0 0 108 29"
+			local switchB = "Texture/Aries/Creator/keepwork/setting/qiehuan2_108X29_32bits.png;0 0 108 29"
+
+			if (Mod.WorldShare.Utils.IsEnglish()) then
+				switchA = "Texture/Aries/Creator/keepwork/worldshare/main_login_buttons2_32bits.png;48 104 109 29";
+				switchB = "Texture/Aries/Creator/keepwork/worldshare/main_login_buttons2_32bits.png;48 145 109 29";
+			end
+
+			page:CallMethod(
+				name,
+				"SetUIBackground",
+				bChecked and switchA or switchB
+			);
 		end
 	end
 end
@@ -1545,18 +1558,18 @@ function SystemSettingsPage.OnChangeStereoMode(name, value)
 	if value=="8" then 
 		local att = ParaEngine.GetAttributeObject();
 		local oldsize = att:GetField("ScreenResolution", {1280,720});
-		if oldsize[2] - oldsize[1]/2<200 then
+		if (oldsize[2] < oldsize[1] / 4 * 3) then
 			GameLogic.options:EnableStereoMode(0);
-			
-			att:SetField("ScreenResolution", {oldsize[1],oldsize[1]}); 
+			local height = math.floor(oldsize[1] / 4 * 3)
+			att:SetField("ScreenResolution", {oldsize[1], height}); 
 			att:CallField("UpdateScreenMode");
 
-			local screen_resolution =  string.format("%d × %d", oldsize[1],oldsize[1])
+			local screen_resolution =  string.format("%d × %d", oldsize[1], height)
 			page:SetNodeValue("ScreenResolution", screen_resolution) -- 分辨率	
 			SystemSettingsPage.setting_ds["screen_resolution"] = screen_resolution;
 			commonlib.TimerManager.SetTimeout(function()
 				SystemSettingsPage.OnChangeStereoMode(name, value)
-			end,200)
+			end, 200)
 			return
 		end
 	end

@@ -354,7 +354,7 @@ function TeachingQuestPage.GetTaskTitle(index)
 	if (task) then
 		return task.title;
 	else
-		return L"";
+		return "";
 	end
 end
 

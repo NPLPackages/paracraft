@@ -758,9 +758,11 @@ function MacroPlayer.ShowCursor(bShow, x, y, button)
                 else
                     altKey.visible = false;
                 end
+
                 if isShowOperate then
                     MacroPlayer.ShowMobileClickButtons(button)
                 end
+
                 local mouseBtn = page:FindControl("mouseBtn");
                 mouseBtn.y = offset;
 
@@ -828,25 +830,42 @@ end
 
 
 function MacroPlayer.ShowMobileClickButtons(button)
-    local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled',false)
+    local IsMobileUIEnabled = GameLogic.GetFilters():apply_filters('MobileUIRegister.IsMobileUIEnabled', false);
     local parent = page:FindControl("mobileButtons");
+
     if not IsMobileUIEnabled or not page or button == nil then
-        parent:RemoveAll()
-        parent.visible = false
-        return
+        if (MacroPlayer.btnDts and
+            type(MacroPlayer.btnDts) == "table" and
+            #MacroPlayer.btnDts > 0) then
+            for key, item in ipairs(MacroPlayer.btnDts) do
+                if (item and item.virtual_key) then
+                    MacroPlayer.SendRawKeyEvent(item.virtual_key, false);
+                end
+            end
+        end
+
+        parent:RemoveAll();
+        parent.visible = false;
+        return;
     end
-    local button = button or ""
-    local btnDts = {}
+
+    local button = button or "";
+    local btnDts = {};
+
     if button:match("alt") then
-        btnDts[#btnDts + 1] = {value="ALT",textX=15,virtual_key= DIK_SCANCODE.DIK_LMENU}
+        btnDts[#btnDts + 1] = { value="ALT", textX = 15, virtual_key = DIK_SCANCODE.DIK_LMENU };
     end
+
     if button:match("ctrl") then
-        btnDts[#btnDts + 1] = {value="CTRL",textX=13,virtual_key= DIK_SCANCODE.DIK_LCONTROL}
+        btnDts[#btnDts + 1] = { value="CTRL", textX = 13, virtual_key = DIK_SCANCODE.DIK_LCONTROL };
     end
+
     if button:match("shift") then
-        btnDts[#btnDts + 1] = {value="SHIFT",textX=10,virtual_key= DIK_SCANCODE.DIK_LSHIFT}
+        btnDts[#btnDts + 1] = { value="SHIFT", textX = 10, virtual_key = DIK_SCANCODE.DIK_LSHIFT };
     end
-    MacroPlayer.ShowMobileKeyUI(btnDts)
+
+    MacroPlayer.btnDts = btnDts;
+    MacroPlayer.ShowMobileKeyUI(btnDts);
 end
 
 function MacroPlayer.ShowMobileKeyOperate(operateDts)
@@ -861,39 +880,63 @@ function MacroPlayer.ShowMobileKeyOperate(operateDts)
 end
 
 function MacroPlayer.ShowMobileKeyUI(operateDts)
-    MacroPlayer.UpdateOperateKey()
-    if operateDts and #operateDts > 0 then
-        local parent = page:FindControl("mobileButtons");
-        local bg = "Texture/Aries/Quest/keyboard_btn.png:10 10 10 16"
-        parent:RemoveAll()
-        parent.visible = true
+    MacroPlayer.UpdateOperateKey();
 
-        local iconSize = 60
-        local num = #operateDts
-        local offsetX = 20
-        local total_width = iconSize * num + offsetX *(num - 1)
+    if (operateDts and #operateDts > 0) then
+        local parent = page:FindControl("mobileButtons");
+        local bg = "Texture/Aries/Quest/keyboard_btn.png:10 10 10 16";
+        parent:RemoveAll();
+        parent.visible = true;
+
+        local iconSize = 60;
+        local num = #operateDts;
+        local offsetX = 20;
+        local total_width = iconSize * num + offsetX * (num - 1);
         local fontName = "System;16;bold";
-        local startX = math.floor((parent.width/2 - total_width/2) + 0.5)
-        for i,v in ipairs(operateDts) do
-            local buttonBg = ParaUI.CreateUIObject("container", "button_"..v.value, "_lt", startX + (i-1)*(iconSize + offsetX), 0, iconSize, iconSize -20);
-            buttonBg.background = bg
-            parent:AddChild(buttonBg)
+        local startX = math.floor((parent.width / 2 - total_width / 2) + 0.5);
+
+        for i, v in ipairs(operateDts) do
+            local buttonBg =
+                ParaUI.CreateUIObject(
+                    "container",
+                    "button_" .. v.value,
+                    "_lt",
+                    startX + (i - 1) * (iconSize + offsetX),
+                    0,
+                    iconSize,
+                    iconSize - 20
+                );
+
+            buttonBg.background = bg;
+            parent:AddChild(buttonBg);
     
-            local textWidth = _guihelper.GetTextWidth(v.value, fontName)
-            local button_text = ParaUI.CreateUIObject("text", "button_text_"..v.value, "_lt", iconSize/2-textWidth/2, 4, textWidth, iconSize -20);
+            local textWidth = _guihelper.GetTextWidth(v.value, fontName);
+            local button_text =
+                ParaUI.CreateUIObject(
+                    "text",
+                    "button_text_" .. v.value,
+                    "_lt",
+                    iconSize / 2 - textWidth / 2,
+                    4,
+                    textWidth,
+                    iconSize - 20
+                );
+
             _guihelper.SetFontColor(button_text, "#000000");
-            button_text.text = v.value
-            button_text.font = fontName
-            buttonBg:AddChild(button_text)
+            button_text.text = v.value;
+            button_text.font = fontName;
+            buttonBg:AddChild(button_text);
     
             buttonBg:SetScript("onmousedown", function() 
-                MacroPlayer.OnOperateMouseDown(v)
+                MacroPlayer.OnOperateMouseDown(v);
             end);
-            buttonBg:SetScript("ontouch", function() 
-                MacroPlayer.OnOperateTouch(msg,v)
+
+            buttonBg:SetScript("ontouch", function()
+                MacroPlayer.OnOperateTouch(msg, v);
             end);
-            buttonBg:SetScript("onmouseup", function() 
-                MacroPlayer.OnOperateMouseUp(v)
+
+            buttonBg:SetScript("onmouseup", function()
+                MacroPlayer.OnOperateMouseUp(v);
             end);
         end
     end
@@ -901,31 +944,31 @@ end
 
 -- simulate the touch event with id=-1
 function MacroPlayer.OnOperateMouseDown(data)
-	local touch = {type="WM_POINTERDOWN", x=mouse_x, y=mouse_y, id=-1, time=0};
-	MacroPlayer.OnOperateTouch(touch,data);
+	local touch = { type = "WM_POINTERDOWN", x = mouse_x, y = mouse_y, id = -1, time = 0 };
+	MacroPlayer.OnOperateTouch(touch, data);
 end
 -- simulate the touch event
 function MacroPlayer.OnOperateMouseUp(data)
-	local touch = {type="WM_POINTERUP", x=mouse_x, y=mouse_y, id=-1, time=0};
-	MacroPlayer.OnOperateTouch(touch,data);
+	local touch = { type = "WM_POINTERUP", x = mouse_x, y = mouse_y, id = -1, time = 0 };
+	MacroPlayer.OnOperateTouch(touch, data);
 end
 
 -- handleTouchEvent 
-function MacroPlayer.OnOperateTouch(touch,data)
+function MacroPlayer.OnOperateTouch(touch, data)
     -- local touch_session = TouchSession.GetTouchSession(touch);
-	if(touch.type == "WM_POINTERDOWN") then
+	if (touch.type == "WM_POINTERDOWN") then
         MacroPlayer.SendRawKeyEvent(data.virtual_key, true)
-	elseif(touch.type == "WM_POINTERUPDATE") then
-		
-	elseif(touch.type == "WM_POINTERUP") then
+	elseif (touch.type == "WM_POINTERUPDATE") then
+
+	elseif (touch.type == "WM_POINTERUP") then
         MacroPlayer.SendRawKeyEvent(data.virtual_key, false)
 	end
 end
 
 function MacroPlayer.SendRawKeyEvent(key, isDown)
-	if(key) then
+	if (key) then
 		Keyboard:SendKeyEvent(isDown and "keyDownEvent" or "keyUpEvent", key);
-        MacroPlayer.AddOperateKey(key,isDown)
+        MacroPlayer.AddOperateKey(key, isDown)
 	end
 end
 
@@ -954,35 +997,43 @@ function MacroPlayer.CheckButton(button)
     button = button or "";
     local isOK = true;
     local reason;
+
     if(button:match("left") and mouse_button ~= "left") then
         isOK = false
         reason = "mouseButtonWrong"
     end
+
     if(button:match("right") and mouse_button ~= "right") then
         isOK = false
         reason = "mouseButtonWrong"
     end
+
     if(button:match("middle") and mouse_button ~= "middle") then
         -- since, some mouse does not have a middle button, we will pass anyway, but tell the user about it. 
         GameLogic.AddBBS("Macro", L"按鼠标中键", 5000, "255 0 0");
     end
+
     --移动端不区分左右键
     if IsMobileUIEnabled then
         isOK = true
         reason = ""
     end
+
     if((not button:match("ctrl")) == (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LCONTROL) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RCONTROL))) then
         isOK = false
         reason = "keyboardButtonWrong"
     end
+
     if((not button:match("shift")) == (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LSHIFT) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RSHIFT))) then
         isOK = false
         reason = "keyboardButtonWrong"
     end
+
     if((not button:match("alt")) == (ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_LMENU) or ParaUI.IsKeyPressed(DIK_SCANCODE.DIK_RMENU))) then
         isOK = false
         reason = "keyboardButtonWrong"
     end
+
     return isOK, reason;
 end
 

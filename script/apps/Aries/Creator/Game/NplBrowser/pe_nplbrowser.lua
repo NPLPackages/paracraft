@@ -35,18 +35,33 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
     local url = mcmlNode:GetAttributeWithCode("url","",true);
 	local video_url = mcmlNode:GetAttributeWithCode("video_url","",true);
 	local mobile_video_urls = mcmlNode:GetAttributeWithCode("mobile_video_urls","",true);
-	if mobile_video_urls and mobile_video_urls ~= "" and System.options.IsTouchDevice then
+
+	if (mobile_video_urls and mobile_video_urls ~= "" and System.options.IsTouchDevice) then
 		video_url = mobile_video_urls
 	end
-	if video_url ~= "" then
+
+	if (video_url ~= "") then
 		NplBrowserManager:SetVideoUrl(video_url)
-		GameLogic.RunCommand("/webserver -silent")
-		url = "npl://video" .. "?video_url=" .. NplBrowserManager:GetVideoUrlSrc()
+		if(NplBrowserPlugin.IsSupportFullWebView()) then
+			local src_url = NplBrowserManager:GetVideoUrlSrc("mp4")
+			if(src_url) then
+				local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
+				local online_url = "https://keepwork.com/official/open/apps/video"
+				url = online_url.."?video_url="..src_url;
+				local videoParams = RedSummerCampPPtPage.GetVideoParams()
+				if GameLogic.GetFilters():apply_filters('is_signed_in') and videoParams then
+					url = online_url.."?"..videoParams.."&video_url="..src_url
+				end
+				LOG.std(nil, "info", "pe_nplbrowser", "create url===%s",url);
+			end
+		else
+			GameLogic.RunCommand("/webserver -silent")
+			url = "npl://video" .. "?video_url=" .. NplBrowserManager:GetVideoUrlSrc()
+		end
 		url = pe_nplbrowser.cmd_open_url(url)
-		-- url = GameLogic.GetFilters():apply_filters("cmd_open_url", url);
 	end
-	
-	if System.os.GetPlatform() == 'win32' then
+
+	if (System.os.GetPlatform() == "win32") then
 		if(not NplBrowserLoaderPage.IsLoaded())then
 			if(not pe_nplbrowser.isBrowserLoading) then
 				pe_nplbrowser.isBrowserLoading = true
@@ -54,7 +69,7 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 					if(bLoaded) then
 						if mcmlNode:GetPageCtrl():IsVisible() then --避免已经关闭界面了，突然还加载一个独立的web窗口出来
 							--pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, css, parentLayout) 
-							mcmlNode:GetPageCtrl():Refresh(0)
+							mcmlNode:GetPageCtrl():Refresh()
 							return
 						end
 					end
@@ -64,15 +79,16 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 			return
 		end
 	end
-
+	local userControl = mcmlNode:GetAttributeWithCode("userControl",false);
 	local withControl = mcmlNode:GetAttributeWithCode("withControl",false);
 	local visible = mcmlNode:GetAttributeWithCode("visible", nil, true);
-	visible = not (visible == false or visible=="false");
-	local enabledResize = mcmlNode:GetBool("enabledResize");
+	if(visible and visible=="true") then
+		visible = true
+	end
 	local min_width = mcmlNode:GetNumber("min_width");
 	local min_height = mcmlNode:GetNumber("min_height");
-	width = mcmlNode:GetNumber("width") or width;
-	height = mcmlNode:GetNumber("height") or height;
+	width = mcmlNode:GetNumber("width");
+	height = mcmlNode:GetNumber("height");
 	local screen_x, screen_y, screen_width, screen_height = _parent:GetAbsPosition();
 
     local x = screen_x + left;
@@ -90,16 +106,17 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 		_parent = _parent,
 	};
 
-	if( (min_width and min_width > 0 and screen_width < min_width) or 
-		(min_height and min_height > 0 and screen_height < min_height))then
-        input.zoom = -1;
-    else
-        input.zoom = 0;
-    end
+	-- if ((min_width and min_width > 0 and screen_width < min_width) or 
+	-- 	(min_height and min_height > 0 and screen_height < min_height))then
+    --     input.zoom = -1;
+    -- else
+    --     input.zoom = 0;
+    -- end
 
 	if (System.os.GetPlatform() == "win32" or
 		System.os.GetPlatform() == "mac" or
-		System.os.GetPlatform() == "ios") then
+		System.os.GetPlatform() == "ios" or
+		System.os.GetPlatform() == "android") then
 		local uiScales = Screen:GetUIScaling(true);
 
 		if (uiScales[1] ~= 1 or uiScales[2] ~= 1) then
@@ -109,57 +126,26 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 			input.height = math.floor(input.height * uiScales[2]);
 		end
 	end
-
-	if NplBrowserPlugin.WindowIsExisted(id) then
-		local config = NplBrowserPlugin.GetCache(id);
-
-	    if (config and
-			config.url == input.url and
-			config.x == input.x and
-			config.y == input.y and
-			config.width == input.width and
-			config.height == input.height) then
-
-			if (config.zoom ~= 0) then
-				NplBrowserPlugin.Zoom({id = id, zoom = config.zoom});
-			end
+	
+	if (NplBrowserPlugin.IsWindowCreated(id)) then
+		local config = NplBrowserPlugin.GetWindowState(id);
+		if (config and config.url ~= input.url) then
+			NplBrowserPlugin.Open(input);
 		else
-            if (enabledResize and config.url == input.url)then
-			    NplBrowserPlugin.ChangePosSize({id = id, x = input.x, y = input.y, width = input.width, height = input.height, });
-            else
-				NplBrowserPlugin.Open(input);
-            end
+			NplBrowserPlugin.ChangePosSize(input);
 		end
 	else
 		NplBrowserPlugin.Start(input);
-
-		if (input.zoom ~= 0) then
-			-- set zoom at 1, 3, 6, 10 seconds
-			local i = 1;
-			local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
-				local config = NplBrowserPlugin.GetCache(id);
-				if(config.visible and input.zoom ~= 0)then
-					NplBrowserPlugin.Zoom({id = id, zoom = input.zoom});
-					i = i + 1;
-					if(i<=4) then
-						timer:Change(i*1000, nil)
-					end
-				end
-			end});
-
-			mytimer:Change(i*1000, nil)
-		end
 	end
-
-	-- force save cache for zooming when run pe_nplbrowser.SetVisible after opened cef browser
-	NplBrowserPlugin.UpdateCache(id, input);
-
+	if(visible) then
+		NplBrowserPlugin.Show(input)
+	end
 	CommonCtrl.AddControl(id, id);
 
 	local function resize(id, _parent)
         if (_parent and _parent.GetAbsPosition) then
 		    local screen_x, screen_y, screen_width, screen_height = _parent:GetAbsPosition();
-		    local config = NplBrowserPlugin.GetCache(id);
+		    local config = NplBrowserPlugin.GetWindowState(id);
 
 		    if (config) then
 			    local x = screen_x + left;
@@ -169,7 +155,8 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 
 				if (System.os.GetPlatform() == "win32" or
 					System.os.GetPlatform() == "ios" or
-					System.os.GetPlatform() == "mac") then
+					System.os.GetPlatform() == "mac" or
+					System.os.GetPlatform() == "android") then
 					local uiScales = Screen:GetUIScaling(true);
 
 					if (uiScales[1] ~= 1 or uiScales[2] ~= 1) then
@@ -187,40 +174,32 @@ function pe_nplbrowser.create(rootName, mcmlNode, bindingContext, _parent, left,
 						y = y,
 						width = width,
 						height = height
-					},
-					true
+					}
 				);
 		    end
         end
 	end
-
-	if (System.os.GetPlatform() == 'android') then
-		local config = NplBrowserPlugin.GetCache(id);
-
-		local function resizeInterval()
-			commonlib.TimerManager.SetTimeout(function()
-				if config.isLoadWebview and config.bResizeInterval then
-					resize(id, _parent);
-					resizeInterval();
-				else
-					config.bResizeInterval = false
-				end
-			end, 100)
-		end
-
-		config.resizeInterval = resizeInterval;
-	end
-
 	_parent:SetScript("onsize", function()
-		if enabledResize then
-            resize(id, _parent);
+		if not userControl then
+			resize(id, _parent);
 		end
-	end)
+	end);
+	
+	local parent_id = _parent.id
+	NplBrowserPlugin.UpdateWindowState(id, {parent_id = parent_id});
+
+	_parent:SetScript("ondestroy", function()
+		-- tricky: only make it invisible if the browser is not binded to another parent control
+		local config = NplBrowserPlugin.GetWindowState(id);
+		if (config and config.parent_id == parent_id) then
+			NplBrowserPlugin.Show({id=id, visible = false});
+		end
+	end);
 end
 
 function pe_nplbrowser.Reload(mcmlNode,name,url)
 	local id = mcmlNode:GetAttributeWithCode("name") or mcmlNode.name or mcmlNode:GetInstanceName(rootName);
-	local config = NplBrowserPlugin.GetCache(id);
+	local config = NplBrowserPlugin.GetWindowState(id);
 	if(config)then
 		config.url = url;
 		NplBrowserPlugin.Open(config);
@@ -229,24 +208,11 @@ end
 
 function pe_nplbrowser.SetVisible(mcmlNode, name, visible)
 	local id = mcmlNode:GetAttributeWithCode("name") or mcmlNode.name or mcmlNode:GetInstanceName(rootName);
-	local config = NplBrowserPlugin.GetCache(id);
+	local config = NplBrowserPlugin.GetWindowState(id);
 
 	if (config) then
 		config.visible = visible;
 		NplBrowserPlugin.Show(config);
-
-		if (System.os.GetPlatform() == 'android') then
-			config.bResizeInterval = false;
-
-			if config.visible then
-				commonlib.TimerManager.SetTimeout(function()
-					if config.resizeInterval and not config.bResizeInterval then
-						config.bResizeInterval = true;
-						config.resizeInterval();
-					end
-				end, 100)
-			end
-		end
 
 		if (not visible) then
 			commonlib.TimerManager.SetTimeout(function()  

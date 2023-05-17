@@ -46,6 +46,9 @@ local VipSchoolLimit  ={}
 
 -- 检测是否特殊身份 (vip, school_admin, school_teacher, school_student, org_school)
 function UserPermission.IsSpecialIdentity()
+    if System.options.channelId_431 then
+        return false
+    end
     local check_role_list = {
         "vip","school_admin","school_teacher","school_student","org_school"
     }
@@ -71,14 +74,22 @@ function UserPermission.GetPermissionData(check_type)
 end
 
 function UserPermission.CheckHasPermission(check_type)
-    local permission_data = UserPermission.GetPermissionData(check_type)
-    if not permission_data then
-        return false
-    end
-    local time_rules = permission_data.timeRules
+    if (true) then return true end -- bugID 1003014 1003013 1003012 1003011
 
-    if UserPermission.CheckTimeRules(time_rules) then
+    if (System.options.channelId_431) then
         return true
+    end
+
+    local permission_data = UserPermission.GetPermissionData(check_type);
+
+    if (not permission_data) then
+        return false;
+    end
+
+    local time_rules = permission_data.timeRules;
+
+    if (UserPermission.CheckTimeRules(time_rules)) then
+        return true;
     end
 
     return false
@@ -87,6 +98,9 @@ end
 -- 检查用户是否有特殊身份 vip学校学生 江西某学校等
 
 function UserPermission.CheckIsSpecialSchool()
+    if System.options.channelId_431 then
+        return false
+    end
     for key, value in pairs(SpecialSchoolRoleList) do
         if UserPermission.GetRoleData(key) then
             return true
@@ -159,6 +173,9 @@ end
 
 -- 检测是否在时间规则定义的时间内
 function UserPermission.CheckIsInTimeRule(time_rule)
+    if System.options.channelId_431 then
+        return true
+    end
     local start_time_t, end_time_t = UserPermission.GetTimeRuleStartEndTimeT(time_rule)
     if not start_time_t then
         return
@@ -206,6 +223,9 @@ end
 
 -- 检测是否上课的时间
 function UserPermission.IsInVipSchoolCourseTime()
+    if System.options.channelId_431 then
+        return true
+    end
     local cur_time_stamp = QuestAction.GetServerTime()
     local start_time_t, end_time_t = UserPermission.GetVipSchoolLimitTime()
     local start_hour,start_min = start_time_t.start_hour, start_time_t.start_min
@@ -223,56 +243,66 @@ end
 
 function UserPermission.CheckCanEditBlock(check_type, callbackFunc)
 	local function InvokeCallBack_()
-		if(callbackFunc) then
+		if (callbackFunc) then
 			callbackFunc();
 		end
 	end
+
     -- if not System.options.isDevMode then
     --     if cb then
     --         cb()
     --     end
     --     return
     -- end
+
+    if (System.options.channelId_431) then
+        InvokeCallBack_();
+        return;
+    end
+
     -- 宏示教的情况允许
-    if GameLogic.Macros:IsPlaying() then
-        InvokeCallBack_()
-        return
+    if (GameLogic.Macros:IsPlaying()) then
+        InvokeCallBack_();
+        return;
     end
 
     -- 白名单世界
-    local world_data = QuestAction.GetCurWorldData()
-    if world_data and world_data.isFreeWorld then
-		InvokeCallBack_()
-        return
+    local world_data = QuestAction.GetCurWorldData();
+
+    if (world_data and (world_data.isFreeWorld or 0) ~= 0) then
+		InvokeCallBack_();
+        return;
     end
 
     -- 没登录的话 要求登录
-	if not GameLogic.GetFilters():apply_filters('is_signed_in') then
-		if(System.options.cmdline_world) then
+	if (not GameLogic.GetFilters():apply_filters('is_signed_in')) then
+		if (System.options.cmdline_world) then
 			-- tricky: this will allow offline editing for local editing. 
-			InvokeCallBack_()
-			return
+			InvokeCallBack_();
+			return;
 		end
 
-		GameLogic.GetFilters():apply_filters('check_signed_in', "请先登录", function(result)
-		end)
+		GameLogic.GetFilters():apply_filters('check_signed_in', "请先登录");
 
-		return
+		return;
 	end
-    if GameLogic.IsVip() then
-        InvokeCallBack_()
-        return
+
+    if (GameLogic.IsVip()) then
+        InvokeCallBack_();
+        return;
     end
+
     -- "您所在的学校免费使用时段为周一到周五（9:00-18:00）"
     -- "可联系学校老师解锁该功能或开通"
 
-    local has_permission = UserPermission.CheckHasPermission(check_type)
+    local has_permission = UserPermission.CheckHasPermission(check_type);
+
     if has_permission then
-        InvokeCallBack_()
+        InvokeCallBack_();
     else
-        local permission_type = CheckTypeToPermission[check_type]
-        local cache_policy = "access plus 20 second"
-    
+        local permission_type = CheckTypeToPermission[check_type];
+        local cache_policy = "access plus 20 second";
+
         keepwork.permissions.single({
 			router_params = {
 				featureNames = permission_type,
@@ -280,19 +310,16 @@ function UserPermission.CheckCanEditBlock(check_type, callbackFunc)
             cache_policy = cache_policy,
         },function(err, msg, data)
             if err == 200 then
-                -- studyFunc(data.data)
-                -- print("iiiiiiiiiiiiierrr")
-                -- echo(data, true)
                 for k, v in pairs(data) do
-                    local key = v.name == v.enName and v.name or v.enName
-                    UserPermissionsList[key] = v
+                    local key = v.name == v.enName and v.name or v.enName;
+                    UserPermissionsList[key] = v;
                 end
 
                 if UserPermission.CheckHasPermission(check_type) then
-                    InvokeCallBack_()
+                    InvokeCallBack_();
                 else
-                    local desc = CheckTypeToDesc[check_type]
-                    local ContactTeacherAlert = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ContactTeacher/ContactTeacherAlert.lua")
+                    local desc = CheckTypeToDesc[check_type];
+                    local ContactTeacherAlert = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/ContactTeacher/ContactTeacherAlert.lua");
                     ContactTeacherAlert.Show(check_type, desc);
                 end
             end

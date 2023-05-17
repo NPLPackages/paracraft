@@ -293,9 +293,11 @@ function MyCompany.Aries.OnConnection(app, connectMode)
 				
 			-- System
 			commandName = "Profile.Aries.OnCloseApp";
-			command = System.App.Commands.AddNamedCommand(
-				{name = commandName, app_key = app.app_key, icon = app.icon, });
-				
+			local closeCommand = System.App.Commands.GetCommand(commandName);
+			if closeCommand == nil then
+				command = System.App.Commands.AddNamedCommand(
+					{name = commandName, app_key = app.app_key, icon = app.icon, });
+			end
 			--commandName = "Profile.Aries.DoSkill";
 			--command = System.App.Commands.AddNamedCommand(
 				--{name = commandName, app_key = app.app_key, icon = app.icon, });			
@@ -408,6 +410,14 @@ function MyCompany.Aries.OnConnection(app, connectMode)
 		commandName = "Profile.Aries.SYS_WM_SETTINGCHANGE";	
 		command = System.App.Commands.AddNamedCommand(
 			{name = commandName, app_key = app.app_key, icon = app.icon, });
+		
+		
+		-- System
+		if System.options.isPapaAdventure then
+			commandName = "Profile.Aries.OnCloseApp";
+			command = System.App.Commands.AddNamedCommand(
+				{name = commandName, app_key = app.app_key, icon = app.icon, });
+		end
 
 	end
 end

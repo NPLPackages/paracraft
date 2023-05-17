@@ -94,7 +94,7 @@ function MacroRecorder.ShowMacroRecordArea(bShow)
             _parent = ParaUI.CreateUIObject("container", "RecordSafeArea", "_fi", 0,0,0,0);
             _parent.background = "";
             _parent.enabled = false;
-            _parent.zorder = 100;
+            _parent.zorder = -100;
             _parent:AttachToRoot();
 
             local _border = ParaUI.CreateUIObject("container", "border", "_fi", 0,0,0,0);
@@ -121,7 +121,7 @@ function MacroRecorder.ShowMacroRecordArea(bShow)
             _this.background = "Texture/whitedot.png";
             _this.enabled = false;
             _border:AddChild(_this);
-			_border.colormask = "255 0 0 88";
+			_border.colormask = "255 0 0 30";
 			_border:ApplyAnim();
         end
         _parent.visible = true;

@@ -1,0 +1,271 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Areas/EscFramePage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+    <pe:mcml>
+<script refresh="false" type="text/npl" src="EscFramePage.lua"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldStacks.lua");
+WorldStacks = commonlib.gettable("MyCompany.Aries.Game.WorldStacks");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ServerPage.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/Lessons/Creation.lua");
+
+local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
+local ServerPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.ServerPage");
+GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
+local Desktop = commonlib.gettable('MyCompany.Aries.Creator.Game.Desktop')
+EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+EscFramePage.OnInit();
+
+function ClosePage()
+    Page:CloseWindow();
+end
+
+function GetCategoryButtons()
+    return EscFramePage.category_ds;
+end
+
+function OnChangeCategory(index)
+    EscFramePage.OnChangeCategory(index);
+end
+
+function OnLeave()
+    GameLogic.RunCommand("/menu file.exit");
+end
+
+function OnSaveAndLeave()
+    GameLogic.QuickSave();
+    GameLogic.RunCommand("/menu file.exit");
+end
+
+function OnHelp()
+    GameLogic.RunCommand("/menu help.help");
+end
+
+function OnGameMarket()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/GameMarket/EnterGamePage.lua");
+	local EnterGamePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EnterGamePage");
+	EnterGamePage.ShowPage(true)
+end
+
+function OnLoadGame()
+    GameLogic.RunCommand("/menu file.loadworld");
+end
+
+function OnUploadGame()
+    GameLogic.RunCommand("/menu file.uploadworld");
+end
+
+function OnFriendsPage()
+    System.App.Commands.Call("Profile.Aries.FriendsWnd");
+end
+
+function OnTextureModPage()
+    GameLogic.RunCommand("/menu window.texturepack");
+end
+
+function OnSaveGame()
+    GameLogic.RunCommand("/menu file.saveworld");
+end
+
+function OnSettings()
+    GameLogic.RunCommand("/menu file.settings");
+end
+
+function GetCurWorldName()
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local text = WorldCommon.GetWorldTag("name") or ""
+    local width = 0
+    local name = ""
+    if text~= nil and text ~= "" then
+        for uchar in string.gmatch(text, '([%z\1-\127\194-\244][\128-\191]*)') do
+            local w = _guihelper.GetTextWidth(uchar, "System;14");
+            width = width + tonumber(w)
+            if width < 350 then
+                name = name.. uchar
+            end
+        end
+    end
+    return name
+end
+
+function GetVersion()
+    local ver = System.options.ClientVersion;
+    if(ver) then
+        if(ver == "") then
+            ver = nil;
+        else
+            ver = "ver "..ver;
+        end
+    end
+    return ver or "";
+end
+
+function OnOpenWorldDir()
+    GameLogic.RunCommand("/menu file.openworlddir");
+end
+
+function CreateNewWorld()
+    GameLogic.RunCommand("/menu file.createworld");
+end
+
+function OnClickButton(name,mcmlNode)
+    ClosePage();
+    if(name=="shareWorld") then
+        --OnUploadGame();
+        GameLogic.QuickSave()
+        Creation.submitType = 2
+        Creation:ShowOpusSubmitPage()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.share_world");
+    elseif(name=="saveWorld") then
+        OnSaveGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.save_world");
+    elseif(name=="changeTexture") then
+        OnTextureModPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.change_texture");
+    elseif(name=="loadWorld") then
+        OnLoadGame();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.load_world");
+    elseif(name=="systemSetting") then
+        OnSettings();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.system_setting");
+    elseif(name=="exitWorld") then
+        --OnLeave();
+        Desktop.is_exiting = true
+        Creation.submitType = 3
+        Creation:ShowOpusSubmitPage()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.exit_world");
+    elseif(name=="friends") then
+        OnFriendsPage()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.friends");
+    elseif(name=="continueGame") then
+        ClosePage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.continue_game");
+    elseif(name=="createNewWorld") then
+        --CreateNewWorld();
+        NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
+        local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+        PapaAPI:CreateWorldInWorld()
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.create_new_world");
+    elseif(name=="openServerPage") then
+        ServerPage.ShowPage();
+        GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.system_setting.open_server_page");
+    end
+end
+
+function Dummy()
+end
+
+function GetServerButtonValue()
+    if(ServerPage.IsServer() or ServerPage.IsClient()) then
+        return L"私服信息";
+    else
+        return L"架设私服";
+    end
+end
+
+function OnClickRevision()
+    GameLogic.RunCommand("/menu file.worldrevision");
+end
+function OnClickViewHistory()
+    GameLogic.RunCommand("/menu file.openbackupfolder");
+end
+    
+function OnReturnLastWorld()
+    ClosePage();
+    WorldStacks:ReturnLastWorld();
+end
+
+function IsHomeWorkWorld()
+    if GameLogic.IsReadOnly() then
+        return false
+    end
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
+    return isHomeWorkWorld
+end
+
+function showCreateWorld()
+    if Creation and Creation.curSection then
+        if Creation.curSection.content.type == 6 or  Creation.curSection.content.type == 7 then
+            return false
+        else
+            return true
+        end
+    else
+        return true
+    end
+end
+]]></script>
+<div style="height:64px;width:500px;">
+    <pe:if condition='<%=WorldStacks:GetReturnWorld() ~= nil%>'>
+        <input type="button" value='<%=WorldStacks:GetReturnWorld():GetDisplayName()%>' class="mc_big_button" style="color:#572712;font-size:16px;width:370px;height:52px;" onclick="OnReturnLastWorld" />    
+    </pe:if>
+</div>
+<pe:container style="width:500px;height:276px;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/bg_500x276_32bits.png#0 0 500 276);" >
+    <div style="float:left;width: 460px;height:40px;margin-top:10px;font-weight:bold;font-size:20px;text-align: center;">
+        菜单
+    </div>
+    <input type="button" style="float:left;width: 32px;height:32px;margin-top:10px;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/close_64x64_32bits.png#0 0 64 64);" onclick="ClosePage"/>
+    <div style="padding-bottom:10px;">
+        <div style="margin-left:31px;">
+            <pe:if condition='<%=GameLogic.IsReadOnly()%>'>
+                <pe:if condition='<%=showCreateWorld()%>'>
+                    <div style="margin-top:13px;">
+                        <input type="button" name="createNewWorld" uiname="EscFramePage.createNewWorld" style="margin-left:0px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/create_world_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" name= "systemSetting" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/setting_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button"  name= "openServerPage" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/si_fu_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" name="changeTexture" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/cai_zhi_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                    </div>
+                    <div style="margin-top:16px;margin-bottom:30px;">
+                        <input type="button" uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:0px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/exit_world_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not showCreateWorld()%>'>
+                    <div style="margin-top:50px;">
+                        <input type="button" name= "systemSetting" style="margin-left:0px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/setting_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button"  name= "openServerPage" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/si_fu_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" name="changeTexture" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/cai_zhi_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/exit_world_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                    </div>
+                </pe:if>
+                
+            </pe:if>
+            <pe:if condition='<%=not GameLogic.IsReadOnly()%>'>
+                <pe:if condition='<%=showCreateWorld()%>'>
+                    <div style="margin-top:13px;">
+                        <input type="button" uiname="EscFramePage.shareWorld" name="shareWorld" style="width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/save_world_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" name="createNewWorld" uiname="EscFramePage.createNewWorld" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/create_world_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" name= "systemSetting" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/setting_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button"  name= "openServerPage" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/si_fu_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                    </div>
+                    <div style="margin-top:16px;margin-bottom:30px;">
+                        <input type="button" name="changeTexture" style="width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/cai_zhi_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" uiname="EscFramePage.exitWorld" name= "exitWorld" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/exit_world_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                       
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not showCreateWorld()%>'>
+                    <div style="margin-top:13px;">
+                        <input type="button" uiname="EscFramePage.shareWorld" name="shareWorld" style="width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/save_world_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" name= "systemSetting" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/setting_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button"  name= "openServerPage" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/si_fu_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                        <input type="button" name="changeTexture" style="margin-left:16px;width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/cai_zhi_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                    </div>
+                    <div style="margin-top:16px;margin-bottom:30px;">
+                        <input type="button" uiname="EscFramePage.exitWorld" name= "exitWorld" style="width:100px;height:80px;color:#ffffff;background: url(Texture/Aries/Creator/paracraft/Tutorial/Esc/exit_world_100x80_32bits.png#0 0 200 160);" class="mc_light_grey_button_with_fillet" onclick="OnClickButton"/>
+                       
+                    </div>
+                </pe:if>
+            </pe:if>
+        </div>
+    </div>
+</pe:container>
+</pe:mcml>
+</body>
+</html>
+

@@ -29,6 +29,7 @@ function ParaWorldNPC.OnInit()
 end
 
 function ParaWorldNPC.CreateDefaultNPC(x, y, z)
+	if System.options.isPapaAdventure then return end
 	for i = #ParaWorldNPC.npcList, 1, -1 do
 		ParaWorldNPC.npcList[i] = nil;
 	end
@@ -44,6 +45,7 @@ function ParaWorldNPC.CreateDefaultNPC(x, y, z)
 end
 
 function ParaWorldNPC.LoadNPCFromHomePoint(node)
+	if System.options.isPapaAdventure then return end
 	for i = #ParaWorldNPC.npcList, 1, -1 do
 		ParaWorldNPC.npcList[i] = nil;
 	end
@@ -71,6 +73,7 @@ function ParaWorldNPC.LoadNPCFromHomePoint(node)
 end
 
 function ParaWorldNPC.CreateNPCImp(npc)
+	if System.options.isPapaAdventure then return end
 	if (not npc.show) then return end
 	local x, y, z = BlockEngine:ConvertToRealPosition_float(npc.x, npc.y, npc.z);
 	local entity = EntityManager.EntityNPC:Create({x=x,y=y-0.5,z=z, item_id = block_types.names["villager"]});
@@ -126,6 +129,7 @@ function ParaWorldNPC.CreateNPCImp(npc)
 end
 
 function ParaWorldNPC.CreateTeacherNPC(entity, npcName, npcType)
+	if System.options.isPapaAdventure then return end
 	local function getTaskFromUrl(taskName, callback)
 		--[[
 		keepwork.rawfile.get({
@@ -142,7 +146,7 @@ function ParaWorldNPC.CreateTeacherNPC(entity, npcName, npcType)
 		end)
 		]]
 		keepwork.npc.list({cache_policy = "access plus 0", code = taskName}, function(err, msg, data)
-			if (data and #data > 0) then
+			if (data and #data > 0 and data[1]) then
 				local result = {};
 				result.npcName = data[1].npcName;
 				result.npcScript = data[1].npcScript;

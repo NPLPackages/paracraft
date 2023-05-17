@@ -8,7 +8,7 @@ EditModelTask.InitPage(Page);
 task = EditModelTask.GetInstance();
 ]]>
 </script>
-<div style='<%=format("padding:5px;background-color:%s;color:#ffffff;width:360px;height:66px", (task and task:IsTransformMode()) and "#8080ff" or "#80808080") %>' >
+<div style='<%=format("padding:5px;background-color:%s;color:#ffffff;height:66px", (task and task:IsTransformMode()) and "#8080ff" or "#80808080") %>' >
     <div style="float:left;margin-left:-5px;margin-top:-5px;" onclick="EditModelTask.OnChangeModelType">
         <pe:mc_block block_id='<%=EditModelTask.GetItemID()%>' style="width:28px;height:28px;"/>
     </div>
@@ -16,7 +16,7 @@ task = EditModelTask.GetInstance();
         <pe:if condition='<%=task:GetSelectedModel()~=nil%>'>
             <input name="toggleTransformModeBtn" uiname="EditModelTask.toggleTransformModeBtn" value='<%=task:IsWorldTransformMode() and L"世界坐标" or L"模型坐标"%>' tooltip='<%=L"点击切换坐标系(T)"%>' type="button" style="height:20px;padding-top:3px;max-width:58px;" onclick="EditModelTask.OnClickToggleTransformMode" />
             <div style="float:left;margin-left:3px">
-                <span style="margin-left:5px;" onclick="EditModelTask.OnClickToggleRotationMode" tooltip='<%=L"点击切换三轴旋转 (快捷键3)"%>'><%=L"方向"%></span><input uiname="EditModelTask.facing" auto_virtual_keyboard="true" name="facing" type="text" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%d", task:GetFacingDegree())%>' onchange="    EditModelTask.OnFacingDegreeChanged"/>
+                <span style="margin-left:5px;" onclick="EditModelTask.OnClickToggleRotationMode" tooltip='<%=L"点击切换三轴旋转 (快捷键3)"%>'><%=L"方向"%></span><input uiname="EditModelTask.facing" auto_virtual_keyboard="true" name="facing" type="text" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%d", task:GetFacingDegree())%>' onchange="EditModelTask.OnFacingDegreeChanged"/>
                 <span style="margin-left:5px;"><%=L"大小"%></span><input uiname="EditModelTask.scale" name="scale" type="text" auto_virtual_keyboard="true" style="margin-left:2px;width:30px;height:18px;color:#000000" value='<%=string.format("%.2f", task:GetSelectedModel():GetScaling())%>'  onchange="EditModelTask.OnScalingChanged"/>
                 <input uiname="EditModelTask.resetBtn" name="resetBtn" value='<%=L"重置"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnResetModel" />
                 <input uiname="EditModelTask.physicsBtn" name="physicsBtn" value='<%=task:GetSelectedModel():HasPhysics() and L"有物理" or L"无物理"%>' type="button" style="margin-left:5px;height:20px;padding-top:3px;" onclick="EditModelTask.OnClickTogglePhysics" />
@@ -34,8 +34,9 @@ task = EditModelTask.GetInstance();
                 <pe:if condition="<%=not EditModelTask.IsHaveSkin()%>">
                     <input uiname="EditModelTask.modelBtn" name="modelBtn" value='<%=L"模型..."%>' type="button" style="margin-left:5px;height:20px;padding-top:3px" onclick="EditModelTask.OnChangeModel" />
                 </pe:if>
-                
-                <span style="margin-left:5px;" tooltip="/sendevent XXX {x,y,z,name}"><%=L"点击事件"%></span><input name="onclickEvent" uiname="EditModelTask.onclickEvent" auto_virtual_keyboard="true" type="text" style="margin-left:2px;width:100px;height:18px;color:#000000" value='<%=task:GetSelectedModel():GetOnClickEvent()%>' onchange="EditModelTask.OnChangeOnClickEvent"/>
+                <div style="float:left;max-width:150px;">
+                    <span style="margin-left:5px;" tooltip="/sendevent XXX {x,y,z,name}"><%=L"点击事件"%></span><input name="onclickEvent" uiname="EditModelTask.onclickEvent" auto_virtual_keyboard="true" type="text" style="margin-left:2px;min-width:80px;max-width:100px;height:18px;color:#000000" value='<%=task:GetSelectedModel():GetOnClickEvent()%>' onchange="EditModelTask.OnChangeOnClickEvent" />
+                </div>
                 <span style="margin-left:5px;"><%=L"插件点"%></span><input uiname="EditModelTask.mountpointCount" auto_virtual_keyboard="true" name="mountpointCount" type="text" style="margin-left:2px;width:20px;height:18px;color:#000000" value='<%=string.format("%d", task:GetMountPointCount())%>' onchange="EditModelTask.OnMountPointCountChanged"/>
             </div>
         </pe:if>

@@ -155,11 +155,6 @@ function KeepWorkItemManager.OnKeepWorkLogin_Callback(res)
         local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
         if UserInfoPage and UserInfoPage.CheckUserSkin then
             UserInfoPage.CheckUserSkin()
-        else
-            local CheckSkin = NPL.load("(gl)Mod/GeneralGameServerMod/UI/Vue/Page/User/CheckSkin.lua");
-            if CheckSkin and CheckSkin.CheckUserSkin then
-                CheckSkin.CheckUserSkin()
-            end
         end
     end)            
     return res;

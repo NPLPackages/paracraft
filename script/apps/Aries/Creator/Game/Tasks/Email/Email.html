@@ -202,8 +202,7 @@ function ClickName(name, mcmlNode)
     end
     if username and data.interaction_type ~= Email.InteractionType.wechat_like then
         ClosePage()
-        local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-        user_page.ShowUserInfoPage({username=username});
+        GameLogic.ShowUserInfoPage({username=username});
     end
 end
 

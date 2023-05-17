@@ -9,20 +9,21 @@
 <script type="text/npl" refresh="false"><![CDATA[
 NPL.load("(gl)script/apps/Aries/Creator/Game/Login/Rebranding.lua");
 Rebranding = commonlib.gettable("MyCompany.Aries.Creator.Game.Rebranding");
+local UserProtocol = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/UserProtocol.lua");
 
 function OnClose()
     Page:CloseWindow();
 end
 function OnClickOfficialSite()
-    ParaGlobal.ShellExecute("open", L"http://paracraft.cn/", "", "", 1);
+    ParaGlobal.ShellExecute("open", L"https://www.paracraft.cn/", "", "", 1);
 end
 
 function OnClickLicenseSite()
-    ParaGlobal.ShellExecute("open", "https://github.com/LiXizhi/ParaCraftSDK/wiki/License", "", "", 1);
+    UserProtocol.ShowPage(1);
 end
 
 function OnClickPrivacySite()
-    ParaGlobal.ShellExecute("open", "https://keepwork.com/official/docs/references/license", "", "", 1);
+    UserProtocol.ShowPage(2);
 end
     
 function OnClickDonate()
@@ -66,8 +67,15 @@ if System.options.channelId_431 then
     ClientVersion = string.format(L"帕拉卡客户端 v%s", GameLogic.options.GetClientVersion());
     CompanyName = L"深圳市帕拉卡科技有限公司"
 else
-    ClientVersion = string.format(L"Paracraft帕拉卡 v%s", GameLogic.options.GetClientVersion());
-    CompanyName = L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"
+    local androidFlavor = ParaEngine.GetAppCommandLineByParam('android_flavor', nil);
+
+    if (androidFlavor == "Xiaomi") then
+        ClientVersion = string.format(L"Paracraft帕拉卡3D虚拟社区学习软件 v%s", GameLogic.options.GetClientVersion());
+        CompanyName = L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"
+    else
+        ClientVersion = string.format(L"Paracraft帕拉卡 v%s", GameLogic.options.GetClientVersion());
+        CompanyName = L"(c)Tatfook.".." "..L"powered by NPL and ParaEngine"
+    end
 end
 
 function GetTitle()

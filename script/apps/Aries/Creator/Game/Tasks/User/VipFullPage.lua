@@ -118,7 +118,7 @@ function VipFullPage.ShowPage__(key, desc)
 			DestroyOnClose = true,
 			style = CommonCtrl.WindowFrame.ContainerStyle,
 			allowDrag = false,
-			enable_esc_key = false,
+			enable_esc_key = true,
 			directPosition = true,
 			isTopLevel = true,
 			zorder = 1,

@@ -261,3 +261,32 @@ function env_imp:List_Length(list)
     end
     return #(list);
 end
+
+-- get url synchronously or async according to whether callbackFunc is nil. 
+-- @param url_params: {url=string, options={}, form={}, headers={}, json=true}, see also System.os.GetUrl(). 
+-- @param callbackFunc: function(data, errCode, msg) end. if nil, this function is synchronous, if not this function is async. 
+-- @return data, errCode, msg: data can be nil or msg if no json object. The second parameter is always http code, the third is HTML message. 
+function env_imp:getUrl(url_params, callbackFunc)
+	if(not callbackFunc) then
+		local err_, msg_, data_
+		System.os.GetUrl(url_params, self.co:MakeCallbackFunc(function(err, msg, data)
+			err_, msg_, data_ = err, msg, data
+			env_imp.resume(self, err, msg, data);
+		end))
+		env_imp.yield(self)
+		if(data_) then
+			return data_, err_, msg_;
+		elseif(err_ == 200) then
+			return msg_, err_, msg_;
+		else
+			return nil, err_, msg_;	
+		end
+	else
+		System.os.GetUrl(url_params, self.co:MakeCallbackFuncAsyncRun(function(err, msg, data)
+			if(not data and err == 200) then
+				data = msg;
+			end
+			callbackFunc(data, err, msg)
+		end))
+	end
+end

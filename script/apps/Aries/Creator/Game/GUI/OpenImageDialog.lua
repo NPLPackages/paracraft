@@ -343,6 +343,8 @@ function OpenImageDialog.OnOpenFileDialog()
 
 	local function RefreshPage(filename)
 		if(filename and page) then
+			-- we fixed win32 api to use unicode so that the following are not required. 
+			-- filename = Files.GetFilePathTryMultipleEncodings(filename)
 			local fileItem = Files.ResolveFilePath(filename);
 			if(fileItem) then
 				if not fileItem.isInWorldDirectory then

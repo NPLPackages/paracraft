@@ -95,7 +95,7 @@ function GetRankDesc()
 end
 
 function GetItemDesc(data)
-    if data.goods and data.goods.name then
+    if data and data.goods and data.goods.name then
         return data.goods.name
     end
     return ""
@@ -120,9 +120,8 @@ end
 function ClickHead(name, mcmlNode)
     local index = mcmlNode:GetAttribute("param1")
     local data = Rank.RankData[index]
-    if data.username then
-        local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-        user_page.ShowUserInfoPage({username=data.username});
+    if data and data.username then
+        GameLogic.ShowUserInfoPage({username=data.username});
     elseif IsProjectRank() then
         Rank.ToWorld(index)
     end
@@ -130,8 +129,7 @@ function ClickHead(name, mcmlNode)
 end
 
 function ClickMyHead()
-    local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-    user_page.ShowUserInfoPage();
+    GameLogic.ShowUserInfoPage();
 end
 
 function IsUseDefaul(portrait)

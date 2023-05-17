@@ -216,6 +216,9 @@ end
 -- convert from world position to 2d map position in pixel. 
 -- @return nil, nil if point is not on map
 function ParaWorldMinimapSurface:WorldToMapPos(worldX, worldZ)
+	if not self.map_left or not self.map_top then
+		return
+	end
 	local mapX, mapZ = worldX - self.map_left, worldZ - self.map_top;
 	if(mapX>=0 and mapX < self.map_width and mapZ>=0 and mapZ < self.map_height) then
 		local width, height = self:width(), self:height();
@@ -311,7 +314,10 @@ end
 
 -- @return true if we have finished drawing
 function ParaWorldMinimapSurface:DrawSome(painter)
-	local step_size = self.step_size;
+	if self.map_left then
+		return
+	end
+	local step_size = self.step_size or 1;
 	local block_size = self.block_size;
 	local block_count = self.block_count;
 

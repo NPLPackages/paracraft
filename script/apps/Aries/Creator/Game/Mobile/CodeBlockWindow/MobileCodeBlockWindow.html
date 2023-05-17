@@ -31,9 +31,28 @@
             function OnClickCompileAndRun()    
                 local MobileCodeLogPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/CodeBlockWindow/MobileCodeLogPage.lua");
                 MobileCodeLogPage.Show();
-                CodeBlockWindow.OnClickCompileAndRun(function()
-                end)
 
+                local codeEntity = CodeBlockWindow.GetCodeEntity();
+
+                if CodeBlockWindow.IsBlocklyEditMode() then
+                    if codeEntity and
+                       codeEntity.npl_blockly_nplcode and
+                       type(codeEntity.npl_blockly_nplcode) == "string" and
+                       #codeEntity.npl_blockly_nplcode > 0 then
+                       CodeBlockWindow.Show(false);
+                    end
+                else
+                    if codeEntity and
+                        codeEntity.nplcode and
+                        type(codeEntity.nplcode) == "string" and
+                        #codeEntity.nplcode > 0 then
+                        CodeBlockWindow.Show(false);
+                    end
+                end
+                
+                CodeBlockWindow.OnClickCompileAndRun(function()
+                    CodeBlockWindow.Show(true);
+                end);
             end
         ]]>
     </script>

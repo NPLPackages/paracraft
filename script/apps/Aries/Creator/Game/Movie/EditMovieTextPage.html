@@ -169,16 +169,17 @@ end
     </div>
 
     <div style="margin-top: 10px;">
+        <pe:if condition="<%=not System.options.isHideVip%>">
+            <div style="float:left;margin-left:30px;">
+                <div style="margin-top: 2px; float: left; margin-left:0px;width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/Quest/VIP_20X20_32bits.png#0 0 20 20);"></div>
+                <%=L"播音员:"%>
+                <select uiname="EditMovieTextPage.voicenarrator" onclick="EditMovieTextPage.OnClickSelcetNarrator" name="voicenarrator" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetVoiceNarratorDS()%>'>
+                </select>
+            </div>
 
-        <div style="float:left;margin-left:30px;">
-            <div style="margin-top: 2px; float: left; margin-left:0px;width: 20px;height: 20px; background: url(Texture/Aries/Creator/keepwork/Quest/VIP_20X20_32bits.png#0 0 20 20);"></div>
-            <%=L"播音员:"%>
-            <select uiname="EditMovieTextPage.voicenarrator" onclick="EditMovieTextPage.OnClickSelcetNarrator" name="voicenarrator" AllowUserEdit="false" style="height:24px;" DataSource='<%=GetVoiceNarratorDS()%>'>
-            </select>
-        </div>
-
-        <input type="button" uiname="EditMovieTextPage.ListeningTest" name="ListeningTest" style="margin-left:10px;min-width:70px;margin-top: 3px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnListeningTest" value='<%=L"试听"%>' />
-        <label name="SoundDesc" style="float:left;margin-left:12px;width: 80px;margin-top: 3px;"/>
+            <input type="button" uiname="EditMovieTextPage.ListeningTest" name="ListeningTest" style="margin-left:10px;min-width:70px;margin-top: 3px;" class="mc_light_grey_button_with_fillet" onclick="EditMovieTextPage.OnListeningTest" value='<%=L"试听"%>' />
+            <label name="SoundDesc" style="float:left;margin-left:12px;width: 80px;margin-top: 3px;"/>
+        </pe:if>
         
         <div style="float:left;margin-left:45px;">
             <%=L"唇同步:"%>

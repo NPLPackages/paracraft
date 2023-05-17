@@ -276,7 +276,7 @@ end
 
 function RecordCode:RefreshPlayData()
     local projectId = GameLogic.options:GetProjectId() --本地世界不能分享
-    if projectId and projectId > 0 then 
+    if projectId and tonumber(projectId) > 0 then 
         self.play_macro_data = {}
         for k,v in pairs(self.record_data) do
             if v.IsEdit and (v.writeLineNum and v.writeLineNum > 0) then
@@ -405,7 +405,7 @@ function RecordCode:GetNplBlocklyMacro(npl_blockly_xml_code,callfunc)
         return 
     end
     self:CloseNplPage()
-    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
+    local Page = NPL.load("script/ide/System/UI/Page.lua");
     local width, height, margin_right, bottom, top, sceneMarginBottom = CodeBlockWindow:CalculateMargins()
     myNplBlocklyEditorPage = Page.Show({
         Language = "npl",
@@ -792,6 +792,10 @@ function RecordCode:GenerateCode()
         self.play_macro_max_index = #codeData
     end
     return #codeData
+end
+
+function RecordCode:GetCodeData()
+    return self.play_macro_data
 end
 
 function RecordCode:StartPlay(playtime,finish_callback)

@@ -475,8 +475,7 @@ function options:OnLoadWorld()
 	
 	self:ShowSkyBox();
 	self:ResetWindowTitle();
-	WorldCommon.SetModified(false);
-
+	
 	-- try pop world
 	NPL.load("(gl)script/apps/Aries/Creator/Game/World/WorldStacks.lua");
 	local WorldStacks = commonlib.gettable("MyCompany.Aries.Game.WorldStacks");
@@ -681,7 +680,10 @@ function options:ResetWindowTitle()
 			end
 			local windowTitle = format("%s  %s", worldName, System.options.WindowTitle)
 			windowTitle = GameLogic.GetFilters():apply_filters('WorldName.ResetWindowTitle', windowTitle, System.options.WindowTitle)
-			ParaEngine.SetWindowText(windowTitle);	
+			if not Game.is_started and System.options.isPapaAdventure then
+				return
+			end
+			ParaEngine.SetWindowText(windowTitle);
 		end
 	end
 end
@@ -1192,7 +1194,7 @@ local MOVIE_CAPTURE_MODE = {
 };
 
 options._stereoLockWindowSize = nil
--- @param value: 0 or false is disable, 2 or true is left/right, 5 is red/blue
+-- @param value: 0 or false is disable, 2 or true is left/right, 5 is red/blue, 8 for ODS single eye. 
 function options:EnableStereoMode(value)
 	if(value == true) then
 		value = 2; -- default to left/right
@@ -1205,11 +1207,21 @@ function options:EnableStereoMode(value)
 	end
 	self.stereoMode = tonumber(value) or 0;
 	if(ParaMovie and ParaMovie.GetAttributeObject) then
+		-- tricky: reset viewport alignment, and ods may set it to "_lt"
+		NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+		local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+		local viewport = ViewportManager:GetSceneViewport();
+		if(not viewport) then
+			return
+		end
+		
 		local attr = ParaMovie.GetAttributeObject();
 		if(self.stereoMode~=0) then
 			attr:SetField("StereoCaptureMode", self.stereoMode);
+			viewport:SetAlignment("_lt");
 		else
 			attr:SetField("StereoCaptureMode", 0);
+			viewport:SetAlignment("_fi");
 		end
 		if(self.stereoMode == MOVIE_CAPTURE_MODE.MOVIE_CAPTURE_MODE_STEREO_RED_BLUE) then
 			local effect = GameLogic.GetShaderManager():GetEffect("RedBlueStereo");
@@ -1323,7 +1335,9 @@ function options:GetUIScaling()
 end
 
 function options:OnResize()
-	self:SetUIScaling(nil)
+	if (System.os.GetPlatform() ~= "mac") then
+		self:SetUIScaling(nil)
+	end
 end
 
 -- async asset loader

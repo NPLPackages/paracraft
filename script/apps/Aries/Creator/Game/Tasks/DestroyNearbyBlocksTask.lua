@@ -75,6 +75,7 @@ function DestroyNearbyBlocks:Run()
 	if((#(self.destroy_blocks) > 0) or (self.liveEntities and #(self.liveEntities) > 0))then
 		self.start_time = commonlib.TimerManager.GetCurrentTime();
 		TaskManager.AddTask(self);
+		GameLogic.SetModified();
 		GameLogic.GetFilters():apply_filters("lessonbox_change_region_blocks",self.destroy_blocks, true)
 	end
 end

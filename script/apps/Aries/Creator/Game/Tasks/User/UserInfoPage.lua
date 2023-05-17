@@ -1115,7 +1115,7 @@ function UserInfoPage.GetBindInfoData()
 end
 
 function UserInfoPage.RemoveAccount()
-	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+	local Page = NPL.load("script/ide/System/UI/Page.lua");
 	Page.Show({
 		OnFinish = function()
 			

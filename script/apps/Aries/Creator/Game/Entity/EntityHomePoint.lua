@@ -82,7 +82,7 @@ end
 function Entity:LoadFromXMLNode(node)
 	Entity._super.LoadFromXMLNode(self, node);
 	local generatorName = WorldCommon.GetWorldTag("world_generator");
-	if (generatorName == "paraworld") then
+	if (generatorName == "paraworld" and not System.options.isPapaAdventure) then
 		ParaWorldNPC.LoadNPCFromHomePoint(node);
 	end
 end
@@ -90,7 +90,7 @@ end
 function Entity:SaveToXMLNode(node, bSort)
 	node = node or {name='entity', attr={}};
 	local generatorName = WorldCommon.GetWorldTag("world_generator");
-	if (generatorName == "paraworld") then
+	if (generatorName == "paraworld" and not System.options.isPapaAdventure) then
 		local npcList = {};
 		for i = 1, #ParaWorldNPC.npcList do
 			npcList[i] = {name = 'npc', attr = ParaWorldNPC.npcList[i]};
@@ -134,7 +134,7 @@ function Entity:OnClick(x, y, z, mouse_button)
 		task:Run();
 
 		local generatorName = WorldCommon.GetWorldTag("world_generator");
-		if (generatorName == "paraworld") then
+		if (generatorName == "paraworld" and not System.options.isPapaAdventure) then
 			ParaWorldNPC.ShowPage();
 		end
 	end

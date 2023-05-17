@@ -209,28 +209,15 @@ function OpenRole()
                         return
                     end
                     RedSummerCampMainPage.RefreshPage()
-                    if true then
-                        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
-                        UserInfoPage.ShowPage(System.User.keepworkUsername)
-                    else
-                        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-                        page.ShowUserInfoPage({username = System.User.keepworkUsername});
-                    end
-                    
+                    GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
                 end, 500)
             end
         end)
 
         return
     end
-
-    if true then
-        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
-        UserInfoPage.ShowPage(System.User.keepworkUsername)
-    else
-        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-        page.ShowUserInfoPage({username = System.User.keepworkUsername});
-    end
+    
+    GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
 end
 
 function GetHeadBgStyle()
@@ -340,7 +327,14 @@ end
             <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:15px;margin-top:15px;","2D_main")%>
             <!-- <input type="button" value='' onclick="OpenVip" class="red_summer_camp_open_vip_btn" style="margin-right:15px;margin-top:15px;" /> -->
             <input name="helpBtn" type="button" value='' onclick="OpenHelpPage" style="margin-right:15px;margin-top:15px; width: 64px;height: 97px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bangzhu_97X27_32bits.png#0 0 64 97);" />
-            <input type="button" value='' onclick="ClosePage" style="margin-right:15px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn3_64X70_32bits.png#0 0 64 70);" />
+            <input type="button"
+                   value=''
+                   onclick="ClosePage"
+                   style="margin-right: 15px;
+                          margin-top: 15px;
+                          width: 77px;
+                          height: 78px;
+                          background: url(Texture/Aries/Creator/keepwork/worldshare/main_login_buttons_32bits.png#322 360 77 78);" />
         </pe:container>
         <div zorder="-2" style='<%=GetHeadBgStyle()%>'>
             <div style="float: left;margin-left: 16px;margin-top: 8px; width: 96px;height: 96px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/touxiang3_96X96_32bits.png#0 0 96 96:16 16 16 16);">

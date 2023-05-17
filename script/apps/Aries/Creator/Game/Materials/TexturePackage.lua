@@ -24,7 +24,8 @@ local TexturePackage = commonlib.inherit(nil, commonlib.gettable("MyCompany.Arie
 TexturePackage.default_texture_path = commonlib.Encoding.Utf8ToDefault("worlds/BlockTextures/official/Paracraft32xMixed.zip");
 TexturePackage.default_texture_type = "official";
 -- TexturePackage.default_texture_url  = "http://www.paraengine.com/twiki/pub/CCWeb/RecommendedTextureListData/Paracraft32xMixed.zip";
-TexturePackage.default_texture_url  = "https://api.keepwork.com/storage/v0/siteFiles/7617/raw#Paracraft32xMixed.zip";
+-- TexturePackage.default_texture_url  = "https://api.keepwork.com/storage/v0/siteFiles/7617/raw#Paracraft32xMixed.zip";
+TexturePackage.default_texture_url = "https://cdn.keepwork.com/paracraft/texturepacks/Paracraft32xMixed.zip";
 TexturePackage.default_texture_name = "Paracraft32xMixed.zip"
 
 local defaultPreviewImage = commonlib.Encoding.Utf8ToDefault("worlds/BlockTextures/PreviewImage/defaultPreviewImage.png");

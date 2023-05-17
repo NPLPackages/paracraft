@@ -362,13 +362,7 @@ function TeacherPage.OpenHistoryWork()
 end
 
 function TeacherPage.OpenMyProject()
-    if true then
-        local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
-        UserInfoPage.ShowPage(System.User.keepworkUsername)
-    else
-        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-        page.ShowUserInfoPage({username = System.User.keepworkUsername});
-    end
+	GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
 end
 
 function TeacherPage.OpenPersonalDataStatistics()
@@ -408,7 +402,7 @@ function TeacherPage.OpenCompleClassInfo()
         return
    end
 
-    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+    local Page = NPL.load("script/ide/System/UI/Page.lua");
     Page.Show({OnFinish = function()
         GameLogic.AddBBS(nil, L"加入班级成功", 3000, "0 255 0")
         page:Refresh(0.01)

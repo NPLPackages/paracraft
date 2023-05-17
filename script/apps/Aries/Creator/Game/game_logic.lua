@@ -53,6 +53,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Login/TeacherAgent/TeacherAgent.lua
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Quest/QuestAction.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/FolderManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Dock/DockManager.lua") 
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tutorial/Assessment.lua")
+local Assessment = commonlib.gettable("MyCompany.Aries.Creator.Game.Tutorial.Assessment")
 local DockManager = commonlib.gettable("MyCompany.Aries.Game.DockManager")
 local FolderManager = commonlib.gettable("MyCompany.Aries.Game.GameLogic.FolderManager")
 local TeacherAgent = commonlib.gettable("MyCompany.Aries.Creator.Game.Teacher.TeacherAgent");
@@ -91,6 +93,7 @@ local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types")
 local block = commonlib.gettable("MyCompany.Aries.Game.block")
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
+local ParaWorldMain = commonlib.gettable("Paracraft.Controls.ParaWorldMain");
 -- block names enumeration
 local names;
 -- TODO: testing only, replace this with 
@@ -180,6 +183,7 @@ function GameLogic:ctor()
 	-- end
 
 	NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWork.lua");
+	NPL.load("script/ide/System/UI/Page/Macro/MacrosExtend.lua");
 end
 
 
@@ -192,8 +196,8 @@ function GameLogic:InitAPIPath()
 	GameLogic.ItemClient = ItemClient;
     GameLogic.QuestAction = QuestAction;
 	GameLogic.SelectionManager = SelectionManager;
-
-	
+	GameLogic.Assessment = Assessment
+	GameLogic.Assessment:GetAllData() --获取商城数据
 	GameLogic.DockManager = DockManager:InitSingleton()
 	GameLogic.DockManager:OnInit()
 	_G["GameLogic"] = GameLogic; 
@@ -393,6 +397,11 @@ function GameLogic.Init(worldObj)
 	LOG.std(nil, "system", "GameLogic", "Game Logics is initialized for the current world");
 
 	collectgarbage("collect");
+	if System.options.isPapaAdventure then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
+		local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+		PapaAPI:EnterWorld()
+	end
 end
 
 function GameLogic.OnBeforeBlockWorldLoaded()
@@ -722,7 +731,7 @@ function GameLogic.LoadGame()
 
 	if not GameLogic.IsReadOnly() then
 		local second = 0
-		GameLogic.saveWorldTipTimer = commonlib.Timer:new({callbackFunc = function(timer)
+		GameLogic.saveWorldTipTimer = GameLogic.saveWorldTipTimer or commonlib.Timer:new({callbackFunc = function(timer)
 			second = second + 1;
 			if second==60*3 then
 				GameLogic.AddBBS("saveWorldTip",L"Ctrl+S 可快速保存世界",5000)
@@ -733,6 +742,26 @@ function GameLogic.LoadGame()
 			end
 		end})
 		GameLogic.saveWorldTipTimer:Change(0,1000)
+	end
+	
+	GameLogic.GetFilters():remove_filter("local_race_world_submited",GameLogic.LocalRaceWorldSubmited)
+	GameLogic.GetFilters():add_filter("local_race_world_submited", GameLogic.LocalRaceWorldSubmited)
+
+	if(not GameLogic.IsReadOnly()) then
+		if(GameLogic.GetFilters():apply_filters("CheckShowIfApplyStagedChanges", true)) then
+			if(GameLogic.world_revision:CheckStageFolderVersion()) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/AutoSaveTask.lua");
+				local task = MyCompany.Aries.Game.Tasks.AutoSave:new({mode = "apply_staged_changes"})
+				task:Run();
+			end
+		end
+	end
+end
+
+function GameLogic.LocalRaceWorldSubmited(data)
+	GameLogic.GetFilters():remove_filter("local_race_world_submited",GameLogic.LocalRaceWorldSubmited)
+	if data ~=nil and data.cb ~= nil and type(data.cb) == "function" then
+		commonlib.TimerManager.SetTimeout(data.cb,3000)
 	end
 end
 
@@ -887,7 +916,7 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 		GameLogic.world_sim:Save();
 	end
 	NeuronManager.SaveToFile(bSaveToLastSaveFolder);
-	EntityManager.SaveToFile(bSaveToLastSaveFolder==true);
+	EntityManager.SaveToFile();
 	BroadcastHelper.PushLabel({id="GameLogic", label = format(L"本地保存成功 [版本:%d]", GameLogic.options:GetRevision()), max_duration=4000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
 	-- DailyTaskManager.AchieveTask(DailyTaskManager.task_id_list.UpdataWorld)
 
@@ -897,6 +926,7 @@ function GameLogic.SaveAll(bSaveToLastSaveFolder, bForceSave)
 
 	GameLogic.GetFilters():apply_filters("OnSaveWrold");
 	-- GameLogic.SysncHomeWorkWorld()
+	ParaEngine.GetAttributeObject():CallField("FlushDiskIO");
 end
 
 -- let a given character to play an animation. 
@@ -933,10 +963,10 @@ function GameLogic.Exit(bSoft)
 	
 	MovieManager:Exit();
 	
-	if(GameLogic.world_revision) then
-		if(GameLogic.world_revision:IsModifiedAndNotBackedup()) then
-			-- always backup on exit when modified
-			GameLogic.world_revision:Backup();
+	if(GameLogic.world_revision and not GameLogic.IsReadOnly()) then
+		if(GameLogic.world_revision:IsModifiedAndNotBackedup() and GameLogic.world_revision:IsModifiedAndNotAutoSaved()) then
+			-- always do an auto save on exit when modified
+			GameLogic.world_revision:StageChangesToFolder();
 		end
 	end
 
@@ -1582,14 +1612,18 @@ function GameLogic.GetFreeCamera()
 	else
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityCamera.lua");
 		local EntityCamera = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityCamera");
-		local x, y, z = EntityManager.GetPlayer():GetPosition();
-		local entity = EntityCamera:Create({name=name, x=x,y=y,z=z, item_id = block_types.names.TimeSeriesCamera});
-		entity:HideCameraModel();
-		entity:SetPersistent(false);
-		entity:SetCameraCollision(true);
-		entity:SetScaling(0.2); -- a smaller camera
-		entity:Attach();
-		return EntityManager.GetEntity(name);
+		local player = EntityManager.GetPlayer() or EntityManager.GetFocus()
+		local x, y, z
+		if player then
+			x, y, z= player:GetPosition();
+			local entity = EntityCamera:Create({name=name, x=x,y=y,z=z, item_id = block_types.names.TimeSeriesCamera});
+			entity:HideCameraModel();
+			entity:SetPersistent(false);
+			entity:SetCameraCollision(true);
+			entity:SetScaling(0.2); -- a smaller camera
+			entity:Attach();
+			return EntityManager.GetEntity(name);
+		end
 	end
 end	
 
@@ -1703,9 +1737,15 @@ end
 -- toggle desktop view
 function GameLogic.ToggleDesktop(name)
 	if(name == "esc") then
-		NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
-		local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
-		EscFramePage.ShowPage();
+		NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/Lessons/Creation.lua");
+		local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
+		if System.options.isPapaAdventure and Creation.rejectEsc then
+			return
+		else
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/EscFramePage.lua");
+			local EscFramePage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.EscFramePage");
+			EscFramePage.ShowPage();
+		end
 	elseif(name == "builder") then
 		if(GameMode:IsUseCreatorBag()) then
 			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/CreatorDesktop.lua");
@@ -1906,7 +1946,7 @@ end
 
 -- if the current world is social, where the current player maintains its social outfit. 
 function GameLogic.IsSocialWorld()
-	return Paracraft.Controls.ParaWorldMain:IsCurrentParaWorld();
+	return ParaWorldMain.IsCurrentParaWorld and ParaWorldMain.IsCurrentParaWorld();
 end
 
 local errorCount = 1;
@@ -2180,4 +2220,38 @@ function GameLogic.SysncHomeWorkWorld(callback,isModified)
 			end)
 	end
 
+end
+
+-- @param params: {username=string, userId = id, tabName="skin|honor|nil"} or just username
+function GameLogic.ShowUserInfoPage(params)
+	if System.options.isPapaAdventure or System.options.channelId_431 then
+		--GameLogic.AddBBS(nil,"")
+		return
+	end
+	if(type(params) == "string") then
+		params = {username = params}
+	elseif(type(params) == "number") then
+		params = {userId = params}
+	end
+	local userId = params and params.userId 
+    local username = params and params.username or ""
+	local tabName = params and params.tabName
+    local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
+    if UserInfoPage then
+        UserInfoPage.ShowPage(username, tabName, userId)
+    end
+end
+
+function GameLogic.IsDevMode()
+	if(GameLogic.isDevMode_ == nil) then
+		GameLogic.isDevMode_ = false
+		if(System.options.isDevEnv or System.options.isDevMode or System.options.isAB_SDK or System.options.httpdebug) then
+			GameLogic.isDevMode_ = true
+		end
+	end
+	return GameLogic.isDevMode_
+end
+
+function GameLogic.SetModified()
+	GameLogic.world_revision:SetModified()
 end

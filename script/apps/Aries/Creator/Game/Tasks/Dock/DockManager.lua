@@ -275,6 +275,10 @@ function DockManager.EndTimer(isWorldUnLoad)
     end
 end
 
+function DockManager:GetWorldName()
+    return WorldCommon.GetWorldTag("name")
+end
+
 function DockManager.WriteInfo()
     local worldName = DockManager:GetWorldName()
     local guid = ParaGlobal.GenerateUniqueID()

@@ -233,7 +233,7 @@ function Actor:GetTextObj(bCreateIfNotExist)
 			_parent = ParaUI.CreateUIObject("container", "MovieGUIRoot", "_fi", 0, 0, 0, 0);
 			_parent.background = ""
 			_parent.enabled = false;
-			_parent.zorder = -3;
+			_parent.zorder = -5;
 			_parent:AttachToRoot();
 			
 			local viewport = ViewportManager:GetSceneViewport();

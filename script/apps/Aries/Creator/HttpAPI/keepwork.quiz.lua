@@ -48,7 +48,12 @@ function(self, err, msg, data)
 end
 )
 
---http://yapi.kp-para.cn/project/158/interface/api/2442
+-- http://yapi.kp-para.cn/project/158/interface/api/2322 paracraft获取自己参加的活动
+HttpWrapper.Create("keepwork.quiz.getMyActivity", "%MAIN%/online-quiz/v0/activity/myActivity", "GET", true)
+-- http://yapi.kp-para.cn/project/158/interface/api/2337
+HttpWrapper.Create("keepwork.quiz.activity.detail", "%MAIN%/online-quiz/v0/activity/:id", "GET", true)
+
+-- http://yapi.kp-para.cn/project/158/interface/api/2442
 -- get
 HttpWrapper.Create("keepwork.quiz.checkavailable", "%MAIN%/online-quiz/v0/activity/checkAvailable", "GET", true, nil,
 -- PreProcessor

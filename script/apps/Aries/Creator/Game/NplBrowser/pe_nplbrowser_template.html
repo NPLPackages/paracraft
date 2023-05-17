@@ -1,9 +1,4 @@
-<!-- "Mod/NplBrowser/pe_nplbrowser_template.html" -->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>pe_nplbrowser</title>
-</head>
+<!-- "script/apps/Aries/Creator/Game/NplBrowser/pe_nplbrowser_template.html?noTitle=true&url=" -->
 <pe:mcml>
 <script type="text/npl" refresh="true">
 <![CDATA[
@@ -11,15 +6,14 @@
     local NplBrowserPage = commonlib.gettable("NplBrowser.NplBrowserPage");
     local pageCtrl = document:GetPageCtrl();
     local npl_browser_page = pageCtrl.npl_browser_page;
+    local url = pageCtrl:GetRequestParam("url")
     function DoClose()
         if(npl_browser_page)then
 		    npl_browser_page:Close()
         end
     end
     function GetUrl()
-        if(npl_browser_page)then
-            return npl_browser_page.url;
-        end
+        return url or (npl_browser_page and npl_browser_page.url);
     end
     function IsShowControl()
         if(npl_browser_page)then
@@ -31,16 +25,24 @@
             return npl_browser_page.title or L"NPL浏览器";
         end
     end
+    function hasTitle()
+        if(not pageCtrl:GetRequestParam("noTitle")) then
+            return true;
+        end
+    end
 ]]>
 </script>
-    <div width="100%" height="100%" style="background-color:#000000;">
-            <div style="height:30px;" >
-                <div style="position:relative;margin-left:5px;margin-top:2px;color:#ffffff;"><%=GetTitle()%></div>
-                <input type="button" value="X" align="right" style="width:50px;height:30px;" onclick="DoClose()" class="mc_light_grey_button_with_fillet"/>
-            </div>
-            <pe:container width="100%" height="100%" >
-                <pe:nplbrowser name="nplbrowser_instance" withControl="<%=IsShowControl()%>" enabledResize="true" url="<%=GetUrl()%>"/>
-            </pe:container>
-    </div>
-</html>
+<div width="100%" height="100%" style="background-color:#000000;">
+    <pe:if condition="<%=hasTitle()%>">
+        <div style="height:30px;" >
+            <div style="position:relative;margin-left:5px;margin-top:2px;color:#ffffff;"><%=GetTitle()%></div>
+            <input type="button" value="X" align="right" style="width:50px;height:30px;" onclick="DoClose()" class="mc_light_grey_button_with_fillet"/>
+        </div>
+    </pe:if>
+    <pe:container width="100%" height="100%" style="background:url()">
+        <pe:nplbrowser visible="true" name="nplbrowser_instance" withControl="<%=IsShowControl()%>" enabledResize="true" url="<%=GetUrl()%>"/>
+    </pe:container>
+</div>
+</pe:mcml>
+
 

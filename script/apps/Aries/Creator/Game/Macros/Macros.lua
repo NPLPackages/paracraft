@@ -704,7 +704,7 @@ function Macros:LoadMacrosFromText(text)
 				end
 			elseif (name == "Idle" and params) then
 				params = NPL.LoadTableFromString("{"..params.."}");
-				local t = unpack(params);
+				local t = params and unpack(params) or 0;
 				last_total_idle = last_total_idle + t;
 			end
 		end

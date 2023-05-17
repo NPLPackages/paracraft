@@ -201,7 +201,9 @@ end
 --自己所有链接的子节点也一并删除
 function Entity:SetDeadWithAllChildren()
 	self:ForEachChildLinkEntity(function(child)
-		child:SetDeadWithAllChildren()
+		if child and type(child.SetDeadWithAllChildren) == "function" then
+			child:SetDeadWithAllChildren()
+		end
 	end)
 	self:SetDead()
 end
@@ -667,21 +669,23 @@ function Entity:SaveToXMLNodeWithAllLinkedInfo()
             end
             local _xml = eee:SaveToXMLNode()
             loadLinkedXmls(eee,_xml)
-            local _linkInfo = eee.linkInfo or {}
-            table.insert(xmlInfo.linkList,{
-                mountIdx = mountIdx, --如果是插件点上的点，记录是本节点的哪个插件点
-                xmlInfo = _xml,
-                linkInfo = {
-                    boneName = _linkInfo.boneName,
-                    pos = _linkInfo.pos,
-                    rot = _linkInfo.rot,
-                },
-                nodeInfo = { --记录相对与本节点的位移
-                    x = _xml.attr.x - _xmlInfo.attr.x,
-                    y = _xml.attr.y - _xmlInfo.attr.y,
-                    z = _xml.attr.z - _xmlInfo.attr.z,
-                }
-            })
+			if(_xml and _xml.attr and _xml.attr.x) then
+				local _linkInfo = eee.linkInfo or {}
+				table.insert(xmlInfo.linkList,{
+					mountIdx = mountIdx, --如果是插件点上的点，记录是本节点的哪个插件点
+					xmlInfo = _xml,
+					linkInfo = {
+						boneName = _linkInfo.boneName,
+						pos = _linkInfo.pos,
+						rot = _linkInfo.rot,
+					},
+					nodeInfo = { --记录相对与本节点的位移
+						x = _xml.attr.x - _xmlInfo.attr.x,
+						y = _xml.attr.y - _xmlInfo.attr.y,
+						z = _xml.attr.z - _xmlInfo.attr.z,
+					}
+				})
+			end
         end)
     end
 	loadLinkedXmls(self,_xmlInfo)
@@ -776,7 +780,7 @@ function Entity:CheckNearbyStaticPhysicsLoaded(halfwidth, halfheight, halfdepth)
 					for entity,_ in pairs(entities) do
 						if(entity ~= self) then
 							if(entity:HasRealPhysics()) then
-								if(not entity:CheckLoadPhysics()) then
+								if(entity.CheckLoadPhysics and not entity:CheckLoadPhysics()) then
 									self.stateLoadPhysics = "waitForStatic";
 									return false
 								end
@@ -1474,6 +1478,7 @@ function Entity:OpenEditor(editor_name, entity)
 			EditModelTask.GetInstance():SetTransformMode(true)
 			EditModelTask.GetInstance():SelectModel(self);
 		end
+		GameLogic.SetModified();
 	end
 end
 
@@ -2117,9 +2122,11 @@ end
 -- return true if we handled picking effect ourselves.. 
 function Entity:OnHighlightPickingEntity(result)
 	local item = self:GetItemClass()
-	result, hoverEntity = item:CheckMousePick()
-	if(hoverEntity) then
-		return true;
+	if(item) then
+		result, hoverEntity = item:CheckMousePick()
+		if(hoverEntity) then
+			return true;
+		end
 	end
 end
 

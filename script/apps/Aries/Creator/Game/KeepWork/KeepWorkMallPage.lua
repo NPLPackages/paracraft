@@ -589,8 +589,7 @@ function KeepWorkMallPage.OnClickBuy(item_data)
 	end
 
 	if item_data.is_use_in_player and item_data.bag_nums > 0 then
-        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-        page.ShowUserInfoPage({ username = System.User.keepworkUsername, });
+		GameLogic.ShowUserInfoPage({ username = System.User.keepworkUsername, });
 		return
 	end
 

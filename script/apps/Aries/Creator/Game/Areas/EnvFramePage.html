@@ -83,7 +83,7 @@ end
                     <div style="float:left;margin-left:7px;margin-top:-2px;width:13px;height:22px;background:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#196 238 13 22)"/>
                 </div>
                 <div style="float:left;margin-left:9px;margin-top: 6px;font-size:10px">
-                    <input type="checkbox" checked="<%=GameLogic.options:IsTimesAutoGo()%>" onclick="EnvFramePage.OnToggleAutoTimesGo"  name="auto_times_go"/>自动昼夜交替<br />
+                    <input type="checkbox" checked="<%=GameLogic.options:IsTimesAutoGo()%>" onclick="EnvFramePage.OnToggleAutoTimesGo" name="auto_times_go" /><%=L"自动昼夜交替"%><br />
                 </div>
             </div>
             <div style="padding:8px;padding-right:5px;margin-top:7px;width:220px;height:105px;" class="mc_border" >
@@ -120,7 +120,7 @@ end
                     </div>
                 </div>
                 <div style="margin-top:5px;">
-                    <div style="float:left;margin-left:7px;width:90px;height:20px;" tooltip='<%=L"高级shader中影响影子的深浅"%>'><%=L"云量"%></div>
+                    <div style="float:left;margin-left:7px;min-width:90px;height:20px;" tooltip='<%=L"高级shader中影响影子的深浅"%>'><%=L"云量"%></div>
                     <div style="float:left;margin-top:1px;margin-left:9px;">
                         <pe:sliderbar uiname="EnvFramePage.cloudness" name="cloudness" min="0" max="1" value='<%=GameLogic.options:GetCloudThickness()%>' style="width:80px;height:22px;" onchange="EnvFramePage.OnCloudnessChanged()"></pe:sliderbar>
                     </div>

@@ -89,67 +89,71 @@ function EscFramePage.IsVisible()
 end
 
 function EscFramePage.ShowPage(bShow)
-	GameLogic.GetFilters():apply_filters("OnShowEscFrame", bShow);
-	if(System.options.IsMobilePlatform) then
-		EscFramePage.ShowPage_Mobile()
-	else
-		local isCustomShow = GameLogic.GetFilters():apply_filters('EscFramePage.ShowPage', false, bShow)
-		if not isCustomShow then
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
-			NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
-			local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
-			local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
-			local isMobile = MobileUIRegister.GetMobileUIEnabled()
-			if isMobile then
-				EscFramePage.GetProfile()
-			end
-			local bActivateMenu = true;
-			if(bShow ~= false) then
-				if(EscFramePage.IsVisible()) then
-					bActivateMenu = false;
-				end
-				 DesktopMenuPage.ActivateMenu(bActivateMenu);
-			end
-			EscFramePage.bForceHide = bShow == false;
-			local url = "script/apps/Aries/Creator/Game/Areas/EscFramePage.html"
-			if System.options.channelId_431 then
-				url = "script/apps/Aries/Creator/Game/Educate/Other/EscFramePage.431.html"
-			end
-			local params = {
-					url = url,
-					name = "EscFramePage.ShowPage", 
-					isShowTitleBar = false,
-					DestroyOnClose = true,
-					bToggleShowHide=true, 
-					style = CommonCtrl.WindowFrame.ContainerStyle,
-					allowDrag = false,
-					enable_esc_key = true,
-					bShow = bShow,
-					click_through = false, 
-					zorder = 10,
-					-- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
-					directPosition = true,
-						align = "_ct",
-						x = -390/2,
-						y = -350/2,
-						width = 390,
-						height = 350,
-					-- DesignResolutionWidth = 1280,
-					-- DesignResolutionHeight = 720,
-				};
-			params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"EscFramePage");
-			System.App.Commands.Call("File.MCMLWindowFrame", params);
-			if(bShow ~= false) then
-				params._page.OnClose = function()
-					if(not EscFramePage.bForceHide) then
-						GameLogic.GetFilters():apply_filters("OnEscFrameClose");
-						DesktopMenuPage.ActivateMenu(false);
-						page = nil
-					end
-				end;
-			end
-		end
-	end
+    GameLogic.GetFilters():apply_filters("OnShowEscFrame", bShow);
+    if (System.options.IsMobilePlatform) then
+        EscFramePage.ShowPage_Mobile()
+    else
+        local isCustomShow = GameLogic.GetFilters():apply_filters('EscFramePage.ShowPage', false, bShow)
+        if not isCustomShow then
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/DesktopMenuPage.lua");
+            NPL.load("(gl)script/apps/Aries/Creator/Game/Mobile/MobileUIRegister.lua")
+            local DesktopMenuPage = commonlib.gettable("MyCompany.Aries.Creator.Game.Desktop.DesktopMenuPage");
+            local MobileUIRegister = commonlib.gettable("MyCompany.Aries.Creator.Game.Mobile.MobileUIRegister");
+            local isMobile = MobileUIRegister.GetMobileUIEnabled()
+            if isMobile then
+                EscFramePage.GetProfile()
+            end
+            local bActivateMenu = true;
+            if (bShow ~= false) then
+                if (EscFramePage.IsVisible()) then
+                    bActivateMenu = false;
+                end
+                DesktopMenuPage.ActivateMenu(bActivateMenu);
+            end
+            local width, height = 390, 350
+            EscFramePage.bForceHide = bShow == false;
+            local url = "script/apps/Aries/Creator/Game/Areas/EscFramePage.html"
+            if System.options.channelId_431 then
+                url = "script/apps/Aries/Creator/Game/Educate/Other/EscFramePage.431.html"
+            elseif System.options.isPapaAdventure then
+                url = "script/apps/Aries/Creator/Game/Areas/EscFrameTutorialPage.html"
+                width, height = 500, 340
+            end
+            local params = {
+                url = url,
+                name = "EscFramePage.ShowPage",
+                isShowTitleBar = false,
+                DestroyOnClose = true,
+                bToggleShowHide = true,
+                style = CommonCtrl.WindowFrame.ContainerStyle,
+                allowDrag = false,
+                enable_esc_key = true,
+                bShow = bShow,
+                click_through = false,
+                zorder = 10,
+                -- app_key = MyCompany.Aries.Creator.Game.Desktop.App.app_key, 
+                directPosition = true,
+                align = "_ct",
+                x = -width / 2,
+                y = -height / 2,
+                width = width,
+                height = height
+                -- DesignResolutionWidth = 1280,
+                -- DesignResolutionHeight = 720,
+            };
+            params = GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam', params, "EscFramePage");
+            System.App.Commands.Call("File.MCMLWindowFrame", params);
+            if (bShow ~= false) then
+                params._page.OnClose = function()
+                    if (not EscFramePage.bForceHide) then
+                        GameLogic.GetFilters():apply_filters("OnEscFrameClose");
+                        DesktopMenuPage.ActivateMenu(false);
+                        page = nil
+                    end
+                end;
+            end
+        end
+    end
 end
 
 function EscFramePage.GetProfile()

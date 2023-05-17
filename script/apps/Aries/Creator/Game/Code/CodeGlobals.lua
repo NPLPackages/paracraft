@@ -186,11 +186,12 @@ function CodeGlobals:ctor()
 		getMousePoint = function()
 			return self:GetMousePoint();
 		end,
+
 		Camera = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/CameraBlocklyDef/Camera.lua"),
 		----------------------
 		-- @NOTE: the following may not be safe to expose to users
 		----------------------
-		NPL = { load = NPL.load },
+		NPL = { load = NPL.load, FromJson = NPL.FromJson },
 		System = System, 
 		commonlib = commonlib, 
 		ParaIO = ParaIO,
@@ -225,6 +226,8 @@ function CodeGlobals:Reset()
 			return self.cur_co and self.cur_co:GetActor();
 		elseif(name == "document") then
 			return document;
+		elseif(name == "ggs") then
+			return self:GetGGS();
 		elseif(name == "GI") then
 			return self:GetSandboxAPI();
 		end
@@ -256,6 +259,19 @@ function CodeGlobals:Reset()
 	-- TODO: 
 	LobbyServer.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
 	LobbyServerViaTunnel.GetSingleton():Connect("handleMessage", self, self.handleNetworkEvent, "UniqueConnection");
+end
+
+function CodeGlobals:GetGGS()
+	if (self.__GGS__) then return self.__GGS__ end
+	NPL.load("Mod/GeneralGameServerMod/App/Client/AppGeneralGameClient.lua");
+	local AppGeneralGameClient = commonlib.gettable("Mod.GeneralGameServerMod.App.Client.AppGeneralGameClient");
+	self.__GGS__ = {
+		IsLogin = function() return AppGeneralGameClient:IsLogin() end,
+		GetServerListByWorldId = function(...) return AppGeneralGameClient:GetServerListByWorldId(...) end,
+		Connect = function(...) return AppGeneralGameClient:SwitchServer(...) end,
+		GetOnlinePlayers = function() return AppGeneralGameClient:GetPlayers() end,
+	}
+	return self.__GGS__;
 end
 
 function CodeGlobals:GetGI()

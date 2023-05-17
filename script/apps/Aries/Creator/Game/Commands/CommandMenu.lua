@@ -111,6 +111,11 @@ Commands["menu"] = {
 					local EducateProjectList = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProjectList.lua")
         			EducateProjectList.ShowPage()
 					return
+				elseif System.options.isPapaAdventure then
+					NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
+					local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+					PapaAPI:OpenMyWorks()
+					return
 				end
 				GameLogic.GetFilters():apply_filters("cellar.opus.show");
 			elseif(name == "file.export") then
@@ -196,8 +201,7 @@ Commands["menu"] = {
 					function(result)
 						if (result) then
 							commonlib.TimerManager.SetTimeout(function()
-								local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-								page.ShowUserInfoPage({username = System.User.keepworkUsername});
+								GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
 							end, 250);
 						end
 					end)
@@ -274,6 +278,9 @@ Commands["menu"] = {
 			elseif(name == "help.home") then
 				GameLogic.RunCommand("/home")
 			elseif(name == "help.dailycheck" or name == "help.creativespace") then
+				if System.options.isPapaAdventure or System.options.channelId_431 then
+					return
+				end
 				GameLogic.CheckSignedIn(L"此功能需要登陆后才能使用",
 					function(result)
 						if (result) then

@@ -426,12 +426,25 @@ function Entity:OpenEditor(editor_name, entity)
 		CodeBlockWindow.SetCodeEntity(self);
 		GameLogic.GetFilters():apply_filters("CodeBlockEditorOpened", CodeBlockWindow, entity,self)	
 	end
+	local function open_editor_wrap()
+		if (System.User.isAnonymousWorld) then
+			GameLogic.CheckSignedIn(L"请先登录！", function()
+				if (System.User.isAnonymousWorld) then 
+					GameLogic.AddBBS(nil, L"需要会员权限才能访问", 5000, "255 0 0");
+				else
+					open_editor();
+				end
+			end);
+		else
+			open_editor();
+		end
+	end
 
 	if self.languageConfigFile == "" or self.languageConfigFile == "npl_cad" then
 		local check_type = self.languageConfigFile == "npl_cad" and "click_cad_block" or "click_code_block"
-		UserPermission.CheckCanEditBlock(check_type, open_editor)
+		UserPermission.CheckCanEditBlock(check_type, open_editor_wrap)
 	else
-		open_editor()
+		open_editor_wrap()
 	end
 end
 

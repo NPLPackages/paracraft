@@ -59,6 +59,9 @@ function VisionContext:Update(playerContext)
 	
 	playerContext = playerContext or EntityManager.GetPlayer();
 	local eye_x, eye_y, eye_z = playerContext:GetBlockPos();
+	if(not eye_x) then
+		return
+	end
 	local facing = playerContext:GetFacing();
 	local lookat_dir = Direction.GetDirectionFromFacing(facing);
 	local viewDist = self:GetViewDist();

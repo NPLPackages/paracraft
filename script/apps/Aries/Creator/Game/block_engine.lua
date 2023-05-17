@@ -86,6 +86,7 @@ end
 -- call this function to connect the block engine with the current low level game engine's block terrain world. 
 -- call this function when one enters the block based game.
 function BlockEngine:Connect()
+	self.sessionId = (self.sessionId or 0) + 1;
 	-- clear the block cache
 	self.block_cache = {};
 	custom_model_load_map = {};
@@ -140,6 +141,11 @@ function BlockEngine:Connect()
 		self:OnFrameMove();
 	end})
 	self.mytimer:Change(self.sim_interval, self.sim_interval);
+end
+
+-- increased by 1 when a new world is loaded. One can use this to check if world session is changed.
+function BlockEngine:GetSessionId()
+	return self.sessionId or 0
 end
 
 local results = {};
@@ -1221,4 +1227,91 @@ end
 function BlockEngine:GetBlockExternalMaterial(x, y, z, side)
 	local nFaceId = sideToFaces[side] or side;
 	return ParaTerrain.GetBlockMaterial(x, y, z, nFaceId)
+end
+
+-- save all modified raw files to disk
+-- @param bIgnoreModified: if true we will save all loaded regions regardless whether it is modified.
+function BlockEngine:SaveToDirectory(parentDirectory, bIgnoreModified)
+	parentDirectory = parentDirectory or ParaWorld.GetWorldDirectory();
+
+	local attrBlockWorld = ParaTerrain.GetBlockAttributeObject()
+	for i=0, attrBlockWorld:GetChildCount(0)-1, 1 do
+		local attrRegion = attrBlockWorld:GetChildAt(i)
+		if(bIgnoreModified or attrRegion:GetField("IsModified", false)) then
+			local regionX = attrRegion:GetField("RegionX", 0)
+			local regionZ = attrRegion:GetField("RegionZ", 0)
+			local filename = format("%sblockWorld.lastsave/%d_%d.raw", parentDirectory, regionX, regionZ)
+			attrRegion:SetField("SaveToFile", filename);
+		end
+	end
+end
+
+function BlockEngine:IsBlockWorldModifed()
+	local attrBlockWorld = ParaTerrain.GetBlockAttributeObject()
+	for i=0, attrBlockWorld:GetChildCount(0)-1, 1 do
+		local attrRegion = attrBlockWorld:GetChildAt(i)
+		if(attrRegion:GetField("IsModified", false)) then
+			return true;
+		end
+	end
+end
+
+-- this function will also try load the region if not. 
+-- @param regionX, regionY
+-- @param callbackFunc: function(attrRegion) end is called when region is loaded and not locked. if nil, we will not create region if it does not exist
+function BlockEngine:GetRegionAttr(regionX, regionY, callbackFunc)
+	local attrRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", regionX, regionY))
+	if(attrRegion:IsValid()) then
+		
+	elseif(callbackFunc) then
+		-- create region first
+		ParaBlockWorld.LoadRegion(GameLogic.GetBlockWorld(), regionX * 512, 0, regionY * 512);
+		attrRegion = ParaTerrain.GetBlockAttributeObject():GetChild(format("region_%d_%d", regionX, regionY))
+	end
+	if(callbackFunc and attrRegion:IsValid()) then
+		if(attrRegion:GetField("IsLocked", false)) then
+			local lastId = BlockEngine:GetSessionId()
+			local mytimer = commonlib.Timer:new({callbackFunc = function(timer)
+				if(lastId == BlockEngine:GetSessionId()) then
+					if(not attrRegion:IsValid() or not attrRegion:GetField("IsLocked", false)) then
+						timer:Change()
+						callbackFunc(attrRegion)
+					end
+				else
+					timer:Change()
+				end
+			end})
+			mytimer:Change(50, 100)
+		else
+			callbackFunc(attrRegion)
+		end
+	end
+	return attrRegion;
+end
+
+-- clear all region blocks and block entities
+function BlockEngine:ClearRegion(regionX, regionY)
+	local attrRegion = self:GetRegionAttr(regionX, regionY)
+	if(attrRegion:IsValid() and not attrRegion:GetField("IsLocked", false)) then
+		attrRegion:CallField("DeleteAllBlocks");
+
+		for i = 0, 31 do
+			for j = 0, 31 do
+				local x = regionX * 512 + i *16 + 8;
+				local y = regionY * 512 + j *16 + 8;
+				local timeStamp = ParaTerrain.GetChunkColumnTimeStamp(x, y);
+				if(timeStamp <= 0) then
+					ParaTerrain.SetChunkColumnTimeStamp(x, y, 1);
+				end
+			end
+		end
+	
+		local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
+		local region = EntityManager.GetRegion(regionX*512, regionY*512);
+		if(region) then
+			region:RemoveAll();
+		end
+		BlockEngine.SetRegionLoaded(regionX, regionY, false)
+		return true;
+	end
 end

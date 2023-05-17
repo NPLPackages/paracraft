@@ -35,6 +35,7 @@ function CloneBlocks:Run()
 		if(GameLogic.GameMode:CanAddToHistory()) then
 			if(#(self.history) > 0) then
 				UndoManager.PushCommand(self);
+				GameLogic.SetModified();
 			end
 		end
 	end

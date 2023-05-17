@@ -38,22 +38,26 @@ Commands["save"] = {
 			return 
 		end
 		local function callback()
-			if (GameLogic.GetFilters():apply_filters('is_signed_in')) then
-				GameLogic.GetFilters():apply_filters(
-					"service.keepwork_service_world.limit_free_user",
-					false,
-					function(result)
-						if result then
-							GameLogic.QuickSave();
-						else
-							if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip')==true then
-								return
+			if (GameLogic.GetFilters():apply_filters('is_signed_in'))  then
+				if System.options.channelId_431 or System.options.channelId_tutorial then
+					GameLogic.QuickSave();
+				else
+					GameLogic.GetFilters():apply_filters(
+						"service.keepwork_service_world.limit_free_user",
+						false,
+						function(result)
+							if result then
+								GameLogic.QuickSave();
+							else
+								if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip')==true then
+									return
+								end
+								_guihelper.MessageBox(L'操作被禁止了，免费用户最多只能拥有家园+1个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。')
 							end
-							_guihelper.MessageBox(L'操作被禁止了，免费用户最多只能拥有家园+1个本地世界，请删除不要的本地世界，或者联系老师（或家长）开通权限。')
-						end
-					end,
-					true
-				);
+						end,
+						true
+					);
+				end
 			else
 				GameLogic.QuickSave();
 			end
@@ -68,7 +72,7 @@ Commands["save"] = {
 
 Commands["autosave"] = {
 	name="autosave", 
-	quick_ref="/autosave [-checkModified] [on|off] [mins]", 
+	quick_ref="/autosave [-checkModified|stage|apply|rollback] [on|off] [mins]", 
 	desc=[[automatically save the world every few mins. 
 @param interval: how many minutes to auto save the world. 
 e.g.
@@ -76,6 +80,9 @@ e.g.
 /autosave on     :enable auto save
 /autosave off    :disable autosave
 /autosave on 10  :enable auto save every 10 minutes
+/autosave -stage  :stage current world changes to temp folder which can be recovered later
+/autosave -apply : apply staged changes usually from auto save folder in memory.
+/autosave -rollback : rollback changes, a restart is preferred over rollback.
 /autosave -checkModified on :enable auto save with world modified
 /autosave -checkModified on 10:enable auto save with world modified every 10 minutes
 ]], 
@@ -84,8 +91,31 @@ e.g.
 		local WorldRevision = commonlib.gettable("MyCompany.Aries.Creator.Game.WorldRevision");
 		local interval, bEnabled,options;
 		options,cmd_text = CmdParser.ParseOptions(cmd_text);
-		if options and options.checkModified then
-			GameLogic.CreateGetAutoSaver():SetCheckModified(options.checkModified)
+		if options then
+			if(options.checkModified) then
+				GameLogic.CreateGetAutoSaver():SetCheckModified(options.checkModified)
+			elseif(options.stage or options.apply) then
+				if(GameLogic.world_revision) then
+					if(options.stage) then
+						GameLogic.AddBBS("autosave", L"正在自动备份...");
+						commonlib.TimerManager.SetTimeout(function()  
+							GameLogic.world_revision:StageChangesToFolder();
+							GameLogic.AddBBS("autosave", L"自动备份完毕");
+						end, 500)
+					elseif(options.apply) then
+						if(GameLogic.world_revision:CheckStageFolderVersion()) then
+							GameLogic.AddBBS("autosave", L"正在从自动备份恢复数据...");
+							commonlib.TimerManager.SetTimeout(function()  
+								GameLogic.world_revision:ApplyChangesFromFolder();
+								GameLogic.AddBBS("autosave", L"数据恢复完毕, 如果正确请尽快存盘");
+							end, 500)
+						else
+							GameLogic.AddBBS("autosave", L"本地数据比备份数据新，操作被忽略");
+						end
+					end
+				end
+				return;
+			end
 		end
 		bEnabled, cmd_text = CmdParser.ParseBool(cmd_text);
 		if(bEnabled == false) then
@@ -866,3 +896,19 @@ Commands["setloginworld"] = {
 		WorldCommon.SetParentProjectId(param1)
 	end,
 };
+
+Commands['checkworldassessment'] = {
+	name="checkworldassessment",
+	quick_ref='checkworldassessment [courseId] [projectIds]',
+	desc=[[use course config assessment a world
+		@param courseId:  the current course id
+		@param projectIds: assessment worlds
+		/setloginworld [courseId | projectIds ]
+		]],
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local param1,param2;
+		param1, param2 = CmdParser.ParseFilename(cmd_text);
+		local AssessmentQueue = NPL.load("(gl)script/apps/Aries/Creator/Game/Tutorial/AssessmentQueue.lua")
+		AssessmentQueue.Init(param1,param2)
+	end,
+}

@@ -2,43 +2,48 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
-<title>2009.8.2</title>
+<title></title>
 </head>
 <body> 
 <pe:mcml>
-<script type="text/npl" refresh="false"><![CDATA[
-JumpAppStoreDialog = commonlib.gettable("MyCompany.Aries.Game.Login.Update.JumpAppStoreDialog")
-JumpAppStoreDialog.OnInit()
-function OnClose()
-    Page:CloseWindow();
-end
-function OnClickExit()
-    if System.options.channelId=="430" then
-        ParaGlobal.ShellExecute("open", System.options.launcherExeName, "isFixMode=true", "", 1);
+<script type="text/npl" refresh="false">
+<![CDATA[
+    JumpAppStoreDialog = commonlib.gettable("MyCompany.Aries.Game.Login.Update.JumpAppStoreDialog");
+    JumpAppStoreDialog.OnInit();
+
+    function OnClose()
+        Page:CloseWindow();
     end
-    commonlib.TimerManager.SetTimeout(function()  
-        ParaGlobal.ExitApp();
-    end, 200);
-    
-end
 
-function OnClickChangeLog()
-    ParaGlobal.ShellExecute("open", L"https://keepwork.com/keepwork/changelog/paracraft/changelog_zh", "", "", 1);
-end
-latestVersion = Page:GetRequestParam("latestVersion")
-curVersion = Page:GetRequestParam("curVersion")
+    function OnClickExit()
+        if System.options.channelId=="430" then
+            ParaGlobal.ShellExecute("open", System.options.launcherExeName, "isFixMode=true", "", 1);
+        end
+        commonlib.TimerManager.SetTimeout(function()  
+            ParaGlobal.ExitApp();
+        end, 200);
+        
+    end
 
-function OnClickUpdate()
-    JumpAppStoreDialog.OnClickUpdate()
-end
+    function OnClickChangeLog()
+        ParaGlobal.ShellExecute("open", L"https://keepwork.com/keepwork/changelog/paracraft/changelog_zh", "", "", 1);
+    end
 
-function GetBtnText()
-    return L"更新"
-end
-]]></script>
+    latestVersion = Page:GetRequestParam("latestVersion");
+    curVersion = Page:GetRequestParam("curVersion");
+
+    function OnClickUpdate()
+        JumpAppStoreDialog.OnClickUpdate();
+    end
+
+    function GetBtnText()
+        return L"更新";
+    end
+]]>
+</script>
 <aries:window mode="thin" width="420" title='<%=L"更新提示" %>' >
     <div class="default" style="margin:20px">
-        <div style="">
+        <!-- <div style="">
             <%=L"最新版本为:"%><%=Eval("latestVersion")%>
         </div>
         <div style="margin-top:5px">
@@ -46,12 +51,14 @@ end
         </div>
         <div style="margin-top:10px;color:#ff6a00">
             <div>只有最新版才能进入，请点击【更新】按钮，去应用商店安装最新应用</div>
+        </div> -->
+        <div style="margin-top: 10px;color: #ff6a00">
+            <div>发现客户端新版本，请点击下方按钮跳转App Store</div>
         </div>
     </div>
     <hr />
-    <div style="margin-top:30px;margin-bottom:30px;" class="default">
-        <input type="button" value='<%=L"更新日志..." %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:100px;height:28px;" onclick="OnClickChangeLog" />    
-
+    <div style="margin-top: 30px;margin-bottom: 30px;" class="default">
+        <!-- <input type="button" value='<%=L"更新日志..." %>' class="mc_light_grey_button_with_fillet" style="margin-left:20px;min-width:100px;height:28px;" onclick="OnClickChangeLog" />     -->
         <input type="button" value='<%=GetBtnText() %>' class="mc_yellow_button_with_fillet" align="right" style="margin-right:20px;min-width:70px;height:28px;" onclick="OnClickUpdate"/>
     </div>
 </aries:window>

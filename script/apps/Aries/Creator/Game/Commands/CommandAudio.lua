@@ -261,3 +261,29 @@ Commands["/recordsound"] = {
 		end);
 	end,
 };
+
+Commands["/audio"] = {
+	name="audio", 
+	quick_ref="/audio [-reset] [-stopall]", 
+	desc=[[audio
+reset to default audio device
+/audio -reset
+stop all audios
+/audio -stopall
+]], 
+	handler = function(cmd_name, cmd_text, cmd_params, fromEntity)
+		local options;
+		options, cmd_text = CmdParser.ParseOptions(cmd_text)
+		if(options) then
+			if(options.reset) then
+				NPL.load("(gl)script/ide/AudioEngine/AudioEngine.lua");
+				local AudioEngine = commonlib.gettable("AudioEngine");
+				AudioEngine.ResetAudioDevice();
+			elseif(options.stopall) then
+				NPL.load("(gl)script/ide/AudioEngine/AudioEngine.lua");
+				local AudioEngine = commonlib.gettable("AudioEngine");
+				AudioEngine.StopAllSounds();
+			end
+		end
+	end,
+};

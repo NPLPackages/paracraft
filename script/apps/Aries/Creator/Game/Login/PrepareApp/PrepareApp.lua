@@ -221,10 +221,16 @@ function PrepareApp.CheckWritePermission(callback)
     end
 end
 
---通过ping命令解析检查网络状态
+-- ping version server for network connection 
 function PrepareApp.CheckNetWork(callback)
     PrepareApp.SetStateTip(L"正在检查网络状态...")
     
+	local SKIP_NETWORK_CHECK = true;
+	if(SKIP_NETWORK_CHECK) then
+		callback(true)
+		return
+	end
+
     local cmdStr = "ping tmlog.paraengine.com -n 1"
     local _pingFunc;
     _pingFunc = function(tryAcc)
@@ -407,7 +413,7 @@ end
 function PrepareApp.SetBarProgress(percent)
     local progress_fg = ParaUI.GetUIObject("progress_fg")
     progress_fg.width = math.floor(500*(percent*0.01))
-    progress_fg.background = string.format("Texture/progress_fg_500x36_32bits.png#0 0 %s 36;",progress_fg.width)
+    progress_fg.background = string.format("Mod/WorldShare/Texture/progress_fg_500x36_32bits.png#0 0 %s 36;",progress_fg.width)
 end
 
 function PrepareApp.SetStateTip(str)

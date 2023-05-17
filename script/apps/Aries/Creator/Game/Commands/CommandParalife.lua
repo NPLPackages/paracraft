@@ -150,7 +150,7 @@ e.g.
                 options, cmd_text = CmdParser.ParseOptions(cmd_text);
                 ParalifeLiveModel.SetBagTypeBottom(options)
             elseif _type=="gridtop" then
-                options = CommonLib.ParseOptions(cmd_text);
+                options = CmdParser.ParseOptionsNameValue(cmd_text);
                 ParalifeLiveModel.SetBagTypeTop(options)
             else
                 ParalifeLiveModel.SetBagTypeDefault()

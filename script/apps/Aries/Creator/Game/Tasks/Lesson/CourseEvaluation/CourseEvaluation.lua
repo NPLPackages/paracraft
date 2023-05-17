@@ -20,6 +20,12 @@ function CourseEvaluation.OnInit()
 end
 
 function CourseEvaluation.ShowView(callback,isFinished)
+    if  System.options.channelId_431 or System.options.isPapaAdventure then
+        if callback then
+            callback()
+        end
+        return
+    end
     CourseEvaluation.RegisterEvent()
     local RedSummerCampPPtPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampPPtPage.lua");
     local courseData = RedSummerCampPPtPage.GetLastCourseData()

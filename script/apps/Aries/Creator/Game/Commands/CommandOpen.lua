@@ -48,28 +48,28 @@ end
 
 local function openUrl(url)
 	if System.os.GetPlatform()~="win32" or System.os.IsWindowsXP() then
-        if System.os.GetPlatform() == 'android' then
-            NPL.load("(gl)script/ide/System/Windows/Screen.lua");
-            local Screen = commonlib.gettable("System.Windows.Screen");
+        -- if System.os.GetPlatform() == 'android' then
+        --     NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+        --     local Screen = commonlib.gettable("System.Windows.Screen");
 
-            local width,height = Screen:GetWindowSolution()
-            local x = math.min(width*0.3/2,200)
-            width = width - x*2
+        --     local width,height = Screen:GetWindowSolution()
+        --     local x = math.min(width*0.3/2,200)
+        --     width = width - x*2
 
-            local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
-            params = {
-                x = x,y = 0,
-                width = width,
-                height = height,
-                alpha = 0.95,
-                url = url,
-                withTouchMask = true,
-            }
+        --     local PlatformBridge = NPL.load("(gl)script/ide/PlatformBridge/PlatformBridge.lua");
+        --     params = {
+        --         x = x,y = 0,
+        --         width = width,
+        --         height = height,
+        --         alpha = 0.95,
+        --         url = url,
+        --         withTouchMask = true,
+        --     }
             
-            PlatformBridge.open_webview(params)
+        --     PlatformBridge.open_webview(params)
 
-            return
-        end
+        --     return
+        -- end
         ParaGlobal.ShellExecute("open", url, "", "", 1);
         return
     end

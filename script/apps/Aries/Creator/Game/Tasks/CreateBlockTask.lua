@@ -180,6 +180,7 @@ function CreateBlock:Run()
 	end
 	if(add_to_history) then
 		UndoManager.PushCommand(self);
+		GameLogic.SetModified();
 	end
 
 	if(self.blockX and not self.isSilent) then

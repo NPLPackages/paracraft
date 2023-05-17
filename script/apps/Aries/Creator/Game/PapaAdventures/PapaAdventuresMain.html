@@ -1,0 +1,36 @@
+<html>
+    <body> 
+        <pe:mcml>
+            <script type="text/npl">
+                <![CDATA[
+                    NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAdventuresMain.lua");
+                    local PapaAdventuresMain = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Main")
+                    PapaAdventuresMain:InitUI()
+
+                    function get_url()
+                        if (PapaAdventuresMain) then
+                            return PapaAdventuresMain.url;
+                        end
+                    end
+                ]]>
+            </script>
+            <style type="text/mcss">
+                {
+                    ["bottom-PiP"] = {
+                        ["background-color"] = "#FDBA47",
+                    },
+                }
+            </style>
+            <pe:container alignment="_fi" style="background:url();">
+                <pe:container alignment="_fi"
+                    uiname="papa_container"
+                    class="bottom-PiP">
+                </pe:container>
+                <pe:nplbrowser name="papa_nplbrowser_instance"
+                          userControl="true"
+                          url="<%= get_url() %>"
+                          visible="true"/>
+            </pe:container>
+        </pe:mcml>
+    </body>
+</html>

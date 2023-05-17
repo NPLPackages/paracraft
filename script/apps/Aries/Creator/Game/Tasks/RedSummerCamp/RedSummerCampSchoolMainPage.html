@@ -187,8 +187,7 @@ function OpenRole()
                         return
                     end
                     RedSummerCampSchoolMainPage.RefreshPage()
-                    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-                    page.ShowUserInfoPage({username = System.User.keepworkUsername});
+                    GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
                 end, 500)
             end
         end)
@@ -196,8 +195,7 @@ function OpenRole()
         return
     end
 
-    local role_page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-    role_page.ShowUserInfoPage({username = System.User.keepworkUsername});
+    GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
 end
 
 function GetHeadBgStyle()
@@ -255,7 +253,6 @@ end
             color = "#000000",
             ['text-offset-y'] = -3,
         },
-
         head_text = {
             ["base-font-size"] = 14,
             ["font-size"] = 14,
@@ -263,7 +260,6 @@ end
             float = "left",
             color = "#ffffff",
         },
-
         yellon_button = {
             background = "Texture/Aries/Creator/keepwork/RedSummerCamp/main/btnh_64X52_32bits.png#0 0 64 52:22 22 22 22",
             ["base-font-size"] = 20,
@@ -273,10 +269,22 @@ end
             height = 52,
             float = "left",
         },
-
+        opus_bar_search = {
+            background = 'Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#176 173 32 42: 7 7 7 7',
+            height = 42,
+            ['margin-left'] = 10,
+            ['margin-top'] = 10,
+        }
         opus_bar_button = {
             background = 'Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#205 112 86 46',
         },
+        opus_content_textfield = {
+            height = 42,
+            ['font-size'] = 18,
+            ['base-font-size'] = 18,
+            ['text-valign'] = 'center',
+            background = ''
+        }
     }
 </style>
 
@@ -285,8 +293,15 @@ end
         <pe:container alignment="_rt" style="background:;">
             <%=GameLogic.GetFilters():apply_filters('get_vip_time_icon_div')%>
             <%=GameLogic.GetFilters():apply_filters('get_vip_btn_div',"margin-right:15px;margin-top:15px;","2D_main")%>
-            <!-- <input name="helpBtn" type="button" value='' onclick="OpenHelpPage" style="margin-right:15px;margin-top:15px; width: 64px;height: 97px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bangzhu_97X27_32bits.png#0 0 64 97);" /> -->
-            <input type="button" value='' onclick="ClosePage" style="margin-right:15px;margin-top:15px;width: 64px;height: 70px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/btn3_64X70_32bits.png#0 0 64 70);" />
+
+            <input type="button"
+                   value=''
+                   onclick="ClosePage"
+                   style="margin-right: 15px;
+                          margin-top: 15px;
+                          width: 77px;
+                          height: 78px;
+                          background: url(Texture/Aries/Creator/keepwork/worldshare/main_login_buttons_32bits.png#322 360 77 78);" />
         </pe:container>
         <div zorder="-2" style='<%=GetHeadBgStyle()%>'>
             <div style="float: left;margin-left: 16px;margin-top: 8px; width: 96px;height: 96px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/touxiang3_96X96_32bits.png#0 0 96 96:16 16 16 16);">
@@ -371,23 +386,15 @@ end
 
         <div style='float: left;margin-top: 25px;margin-left: 10px;'>
             <!-- seach bar -->
-            <div style='background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/works/works_32bits.png#176 173 32 42: 7 7 7 7);
-                        width: 370px;
-                        height: 42px;
-                        margin-left: 10px;
-                        margin-top: 10px;'>
-                <div style='width: 495px;'>
+            <div class="opus_bar_search" style='<%= Mod.WorldShare.Utils.IsEnglish() and "width: 420px" or "width: 370px" %>'>
+                <div style='<%= Mod.WorldShare.Utils.IsEnglish() and "width: 545px;" or "width: 495px;" %>'>
                     <input type='text'
                             name='opus_content'
                             spacing='10'
                             EmptyText='<%= L"输入项目ID或课程ID或服务器地址" %>'
                             EmptyTextColor='#FF25282E'
-                            style='width: 336px;
-                                    height: 42px;
-                                    font-size: 18px;
-                                    base-font-size: 18px;
-                                    text-valign: center;
-                                    background:;'/>
+                            class="opus_content_textfield"
+                            style='<%= Mod.WorldShare.Utils.IsEnglish() and "width: 396px" or "width: 336px" %>'/>
                     <input type='button'
                             class='opus_bar_button'
                             DefaultButton='true'
@@ -420,7 +427,7 @@ end
                         <div zorder="-1" style='width: 334px;height: 368px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/chuangyikongjian_334x368_32bits.png#0 0 334 368)'></div>
                         <div style="margin-left: 14px;margin-top: 326px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                             <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
-                                创意空间（课程）
+                               <%= L"创意空间（课程）" %>
                             </div>
                         </div>
                         <!-- background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk_64X64_32bits.png#0 0 64 64:24 24 24 24) -->
@@ -430,8 +437,40 @@ end
                                 <input type="button" onclick="OnClickLearn" value="<%=GetLearnContent()%>" style="base-font-size:14px;font-size: 14px;color: #000000;font-weight: bold;  margin-left: 100px; margin-top: 26px; width: 191px; height: 39px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
                             </pe:if>
                             <pe:if condition="<%=not IsHaveLearnHistroy()%>">
-                                <div style=" position: relative; margin-left: 50px; margin-top: 34px;">最近无课程记录</div>
-                                <input type="button" value="进入课程" onclick="OnClickLearn" style="base-font-size:14px;font-size: 14px;color: #000000;font-weight: bold; margin-left: 200px; margin-top: 30px; width: 131px; height: 39px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                                <pe:if condition="<%= Mod.WorldShare.Utils.IsEnglish() %>">
+                                    <div style=" position: relative; margin-left: 15px; margin-top: 34px;">
+                                        <%= L"最近无课程记录" %>
+                                    </div>
+                                    <input type="button"
+                                        value="Enter"
+                                        onclick="OnClickLearn"
+                                        style="base-font-size: 14px;
+                                               font-size: 16px;
+                                               color: #000000;
+                                               font-weight: bold;
+                                               margin-left: 250px;
+                                               margin-top: 30px;
+                                               width: 90px;
+                                               height: 39px;
+                                               background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                                </pe:if>
+                                <pe:if condition="<%= not Mod.WorldShare.Utils.IsEnglish() %>">
+                                    <div style=" position: relative; margin-left: 50px; margin-top: 34px;">
+                                        <%= L"最近无课程记录" %>
+                                    </div>
+                                    <input type="button"
+                                        value="<%= L'进入课程' %>"
+                                        onclick="OnClickLearn"
+                                        style="base-font-size: 14px;
+                                                font-size: 14px;
+                                                color: #000000;
+                                                font-weight: bold;
+                                                margin-left: 200px;
+                                                margin-top: 30px;
+                                                width: 131px;
+                                                height: 39px;
+                                                background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/anniu_191x39_32bits.png#0 0 191 39);" />
+                                </pe:if>
                             </pe:if>
                         </div>
                     </div>
@@ -443,7 +482,7 @@ end
                         <div zorder="-1" style='width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/zixueshiping_335x421_32bits.png#0 0 335 421)'></div>
                         <div style="margin-left: 14px;margin-top: 378px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                             <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
-                                入门必看
+                                <%= L"入门必看" %>
                             </div>
                         </div>
                         <pe:container uiname="red_tip" style="position: relative;margin-left: 322px; margin-top: 18px; width: 13px; height: 13px; background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/hongdian_13x13_32bits.png#0 0 13 13)"></pe:container>
@@ -457,7 +496,7 @@ end
                         <div zorder="-1" style='width: 334px;height: 421px; position: relative;margin-left: 14px;margin-top: 8px;background: url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/tuijianzuoping_334x421_32bits.png#0 0 334 421)'></div>
                         <div style="margin-left: 14px;margin-top: 378px; position: relative;width: 334px;height:51px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/bjk2_64X51_32bits.png#0 0 64 51:16 16 16 16)">
                             <div style="margin-top: 10px; text-align: center;base-font-size:20px;font-size: 20px;color: #ffffff;font-weight: bold;">
-                                推荐作品
+                                <%= L"推荐作品" %>
                             </div>
                         </div>
                     </div>
@@ -479,11 +518,29 @@ end
         </pe:container> -->
 
         <pe:container alignment="_rb" width="465" height="102" style="margin-right: 98px;margin-bottom: 26px;background:;">
-            <input type="button" value='' uiname="RedSummerCampSchoolMainPage.QuickStart" onclick="QuickStart" style="margin-left:181px;margin-top:0px; width: 279px;height: 110px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b4_279X110_32bits.png#0 0 279 110)" />
+            <pe:if condition="<%= Mod.WorldShare.Utils.IsEnglish() %>">
+                <input type="button"
+                    value=''
+                    uiname="RedSummerCampSchoolMainPage.QuickStart"
+                    onclick="QuickStart"
+                    style="margin-left: 181px;
+                           margin-top: 0px;
+                           width: 279px;
+                           height: 110px;
+                           background:url(Texture/Aries/Creator/keepwork/worldshare/main_login_buttons2_32bits.png#10 188 279 110)" />
+            </pe:if>
+            <pe:if condition="<%= not Mod.WorldShare.Utils.IsEnglish() %>">
+                <input type="button"
+                    value=''
+                    uiname="RedSummerCampSchoolMainPage.QuickStart"
+                    onclick="QuickStart"
+                    style="margin-left: 181px;
+                            margin-top: 0px;
+                            width: 279px;
+                            height: 110px;
+                            background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/main/b4_279X110_32bits.png#0 0 279 110)" />
+            </pe:if>
         </pe:container>
-        
-
-
     </pe:container>
 </pe:container>
 

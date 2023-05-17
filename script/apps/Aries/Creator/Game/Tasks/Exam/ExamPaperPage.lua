@@ -47,7 +47,6 @@ function ExamPaperPage.ShowPage(bShow)
 		end
 		return 
 	end
-	
 	local params = {
 			url = "script/apps/Aries/Creator/Game/Tasks/Exam/ExamPaperPage.html", 
 			name = "ExamPaperPage.ShowPage", 
@@ -80,7 +79,13 @@ function ExamPaperPage.ShowPage(bShow)
 end
 
 
-function ExamPaperPage.CheckShow(rules)
+function ExamPaperPage.CheckShow(rules,endTime,showScore)
+    ExamPaperPage.endTime = endTime
+    if showScore == nil or showScore == true or showScore == "true" then
+        ExamPaperPage.showScore = true
+    else
+        ExamPaperPage.showScore  = false
+    end
     if rules==nil then
         rules = ExamPaperPage.GetPaperParam()
     elseif type(rules)=="string" then
@@ -213,9 +218,13 @@ function ExamPaperPage.UpdateClock()
     local totalTime = ExamPaperPage.totalTime or 45*60
 
     if ExamPaperPage.paper_data then
-        local start_stamp = commonlib.timehelp.GetTimeStampByDateTime(ExamPaperPage.paper_data.startAt)
-        local leftTime = totalTime - (os.time()-start_stamp ) + ExamPaperPage.timeDiff
-
+        local leftTime = 0
+        if ExamPaperPage.endTime ~= nil then
+            leftTime = ExamPaperPage.endTime - ExamPaperPage.GetServerTime() + ExamPaperPage.timeDiff
+        else
+            local start_stamp = commonlib.timehelp.GetTimeStampByDateTime(ExamPaperPage.paper_data.startAt)
+            leftTime = totalTime - (os.time()-start_stamp ) + ExamPaperPage.timeDiff
+        end
         ExamPaperPage.isTimeout = leftTime<0
         ExamPaperPage.curTimeVal = L"剩余时间".." "..os.date("%M:%S",math.max(leftTime,0))
         page:SetUIValue("label_left_time",ExamPaperPage.curTimeVal)
@@ -564,6 +573,14 @@ function ExamPaperPage.onBtnClick(name)
     end
 end
 
+function ExamPaperPage.GetServerTime()
+    if System.options.isDevMode then
+        return os.time()
+    end
+    local timp_stamp = GameLogic.GetFilters():apply_filters('store_get', 'world/currentServerTime')
+    return timp_stamp or os.time()
+end
+
 --得分
 function ExamPaperPage.showResultPage(score,tip)
     local params = {
@@ -590,6 +607,16 @@ function ExamPaperPage.showResultPage(score,tip)
             height = 320,
     };
     System.App.Commands.Call("File.MCMLWindowFrame", params);
+    GameLogic.AddBBS(nil,L"考试结束5秒后即将退出考试世界");
+    commonlib.TimerManager.SetTimeout(function()
+        if not ExamPaperPage.reExam then
+            local WorldExitDialog = NPL.load('Mod/WorldShare/cellar/WorldExitDialog/WorldExitDialog.lua')
+            WorldExitDialog.OnDialogResult(_guihelper.DialogResult.No)
+        else
+            GameLogic.AddBBS(nil,L"正在重新考试");
+        end
+        ExamPaperPage.reExam = false
+    end,5000)
 end
 
 function ExamPaperPage.OnReExamine()
@@ -603,6 +630,7 @@ function ExamPaperPage.OnReExamine()
                 GameLogic.AddBBS(nil,"试题为空")
                 return
             end
+            ExamPaperPage.reExam = true
             ExamPaperPage.ShowPage(true)
         end
     end,forceUpdate)

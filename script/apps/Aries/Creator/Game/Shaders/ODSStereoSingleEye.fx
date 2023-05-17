@@ -4,6 +4,10 @@ Email:
 Date: 2022.10.18
 Desc: 
 */
+
+/** define this to show original all 6 original ods textures in the upper region of the screen. */
+// #define DEBUG_SHOW_ODS_ORIGINAL_SIX_FACES
+
 float2 screenParam = float2(512, 512);
 float num_h = 4;
 float num_v = 2;
@@ -45,8 +49,6 @@ void StereoVS(float3 iPosition:POSITION,
 
 float4 StereoPS(float2 texCoord:TEXCOORD0) :COLOR
 {
-// define this to show original ods textures in the upper region of the screen. 
-// #define DEBUG_SHOW_ODS_ORIGINAL_SIX_FACES
 #ifdef DEBUG_SHOW_ODS_ORIGINAL_SIX_FACES
 	if (texCoord.y <= 0.5)
 	{
@@ -56,7 +58,7 @@ float4 StereoPS(float2 texCoord:TEXCOORD0) :COLOR
 	}
 	clip(0);
 #endif
-
+	
 	float u = texCoord.x/cubeTextureRect.z;
 	float v = texCoord.y/cubeTextureRect.w;
 	// float u = texCoord.x;
@@ -153,12 +155,17 @@ float4 StereoPS(float2 texCoord:TEXCOORD0) :COLOR
 	return color0;
 }
 
-//  float4 StereoPS(float2 texCoord:TEXCOORD0) :COLOR
-//  {
-//  	float4 Color1 = tex2D(sourceSp0, float2(texCoord.x/cubeTextureRect.z,texCoord.y/cubeTextureRect.w));
-	
-//  	return Color1;
-//  }
+float4 StereoPS_debug_ods(float2 texCoord:TEXCOORD0) :COLOR
+{
+	if (texCoord.y <= 0.5)
+	{
+		float4 color0 = tex2D(sourceSp0, float2(texCoord.x, texCoord.y));
+		color0.a = 1.0;
+		return color0;
+	}
+	clip(0);
+	return float4(0,0,0,0);
+}
 
 technique Default
 {
@@ -171,4 +178,15 @@ technique Default
 		VertexShader = compile vs_3_0 StereoVS();
         PixelShader = compile ps_3_0 StereoPS();
     }
+
+	pass P1
+	{
+		cullmode = none;
+		ZEnable = false;
+		ZWriteEnable = false;
+		FogEnable = False;
+		VertexShader = compile vs_3_0 StereoVS();
+		PixelShader = compile ps_3_0 StereoPS_debug_ods();
+	}
+
 }

@@ -50,7 +50,7 @@ Entity:Property({"facing", 0, "GetFacing", "SetFacing", auto=true});
 Entity:Property({"yaw", 0, "GetYaw", "SetYaw"});
 Entity:Property({"pitch", 0, "GetPitch", "SetPitch", auto=true});
 Entity:Property({"opacity", 1, "GetOpacity", "SetOpacity"});
-Entity:Property({"isSolid", 1, "IsSolid", "SetSolid"});
+Entity:Property({"isSolid", true, "IsSolid", "SetSolid"});
 Entity:Property({"isScreenMode", false, "IsScreenMode", "SetScreenMode"});
 Entity:Property({"ui_x", 0, "GetScreenX", "SetScreenX", auto=true});
 Entity:Property({"ui_y", 0, "GetScreenY", "SetScreenY", auto=true});
@@ -196,7 +196,7 @@ end
 
 function Entity:IsSolid()
 	if(self.overlay) then
-		return self.overlay:SetSolid(bIsSolid)
+		return self.overlay:IsSolid()
 	end
 end
 

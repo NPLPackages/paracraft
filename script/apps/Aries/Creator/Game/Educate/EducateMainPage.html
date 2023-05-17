@@ -129,9 +129,12 @@
                     style="position: relative; font-size:14px; base-font-size:14px; margin-left:10px;margin-top: 4px; width: 290px; height:30px; background: url();" />
                 <input type="button" onclick="OnClickGo" style="margin-left: 249px; margin-top: -32px; width: 48px; height: 28px; background: url(Texture/Aries/Creator/paracraft/Educate/jinru_47x27_32bits.png#0 0 48 28);  " />
             </pe:container>
-            <pe:container uiname="lesson_button_bg" visible="true" style="width: 60px; height: 60px; margin-left: 1160px; margin-top: -50px; background: url();">
+            <pe:container uiname="lesson_button_bg" visible="false" style="width: 60px; height: 60px; margin-left: 1160px; margin-top: -50px; background: url();">
                 <input type="button" name="course" onclick="OnClickCourse" style="width: 45px; height: 45px; background: url(Texture/Aries/Creator/paracraft/Educate/Project/dangqianketang_40x40_32bits.png#0 0 40 40);"/>
                 <div for="course" style="margin-top: 2px; font-size: 10px;"><%=L"当前课堂"%></div>
+                <pe:container uiname="course_tip" visible="false" style="margin-left: 34px; margin-top: -68px; width: 14px; height: 14px; background: url(Texture/Aries/Creator/paracraft/Educate/hondian_14x14_32bits.png#0 0 14 14);">
+                    <!-- <pe:label name="course_tip_text" value="0" style=" margin-top: -2px; text-align: center; color: #ffffff; font-size: 8px; "></pe:label> -->
+                </pe:container>
             </pe:container>
         </div>    
         <!-- RIGHT -->

@@ -156,7 +156,7 @@ function CodeBlockSettings.ClickBlockToolboxBtn()
 	if (not entity or type(entity.IsUseNplBlockly) ~= "function" or not entity:IsUseNplBlockly()) then return end 
 	if(page) then page:CloseWindow() end
 	local config = CodeBlockWindow.PrepareNplBlocklyConfig(entity);
-	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
+	local Page = NPL.load("script/ide/System/UI/Page.lua");
 	Page.Show({
 		XmlText = config.toolbox_xmltext,
 		Language = config.language,
@@ -178,7 +178,7 @@ end
 
 function CodeBlockSettings.ClickCustomBlockBtn()
 	if(page) then page:CloseWindow() end
-	local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua", IsDevEnv);
+	local Page = NPL.load("script/ide/System/UI/Page.lua");
 	Page.Show({
 	}, {
 		draggable = false,

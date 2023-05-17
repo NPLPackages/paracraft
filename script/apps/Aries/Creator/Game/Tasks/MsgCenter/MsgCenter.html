@@ -77,8 +77,7 @@ function ClickName(name, mcmlNode)
     local msg = server_data.msg or {}
     local username = msg.username
     if username then
-        local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-        user_page.ShowUserInfoPage({username=username});
+        GameLogic.ShowUserInfoPage({username=username});
     end
 end
 ]]></script>

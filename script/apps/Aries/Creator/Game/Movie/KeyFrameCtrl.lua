@@ -314,6 +314,7 @@ function KeyFrameCtrl:GetTimeFromUIObj(ui_obj)
 	if(time) then
 		return tonumber(time);
 	end
+	return 0
 end
 
 -- return x, y position. 

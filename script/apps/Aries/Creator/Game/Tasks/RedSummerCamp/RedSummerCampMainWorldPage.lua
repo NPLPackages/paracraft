@@ -107,7 +107,7 @@ end
 
 function RedSummerCampMainWorldPage.ClickLBBt()
 	if RedSummerCampMainWorldPage.name == "summer_camp" then
-        local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+        local Page = NPL.load("script/ide/System/UI/Page.lua");
         Page.ShowShenTongBeiPage();
 	elseif RedSummerCampMainWorldPage.name == "ai_school" then
 		local RedSummerCampParentsPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampParentsPage.lua");

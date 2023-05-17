@@ -214,6 +214,7 @@ function KeepWorkMallPage.ShowView()
 				};
 			System.App.Commands.Call("File.MCMLWindowFrame", params);
 			KeepWorkMallPage.GetPageDt()
+			KeepWorkMallPage.SetBrowserVisible(false)
 			GameLogic.GetFilters():add_filter("OnInstallModel", function ()
 				commonlib.TimerManager.SetTimeout(function()
 					if KeepWorkMallPage.isOpen then
@@ -587,7 +588,7 @@ function KeepWorkMallPage.HandleDataSources()
 			end
 		end
 	end
-	if System.options.isChannel_430 then
+	if System.options.isHideVip then
 		KeepWorkMallPage.grid_data_sources = commonlib.filter(KeepWorkMallPage.grid_data_sources, function (item)
 			return item.hasPermission
 		end)
@@ -829,6 +830,10 @@ function KeepWorkMallPage.CloseView()
 	KeepWorkMallPage.model_index = 1
 	KeepWorkMallPage.search_keyworlds = ""
 	KeepWorkMallPage.isExpland_modelType = false
+	if KeepWorkMallPage.IsBrowserVisible ~= nil and KeepWorkMallPage.IsBrowserVisible == false then
+		KeepWorkMallPage.SetBrowserVisible(true)
+		KeepWorkMallPage.IsBrowserVisible = nil
+	end
 end
 
 function KeepWorkMallPage.Close()
@@ -1095,6 +1100,20 @@ function KeepWorkMallPage.onClick_modelType()
 	end
 	KeepWorkMallPage.isExpland_modelType = not KeepWorkMallPage.isExpland_modelType
 	KeepWorkMallPage.OnRefresh()
+end
+
+function KeepWorkMallPage.SetBrowserVisible(bVisible)
+	NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAdventuresMain.lua");
+	local PapaAdventuresMain = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Main");
+	if not PapaAdventuresMain.mode or PapaAdventuresMain.mode ~= "mini" then
+		return
+	end
+	KeepWorkMallPage.IsBrowserVisible = bVisible == true
+	if bVisible == true then
+		PapaAdventuresMain:HideBrowser(false)
+	else
+		PapaAdventuresMain:HideBrowser(true)
+	end
 end
 
 --#endregion

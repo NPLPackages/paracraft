@@ -514,7 +514,7 @@ function RedSummerCampCourseScheduling.InitPageData()
 end
 
 function RedSummerCampCourseScheduling.GetSaveKey()
-    local userId = GameLogic.GetFilters():apply_filters('store_get', 'user/userId');
+    local userId = GameLogic.GetFilters():apply_filters('store_get', 'user/userId') or "";
     local save_key = userId.."cource_scheduling"
     return save_key
 end
@@ -858,7 +858,7 @@ local function OpenPPTByLessonAuth(config,courseData,pptIndex,server_index)
     
     if courseData.sectionAuths then
         for k,v in pairs(courseData.sectionAuths) do
-            if v.index == server_index or v.ppt_index == pptIndex then
+            if (server_index and v.index == server_index) or  (pptIndex and v.ppt_index == pptIndex) then
                 section_auth = true
                 break
             end
@@ -1135,7 +1135,7 @@ function RedSummerCampCourseScheduling.UpdateMyLessonAfterLearn()
     for i = 1,#role do
         data = data or RedSummerCampCourseScheduling.UserRoleList[role[i]]
     end
-    isHaveTutorial = data ~= nil and (System.options.channelId ~= CHANNEL_CONFIG.CHANNEL_430 or System.options.channelId_tutorial)
+    isHaveTutorial = data ~= nil and System.options.channelId_tutorial
     if isHaveTutorial then
         -- echo(RedSummerCampCourseScheduling.show_lesson_classes,true)
         -- print("dddddddddddddddddd")
@@ -1145,6 +1145,10 @@ function RedSummerCampCourseScheduling.UpdateMyLessonAfterLearn()
         RedSummerCampCourseScheduling.show_lesson_list = {}
         for i,v in ipairs(tempCourse) do
             RedSummerCampCourseScheduling.show_lesson_list[#RedSummerCampCourseScheduling.show_lesson_list + 1] = v
+        end
+        if System.options.isDevMode then
+            print("dddddddddddddddddd")
+            echo(RedSummerCampCourseScheduling.show_lesson_list,true)
         end
         return 
     end

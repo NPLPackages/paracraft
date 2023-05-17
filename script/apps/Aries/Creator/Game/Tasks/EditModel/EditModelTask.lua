@@ -229,7 +229,7 @@ function EditModelTask:ShowPage()
 		window:Show({
 			name="EditModelTask", 
 			url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
-			alignment="_ctb", left=52, top= -110, width = 640, height = 96, parent = parent
+			alignment="_ctb", left=52, top= -110, width = 700, height = 96, parent = parent
 		});
 		window:SetUIScaling(1.5,1.5)
 		return 
@@ -238,7 +238,7 @@ function EditModelTask:ShowPage()
 	window:Show({
 		name="EditModelTask", 
 		url="script/apps/Aries/Creator/Game/Tasks/EditModel/EditModelTask.html",
-		alignment="_ctb", left=0, top= -55, width = 360, height = 64, parent = parent
+		alignment="_ctb", left=0, top= -55, width = 420, height = 64, parent = parent
 	});
 end
 

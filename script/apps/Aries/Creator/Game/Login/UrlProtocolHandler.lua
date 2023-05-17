@@ -39,10 +39,11 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 	local cmdline = cmdline or ParaEngine.GetAppCommandLine();
 	-- the c++ ConvertToCanonicalForm may replace : with space for standard command line
 	local urlProtocol = self:GetParacraftProtocol(cmdline);
+
 	if (urlProtocol) then
 		NPL.load("(gl)script/ide/Encoding.lua");
 		urlProtocol = commonlib.Encoding.url_decode(urlProtocol);
-		LOG.std(nil, "debug", "UrlProtocolHandler", "protocol "..self:GetProtocolName().."://%s", urlProtocol);
+		LOG.std(nil, "debug", "UrlProtocolHandler", "protocol " .. self:GetProtocolName() .. "://%s", urlProtocol);
 		local action_text = urlProtocol:match("action=(%w+)");
 
 		if (action_text == "runcode") then
@@ -105,12 +106,14 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 			RunWithResult()
 		end
 
-		local cmd_text = urlProtocol:match("cmd%(\"(.+)\"%)")
+		local cmd_text = urlProtocol:match("cmd%(\"(.+)\"%)");
+
 		if (cmd_text) then
-			if cmd_text:match("loadworld") then
+			if (cmd_text:match("loadworld")) then
 				System.options.cmdline_world = cmd_text;
-				if System.options.isDevMode then
-					print("hygg System.options.cmdline_world",System.options.cmdline_world)
+
+				if (System.options.isDevMode) then
+					LOG.std(nil, "info", "UrlProtocolHandler:ParseCommand", "System.options.cmdline_world: %s", System.options.cmdline_world);
 				end
 			else
 				local CommandManager = commonlib.gettable("MyCompany.Aries.Game.CommandManager");
@@ -120,6 +123,7 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 
 		-- paracraft://cmd/loadworld/[url or filename or id]
 		local cmdline_world = urlProtocol:match("cmd/loadworld[%s/]+([%S]*)");
+
 		if (cmdline_world) then
 			-- remote duplicated ? in url, just a quick client fix to keepwork url bug. 
 			cmdline_world = cmdline_world:gsub("^([^%?]*%?[^%?]*)(%?.*)$", "%1");
@@ -130,9 +134,11 @@ function UrlProtocolHandler:ParseCommand(cmdline)
 		end
 	
 		local cmdline_options = urlProtocol:match("cmd/edu_do_works[%s/]+([%S]*)");
-		if cmdline_options then
-			cmdline_options = cmdline_options:gsub("/$", "")
-			System.options.cmdline_world = "edu_do_works/"..cmdline_options
+
+		if (cmdline_options) then
+			cmdline_options = cmdline_options:gsub("/$", "");
+			System.options.cmdline_world = "edu_do_works/" .. cmdline_options;
+
 			if System.options.isDevMode then
 				print("pbb System.options.cmdline_world",System.options.cmdline_world)
 			end
@@ -143,6 +149,10 @@ end
 -- this will spawn a new process that request for admin right
 -- @param protocol_name: TODO: default to "paracraft"
 function UrlProtocolHandler:RegisterUrlProtocol(protocol_name)
+	if System.options.isPapaAdventure then
+		_guihelper.MessageBox(L"该客户端暂不支持此功能")
+		return 
+	end
 	local protocol_name = protocol_name or "paracraft";
 	local res = System.os([[reg query "HKCR\]]..protocol_name)
 	if(res and res:match("URL Protocol")) then
@@ -204,6 +214,9 @@ function UrlProtocolHandler:HasUrlProtocol(protocol_name)
 end
 
 function UrlProtocolHandler:CheckInstallUrlProtocol()
+	if System.options.isPapaAdventure then
+		return
+	end
 	local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 	local customInstallUrlProtocol = GameLogic.GetFilters():apply_filters("CheckInstallUrlProtocol", false)
 	
@@ -217,7 +230,7 @@ function UrlProtocolHandler:CheckInstallUrlProtocol()
 		print("CheckInstallUrlProtocol isFristLaunch",isFristLaunch,"customInstallUrlProtocol",customInstallUrlProtocol)
 	end
 	
-	if isFristLaunch or not customInstallUrlProtocol then
+	if not customInstallUrlProtocol then --isFristLaunch 不需要跟着版本
 		if(System.os.GetPlatform() == "win32" and not (System.options and (System.options.isFromQQHall or System.options.isSchool))) then
 			local bFound, exeName = self:HasUrlProtocol()
 			if System.options.isDevMode then

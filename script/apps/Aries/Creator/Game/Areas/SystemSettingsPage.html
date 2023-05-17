@@ -68,7 +68,9 @@ end
 function GetShaderDS()
     return SystemSettingsPage.shader_ds;
 end
-
+function GetStereoDS()
+    return SystemSettingsPage.stereoMode_ds;
+end
 
 function GetLimitValue(text)
     return commonlib.GetLimitLabel(text, 25)
@@ -123,7 +125,12 @@ end
                             <div style="height:25px;margin-top:13px;">
                                 <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"全屏显示" %></div>
                                 <div style="float:left;margin-top:-2px;margin-left:18px;">
-                                    <input name='btn_FullScreenMode' value='' type="button" onclick='SystemSettingsPage.OnClickEnableFullScreenMode' style="width:108px;height:29px;font-size:14px;" class="mc_light_grey_button_with_fillet"/>
+                                    <input name='btn_FullScreenMode'
+                                           value=''
+                                           type="button"
+                                           onclick='SystemSettingsPage.OnClickEnableFullScreenMode'
+                                           style="width:108px;height:29px;font-size:14px;"
+                                           class="mc_light_grey_button_with_fillet"/>
                                 </div>
                             </div>
                         </pe:if>
@@ -135,15 +142,13 @@ end
                                         <option value="3840 x 2160">3840X2160 (4K)</option>
                                         <option value="2560 x 1440">2560X1440 (2K)</option>
                                         <option value="1920 x 1080">1920X1080 (1080p)</option>
-                                        <option value="1280 x 720" selected="true">1280X720 (720p)</option>
                                         <option value="1600 x 1200">1600X1200 (UXGA)</option>
+                                        <option value="1280 x 720" selected="true">1280X720 (720p)</option>
                                         <option value="1024 x 768">1024X768 (XGA)</option>
-                                        <option value="2048 x 2048">2048X2048 (XGA)</option>
-                                        <option value="1024 x 1024">1024X1024 (XGA)</option>
-                                        <option value="1280 x 1280">1280X1280 (XGA)</option>
-                                        <option value="2160 x 1080">2160X1080 (XGA)</option>
-                                        <option value="2160 x 2160">2160X2160</option>
-                                        <option value="4320 x 4320">4320X4320</option>
+                                        <option value="8196 x 6148">8196X6148(8K 360)</option>
+                                        <option value="6144 x 4608">6144X4608(6K 360)</option>
+                                        <option value="4096 x 3072">4096X3072(4K 360)</option>
+                                        <option value="2048 x 1536">2048X1536(2K 360)</option>
                                     </select>
                                 </div>
                             </div>
@@ -186,7 +191,14 @@ end
                                 <div style="float:left;">
                                     <pe:sliderbar name="UI_Scaling" min="0.6" max='<%=SystemSettingsPage.GetMaxUIScale()%>' min_step="0.05" value="<%=SystemSettingsPage.GetDefaultUiScale() %>" button_bg="Texture/Aries/Creator/keepwork/setting/xiala2_12X20_32bits.png#0 0 12 20"  background="Texture/Aries/Creator/keepwork/setting/xiala1_16X8_32bits.png#0 0 16 8:6 2 6 2" style="height:22px;width:100px;" onchange="SystemSettingsPage.OnChangeUIScaling" />
                                 </div>
-                                <input type="button" style="margin-left:5px;width:39px; height: 18px; background: url(Texture/Aries/Creator/keepwork/setting/chongzhi_39X18_32bits.png#0 0 39 18);" name="orignalScaling" value='' onclick='SystemSettingsPage.OnClickResetUIScaling' />
+                                <input type="button"
+                                       style="margin-left: 5px;
+                                              width: 18px;
+                                              height: 18px;
+                                              background: url(Texture/Aries/Creator/keepwork/worldshare/main_login_buttons2_32bits.png#9 104 18 18);"
+                                       name="orignalScaling"
+                                       value=''
+                                       onclick='SystemSettingsPage.OnClickResetUIScaling' />
                             </div>
                         </div>
                         <pe:if condition='<%=not SystemSettingsPage.NeedShowViewBobbing() %>' >
@@ -207,13 +219,7 @@ end
                             <div style="float:left;margin-left:5px;width:90px;height:20px;text-align:left;font-size:14px;" ><%=L"立体输出" %></div>
                             <div style="float:left;margin-left:20px;">
                                 <pe:if condition='<%= System.os.GetPlatform()=="win32" %>'>
-                                    <select name="stereomode" AllowUserEdit="false" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 103px; height:28px" onselect="SystemSettingsPage.OnChangeStereoMode">
-                                        <option value="0" selected="true">Off</option>
-                                        <option value="2">Left/Right</option>
-                                        <option value="5">Red/Blue</option>
-                                        <option value="8">ODS SingleEye</option>
-                                        <!-- <option value="7">SingleEye old</option> -->
-                                    </select>
+                                    <select name="stereomode" AllowUserEdit="false" DataSource="<%=GetStereoDS()%>" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="height:28px" onselect="SystemSettingsPage.OnChangeStereoMode"></select>
                                 </pe:if>
                                 <pe:if condition='<%= System.os.GetPlatform()~="win32" %>'>
                                     <select name="stereomode" AllowUserEdit="false" dropX="-30" dropY="0" dropWidth="31" dropHeight="30" dropBg="Texture/Aries/Creator/keepwork/setting/shuru2_34X32_32bits.png#0 0 34 32" contentBg="Texture/Aries/Creator/keepwork/setting/shuru1_32X28_32bits.png#0 0 32 28:13 13 13 13" style="width: 103px; height:28px" onselect="SystemSettingsPage.OnChangeStereoMode">
@@ -276,7 +282,12 @@ end
                                 
                             </div>
                             <div style="float:left;margin-top:0px;margin-left:6px;">
-                                <input name="btn_ResetDevice" type="button" onclick="SystemSettingsPage.OnClickResetAudioDevice" style="width:39px; height: 18px; background: url(Texture/Aries/Creator/keepwork/setting/chongzhi_39X18_32bits.png#0 0 39 18);"/>
+                                <input name="btn_ResetDevice"
+                                       type="button"
+                                       onclick="SystemSettingsPage.OnClickResetAudioDevice"
+                                       style="width:18px;
+                                              height: 18px;
+                                              background: url(Texture/Aries/Creator/keepwork/worldshare/main_login_buttons2_32bits.png#9 104 18 18);"/>
                             </div>
                         </div>
                     </pe:if>
@@ -389,9 +400,12 @@ end
                         <div style="margin-top:12px;">
                             <input type="button" name="OpenBackupFolder" value='<%=L"打开世界备份目录" %>' style="font-weight: bold; font-size: 14px; width: 144px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);" onclick="SystemSettingsPage.OnOpenBackupFolder()" />
                         </div>
-                        <div style="margin-top:12px;">
-                            <input type="button" name="SetSchoolMode" value='<%=L"学校模式360天" %>' style="font-weight: bold; font-size: 14px; width: 144px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);" onclick="SystemSettingsPage.OnSetSchoolMode()" />
-                        </div>
+                        <pe:if condition='<%=System.options.channelId ~= "431" %>' >
+                            <div style="margin-top:12px;">
+                                <input type="button" name="SetSchoolMode" value='<%=L"学校模式360天" %>' style="font-weight: bold; font-size: 14px; width: 144px; height: 32px; background: url(Texture/Aries/Creator/keepwork/setting/btn_32X28_32bits.png#0 0 32 28:14 13 14 13);" onclick="SystemSettingsPage.OnSetSchoolMode()" />
+                            </div>
+                        </pe:if>
+                        
                         <div style="height:25px;margin-top:14px;">
                             <div style="float:left;margin-left:5px;width:140px;height:20px;text-align:left;font-size:14px;" ><%=L"保持电影方块窗口比例" %></div>
                             <div style="float:left;margin-top:-2px;margin-left:20px;">

@@ -88,7 +88,6 @@ function TeachingQuestTitle.OnWorldLoaded()
 					GameLogic.GetEvents():AddEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle, "TeachingQuestTitle");
 					GameLogic.GetEvents():AddEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle, "TeachingQuestTitle");
 					GameLogic.GetFilters():add_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
-					GameLogic.GetFilters():add_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
 					GameLogic.GetFilters():add_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback)
 				end, 1000)
 			else
@@ -163,16 +162,10 @@ function TeachingQuestTitle.OnShowEscFrame(bShow)
 	return bShow;
 end
 
-function TeachingQuestTitle.OnShowExitDialog(p1)
-	--TeachingQuestTitle.CreateOrGetBrowserPage():Close();
-	return p1;
-end
-
 function TeachingQuestTitle.OnKeepWorkLogout_Callback(res)
 	GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle);
 	GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle);
 	GameLogic.GetFilters():remove_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
-	GameLogic.GetFilters():remove_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
 	GameLogic.GetFilters():remove_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback);
 	if (page) then
 		page:CloseWindow();
@@ -411,7 +404,6 @@ function TeachingQuestTitle.OnReturn()
 		GameLogic.GetEvents():RemoveEventListener("DesktopMenuShow", TeachingQuestTitle.MoveDown, TeachingQuestTitle);
 		GameLogic.GetEvents():RemoveEventListener("CodeBlockWindowShow", TeachingQuestTitle.MoveLeft, TeachingQuestTitle);
 		GameLogic.GetFilters():remove_filter("OnShowEscFrame", TeachingQuestTitle.OnShowEscFrame);
-		GameLogic.GetFilters():remove_filter("ShowExitDialog", TeachingQuestTitle.OnShowExitDialog);
 		GameLogic.GetFilters():remove_filter("OnKeepWorkLogout", TeachingQuestTitle.OnKeepWorkLogout_Callback);
 		page:CloseWindow();
 		--GameLogic.RunCommand("/loadworld -force "..ParaWorldLoginAdapter.MainWorldId);

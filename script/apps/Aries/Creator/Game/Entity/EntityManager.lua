@@ -399,16 +399,15 @@ function EntityManager.SetMainPlayer(playerEntity)
 	end
 end
 
-function EntityManager.SaveAllPlayers()
+function EntityManager.SaveAllPlayers(parentDirectory)
 	local save_handler = GameLogic.GetSaveHandler();
 	local world = GameLogic.GetWorld();
 	if(save_handler and world) then
 		for name, player in pairs(players) do
-			save_handler:GetPlayerSaveHandler():WritePlayerData(player);
+			save_handler:GetPlayerSaveHandler():WritePlayerData(player, parentDirectory);
 		end
 	end
 end
-
 
 -- get player
 -- @param name: if nil or "player", the current player is returned. 
@@ -697,8 +696,9 @@ function EntityManager.GetRegion(bx,bz)
 	end
 end
 
-function EntityManager.SaveToFile(bSaveToLastSaveFolder)
-	local filename = format("%s%s", ParaWorld.GetWorldDirectory(), default_filename);
+-- @param parentDirectory: should be nil, unless you want to stage changes to another folder. 
+function EntityManager.SaveToFile(parentDirectory)
+	local filename = format("%s%s", parentDirectory or ParaWorld.GetWorldDirectory(), default_filename);
 
 	local root = {name='entities', attr={file_version="0.1"} }
 	local entity;
@@ -757,11 +757,16 @@ function EntityManager.SaveToFile(bSaveToLastSaveFolder)
 	
 	for _, region in pairs(regions) do
 		if(region:IsModified()) then
-			region:SaveToFile();
+			local filename;
+			if(parentDirectory) then
+				filename = region:ComputeRegionFilepath(parentDirectory);
+				ParaIO.CreateDirectory(filename)
+			end
+			region:SaveToFile(filename);
 		end
 	end
 
-	EntityManager.SaveAllPlayers();
+	EntityManager.SaveAllPlayers(parentDirectory);
 end
 
 -- @param chunkX, chunkZ: chunk pos, if chunkZ is nil, chunkX is packed index

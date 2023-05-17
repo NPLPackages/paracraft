@@ -290,7 +290,8 @@ function ClientUpdater:getLatestVersion()
 end
 
 function ClientUpdater:Restart()
-	print("hyz update log--------ClientUpdater 163")
+	LOG.std(nil, "info", "ClientUpdater", "Restart");
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/game_options.lua");
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Login/UrlProtocolHandler.lua");
 
@@ -300,10 +301,14 @@ function ClientUpdater:Restart()
 	local restartCmd = '';
 
 	if (urlProtocol and type(urlProtocol) == 'string') then
-		restartCmd = format('%s paraworldapp="%s" nplver="%s"', 'paracraft://' .. urlProtocol, self.appname, self:GetCurrentVersion())--ParaEngine.GetVersion()
+		restartCmd = format('%s paraworldapp="%s" nplver="%s"', 'paracraft://' .. urlProtocol, self.appname, self:GetCurrentVersion()) -- ParaEngine.GetVersion()
 	else
-		restartCmd = format('paraworldapp="%s" nplver="%s"', self.appname, self:GetCurrentVersion())--ParaEngine.GetVersion()
+		restartCmd = format('paraworldapp="%s" nplver="%s"', self.appname, self:GetCurrentVersion()) -- ParaEngine.GetVersion()
 	end
-	print("hyz update log--------ClientUpdater 177",self.appname,"restartCmd",restartCmd)
+
+	restartCmd = restartCmd .. " default_ui_scaling=\"" .. System.options.default_ui_scaling[1] .. "\"";
+
+	LOG.std(nil, "info", "ClientUpdater", "%s %s %s", self.appname, "restartCmd: ", restartCmd);
+
 	ParaWorldLoginDocker.Restart(self.appname, restartCmd);
 end

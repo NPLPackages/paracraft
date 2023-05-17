@@ -66,6 +66,7 @@ function FillLine:Run()
 		GameLogic.PlayAnimation({animationName = "Create",facingTarget = {x=tx, y=ty, z=tz},});
 
 		TaskManager.AddTask(self);
+		GameLogic.SetModified();
 	end	
 end
 

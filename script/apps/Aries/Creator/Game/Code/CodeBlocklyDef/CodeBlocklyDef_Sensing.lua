@@ -407,6 +407,7 @@ end
 	examples = {{desc = "", canRun = true, code = [[
 ask("what is your name")
 say("hello "..tostring(answer), 2)
+ask("use true for multiline text", true)
 
 ask("select your choice", {"choice A", "choice B"})
 if(answer == 1) then

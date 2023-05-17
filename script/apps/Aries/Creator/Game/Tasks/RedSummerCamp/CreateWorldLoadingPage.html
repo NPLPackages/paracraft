@@ -1,0 +1,53 @@
+﻿<!-- "script/apps/Aries/Creator/Game/Tasks/Quest/CreateWorldLoadingPage.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+</head>
+<body>
+<pe:mcml>
+<script refresh="true" type="text/npl" src="CreateWorldLoadingPage.lua"><![CDATA[
+local CreateWorldLoadingPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/CreateWorldLoadingPage.lua");
+CreateWorldLoadingPage.OnInit()
+function ClosePage()
+    CreateWorldLoadingPage.CloseView()
+end
+
+function GetDesc1()
+    return CreateWorldLoadingPage.GetDesc1()
+end
+
+function GetDesc2()
+    return CreateWorldLoadingPage.GetDesc2()
+end
+]]></script>
+<kp:window name="iframe" width="760" height="364">
+    <div style="position: relative;color: #ffffff;font-size: 24px;margin-top: 2px;margin-left: 15px;font-weight: bold;">信息</div>
+    <div style="margin-top: 90px;color:#333333;text-align: center;font-size: 24px;height: 30px;font-weight: bold;"><%=GetDesc1()%></div>
+
+    <div style="margin-left: 140px;margin-top: 30px;">
+        <pe:container name="block_icon_1" visible="false" style="float: left;margin-left: 0px; width: 64px;height: 64px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/createworld/icon100_32bits.png#0 0 64 64) ">
+        </pe:container>
+        <pe:container name="block_icon_2" visible="false" style="float: left;margin-left: 16px; width: 64px;height: 64px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/createworld/icon101_32bits.png#0 0 64 64) ">
+        </pe:container>
+        <pe:container name="block_icon_3" visible="false" style="float: left;margin-left: 16px; width: 64px;height: 64px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/createworld/icon104_32bits.png#0 0 64 64) ">
+        </pe:container>
+        <pe:container name="block_icon_4" visible="false" style="float: left;margin-left: 16px; width: 64px;height: 64px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/createworld/icon106_32bits.png#0 0 64 64) ">
+        </pe:container>
+        <pe:container name="block_icon_5" visible="false" style="float: left;margin-left: 16px; width: 64px;height: 64px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/createworld/icon107_32bits.png#0 0 64 64) ">
+        </pe:container>
+        <pe:container name="block_icon_6" visible="false" style="float: left;margin-left: 16px; width: 64px;height: 64px;background:url(Texture/Aries/Creator/keepwork/RedSummerCamp/createworld/icon202_32bits.png#0 0 64 64) ">
+        </pe:container>
+    </div>
+
+    <div style="margin-top: 33px;color:#333333;text-align: center;font-size: 16px;height: 20px;"><%=L"世界创建中，请耐心等待..."%></div>
+
+    <div style="margin-top: 22px;color:#333333;text-align: center;font-size: 16px;height: 20px;"><%=GetDesc2()%></div>
+</kp:window>
+
+    
+</pe:mcml>
+</body>
+</html>
+

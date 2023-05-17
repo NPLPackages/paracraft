@@ -1887,6 +1887,53 @@ local str = [[
 	examples = {},
 },
 
+{
+	type = "getUrl", 
+	message0 = L"获取URL %1", 
+	arg0 = {
+		{
+			name = "url_params",
+			type = "input_value",
+			text = L"https://", 
+			shadow = { type = "text", value = "https://",},
+		},
+	},
+	category = "Data", 
+	helpUrl = "", 
+	canRun = false,
+	output = {type = "field_number",},
+	funcName = "getUrl",
+	func_description = 'getUrl(%s)',
+	ToNPL = function(self)
+		return string.format('getUrl("%s")', self:getFieldAsString('url_params'));
+	end,
+	examples = {{desc = "", canRun = true, code = [[
+-- get URL synchronously
+local data, err, msg = getUrl("https://api.keepwork.com/version-control/version.xml")
+if(data) then
+	echo(data)
+	echo({err==200, msg.data == data, msg.header})
+end
+
+-- get URL asynchronously
+getUrl("https://api.keepwork.com/version-control/version.xml", function(data, err, msg)
+	echo(data)
+end)
+
+-- get with form params and return json object
+local data, err, msg = getUrl({
+    url="https://openaiproxy.keepwork.com/v1/chat/completions",
+    form={
+        messages={ { content="hello", role="user" } },
+        model="gpt-3.5-turbo" 
+    },
+    headers={ Authorization="Bearer YOUR_API_KEY" },
+})
+echo(data)
+]]},
+},
+},
+
 };
 function CodeBlocklyDef_Data.GetCmds()
 	return cmds;

@@ -114,6 +114,7 @@ function Entity:OpenEditor(editor_name, entity)
 		EntityManager.SetLastTriggerEntity(nil);
 		self:EndEdit();
 	end
+	GameLogic.SetModified();
 end
 
 function Entity:GetCheckpointName()

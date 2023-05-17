@@ -135,7 +135,7 @@ function ClientUpdater430:downloadManifest(callback)
             local delete_list = {}
             if(err == 200 and data)then
                 local tempFile = ParaIO.GetWritablePath().."temp_"..file_name;
-                local CommonLib = NPL.load("Mod/GeneralGameServerMod/CommonLib/CommonLib.lua");
+                local CommonLib = NPL.load("(gl)script/ide/System/Util/CommonLib.lua");
                 CommonLib.WriteFile(tempFile,data)
                 local md5 = CommonLib.GetFileMD5(tempFile)
                 if md5==file_md5 then

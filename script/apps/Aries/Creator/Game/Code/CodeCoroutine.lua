@@ -24,6 +24,9 @@ CodeCoroutine:Signal("finished");
 -- for debugging purposes
 CodeCoroutine:Property({"description", nil, "GetDescription", "SetDescription", auto=true});
 
+-- set this to false, if yielding from xpcall() is not possible, such as in emscripten web asm vm. 
+local bCanYieldFromXPCall = ParaEngine.hasFFI == true;
+
 function CodeCoroutine:ctor()
 end
 
@@ -99,6 +102,23 @@ function CodeCoroutine:MakeCallbackFuncAsync(callbackFunc)
 				end
 			end	
 		end, 0)
+	end
+end
+
+-- this function is the recommended method to use in code block for callback to prevent yielding from C-Call boundary. 
+-- @important: this function should be called inside coroutine.
+-- @param callbackFunc: this function is called with run(callbackFunc) in code block.
+function CodeCoroutine:MakeCallbackFuncAsyncRun(callbackFunc)
+	return function(p1, p2, p3, p4, p5)
+		if(type(callbackFunc) == "function") then
+			local co = CodeCoroutine:new():Init(self:GetCodeBlock());
+			co:SetActor(self.actor);
+			co:SetFunction(function()
+				callbackFunc(p1, p2, p3, p4, p5);
+			end);
+			co:Run();
+			self:SetCurrentCodeContext();
+		end
 	end
 end
 
@@ -331,5 +351,52 @@ end
 function CodeCoroutine:Yield()
 	if(self.co) then
 		return coroutine.yield();
+	end
+end
+
+-- unforturnately, we can not yield from xpcall(C call) boundary in coroutine if luajit or lua coco is not available such as in web asm virtual machine.  
+-- we can not print full stack when there is an error. luajit support yielding from pcall(), but not other C function. Lua coco is disabled in luajit too. 
+if(not bCanYieldFromXPCall) then
+	LOG.std(nil, "info", "CodeCoroutine", "yield from pcall is not supported. Codeblock stack trace can only show 1 level", result, lastErrorCallstack);
+	function CodeCoroutine:RunImp(msg)
+		local code_func = self.code_func;
+		if(code_func) then
+			return code_func(msg)
+		end
+	end
+
+	function CodeCoroutine:Resume(err, msg, p3, p4)
+		if(self.co and not self.isStopped) then
+			self:SetCurrentCodeContext();
+			local ok, result, r2, r3, r4 = coroutine.resume(self.co, err, msg, p3, p4);
+			if(not ok) then
+				lastErrorCallstack = ""
+				if(result:match("_stop_all_")) then
+					self:GetCodeBlock():StopAll();
+				elseif(result:match("_terminate_")) then
+					-- terminate only the coroutine
+				elseif(result:match("_restart_all_")) then
+					self:GetCodeBlock():RestartAll();
+				else
+					LOG.std(nil, "error", "CodeCoroutine", "%s\n%s", result, lastErrorCallstack);
+					local msg = format(L"运行时错误: %s\n在%s", self:GetCodeBlock():BeautifyRuntimeErrorMsg(tostring(result)), self:GetCodeBlock():GetFilename());
+					self:GetCodeBlock():send_message(msg, "error");
+					if not string.match(result,"_block%(%d+, %d+, %d+%)") then --代码方块的直接报错不进行上报
+						local ParacraftDebug = commonlib.gettable("MyCompany.Aries.Game.Common.ParacraftDebug");
+						ParacraftDebug:SendErrorLog("NplRuntimeError", {
+							errorMessage = msg,
+							stackInfo = lastErrorCallstack,
+						})
+					end
+				end
+				-- mark as finished and disconnect
+				self:SetFinished();
+				self.codeBlock:Disconnect("beforeStopped", self, self.Stop);
+				if(self.actor) then
+					self.actor:Disconnect("beforeRemoved", self, self.Stop);
+				end
+			end
+			return ok, result, r2, r3, r4
+		end
 	end
 end

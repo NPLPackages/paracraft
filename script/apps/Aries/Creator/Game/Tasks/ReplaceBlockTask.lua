@@ -54,6 +54,7 @@ function ReplaceBlock:Run()
 	if(self.radius and self.blockX and self.mode=="all" and self.from_id and self.to_id) then
 		if(self:ReplaceBlockInRegion(self.blockX,self.blockZ, self.radius or 256, self.from_id, self.to_id) > 0) then
 			TaskManager.AddTask(self);
+			GameLogic.SetModified();
 		end
 	elseif(next(self.blocks) and self.to_id) then
 		local _, block
@@ -61,6 +62,7 @@ function ReplaceBlock:Run()
 			self:ReplaceBlock(block[1], block[2], block[3]);
 		end
 		TaskManager.AddTask(self);
+		GameLogic.SetModified();
 	elseif(self.blockX and self.to_id) then
 		if(not self.from_id) then
 			self.from_id, self.from_data = BlockEngine:GetBlockFull(self.blockX, self.blockY, self.blockZ);
@@ -73,6 +75,7 @@ function ReplaceBlock:Run()
 				local tx, ty, tz = BlockEngine:real(self.blockX,self.blockY,self.blockZ);
 				GameLogic.PlayAnimation({animationName = "Create",facingTarget = {x=tx, y=ty, z=tz},});
 				TaskManager.AddTask(self);
+				GameLogic.SetModified();
 			end
 		end
 	end

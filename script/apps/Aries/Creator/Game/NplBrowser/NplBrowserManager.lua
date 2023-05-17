@@ -17,6 +17,7 @@ NplBrowserManager:CreateOrGet("DailyCheckBrowser"):Show("https://keepwork.com", 
 NplBrowserManager:CreateOrGet("DailyCheckBrowser"):GotoEmpty()
 -------------------------------------------------------
 ]]
+local NplBrowserPlugin = commonlib.gettable("NplBrowser.NplBrowserPlugin");
 local NplBrowserFrame = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserFrame.lua");
 local NplBrowserManager = NPL.export();
 NplBrowserManager.browser_pages = {};
@@ -106,10 +107,12 @@ end
 
 function NplBrowserManager:PauseVideo()
 	self.IsVideoPaused = true
+	NplBrowserPlugin.NPL_Activate(nil, "video.page", {cmd="pause"})
 end
 
 function NplBrowserManager:PlayVideo()
 	self.IsVideoPaused = false
+	NplBrowserPlugin.NPL_Activate(nil, "video.page", {cmd="play"})
 end
 
 function NplBrowserManager:ClearVideoPausedState()

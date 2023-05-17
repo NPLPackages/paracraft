@@ -51,6 +51,7 @@ function OffsetWorldTask:Run()
 		self:EndProcess();
 	end})
 	mytimer:Change(1000, nil);
+	GameLogic.SetModified();
 end
 
 function OffsetWorldTask:BeginProcess()

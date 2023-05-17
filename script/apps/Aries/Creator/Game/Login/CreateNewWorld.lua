@@ -84,52 +84,70 @@ function CreateNewWorld.OnInit()
 	end	
 end
 
+
+function CreateNewWorld.ShowView(is_only_close)
+	CreateNewWorld.is_only_close = is_only_close
+	local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
+	if (isCustomShow == "show") then
+		local url = System.options.channelId_431 and "script/apps/Aries/Creator/Game/Educate/Other/CreateNewWorld.html" or "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html"
+		local params = {
+			url = url,
+			name = "CreateMCNewWorld", 
+			isShowTitleBar = false,
+			DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
+			style = CommonCtrl.WindowFrame.ContainerStyle,
+			zorder = 0,
+			allowDrag = false,
+			directPosition = true,
+			align = "_fi",
+			x = 0,
+			y = 0,
+			width = 0,
+			height = 0,
+			cancelShowAnimation = true,
+		}
+		params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"CreateNewWorld");
+		System.App.Commands.Call(
+			"File.MCMLWindowFrame",
+			params
+		);
+	end
+end
+
 -- show page
 -- is_close:is only close page when click retturn button
 function CreateNewWorld.ShowPage(is_only_close)
 	if (GameLogic.GetFilters():apply_filters('is_signed_in')) then
-		GameLogic.GetFilters():apply_filters(
-            "service.keepwork_service_world.limit_free_user",
+		if System.options.isPapaAdventure then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
+			local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+			PapaAPI:CreateWorldInWorld()
+			return
+		end
+		if System.options.channelId_431 or System.options.channelId_tutorial then
+			CreateNewWorld.ShowView(is_only_close)
+			return 
+		end
+		GameLogic.GetFilters():apply_filters("service.keepwork_service_world.limit_free_user",
             false,
             function(result)
                 if result then
-                    CreateNewWorld.is_only_close = is_only_close
-					local isCustomShow = GameLogic.GetFilters():apply_filters("show_custom_create_new_world", "show");
-					if (isCustomShow == "show") then
-						local url = System.options.channelId_431 and "script/apps/Aries/Creator/Game/Educate/Other/CreateNewWorld.html" or "script/apps/Aries/Creator/Game/Login/CreateNewWorld.html"
-						local params = {
-							url = url,
-							name = "CreateMCNewWorld", 
-							isShowTitleBar = false,
-							DestroyOnClose = true, -- prevent many ViewProfile pages staying in memory
-							style = CommonCtrl.WindowFrame.ContainerStyle,
-							zorder = 0,
-							allowDrag = false,
-							directPosition = true,
-							align = "_fi",
-							x = 0,
-							y = 0,
-							width = 0,
-							height = 0,
-							cancelShowAnimation = true,
-						}
-						params =  GameLogic.GetFilters():apply_filters('GetUIPageHtmlParam',params,"CreateNewWorld");
-						System.App.Commands.Call(
-							"File.MCMLWindowFrame",
-							params
-						);
-					end
+                    CreateNewWorld.ShowView(is_only_close)
                 else
                     GameLogic.ShowVipGuideTip("UnlimitWorldsNumber")
                 end
             end
         );
 	else
-		GameLogic.CheckSignedIn(L"请先登录！", function(bSucceed)
-			if bSucceed then
-				CreateNewWorld.ShowPage(is_only_close);
-			end
-		end);
+		if(System.options.DisableOfflineMode) then
+			GameLogic.CheckSignedIn(L"请先登录！", function(bSucceed)
+				if bSucceed then
+					CreateNewWorld.ShowPage(is_only_close);
+				end
+			end);
+		else
+			CreateNewWorld.ShowView(is_only_close)
+		end
 	end
 end
 
@@ -305,7 +323,7 @@ function CreateNewWorld.OnClickCreateWorld()
 	local world_name = CreateNewWorld.page:GetValue("new_world_name") or CreateNewWorld.default_worldname;
 	local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString(world_name);
     if temp~=world_name then 
-        _guihelper.MessageBox(L"世界名包含敏感词，请重新输入");
+        _guihelper.MessageBox(L"该世界名称不可用，请重新设定");
         return
     end
 	local item = CreateNewWorld.cur_terrain;
@@ -417,7 +435,8 @@ function CreateNewWorld.CreateWorld(values)
 		local worldpath = (worldfolder..worldname);
 		
 		-- create a new world
-		local res = System.CreateWorld(worldpath, parentworld, inherit_char, inherit_scene, true);
+		local bOverwriteExisting = true;
+		local res = System.CreateWorld(worldpath, parentworld, inherit_char, inherit_scene, true, bOverwriteExisting);
 		if(res == true) then
 			local file = ParaIO.open(worldpath.."/tag.xml", "w");
 			if(file:IsValid()) then

@@ -158,8 +158,7 @@ end
 
 function ParaWorldMinimapWnd.OnClickMapName()
 	if (ParaWorldMinimapWnd.nameMap and ParaWorldMinimapWnd.userId) then
-		local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-		page.ShowUserInfoPage({userId = ParaWorldMinimapWnd.userId});
+		GameLogic.ShowUserInfoPage({userId = ParaWorldMinimapWnd.userId});
 	end
 end
 

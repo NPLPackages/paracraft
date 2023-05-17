@@ -87,6 +87,8 @@ System.options.open_resolution = ParaEngine.GetAppCommandLineByParam("resolution
 
 System.options.cmdline_world = System.options.cmdline_world or ParaEngine.GetAppCommandLineByParam("world","");
 
+System.options.cmdline_username = System.options.cmdline_world or ParaEngine.GetAppCommandLineByParam("username","");
+
 System.options.isCodepku = (ParaEngine.GetAppCommandLineByParam("isCodepku", "false") == "true");
 
 System.User = System.User or {};
@@ -96,14 +98,22 @@ if (not System.User.keepworktoken) then
 end
 
 System.options.default_ui_scaling = {};
-ParaUI.GetUIObject("root"):GetField("UIScale", System.options.default_ui_scaling);
+
+if (ParaEngine.GetAppCommandLineByParam("default_ui_scaling", "") ~= "") then
+	local default_ui_scaling = tonumber(ParaEngine.GetAppCommandLineByParam("default_ui_scaling", ""));
+	System.options.default_ui_scaling[1] = default_ui_scaling;
+	System.options.default_ui_scaling[2] = default_ui_scaling;
+else
+	ParaUI.GetUIObject("root"):GetField("UIScale", System.options.default_ui_scaling);
+end
 
 --430开关
 System.options.isChannel_430 = (System.options.channelId=="430");
 System.options.channelId_tutorial = System.options.channelId =="tutorial";
 System.options.channelId_431 = System.options.channelId =="431";
+System.options.isPapaAdventure = (System.options.channelId_tutorial and System.options.isDevMode) or System.options.channelId =="papa";
 
-if (System.options.isChannel_430) then
+if (System.options.isChannel_430 or System.options.channelId_431 or System.options.isPapaAdventure) then
 	System.options.isHideVip = true;
 end
 
@@ -500,11 +510,11 @@ local function Aries_load_config(filename)
 		end
 	end
 
-	-- force debugger interface at startup
-	local force_http = true
-	local httpdebug = ParaEngine.GetAppCommandLineByParam("httpdebug", "") == "true"
-	if force_http or httpdebug then
-		if httpdebug then
+	-- force debugger interface at startup for video page. 
+	local force_http = not System.options.channelId_tutorial and System.os.GetPlatform() ~= 'win32';
+	System.options.httpdebug = ParaEngine.GetAppCommandLineByParam("httpdebug", "") == "true"
+	if force_http or System.options.httpdebug then
+		if System.options.httpdebug then
 			LOG.SetLogLevel("DEBUG");
 		end
 		
@@ -513,7 +523,8 @@ local function Aries_load_config(filename)
 		NPL.load("(gl)script/apps/WebServer/WebServer.lua");
 		local att = NPL.GetAttributeObject();
 		if (not att:GetField("IsServerStarted", false) and not System.os.IsEmscripten()) then
-			local function TestOpenNPLPort_(test_port)
+			local TestOpenNPLPort_;
+			TestOpenNPLPort_ = function(test_port)
 				System.os.GetUrl(format("http://127.0.0.1:%s/ajax/console?action=getpid", test_port or port), function(err, msg, data)
 					if (data and data.pid) then
 						if (System.os.GetCurrentProcessId() ~= data.pid) then
@@ -542,7 +553,33 @@ local function Aries_load_config(filename)
 					end
 				end);
 			end
-			TestOpenNPLPort_();
+			local USE_NPL_GET_PID = false
+			if(USE_NPL_GET_PID or not ParaGlobal.IsPortAvailable) then
+				TestOpenNPLPort_();
+			else
+				for i = 1, 20 do
+					if(ParaGlobal.IsPortAvailable(host, port)) then
+						WebServer:StopServer();
+						WebServer:Start("script/apps/WebServer/admin", host, port);	
+						commonlib.TimerManager.SetTimeout(function()
+							System.os.GetUrl(format("http://127.0.0.1:%s/ajax/console?action=getpid", port), function(err, msg, data)
+								if (data and data.pid) then
+									if (System.os.GetCurrentProcessId() == data.pid) then
+										-- already opened by the same process
+										LOG.std(nil, "info", "WebServer", "NPL Network Layer started success  %s:%d", host, port);
+									else
+										LOG.std(nil, "error", "WebServer", "NPL network layer already started by another application, ");
+									end
+								else
+									LOG.std(nil, "error", "WebServer", "failed to start NPL Network Layer!");
+								end
+							end);
+						end, 100); 
+						break
+					end
+					port = port + 1
+				end
+			end
 		end
 	elseif (System.options.version == 'kids' or System.options.version == 'teen') then
 		
@@ -768,7 +805,7 @@ local function Aries_Init()
 	if (System.options.mc) then
 		local platform = System.os.GetPlatform();
 
-		if (platform == "win32" or platform == "mac") then
+		if (platform == "win32") then
 			System.options.appId = "paracraft";
 		else
 			if (platform ~= "mac" and platform ~= "ios") then

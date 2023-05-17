@@ -58,7 +58,8 @@ function WorldInfo:LoadFromXMLNode(node)
 		self.materialName = self.materialName or ""
 		self.classroomId = self.classroomId or ""
 		self.sectionContentId = self.sectionContentId or ""
-		-- web课程相关 end		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
+		-- web课程相关 end		
+		GameLogic.GetFilters():apply_filters("load_world_info", self, node);
 	end
 end
 

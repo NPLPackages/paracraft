@@ -597,6 +597,7 @@ function Entity:OpenEditor(editor_name, entity)
 			end
 		end
 	end
+	GameLogic.SetModified();
 end
 
 -- virtual function: get array of item stacks that will be displayed to the user when user try to create a new item. 

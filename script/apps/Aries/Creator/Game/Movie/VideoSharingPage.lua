@@ -272,7 +272,7 @@ function VideoSharingPage.on_click_save_name()
     -- 客户端处理铭感词
     local temp = MyCompany.Aries.Chat.BadWordFilter.FilterString(temp_modify_worldname);
     if temp~=temp_modify_worldname then 
-        _guihelper.MessageBox(L"世界名包含敏感词，请重新修改");
+        _guihelper.MessageBox(L"该世界名称不可用，请重新设定");
         return
     end
     -- print("temp_modify_worldname",temp_modify_worldname)

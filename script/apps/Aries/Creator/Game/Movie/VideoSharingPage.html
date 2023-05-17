@@ -138,52 +138,49 @@ end
                         <label name="text_remoteVersion" value='<%=L"在线版本:" .. L"无" %>' style=' color: #181818'>
                         </label>
                     </div>
-                    <div onclick='VideoSharingPage.Snapshot()' style="margin-top: 41px;font-size: 15px;base-font-size:15px;color: #44C1EF;" tooltip='<%= L"重新截图" %>' >
-                        重新截图
+                    <div onclick='VideoSharingPage.Snapshot()' style="margin-top: 41px;font-size: 15px;base-font-size:15px;color: #44C1EF;" tooltip='<%= L"重新截图" %>'>
+                        <%= L'重新截图' %>
                         <div style="margin-top: -3px;margin-left: 2px; width:60px;height: 2px;background-color: #44C1EF;"></div>
                     </div>
                 </div>
             </div>
             <div style="position: relative;">
-                <div style="background-color: #ff000000;margin-top: 20px;" width="350" height="50">
+                <div style="background-color: #ff000000;margin-top: 20px;" height="50">
                     <div valign="center" height="50" style='float:left;min-width: 90px;font-size: 19px;base-font-size:19px; color: #181818;font-weight: bold; margin-top: 11px;'>
                         <%= L'短视频' %>
                     </div>
                     <input type='button' uiname="btn_record_1" name="btn_record_1" onclick='VideoSharingPage.on_btn_click()' value='<%= L"开始录制" %>' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45);
-                                            float:left; width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
+                                            float:left; min-width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
                     <pe:if condition='<%= VideoSharingPage.hasVideo %>'>
-                        <input type='button' uiname="btn_download_1" name="btn_download_1" onclick='VideoSharingPage.on_btn_click()' value='<%= L"下载" %>' style='margin-left: 20px; background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45);
-                                            float:left; width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
+                        <input type='button' uiname="btn_download_1" name="btn_download_1" onclick='VideoSharingPage.on_btn_click()' value='<%= L"下载" %>' style='margin-left: 20px; background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45); float: left; min-width: 102px; height: 45px; font-weight: bold; font-size: 15px; base-font-size: 15px;' />
                     </pe:if>
                     <pe:if condition='<%= not VideoSharingPage.hasVideo %>'>
-                        <div tooltip='<%=L"视频未生成，无法下载"%>'  style='background: url(); float:left; width: 102px;height: 45px;margin-left: 20px; ' >
+                        <div tooltip='<%=L"视频未生成，无法下载"%>'  style='background: url(); float:left; min-width: 102px;height: 45px;margin-left: 20px; ' >
                             <div style="width: 102px;height: 45px;background: url(Texture/Aries/Creator/keepwork/VideoShare/anniuhui_102x45_32bits.png#0 0 102 45);">
                                
                                 <label style="font-weight: bold;font-size: 15px;base-font-size:15px;color:#000000;text-align: center;margin-top: 10px;" value='<%= L"下载" %>'></label>
                             </div>
                         </div>
                     </pe:if>
-                    
                 </div>
-                <div style="background-color: #ff000000;margin-top: 0px;" width="350" height="50">
+                <div style="background-color: #ff000000;margin-top: 0px;" height="50">
                     <div valign="center" height="50" style='float:left;min-width: 90px;font-size: 19px;base-font-size:19px; color: #181818;font-weight: bold; margin-top: 11px;'>
                         <%= L'全景图' %>
                     </div>
                     <input type='button' uiname="btn_record_2" name="btn_record_2" onclick='VideoSharingPage.on_btn_click()' value='<%= L"开始录制" %>' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45);
-                                            float:left; width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
+                                            float:left; min-width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
                 </div>
-                <div style="background-color: #ff000000;margin-top: 0px;" width="350" height="50">
+                <div style="background-color: #ff000000;margin-top: 0px;" height="50">
                     <div valign="center" height="50" style='float:left;min-width: 90px;font-size: 19px;base-font-size:19px; color: #181818;font-weight: bold; margin-top: 11px;'>
                         <%= L'精彩回放' %>
                     </div>
                     <pe:if condition='<%= VideoSharingPage.hasAutoVideo %>'>
                         <input type='button' uiname="btn_download_3" name="btn_download_3" onclick='VideoSharingPage.on_btn_click()'  value='<%= L"下载" %>' style='background: url(Texture/Aries/Creator/keepwork/VideoShare/anniu_102x45_32bits.png#0 0 102 45);
-                                            float:left; width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
+                                            float:left; min-width: 102px;height: 45px;font-weight: bold;font-size: 15px;base-font-size:15px;' />
                     </pe:if>
                     <pe:if condition='<%= not VideoSharingPage.hasAutoVideo %>'>
-                        <div tooltip='<%=L"视频未生成，无法下载"%>'  style='background: url(); float:left; width: 102px;height: 45px;' >
-                            <div style="width: 102px;height: 45px;background: url(Texture/Aries/Creator/keepwork/VideoShare/anniuhui_102x45_32bits.png#0 0 102 45);">
-                               
+                        <div tooltip='<%=L"视频未生成，无法下载"%>'  style='background: url(); float: left; min-width: 102px; height: 45px;' >
+                            <div style="width: 102px; height: 45px; background: url(Texture/Aries/Creator/keepwork/VideoShare/anniuhui_102x45_32bits.png#0 0 102 45);">
                                 <label style="font-weight: bold;font-size: 15px;base-font-size:15px;color:#000000;text-align: center;margin-top: 10px;" value='<%= L"下载" %>'></label>
                             </div>
                         </div>
@@ -191,7 +188,7 @@ end
                     
                     <div style="float:left;margin-top: 10px;margin-left: 26px;">                
                         <input type="checkbox" name = "check_autovideo" onclick="VideoSharingPage.on_check_autovideo()" style="float: left; margin-top: 4px; width:14px;height:14px;" UncheckedBG="Texture/Aries/Creator/keepwork/VideoShare/gouxuan_15x15_32bits.png#0 0 15 15" CheckedBG="Texture/Aries/Creator/keepwork/VideoShare/duigou_15x15_32bits.png#0 0 15 15"/>
-                        <div onclick="VideoSharingPage.on_check_autovideo()" style="float: left;margin-left: 5px;margin-top: 0px;width: 100px;height: 30px; color: #676767;" >
+                        <div onclick="VideoSharingPage.on_check_autovideo()" style="float: left;margin-left: 5px;margin-top: 0px;height: 30px; color: #676767;" >
                             <%=L"自动生成回放"%>
                         </div>
                     </div>

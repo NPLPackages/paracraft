@@ -23,6 +23,8 @@ local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 
 local SwitchTo430ChannelPage = commonlib.gettable("MyCompany.Aries.Game.MainLogin.SwitchTo430ChannelPage")
 
+local launcherExeName = System.options.launcherExeName or "ParaCraft.exe"
+
 SwitchTo430ChannelPage.page = nil;
 
 function SwitchTo430ChannelPage.OnInit()
@@ -62,23 +64,23 @@ function SwitchTo430ChannelPage.MakeRepairBat()
         local str = [[
             start %s isFixMode=true
         ]]
-        str = string.format(str,System.options.launcherExeName)
+        str = string.format(str,launcherExeName)
         file:WriteString(str);
         file:close();
     end
 end
 
 function SwitchTo430ChannelPage:download430launcher(callback)
-    local launchanerUrl = string.format("https://cdn.keepwork.com/paracraft/win32/%s",System.options.launcherExeName);
+    local launchanerUrl = string.format("https://cdn.keepwork.com/paracraft/win32/%s",launcherExeName);
     print("launchanerUrl",launchanerUrl)
     local fileDownloader = FileDownloader:new();
     fileDownloader.isSilent = true;
 
     GameLogic.GetFilters():apply_filters("cellar.common.msg_box.show", L"正在下载校园版启动器...", 120000, nil, 350);
 
-    local exeFile = ParaIO.GetWritablePath()..System.options.launcherExeName;
-    local exeFilebak = ParaIO.GetWritablePath()..string.format("temp/%s.bak",System.options.launcherExeName);
-    local exeFileTmp = ParaIO.GetWritablePath()..string.format("%s.tmp",System.options.launcherExeName);
+    local exeFile = ParaIO.GetWritablePath()..launcherExeName ;
+    local exeFilebak = ParaIO.GetWritablePath()..string.format("temp/%s.bak",launcherExeName);
+    local exeFileTmp = ParaIO.GetWritablePath()..string.format("%s.tmp",launcherExeName);
     ParaIO.DeleteFile(exeFileTmp)
     commonlib.TimerManager.SetTimeout(function()
         fileDownloader:Init(nil, launchanerUrl, exeFileTmp, function(result)

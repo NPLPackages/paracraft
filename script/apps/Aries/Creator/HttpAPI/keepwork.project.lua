@@ -24,6 +24,10 @@ HttpWrapper.Create("keepwork.project.favorite_search", "%MAIN%/core/v0/favorites
 --更新项目
 HttpWrapper.Create("keepwork.project.update", "%MAIN%/core/v0/projects/:id", "PUT", true);
 
+--http://yapi.kp-para.cn/project/32/interface/api/752
+--获得项目信息
+HttpWrapper.Create("keepwork.project.get", "%MAIN%/core/v0/projects/:id/detail", "GET", true);
+
 
 --世界相关
 --http://yapi.kp-para.cn/project/32/interface/api/1217
@@ -47,12 +51,17 @@ status	number	非必须 完成状态: 1.完成
 projectId	number	非必须 世界id]]
 HttpWrapper.Create("keepwork.edu.updateSectionContents", "%MAIN%/edu/v0/classroomStudents/sectionContents", "POST", true);
 
-
 --获取可用容量
 --http://yapi.kp-para.cn/project/655/interface/api/5823
 HttpWrapper.Create("keepwork.world.gettotalsize", "%MAIN%/edu/v0/users/onlineDisks", "GET", true);
 
 --可用容量-检查是否可以上传
---http://yapi.kp-para.cn/project/655/interface/api/5824
---[[projectId	无projectId则为创建新世界 fileSize]]
-HttpWrapper.Create("keepwork.world.checkupload", "%MAIN%/edu/v0/users/onlineDisks/check", "GET", true);
+if System.options.isPapaAdventure then
+    --[[fileSize]]
+    --http://yapi.kp-para.cn/project/1952/interface/api/5946
+    HttpWrapper.Create("keepwork.world.checkupload", "%MAIN%/client-marketing/users/onlineDisks/check", "GET", true);
+else
+    --http://yapi.kp-para.cn/project/655/interface/api/5824
+    --[[projectId	无projectId则为创建新世界 fileSize]]
+    HttpWrapper.Create("keepwork.world.checkupload", "%MAIN%/edu/v0/users/onlineDisks/check", "GET", true);
+end

@@ -220,7 +220,7 @@ function ParaWorldMiniChunkGenerator:GetTotalCount()
 	return self.count or 0;
 end
 
-
+local isShowUploadPage = false
 function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	local blocks = self:GetAllBlocks();
 	NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/BlockTemplateTask.lua");
@@ -263,9 +263,9 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 						local x, y, z = player:GetBlockPos();
 						keepwork.miniworld.upload({projectId = projectId, name = myHomeWorldName, type="main", commitId = world.commitId,
 							block = self:GetTotalCount(), bornAt = {math.floor(x), math.floor(y), math.floor(z)}}, function(err, msg, data)
-								if (err == 200) then
-								_guihelper.MessageBox(L"上传成功！");
-							end
+								if (err == 200 and not System.options.isPapaAdventure) then
+									_guihelper.MessageBox(L"上传成功！");
+								end
 						end);
 						break;
 					end
@@ -291,7 +291,25 @@ function ParaWorldMiniChunkGenerator:OnSaveWorld()
 	
 	if (WorldCommon.GetWorldTag("world_generator") == "paraworldMini") then
 		if myHomeWorldName == currentWorldName or myHomeWorldName1 == currentWorldFloderName then
-			showSaveTip()
+			if System.options.isPapaAdventure then
+				if not isShowUploadPage then
+					isShowUploadPage = true
+					NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/Lessons/Creation.lua");
+					local Creation = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.Lessons.Creation");
+					Creation.submitType = 2
+					Creation:ShowOpusSubmitPage(function(res)
+						if (res) then
+							local currentWorld = GameLogic.GetFilters():apply_filters('store_get', 'world/currentEnterWorld')
+							if (currentWorld and currentWorld.kpProjectId) then
+								uploadMiniWorld(tonumber(currentWorld.kpProjectId));
+							end
+							isShowUploadPage = false
+						end
+					end)
+				end
+			else
+				showSaveTip()
+			end
 		end		
 	end
 end

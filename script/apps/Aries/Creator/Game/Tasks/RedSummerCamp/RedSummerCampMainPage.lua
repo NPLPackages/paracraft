@@ -25,6 +25,7 @@ local Notice = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/NoticeV2/Notic
 local VipRewardPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/VipRewardPage.lua");
 local QuestAction = commonlib.gettable("MyCompany.Aries.Game.Tasks.Quest.QuestAction");
 local Email = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Email/Email.lua");
+local EducateProjectManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProjectManager.lua")
 local page
 local notice_time = 3000
 RedSummerCampMainPage.UserData = {}
@@ -32,7 +33,8 @@ RedSummerCampMainPage.ItemData = {
 	{name="大赛", is_show_vip=false, is_show_recommend=true, node_name = "shentongbei", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_1_220x220_32bits.png#0 0 220 220"},
 	{name="入门必看", is_show_vip=false, is_show_recommend=false, node_name = "course_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/rumengbikan_226x206_32bits.png#0 0 226 206"},
 	-- {name="乐园设计师", is_show_vip=false, is_show_recommend=false, node_name = "leyuan", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/8_219X202_32bits.png#0 0 220 220"},
-	{name="讲好“中国好故事”", is_show_vip=false, is_show_recommend=false, node_name = "china_story", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/xinchangzheng_220x220_32bits.png#0 0 220 220"},
+	-- {name="讲好“中国好故事”", is_show_vip=false, is_show_recommend=false, node_name = "china_story", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/xinchangzheng_220x220_32bits.png#0 0 220 220"},
+	{name="3D动画编程赛", is_show_vip=false, is_show_recommend=false, node_name = "animation_race", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/animation_race_220X220_32bits.png#0 0 220 220"},
 	{name="推荐作品", is_show_vip=false, is_show_recommend=false, node_name = "explore", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_4_220x220_32bits.png#0 0 220 220"},
 	{name="虚拟校园", is_show_vip=false, is_show_recommend=false, node_name = "ai_school", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_5_220x220_32bits.png#0 0 220 220"},
 	{name="家长指南", is_show_vip=false, is_show_recommend=false, node_name = "parent_page", img="Texture/Aries/Creator/keepwork/RedSummerCamp/main/bg_6_220x220_32bits.png#0 0 220 220"},
@@ -43,7 +45,7 @@ local notice_desc = {
 	-- {desc = [[国庆学习有豪礼，学习进步在坚持！]], name="nationak_day"},
 	-- {desc = [[关于举办"神通杯"第一届全国学校联盟中小学计算机编程大赛的通知]], name="shentongbei"},
 	-- {desc = [[金秋九月，开学课程抢鲜学]], name="course_page"},
-	{desc = [[学3D动画编程，参加青少年 “讲好中国故事“ 创意编程大赛]], name="zhengcheng"},
+	-- {desc = [[学3D动画编程，参加青少年 “讲好中国故事“ 创意编程大赛]], name="zhengcheng"},
 	-- {desc = [[全新世界“圣诞树”等你来体验]], name="ai_school"},
 	-- {desc = [[冬令营课程包全新上线]], name="ai_school"},
 }
@@ -67,10 +69,19 @@ function RedSummerCampMainPage.OnInit()
 end
 
 function RedSummerCampMainPage.Show()
+	if System.options.isPapaAdventure then
+		NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaAPI.lua");
+        local PapaAPI = commonlib.gettable("MyCompany.Aries.Creator.Game.PapaAdventures.PapaAPI");
+		PapaAPI:ExitGame()
+		PapaAPI:EnterVueHome()
+		PapaAPI:OnDisplayModeChange("show")
+		PapaAPI:OnDisplayModeChange("ingame")
+		return
+	end
+
 	NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
 	local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon");
-	local parent_id = WorldCommon.GetParentProjectId()
-	
+	local parent_id = type(WorldCommon.GetParentProjectId) =="function" and WorldCommon.GetParentProjectId() or nil
 	if parent_id then
 		local cur_project_id = GameLogic.options:GetProjectId()
 		if tonumber(parent_id) ~= tonumber(cur_project_id) then
@@ -699,7 +710,7 @@ function RedSummerCampMainPage.OpenPage(name)
         local RedSummerCampRecCoursePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampRecCoursePage.lua");
         RedSummerCampRecCoursePage.Show();
     elseif(name == "shentongbei")then
-        -- local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+        -- local Page = NPL.load("script/ide/System/UI/Page.lua");
         -- Page.ShowShenTongBeiPage();
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.match", {useNoId=true});
 		local RacePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/Race/RacePage.lua");
@@ -740,6 +751,10 @@ function RedSummerCampMainPage.OpenPage(name)
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.china_story", {useNoId=true});
 		local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
         RedSummerCampCommonPage.Show("china_story");
+	elseif(name == "animation_race")then
+		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.animation_race", {useNoId=true});
+		local RedSummerCampCommonPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/RedSummerCamp/RedSummerCampCommonPage.lua");
+        RedSummerCampCommonPage.Show("animation_race");
     elseif(name == "explore")then
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.explore", {useNoId=true});
 		GameLogic.GetFilters():apply_filters('show_offical_worlds_page')
@@ -808,21 +823,11 @@ function RedSummerCampMainPage.OnClickRightBt(name)
 
     if name == "skin" then
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openuserskin", {useNoId=true});
-		-- if not System.options.isDevMode then
-		-- 	local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-		-- 	last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="skin", username = System.User.keepworkUsername});
-		-- 	return 
-		-- end
 		
 		local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
 		UserInfoPage.ShowPage(System.User.keepworkUsername,"skin")
 	elseif name == "certificate" then
 		GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.login_main_page.openuserhonor", {useNoId=true});
-		-- if not System.options.isDevMode then
-		-- 	local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-		-- 	last_page_ctrl = page.ShowUserInfoPage({HeaderTabIndex="honor", username = System.User.keepworkUsername});
-		-- 	return 
-		-- end
 		local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
 		UserInfoPage.ShowPage(System.User.keepworkUsername,"honor")
 	elseif name == "friend" then

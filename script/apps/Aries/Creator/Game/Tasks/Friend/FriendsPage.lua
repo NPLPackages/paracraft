@@ -264,8 +264,6 @@ function FriendsPage.OnRefresh()
 end
 function FriendsPage.ClickItem(data)
     if mouse_button == "left" then
-		-- local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-		-- user_page.ShowUserInfoPage({username=data.username});
 		FriendsPage.PrivateLetter(data);
     elseif mouse_button == "right" then
         FriendsPage.OpenFriendMenu(data)
@@ -346,8 +344,7 @@ function FriendsPage.OpenFriendMenu(data)
 	-- end, }));	
 	node:AddChild(CommonCtrl.TreeNode:new({Text = "查看资料", Name = "viewprofile", Type = "Menuitem", onclick = function()
 		-- NewProfileMain.ShowPage(ctl.nid);
-		local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-		user_page.ShowUserInfoPage({username=data.username});
+		GameLogic.ShowUserInfoPage({username=data.username});
 		FriendsPage.CloseView()
 	end, }));
 

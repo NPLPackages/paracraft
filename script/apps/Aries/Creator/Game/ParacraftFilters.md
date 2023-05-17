@@ -88,6 +88,8 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "cellar.vip_notice.init": Show vip notice page
   - "cellar.vip_notice.close": Close vip notice page
   - "user_skin_change": User skin changes
+  - "WebviewShowWindow", state, windowId: when a webview window of given id is first shown. Consider using "ShowTopWindow" filter instead, see below. 
+  - "ShowTopWindow", state, windowName, windowType: when a top window of given name is first shown. windowName can be "Desktop.OnExit"|"panorama_preview"|"RedSummerCampPPtPage" and more. it also include all WebviewShowWindow window names. windowType can be nil or "webview"
 
 - world:
   - "OnWorldInitialRegionsLoaded": called only once after the first world regions are loaded. 
@@ -125,6 +127,11 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "OnPlayMovieText": play movie text event.
   - "OnMacroMovieText": play macro text event.
   - "OnWorldTageChange": on world tage change
+  - "SyncWorldFinish": on world sync finish
+  - "SyncWorldFinishBegin": on world sync start
+  - "EnterWorldFailed": onEnterWorldFailed
+  --"ConnectServerFailed": ConnectServerFailed
+  --"CheckShowIfApplyStagedChanges", true: if we shall display an UI asking the user if we need to recover
 
 - global:
   - "register_classes_into_sandbox_api", additionalEnv:
@@ -157,7 +164,7 @@ This gives an overview of filters in paracraft. Please search the source code of
   - "get_single_file_by_commit_id": Get single file by commit id
   - "get_socket_url": Get socket url
   - "get_core_api_url": Get core api url
-  
+  - "OnCloseAppWindow": PapaAdventure Exit App
 - file exporters:
   - "file_exported", id, filename:
   - "GetExporters", exporters: file exporters

@@ -73,8 +73,7 @@ end
 
 function ClickHead(name, mcmlNode)
     local data = mcmlNode:GetAttribute("param1")
-    local user_page = NPL.load("(gl)Mod/GeneralGameServerMod/App/ui/page.lua");
-    user_page.ShowUserInfoPage({username=data.username});
+    GameLogic.ShowUserInfoPage({username=data.username});
 end
 ]]></script>
 <kp:window name="iframe" mode="lite" width="560" height="207" title='<%= L"添加好友"%>' onclose="ClosePage">

@@ -72,7 +72,7 @@
                             text = System.Core.UniString:new(text):sub(1, count).text .. '...'
                         end
 
-                        return text
+                        return text or "";
                     end
 
                     function on_click_cancel()
@@ -146,7 +146,7 @@
                             return tostring(currentWorld.kpProjectId)
                         end
 
-                        return L'上传世界后获得'
+                        return L"上传世界后获得"
                     end
 
                     function has_project_id()
@@ -261,7 +261,7 @@
                                     <span style='color: #181818'><%= '项目名称：'..get_cur_world_name() %></span>
                                 </div>
                                 <div style='margin-top: 0px;margin-bottom: 10px;'>
-                                    <span style='color: #181818'><%= '项目ID：'.. get_project_id() %></span>
+                                    <span style='color: #181818'><%= '项目ID：'..get_project_id() %></span>
                                 </div>
                                 
                             </div>

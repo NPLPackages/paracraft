@@ -80,7 +80,7 @@ RacePage.ItemData = {
 		icon = "tu2_875X255_32bits"
 	},
 	{
-		visible = true,
+		visible = false,
 		time = "2021年8月15日-2022年12月31日",
 		signUpBtnInfo = {tooltip = "提交截止时间：2022年12月31日",endDay = "2022-12-31",endTime ="23:59:59"},
 		timeRule = {
@@ -162,6 +162,26 @@ RacePage.ItemData = {
 		},
 		name = "zhong_xiao_xue_dian_nao_zhi_zuo_huo_dong",
 		icon = "tu6_875X255_32bits"
+	},
+	{
+		visible = true,
+		time = "2023年3月-2023年9月",
+		signUpBtnInfo = {tooltip = "报名截止时间：2023年4月30日",endDay = "2023-04-30",endTime ="23:59:59"},
+		timeRule = {
+			startDay="2023-03-01",
+			startTime="00:00:00",
+			endDay="2023-09-31",
+			endTime="23:59:59"
+		},
+		race="2023全国青少年信息素养大赛—3D动画编程赛",
+		content="全国青少年信息素养大赛（以下简称大赛）是中国电子学会主办的“世界机器人大会青少年机器人设计与信息素养大赛”的重要赛事之一，根据《教育部办公厅关于公布2022-2025学年面向中小学生的全国性竞赛活动的通知》，大赛是“2022-2025学年面向中小学的全国竞赛名单”赛事之一。大赛自创立以来已连续成功举办七届，获得第二十九届、第三十届联合国国际科学与和平周“优秀获得奖”和“特别贡献奖”。<br/>&#10;3D动画编程赛项是为了让青少年通过国产自主研发的3D动画编程学习创作平台——帕拉卡（Paracraft），充分发挥想象力和创造力，展现青少年逻辑思考、算法实现和创意实现能力，开展科学与艺术的融合探索学习，培养青少年的创新精神与探索实践能力，全面提升信息素养。",
+		ListData = {},
+		leftTopBtnInfo = {btnText = "报名",url = L"https://ceic.kpcb.org.cn/comp/enrollMatch/38"},
+		enterPage = {
+			{name = "大赛官网", node_name = "enter_3ddhbcs_official_web", url = L"https://ceic.kpcb.org.cn/cms/cssc/7872.htm"}
+		},
+		name = "guo_ji_qing_shao_nian_bian_cheng",
+		icon = "animation_race_875X255_32bits"
 	},
 	{
 		visible = true,
@@ -329,7 +349,7 @@ end
 function RacePage.ClickCompetition()
 	if RacePage.selectName == "shen_tong_bei" then
 		--神通杯
-		local GeneralPage = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua")
+		local GeneralPage = NPL.load("script/ide/System/UI/Page.lua");
 		GeneralPage.ShowShenTongBeiCompetitionPage()
 	elseif RacePage.selectName == "lan_qiao_bei" then
 		--蓝桥杯
@@ -356,6 +376,11 @@ function RacePage.ClickCompetition()
 		local url = RacePage.Datas[RacePage.index].leftTopBtnInfo.url
 		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	else
+		if RacePage.selectName == "quan_guo_qing_shao_nian_xin_xi_su_yang_da_sai" then
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.match.join", {
+                useNoId = true
+            });
+        end
 		local url = RacePage.Datas[RacePage.index].leftTopBtnInfo.url
 		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	end
@@ -389,7 +414,7 @@ function RacePage.OnClickRaceItem(index)
 		return
 	end
 	local node_name = ListData[index].node_name
-	local GeneralPage = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua")
+	local GeneralPage = NPL.load("script/ide/System/UI/Page.lua");
 	if node_name == "constitution" then
 		-- 赛事章程
 		GeneralPage.ShowShenTongBeiConstituionPage()
@@ -418,6 +443,11 @@ function RacePage.OnEnterPage(name)
 		LanQiaoBeiPage.SetSelectIndex(2)
 		LanQiaoBeiPage.Show()
 	else
+		if RacePage.selectName == "quan_guo_qing_shao_nian_xin_xi_su_yang_da_sai" then
+            GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.match.officialweb", {
+                useNoId = true
+            });
+        end
 		local url = RacePage.Datas[RacePage.index].enterPage[1].url
 		ParaGlobal.ShellExecute("open", url, "", "", 1)
 	end

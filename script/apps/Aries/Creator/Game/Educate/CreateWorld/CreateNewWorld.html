@@ -15,6 +15,7 @@
                     CreateNewWorld.page = page;
                     CreateNewWorld.GetUserName()
                     CreateNewWorld.OnInit();
+                    CreateNewWorld.is_only_close = nil
 
                     local cur_mode = CreateNewWorld.init_mode;
 
@@ -212,6 +213,13 @@
                             SetCurrentTerrainInfo(2)
                         end
                     end
+
+                    function update_status()
+                        local ctrl = page:FindControl("world_name_error_tip")
+                        if ctrl then
+                            ctrl.visible = false
+                        end
+                    end
                 ]]>
             </script>
             <pe:container style="width:1132px;height:672px;background-color:#00000000;">
@@ -257,8 +265,17 @@
                                     <%= L"世界名称" %>
                                 </div>
                                 <div style="float: left;width: 2px;height:25px;margin-left: 32px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/fengexian_2x25_32bits.png#0 0 2 25)"/>
-                                <div style = "float: left;margin-left:32px;margin-top:-11px;width:303px;height:46px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/shurukuang_46x46_32bits.png#0 0 46 46:16 16 16 16);">
-                                    <input type="text" SkipAutoBadWordFilter="true" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" EmptyText='<%= L"给你的世界取个名字吧" %>' onkeyup="OnWorldNameChange" style="margin-top:11px;margin-left:14px;width:300px;height:25px;font-size: 16px;font-weight: bold;color:#0e1627;background: url()"/>
+                                <div style="float: left;margin-left:32px;margin-top:-11px;width:303px;height:46px;">
+                                    <div style = "width:303px;height:46px;background: url(Texture/Aries/Creator/paracraft/Educate/CreateWorld/shurukuang_46x46_32bits.png#0 0 46 46:16 16 16 16);">
+                                        <input type="text" SkipAutoBadWordFilter="true" uiname="CreateNewWorld.new_world_name" name="new_world_name" value='<%=GetWorldName()%>' tooltip="<%= L'请勿使用特殊字符作为世界名称'%>" EmptyText='<%= L"给你的世界取个名字吧" %>' onchange='update_status' onkeyup="OnWorldNameChange" style="margin-top:11px;margin-left:14px;width:300px;height:25px;font-size: 16px;font-weight: bold;color:#0e1627;background: url()"/>
+                                    </div>
+                                    <pe:container name = "world_name_error_tip" visible = "false" style="margin-top: 5px;
+                                                color: #ff0000;
+                                                font-weight: bold;
+                                                font-size: 12px;
+                                                background: ;">
+                                        <%= L"世界名称不规范，请重新输入" %>
+                                    </pe:container>
                                 </div>
                             </div>
                             <div style="margin-left: 78px;margin-top: 40px;">

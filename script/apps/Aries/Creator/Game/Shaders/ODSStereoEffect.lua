@@ -1,6 +1,6 @@
 --[[
 Title: ODSStereo Effect
-Author(s): hyz
+Author(s): hyz, lixizhi
 Email: 
 Date: 2022.18.48
 Desc: 
@@ -13,6 +13,7 @@ local effect = GameLogic.GetShaderManager():GetEffect("ODSStereo");
 if(effect) then
 	effect:SetEnabled(true);
 end
+ODSStereoEffect.SetDebugMode(true)
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Effects/ShaderEffectBase.lua");
@@ -20,13 +21,10 @@ local ODSStereoEffect = commonlib.inherit(commonlib.gettable("MyCompany.Aries.Ga
 
 ODSStereoEffect.name = "ODSStereo";
 
-local viewPortManager;
-local stereoMode;
-local frame_size;
-local cubeTextureRect = {0,0,1,1};--立方体的6张贴图的实际区域（不一定等于全屏的）
+local cubeTextureRect = {0,0,1,1};
 
-local needCompositeUI = false;--是否需要合成UI
-local dftTextureRect = {0,0,1,1};--默认UI和3D场景的纹理区域
+local needCompositeUI = false;
+local dftTextureRect = {0,0,1,1};
 local ui_fov_v = 60*math.pi/180;
 local ui_fov_h = 90*math.pi/180;
 
@@ -34,6 +32,29 @@ ODSStereoEffect.isIgnoreUI = false;
 
 function ODSStereoEffect:ctor()
 end
+
+function ODSStereoEffect.SetDebugMode(bIsDebugMode)
+	ODSStereoEffect.bIsDebugMode = bIsDebugMode == true;
+end
+
+-- adjust screen resolution to display for ods single eye, this is usually a square resolution like 1280*1280
+-- @param callbackFunc: called when screen is adjusted to N*N
+function ODSStereoEffect.AutoAdjustODS_SingleResolution(callbackFunc)
+	local att = ParaEngine.GetAttributeObject();
+	local oldsize = att:GetField("ScreenResolution", {1280,720});
+	if (oldsize[2] - oldsize[1]/2) < 200 then
+		att:SetField("ScreenResolution", {oldsize[1],oldsize[1]}); 
+		att:CallField("UpdateScreenMode");
+		commonlib.TimerManager.SetTimeout(function()
+			ODSStereoEffect.AutoAdjustODS_SingleResolution(callbackFunc)
+		end, 200)
+	else
+		if(callbackFunc) then
+			callbackFunc(true);
+		end
+	end
+end
+		
 
 function ODSStereoEffect.SetIsIgnoreUI(val)
 	ODSStereoEffect.isIgnoreUI = val
@@ -46,19 +67,26 @@ function ODSStereoEffect.SetIsIgnoreUI(val)
 
 	local frame_size = {System.Windows.Screen:GetWindowSolution()}
 
-	local cubeWidth = math.floor(frame_size[1]/4) --立方体宽度
+	local cubeWidth = math.floor(frame_size[1]/4)
 	local cubeTextureRect = {0,0,cubeWidth*4/frame_size[1],cubeWidth*2/frame_size[2]};
 
 	return frame_size[2] - cubeWidth*2>200
 end
 
--- 重新排版ods_render_target
+-- set layout to ods_render_target
 function ODSStereoEffect:SetEnabled(bEnable)
 	self._bEnable = bEnable
-	frame_size = {System.Windows.Screen:GetWindowSolution()}
-	viewPortManager = ParaEngine.GetAttributeObject():GetChild("ViewportManager")
+	local frame_size = {System.Windows.Screen:GetWindowSolution()}
+	local viewPortManager = ParaEngine.GetAttributeObject():GetChild("ViewportManager")
 	
-	stereoMode = viewPortManager:GetField("layout")
+	local stereoMode = viewPortManager:GetField("layout")
+
+	NPL.load("(gl)script/ide/System/Scene/Viewports/ViewportManager.lua");
+	local ViewportManager = commonlib.gettable("System.Scene.Viewports.ViewportManager");
+	local viewport = ViewportManager:GetSceneViewport();
+	if(viewport) then
+		viewport:SetAlignment(bEnable and "_lt" or "_fi");
+	end
 
 	if GameLogic.options:IsSingleEyeOdsStereo() then
 		local viewport = viewPortManager:GetChild("ods_final_composite");
@@ -145,7 +173,7 @@ function ODSStereoEffect:OnRenderPostProcessingSingle_1()
 			params:SetFloat("ui_fov_h",ui_fov_h)
 		end
 
-		effect:BeginPass(0);
+		effect:BeginPass(ODSStereoEffect.bIsDebugMode and 1 or 0);
 			params:SetTextureObj(0, _ColorRT);
 			effect:CommitChanges();
 			ParaEngine.DrawQuad();

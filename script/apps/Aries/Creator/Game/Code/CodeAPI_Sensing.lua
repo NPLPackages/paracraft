@@ -238,7 +238,7 @@ end
 
 -- @param text: string support basic html.  
 -- if nil, it will close the dialog
--- @param buttons: nil or {"button1", "button2"}
+-- @param buttons: nil or {"button1", "button2"} or true for multiline text
 -- @param cb: additional callback function. use Sync mode with run(function()   end) is preferred over cb. 
 -- @return result
 function env_imp:ask(text, buttons, cb)
@@ -257,7 +257,10 @@ function env_imp:ask(text, buttons, cb)
 	height = 220;
 	if(buttons) then
 		if(type(buttons) == "table") then
-			height = math.max(height, 140 + (#buttons)*36);			
+			height = math.max(height, 140 + (#buttons)*36);
+		elseif(buttons == true or buttons == "multiline") then
+			height = 140 + 21 * 10; -- 10 rows
+			type_ = true;
 		end
 	end
 

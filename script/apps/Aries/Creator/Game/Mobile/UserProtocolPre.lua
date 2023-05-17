@@ -88,8 +88,9 @@ function UserProtocolPre.onBtn_agree()
     UserProtocolPre.ClosePage()
 end
 
+
 function UserProtocolPre.onBtn_close()
     UserProtocolPre.ClosePage()
-    ParaGlobal.ExitApp()
-    ParaGlobal.ExitApp()
+    --ParaGlobal.ExitApp()
+    --ParaGlobal.ExitApp()
 end

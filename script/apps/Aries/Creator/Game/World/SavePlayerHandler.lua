@@ -27,9 +27,9 @@ function SavePlayerHandler:GetWorldPath()
 end
 
 -- write player data to disk
-function SavePlayerHandler:WritePlayerData(entity)
+function SavePlayerHandler:WritePlayerData(entity, parentDirectory)
 	local name = entity:GetUserName() or "default";
-	local filename = format("%splayers/%s.entity.xml", self:GetWorldPath(), name);
+	local filename = format("%splayers/%s.entity.xml", parentDirectory or self:GetWorldPath(), name);
 	ParaIO.CreateDirectory(filename);
 	local file = ParaIO.open(filename, "w");
 	if(file:IsValid()) then

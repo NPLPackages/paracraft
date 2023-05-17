@@ -30,35 +30,15 @@ WorldCommon.world_info = nil;
 
 -- get whether the game world is modified or not
 function WorldCommon.IsModified()
-	local is_modified = WorldCommon.is_modified;
-	if(not is_modified) then
-		return WorldCommon.CheckIfBlockWorldIsModified();
+	return GameLogic.world_revision and GameLogic.world_revision:IsModified();
+end
+
+-- set world modified
+function WorldCommon.SetModified()
+	if(GameLogic.world_revision) then
+		GameLogic.world_revision:SetModified()
 	end
-	return is_modified;
 end
-
--- return true if block world is modified since last load or save 
-function WorldCommon.CheckIfBlockWorldIsModified()
-	local blockWorld = GameLogic.GetBlockWorld()
-	local worldAtt = ParaBlockWorld.GetBlockAttributeObject(blockWorld);
-	local count = worldAtt:GetChildCount();
-
-	local is_modified = false;
-	for i = 0, count - 1 do
-		local regionAtt = worldAtt:GetChildAt(i);
-		is_modified = is_modified or regionAtt:GetField("IsModified", false);
-		if(is_modified) then
-			break
-		end
-	end
-	return is_modified;
-end
-
--- set whether the game world is modified or not
-function WorldCommon.SetModified(bModified)
-	WorldCommon.is_modified = bModified;
-end
-
 
 -- load world info from tag.xml under the world_path
 -- @param world_path: if nil, ParaWorld.GetWorldDirectory() is used. 
@@ -102,8 +82,8 @@ end
 -- @return true if succeeded. 
 function WorldCommon.SaveWorldTag()
 	if (WorldCommon.world_info and type(WorldCommon.world_info) == 'table') then
-		if (WorldCommon.world_info.instituteVipChangeOnly or
-			WorldCommon.world_info.instituteVipSaveAsOnly) then
+		if (WorldCommon.world_info.instituteVipSaveAsOnly == true or WorldCommon.world_info.instituteVipSaveAsOnly == "true"
+			or WorldCommon.world_info.instituteVipChangeOnly == true or WorldCommon.world_info.instituteVipChangeOnly == "true") then
 			if (not WorldCommon.world_info.privateKey or
 				WorldCommon.world_info.privateKey == "") then
 				WorldCommon.world_info.privateKey = WorldCommon.GeneratePrivateKey();
@@ -243,10 +223,8 @@ function WorldCommon.LeaveWorld(callbackFunc)
 		-- pop up a message box to ask whether to save the game world. 	
 		_guihelper.MessageBox(string.format([[<div style="margin-top:28px">你即将离开领地[%s]<br/>是否在离开前保存领地?</div>]], WorldCommon.GetWorldTag("name")), function(result)
 			if(_guihelper.DialogResult.Yes == result) then
-				WorldCommon.SetModified(false);
 				WorldCommon.SaveWorld();
 			elseif(_guihelper.DialogResult.No == result) then
-				WorldCommon.SetModified(false);
 			else
 			end
 			
@@ -279,12 +257,11 @@ function WorldCommon.SaveWorldAs()
 		GameLogic.SaveAll(true, true);
 	end
 
-	local defaultWorldName = lastWorldName;
-	for i=1, 10 do
-		local baseFolder =
-			GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path') or
+	local baseFolder = GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path') or
 			LocalLoadWorld.GetDefaultSaveWorldPath();
+	local defaultWorldName = lastWorldName;
 
+	for i=1, 10 do
 		local targetFolder = baseFolder .. "/".. commonlib.Encoding.Utf8ToDefault(defaultWorldName) .. "/";
 		if(ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
 			defaultWorldName = lastWorldName..L"_副本"..tostring(i);
@@ -321,18 +298,29 @@ function WorldCommon.SaveWorldAs()
 		OpenFileDialog.ShowPage(L"输入新的世界名字".."<br/>"..L"如果你复制的是别人的世界, 请在世界中著名原作者, 并取得对方同意", function(result)
 			if(result and result~="") then
 				local function callback()
-					local baseFolder =
-						GameLogic.GetFilters():apply_filters('service.local_service_world.get_user_folder_path') or
-						LocalLoadWorld.GetDefaultSaveWorldPath();
 					local targetFolder = baseFolder .. "/".. result.. "/";
+
+					local function SaveAsWorldCheckModified_(targetFolder)
+						if(GameLogic.world_revision:IsModified()) then
+							_guihelper.MessageBox(format(L"世界%s刚刚被修改过。是否保留修改后的内容?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
+								if(res and res == _guihelper.DialogResult.Yes) then
+									WorldCommon.SaveWorldAsImp(targetFolder, nil, true);
+								else
+									WorldCommon.SaveWorldAsImp(targetFolder);
+								end
+							end, _guihelper.MessageBoxButtons.YesNo);
+						else
+							WorldCommon.SaveWorldAsImp(targetFolder);
+						end
+					end
 					if (ParaIO.DoesFileExist(targetFolder.."tag.xml", false)) then
 						_guihelper.MessageBox(format(L"世界%s已经存在, 是否覆盖?",commonlib.Encoding.DefaultToUtf8(result)), function(res)
 							if(res and res == _guihelper.DialogResult.Yes) then
-								WorldCommon.SaveWorldAsImp(targetFolder);
+								SaveAsWorldCheckModified_(targetFolder)
 							end
 						end, _guihelper.MessageBoxButtons.YesNo);
 					else
-						WorldCommon.SaveWorldAsImp(targetFolder);
+						SaveAsWorldCheckModified_(targetFolder)
 					end
 
 					local worldname = GameLogic.GetWorldDirectory():match("([^/\\]+)$")
@@ -358,9 +346,9 @@ function WorldCommon.SaveWorldAs()
 	end)
 end
 
-function WorldCommon.SaveWorldAsImp(folderName, callbackFunc)
+function WorldCommon.SaveWorldAsImp(folderName, callbackFunc, bPreserveModified)
 	local function Handle()
-		if(WorldCommon.CopyWorldTo(folderName)) then
+		if(WorldCommon.CopyWorldTo(folderName, bPreserveModified)) then
 			local save_world_handler = SaveWorldHandler:new():Init(folderName);
 			local xmlRoot = save_world_handler:LoadWorldXmlNode();
 			if(xmlRoot) then
@@ -419,14 +407,14 @@ function WorldCommon.SaveWorldAsImp(folderName, callbackFunc)
 		end)) then
 		return
 	end
-
-	Handle();
 end
 
+-- @param bPreserveModified: true to preserve modified changes. 
 -- @return true if succeed
-function WorldCommon.CopyWorldTo(destinationFolder)
+function WorldCommon.CopyWorldTo(destinationFolder, bPreserveModified)
 	ParaIO.CreateDirectory(destinationFolder);
 
+	local bResult;
 	local worldzipfile = System.World.worldzipfile;
 	if(worldzipfile) then
 		local zip_archive = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CFileManager"):GetChild(worldzipfile);
@@ -463,13 +451,14 @@ function WorldCommon.CopyWorldTo(destinationFolder)
 
 				local re = ParaIO.CopyFile(source_path, dest_path, true);
 				LOG.std(nil, "info", "CopyWorldFile", "copy(%s) %s -> %s",tostring(re),source_path,dest_path);
+				fileCount = fileCount + 1
 			else
 				-- this is a folder
 				ParaIO.CreateDirectory(destinationFolder..filename.."/");
 			end
 		end
 		LOG.std(nil, "info", "CopyWorldTo", "%s is unziped to %s ( %d files)", worldzipfile, destinationFolder, fileCount); 
-		return true;
+		bResult = true;
 	else
 		-- search just in disk file
 		local filesOut = {};
@@ -486,14 +475,21 @@ function WorldCommon.CopyWorldTo(destinationFolder)
 				local dest_path = destinationFolder..filename;
 				local re = ParaIO.CopyFile(source_path, dest_path, true);
 				LOG.std(nil, "info", "CopyWorldFile", "copy(%s) %s -> %s",tostring(re),source_path,dest_path);
+				fileCount = fileCount + 1
 			else
 				-- this is a folder
 				ParaIO.CreateDirectory(destinationFolder..filename.."/");
 			end
 		end
 		LOG.std(nil, "info", "CopyWorldTo", "%s is copied to %s ( %d files)", parentDir, destinationFolder, fileCount); 
-		return true;
+		bResult = true;
 	end
+	if(bResult) then
+		if(bPreserveModified and GameLogic.world_revision:IsModified()) then
+			GameLogic.world_revision:StageChangesToFolder(destinationFolder, true);
+		end
+	end
+	return bResult;
 end
 
 function WorldCommon.ReplaceWorld(targetProjectId)

@@ -478,7 +478,8 @@ end
 
 -- both obstruction block and physical mesh is taken into account. 
 function ParaLifeTouchController.CanPlayerStayAtCurrentPosition()
-	if(not GameLogic.GetSceneContext():GetTargetPosition()) then
+	local context = GameLogic.GetSceneContext()
+	if( context and not context:GetTargetPosition()) then
 		return true
 	else
 		local player = EntityManager.GetPlayer();

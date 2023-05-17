@@ -53,10 +53,7 @@ function KpChatHelper.ShowUserInfo(username)
     if(not username)then
         return
     end
-    local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-    if(page and page.ShowUserInfoPage)then
-        page.ShowUserInfoPage({ username = username }); 
-    end
+    GameLogic.ShowUserInfoPage({ username = username }); 
 end
 function KpChatHelper.ShowComplainPage(id)
     if(not id)then

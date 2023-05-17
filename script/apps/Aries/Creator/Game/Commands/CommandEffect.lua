@@ -331,7 +331,7 @@ Commands["stereo"] = {
 	name="stereo", 
 	mode_deny = "",
 	mode_allow = "",
-	quick_ref="/stereo [on|off|red|left] [eye_dist]", 
+	quick_ref="/stereo [on|off|red|left|ods|odsdebug] [eye_dist]", 
 	desc=[[turn on/off stereo mode. 
 e.g.
 /stereo on 0.1			with 0.1 eye distance
@@ -339,6 +339,8 @@ e.g.
 /stereo off				turn 3d off
 /stereo red				red/blue mode 
 /stereo left			left/right mode
+/stereo ods			    ods 360 single eye
+/stereo odsdebug        ods 360 single eye debug mode
 /stereo					toggle
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
@@ -354,6 +356,18 @@ e.g.
 				mode = 2;
 			elseif(mode:match("^red")) then
 				mode = 5;
+			elseif(mode:match("^ods")) then
+				NPL.load("(gl)script/apps/Aries/Creator/Game/Shaders/ODSStereoEffect.lua");
+				local ODSStereoEffect = commonlib.gettable("MyCompany.Aries.Game.Shaders.ODSStereoEffect");
+				ODSStereoEffect.SetDebugMode(false)
+				if(mode:match("debug")) then
+					ODSStereoEffect.SetDebugMode(true)
+				end
+				mode = 8
+				ODSStereoEffect.AutoAdjustODS_SingleResolution(function()
+					GameLogic.options:EnableStereoMode(mode);
+				end)
+				return
 			else
 				mode = 0;
 			end

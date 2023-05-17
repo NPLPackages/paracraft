@@ -402,7 +402,9 @@ function ClassSchedule_new.GetDate_ds()
 end
 
 function ClassSchedule_new.GetDaysOfMonth(year,month,class_id)
-    
+    if not class_id or not year or not month then
+        return {}
+    end
     if ClassSchedule_new.course_ds==nil then
         ClassSchedule_new.course_ds = {}
     end

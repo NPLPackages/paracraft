@@ -9,12 +9,15 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/World/AutoSaver.lua");
 local AutoSaver = commonlib.gettable("MyCompany.Aries.Creator.Game.AutoSaver");
 
 GameLogic.CreateGetAutoSaver():SetInterval(10)
+GameLogic.CreateGetAutoSaver():SetAutoSaveMode();
 GameLogic.CreateGetAutoSaver():SetSaveMode();
 GameLogic.CreateGetAutoSaver():SetTipMode();
 GameLogic.CreateGetAutoSaver():SetAutoSaveOperationCount(15);
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/UndoManager.lua");
+NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
 local UndoManager = commonlib.gettable("MyCompany.Aries.Game.UndoManager");
 
 local AutoSaver = commonlib.inherit(nil,commonlib.gettable("MyCompany.Aries.Creator.Game.AutoSaver"));
@@ -22,6 +25,7 @@ local GameLogic = commonlib.gettable("MyCompany.Aries.Game.GameLogic")
 
 -- default to 10 mins
 AutoSaver.interval = 10 * 60 * 1000;
+--AutoSaver.interval = 0.2 * 60 * 1000;
 AutoSaver.autosave_operation_count = 15;
 AutoSaver.mode = "tip";
 AutoSaver.operation_count = 0;
@@ -31,7 +35,7 @@ function AutoSaver:ctor()
 	GameLogic:Connect("WorldLoaded", self, self.OnEnterWorld, "UniqueConnection");
 	GameLogic:Connect("WorldUnloaded", self, self.OnLeaveWorld, "UniqueConnection");
 	GameLogic:Connect("WorldSaved", self, self.ResetTimer, "UniqueConnection");
-	self:SetTipMode();
+	self:SetAutoSaveMode();
 end
 
 -- @param intervalMins: number mins to do auto save. default to 10
@@ -47,11 +51,6 @@ end
 -- @param nCount: default to 1
 function AutoSaver:IncreaseOperation(nCount)
 	self.operation_count = self.operation_count + (nCount or 1);
-	if(self.timeout and self.autosave_operation_count > 0 and self.operation_count > self.autosave_operation_count) then
-		--self.operation_count = 1;
-		self:DoAutoSave();
-		self:ResetTimer();
-	end
 end
 
 -- When the operation count reach autosave_operation_count, we will automatically save. 
@@ -73,6 +72,11 @@ function AutoSaver:SetTipMode()
 	LOG.std(nil, "info", "AutoSaver", "tip mode is on");
 end
 
+function AutoSaver:SetAutoSaveMode()
+	self.mode = "autosave";
+	LOG.std(nil, "info", "AutoSaver", "autosave mode is on");
+end
+
 function AutoSaver:IsSaveMode()
 	return self.mode == "save";
 end
@@ -85,10 +89,8 @@ function AutoSaver:Init()
 end
 
 function AutoSaver:DoAutoSave()
-	if(GameLogic.GameMode:IsEditor()) then
-		NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
-		local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
-		if self.isCheckModified and not WorldCommon.IsModified() then
+	if(not GameLogic.IsReadOnly() and WorldCommon.IsModified()) then
+		if self.isCheckModified then
 			return
 		end
 		if(self.autosave_operation_count > 0 and self.operation_count > self.autosave_operation_count) then
@@ -110,6 +112,9 @@ function AutoSaver:DoAutoSave()
 			end
 		else
 			self.timeout = true;
+		end
+		if self.mode == "autosave" and GameLogic.world_revision and GameLogic.world_revision:IsModifiedAndNotAutoSaved() then
+			GameLogic.RunCommand("/autosave -stage");
 		end
 	end
 end

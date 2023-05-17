@@ -626,7 +626,7 @@ function Email.OnClickGoLesson()
 	-- echo(email_content,true)
 	local isNewCourse = false
 	local id = email_content.id
-	local course_data = EmailManager.LoadEmailCfg()
+	local course_data = EmailManager.LoadEmailCfg() or {}
 	course_data = course_data[id]
 	if not course_data then
 		course_data = EmailManager.FindEmailDataById(id)

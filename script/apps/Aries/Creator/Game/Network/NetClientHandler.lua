@@ -99,6 +99,7 @@ function NetClientHandler:handleErrorMessage(text)
 	if(text == "ConnectionNotEstablished") then
 		BroadcastHelper.PushLabel({id="NetClientHandler", label = L"无法链接到这个服务器", max_duration=6000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 		_guihelper.MessageBox(L"无法链接到这个服务器,可能该服务器未开启或已关闭.详情请联系该服务器管理员.");
+		GameLogic.GetFilters():apply_filters("ConnectServerFailed")
 	else --if(text == "OnConnectionLost") then
 		if(GameLogic.GetWorld() == self.worldClient) then
 			BroadcastHelper.PushLabel({id="NetClientHandler", label = L"与服务器的连接断开了", max_duration=6000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
@@ -123,14 +124,19 @@ function NetClientHandler:handleErrorMessage(text)
 			--end
 		else
 			_guihelper.MessageBox(L"服务器返回错误信息"..(text or ""));
+			GameLogic.GetFilters():apply_filters("ConnectServerFailed")
 		end
 	end
 	self:Cleanup();
 end
 
 function NetClientHandler:GetEntityByID(id)
-	if(id == self.worldClient:GetPlayer().entityId) then
-		return self.worldClient:GetPlayer();
+	if not self.worldClient then
+		return 
+	end
+	local player = self.worldClient:GetPlayer();
+	if(player and id == player.entityId) then
+		return player;
 	else
 		return self.worldClient:GetEntityByID(id);
 	end
@@ -175,6 +181,7 @@ function NetClientHandler:handleAuthUser(packet_AuthUser)
 		local text = L"服务器暂时不允许链接， 可能是已经满了。"..(packet_AuthUser.info.errMsg or "");
 		BroadcastHelper.PushLabel({id="NetClientHandler", label = text, max_duration=7000, color = "255 0 0", scaling=1.1, bold=true, shadow=true,});
 		self:Cleanup();
+		GameLogic.GetFilters():apply_filters("ConnectServerFailed","isfull")
 	end
 end
 

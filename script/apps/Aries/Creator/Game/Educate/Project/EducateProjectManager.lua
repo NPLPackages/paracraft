@@ -36,7 +36,7 @@ function EducateProjectManager.RegisterEvent()
         EducateProjectManager.CurrentCreateWorldName = worldPath
         return worldPath
     end)
-    GameLogic.GetFilters():add_filter("SyncWorldFinish", EducateProjectManager.OnSyncWorldFinish);
+    -- GameLogic.GetFilters():add_filter("SyncWorldFinish", EducateProjectManager.OnSyncWorldFinish);
     GameLogic:Connect("WorldLoaded", EducateProjectManager, EducateProjectManager.OnWorldLoaded, "UniqueConnection");
     GameLogic.GetFilters():add_filter("apps.aries.creator.game.login.swf_loading_bar.close_page", function()
         EducateProjectManager.OnLoadingProgressFinish()
@@ -59,14 +59,27 @@ function EducateProjectManager.StartSycUserWorld()
     if not EducateProjectManager.IsSwfLoadingFinished or not EducateProjectManager.IsWorldLoaded then
         return
     end
-    if EducateProjectManager.CurrentCreateWorldName and EducateProjectManager.CurrentCreateWorldName ~= "" then
-        GameLogic.AddBBS(nil,"世界创建成功，开始自动保存世界")
-        ShareWorld:SysncWorld(function()
-            EducateProjectManager.CurrentCreateWorldName = ""
-            EducateProjectManager.IsWorldLoaded = false
-            EducateProjectManager.IsSwfLoadingFinished = false
-            GameLogic.AddBBS(nil,"世界保存成功")
-        end)
+
+    if System.options.channelId_431 then
+        if EducateProjectManager.CurrentCreateWorldName and EducateProjectManager.CurrentCreateWorldName ~= "" then
+            GameLogic.AddBBS(nil,"世界创建成功，开始自动保存世界")
+            GameLogic.QuickSave();
+            ShareWorld:SysncWorld(function()
+                EducateProjectManager.CurrentCreateWorldName = ""
+                EducateProjectManager.IsWorldLoaded = false
+                EducateProjectManager.IsSwfLoadingFinished = false
+                GameLogic.AddBBS(nil,"世界保存成功")
+            end)
+        end
+    end
+    NPL.load("(gl)script/apps/Aries/Creator/WorldCommon.lua");
+    local WorldCommon = commonlib.gettable("MyCompany.Aries.Creator.WorldCommon")
+    local isHomeWorkWorld = WorldCommon.GetWorldTag("isHomeWorkWorld");
+    --start auto save every 2 minite
+    if isHomeWorkWorld == true or isHomeWorkWorld == "true" then
+        GameLogic.CreateGetAutoSaver():SetCheckModified()
+        GameLogic.CreateGetAutoSaver():SetSaveMode();
+        GameLogic.CreateGetAutoSaver():SetInterval(2);
     end
 end
 

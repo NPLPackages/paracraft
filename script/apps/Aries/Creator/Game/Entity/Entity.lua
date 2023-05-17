@@ -783,7 +783,8 @@ function Entity:SetHeadonEntity(index, entity)
 end
 
 -- display a mcml v2 url or xmlnode on top of the entity. 
--- @param params: {url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:red">hello world</div></pe:mcml>'), pageGlobalTable, is3D:bool}
+-- @param params: {url=ParaXML.LuaXML_ParseString('<pe:mcml><div style="background-color:red">hello world</div></pe:mcml>'), 
+--    pageGlobalTable, is3D:bool, bReuseWindow:bool, bAbove3D:bool, }
 -- if nil, it will remove head on display
 -- @param headonIndex: default to 0, it can also be 1 or 2. so that multiple headon display can be shown at the same time.  
 -- @return the headon display object if created
@@ -1512,6 +1513,7 @@ function Entity:OpenEditor(editor_name, entity)
 		local task = MyCompany.Aries.Game.Tasks.SelectModel:new({obj=self:GetInnerObject()})
 		task:Run();
 	end
+	GameLogic.SetModified();
 end
 
 function Entity:GetBlockContainer()
@@ -3273,7 +3275,7 @@ end
 -- @param color: 0xff0000 or "#ff00ff"
 function Entity:SetColor(color)
 	color = Color.ToValue(color)
-	if(self.color ~= color) then
+	if(color and self.color ~= color) then
 		self.color = color;
 		local obj = self:GetInnerObject()
 		if(obj) then

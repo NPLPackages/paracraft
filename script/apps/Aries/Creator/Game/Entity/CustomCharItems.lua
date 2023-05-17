@@ -315,7 +315,7 @@ function CustomCharItems:Init()
 end
 
 function CustomCharItems:GetModelItems(filename, category, skin, avatar)
-	if (not skin:match("^%d+#")) then
+	if (skin and not skin:match("^%d+#")) then
 		skin = CustomCharItems:ItemIdsToSkinString(skin);
 	end
 	for type, names in pairs(models) do
@@ -326,6 +326,7 @@ function CustomCharItems:GetModelItems(filename, category, skin, avatar)
 		end
 	end
 end
+
 
 function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 	local checkGeoset = {0, 0};
@@ -342,7 +343,7 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 		end
 	end
 	]]
-
+	local checkVipAvailable = GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip',{noBoxTip=true})
 	local groups = CustomCharItems.category_items[category];
 	if (groups) then
 		local itemList = {};
@@ -356,7 +357,7 @@ function CustomCharItems:GetItemsByCategory(category, modelType, skin, avatar)
 						data.icon = item.icon;
 						data.name = item.name;
 						data.isVip = item.isVip;
-						if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip',{noBoxTip=true})==true and data.type=="1" then --禁用vip功能时，过滤掉vip装饰
+						if checkVipAvailable ==true and data.type=="1" then --禁用vip功能时，过滤掉vip装饰
 						else
 							itemList[#itemList+1] = data;
 						end

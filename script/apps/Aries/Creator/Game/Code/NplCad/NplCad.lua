@@ -354,12 +354,26 @@ function NplCad.OnShowCodeLib()
     local NplCadLibPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Code/NplCadLibPage.lua");
     NplCadLibPage:ToggleVisible();
 end
+
+function NplCad.SaveBrowseAndBlocklyShow()
+	NplCad.export_close_npl_browser = CodeBlockWindow.IsNPLBrowserVisible();
+	NplCad.export_close_npl_blockly = CodeBlockWindow.HasNplBlocklyEditorPage();
+end
+
+function NplCad.RestoreBrowseAndBlocklyShow()
+	CodeBlockWindow.SetNplBrowserVisible(NplCad.export_close_npl_browser);
+	if (NplCad.export_close_npl_blockly) then CodeBlockWindow.ShowNplBlocklyEditorPage() end
+end
+
 function NplCad.OnClickShowExport()
 	NplCad.ShowNplcadToolMenu()
-	if(CodeBlockWindow.IsNPLBrowserVisible()) then
-		CodeBlockWindow.SetNplBrowserVisible(false)
+	
+	if (NplCad.bShowToolMenu) then
+		if(CodeBlockWindow.IsNPLBrowserVisible()) then
+			CodeBlockWindow.SetNplBrowserVisible(false)
+		end
+		CodeBlockWindow.CloseNplBlocklyEditorPage();
 	end
-	CodeBlockWindow.CloseNplBlocklyEditorPage();
 end
 
 function NplCad.ShowNplcadToolMenu()
@@ -371,9 +385,11 @@ function NplCad.ShowNplcadToolMenu()
 			showContent.visible = not showContent.visible
 		end
 		NplCad.bShowToolMenu = showContent.visible
-		-- if NplCad.bShowToolMenu then
-		-- 	NplCad.CheckShowExport()
-		-- end
+		if NplCad.bShowToolMenu then
+			NplCad.SaveBrowseAndBlocklyShow();
+		else
+			NplCad.RestoreBrowseAndBlocklyShow();
+		end
 	end
 end
 
@@ -383,9 +399,12 @@ function NplCad.CloseToolMenu()
 		showContent.visible = false
 		NplCad.bShowToolMenu = false
 	end
+	NplCad.export_close_npl_browser = false;
+	NplCad.export_close_npl_blockly = false;
 end
 
 function NplCad.OnClickExport(type)
+	NplCad.RestoreBrowseAndBlocklyShow();
 	NplCad.CloseToolMenu()
 	local codeBlock = CodeBlockWindow.GetCodeBlock();
 	if(codeBlock) then

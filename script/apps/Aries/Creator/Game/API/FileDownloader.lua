@@ -29,7 +29,9 @@ end
 -- @param cachePolicy: default to "access plus 5 mins"
 -- @param bAutoDeleteCacheFile: if true we will remove cache file after downloaded.
 -- @param maxRetryCount: default to 2, we will try at least 2 times. 
-function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bAutoDeleteCacheFile, maxRetryCount)
+-- @param progressCallbackFunc: function OnProgress(downloadState, text,currentFileSize, totalFileSize)  end, if provided, we will silence global tips
+-- downloadState(0:downloading, 1:complete, 2:terminated),text(downloadFile text tips),currentFileSize, totalFileSize
+function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bAutoDeleteCacheFile, maxRetryCount, progressCallbackFunc)
 	if(type(url) == "table") then
 		self.url = url.url;
 		self.headers = url.headers;
@@ -52,6 +54,10 @@ function FileDownloader:Init(text, url, localFile, callbackFunc, cachePolicy, bA
 	self.bAutoDeleteCacheFile = bAutoDeleteCacheFile;
 	self.retryCount = 0;
 	self.maxRetryCount = maxRetryCount;
+	self.progressCallbackFunc = progressCallbackFunc;
+	if(progressCallbackFunc) then
+		self:SetSilent(true)
+	end
 	self:Start(self.url, self.localFile, self.callbackFunc, cachePolicy, self.headers);
 
 	return self;
@@ -114,6 +120,13 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 		self.isFetching = false;
 		if(callbackFunc) then
 			callbackFunc(false, msg);
+		end
+	end
+	-- downloadState(0:downloading, 1:complete, 2:terminated),text(downloadFile text tips),currentFileSize, totalFileSize
+	local function OnProgress(downloadState, text, currentFileSize, totalFileSize)
+		GameLogic.GetFilters():apply_filters("downloadFile_notify", downloadState, text, currentFileSize, totalFileSize);
+		if(self.progressCallbackFunc) then
+			self.progressCallbackFunc(downloadState, text, currentFileSize, totalFileSize)
 		end
 	end
 	
@@ -179,10 +192,10 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 					text = string.format(L"下载中: %d/%dKB", math.floor(msg.currentFileSize/1024), math.floor(msg.totalFileSize/1024));
 				end
 				
-				GameLogic.GetFilters():apply_filters("downloadFile_notify", 0, text, math.floor(msg.currentFileSize/1024), math.floor(msg.totalFileSize/1024));
+				OnProgress(0, text, math.floor(msg.currentFileSize/1024), math.floor(msg.totalFileSize/1024));
 			elseif(msg.DownloadState == "complete") then
 				text = L"下载完毕";				
-				GameLogic.GetFilters():apply_filters("downloadFile_notify", 1, text);
+				OnProgress(1, text);
 			elseif(msg.DownloadState == "terminated") then
 				text = L"下载终止了";
 				self.retryCount =  self.retryCount + 1;
@@ -197,7 +210,7 @@ function FileDownloader:Start(src, dest, callbackFunc, cachePolicy, headers)
 					isRedText = true;
 					LOG.std(nil, "warn", "FileDownloader", "downloading terminated for %s", commonlib.serialize_compact(url));
 					LOG.std(nil, "warn", "FileDownloader", msg);
-					GameLogic.GetFilters():apply_filters("downloadFile_notify", 2, text);	
+					OnProgress(2, text);	
 				end
 			end
 			if(not self.isSilent and text and self.text ~= "official_texture_package" and (showLabel or showLabel == nil)) then

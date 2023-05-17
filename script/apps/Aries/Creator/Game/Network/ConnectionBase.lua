@@ -64,7 +64,7 @@ end
 
 -- send a packet to send queue
 function ConnectionBase:AddPacketToSendQueue(packet)
-	return packet:Send(self);
+	return packet and packet:Send(self);
 end
 
 local ping_msg = {url = "ping",};
@@ -176,6 +176,7 @@ function ConnectionBase:CloseConnection(reason)
 	if(self.nid) then
 		NPL.reject({["nid"]=self.nid, ["reason"]=reason});
 		self.connectionClosed = true;
+		Connections:RemoveConnection(self.nid);
 	end
 end
 

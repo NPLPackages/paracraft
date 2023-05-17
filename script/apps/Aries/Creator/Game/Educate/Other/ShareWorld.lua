@@ -130,7 +130,7 @@ function ShareWorld:GetWorldSize()
 
     local filesTotal = LocalService:GetWorldSize(worldpath)
 
-    return Mod.WorldShare.Utils.FormatFileSize(filesTotal)
+    return Mod.WorldShare.Utils.FormatFileSize(filesTotal),filesTotal
 end
 
 function ShareWorld:GetRemoteRevision()
@@ -241,7 +241,7 @@ function ShareWorld:GetPreviewImagePath()
 end
 
 function ShareWorld:GetWorldName()
-    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get','world/currentEnterWorld')
+    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get','world/currentEnterWorld') or {}
 
     return currentEnterWorld.text or ''
 end
@@ -309,21 +309,27 @@ end
 
 
 function ShareWorld:CheckCanUpload(callback)
-    local world_size = self:GetWorldSize()
-    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get','world/currentEnterWorld')
+    local _,world_size = self:GetWorldSize()
+    local currentEnterWorld = GameLogic.GetFilters():apply_filters('store_get','world/currentEnterWorld') or {}
     local kpProjectId = currentEnterWorld.kpProjectId or 0
     local params = {}
     if kpProjectId and kpProjectId > 0 then
-        params.projectId = kpProjectId
+        if not System.options.isPapaAdventure then
+            params.projectId = kpProjectId
+        end
     end
     params.fileSize = world_size
+    local maxSize = GameLogic.IsVip('LimitWorldSize20Mb',false) == true and 50*1024*1024 or 20*1024*1024
     keepwork.world.checkupload(params,function(err,msg,data)
         if System.options.isDevMode then
             print("err=========",err)
+            print("maxsize====",maxSize,type(maxSize),world_size,type(world_size))
             echo(data)
         end
         if err == 200 and data == true then
-            GameLogic.AddBBS(nil,"空间大小检测通过，开始上传")
+            if  world_size < maxSize  then
+                --GameLogic.AddBBS(nil,"空间大小检测通过，开始上传")
+            end
             if callback then
                 callback()
             end

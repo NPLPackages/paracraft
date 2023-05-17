@@ -34,6 +34,7 @@ end
 YellowCodeLimitPage.phoneNumber = "13058184926"--童老师电话
 
 function YellowCodeLimitPage.CheckShow()
+    if (true) then return end -- BugID 1003005
     if System.options.channelId_431 then --智慧教育版，屏蔽黄码弹窗
         return
     end
@@ -51,6 +52,10 @@ function YellowCodeLimitPage.CheckShow()
 end
 
 function YellowCodeLimitPage.ShowPage(deadline)
+    if (true) then return end -- BugID 1003005
+    if System.options.channelId_431 then --智慧教育版，屏蔽黄码弹窗
+        return
+    end
     YellowCodeLimitPage.deadlineStramp = commonlib.timehelp.GetTimeStampByDateTime(deadline)
     YellowCodeLimitPage.deadlineDesc = os.date("%Y-%m-%d %H:%M",YellowCodeLimitPage.deadlineStramp)
 

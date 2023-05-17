@@ -221,7 +221,7 @@ function EditModelProperty.ShowPage(OnClose, last_values)
 				x = -320,
 				y = -210,
 				width = 650,
-				height = 370,
+				height = 410,
 		};
 	System.App.Commands.Call("File.MCMLWindowFrame", params);
 

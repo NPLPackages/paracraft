@@ -266,11 +266,8 @@ function NplBrowserFrame:OnResize()
 	local top = options.top or 0;
 	local right = options.right or 0;
 	local bottom = options.bottom or 0;
-		commonlib.echo("=====================resize 1");
 
 	local function Resize(width, height)
-		commonlib.echo("=====================resize");
-		commonlib.echo({width, height});
 		if(self.width ~= width or self.height ~= height)then
 			self.width = width;
 			self.height = height;
@@ -281,7 +278,7 @@ function NplBrowserFrame:OnResize()
 			else
 				_this:Reposition("_ct", -width / 2, -height / 2, width, height);
 			end
-			self.page:Refresh(0);
+			self.page:Refresh(0.01);
             if(self.callback)then
 			    self.callback("ONRESIZE");
             end
@@ -333,4 +330,10 @@ function NplBrowserFrame:GotoEmpty()
     commonlib.TimerManager.SetTimeout(function()  
 		ParaUI.GetUIObject("root"):Focus();
 	end, 1000)
+end
+function NplBrowserFrame:SendMessage(message)
+	local p = NplBrowserPlugin.GetWindowState(self.browser_name)
+	if p then
+		NplBrowserPlugin.SendMessage(p,message)
+	end
 end

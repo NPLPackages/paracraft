@@ -41,7 +41,7 @@ end
         </pe:if>
         <pe:if condition='<%=EnterTextDialog.IsMultiLine()%>'>
             <div class="mc_paper_panel" style="padding:6px;margin-bottom:6px;margin-right:6px;">
-                <textarea rows="4" UseSystemControl="true" uiname="EnterTextDialog.text_multi" name="text_multi" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" />
+                <textarea rows="10" UseSystemControl="true" uiname="EnterTextDialog.text_multi" name="text_multi" EmptyText='<%=L"点击这里输入(Ctrl+V可以粘贴)"%>' VerticalScrollBarStep="40" />
             </div>
         </pe:if>
         <pe:if condition='<%=EnterTextDialog.IsSelectText()%>'>

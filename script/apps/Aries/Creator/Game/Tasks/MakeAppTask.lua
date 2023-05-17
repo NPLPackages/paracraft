@@ -133,7 +133,7 @@ function MakeApp:Run(...)
         _guihelper.MessageBox(L"您没有权限打包此世界");
         return;
     end
-
+    GameLogic.QuickSave()
     local platform = System.os.GetPlatform();
 
     if (platform == "win32" or platform == "mac") then
@@ -255,7 +255,11 @@ function MakeApp:MakeStartupExe()
         file:WriteString("@echo off\n");
         file:WriteString("cd bin\n");
         local worldPath = Files.ResolveFilePath(GameLogic.GetWorldDirectory()).relativeToRootPath or GameLogic.GetWorldDirectory()
-        file:WriteString("start ParaEngineClient.exe noupdate=\"true\" IsAppVersion=\"true\" mc=\"true\" bootstrapper=\"script/apps/Aries/main_loop.lua\" world=\"%~dp0data/\"");
+        local strCmd = "start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" mc=\"true\"  bootstrapper=\"script/apps/Aries/main_loop.lua\" world=\"../data/\""
+        if (System.options.channelId and System.options.channelId ~= "") then
+            strCmd = string.format("start ParaEngineClient.exe noclientupdate=\"true\" IsAppVersion=\"true\" mc=\"true\" channelId=\"%s\"  bootstrapper=\"script/apps/Aries/main_loop.lua\" world=\"../data/\"",System.options.channelId)
+        end
+        file:WriteString(strCmd);
         file:close();
         return true;
     end

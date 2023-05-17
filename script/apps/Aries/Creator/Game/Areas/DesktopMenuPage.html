@@ -64,14 +64,13 @@
                         GameLogic.CheckSignedIn()
                         EscFramePage.ShowPage(bShow)
                     else
-                        local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-                        page.ShowUserInfoPage({username = System.User.keepworkUsername});
+                        GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
                         EscFramePage.ShowPage(bShow)
                     end
                 end
 
                 function is_show_username()
-                    if (GameLogic.Macros.GetHelpLevel() == -2) then
+                    if (GameLogic.Macros.GetHelpLevel() == -2 or System.options.channelId_431 or System.options.isPapaAdventure) then
                         return false;
                     else
                         return true;
@@ -161,16 +160,19 @@
                                value="<%= GetTrimUserText() %>"
                                class="mc_button_grey" />
                     </pe:if>
-                    <input type="button"
+                    <pe:if condition="<%= not System.options.isPapaAdventure%>">
+                        <input type="button"
                             uiname="DesktopMenuPage.projectId"
                             name="projectId"
                             style="float: left;
-                                   margin-left: 6px;
-                                   height: 32px"
+                                margin-left: 6px;
+                                height: 32px"
                             tooltip='<%= L"点击访问作品项目页面" %>'
                             onclick="DesktopMenuPage.OnClickProjectId"
                             value="<%= DesktopMenuPage.GetProjectText() %>"
                             class="mc_button_grey" />
+                    </pe:if>
+                    
                 </div>
                 <div style="width:36px;position:relative;" align="right">
                     <div tooltip='<%=L"自动隐藏"%>' name="btnPinMenu" onclick="DesktopMenuPage.TogglePinned" style="padding:2px;width:30px;height:30px;background:;background2:url(Texture/Aries/Creator/Theme/GameCommonIcon_32bits.png#428 364 25 26:6 6 6 6);">

@@ -1,0 +1,34 @@
+<!-- "Mod/NplBrowser/NplBrowserDialog.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>2023.4.11</title>
+</head>
+<body> 
+<pe:mcml>
+    <script type="text/npl" refresh="true" src="NplBrowserDialog.lua">
+    <![CDATA[
+        local NplBrowserDialog = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NplBrowserDialog.lua");
+        NplBrowserDialog.OnInit();
+
+        function close()
+            NplBrowserDialog.ClosePage()
+        end
+
+        function Onclick(name)
+            NplBrowserDialog.OnClickButton(name)
+        end
+    ]]>
+    </script>
+    <kp:window title="<%=L'提示'%>" width="470" height="200" onclose="close()">
+        <div style="margin-top: 60px;margin:10px;">
+            <pe:label name="show_text" style="text-align: center; height: 40px;" value='<%=L"检测到你的系统浏览器版本过低，请升级："%>'></pe:label>
+            <pe:container uiname="show_button" style="margin-top: 0px; margin-left: 0px; background: url();">
+                <input type="button" onclick="Onclick" name="auto" value="<%=L'点击这里，自动升级'%>" tooltip="<%=L'升级后需要重启客户端'%>" style="margin-left: 155px; width: 160px; height: 40px; background: url(Texture/Aries/Creator/keepwork/Window/button/huanganniu_32x32_32bits.png#0 0 32 32:14 14 14 14);"/>
+            </pe:container>
+            <input type="button" onclick="Onclick" name="manual" uiname="btn_manual" value="<%=L'如果无法自动升级，【点击这里】手工下载最新微软浏览器'%>" tooltip="<%=L'升级后需要重启客户端'%>" style=" color: #0000ff; margin-left: 36px; margin-top: 18px; background: url();"/>
+        </div>
+    </kp:window>
+</pe:mcml>
+</body>
+</html>

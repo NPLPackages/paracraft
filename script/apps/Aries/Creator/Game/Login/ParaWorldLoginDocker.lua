@@ -450,58 +450,67 @@ end
 -- Desktop.Restart("paracraft")
 -- @param appName: nil default to application at working directory. 
 function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, additional_restart_code)
-	if(not appName) then
-		appName = ParaWorldLoginDocker.GetSourceAppName()
-		if(not additional_commandline_params) then
-			additional_commandline_params = format('paraworldapp="%s"', appName)
+	if (not appName) then
+		appName = ParaWorldLoginDocker.GetSourceAppName();
+
+		if (not additional_commandline_params) then
+			additional_commandline_params = format('paraworldapp="%s"', appName);
 		end
 	end
-	
+
 	local oldCmdLine = ParaEngine.GetAppCommandLine();
 	local newCmdLine = oldCmdLine;
-	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName)
-	if(app and app.cmdLine) then
+	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName);
+
+	if (app and app.cmdLine) then
 		newCmdLine = app.cmdLine;
 	end
 
-	local srcAppName = ParaWorldLoginDocker.GetSourceAppName()
+	local srcAppName = ParaWorldLoginDocker.GetSourceAppName();
 	newCmdLine = format("%s src_paraworldapp=\"%s\"", newCmdLine, srcAppName);
-	newCmdLine = newCmdLine.." "..(ParaWorldLoginDocker.GetRedirectableCmdLineParams() or "");
+	newCmdLine = newCmdLine .. " " .. (ParaWorldLoginDocker.GetRedirectableCmdLineParams() or "");
 
 	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName);
-	if(app and not ParaWorldLoginDocker.IsLoadedApp(appName)) then
+
+	if (app and not ParaWorldLoginDocker.IsLoadedApp(appName)) then
 		local redistFolder = ParaWorldLoginDocker.GetAppFolder(appName);
 		redistFolder = redistFolder:gsub("\\", "/");
 
-		if(ParaWorldLoginDocker.GetCurrentRedistFolder() ~= redistFolder) then
+		if (ParaWorldLoginDocker.GetCurrentRedistFolder() ~= redistFolder) then
 			additional_commandline_params = format("dev=\"%s\" %s", redistFolder, additional_commandline_params or "");
 			LOG.std(nil, "info", "ParaWorldLoginDocker", "dev folder changed to %s", redistFolder);
 
 			-- unload all pkg files
 			local fileManager = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CFileManager");
 			local loadedPkgFiles = {};
+
 			for i=0, fileManager:GetChildCount(0) -1 do
 				local archiveAttr = fileManager:GetChildAt(i, 0);
 				loadedPkgFiles[#loadedPkgFiles+1] = archiveAttr:GetField("name", "");
 			end
+
 			for _, name in ipairs(loadedPkgFiles) do
 				ParaAsset.CloseArchive(name);
 				LOG.std(nil, "info", "ParaWorldLoginDocker", "unload archive: %s", name);
 			end
+
 			-- prepend all haqi pkg files
-			if(app.mergeHaqiPKGFiles) then
-				local app_src = ParaWorldLoginDocker.GetAppInstallDetails("haqi")
-				local folder = ParaWorldLoginDocker.GetAppFolder("haqi")
-				if(redistFolder~=folder) then
+			if (app.mergeHaqiPKGFiles) then
+				local app_src = ParaWorldLoginDocker.GetAppInstallDetails("haqi");
+				local folder = ParaWorldLoginDocker.GetAppFolder("haqi");
+
+				if (redistFolder~=folder) then
 					ParaWorldLoginDocker.LoadAllMainPackagesInFolder(folder);
 				end
 			end
+
 			-- load all pkg files in redist folder
 			ParaWorldLoginDocker.LoadAllMainPackagesInFolder(redistFolder);
 		end
+
 		local asset_manifest = ParaEngine.GetAttributeObject():GetChild("AssetManager"):GetChild("CAssetManifest");
-		asset_manifest:CallField("Clear")
-		asset_manifest:SetField("LoadManifestFile", redistFolder.."assets_manifest.txt")
+		asset_manifest:CallField("Clear");
+		asset_manifest:SetField("LoadManifestFile", redistFolder.."assets_manifest.txt");
 	end
 
 	if (GameLogic.GetFilters():apply_filters("store_get", "user/isSettingLanguage")) then
@@ -523,11 +532,14 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 
 	ParaEngine.SetAppCommandLine(newCmdLine);
 	System.reset();
+
 	-- flush all local server 
-	if(System.localserver) then
+	if (System.localserver) then
 		System.localserver.FlushAll();
-	end	
+	end
+
 	ParaScene.UnregisterAllEvent();
+
 	-- reset to default value
 	ParaTerrain.LeaveBlockWorld();
 	ParaTerrain.GetAttributeObject():SetField("RenderTerrain", true);
@@ -547,26 +559,29 @@ function ParaWorldLoginDocker.Restart(appName, additional_commandline_params, ad
 
 	-- System.options.cmdline_world=""; -- 支持手机直接进入世界
 	local restart_code = [[
-	ParaUI.ResetUI();
-	ParaScene.Reset();
-	NPL.load("(gl)script/apps/Aries/main_loop.lua");
-	NPL.activate("(gl)script/apps/Aries/main_loop.lua");
-]];
-	if(additional_restart_code) then
+		ParaUI.ResetUI();
+		ParaScene.Reset();
+		NPL.load("(gl)script/apps/Aries/main_loop.lua");
+		NPL.activate("(gl)script/apps/Aries/main_loop.lua");
+	]];
+
+	if (additional_restart_code) then
 		restart_code = restart_code .. additional_restart_code;
 	end
 
 	-- TODO: close world archives, packages and search paths
 
 	-- clear pending messages before reset
-	while(true) do
+	while (true) do
 		local nSize = __rts__:GetCurrentQueueSize();
-		if(nSize>0) then
+
+		if (nSize>0) then
 			__rts__:PopMessageAt(0, {process = true});
 		else
 			break;
 		end
 	end
+
 	__rts__:Reset(restart_code);
 end
 

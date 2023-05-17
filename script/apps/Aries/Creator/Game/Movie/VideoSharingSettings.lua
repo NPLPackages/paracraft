@@ -92,7 +92,7 @@ end
 
 function VideoSharingSettings.GetOutputFilepath()
 	local date, hour = commonlib.timehelp.GetLocalTime();
-	return format(L"%s%s_ถฬสำฦต_%s-%s.%s", settings.folder, VideoSharingSettings.GetOutputFilename(), date, hour, VideoSharingSettings.GetCodecExtension());
+	return format(L"%s%s_video_%s-%s.%s", settings.folder, VideoSharingSettings.GetOutputFilename(), date, hour, VideoSharingSettings.GetCodecExtension());
 end
 
 function VideoSharingSettings.GetOutputFilename()

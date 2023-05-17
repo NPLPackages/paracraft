@@ -244,12 +244,17 @@ e.g.
 
 Commands["makepkg"] = {
 	name="makepkg", 
-	quick_ref="/makepkg zip_src [pkg_dest]", 
+	quick_ref="/makepkg zip_src|package.txt [pkg_dest]", 
 	desc=[[make src zip file to dest pkg file. If dest is not provided, the src zip file extension is changed to pkg. 
 pkg is an encrpted zip file and can be used interchangably with zip file in paracraft. 
 e.g.
-/makepkg temp/test.zip
-/makepkg main_mobile_res     :internally used
+/makepkg test.zip  -- generate test.pkg
+/makepkg main_mobile_res   -- internally used
+
+It also takes a text file name, whose content is same as .gitignore, but has the reverse meaning. 
+e.g. the following generate paracraft-mini.pkg and paracraft-mini.zip according to package list file
+/makepkg packages/redist/paracraft-mini.txt 
+
 ]], 
 	handler = function(cmd_name, cmd_text, cmd_params)
 		local src, dest;
@@ -260,15 +265,38 @@ e.g.
 			NPL.load("(gl)script/installer/BuildParaWorld.lua");
 			local error_count = commonlib.BuildParaWorld.MakeZipPackage({"main_mobile_res"}) or 0;
 			commonlib.BuildParaWorld.EncryptZipFiles({"main_mobile_res"});
-			_guihelper.MessageBox(format("error_count: %d. main_mobile_res.pkg已经生成并覆盖好了，请上传AB. ", error_count or 0), function()
-				local absPath = string.gsub(ParaIO.GetCurDirectory(0).."installer/", "/", "\\");
+			_guihelper.MessageBox(format("error_count: %d. main_mobile_res.pkg已经生成并覆盖好了，请上传p4. ", error_count or 0), function()
+				local absPath = string.gsub(ParaIO.GetWritablePath().."installer/", "/", "\\");
 				ParaGlobal.ShellExecute("open", "explorer.exe", absPath, "", 1);
 			end)
 		elseif(src) then
-			if(not dest) then
-				dest = src:gsub("zip$", "pkg")
+			if(src:match("%.zip$")) then
+				if(not dest) then
+					dest = src:gsub("zip$", "pkg")
+				end
+				ParaAsset.GeneratePkgFile(src, dest);
+			elseif(src:match("%.txt$")) then
+				-- make package from reverse of git ignore file
+				local packagename = src:match("[^/\\]+$");
+				packagename = "installer/"..packagename;
+				local zipFileName = packagename:gsub("txt$", "zip")
+
+				NPL.load("(gl)script/ide/System/Util/ZipFile.lua");
+				local ZipFile = commonlib.gettable("System.Util.ZipFile");
+				local zipFile = ZipFile:new();
+				ParaIO.DeleteFile(zipFileName)
+				if(zipFile:open(zipFileName, "w")) then
+					-- compile to bin folder
+					zipFile:SetAutoCompileNPLFile(true)
+					local stats = zipFile:AddFromPackageListFile(src)
+					zipFile:close();
+					zipFile:SaveAsPKG();
+					_guihelper.MessageBox(format(L"%s已经生成. %s <br/>是否要打开目录?", zipFileName, commonlib.serialize_compact(stats)), function()
+						local absPath = string.gsub(ParaIO.GetWritablePath().."installer/", "/", "\\");
+						ParaGlobal.ShellExecute("open", "explorer.exe", absPath, "", 1);
+					end)
+				end
 			end
-			ParaAsset.GeneratePkgFile(src, dest);
 		end
 	end,
 };

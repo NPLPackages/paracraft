@@ -86,6 +86,9 @@ _G.DOCK_CONFIG = {
         {name = "lesson", align = "_lb", tooltip=L"查看课程", enabled = true, onclick=onclick, sortIndex=995, width=206,height=116, bg="Texture/Aries/Creator/keepwork/dock/ppt_206x116_32bits.png#0 0 206 116",},
         {name = "save", align = "_rt", tooltip=L"提交作业", enabled = true, onclick=onclick, sortIndex=994, width=138,height=55, bg="Texture/Aries/Creator/keepwork/dock/zuoye_138x55_32bits.png#0 0 138 55",},
     },
+    E_DOCK_PAPA = { 
+        {name = "setting", align = "_rt",tooltip=L"系统设置", enabled = true, onclick=onclick, sortIndex=999,  width=64,height=45, bg="Texture/Aries/Creator/keepwork/dock/shezhi_45x45_32bits.png#0 0 64 45",},
+    },
 }
 
 function DockConfig.FilterConfigByProjectId(config)
@@ -251,7 +254,7 @@ function DockConfig.OnClickItem(name)
 end
 
 function DockConfig.OnClickDongao(id)
-    local Page = NPL.load("Mod/GeneralGameServerMod/UI/Page.lua");
+    local Page = NPL.load("script/ide/System/UI/Page.lua");
     local idCnf = {
         winter_camp ="tiyujinsai",
         papa="quweibiancheng",
@@ -306,8 +309,7 @@ function DockConfig.OnClickParaWorldDock(id)
             local UserInfoPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/User/UserInfoPage.lua");
             UserInfoPage.ShowPage(System.User.keepworkUsername)
         else
-            local page = NPL.load("Mod/GeneralGameServerMod/App/ui/page.lua");
-            page.ShowUserInfoPage({username = System.User.keepworkUsername});
+            GameLogic.ShowUserInfoPage({username = System.User.keepworkUsername});
         end
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.character");
     elseif(id == "work")then
@@ -380,7 +382,8 @@ function DockConfig.OnClickParaWorldDock(id)
             );
         end
     elseif (id == "create_spage") then
-        GameLogic.ToggleDesktop("esc");
+        --GameLogic.ToggleDesktop("esc");
+        GameLogic.RunCommand("/menu help.creativespace");
     elseif (id == "home_point") then
         GameLogic.RunCommand("/home");
     else
@@ -390,6 +393,7 @@ end
 
 function DockConfig.OnClickNormal(id)
     if id == "setting" then
+        print("ddddddddddddddddd",id)
         GameLogic.ToggleDesktop("esc");
         GameLogic.GetFilters():apply_filters("user_behavior", 1, "click.dock.setting");
     end
@@ -439,7 +443,11 @@ function DockConfig.OnClickLike()
     if isLiked then
         return 
     end
-	keepwork.world.star({router_params = {id = worldParams.projectId}}, function(err, msg, data)
+    local kpProjectId = GameLogic.options:GetProjectId()
+    if not kpProjectId or tonumber(kpProjectId) == 0 then
+        return
+    end
+	keepwork.world.star({router_params = {id = kpProjectId}}, function(err, msg, data)
 		if (err == 200) then
 			isLiked = true;
 			GameLogic.QuestAction.SetDailyTaskValue("40012_1", nil, 1)
@@ -449,7 +457,11 @@ function DockConfig.OnClickLike()
 end
 
 function DockConfig.OnClickFavorite()
-	keepwork.world.favorite({objectId = worldParams.projectId, objectType = 5}, function(err, msg, data)
+    local kpProjectId = GameLogic.options:GetProjectId()
+    if not kpProjectId or tonumber(kpProjectId) == 0 then
+        return
+    end
+	keepwork.world.favorite({objectId = kpProjectId, objectType = 5}, function(err, msg, data)
 		if (err == 200) then
 			isFavorited = true;
             DockConfig.UpdateNum()
@@ -458,7 +470,11 @@ function DockConfig.OnClickFavorite()
 end
 
 function DockConfig.OnClickUnFavorite()
-	keepwork.world.unfavorite({objectId = worldParams.projectId, objectType = 5}, function(err, msg, data)
+    local kpProjectId = GameLogic.options:GetProjectId()
+    if not kpProjectId or tonumber(kpProjectId) == 0 then
+        return
+    end
+	keepwork.world.unfavorite({objectId = kpProjectId, objectType = 5}, function(err, msg, data)
 		if (err == 200) then
 			isFavorited = false;
             DockConfig.UpdateNum()
@@ -467,7 +483,11 @@ function DockConfig.OnClickUnFavorite()
 end
 
 function DockConfig.UpdateNum()
-    keepwork.world.detail({router_params = {id = worldParams.projectId}}, function(err, msg, data)
+    local kpProjectId = GameLogic.options:GetProjectId()
+    if not kpProjectId or tonumber(kpProjectId) == 0 then
+        return
+    end
+    keepwork.world.detail({router_params = {id = kpProjectId}}, function(err, msg, data)
         if (data) then
             likeCount = data.star or 0;
             favoriteCount = data.favorite or 0;
@@ -480,20 +500,24 @@ function DockConfig.UpdateNum()
 end
 
 function DockConfig.Refresh(userId)
+    local kpProjectId = GameLogic.options:GetProjectId()
+    if not kpProjectId or tonumber(kpProjectId) == 0 then
+        return
+    end
 	currentId = userId;
-	keepwork.world.detail({router_params = {id = worldParams.projectId}}, function(err, msg, data)
+	keepwork.world.detail({router_params = {id = kpProjectId}}, function(err, msg, data)
 		if (data) then
 			likeCount = data.star or 0;
 			favoriteCount = data.favorite or 0;
             -- print("Refresh===========",likeCount,favoriteCount)
 		end
-		keepwork.world.is_stared({router_params = {id = worldParams.projectId}}, function(err, msg, data)
+		keepwork.world.is_stared({router_params = {id = kpProjectId}}, function(err, msg, data)
 			if (err == 200) then
 				isLiked = data == true;
                 DockConfig.SetLike(isLiked)
                 DockConfig.SetLikeNum(likeCount)
 			end
-			keepwork.world.is_favorited({objectId = worldParams.projectId, objectType = 5}, function(err, msg, data)
+			keepwork.world.is_favorited({objectId = kpProjectId, objectType = 5}, function(err, msg, data)
 				if (err == 200) then
 					isFavorited = data == true;
                     DockConfig.SetFavorite(isFavorited)

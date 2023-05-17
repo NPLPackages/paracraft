@@ -175,6 +175,10 @@ end
 
 function Entity:ToggleFly(bFly)
 	local player = self:GetInnerObject();
+	if not player then
+		LOG.std(nil,"info","EntityMovable","player toggole fly error")
+		return
+	end
 	if(bFly == nil) then
 		if(not self:IsFlying()) then
 			bFly = true;
@@ -197,8 +201,6 @@ function Entity:ToggleFly(bFly)
 		-- this fixed camera direction in mobile device. 
 		player:SetField("FlyUsingCameraDir", true);
 
-		-- BroadcastHelper.PushLabel({id="fly_tip", label = "�������ģʽ����ס����Ҽ����Ʒ���, W��ǰ��", max_duration=5000, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
-
 	elseif(bFly == false) then
 		-- restore to original density
 		player:SetDensity(GameLogic.options.NormalDensity);
@@ -208,8 +210,7 @@ function Entity:ToggleFly(bFly)
 		player:SetField("AlwaysFlying",false);
 		player:ToCharacter():SetSpeedScale(self:GetSpeedScale());
 		player:ToCharacter():FallDown();
-		
-		-- BroadcastHelper.PushLabel({id="fly_tip", label = "�˳�����ģʽ", max_duration=1500, color = "0 255 0", scaling=1.1, bold=true, shadow=true,});
+
 	end
 	return self.bFlying;
 end

@@ -136,8 +136,10 @@ function MobilePlayContext:handleLeftClickScene(event, result)
 			if(itemStack) then
 				block_id = itemStack.id
 			end
-			local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
-			self:OnCreateSingleBlock(x,y,z, block_id, result)
+			if result.blockX then
+				local x,y,z = BlockEngine:GetBlockIndexBySide(result.blockX,result.blockY,result.blockZ,result.side);
+				self:OnCreateSingleBlock(x,y,z, block_id, result)
+			end
 		end	
 		event:accept();
 	end

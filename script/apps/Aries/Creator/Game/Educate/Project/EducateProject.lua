@@ -23,7 +23,7 @@ function EducateProject.ShowCreate()
         local height = 470
         local x = -510
         local y = -220
-        Opus:ShowCreate(nil,width,height,x,y,true,1)
+        Opus:ShowCreate(nil,width,height,x,y,true,-1)
     end
     EducateProject.GetUserWorldUsedSize()
 end
@@ -41,6 +41,7 @@ function EducateProject.GetUserWorldUsedSize()
             end
             local totalSize = tonumber(data.total) or 0 --总容量
             local surplus = tonumber(data.surplus) or 0 --剩余容量
+            surplus = math.max(surplus,0)
             local use = tonumber(data.use) or 0 --使用容量
             if surplus then
                 local objText = ParaUI.GetUIObject("project_memui")

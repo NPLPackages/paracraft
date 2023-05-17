@@ -14,6 +14,9 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Common/SysInfoStatistics.lua");
 local SysInfoStatistics = commonlib.gettable("MyCompany.Aries.Game.Common.SysInfoStatistics")
 -------------------------------------------------------
 ]]
+NPL.load("(gl)script/ide/System/Windows/Screen.lua");
+local Screen = commonlib.gettable("System.Windows.Screen");
+	
 local LuaCallbackHandler = NPL.load("(gl)script/ide/PlatformBridge/LuaCallbackHandler.lua");
 
 local SysInfoStatistics = commonlib.gettable("MyCompany.Aries.Game.Common.SysInfoStatistics")
@@ -39,6 +42,9 @@ local function getVersionByPath(parentPath)
 end
 
 function SysInfoStatistics.uploadSysInfo(_info)
+    local win_width = Screen:GetWidth()
+	local win_height = Screen:GetHeight()
+    local scalling = Screen:GetUIScaling(true);
     local obj = _info --整合之后的数据
     
     obj.installPath = ParaIO.GetWritablePath()
@@ -54,6 +60,9 @@ function SysInfoStatistics.uploadSysInfo(_info)
     obj.isDevMode = System.options.isDevMode
     obj.mc = System.options.mc
     obj.platform = System.os.GetPlatform()
+    obj.winwidth = win_width
+    obj.winheight = win_height
+    obj.scalling = scalling
 
     local SessionsData = NPL.load('(gl)Mod/WorldShare/database/SessionsData.lua')
     local bak_sessions = SessionsData:GetSessions()

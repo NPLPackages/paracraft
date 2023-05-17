@@ -568,35 +568,37 @@ function ParacraftLearningRoomDailyPage.OnOpenWeb(index,bCheckVip)
 
 		RedSummerCampPPtPage.StartTask("dailyVideo")
 		GameLogic.GetFilters():apply_filters("user_behavior", 2, "duration.learning_daily", { started = true, learningIndex = index });
-		if System.os.GetPlatform() ~= 'win32' or not System.options.enable_npl_brower or  System.os.IsWindowsXP() then
-			-- 除了win32平台，使用默认浏览器打开视频教程
-			if System.os.IsWindowsXP() then
-				url = string.gsub(url, "https", "http")
+		if (not System.os.IsEmscripten()) then
+			if System.os.GetPlatform() ~= 'win32' or not System.options.enable_npl_brower or  System.os.IsWindowsXP() then
+				-- 除了win32平台，使用默认浏览器打开视频教程
+				if System.os.IsWindowsXP() then
+					url = string.gsub(url, "https", "http")
+				end
+				
+				local cmd = string.format("/open %s", url);
+				GameLogic.RunCommand(cmd);
+				if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
+					local exid = ParacraftLearningRoomDailyPage.exid;
+					KeepWorkItemManager.DoExtendedCost(exid, function()
+		
+						if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
+							ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp);
+						else
+							ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
+						end
+		
+						local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
+						local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
+						GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
+						GameLogic.GetFilters():apply_filters('finish_daily_video') 
+						QuestAction.SetDailyTaskValue("40009_1",1)
+						RedSummerCampPPtPage.OnCloseDailyVideo()
+					end, function()
+						_guihelper.MessageBox(L"签到失败！");
+					end)
+				end
+				return
 			end
-			
-			local cmd = string.format("/open %s", url);
-			GameLogic.RunCommand(cmd);
-			if not ParacraftLearningRoomDailyPage.HasCheckedToday() then
-				local exid = ParacraftLearningRoomDailyPage.exid;
-				KeepWorkItemManager.DoExtendedCost(exid, function()
-	
-					if(ParacraftLearningRoomDailyPage.is_red_summercamp)then
-						ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage_RedSummerCamp);
-					else
-						ParacraftLearningRoomDailyPage.SaveToLocal(ParacraftLearningRoomDailyPage.ShowPage);
-					end
-	
-					local reward_num = DailyTaskManager.GetTaskRewardNum(ParacraftLearningRoomDailyPage.exid)
-					local desc = string.format("为你的学习点赞，奖励你%s个知识豆，再接再厉哦~", reward_num)
-					GameLogic.AddBBS("desktop", desc, 3000, "0 255 0"); 
-					GameLogic.GetFilters():apply_filters('finish_daily_video') 
-					QuestAction.SetDailyTaskValue("40009_1",1)
-					RedSummerCampPPtPage.OnCloseDailyVideo()
-				end, function()
-					_guihelper.MessageBox(L"签到失败！");
-				end)
-			end
-			return
 		end
 	
 		NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/BackgroundMusic.lua");

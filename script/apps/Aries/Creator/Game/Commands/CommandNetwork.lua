@@ -474,24 +474,36 @@ e.g.
 			end
 
 			if(not att:GetField("IsServerStarted", false)) then
-				local function TestOpenNPLPort_()
-					System.os.GetUrl(format("http://127.0.0.1:%s/ajax/console?action=getpid", port), function(err, msg, data)
-						if(data and data.pid) then
-							if(System.os.GetCurrentProcessId() ~= data.pid) then
-								-- already started by another application, 
-								-- try 
-								port = port + 1;
-								TestOpenNPLPort_();
-								return;
+				local USE_NPL_GET_PID = false
+				if(USE_NPL_GET_PID or not ParaGlobal.IsPortAvailable) then
+					local function TestOpenNPLPort_()
+						System.os.GetUrl(format("http://127.0.0.1:%s/ajax/console?action=getpid", port), function(err, msg, data)
+							if(data and data.pid) then
+								if(System.os.GetCurrentProcessId() ~= data.pid) then
+									-- already started by another application, 
+									-- try 
+									port = port + 1;
+									TestOpenNPLPort_();
+									return;
+								else
+									-- already opened by the same process
+								end
 							else
-								-- already opened by the same process
+								startserver_();
 							end
-						else
+						end);
+					end
+					TestOpenNPLPort_();
+				else
+					local testHost = ((host or "") == "") and "0.0.0.0" or host
+					for i = 1, 20 do
+						if(ParaGlobal.IsPortAvailable(testHost, port)) then
 							startserver_();
+							break
 						end
-					end);
+						port = port + 1
+					end
 				end
-				TestOpenNPLPort_();
 			elseif(not WebServer:IsStarted()) then
 				-- this could happen when game server is started before web server, we will share the same port with exiting server. 
 				port = tonumber(att:GetField("HostPort", "8099"))

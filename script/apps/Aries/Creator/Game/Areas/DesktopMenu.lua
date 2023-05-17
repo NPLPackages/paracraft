@@ -20,6 +20,8 @@ local menu_name_map = {};
 local edit_mode_menu = {};
 local game_mode_menu = {};
 
+local isRename = System.options.channelId_431 or System.options.isPapaAdventure
+
 function DesktopMenu.LoadMenuItems(bForceReload)
 	if(menu_items and not bForceReload) then
 		return menu_items;
@@ -35,10 +37,10 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 			{
 				{text = L"新建...".."  Ctrl+N",name = "file.createworld",onclick=nil},
 				{text = L"打开...".."  Ctrl+O",name = "file.loadworld",onclick=nil},
-				{text = System.options.channelId_431 and L"临时保存".."  Ctrl+S" or L"快速保存".."  Ctrl+S",name = "file.saveworld",onclick=nil, cmd="/save"},
+				{text = isRename and L"临时保存".."  Ctrl+S" or L"快速保存".."  Ctrl+S",name = "file.saveworld",onclick=nil, cmd="/save"},
 				{text = L"另存为...",name = "file.saveworldas",onclick=nil},
 				{Type = "Separator"},
-				{text = System.options.channelId_431 and L"保存世界" or L"上传世界",name = "file.uploadworld",onclick=nil},
+				{text = isRename and L"保存世界" or L"上传世界",name = "file.uploadworld",onclick=nil},
 				{text = L"本地历史版本...",name = "file.openbackupfolder",onclick=nil},
 				{text = L"生成独立应用程序...",name = "file.makeapp", cmd="/makeapp UImode"},
 				{text = L"备份...",name = "file.worldrevision",onclick=nil},
@@ -71,7 +73,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 						{text = L"查看全部跳转点...", name = "edit.bookmark.viewall", cmd="/menu edit.bookmark.viewall"},
 					}
 				},
-				{Type = "Separator"},
+				--{Type = "Separator"},
 				{text = L"录制宏命令...", name = "window.macro", cmd="/macro record -i", onclick=nil},
 				{text = L"分享模型...", name = "window.sharemod", onclick=nil},
 			},
@@ -123,7 +125,7 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				-- {text = L"教学视频",name = "help.videotutorials", onclick=nil},
 				{text = L"官方文档".." & "..L"教学视频",name = "help.learn", onclick=nil},
 				{text = L"新手教学...",name = "help.dailycheck", onclick=nil},
-				{text = L"创意空间...".."(课程)".."  F7",name = "help.creativespace", onclick=nil},
+				{text = L"创意空间..."..L"(课程)".."  F7",name = "help.creativespace", onclick=nil},
 				{Type = "Separator"},
 				-- {text = L"操作提示(F1)",name = "help.actiontutorial", onclick=nil},
 				{text = L"帮助...".."  F1",name = "help.help", onclick=nil},
@@ -168,7 +170,9 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 		for _, menuItem in ipairs(menu_items) do
 			if(menuItem.children and menuItem.name =="help") then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
-					return item.name ~= "help.learn" and item.name ~= "help.userintroduction" and item.name ~= "help.dailycheck" and item.name ~= "help.creativespace" and item.name ~= "help.ask" and item.name ~= "help.bug"
+					return item.name ~= "help.learn" and item.name ~= "help.userintroduction" 
+					and item.name ~= "help.dailycheck" and item.name ~= "help.creativespace" 
+					and item.name ~= "help.ask" and item.name ~= "help.bug"
 				end)
 			elseif(menuItem.children and menuItem.name =="file")then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
@@ -176,11 +180,56 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 				end)
 			elseif(menuItem.children and menuItem.name =="edit")then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
-					return item.name ~= "window.macro"
+					return item.name ~= "window.macro" and item.name ~= "window.sharemod"
 				end)
 			elseif(menuItem.children and menuItem.name =="window")then
 				menuItem.children = commonlib.filter(menuItem.children,function (item)
-					return item.name ~= "window.explore" and item.name ~= "window.role"  and item.name ~= "window.schoolcenter" and item.name ~= "window.userbag" and item.name ~= "window.friend" and item.name ~= "window.email" and item.name ~= "window.console" and item.name ~= "window.mod"
+					return item.name ~= "window.explore" and item.name ~= "window.role"  and item.name ~= "window.schoolcenter" 
+						and item.name ~= "window.userbag" and item.name ~= "window.friend" and item.name ~= "window.email" 
+						and item.name ~= "window.console" and item.name ~= "window.mod"
+				end)
+			end
+		end
+	end
+
+	if System.options.isPapaAdventure then
+		for _, menuItem in ipairs(menu_items) do
+			if(menuItem.children and menuItem.name =="help") then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					return item.name ~= "help.dailycheck" and item.name ~= "help.creativespace" 
+				end)
+			elseif(menuItem.children and menuItem.name =="file")then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					if GameLogic.IsReadOnly() then
+						if DesktopMenu.IsPapaCreate() then
+							return item.name == "file.exit" or item.name == "file.settings"
+						end
+						return item.name == "file.exit" or item.name == "file.settings" or item.name == "file.loadworld" or item.name == "file.createworld"
+					end
+					if DesktopMenu.IsPapaCreate() then
+						return item.name ~= "file.saveworldas" and item.name ~= "file.openbackupfolder" 
+							and item.name ~= "file.worldrevision" and item.name ~= "file.makeapp" 
+							and item.name ~= "file.loadworld" and item.name ~= "file.createworld"
+					end
+					return item.name ~= "file.saveworldas" and item.name ~= "file.openbackupfolder" 
+						and item.name ~= "file.worldrevision" and item.name ~= "file.makeapp"
+				end)
+			elseif(menuItem.children and menuItem.name =="edit")then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					return item.name ~= "window.macro" and item.name ~= "window.sharemod" 
+				end)
+			elseif(menuItem.children and menuItem.name =="window")then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+					return item.name ~= "window.explore" and item.name ~= "window.role"  
+					and item.name ~= "window.schoolcenter" and item.name ~= "window.userbag" 
+					and item.name ~= "window.friend" and item.name ~= "window.email" and item.name ~= "window.console"
+				end)
+			elseif(menuItem.children and menuItem.name =="project")then
+				menuItem.children = commonlib.filter(menuItem.children,function (item)
+
+					return item.name == "project.name" or item.name == "project.pid"  or item.name == "project.ppid" 
+						or item.name == "project.unlike" or item.name == "project.like" 
+						or item.name == "project.favorite" or item.name == "project.unfavorite" 
 				end)
 			end
 		end
@@ -214,6 +263,11 @@ function DesktopMenu.LoadMenuItems(bForceReload)
 	end
 	table.sort(game_mode_menu, menu_sort_function);
 	table.sort(edit_mode_menu, menu_sort_function);
+end
+
+function DesktopMenu.IsPapaCreate()
+	local PapaUtils = NPL.load("(gl)script/apps/Aries/Creator/Game/PapaAdventures/PapaUtils.lua");
+	return PapaUtils.IsPapaCreate()
 end
 
 function DesktopMenu.Init()

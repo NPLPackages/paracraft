@@ -6,7 +6,7 @@ Desc:
 Use Lib:
 -------------------------------------------------------
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.share.lua");
-http://api-dev.kp-para.cn/storage/v0/qinius/uploadToken
+https://api-dev.kp-para.cn/storage/v0/qinius/uploadToken
 ]]
 local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
 

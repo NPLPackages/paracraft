@@ -36,11 +36,27 @@ function UserProtocol.ClosePage()
 end
 
 function UserProtocol.ShowPage(index)
-	UserProtocol.index = index
-	local url = 'https://api.keepwork.com/core/v0/repos/official%2Fdocs/files/official%2Fdocs%2Freferences%2Flicense.md'
-	if index == 2 then
-		url = 'https://api.keepwork.com/core/v0/repos/official%2Fdocs/files/official%2Fdocs%2Freferences%2Fprivacy.md'
+	UserProtocol.index = index;
+
+	local url = "";
+	local androidFlavor = ParaEngine.GetAppCommandLineByParam('android_flavor', nil);
+
+	if index == 1 then
+		-- agreement page
+		if (androidFlavor == "Xiaomi") then
+			url = "https://api.keepwork.com/core/v0/repos/official%2Fdocs/files/official%2Fdocs%2Freferences%2Flicense_app.md";
+		else
+			url = "https://api.keepwork.com/core/v0/repos/official%2Fdocs/files/official%2Fdocs%2Freferences%2Flicense.md";
+		end
+	elseif index == 2 then
+		-- user privacy
+		if (androidFlavor == "Xiaomi") then
+			url = "https://api.keepwork.com/core/v0/repos/official%2Fprivacy_app/files/official%2Fprivacy_app%2Findex.md";
+		else
+			url = "https://api.keepwork.com/core/v0/repos/official%2Fdocs/files/official%2Fdocs%2Freferences%2Fprivacy.md";
+		end
 	end
+
 	HttpRequest:Get(url, nil, nil, function(data, err)
 		UserProtocol.htmlData = MdParser:MdToHtml(data, true)
 		local params = {

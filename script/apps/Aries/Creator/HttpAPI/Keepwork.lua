@@ -140,6 +140,10 @@ function Keepwork:OnLogin()
 
     local userinfo = self:GetUserInfo();
     LOG.std(nil, 'info', 'GetUserInfo', userinfo);
+    
+    -- emscripten 专用 https://www.tapd.cn/31439671/prong/stories/view/1131439671001002594?from=letter
+    System.options.cmdline_username = userinfo.username;
+
     userinfo.extra = userinfo.extra or {};
     userinfo.extra.ParacraftPlayerEntityInfo = userinfo.extra.ParacraftPlayerEntityInfo or {};
     local old_skin = userinfo.extra.ParacraftPlayerEntityInfo.skin or "";
