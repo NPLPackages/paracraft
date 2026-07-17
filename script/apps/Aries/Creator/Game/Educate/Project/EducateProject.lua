@@ -7,6 +7,7 @@
         EducateProject.ShowPage()
 ]]
 local Opus = NPL.load("(gl)Mod/WorldShare/cellar/Opus/Opus.lua")
+local KeepworkServicePermission = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Permission.lua')
 local EducateProject = NPL.export()
 local page,page_root
 function EducateProject.OnInit()
@@ -167,7 +168,13 @@ function EducateProject.ShowOptionMenu()
             btnNode:SetScript("onclick",function()
                 EducateProject.CloseMenu()
                 commonlib.TimerManager.SetTimeout(function()  
-                    GameLogic.RunCommand("/menu file.importp3dfile")
+                    KeepworkServicePermission:Authentication('LimitP3dFile', function(result)
+                        if result then
+                            GameLogic.RunCommand("/menu file.importp3dfile")
+                        else
+                            _guihelper.MessageBox(L'导入P3D文件解锁请联系客服', nil, _guihelper.MessageBoxButtons.OK)
+                        end
+                    end)
                 end, 200);
                 
             end)

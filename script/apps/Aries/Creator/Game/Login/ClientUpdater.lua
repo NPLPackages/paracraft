@@ -350,7 +350,8 @@ function ClientUpdater:Download(callbackFunc)
 		ClientUpdater.Download_callbackFunc = callbackFunc
 	end
 	if(self.autoUpdater:isNeedUpdate())then
-		ParaWorldLoginDocker.SetInstalling(true, ParaWorldLoginDocker.GetAppTitle(self.appname));
+		-- show the current app's title (e.g. 魔法哈奇 for haqi) instead of the fixed paracraftAppVersion title.
+		ParaWorldLoginDocker.SetInstalling(true, ParaWorldLoginDocker.GetAppTitle(ParaWorldLoginDocker.GetCurrentAppName()));
 		DownloadWorld.ShowPage(self.gamename);
 		self.autoUpdater:download()
 	else

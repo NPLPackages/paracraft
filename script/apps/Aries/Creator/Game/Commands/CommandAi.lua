@@ -13,10 +13,8 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandAi.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.ai.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/AIChat.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/EasyAIChatTools.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
 local AIChat = commonlib.gettable("MyCompany.Aries.Game.Common.AIChat");
-local EasyAIChatTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.EasyAIChatTools");
 
 local CmdParser = commonlib.gettable("MyCompany.Aries.Game.CmdParser");	
 local Commands = commonlib.gettable("MyCompany.Aries.Game.Commands");
@@ -104,10 +102,7 @@ Commands["ask"] = {
             
             -- Register tools if needTool is enabled
             if options.needTool then
-                EasyAIChatTools.RegisterMQTTTools(aiChatSession);
-                EasyAIChatTools.RegisterPersonalPageTools(aiChatSession);
-                -- TODO: Support custom tool registration via -tools option
-                -- e.g., /ask -tools mqtt,personal_page,scheduler
+                aiChatSession:RegisterEasyTools({"mqtt", "personal_page"});
             end
             
             -- If inputMessages provided, set history directly
@@ -132,8 +127,7 @@ Commands["ask"] = {
                 aiChatSession:SetKnowledgeUsername(options.knowledgeUsername);
             end
             if options.needTool then
-                EasyAIChatTools.RegisterMQTTTools(aiChatSession);
-                EasyAIChatTools.RegisterPersonalPageTools(aiChatSession);
+                aiChatSession:RegisterEasyTools({"mqtt", "personal_page"});
             end
         end
 

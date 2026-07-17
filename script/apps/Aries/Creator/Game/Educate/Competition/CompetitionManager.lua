@@ -46,8 +46,11 @@ function CompetitionManager:Init()
     self.isCompeteFinished = false
     self.isSubmitScore = false
     self.bIgnoreCompeteScore = false
+    self.isForceSubmitting = false
     self.custom_answer_score = {}
     self.sync_world_time = 0
+    self.forkWorldAutoLoadName = nil
+    self.forkWorldLoadRequestedName = nil
     EducateProjectManager.Init()
     CompetitionApi.InitCompeteApi()
     GameLogic.GetFilters():remove_filter("apps.aries.creator.game.login.swf_loading_bar.close_page",  CompetitionManager.OnSwfLoadingCloesed);
@@ -73,46 +76,50 @@ function CompetitionManager:Init()
 
     GameLogic.GetFilters():remove_filter("CodeBlockWindow.IsDragable", CompetitionManager.IsCodeWindowDragable);
     GameLogic.GetFilters():add_filter("CodeBlockWindow.IsDragable", CompetitionManager.IsCodeWindowDragable);
-    -- GameLogic.GetFilters():remove_filter("WorldName.ResetWindowTitle", CompetitionManager.ResetWindowTitle);
-    -- GameLogic.GetFilters():add_filter("WorldName.ResetWindowTitle", CompetitionManager.ResetWindowTitle);
+    
+    GameLogic.GetFilters():remove_filter('save_world_info', CompetitionManager.OnSaveWorldInfoFilter);
+    GameLogic.GetFilters():add_filter('save_world_info', CompetitionManager.OnSaveWorldInfoFilter);
 
-    GameLogic.GetFilters():add_filter(
-        'save_world_info',
-        function(ctx, node)
-            self:SaveWorldInfo(ctx, node)
-            return ctx,node
-        end
-    )
+    GameLogic.GetFilters():remove_filter('load_world_info', CompetitionManager.OnLoadWorldInfoFilter);
+    GameLogic.GetFilters():add_filter('load_world_info', CompetitionManager.OnLoadWorldInfoFilter);
 
-    GameLogic.GetFilters():add_filter(
-        'load_world_info',
-        function(ctx, node)
-            self:LoadWorldInfo(ctx, node)
-            return ctx,node
-        end
-    )
+    GameLogic.GetFilters():remove_filter("OnWorldCreate", CompetitionManager.OnWorldCreateFilter);
+    GameLogic.GetFilters():add_filter("OnWorldCreate", CompetitionManager.OnWorldCreateFilter);
 
-    GameLogic.GetFilters():add_filter("OnWorldCreate",  function(worldPath)
-        self.CurrentCreateWorldName = worldPath
-        self.isFirstSyncWorld = true
-        return worldPath
-    end)
-
-    GameLogic.GetFilters():add_filter("EducateLogout",  function(desc,callback)
-        if callback and type(callback) == "function" then
-            GameLogic.GetFilters():apply_filters('logout')
-            GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true)
-            GameLogic.CheckSignedIn(desc or L"请先登录！", function(bSucceed)
-                if bSucceed then
-                    callback()
-                end
-            end);
-        end
-        return desc,callback
-    end)
+    GameLogic.GetFilters():remove_filter("EducateLogout", CompetitionManager.OnEducateLogoutFilter);
+    GameLogic.GetFilters():add_filter("EducateLogout", CompetitionManager.OnEducateLogoutFilter);
 
     GameLogic.GetEvents():RemoveEventListener("createworld_callback",CompetitionManager.CreateWorldCallback, CompetitionManager, "CompetitionManager")
     GameLogic.GetEvents():AddEventListener("createworld_callback", CompetitionManager.CreateWorldCallback, CompetitionManager, "CompetitionManager");
+end
+
+function CompetitionManager.OnSaveWorldInfoFilter(ctx, node)
+    CompetitionManager:SaveWorldInfo(ctx, node)
+    return ctx, node
+end
+
+function CompetitionManager.OnLoadWorldInfoFilter(ctx, node)
+    CompetitionManager:LoadWorldInfo(ctx, node)
+    return ctx, node
+end
+
+function CompetitionManager.OnWorldCreateFilter(worldPath)
+    CompetitionManager.CurrentCreateWorldName = worldPath
+    CompetitionManager.isFirstSyncWorld = true
+    return worldPath
+end
+
+function CompetitionManager.OnEducateLogoutFilter(desc, callback)
+    if callback and type(callback) == "function" then
+        GameLogic.GetFilters():apply_filters('logout')
+        GameLogic.GetFilters():apply_filters("OnKeepWorkLogout", true)
+        GameLogic.CheckSignedIn(desc or L"请先登录！", function(bSucceed)
+            if bSucceed then
+                callback()
+            end
+        end);
+    end
+    return desc, callback
 end
 
 function CompetitionManager.ResetWindowTitle(windowTitle,systemWindowTitle)
@@ -363,6 +370,7 @@ function CompetitionManager:SetCompeteData(data)
     self.compete_data = data
     self.isCompeteFinished = false
     self.bIgnoreCompeteScore = false
+    self.isForceSubmitting = false
     self.CompeteStartImp()
 end
 
@@ -509,59 +517,8 @@ function CompetitionManager:DelayLoadWorld(worldPath,callback)
     timer:Change(0, 500);
 end
 
-function CompetitionManager:CheckCompeteOldData()
-    local competeData = self:GetCompeteData()
-    local competePaperId = (competeData.competePaperId or 0)
-    local currentWorldList = Mod.WorldShare.Store:Get('world/fullWorldList') or {}
-    local competeStr = "_"..competePaperId
-    local competeStr1 = "exam_world(%d+)_(%d+)_(%d+)_(%d+)" --跨天导致的
-    local competeStr2 = "exam_world(%d+)_(%d+)_(%d+)_(%d+)_(%d+)" --旧bug导致的
-    --local year, month, day, hour, min, sec = date_time:match("^(%d+)%D(%d+)%D(%d+)%D(%d+)%D(%d+)%D(%d+)") 
-    local worldList = {}
-    for k,v in pairs(currentWorldList) do
-        local name1 = v.name or ""
-        local isDeleted = v.isDeleted == 1
-        local year,month,day,paperId = name1:match(competeStr1)
-        local year1,month1,day1,paperId1,index = name1:match(competeStr2)
-        if not isDeleted and paperId and tonumber(paperId) > 0 and paperId == competePaperId then
-            local temp = {}
-            temp.name = name1
-            temp.year = tonumber(year)
-            temp.month = tonumber(month)
-            temp.day = tonumber(day)
-            temp.paperId = tonumber(paperId)
-            temp.index = tonumber(index or 0)
-            temp.time_stamp = os.time({year=temp.year,month=temp.month,day=temp.day,hour=0,min=0,sec=0})
-            table.insert(worldList,temp)
-        end
-    end
-
-    table.sort(worldList,function(a,b)
-        if a.time_stamp == b.time_stamp then
-            return a.index < b.index
-        end
-        return a.time_stamp < b.time_stamp
-    end)
-    if #worldList > 0 then
-        local data = worldList[1]
-        local username = Mod.WorldShare.Store:Get("user/username");
-        local worldName = data.name
-        local worldPath = "worlds/DesignHouse/".. worldName
-        if username and username ~= "" then
-            worldPath = "worlds/DesignHouse/_user/" .. username .. "/" .. worldName
-        end
-        return worldName,worldPath
-    end
-end
-
 function CompetitionManager:CreateWorld()
     self:GetFolderName(function(worldName,worldPath,last_world_name,last_world_path)
-        -- local lastname,lastpath = self:CheckCompeteOldData()
-        -- if lastname and lastpath then
-        --     self.compete_data.world_name = ""
-        --     last_world_name = lastname
-        --     last_world_path = lastpath
-        -- end
         self.compete_data.worldPath = last_world_path
         self.compete_data.new_world_name = last_world_name
         GameLogic.GetFilters():add_filter("OnBeforeLoadWorld", CompetitionManager.OnBeforeLoadWorld); 
@@ -582,23 +539,23 @@ end
 
 function CompetitionManager:ForkWorkd(worldId)
     self:GetFolderName(function(worldName,worldPath,last_world_name,last_world_path)
-        -- local lastname,lastpath = self:CheckCompeteOldData()
-        -- if lastname and lastpath then
-        --     self.compete_data.world_name = ""
-        --     last_world_name = lastname
-        --     last_world_path = lastpath
-        -- end
         self.compete_data.worldPath = last_world_path
         self.compete_data.new_world_name = last_world_name
         print("worldName========",worldName,worldPath,last_world_name,last_world_path)
         GameLogic.GetFilters():add_filter("OnBeforeLoadWorld", CompetitionManager.OnBeforeLoadWorld); 
         if (not ParaIO.DoesFileExist(last_world_path)) then
+            -- 使用 -forkType keepwork：CreateWorldCommand 下载完成后会内部自动调度一次 /loadworld。
+            -- 这是“唯一”可靠的加载入口（直接加载，不经过 SyncWorld 的网络网关）。
+            -- 注意：下面的 DelayLoadWorld 只负责同步副作用(kpProjectId/world实例)与空包校验，
+            --       绝不能再对同一世界发起第二次 /loadworld，否则会与 keepwork 的加载竞态，
+            --       导致首次进入 fork 世界时主角被渲染成摄像机（需退出重进才恢复）。
             local cmd = format(
-                "/createworld -name \"%s\" -parentProjectId %d -update -fork %d -mode admin",
+                "/createworld -name \"%s\" -parentProjectId %d -update -fork %d -forkType keepwork -mode admin",
                 last_world_name,
                 worldId,
                 worldId
             );
+            self.forkWorldAutoLoadName = last_world_name
             print("cmd=========",cmd)
             GameLogic.RunCommand(cmd);
         elseif not self:CheckIsRemoteWorld(last_world_path) then
@@ -609,7 +566,14 @@ function CompetitionManager:ForkWorkd(worldId)
             local SyncWorld = NPL.load('(gl)Mod/WorldShare/cellar/Sync/SyncWorld.lua')
             SyncWorld:CheckAndUpdatedByFoldername(last_world_name,function ()
                 if CompetitionManager:CheckWorldValid(last_world_path) then
-                    GameLogic.RunCommand(string.format('/loadworld %s', last_world_path))
+                    -- keepwork 一般已经把世界加载进来了；只有当它没生效（NPL state 重置/兜底场景）
+                    -- 时才在这里补一次加载，避免同一世界被加载两次造成“人变摄像机”。
+                    if not CompetitionManager:IsForkWorldLoaded(last_world_name)
+                        and CompetitionManager.forkWorldAutoLoadName ~= last_world_name
+                        and CompetitionManager.forkWorldLoadRequestedName ~= last_world_name then
+                        CompetitionManager.forkWorldLoadRequestedName = last_world_name
+                        GameLogic.RunCommand(string.format('/loadworld %s', last_world_path))
+                    end
                     local Progress = NPL.load('(gl)Mod/WorldShare/cellar/Sync/Progress/Progress.lua')
                     Progress.syncInstance = nil
                 else
@@ -619,8 +583,49 @@ function CompetitionManager:ForkWorkd(worldId)
                 end
             end)
         end)
+
+        -- 超时兜底安全网：keepwork 与 DelayLoadWorld 都可能因网络/NPL state 异常而没能加载世界
+        -- （keepwork 的回调被重置、CheckAndUpdatedByFoldername 的网络请求/早退不回调等）。
+        -- 到点后若世界仍未进入、但本地世界文件已就绪，就直接加载一次（绕开会卡住的 sync 网关）。
+        -- 同样由 IsForkWorldLoaded 防重入，不会与前两条路径重复加载。
+        commonlib.TimerManager.SetTimeout(function()
+            if CompetitionManager:IsForkWorldLoaded(last_world_name) then
+                if CompetitionManager.forkWorldAutoLoadName == last_world_name then
+                    CompetitionManager.forkWorldAutoLoadName = nil
+                end
+                if CompetitionManager.forkWorldLoadRequestedName == last_world_name then
+                    CompetitionManager.forkWorldLoadRequestedName = nil
+                end
+                return
+            end
+            if CompetitionManager.forkWorldLoadRequestedName == last_world_name then
+                return
+            end
+            if ParaIO.DoesFileExist(last_world_path .. "/tag.xml") then
+                CompetitionManager.forkWorldAutoLoadName = nil
+                CompetitionManager.forkWorldLoadRequestedName = last_world_name
+                LOG.std(nil, "warn", "CompetitionManager", "ForkWorkd 超时兜底：世界仍未进入，直接加载 %s", last_world_name)
+                GameLogic.RunCommand(string.format('/loadworld %s', last_world_path))
+            end
+        end, 15000)
     end)
-    
+
+end
+
+-- 判断指定 fork 世界（按文件夹名）是否已经是当前加载的世界。
+-- 用于在 DelayLoadWorld 兜底前确认 keepwork 是否已经把该世界加载好，避免重复 /loadworld。
+function CompetitionManager:IsForkWorldLoaded(worldName)
+    if not worldName or worldName == "" then
+        return false
+    end
+    local curDir = GameLogic.GetWorldDirectory and GameLogic.GetWorldDirectory() or ""
+    if not curDir or curDir == "" then
+        return false
+    end
+    -- 去掉结尾的斜杠后取最后一段文件夹名做精确比较（兼容尾斜杠/路径分隔符差异）
+    curDir = curDir:gsub("[/\\]+$", "")
+    local curName = curDir:match("([^/\\]+)$")
+    return curName == worldName
 end
 
 function CompetitionManager:WriteConfigFile(worldPath)
@@ -752,7 +757,6 @@ function CompetitionManager:UpdateCompetePaperStatus()
             if not self.isCompeteFinished then
                 GameLogic.AddBBS("CompetitionManager",L"赛事试卷已提交，现在提交创作题")
                 self:ForceSubmitScore()
-                self.isCompeteFinished = true
             end
         end
     end)
@@ -1091,7 +1095,6 @@ function CompetitionManager:UpdateSurplusTime()
                     GameLogic.AddBBS("CompetitionManager",L"答题时间结束，正在提交成绩，请稍候....")
                     if not self.isCompeteFinished then
                         self:ForceSubmitScore()
-                        self.isCompeteFinished = true
                     end
                 end)
             end
@@ -1431,6 +1434,12 @@ end
 
 
 function CompetitionManager:ForceSubmitScore()
+    self.isCompeteFinished = true
+    if self.isForceSubmitting then
+        LOG.std(nil,"warn","CompetitionManager","ForceSubmitScore 重复触发，已忽略")
+        return
+    end
+    self.isForceSubmitting = true
     commonlib.TimerManager.SetTimeout(function()
         self.isSubmitScore = true
         self:SubmitWorld(true)
@@ -1494,7 +1503,7 @@ function CompetitionManager:DeleteCompeteWorld(worldData,callback)
     local EducateProject = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/EducateProject.lua")
     local Create = NPL.load('(gl)Mod/WorldShare/cellar/Create/Create.lua')
     local selectedWorld = worldData
-    if selectedWorld and selectedWorld.kpProjectId and selectedWorld.kpProjectId > 0 then
+    if selectedWorld and tonumber(selectedWorld.kpProjectId) and tonumber(selectedWorld.kpProjectId) > 0 then
         DeleteWorld:DeleteWorldSilent(function(result)
             if not result then
                 GameLogic.AddBBS(nil,"删除错误项目失败，请稍候重试")

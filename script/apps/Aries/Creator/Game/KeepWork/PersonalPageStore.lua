@@ -248,6 +248,10 @@ function PersonalPageStore:ctor()
     self.remoteSyncInterval = remoteSyncInterval
     self.remoteStorePath = "edunotes/store"
     
+    -- Mounted folder system (readonly fallback layers)
+    self.mountedLocalDir = nil       -- string: local disk absolute path (trailing /)
+    self.mountedRemoteFolder = nil   -- table: { username, workspace, remoteStorePath }
+    
     -- Initialize timers
     self:CheckInitSyncTimers()
 end
@@ -286,6 +290,8 @@ function PersonalPageStore:Reset()
     self.pendingDiskPages = {}
     self.pendingSync = {}
     self.isSyncing = false
+    self.mountedLocalDir = nil
+    self.mountedRemoteFolder = nil
 end
 
 
@@ -378,8 +384,10 @@ function PersonalPageStore:GetLocalPagePath(pageName)
     username = (username and username ~= "") and username or "anonymous"
     local userPath = diskPath..username.."/"
     local filepath = userPath..pageName..".md"
-    if not ParaIO.DoesFileExist(filepath) then
-        ParaIO.CreateDirectory(filepath)
+    -- Ensure the parent directory exists (not the file itself)
+    local parentDir = filepath:match("^(.*[/\\])")
+    if parentDir and not ParaIO.DoesFileExist(parentDir) then
+        ParaIO.CreateDirectory(parentDir)
     end
     return filepath
 end
@@ -460,7 +468,14 @@ function PersonalPageStore:SavePageData(pageName, key, value, bFlush)
         end
         if key and key ~= "" and key ~= "metadata" and key ~= "_metadata" and value == nil then
             self.personalPageDataDeleted[pageName] = self.personalPageDataDeleted[pageName] or {}
-            table.insert(self.personalPageDataDeleted[pageName], key)
+            -- Dedup: only add if not already in the deleted list
+            local alreadyInList = false
+            for _, dk in ipairs(self.personalPageDataDeleted[pageName]) do
+                if dk == key then alreadyInList = true; break end
+            end
+            if not alreadyInList then
+                table.insert(self.personalPageDataDeleted[pageName], key)
+            end
         else
             SetValueByPath(self.personalPageDataUpdated[pageName], key, value)
             -- 如果之前标记为删除，现在设置了新值，需要从删除列表中移除
@@ -476,10 +491,15 @@ function PersonalPageStore:SavePageData(pageName, key, value, bFlush)
 
         self.pendingDiskPages[pageName] = true
         self.pendingSync[pageName] = true
-        self:DebouncedDiskSave()
+
         if bFlush then
+            -- Save to disk immediately so the version is bumped before remote sync,
+            -- matching the JavaScript fix for stale-metadata race.
+            self:SaveToDisk(pageName)
+            self.pendingDiskPages[pageName] = nil
             self:BatchSyncToRemote(true)
         else
+            self:DebouncedDiskSave()
             self:CheckInitSyncTimers()
         end
     end)
@@ -524,12 +544,20 @@ function PersonalPageStore:DeletePageData(pageName, key, bFlush)
             DeleteValueByPath(self.personalPageDataUpdated[pageName], key)
         end
         
+        -- Also remove from base data so LoadPageData won't return stale value
+        if existsInOriginal then
+            DeleteValueByPath(self.personalPageData[pageName], key)
+        end
+        
         self.pendingDiskPages[pageName] = true
         self.pendingSync[pageName] = true
-        self:DebouncedDiskSave()
+
         if bFlush then
+            self:SaveToDisk(pageName)
+            self.pendingDiskPages[pageName] = nil
             self:BatchSyncToRemote(true)
         else
+            self:DebouncedDiskSave()
             self:CheckInitSyncTimers()
         end
         LOG.std(nil, "info", "PersonalPageStore", "Marked key for deletion: %s", key)
@@ -661,7 +689,7 @@ function PersonalPageStore:CheckLoadPageFromDisk(pageName, forceRefresh, callbac
             file:close()
             if content and content ~= "" then
                 -- Parse YAML data
-                local pageData = YamlConverter.YAMLToLua(content)
+                local pageData = YamlConverter.YAMLToLua(content, {useFrontMatter=true})
                 if pageData then
                     self:MergeData(self.personalPageData[pageName], pageData)
                     local metadata = self:GetMetadata(pageData)
@@ -675,7 +703,11 @@ function PersonalPageStore:CheckLoadPageFromDisk(pageName, forceRefresh, callbac
 end
 
 -- Check and merge remote data
-function PersonalPageStore:CheckMergeRemoteData(pageName, forceRefresh, callback)
+-- @param pageName: string - Page name
+-- @param forceRefresh: boolean - Force reload from remote
+-- @param callback: function - Callback after merge
+-- @param bUseCache: boolean (optional) - Use cached remote response. Default: auto per page name.
+function PersonalPageStore:CheckMergeRemoteData(pageName, forceRefresh, callback, bUseCache)
     pageName = NormalizePageName(pageName)
     -- Check if we already have loaded remote data for this page
     self.pageStatus[pageName] = self.pageStatus[pageName] or {}
@@ -694,13 +726,15 @@ function PersonalPageStore:CheckMergeRemoteData(pageName, forceRefresh, callback
     
     local localMetadata = self:GetMetadata(self.personalPageData[pageName] or {})
     local remotePath = self:GetRemotePagePath(pageName)
-    local bUseCache = pageName == "game_activity_candybox"
+    if bUseCache == nil then
+        bUseCache = pageName == "game_activity_candybox"
+    end
     KeepworkSiteService:GetMarkdownByFullPath(remotePath, function(remoteDataContent)
         -- 增强异常处理：即使远程获取失败也要继续执行回调
         local success = false
         
         if remoteDataContent and remoteDataContent ~= "" then
-            local remoteData = YamlConverter.YAMLToLua(remoteDataContent)
+            local remoteData = YamlConverter.YAMLToLua(remoteDataContent, {useFrontMatter=true})
             if remoteData and type(remoteData) == "table" then
                 -- Compare versions to determine which data to use
                 local remoteMetadata = self:GetMetadata(remoteData)
@@ -741,6 +775,8 @@ function PersonalPageStore:CheckMergeRemoteData(pageName, forceRefresh, callback
             end
         else
             LOG.std(nil, "info", "PersonalPageStore", "Remote page not found or empty for: %s, using local data", pageName)
+            -- Allow retry on next access since remote was empty (might be transient)
+            self.pageStatus[pageName]._remoteVersionChecked = false
         end
         
         -- 无论远程获取是否成功，都要执行回调以确保本地数据处理逻辑继续
@@ -781,12 +817,12 @@ function PersonalPageStore:SaveToDisk(pageName, forceSave, callback)
     end
     
     local existingMetadata = self:GetMetadata(mergedData)
-    if hasUpdate or not existingMetadata or not existingMetadata.version then
+    if hasUpdate or hasDeleted or not existingMetadata or not existingMetadata.version then
         local newMetadata = self:GenerateVersion(mergedData)
         self:SetMetadata(mergedData, newMetadata)
     end
     
-    local yamlContent = YamlConverter.LuaToYAML(mergedData)
+    local yamlContent = YamlConverter.LuaToYAML(mergedData, {useFrontMatter=true})
     local file = ParaIO.open(localPath, "w")
     if file then
         file:WriteString(yamlContent)
@@ -865,7 +901,7 @@ function PersonalPageStore:SyncToGit(pageName, callback)
             end
         end
         
-        local yamlContent = YamlConverter.LuaToYAML(syncData)
+        local yamlContent = YamlConverter.LuaToYAML(syncData, {useFrontMatter=true})
         local bUseCache = pageName == "game_activity_candybox"
         KeepworkSiteService:EditMarkdownByFullPath(remotePath, yamlContent, function(success)
             self.pendingSync[pageName] = nil
@@ -1311,6 +1347,836 @@ end
 function PersonalPageStore:ClearPageData(pageName, callback)
     self:ClearLocalDisk(pageName)
     self:ClearRemotePage(pageName, callback)
+end
+
+--------------------------------------------------------------------------------
+-- Mounted Folder System
+-- Readonly fallback layers for file operations.
+-- Fallback order: workspace → local mount → remote mount.
+--------------------------------------------------------------------------------
+
+-- Mount a local disk directory as readonly fallback.
+-- Files in this directory can be read but not written.
+-- @param dirPath: string|nil - Absolute path to local directory. nil/empty to unmount.
+function PersonalPageStore:MountLocalFolder(dirPath)
+    if not dirPath or dirPath == "" then
+        self.mountedLocalDir = nil
+        LOG.std(nil, "info", "PersonalPageStore", "Unmounted local folder")
+        return
+    end
+    dirPath = string.gsub(dirPath, "\\", "/")
+    if not string.match(dirPath, "/$") then
+        dirPath = dirPath .. "/"
+    end
+    self.mountedLocalDir = dirPath
+    LOG.std(nil, "info", "PersonalPageStore", "Mounted local folder: %s", dirPath)
+end
+
+-- Mount a remote Keepwork folder as readonly fallback.
+-- Path format: "username/site/workspace" or "username/workspace" (site defaults to self.remoteStorePath).
+-- @param path: string|nil - Remote path. nil/empty to unmount.
+function PersonalPageStore:MountRemoteFolder(path)
+    if not path or path == "" then
+        self.mountedRemoteFolder = nil
+        LOG.std(nil, "info", "PersonalPageStore", "Unmounted remote folder")
+        return
+    end
+    path = string.gsub(path, "^/+", "")
+    path = string.gsub(path, "/+$", "")
+    local parts = {}
+    for segment in string.gmatch(path, "[^/]+") do
+        table.insert(parts, segment)
+    end
+    if #parts < 2 then
+        LOG.std(nil, "warn", "PersonalPageStore", "MountRemoteFolder: path requires at least username/workspace, got '%s'", path)
+        return
+    end
+    local username = parts[1]
+    local workspace = parts[#parts]
+    local remoteStorePath = self.remoteStorePath
+    if #parts > 2 then
+        remoteStorePath = table.concat(parts, "/", 2, #parts - 1)
+    end
+    self.mountedRemoteFolder = {
+        username = username,
+        workspace = workspace,
+        remoteStorePath = remoteStorePath,
+    }
+    LOG.std(nil, "info", "PersonalPageStore", "Mounted remote folder: %s/%s/%s", username, remoteStorePath, workspace)
+end
+
+-- Unmount all mounted folders.
+function PersonalPageStore:UnmountFolder()
+    if self.mountedLocalDir then
+        LOG.std(nil, "info", "PersonalPageStore", "Unmounted local folder: %s", self.mountedLocalDir)
+        self.mountedLocalDir = nil
+    end
+    if self.mountedRemoteFolder then
+        LOG.std(nil, "info", "PersonalPageStore", "Unmounted remote folder")
+        self.mountedRemoteFolder = nil
+    end
+end
+
+-- Build the full remote page path for a file inside the mounted remote folder.
+-- @param pageName: string - Page name (relative, no extension)
+-- @return string|nil - Full path like "username/storePath/workspace/pageName"
+function PersonalPageStore:_GetMountedRemotePagePath(pageName)
+    local m = self.mountedRemoteFolder
+    if not m then return nil end
+    return string.format("%s/%s/%s/%s", m.username, m.remoteStorePath, m.workspace, pageName)
+end
+
+-- Get remote tree params for the mounted remote folder.
+-- @return table|nil - { sitePath, folderBase } or nil
+function PersonalPageStore:_GetMountedRemoteTreeParams()
+    local m = self.mountedRemoteFolder
+    if not m then return nil end
+    local storePathParts = {}
+    for segment in string.gmatch(m.remoteStorePath, "[^/]+") do
+        table.insert(storePathParts, segment)
+    end
+    local siteName = storePathParts[1] or m.remoteStorePath
+    local storeSubPath = table.concat(storePathParts, "/", 2)
+    local sitePath = m.username .. "/" .. siteName
+    local folderBase = (storeSubPath ~= "") and (storeSubPath .. "/" .. m.workspace) or m.workspace
+    return { sitePath = sitePath, folderBase = folderBase }
+end
+
+-- Read file content from the mounted local directory (readonly).
+-- Handles pageName → disk path mapping with extension probing.
+-- @param relPath: string - Relative path (may or may not have extension)
+-- @return string|nil - File content or nil if not found
+function PersonalPageStore:_ReadMountedLocalFile(relPath)
+    if not self.mountedLocalDir then return nil end
+    if not relPath or relPath == "" then return nil end
+    relPath = string.gsub(relPath, "\\", "/")
+    -- Path traversal prevention
+    if string.find(relPath, "%.%.") then return nil end
+    relPath = string.gsub(relPath, "^/+", "")
+
+    -- Helper to try reading a single absolute path
+    local function tryRead(absPath)
+        local file = ParaIO.open(absPath, "r")
+        if file:IsValid() then
+            local content = file:GetText(0, -1)
+            file:close()
+            return content
+        else
+            file:close()
+            return nil
+        end
+    end
+
+    -- If relPath already has an extension, try directly
+    if string.find(relPath, "%.[^/%.]+$") then
+        return tryRead(self.mountedLocalDir .. relPath)
+    end
+
+    -- Otherwise probe extensions in priority order
+    local tryExts = {".md", ".lua", ".txt", ".json", ".xml", ".log", ""}
+    for _, ext in ipairs(tryExts) do
+        local content = tryRead(self.mountedLocalDir .. relPath .. ext)
+        if content then return content end
+    end
+    return nil
+end
+
+-- Read file content from the mounted remote folder (readonly, async).
+-- @param pageName: string - Page name (relative, no extension)
+-- @param callback: function(content) - Returns content string or nil
+function PersonalPageStore:_ReadMountedRemoteFile(pageName, callback)
+    if not self.mountedRemoteFolder then
+        if callback then callback(nil) end
+        return
+    end
+    local m = self.mountedRemoteFolder
+    -- Build path relative to the site: storePath/workspace/pageName
+    local sitePath = table.concat({m.remoteStorePath, m.workspace, pageName}, "/")
+    KeepworkSiteService:GetMarkdownByFullPath(sitePath, function(remoteContent)
+        if remoteContent and remoteContent ~= "" then
+            local pageData = YamlConverter.YAMLToLua(remoteContent, {useFrontMatter=true})
+            if pageData and type(pageData) == "table" and pageData.content ~= nil then
+                if callback then callback(pageData.content) end
+                return
+            end
+            -- Fallback: treat raw content as plain markdown (no YAML frontmatter)
+            if callback then callback(remoteContent) end
+            return
+        end
+        if callback then callback(nil) end
+    end, true, m.username)
+end
+
+-- List files in the mounted local directory.
+-- @param subDir: string|nil - Subdirectory relative to mount root
+-- @return table - Array of {name, filesize} entries
+function PersonalPageStore:_ListMountedLocalDir(subDir)
+    if not self.mountedLocalDir then return {} end
+    local dir = self.mountedLocalDir
+    if subDir and subDir ~= "" then
+        local normSub = string.gsub(subDir, "\\", "/")
+        if string.find(normSub, "%.%.") then return {} end
+        normSub = string.gsub(normSub, "^/+", "")
+        if not string.match(normSub, "/$") then normSub = normSub .. "/" end
+        dir = dir .. normSub
+    end
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/FileTools.lua")
+    local FileTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.FileTools")
+
+    NPL.load("(gl)script/ide/Files.lua")
+    -- List subdirectories ("*." pattern matches entries without extension, i.e. directories)
+    local dirEntries = commonlib.Files.Find({}, dir, 0, 500)
+    -- List allowed-extension files
+    local fileEntries = commonlib.Files.Find({}, dir, 0, 500, function(item)
+        local ext = commonlib.Files.GetFileExtension(item.filename)
+        if ext then
+            return FileTools.ALLOWED_EXTENSIONS["." .. ext]
+        end
+    end)
+
+    local files = {}
+    if dirEntries then
+        for _, item in ipairs(dirEntries) do
+            if item.filename ~= "." and item.filename ~= ".." then
+                table.insert(files, { name = item.filename .. "/", filesize = 0 })
+            end
+        end
+    end
+    if fileEntries then
+        for _, item in ipairs(fileEntries) do
+            table.insert(files, { name = item.filename, filesize = item.filesize })
+        end
+    end
+    return files
+end
+
+-- List files in the mounted remote folder (async).
+-- @param subDir: string|nil - Subdirectory relative to mount workspace
+-- @param callback: function(files) - Array of {name, filesize} entries
+function PersonalPageStore:_ListMountedRemoteDir(subDir, callback)
+    if not self.mountedRemoteFolder then
+        if callback then callback({}) end
+        return
+    end
+    local params = self:_GetMountedRemoteTreeParams()
+    if not params then
+        if callback then callback({}) end
+        return
+    end
+
+    local folderPath = params.sitePath .. "/" .. params.folderBase
+    if subDir and subDir ~= "" then
+        subDir = string.gsub(subDir, "\\", "/")
+        subDir = string.gsub(subDir, "^/+", "")
+        subDir = string.gsub(subDir, "/+$", "")
+        folderPath = folderPath .. "/" .. subDir
+    end
+
+    local repoPath = Mod.WorldShare.Utils.EncodeURIComponent(params.sitePath)
+    repoPath = string.gsub(repoPath, "%%", "%%%%")
+    local encodedFolder = Mod.WorldShare.Utils.EncodeURIComponent(folderPath)
+    encodedFolder = string.gsub(encodedFolder, "%%", "%%%%")
+
+    keepwork.site.tree({router_params = {
+        repoPath = repoPath,
+        folderPath = encodedFolder,
+        recursive = false,
+    }}, function(err, msg, data)
+        local files = {}
+        if err == 200 and data then
+            if type(data) == "table" then
+                for _, entry in ipairs(data) do
+                    local name = entry.name or ""
+                    local isFolder = entry.isTree == true
+                    if isFolder then
+                        if name ~= "" then
+                            table.insert(files, { name = name .. "/", filesize = 0 })
+                        end
+                    else
+                        if not string.match(name, "%.md$") then
+                            name = name .. ".md"
+                        end
+                        if name ~= "" then
+                            table.insert(files, { name = name, filesize = entry.size or 0 })
+                        end
+                    end
+                end
+            end
+        end
+        if callback then callback(files) end
+    end)
+end
+
+-- Build a ReadFile result table from raw content, optionally extracting a line range.
+-- @param content: string - Full file content
+-- @param startLine: number|nil - 1-based start line
+-- @param endLine: number|nil - 1-based end line
+-- @param pageName: string - For error messages
+-- @return table - {success, content, totalLines, startLine, endLine}
+function PersonalPageStore:_BuildLineRangeResult(content, startLine, endLine, pageName)
+    if not content then
+        return {success = false, error = string.format("File '%s' is empty", pageName or "")}
+    end
+    -- Count lines
+    local totalLines = 1
+    local pos = 1
+    while true do
+        local found = string.find(content, "\n", pos, true)
+        if not found then break end
+        totalLines = totalLines + 1
+        pos = found + 1
+    end
+    if not startLine and not endLine then
+        return {success = true, content = content, totalLines = totalLines}
+    end
+    local sl = math.max(1, startLine or 1)
+    local el = math.min(totalLines, endLine or totalLines)
+    local lines = {}
+    local lineNum = 0
+    for line in (content .. "\n"):gmatch("([^\n]*)\n") do
+        lineNum = lineNum + 1
+        if lineNum >= sl and lineNum <= el then
+            table.insert(lines, line)
+        end
+        if lineNum > el then break end
+    end
+    return {
+        success = true,
+        content = table.concat(lines, "\n"),
+        totalLines = totalLines,
+        startLine = sl,
+        endLine = el,
+    }
+end
+
+-- Search content string for query matches, returning a GrepSearch-compatible result.
+-- @param query: string - Search query
+-- @param content: string - File content to search
+-- @param filePath: string - File path for result entries
+-- @param isPattern: boolean - Whether query is a Lua pattern
+-- @param maxResults: number - Max matches to return
+-- @return table - {success, matches, totalMatches, truncated}
+function PersonalPageStore:_GrepContent(query, content, filePath, isPattern, maxResults)
+    maxResults = maxResults or 50
+    local lowerQuery = not isPattern and string.lower(query) or nil
+    local matches = {}
+    local totalMatches = 0
+    local lineNum = 0
+    for line in (content .. "\n"):gmatch("([^\n]*)\n") do
+        lineNum = lineNum + 1
+        local found = false
+        local matchText = nil
+        if isPattern then
+            local ok, result = pcall(string.find, line, query)
+            if ok and result then
+                found = true
+                local ok2, captured = pcall(string.match, line, query)
+                matchText = (ok2 and captured) or nil
+            end
+        else
+            if string.find(string.lower(line), lowerQuery, 1, true) then
+                found = true
+            end
+        end
+        if found then
+            totalMatches = totalMatches + 1
+            if #matches < maxResults then
+                table.insert(matches, {
+                    file = filePath,
+                    lineNumber = lineNum,
+                    line = line,
+                    matchText = matchText,
+                })
+            end
+        end
+    end
+    return {
+        success = true,
+        matches = matches,
+        totalMatches = totalMatches,
+        truncated = totalMatches > maxResults,
+    }
+end
+
+-- Copy content to workspace and apply string replacement.
+-- @param pageName: string - Target page name
+-- @param content: string - Original content from mount layer
+-- @param oldString: string - Text to find
+-- @param newString: string - Replacement text
+-- @param callback: function(result)
+function PersonalPageStore:_CopyOnWriteReplace(pageName, content, oldString, newString, callback)
+    -- Verify oldString appears exactly once
+    local count = 0
+    local searchStart = 1
+    local foundPos = nil
+    while true do
+        local pos = string.find(content, oldString, searchStart, true)
+        if not pos then break end
+        count = count + 1
+        foundPos = pos
+        searchStart = pos + 1
+    end
+    if count == 0 then
+        if callback then callback({success = false, error = "oldString not found in file", matchCount = 0}) end
+        return
+    end
+    if count > 1 then
+        if callback then callback({success = false, error = string.format("oldString found %d times (must be exactly 1)", count), matchCount = count}) end
+        return
+    end
+    -- Apply replacement (use plain find+concat to avoid pattern interpretation)
+    local newContent = string.sub(content, 1, foundPos - 1) .. newString .. string.sub(content, foundPos + #oldString)
+    -- Write to workspace via CreateFile
+    local ft = self:_getFileTools()
+    ft:CreateFile(pageName, newContent, function(createResult)
+        if createResult and createResult.success then
+            if callback then callback({success = true, matchCount = 1}) end
+        else
+            if callback then callback({success = false, error = "Failed to write copy-on-write result: " .. (createResult and createResult.error or "unknown")}) end
+        end
+    end)
+end
+
+--------------------------------------------------------------------------------
+-- File Operations API
+-- Provides file-style CRUD on PersonalPageStore pages (content stored under "content" key).
+-- Internally delegates to FileTools in remote mode for consistent implementation.
+-- These methods match the JS PersonalPageStore file ops API so both sides
+-- present the same capability surface to AI Copilot tools.
+--------------------------------------------------------------------------------
+
+-- Lazy-create a FileTools instance in remote mode, scoped to the current workspace.
+-- @return FileTools instance
+function PersonalPageStore:_getFileTools()
+    if not self._fileToolsInstance then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/FileTools.lua");
+        local FileTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.FileTools");
+        self._fileToolsInstance = FileTools:new();
+    end
+    -- Re-sync workspace setting each call (cheap, and keeps it up to date)
+    local wsName = self._fileOpsWorkspace or ""
+    self._fileToolsInstance:SetWorkSpace(wsName, true)
+    return self._fileToolsInstance
+end
+
+-- Set the workspace scope for file operations.
+-- @param wsName: string - Workspace name (e.g. "papa"). Empty string or nil means root.
+function PersonalPageStore:SetFileOpsWorkspace(wsName)
+    self._fileOpsWorkspace = wsName or ""
+end
+
+-- Check that file operations are scoped to a workspace (safety guard).
+-- @param callerName: string - Name of the calling method (for logging)
+-- @return boolean - true if scoped, false otherwise
+function PersonalPageStore:IsFileOpScoped(callerName)
+    if not self._fileOpsWorkspace or self._fileOpsWorkspace == "" then
+        LOG.std(nil, "warn", "PersonalPageStore", "%s: no workspace set, call SetFileOpsWorkspace first", callerName or "fileOp")
+        return false
+    end
+    return true
+end
+
+-- Read file content by line range.
+-- File content is stored under the "content" key of the page.
+-- @param pageName: string - Page name / file path (relative to workspace)
+-- @param startLine: number (optional) - 1-based start line
+-- @param endLine: number (optional) - 1-based end line (inclusive)
+-- @param callback: function(result) - result = {success, content, totalLines, startLine, endLine, error}
+function PersonalPageStore:ReadFile(pageName, startLine, endLine, callback)
+    if not self:IsFileOpScoped("ReadFile") then
+        if callback then callback({success = false, error = "No workspace set"}) end
+        return
+    end
+    local ft = self:_getFileTools()
+    local self_ = self
+    ft:ReadFile(pageName, startLine, endLine, function(result)
+        -- Layer 1: workspace found it
+        if result and result.success then
+            if callback then callback(result) end
+            return
+        end
+
+        local relPath = pageName or ""
+
+        -- Layer 2: local mount fallback
+        local localContent = self_:_ReadMountedLocalFile(relPath)
+        if localContent then
+            local lineResult = self_:_BuildLineRangeResult(localContent, startLine, endLine, pageName)
+            if callback then callback(lineResult) end
+            return
+        end
+
+        -- Layer 3: remote mount fallback
+        self_:_ReadMountedRemoteFile(relPath, function(remoteContent)
+            if remoteContent then
+                local lineResult = self_:_BuildLineRangeResult(remoteContent, startLine, endLine, pageName)
+                if callback then callback(lineResult) end
+                return
+            end
+            -- All layers failed
+            if callback then
+                callback({success = false, error = string.format(
+                    "File '%s' not found in workspace, local mount, or remote mount", pageName)})
+            end
+        end)
+    end)
+end
+
+-- Replace exactly one occurrence of oldString with newString in a file's content.
+-- @param pageName: string - Page name / file path
+-- @param oldString: string - Exact text to find
+-- @param newString: string - Replacement text
+-- @param callback: function(result) - result = {success, error, matchCount}
+function PersonalPageStore:ReplaceStringInFile(pageName, oldString, newString, callback)
+    if not self:IsFileOpScoped("ReplaceStringInFile") then
+        if callback then callback({success = false, error = "No workspace set"}) end
+        return
+    end
+    local ft = self:_getFileTools()
+    local self_ = self
+    ft:ReplaceStringInFile(pageName, oldString, newString, function(result)
+        -- If workspace had the file (success or error other than "not exist"), return
+        if result and result.success then
+            if callback then callback(result) end
+            return
+        end
+        -- Check if the error is "file not found" (needs copy-on-write from mount)
+        local errMsg = result and result.error or ""
+        if not string.find(errMsg, "does not exist", 1, true) then
+            -- Error is not "not found" (e.g. multiple matches), pass through
+            if callback then callback(result) end
+            return
+        end
+
+        -- File not in workspace: try reading from mount layers, then CoW
+        local relPath = pageName or ""
+        local localContent = self_:_ReadMountedLocalFile(relPath)
+        if localContent then
+            self_:_CopyOnWriteReplace(pageName, localContent, oldString, newString, callback)
+            return
+        end
+
+        self_:_ReadMountedRemoteFile(relPath, function(remoteContent)
+            if remoteContent then
+                self_:_CopyOnWriteReplace(pageName, remoteContent, oldString, newString, callback)
+                return
+            end
+            if callback then
+                callback({success = false, error = string.format(
+                    "File '%s' not found in workspace, local mount, or remote mount", pageName)})
+            end
+        end)
+    end)
+end
+
+-- Search for a pattern in files.
+-- Supports single-file search (filePath = specific file) and global/directory search
+-- (filePath = nil or ends with "/"). Global search scans cached files and mounted folders.
+-- @param query: string - Search pattern (plain text or Lua pattern)
+-- @param filePath: string (optional) - Specific file to search, nil for global search
+-- @param isPattern: boolean (optional) - If true, treat query as Lua pattern
+-- @param maxResults: number (optional) - Max matches (default 50)
+-- @param callback: function(result) - result = {success, matches, totalMatches, truncated, error}
+function PersonalPageStore:GrepSearch(query, filePath, isPattern, maxResults, callback)
+    if not self:IsFileOpScoped("GrepSearch") then
+        if callback then callback({success = false, error = "No workspace set"}) end
+        return
+    end
+    local ft = self:_getFileTools()
+    local self_ = self
+    ft:GrepSearch(query, filePath, isPattern, maxResults, function(result)
+        -- Single-file search: if workspace found it, return; otherwise try mount layers
+        if filePath and not string.match(filePath, "/$") then
+            if result and result.success then
+                if callback then callback(result) end
+                return
+            end
+            local relPath = filePath
+            local localContent = self_:_ReadMountedLocalFile(relPath)
+            if localContent then
+                local grepResult = self_:_GrepContent(query, localContent, filePath, isPattern, maxResults)
+                if callback then callback(grepResult) end
+                return
+            end
+            self_:_ReadMountedRemoteFile(relPath, function(remoteContent)
+                if remoteContent then
+                    local grepResult = self_:_GrepContent(query, remoteContent, filePath, isPattern, maxResults)
+                    if callback then callback(grepResult) end
+                    return
+                end
+                if callback then
+                    callback({success = false, error = string.format(
+                        "File '%s' not found in workspace, local mount, or remote mount", filePath)})
+                end
+            end)
+            return
+        end
+
+        -- Directory or global search: merge workspace results with mounted file results
+        local wsMatches = {}
+        local wsSeen = {}  -- track files already matched in workspace
+        local totalMatches = 0
+        if result and result.success and result.matches then
+            for _, m in ipairs(result.matches) do
+                table.insert(wsMatches, m)
+                if m.file then wsSeen[m.file] = true end
+            end
+            totalMatches = result.totalMatches or #result.matches
+        end
+
+        -- Search mounted local files that are not already in workspace
+        local localFiles = self_:_ListMountedLocalDir(filePath)
+        for _, f in ipairs(localFiles) do
+            local isDir = string.sub(f.name, -1) == "/"
+            if not isDir and not wsSeen[f.name] then
+                local content = self_:_ReadMountedLocalFile(f.name)
+                if content then
+                    local grepResult = self_:_GrepContent(query, content, f.name, isPattern, maxResults)
+                    if grepResult and grepResult.matches then
+                        for _, m in ipairs(grepResult.matches) do
+                            table.insert(wsMatches, m)
+                        end
+                        totalMatches = totalMatches + (grepResult.totalMatches or 0)
+                    end
+                    wsSeen[f.name] = true
+                end
+            end
+        end
+
+        -- Search mounted remote files that are not already in workspace
+        local function finishWithMounted(mountMatches, mountTotal)
+            for _, m in ipairs(mountMatches) do
+                table.insert(wsMatches, m)
+            end
+            totalMatches = totalMatches + mountTotal
+            if callback then
+                callback({
+                    success = #wsMatches > 0,
+                    matches = wsMatches,
+                    totalMatches = totalMatches,
+                    truncated = totalMatches > maxResults,
+                })
+            end
+        end
+
+        -- Collect from mounted remote: list all files, then grep each
+        if not self_.mountedRemoteFolder then
+            finishWithMounted({}, 0)
+            return
+        end
+        self_:_ListMountedRemoteDir(filePath, function(remoteFiles)
+            if not remoteFiles or #remoteFiles == 0 then
+                finishWithMounted({}, 0)
+                return
+            end
+            local mountMatches = {}
+            local mountTotal = 0
+            local pending = 0
+            for _, f in ipairs(remoteFiles) do
+                local isDir = string.sub(f.name, -1) == "/"
+                if not isDir and not wsSeen[f.name] then
+                    pending = pending + 1
+                end
+            end
+            if pending == 0 then
+                finishWithMounted({}, 0)
+                return
+            end
+            local done = 0
+            for _, f in ipairs(remoteFiles) do
+                local isDir = string.sub(f.name, -1) == "/"
+                if not isDir and not wsSeen[f.name] then
+                    self_:_ReadMountedRemoteFile(f.name, function(content)
+                        done = done + 1
+                        if content then
+                            local grepResult = self_:_GrepContent(query, content, f.name, isPattern, maxResults)
+                            if grepResult and grepResult.matches then
+                                for _, m in ipairs(grepResult.matches) do
+                                    table.insert(mountMatches, m)
+                                end
+                                mountTotal = mountTotal + (grepResult.totalMatches or 0)
+                            end
+                        end
+                        if done >= pending then
+                            finishWithMounted(mountMatches, mountTotal)
+                        end
+                    end)
+                end
+            end
+        end)
+    end)
+end
+
+-- Create or overwrite a file.
+-- @param pageName: string - Page name / file path
+-- @param content: string - File content
+-- @param callback: function(result) - result = {success, error}
+function PersonalPageStore:CreateFile(pageName, content, callback)
+    if not self:IsFileOpScoped("CreateFile") then
+        if callback then callback({success = false, error = "No workspace set"}) end
+        return
+    end
+    local ft = self:_getFileTools()
+    ft:CreateFile(pageName, content, callback)
+end
+
+-- List files in the workspace directory.
+-- In remote mode, scans local PersonalPageStore cache directory.
+-- @param subDir: string (optional) - Subdirectory to list
+-- @param callback: function(result) - result = {success, files = [{name, filesize}], error}
+function PersonalPageStore:ListDir(subDir, callback)
+    if not self:IsFileOpScoped("ListDir") then
+        if callback then callback({success = false, error = "No workspace set"}) end
+        return
+    end
+    local ft = self:_getFileTools()
+    local self_ = self
+    ft:ListFiles(subDir, function(result)
+        local files = {}
+        local seen = {}
+        -- Layer 1: workspace files
+        if result and result.success and result.files then
+            for _, f in ipairs(result.files) do
+                table.insert(files, f)
+                seen[f.name] = true
+            end
+        end
+
+        -- Layer 2: local mount files (sync)
+        local localFiles = self_:_ListMountedLocalDir(subDir)
+        for _, f in ipairs(localFiles) do
+            if not seen[f.name] then
+                table.insert(files, f)
+                seen[f.name] = true
+            end
+        end
+
+        -- Layer 3: remote mount files (async)
+        self_:_ListMountedRemoteDir(subDir, function(remoteFiles)
+            for _, f in ipairs(remoteFiles) do
+                if not seen[f.name] then
+                    table.insert(files, f)
+                    seen[f.name] = true
+                end
+            end
+            if callback then
+                callback({success = true, files = files})
+            end
+        end)
+    end)
+end
+
+-- List all pages (convenience wrapper over ListDir).
+-- @param callback: function(result) - result = {success, files, error}
+function PersonalPageStore:ListPages(callback)
+    self:ListDir(nil, callback)
+end
+
+-- Check if a path is absolute (starts with / and contains site path segments).
+-- @param pageName: string
+-- @return boolean
+function PersonalPageStore:IsAbsolutePath(pageName)
+    if not pageName then return false end
+    return string.sub(pageName, 1, 1) == "/"
+end
+
+-- Convert glob pattern to Lua pattern.
+-- Supports: * (any non-slash chars), ** (any chars including slash), ? (single char)
+-- @param glob: string - Glob pattern
+-- @return string - Lua pattern
+function PersonalPageStore:GlobToPattern(glob)
+    if not glob or glob == "" then return ".*" end
+    -- Escape Lua magic characters except * and ?
+    local pattern = glob:gsub("([%.%+%-%^%$%(%)%%])", "%%%1")
+    -- ** → match anything including /
+    pattern = pattern:gsub("%*%*", "{{GLOBSTAR}}")
+    -- * → match non-slash characters
+    pattern = pattern:gsub("%*", "[^/]*")
+    -- ? → match single character
+    pattern = pattern:gsub("%?", ".")
+    pattern = pattern:gsub("{{GLOBSTAR}}", ".*")
+    return "^" .. pattern .. "$"
+end
+
+-- Read a file by absolute path (bypasses workspace scoping).
+-- @param absolutePath: string - Full page path (e.g. "/username/sitename/path")
+-- @param bUseCache: boolean (optional) - Whether to use cache (default true)
+-- @param callback: function(content) - Returns raw content string or nil
+function PersonalPageStore:ReadAbsoluteFile(absolutePath, bUseCache, callback)
+    if not absolutePath or absolutePath == "" then
+        if callback then callback(nil) end
+        return
+    end
+    -- Strip leading slash
+    local cleanPath = absolutePath:gsub("^/+", "")
+    if bUseCache == nil then bUseCache = true end
+    
+    -- Parse full path: username/sitename/rest... → extract username, pass rest to KeepworkSiteService
+    local parts = {}
+    for segment in string.gmatch(cleanPath, "[^/]+") do
+        table.insert(parts, segment)
+    end
+    if #parts < 2 then
+        if callback then callback(nil) end
+        return
+    end
+    local username = parts[1]
+    -- Path without username: sitename/rest...
+    local sitePath = table.concat(parts, "/", 2)
+
+    KeepworkSiteService:GetMarkdownByFullPath(sitePath, function(remoteContent)
+        if remoteContent and remoteContent ~= "" then
+            local pageData = YamlConverter.YAMLToLua(remoteContent, {useFrontMatter=true})
+            if pageData and type(pageData) == "table" and pageData.content ~= nil then
+                if callback then callback(pageData.content) end
+                return
+            end
+            -- Fallback: treat raw content as plain markdown (no YAML frontmatter)
+            if callback then callback(remoteContent) end
+            return
+        end
+        if callback then callback(nil) end
+    end, bUseCache, username)
+end
+
+-- Get remote tree parameters for API calls.
+-- @return table - {sitePath, folderBase}
+function PersonalPageStore:GetRemoteTreeParams()
+    local username = Mod.WorldShare.Store:Get('user/username')
+    username = (username and username ~= "") and username or "anonymous"
+    local siteName = "edunotes"
+    local sitePath = username .. "/" .. siteName
+    local wsPrefix = self._fileOpsWorkspace or ""
+    local folderBase = "store"
+    if wsPrefix ~= "" then
+        folderBase = folderBase .. "/" .. wsPrefix
+    end
+    return {sitePath = sitePath, folderBase = folderBase}
+end
+
+-- Fetch the remote file tree from the Keepwork API.
+-- Uses keepwork.site.tree() directly (same pattern as KeepworkSiteService:CreateFolder).
+-- @param callback: function(treeData) - Array of tree nodes or nil on failure
+function PersonalPageStore:FetchRemoteTree(callback)
+    if self:IsUseLocal() then
+        if callback then callback(nil) end
+        return
+    end
+    local params = self:GetRemoteTreeParams()
+    local repoPath = Mod.WorldShare.Utils.EncodeURIComponent(params.sitePath)
+    repoPath = string.gsub(repoPath, "%%", "%%%%")
+    local fullFolderPath = params.sitePath .. "/" .. params.folderBase
+    local folderPath = Mod.WorldShare.Utils.EncodeURIComponent(fullFolderPath)
+    folderPath = string.gsub(folderPath, "%%", "%%%%")
+    keepwork.site.tree({router_params = { repoPath = repoPath, folderPath = folderPath, recursive = true }}, function(err, msg, data)
+        if err ~= 200 then
+            LOG.std(nil, "warn", "PersonalPageStore", "FetchRemoteTree err: %s", tostring(err))
+            if callback then callback(nil) end
+            return
+        end
+        if callback then callback(data) end
+    end)
 end
 
 PersonalPageStore:InitSingleton()

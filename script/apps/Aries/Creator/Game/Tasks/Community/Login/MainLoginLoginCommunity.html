@@ -292,10 +292,20 @@
                             count = 4
                         end
 
-                        return 'width: 260px;padding-left: 15px;height: ' .. (count * 40) .. 'px;background-color: #25282e;'
+                        return 'width: 300px;padding-left: 0px;height: ' .. (count * 40) .. 'px;background-color: #25282e;'
                     end
 
                     local is_show_account_list = false
+
+                    local function set_account_list_visible(bVisible)
+                        local list = get_page() and get_page():FindControl('account_list')
+                        local mask = get_page() and get_page():FindControl('account_list_mask')
+                        local arrow = get_page() and get_page():FindControl('account_list_arrow')
+                        if list then list.visible = bVisible end
+                        if mask then mask.visible = bVisible end
+                        -- 展开时图标顺时针旋转 180 度（朝上），收起时转回
+                        if arrow then arrow.rotation = bVisible and 3.141592653589793 or 0 end
+                    end
 
                     function show_account_list()
                         if not get_page() then
@@ -304,16 +314,16 @@
 
                         if is_show_account_list then
                             is_show_account_list = false
-                            get_page():FindControl('account_list').visible = false
+                            set_account_list_visible(false)
                         else
                             is_show_account_list = true
-                            get_page():FindControl('account_list').visible = true
+                            set_account_list_visible(true)
                         end
                     end
 
                     function hide_account_list()
                         is_show_account_list = false
-                        get_page():FindControl('account_list').visible = false
+                        set_account_list_visible(false)
                     end
 
                     function select_account(index)
@@ -371,7 +381,8 @@
                     end
 
                     function set_phone_mode()
-                        set_mode('phone')
+                        -- 手机号登录（短信登录）已下架，提示用户使用密码登录
+                        _guihelper.MessageBox(L'短信登录已经下架，请用密码登录，如果忘记密码，可用短信找回。')
                     end
 
                     function set_mode(mode)
@@ -680,11 +691,8 @@
                         local lastLoginMode = GameLogic.GetPlayerController():LoadLocalData("lastLoginMode","")
 
                         if not isLogin then
-                            if lastLoginMode == "account" then
-                                set_account_mode()
-                            else
-                                set_phone_mode()
-                            end
+                            -- 手机号登录已下架，默认进入账号登录
+                            set_account_mode()
                         end
                     end, 0)
                     
@@ -818,63 +826,30 @@
                             </div>
                         </div>
                         <div style='width: 300px;height: 165px; margin-top: 20px;'>
-                            <pe:container name='account_list'
-                                          visible='false'
-                                          zorder='1'
-                                          style='background:;
-                                                 position: relative;
-                                                 margin-top: 75px;
-                                                 margin-left: 0px;'>
-                                <div style='<%= get_account_list_style() %>'>
-                                    <pe:gridview name='account_list_view'
-                                                 DataSource='<%= get_account_list() %>'
-                                                 DefaultNodeHeight='40'
-                                                 pagesize='100'
-                                                 ItemsPerLine='1'
-                                                 AllowPaging='false'>
-                                        <Columns>
-                                            <div style='width: 215px;
-                                                        height: 39px;
-                                                        padding-left: 4px;
-                                                        background-color: #25282e'>
-                                                <input type='button'
-                                                       value='<%= text %>'
-                                                       name='<%= Eval("index") %>'
-                                                       onclick='select_account'
-                                                       style='width: 175px;
-                                                              height: 39px;
-                                                              text-align: left;
-                                                              color: #d3d3d3;
-                                                              background:;' />
-                                                <input type='button'
-                                                       name='<%= Eval("index") %>'
-                                                       style='background: url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#639 407 10 12);
-                                                              width: 10px;
-                                                              height: 12px;
-                                                              margin-top: 16px;
-                                                              margin-left: 15px;'
-                                                       onclick='remove_account'/>
-                                            </div>
-                                            <div style='width: 260px;height: 1px;background-color: #3d4047'></div>
-                                        </Columns>
-                                    </pe:gridview>
-                                </div>
-                            </pe:container>
                             <div>
                                 <div style="width: 120px; height: 20px;">
                                     <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#414 106 16 16);"></div>
                                     <div style="float: left; margin-top: -2px; margin-left: 10px; color: #d3d3d3;"><%=L"账号"%></div>
                                 </div>
-                                <div style='position: relative;
-                                            background: url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#674 408 18 10);
-                                            width: 18px;
-                                            height: 10px;
-                                            margin-left: 270px;
-                                            margin-top: 26px;'
-                                        onclick='show_account_list'
-                                        zorder='1'>
+                                <!-- 扩大的透明点击区（外层 div 可点），内含箭头图标（可旋转） -->
+                                <div onclick='show_account_list'
+                                     zorder='1'
+                                     style='position: relative;
+                                            background:;
+                                            width: 50px;
+                                            height: 40px;
+                                            margin-left: 252px;
+                                            margin-top: -4px;'>
+                                    <div name='account_list_arrow'
+                                         style='position: relative;
+                                                background: url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#674 408 18 10);
+                                                width: 18px;
+                                                height: 10px;
+                                                margin-left: 18px;
+                                                margin-top: 30px;'>
+                                    </div>
                                 </div>
-                                <div style="margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                <div style="margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b;">
                                     <input type='text'
                                         name='account'
                                         onchange='update_login_button_status'
@@ -897,7 +872,7 @@
                                     <div style="float: left; width: 16px; height: 16px; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#346 238 16 16);"></div>
                                     <div style="float: left; margin-top: -2px; margin-left: 10px; color: #d3d3d3;"><%=L"密码"%></div>
                                 </div>
-                                <div style="float: left; margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b; background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);">
+                                <div style="float: left; margin-top: 10px; width: 300px; height: 40px; background-color: #2b2b2b;">
                                     <input type='text'
                                            name='password_show'
                                            style='background:;
@@ -934,7 +909,7 @@
                                        onclick="click_set_show_password"/>
                             </div>
                         </div>
-                        <div style="margin-top: 5px;">
+                        <div style="margin-top: 5px; width: 300px;">
                             <div style='float:left;
                                         color: #9A9DA2;
                                         base-font-size: 13px;
@@ -959,39 +934,44 @@
                                     <div width="77"></div>
                                 </pe:if>
                             </div>
-                            <pe:if condition='<%= System.os.GetPlatform() == "win32" %>'>
+                        </div>
+                        <pe:if condition='<%= true %>'>
+                            <div style='width: 300px; margin-top: -20px;'>
                                 <pe:if condition="<%= Mod.WorldShare.Utils.IsEnglish() %>">
-                                    <div style='float: left;
-                                         base-font-size: 13px;
-                                         font-size: 13px;
-                                         color: #d3d3d3;
-                                         width: 110px;
-                                         margin-left: 106px;'
-                                         onclick='forget_password()'>
+                                    <div onclick='forget_password()'
+                                         style='margin-left: 160px;
+                                                width: 140px;
+                                                text-align: right;
+                                                base-font-size: 13px;
+                                                font-size: 13px;
+                                                color: #d3d3d3;'>
                                          Forgot password?
                                     </div>
                                 </pe:if>
                                 <pe:if condition="<%= not Mod.WorldShare.Utils.IsEnglish() %>">
-                                    <div style='float:left;
-                                            base-font-size: 13px;
-                                            font-size: 13px;
-                                            color: #d3d3d3;margin-left: 155px;'
-                                     onclick='forget_password()'>
-                                        <%= "忘记密码 " %>
+                                    <div onclick='forget_password()'
+                                         style='margin-left: 200px;
+                                                width: 100px;
+                                                text-align: right;
+                                                base-font-size: 13px;
+                                                font-size: 13px;
+                                                color: #d3d3d3;'>
+                                        <%= "忘记密码" %>
                                     </div>
                                 </pe:if>
-                            </pe:if>
-                        </div>
+                            </div>
+                        </pe:if>
                         <div style='margin-top:30px;margin-bottom:10px;'>
-                            <input type='button'
-                                   name='login_button'
-                                   style="width: 300px;
-                                        height: 44px;
-                                        color: #d3d3d3;
-                                        background-color: #404BF5;
-                                        background: url(Texture/Aries/Creator/keepwork/community_32bits.png#778 146 32 32:14 14 14 14);"
-                                   onclick='login()'
-                                   value='<%= L"登录"%>' />
+                            <div style="width: 300px; height: 44px; background-color: #404BF5;">
+                                <input type='button'
+                                       name='login_button'
+                                       style="width: 300px;
+                                            height: 44px;
+                                            color: #FFFFFF;
+                                            background: url();"
+                                       onclick='login()'
+                                       value='<%= L"登录"%>' />
+                            </div>
                         </div>
                         <div style="margin-top: 10px;">
                             <div width='50%'
@@ -1225,6 +1205,59 @@
                             </div>
                         </div>
                     </pe:container>
+                </div>
+            </pe:container>
+            <!-- 历史账号下拉：放到顶层、画在对话框之上，遮罩在下、下拉在上 -->
+            <pe:container name='account_list_mask'
+                          visible='false'
+                          alignment='_fi'
+                          width='100%'
+                          height='100%'
+                          style='background:;'>
+                <input type='button'
+                       value=''
+                       onclick='hide_account_list'
+                       width='100%'
+                       height='100%'
+                       style='background: url();' />
+            </pe:container>
+            <pe:container name='account_list'
+                          visible='false'
+                          alignment='_ct'
+                          style='background:; margin-left: -150px; margin-top: -32px;'>
+                <div style='<%= get_account_list_style() %>'>
+                    <pe:gridview name='account_list_view'
+                                 DataSource='<%= get_account_list() %>'
+                                 DefaultNodeHeight='40'
+                                 pagesize='100'
+                                 ItemsPerLine='1'
+                                 AllowPaging='false'>
+                        <Columns>
+                            <div style='width: 300px;
+                                        height: 39px;
+                                        background-color: #25282e'>
+                                <input type='button'
+                                       value='<%= text %>'
+                                       name='<%= Eval("index") %>'
+                                       onclick='select_account'
+                                       style='width: 245px;
+                                              height: 39px;
+                                              margin-left: 10px;
+                                              text-align: left;
+                                              color: #d3d3d3;
+                                              background:;' />
+                                <input type='button'
+                                       name='<%= Eval("index") %>'
+                                       style='background: url(Texture/Aries/Creator/paracraft/paracraft_login_32bits.png#639 407 10 12);
+                                              width: 10px;
+                                              height: 12px;
+                                              margin-top: 16px;
+                                              margin-left: 15px;'
+                                       onclick='remove_account'/>
+                            </div>
+                            <div style='width: 300px;height: 1px;background-color: #3d4047'></div>
+                        </Columns>
+                    </pe:gridview>
                 </div>
             </pe:container>
         </pe:mcml>

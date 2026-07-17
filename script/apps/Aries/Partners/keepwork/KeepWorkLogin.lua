@@ -143,7 +143,10 @@ function KeepWorkLogin.CheckLoginTime()
     KeepWorkLogin.last_send_time = KeepWorkLogin.last_send_time or 0;
 	local curTime = ParaGlobal.timeGetTime();
 	if((curTime-KeepWorkLogin.last_send_time) < 3000) then
-        _guihelper.MessageBox("正在登陆，请等待。。。");
+        _guihelper.MessageBox("正在登录，请稍后...");
+		commonlib.TimerManager.SetTimeout(function()
+			_guihelper.CloseMessageBox();
+		end, 5000);
 		return;
 	end
 	KeepWorkLogin.last_send_time = curTime;

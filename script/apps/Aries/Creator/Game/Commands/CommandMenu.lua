@@ -10,6 +10,7 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Commands/CommandMenu.lua");
 ]]
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/Files.lua");
 local Files = commonlib.gettable("MyCompany.Aries.Game.Common.Files");
+local KeepworkServicePermission = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Permission.lua');
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
 local SlashCommand = commonlib.gettable("MyCompany.Aries.SlashCommand.SlashCommand");
 local BlockEngine = commonlib.gettable("MyCompany.Aries.Game.BlockEngine")
@@ -151,17 +152,35 @@ Commands["menu"] = {
 			elseif(name == "file.exit") then
 				MyCompany.Aries.Creator.Game.Desktop.OnLeaveWorld(nil, true);
 			elseif(name == "file.openp3dfile") then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
-        		local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
-				P3DFileManager:OpenP3dFile()
+				KeepworkServicePermission:Authentication('LimitP3dFile', function(bHasPermission)
+					if not bHasPermission then
+						_guihelper.MessageBox(L'功能解锁请联系客服', nil, _guihelper.MessageBoxButtons.OK)
+						return
+					end
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
+					local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
+					P3DFileManager:OpenP3dFile()
+				end)
 			elseif(name == "file.exportp3dfile") then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
-				local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
-				P3DFileManager:ExportWorldToP3dFile()
+				KeepworkServicePermission:Authentication('LimitP3dFile', function(bHasPermission)
+					if not bHasPermission then
+						_guihelper.MessageBox(L'功能解锁请联系客服', nil, _guihelper.MessageBoxButtons.OK)
+						return
+					end
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
+					local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
+					P3DFileManager:ExportWorldToP3dFile()
+				end)
 			elseif(name == "file.importp3dfile") then
-				NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
-				local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
-				P3DFileManager:ImportP3dFile()
+					KeepworkServicePermission:Authentication('LimitP3dFile', function(bHasPermission)
+					if not bHasPermission then
+						_guihelper.MessageBox(L'功能解锁请联系客服', nil, _guihelper.MessageBoxButtons.OK)
+						return
+					end
+					NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/File/P3DFileManager.lua")
+					local P3DFileManager = commonlib.gettable("MyCompany.Aries.Game.Educate.P3DFileManager");
+					P3DFileManager:ImportP3dFile()
+				end)
 			elseif(name == "file.webdisk") then
 				local WebImageFileDialog = NPL.load("(gl)script/apps/Aries/Creator/Game/GUI/WebImageFileDialog.lua");
     			WebImageFileDialog.Show(3, function(file)

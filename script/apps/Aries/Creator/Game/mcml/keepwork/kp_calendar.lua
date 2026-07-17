@@ -1,86 +1,23 @@
--- 根据泽勒公式计算出该月的第一天是星期几
-local function getStartDay(year, month)
-    if month < 3 then
-        month = month + 12
-        year = year - 1
-    end
-    local century = math.floor(year / 100)
-    local yearOfCentury = year % 100
-    local startDay = (1 + math.floor((13 * (month + 1)) / 5) + yearOfCentury + math.floor(yearOfCentury / 4) + math.floor(century / 4) - 2 * century) % 7
-    return (startDay + 6) % 7  -- 转换为星期天（0）到星期六（6）的表示
-end
+-- 日期计算已抽取到共用模型 CalendarModel（O(1) 算月首星期，单趟填充网格，无死代码）
+NPL.load("(gl)script/apps/Aries/Creator/Game/mcml/keepwork/CalendarModel.lua");
+local CalendarModel = commonlib.gettable("MyCompany.Aries.Game.mcml.CalendarModel");
 
--- 获取该月的天数
-local function getDaysInMonth(year, month)
-    if month == 2 then
-        if year % 4 == 0 and (year % 100 ~= 0 or year % 400 == 0) then
-            return 29  -- 闰年的二月有29天
-        else
-            return 28
-        end
-    elseif month == 4 or month == 6 or month == 9 or month == 11 then
-        return 30
-    else
-        return 31
-    end
-end
+local COL, ROW = 7, 6
 
--- 构建日历数据
-local function buildCalendarData(year, month)
-    local startDay = getStartDay(year, month)
-    local daysInMonth = getDaysInMonth(year, month)
-
-    local calendarData = {}
-    local day = 1
-    local currentDayOfWeek = startDay
-
-    -- 填充上个月的日期
-    local prevMonth = month - 1
-    local prevYear = year
-    if prevMonth == 0 then
-        prevMonth = 12
-        prevYear = year - 1
-    end
-    local prevMonthDays = getDaysInMonth(prevYear, prevMonth)
-    for i = 1, 6 do
-        calendarData[i] = {}
-        for j = 1, 7 do
-            if (i == 1 and j <= startDay) then
-                calendarData[i][j] = {day = prevMonthDays - startDay + j, isCurrentMonth = false}
-            elseif day > daysInMonth then
-                --day = 1
-                calendarData[i][j] = {day = day - daysInMonth, isCurrentMonth = false}
-                day = day + 1
-            else
-                calendarData[i][j] = {day = day, isCurrentMonth = true}
-                day = day + 1
-            end
-            currentDayOfWeek = (currentDayOfWeek + 1) % 7
-        end
-    end
-
-    return calendarData
-end
-
--- 打印日历
+-- 打印日历（调试用）
 local function printMonthCalendar(year, month)
     local weekdays = {"日", "一", "二", "三", "四", "五", "六"}
-    local calendarData = buildCalendarData(year, month)
+    local cells = CalendarModel.build(year, month, ROW)
 
-    -- 打印星期标题
-    local header = table.concat(weekdays, " ")
-    print(header)
-
-    -- 打印日历内容
-    for i = 1, 6 do
+    print(table.concat(weekdays, " "))
+    for i = 1, ROW do
         local str = ""
-        for j = 1, 7 do
-            local day = calendarData[i][j].day
-            local isCurrentMonth = calendarData[i][j].isCurrentMonth
-            if isCurrentMonth then
-                str = str ..(string.format("%3d ", day))
+        for j = 1, COL do
+            local cell = cells[(i - 1) * COL + j]
+            if cell.monthOffset == 0 then
+                str = str .. string.format("%3d ", cell.day)
             else
-                str = str ..(string.format("[%d] ", day))
+                str = str .. string.format("[%d] ", cell.day)
             end
         end
         print(str)
@@ -113,6 +50,9 @@ end
         on_premonth: 点击上一月的回调方法
         on_nextmonth: 点击下一月的回调方法
         on_click_day: 点击某一天的回调方法
+        week_start: 每周起始列 0=周日打头(默认)，1=周一打头(周日排在最后一列)
+    -- 运行时动态切换周起始列：MyCompany.Aries.Game.mcml.kp_calendar.SetWeekStart(mcmlNode, 0/1)
+    --   （mcmlNode 可从 on_click_day 等回调的第二个参数取得，或 page:GetNode(name) 取得）
     -- example:
     <kp:calendar 
         year_value="<%=GetCurrYear()%>" 
@@ -141,7 +81,6 @@ end
 
 function kp_calendar.create_default(rootName, mcmlNode, bindingContext, _parent, left, top, width, height, parentLayout,css)
     local uiname = mcmlNode:GetAttributeWithCode("uiname", nil, true)
-    local offsetx = mcmlNode:GetNumber("offsetx") or 6
     local offsety = mcmlNode:GetNumber("offsety") or 2
     local year,month
     year = mcmlNode:GetAttributeWithCode("year_value",nil,true) or os.date("%Y");
@@ -151,13 +90,10 @@ function kp_calendar.create_default(rootName, mcmlNode, bindingContext, _parent,
     month = tonumber(month)
 
     local padding = css.padding or 2
-    local onpreyear = mcmlNode:GetString("on_preyear");
-    local onpremonth = mcmlNode:GetString("on_premonth");
-    local onnextyear = mcmlNode:GetString("on_nextyear");
-    local onnextmonth = mcmlNode:GetString("on_nextmonth");
-    local clickday = mcmlNode:GetString("on_click_day");
 
-    local calendarData = buildCalendarData(year,month)
+    -- 每周起始列：0=周日打头(默认)，1=周一打头(周日排在最后一列)
+    local weekStart = tonumber(mcmlNode:GetAttributeWithCode("week_start", nil, true)) or 0
+
     local min_width = 140
     local min_height = 160
     local w = mcmlNode:GetNumber("width") or (width-left);
@@ -173,36 +109,65 @@ function kp_calendar.create_default(rootName, mcmlNode, bindingContext, _parent,
     h = math.max(h, min_height)
     w = math.max(w, min_width)
 
-    local calendar_container_name = uiname or "calendar_container"
-    local calendar_container = ParaUI.GetUIObject("calendar_container_name")
+    -- 用每个节点唯一且稳定的实例名做容器名（参考 pe_design.lua 的 GetInstanceName 用法）。
+    -- 不能再用固定的 "calendar_container"：同一页面有多个日历时会重名，
+    -- 导致后一个日历渲染时把前一个日历的容器（同名）销毁掉，第一个日历就显示异常。
+    local calendar_container_name = uiname or mcmlNode:GetInstanceName(rootName)
+    -- 原地重绘前销毁本节点上一次渲染留下的旧容器（原代码误用了字符串字面量 "calendar_container_name"，从未真正销毁）
+    local calendar_container = ParaUI.GetUIObject(calendar_container_name)
     if calendar_container:IsValid() then
         ParaUI.DestroyUIObject(calendar_container)
     end
 
-   
     local _this = ParaUI.CreateUIObject("container", calendar_container_name, "_lt", left, top, w, h);
 	_this.background = css.background or "";
 	_parent:AddChild(_this);
     mcmlNode:SetObjId(_this.id);
 
-    local col,row = 7,6
+    -- 把重建日历内容所需的参数存在节点上，供 SetWeekStart 原地重建复用
+    mcmlNode._calendarState = {
+        container_id = _this.id,
+        w = w, h = h, offsety = offsety, padding = padding, css = css,
+        year = year, month = month, weekStart = weekStart,
+        onpreyear = mcmlNode:GetString("on_preyear"),
+        onpremonth = mcmlNode:GetString("on_premonth"),
+        onnextyear = mcmlNode:GetString("on_nextyear"),
+        onnextmonth = mcmlNode:GetString("on_nextmonth"),
+        clickday = mcmlNode:GetString("on_click_day"),
+    }
+
+    kp_calendar.buildContent(mcmlNode, _this)
+end
+
+-- 在指定容器内创建日历内容（表头 + 星期 + 日期格）。
+-- 抽出这层是为了 SetWeekStart 能复用它做原地重建（清空容器再重新创建），
+-- 而不必销毁并重建外层容器。所有绘制参数从 mcmlNode._calendarState 读取。
+-- @param mcmlNode: kp:calendar 的节点
+-- @param container: 外层容器 ParaUI 对象
+function kp_calendar.buildContent(mcmlNode, container)
+    local st = mcmlNode._calendarState
+    if (not st) then return end
+
+    local w, h, offsety, padding, css = st.w, st.h, st.offsety, st.padding, st.css
+    local year, month, weekStart = st.year, st.month, st.weekStart
+
+    local col, row = COL, ROW
     local single_w = (w - padding * 2) / col
     local single_h = (h - padding * 2 - offsety - 32) / row
-
     local fontstr = CalculateFont(css) or "System;12;norm"
-    
+    local cells = CalendarModel.build(year, month, ROW, weekStart)
+
     local headerX = w/2 - 70
-    local _header = ParaUI.CreateUIObject("container","calendar_container","_lt",headerX,offsety,140,20)
+    local _header = ParaUI.CreateUIObject("container","calendar_header","_lt",headerX,offsety,140,20)
     _header.background = "";
-    _this:AddChild(_header)
+    container:AddChild(_header)
 
     --创建显示年份
     local startx = 0
     local preYearbtn = ParaUI.CreateUIObject("button","pre_year","_lt",startx,offsety,16,16)
     preYearbtn.background = "Texture/Aries/Creator/keepwork/Window/arrow_left_32bits.png";
-    -- preYearbtn.text = "<"
     preYearbtn:SetScript("onclick",function()
-        Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onpreyear, "pre_year", mcmlNode)
+        Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, st.onpreyear, "pre_year", mcmlNode)
     end)
     _header:AddChild(preYearbtn)
 
@@ -215,18 +180,16 @@ function kp_calendar.create_default(rootName, mcmlNode, bindingContext, _parent,
     local nextYearbtn = ParaUI.CreateUIObject("button","next_year","_lt",startx + 54,offsety,16,16)
     nextYearbtn.background = "Texture/Aries/Creator/keepwork/Window/arrow_right_32bits.png";
     nextYearbtn:SetScript("onclick",function()
-        Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onnextyear, "next_year", mcmlNode)
+        Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, st.onnextyear, "next_year", mcmlNode)
     end)
-    -- nextYearbtn.text = ">"
     _header:AddChild(nextYearbtn)
 
     -- --显示月份
     startx = 80
     local preMonthbtn = ParaUI.CreateUIObject("button","pre_month","_lt",startx,offsety,16,16)
     preMonthbtn.background = "Texture/Aries/Creator/keepwork/Window/arrow_left_32bits.png";
-    -- preMonthbtn.text = "<"
     preMonthbtn:SetScript("onclick",function()
-        Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onpremonth, "pre_month", mcmlNode)
+        Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, st.onpremonth, "pre_month", mcmlNode)
     end)
     _header:AddChild(preMonthbtn)
 
@@ -239,37 +202,38 @@ function kp_calendar.create_default(rootName, mcmlNode, bindingContext, _parent,
     local nextMonthbtn = ParaUI.CreateUIObject("button","next_month","_lt",startx + 34,offsety,16,16)
     nextMonthbtn.background = "Texture/Aries/Creator/keepwork/Window/arrow_right_32bits.png";
     nextMonthbtn:SetScript("onclick",function()
-        Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, onnextmonth, "next_month", mcmlNode)
+        Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, st.onnextmonth, "next_month", mcmlNode)
     end)
     _header:AddChild(nextMonthbtn)
 
     --显示星期
-    local weekday = {"日","一","二","三","四","五","六"}
+    local weekday = CalendarModel.getWeekdayLabels(weekStart)
     for i = 1, col do
         local weekdayLabel = ParaUI.CreateUIObject("text","weekday_label_"..i,"_lt", (i-1)*single_w,offsety + 16 + 2,single_w,16)
         weekdayLabel.text = weekday[i]
         weekdayLabel.font = fontstr
         _guihelper.SetUIFontFormat(weekdayLabel, 5);
-        _this:AddChild(weekdayLabel)
+        container:AddChild(weekdayLabel)
     end
-    
+
     local startY = offsety + 16 +16
     --显示日期
     local fontSize = math.floor(math.min(12, single_w))
     for i = 1, row do
         for j = 1, col do
-            local day = calendarData[i][j].day
-            local isCurrentMonth = calendarData[i][j].isCurrentMonth
+            local cell = cells[(i - 1) * col + j]
+            local day = cell.day
+            local isCurrentMonth = cell.monthOffset == 0
             local buttonName = year.."-"..month.."-"..day
             local calendarBtn = ParaUI.CreateUIObject("button",buttonName,"_lt", (j-1)*single_w,startY + (i-1)*single_h,single_w,single_h)
             calendarBtn.background=""
             calendarBtn.font = "System;"..fontSize..";norm"
             calendarBtn.text = string.format("%d",day)
-            _this:AddChild(calendarBtn)
-            
+            container:AddChild(calendarBtn)
+
             if isCurrentMonth then
                 calendarBtn:SetScript("onclick",function()
-                    Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, clickday, buttonName, mcmlNode)
+                    Map3DSystem.mcml_controls.OnPageEvent(mcmlNode, st.clickday, buttonName, mcmlNode)
                 end)
             else
                 _guihelper.SetButtonFontColor(calendarBtn, "#dcdcdc");
@@ -277,6 +241,33 @@ function kp_calendar.create_default(rootName, mcmlNode, bindingContext, _parent,
             end
         end
     end
+end
+
+-- 运行时动态切换每周起始列（0=周日打头，1=周一打头/周日在最后一列）。
+-- 只清空外层容器里的日历内容再重建，
+-- 不销毁外层容器。用法：在日历任意回调里可拿到 mcmlNode（如 on_click_day 的第二个参数），
+-- 或用 page:GetNode(name) 取节点，然后调用 kp_calendar.SetWeekStart(mcmlNode, 0/1)。
+function kp_calendar.SetWeekStart(mcmlNode, weekStart)
+    local st = mcmlNode and mcmlNode._calendarState
+    if (not st) then return end
+    weekStart = (tonumber(weekStart) == 1) and 1 or 0
+    if (st.weekStart == weekStart) then return end   -- 没变化不重建
+
+    st.weekStart = weekStart
+    local container = ParaUI.GetUIObject(st.container_id)
+    if (container:IsValid()) then
+        container:RemoveAll()                        -- 删除现有 UI
+        kp_calendar.buildContent(mcmlNode, container) -- 重新创建
+    end
+end
+
+-- 读取当前每周起始列（运行时值优先，否则取属性，默认 0）
+function kp_calendar.GetWeekStart(mcmlNode)
+    local st = mcmlNode and mcmlNode._calendarState
+    if (st) then
+        return st.weekStart
+    end
+    return tonumber(mcmlNode and mcmlNode:GetAttributeWithCode("week_start", nil, true)) or 0
 end
 
 

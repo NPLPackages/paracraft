@@ -28,6 +28,7 @@ function ProjectView.Show(id)
 	end);
     local world_id_list = {id}
     keepwork.world.search({
+        ["x-per-page"] = 1,
         type = 1,
         id = id,
     },function(err, msg, data)

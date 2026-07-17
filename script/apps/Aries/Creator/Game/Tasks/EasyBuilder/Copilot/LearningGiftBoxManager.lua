@@ -507,6 +507,12 @@ function Manager:OnLearningComplete(sessionId, result)
     
     -- Play open animation and remove gift box
     self:PlayOpenAnimationAndRemove(sessionId, function()
+        -- Guard: if gift box was already cleaned up (e.g., by ClearAllGiftBoxes during animation), skip
+        if not self.activeGiftBoxes[sessionId] then
+            LOG.std(nil, "debug", "LearningGiftBoxManager", "Gift box %s already removed, skipping completion callback", sessionId);
+            return;
+        end
+        
         -- Award knowledge coins if successful
         if result.success ~= false and result.correct ~= false then
             self:AwardKnowledgeCoins(sessionId, result);
@@ -530,7 +536,7 @@ function Manager:OnLearningComplete(sessionId, result)
         
         LOG.std(nil, "info", "LearningGiftBoxManager", "Learning result: %s", llm_result);
         
-        -- Return result to LLM via stored callback
+        -- Return result to LLM via stored callback (if any)
         if giftBox.callback then
             LOG.std(nil, "info", "LearningGiftBoxManager", "Returning result to LLM for session: %s", sessionId);
             giftBox.callback({
@@ -540,8 +546,34 @@ function Manager:OnLearningComplete(sessionId, result)
         end
         
         -- Cleanup
+        local toolName = giftBox.toolName;
         self:RemoveGiftBox(sessionId);
+        
+        -- Notify BackgroundAgent to continue the learning session
+        -- This is critical: since LaunchLearningTool passes nil callback to CreateGiftBox,
+        -- the LLM has no pending async callback after gift box creation. We must explicitly
+        -- tell the agent to continue teaching after the user finishes the minigame.
+        self:NotifyAgentLearningComplete(toolName, result);
     end);
+end
+
+--[[
+    Notify BackgroundAgent that a gift box learning task has completed.
+    This triggers the AI to continue the learning session with appropriate feedback.
+    @param toolName: string - The learning tool that was completed
+    @param result: table - Learning result {success, correct, score, userAnswer, cancelled, skipped}
+]]
+function Manager:NotifyAgentLearningComplete(toolName, result)
+    local BackgroundAgent = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.BackgroundAgent");
+    if BackgroundAgent and BackgroundAgent.GetInstance then
+        local agent = BackgroundAgent:GetInstance();
+        if agent and agent.OnGiftBoxLearningComplete then
+            agent:OnGiftBoxLearningComplete(toolName, result);
+            LOG.std(nil, "info", "LearningGiftBoxManager", "Notified agent to continue after '%s' completion", toolName);
+        else
+            LOG.std(nil, "debug", "LearningGiftBoxManager", "No agent instance or OnGiftBoxLearningComplete method");
+        end
+    end
 end
 
 --[[
@@ -954,6 +986,7 @@ function Manager:ClearAllGiftBoxes()
                 success = false,
                 llm_result = string.format("Tool: %s was cancelled (world unload/cleanup)", giftBox.toolName),
             });
+            giftBox.callback = nil;  -- Prevent double callback from pending animation timers
         end
     end
     

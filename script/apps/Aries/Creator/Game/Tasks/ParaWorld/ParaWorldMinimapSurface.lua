@@ -92,6 +92,7 @@ function ParaWorldMinimapSurface:Destroy()
 	if(self.timer) then
 		self.timer:Change();
 	end
+	self:StopSampling();
 end
 
 function ParaWorldMinimapSurface:OnTimer()
@@ -185,31 +186,76 @@ function ParaWorldMinimapSurface:SetMapRadius(radius)
 	end
 end
 
+-- mcml v2 rebuilds the whole draw-command list on every render (a self-paint
+-- window's render target is redrawn from scratch each frame, NOT accumulated),
+-- and a repaint() issued from inside paintEvent is consumed by the render in
+-- progress, so it cannot drive a per-frame chain. We therefore:
+--   * sample the world (the expensive column scans) a batch at a time from a
+--     timer, whose callbacks run outside paintEvent so repaint() works there;
+--   * keep paintEvent a pure, complete redraw of the cached color grid.
 function ParaWorldMinimapSurface:paintEvent(painter)
 	if(self:width() <= 0) then
 		return;
 	end
 	self:DrawBackground(painter);
-	if(not self:IsMapLocked() and self:DrawSome(painter)) then
-		if(self:IsShowGrid()) then
-			self:DrawGrid(painter);
-		end
+	self:DrawColorMap(painter);
+	if(self.isSampleFinished and self:IsShowGrid()) then
+		self:DrawGrid(painter);
 	end
-	self:ScheduleNextPaint();
 end
 
 function ParaWorldMinimapSurface:ResetDrawProgress()
-	self.backgroundPainted = false;
-	self.isGridPainted = false;
-	self.last_x, self.last_y = 0,0;
+	self.colorMap = {};
+	self.sample_x, self.sample_y = 0, 0;
+	self.isSampleFinished = false;
+	self:StopSampling();
 	if(not self.CenterX) then
 		return;
 	end
-	
+
 	if(self:width() > 0) then
 		self.step_size = self.BlocksSamplingSize;
 		self.block_size = self:width() / (self.map_width / self.step_size) ;
 		self.block_count = math.floor(self:width()/self.block_size);
+		self:StartSampling();
+	end
+end
+
+-- interval (ms) between sampling batches. each batch samples BlocksPerFrame
+-- block columns, so smaller BlocksPerFrame / larger interval = smoother but slower.
+ParaWorldMinimapSurface.sampleInterval = 30;
+
+function ParaWorldMinimapSurface:StartSampling()
+	if(self.isSampleFinished or not self.block_count) then
+		return;
+	end
+	if(not self.sampleTimer) then
+		self.sampleTimer = commonlib.Timer:new({callbackFunc = function(timer)
+			self:OnSampleTimer();
+		end})
+	end
+	self.sampleTimer:Change(self.sampleInterval, self.sampleInterval);
+end
+
+function ParaWorldMinimapSurface:StopSampling()
+	if(self.sampleTimer) then
+		self.sampleTimer:Change();
+	end
+end
+
+function ParaWorldMinimapSurface:OnSampleTimer()
+	if(self.isSampleFinished or not self.block_count) then
+		self:StopSampling();
+		return;
+	end
+	-- region still loading: wait, keep the map blank there until it is ready.
+	if(self:IsMapLocked()) then
+		return;
+	end
+	self:SampleSome();
+	self:repaint();
+	if(self.isSampleFinished) then
+		self:StopSampling();
 	end
 end
 
@@ -238,7 +284,9 @@ end
 
 function ParaWorldMinimapSurface:Invalidate()
 	self:ResetDrawProgress();
-	self:ScheduleNextPaint();
+	-- called from outside paintEvent (show/recenter/zoom/RefreshMap), so repaint()
+	-- reliably schedules a render; the sampling timer then fills the map in.
+	self:repaint();
 end
 
 
@@ -251,11 +299,9 @@ function ParaWorldMinimapSurface:showEvent()
 end
 
 function ParaWorldMinimapSurface:DrawBackground(painter)
-	if(not self.backgroundPainted) then
-		self.backgroundPainted = true;
-		painter:SetPen(self.BackgroundColor);
-		painter:DrawRect(self:x(), self:y(), self:width(), self:height());
-	end
+	-- v2 redraws the full surface each frame, so the background is always painted.
+	painter:SetPen(self.BackgroundColor);
+	painter:DrawRect(self:x(), self:y(), self:width(), self:height());
 end
 
 -- get the highest block at world block position. may return nil if no block is found
@@ -277,20 +323,17 @@ function ParaWorldMinimapSurface:GetHighmapColor(x,z)
 end
 
 function ParaWorldMinimapSurface:DrawGrid(painter)
-	if(not self.isGridPainted) then
-		self.isGridPainted = true;
-		local count = self:GetMapRadius() * 2 / self.GridSize;
-		local stepSize = self:width() / count;
-		if(count > 1) then
-			painter:SetPen(self.GridColor);
-			for x = 1, count - 1 do
-				local left = self:x()+x*stepSize;
-				painter:DrawLine(left, self:y(), left, self:y()+ self:width());
-			end
-			for y = 1, count - 1 do
-				local top = self:y()+y*stepSize;
-				painter:DrawLine(self:x(), top, self:x()+self:width(), top);
-			end
+	local count = self:GetMapRadius() * 2 / self.GridSize;
+	local stepSize = self:width() / count;
+	if(count > 1) then
+		painter:SetPen(self.GridColor);
+		for x = 1, count - 1 do
+			local left = self:x()+x*stepSize;
+			painter:DrawLine(left, self:y(), left, self:y()+ self:width());
+		end
+		for y = 1, count - 1 do
+			local top = self:y()+y*stepSize;
+			painter:DrawLine(self:x(), top, self:x()+self:width(), top);
 		end
 	end
 end
@@ -312,48 +355,61 @@ function ParaWorldMinimapSurface:IsMapLocked()
 	end
 end
 
--- @return true if we have finished drawing
-function ParaWorldMinimapSurface:DrawSome(painter)
-	if not self.map_left then
-		return
+-- sample up to BlocksPerFrame block columns from the world into self.colorMap.
+-- this is the expensive part (BlockEngine column scan), so it is throttled and
+-- spread across frames. sets self.isSampleFinished when the whole grid is cached.
+function ParaWorldMinimapSurface:SampleSome()
+	if(self.isSampleFinished or not self.map_left or not self.block_count) then
+		return;
 	end
 	local step_size = self.step_size or 1;
-	local block_size = self.block_size;
 	local block_count = self.block_count;
-
 	local from_x, from_y = self.map_left, self.map_top;
-	
+	local colorMap = self.colorMap;
+
 	local count = 0;
-
-	local width, height = self:width(), self:height();
-
 	while (true) do
-		local color = self:GetHighmapColor(from_x+self.last_x*step_size, from_y+self.last_y*step_size);
-		if(color) then
-			painter:SetPen(color);
-			painter:DrawRect(self:x() + width - self.last_y*block_size, self:y() + height - self.last_x*block_size, block_size, block_size);
+		local row = colorMap[self.sample_x];
+		if(not row) then
+			row = {};
+			colorMap[self.sample_x] = row;
 		end
+		-- store false (not nil) so cached-but-empty cells are not re-sampled.
+		row[self.sample_y] = self:GetHighmapColor(from_x + self.sample_x*step_size, from_y + self.sample_y*step_size) or false;
 		count = count + 1;
-		
-		if(self.last_y >= block_count) then
-			self.last_y = 0;
-			self.last_x = self.last_x + 1;
+
+		if(self.sample_y >= block_count) then
+			self.sample_y = 0;
+			self.sample_x = self.sample_x + 1;
 		else
-			self.last_y = self.last_y + 1;
+			self.sample_y = self.sample_y + 1;
 		end
-		if(count >= self.BlocksPerFrame or self.last_x > block_count) then
+		if(self.sample_x > block_count) then
+			self.isSampleFinished = true;
+			break;
+		end
+		if(count >= self.BlocksPerFrame) then
 			break;
 		end
 	end
-	return self.last_x > block_count;
 end
 
-function ParaWorldMinimapSurface:ScheduleNextPaint()
-	if(self.block_count) then
-		if(self.last_x > self.block_count) then
-			self:ResetDrawProgress();
-		else
-			self:repaint();
+-- draw every cached cell. cheap (DrawRect only), so it is done in full every
+-- frame, which keeps each rendered frame complete and consistent under mcml v2.
+function ParaWorldMinimapSurface:DrawColorMap(painter)
+	if(not self.map_left or not self.block_size) then
+		return;
+	end
+	local block_size = self.block_size;
+	local width, height = self:width(), self:height();
+	local x0, y0 = self:x(), self:y();
+	for sample_x, row in pairs(self.colorMap) do
+		local top = y0 + height - sample_x*block_size;
+		for sample_y, color in pairs(row) do
+			if(color) then
+				painter:SetPen(color);
+				painter:DrawRect(x0 + width - sample_y*block_size, top, block_size, block_size);
+			end
 		end
 	end
 end

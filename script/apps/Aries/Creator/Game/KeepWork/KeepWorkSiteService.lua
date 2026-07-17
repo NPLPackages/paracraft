@@ -115,15 +115,19 @@ end
 
 -- 便捷方法：获取markdown内容
 -- path 可以是 "mysite/folder/file.md" 或 "mysite/folder/file"（会自动加上 .md 后缀）
+-- @param path: string - Page path
+-- @param callback: function(data) - Callback
+-- @param bUseCache: boolean - Use page cache API
+-- @param username: string|nil - Override username (for cross-user access). nil = current user.
 -- @return data string
-function KeepworkSiteService:GetMarkdownByFullPath(path, callback, bUseCache)
+function KeepworkSiteService:GetMarkdownByFullPath(path, callback, bUseCache, username)
     local self = KeepworkSiteService:new({params = { path = path }});
     callback = callback or function() end;
     if bUseCache then
-        self:GetMarkdownFromCache(self.sitename, self.fullPath, callback)
+        self:GetMarkdownFromCache(self.sitename, self.fullPath, callback, username)
         return
     end
-    self:GetMarkdown(self.sitename, self.fullPath, callback) 
+    self:GetMarkdown(self.sitename, self.fullPath, callback, username) 
 end
 
 -- 便捷方法：删除markdown文件
@@ -305,13 +309,14 @@ function KeepworkSiteService:EditMarkdown(sitename, path, content, callback)
     end)
 end
 
-function KeepworkSiteService:GetMarkdown(sitename, path, callback)
+function KeepworkSiteService:GetMarkdown(sitename, path, callback, username)
     callback = callback or function() end;
-    local repoPath = System.User.username .. "/" .. sitename;
+    username = username or System.User.username;
+    local repoPath = username .. "/" .. sitename;
     repoPath  = Mod.WorldShare.Utils.EncodeURIComponent(repoPath)
     repoPath  = string.gsub(repoPath , "%%", "%%%%")
 
-    local filePath = System.User.username .. "/" .. path;
+    local filePath = username .. "/" .. path;
     filePath = Mod.WorldShare.Utils.EncodeURIComponent(filePath)
     filePath = string.gsub(filePath, "%%", "%%%%")
     keepwork.site.getFile({router_params = { repoPath = repoPath, filePath = filePath }}, function(err, msg, data)
@@ -339,13 +344,15 @@ function KeepworkSiteService:DeleteMarkdown(sitename, path, callback)
 end
 
 -- use page cache
-function KeepworkSiteService:GetMarkdownFromCache(sitename, path, callback)
+-- @param username: string|nil - Override username (for cross-user access). nil = current user.
+function KeepworkSiteService:GetMarkdownFromCache(sitename, path, callback, username)
     callback = callback or function() end;
-    local repoPath = System.User.username .. "/" .. sitename;
+    username = username or System.User.username;
+    local repoPath = username .. "/" .. sitename;
     repoPath  = Mod.WorldShare.Utils.EncodeURIComponent(repoPath)
     repoPath  = string.gsub(repoPath , "%%", "%%%%")
 
-    local filePath = System.User.username .. "/" .. path;
+    local filePath = username .. "/" .. path;
     filePath = Mod.WorldShare.Utils.EncodeURIComponent(filePath)
     filePath = string.gsub(filePath, "%%", "%%%%")
     keepwork.site.getFileFromCache({router_params = { repoPath = repoPath, filePath = filePath }}, function(err, msg, data)

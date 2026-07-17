@@ -13,6 +13,7 @@ local MallManager = commonlib.gettable("MyCompany.Aries.Game.KeepWorkMall.MallMa
 local KeepWorkMallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/KeepWorkMallPageV2.lua");
 local MallOtherPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallOtherPage.lua");
 local MallPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallPage.lua");
+local KeepworkServicePermission = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Permission.lua')
 
 local MallMainPage = NPL.export();
 
@@ -112,6 +113,22 @@ local posX = {2,106,208,316}
 
 function MallMainPage.OnChangeMenu(index)
     local index = tonumber(index)
+    if index and index > 0 and index <=4 and MallMainPage.select_tab_index ~= index then
+        if index >= 2 then
+            KeepworkServicePermission:Authentication('MallLimit', function(result)
+                if not result then
+                    _guihelper.MessageBox(L'资源库解锁请联系客服', nil, _guihelper.MessageBoxButtons.OK)
+                    return
+                end
+                MallMainPage.OnChangeMenuImp(index)
+            end)
+            return
+        end
+        MallMainPage.OnChangeMenuImp(index)
+    end
+end
+
+function MallMainPage.OnChangeMenuImp(index)
     if index and index > 0 and index <=4 and MallMainPage.select_tab_index ~= index then
         MallMainPage.select_tab_index = index
         MallOtherPage.type = ""

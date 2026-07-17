@@ -1184,7 +1184,7 @@ function VoiceContextManager:ShowDebugUI(bShow)
         if not self.debugPage then
             local width, height = 450, 580;
             local params = {
-                url = "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/VoiceContextManagerDebug.html",
+                url = "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/test/VoiceContextManagerDebug.html",
                 name = "VoiceContextManagerDebug.ShowPage",
                 isShowTitleBar = false,
                 DestroyOnClose = true,

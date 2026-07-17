@@ -93,7 +93,7 @@ function NPLJS:SetCloseCallBack(callback)
     self.m_close_callback = callback;
 end
 
-function NPLJS:Open(url, callback, x, y, width, height)
+function NPLJS:Open(url, callback, x, y, width, height, transparent)
     if (url == NplBrowserPlugin.about_blank_url) then return end
     x = x or 0;
     y = y or 0;
@@ -129,8 +129,8 @@ function NPLJS:Open(url, callback, x, y, width, height)
     self.m_webview_y = y;
     self.m_webview_width = width;
     self.m_webview_height = height;
-    NplBrowserPlugin.Start({id = self:GetID(), url = self:GetUrl(), x = x, y = y, width = width, height = height});
-    NplBrowserPlugin.Open({id = self:GetID(), url = self:GetUrl(), visible = true, x = x, y = y, width = width, height = height});
+    NplBrowserPlugin.Start({id = self:GetID(), url = self:GetUrl(), x = x, y = y, width = width, height = height, transparent = transparent});
+    NplBrowserPlugin.Open({id = self:GetID(), url = self:GetUrl(), visible = true, x = x, y = y, width = width, height = height, transparent = transparent});
     self.m_onload_timer = commonlib.Timer:new({callbackFunc = function()
         self:SendMsg("load");
     end});

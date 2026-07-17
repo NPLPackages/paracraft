@@ -158,6 +158,8 @@ if(is_ajax()) then
             return;
         end
         local agent = GetAgent();
+        agent.waitingForUserReply = false;
+        agent.waitingForUserReplyStartTime = nil;
         agent:ProcessWithLLM(text, function(result)
             -- response already sent; result processed asynchronously
         end);
@@ -244,8 +246,13 @@ if(is_ajax()) then
     -----------------------------------------------------------
     add_action('wp_ajax_set_task', function()
         local text = request:get("text");
+        local soul = request:get("soul");
+        local sop = request:get("sop");
         local agent = GetAgent();
-        agent:SetPrimaryLearningTask(text);
+        local options = {};
+        if soul and soul ~= "" then options.soul = soul; end
+        if sop and sop ~= "" then options.sop = sop; end
+        agent:SetPrimaryLearningTask(text, options);
         wp_send_json({success = true}, true);
     end)
 

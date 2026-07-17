@@ -365,7 +365,8 @@
                     end
 
                     function set_phone_mode()
-                        set_mode('phone')
+                        -- 手机登录（短信登录）已下架，提示用户使用密码登录
+                        _guihelper.MessageBox(L'短信登录已经下架，请用密码登录，如果忘记密码，可用短信找回。')
                     end
 
                     function set_mode(mode)
@@ -1038,10 +1039,23 @@
                                         onclick="click_set_show_password"/>
                             </div>
                         </div>
-                        
+
+                        <div style='width:300px;margin-top:12px;'>
+                            <div onclick='forget_password'
+                                 style='margin-left:208px;
+                                        width:92px;
+                                        text-align:right;
+                                        font-size:14px;
+                                        base-font-size:14px;
+                                        line-height:5px;
+                                        color:#404BF5;'>
+                                <%= L'忘记密码？' %>
+                            </div>
+                        </div>
+
                         <pe:if condition="<%= not get_is_modal()%>">
                             <div style='margin-top:5px;margin-bottom:10px;'>
-                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:60px;width:240px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:30px;width:240px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
                                        name='login_button'
                                        DefaultButton='true'
                                        onclick='login()'
@@ -1051,12 +1065,12 @@
                         </pe:if>
                         <pe:if condition="<%= get_is_modal()%>">
                             <div style='margin-top:5px;margin-bottom:10px;'>
-                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:0px;margin-top:60px;width:135px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:0px;margin-top:30px;width:135px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
                                         name='login_button'
                                         DefaultButton='true'
                                         onclick='login()'
                                         value='<%= L"登  录"%>' />
-                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:60px;width:135px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
+                                <input type='button' style="color:#ffffff;font-size:16px;font-weight: bold;margin-left:30px;margin-top:30px;width:135px;height:50px;background: url(Texture/Aries/Creator/paracraft/Educate/Login/denglu_70x50_32bits.png#0 0 70 50:24 24 24 24)"
                                         onclick='close()'
                                         value='<%= L"取  消"%>' />
                             </div>

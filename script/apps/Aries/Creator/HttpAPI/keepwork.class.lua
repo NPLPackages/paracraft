@@ -74,9 +74,16 @@ HttpWrapper.Create("keepwork.classrooms.signin", "%MAIN%/edu/v0/classroomStudent
 --http://yapi.kp-para.cn/project/655/interface/api/7167
 HttpWrapper.Create("keepwork.lessonPackage.checkLessonNoAuth", "%MAIN%/edu/v0/lessonPackages/:id/checkNoAuthPackages", "POST", true)
 
+-- 获取机构已购课包授权列表
+-- https://yapi.kp-para.cn/project/964/interface/api/8233
+HttpWrapper.Create("keepwork.lessonPackage.getOrgOrderAuths", "%MAIN%/edu/v0/orgOrderLessonPackageAuths", "GET", true)
+
 -- 查询课堂学生
 -- http://yapi.kp-para.cn/project/655/interface/api/7631
 HttpWrapper.Create("keepwork.classrooms.students", "%MAIN%/edu/v0/classrooms/student/search", "GET", true)
+
+-- 检查特殊地区
+HttpWrapper.Create("keepwork.commonConfigs.checkSpecialRegion", "%MAIN%/edu/v0/commonConfigs/checkSpecialRegion", "GET", true)
 
 
 

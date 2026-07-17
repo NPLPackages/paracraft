@@ -29,6 +29,9 @@ local ignoreList = {[9]=true,[253]=true,[110]=true,[216]=true,[217]=true,[196]=t
 local replaceList = {[75]=76,};
 -- max allowed blocks
 ParaWorldMiniChunkGenerator.MaxAllowedBlock = 400000;
+-- default: keep the player locked inside the 128*128 movable area.
+-- this is instance-level default, so every newly loaded world starts locked again.
+ParaWorldMiniChunkGenerator.move_lock_enabled = true;
 
 local road_block_id = 71;
 local ground_block_id = 62;
@@ -189,7 +192,24 @@ function ParaWorldMiniChunkGenerator:LoadFromTemplateFile(filename)
 end
 
 
+-- public: enable/disable the movable-area lock at runtime.
+-- Safe to call from anywhere (e.g. an entity code block during world load), at any time,
+-- regardless of whether OnLoadWorld has run yet: OnLockTimer re-reads this flag on every tick.
+-- Because the flag lives on the generator instance, it is automatically reset to the default
+-- when the next world is loaded (a fresh generator is created), so it never leaks across worlds.
+-- @param bEnabled: false to unlock (allow free movement), true (or nil) to keep the area lock.
+function ParaWorldMiniChunkGenerator:SetMoveLockEnabled(bEnabled)
+	self.move_lock_enabled = bEnabled ~= false;
+end
+
+function ParaWorldMiniChunkGenerator:IsMoveLockEnabled()
+	return self.move_lock_enabled;
+end
+
 function ParaWorldMiniChunkGenerator:OnLockTimer()
+	if(not self.move_lock_enabled) then
+		return
+	end
 	if(GameLogic.Macros:IsPlaying() or GameLogic.Macros:IsRecording()) then
 		return
 	end

@@ -1701,12 +1701,6 @@ function MyCompany.Aries.OnWorldLoad()
 	--att:SetField("FogEnd", FogEnd_range.from + (FogEnd_range.to - FogEnd_range.from) * value);
 	--att:SetField("FogStart", FogStart_range.from + (FogStart_range.to - FogStart_range.from) * value);
 	--ParaCamera.GetAttributeObject():SetField("FarPlane", FarPlane);
-	if(not System.options.mc and System.options.IsTouchDevice) then
-		att:SetField("FogEnd", 52);
-		att:SetField("FogStart", 42);
-		ParaCamera.GetAttributeObject():SetField("FarPlane", 56);
-	end
-
 	if( not System.options.is_mcworld and world_info.share_global_weather ) then
 		att:SetField("FogColor", {187/255, 230/255, 255/255});
 	end	
@@ -1798,6 +1792,16 @@ function MyCompany.Aries.OnWorldLoad()
 		NPL.load("(gl)script/apps/Aries/Scene/main.lua");
 		MyCompany.Aries.Scene.OnWorldLoad();
 
+		-- kids(haqi) 的背景音乐依赖区域雷达(Global_RegionRadar -> ParaTerrain.GetRegionValue 读
+		-- 区域掩码 -> OnGlobalRegionRadar -> Scene.PlayRegionBGMusic)。haqi 跑在 _emptyworld、无区域
+		-- 掩码,且非 win32 上 GetRegionValue 全返回 0,无法驱动按区域切换的 BGM,进入后一直没有声音。
+		-- 这里用一个多曲播放列表(随机循环)兜底;win32 仍走原有区域雷达逻辑,行为不变。
+		if(System.options.version == "kids" and System.os.GetPlatform() ~= "win32") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/HaqiBgmPlaylist.lua");
+			local HaqiBgmPlaylist = commonlib.gettable("MyCompany.Aries.Game.Sound.HaqiBgmPlaylist");
+			HaqiBgmPlaylist:Start();
+		end
+
 		NPL.load("(gl)script/apps/Aries/Instance/main.lua");
 		MyCompany.Aries.Instance.OnWorldLoad();
 
@@ -1857,6 +1861,13 @@ function MyCompany.Aries.OnWorldClosing()
 	
 		MyCompany.Aries.Scene.StopRegionBGMusic();
 		MyCompany.Aries.Scene.StopGameBGMusic();
+
+		-- 停掉 haqi 非 win32 的多曲 BGM 播放列表(若在播)
+		if(System.options.version == "kids" and System.os.GetPlatform() ~= "win32") then
+			NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/HaqiBgmPlaylist.lua");
+			local HaqiBgmPlaylist = commonlib.gettable("MyCompany.Aries.Game.Sound.HaqiBgmPlaylist");
+			HaqiBgmPlaylist:Stop();
+		end
 	end
 end
 

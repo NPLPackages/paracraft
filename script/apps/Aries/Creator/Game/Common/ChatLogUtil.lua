@@ -229,40 +229,75 @@ end
 -- Format a message block with role header and content
 -- @param role: message role (System, User, Assistant, Tool, Tool Calls)
 -- @param content: message content (string or table for multi-modal messages)
+-- @param toolCallsContent: optional beautified JSON string of tool_calls (for Assistant messages)
+-- @param toolMeta: optional table {tool_call_id, name} for Tool role messages (GitHub Copilot style)
 -- @return formatted message block string
-function ChatLogUtil.FormatMessageBlock(role, content)
+function ChatLogUtil.FormatMessageBlock(role, content, toolCallsContent, toolMeta)
     local lines = {};
-    table.insert(lines, "### " .. role);
-    -- Use json syntax highlighting for Tool Calls block
-    if role == "Tool Calls" then
-        table.insert(lines, "~~~json");
-    else
-        table.insert(lines, "~~~md");
-    end
-    
-    -- Handle multi-modal content (array of {type, text/image_url})
-    local contentStr;
-    if type(content) == "table" then
+    -- For Tool role, show tool_call_id inline: ### Tool (call_xxx, tool_name)
+    if role == "Tool" and toolMeta then
         local parts = {};
-        for _, part in ipairs(content) do
-            if type(part) == "table" then
-                if part.type == "text" and part.text then
-                    table.insert(parts, part.text);
-                elseif part.type == "image_url" and part.image_url then
-                    local url = type(part.image_url) == "table" and part.image_url.url or part.image_url;
-                    table.insert(parts, string.format("[Image: %s]", url or "unknown"));
-                end
-            elseif type(part) == "string" then
-                table.insert(parts, part);
-            end
+        if toolMeta.tool_call_id then
+            table.insert(parts, toolMeta.tool_call_id);
         end
-        contentStr = table.concat(parts, "\n\n");
+        if toolMeta.name then
+            table.insert(parts, toolMeta.name);
+        end
+        if #parts > 0 then
+            table.insert(lines, string.format("### %s (%s)", role, table.concat(parts, ", ")));
+        else
+            table.insert(lines, "### " .. role);
+        end
     else
-        contentStr = content or "";
+        table.insert(lines, "### " .. role);
     end
     
-    table.insert(lines, contentStr);
-    table.insert(lines, "~~~");
+    local hasContent = (content ~= nil and content ~= "");
+    local hasToolCalls = (toolCallsContent ~= nil and toolCallsContent ~= "");
+    
+    -- Add text/content block if present
+    if hasContent then
+        table.insert(lines, "~~~md");
+        
+        -- Handle multi-modal content (array of {type, text/image_url})
+        local contentStr;
+        if type(content) == "table" then
+            local parts = {};
+            for _, part in ipairs(content) do
+                if type(part) == "table" then
+                    if part.type == "text" and part.text then
+                        table.insert(parts, part.text);
+                    elseif part.type == "image_url" and part.image_url then
+                        local url = type(part.image_url) == "table" and part.image_url.url or part.image_url;
+                        table.insert(parts, string.format("[Image: %s]", url or "unknown"));
+                    end
+                elseif type(part) == "string" then
+                    table.insert(parts, part);
+                end
+            end
+            contentStr = table.concat(parts, "\n\n");
+        else
+            contentStr = content or "";
+        end
+        
+        table.insert(lines, contentStr);
+        table.insert(lines, "~~~");
+    end
+    
+    -- Add tool calls block merged under the same heading (GitHub Copilot style)
+    if hasToolCalls then
+        table.insert(lines, "~~~json (tool_calls)");
+        table.insert(lines, toolCallsContent);
+        table.insert(lines, "~~~");
+    end
+    
+    -- If neither content nor tool calls, add an empty md block
+    if not hasContent and not hasToolCalls then
+        table.insert(lines, "~~~md");
+        table.insert(lines, "");
+        table.insert(lines, "~~~");
+    end
+    
     return table.concat(lines, "\n");
 end
 
@@ -425,12 +460,14 @@ function ChatLogUtil.WriteMarkdownEntry(entryType, metadata, messages)
             #collapsibleTools, beautified));
     end
     
-    -- Messages section (for request type)
+    -- Messages section
     if messages and #messages > 0 then
-        table.insert(lines, "## Request Messages");
+        -- Use appropriate section title based on entry type (GitHub Copilot style)
+        local sectionTitle = (entryType == "response") and "## Response" or "## Request Messages";
+        table.insert(lines, sectionTitle);
         for _, msg in ipairs(messages) do
-            if msg and msg.role and msg.content then
-                local formattedContent =ChatLogUtil.FormatMessageBlock(msg.role, msg.content)
+            if msg and msg.role then
+                local formattedContent = ChatLogUtil.FormatMessageBlock(msg.role, msg.content, msg.toolCallsContent, msg.toolMeta)
                 if formattedContent and formattedContent ~= "" then
                     table.insert(lines, formattedContent);
                 end
@@ -520,15 +557,49 @@ function ChatLogUtil.LogRequest(sessionId, logParams)
         metadata.knowledgeBaseCodes = logParams.knowledgeBaseCodes;
     end
     
+    -- Build tool_call_id -> tool_name lookup from assistant messages
+    local toolCallIdToName = {};
+    for _, msg in ipairs(messages) do
+        if msg.role == "assistant" and msg.tool_calls then
+            for _, tc in ipairs(msg.tool_calls) do
+                if tc.id and tc["function"] and tc["function"].name then
+                    toolCallIdToName[tc.id] = tc["function"].name;
+                end
+            end
+        end
+    end
+    
     -- Build message array with proper role names
     local formattedMessages = {};
     for i, msg in ipairs(messages) do
         local role = msg.role or "unknown";
         -- Capitalize first letter for display
         role = role:sub(1,1):upper() .. role:sub(2);
+        
+        local hasToolCalls = msg.role == "assistant" and msg.tool_calls and #msg.tool_calls > 0;
+        local hasContent = msg.content and msg.content ~= "";
+        
+        -- Merge tool_calls into Assistant block (GitHub Copilot style)
+        local toolCallsContentStr = nil;
+        if hasToolCalls then
+            local toolCallsJson = commonlib.Json.Encode(msg.tool_calls) or "[]";
+            toolCallsContentStr = commonlib.Json.Beautify(toolCallsJson) or toolCallsJson;
+        end
+        
+        -- For tool role messages, include tool_call_id and resolved name (GitHub Copilot style)
+        local toolMeta = nil;
+        if msg.role == "tool" and msg.tool_call_id then
+            toolMeta = {
+                tool_call_id = msg.tool_call_id,
+                name = toolCallIdToName[msg.tool_call_id],
+            };
+        end
+        
         table.insert(formattedMessages, {
             role = role,
-            content = msg.content or "",
+            content = hasContent and msg.content or nil,
+            toolCallsContent = toolCallsContentStr,
+            toolMeta = toolMeta,
         });
     end
     
@@ -612,12 +683,21 @@ function ChatLogUtil.LogResponse(sessionId, resultCode, fullResult, fullThink, t
         });
     end
     
-    -- Add response block
+    -- Prepare tool calls content if present
+    local toolCallsContentStr = nil;
+    if toolCalls and #toolCalls > 0 then
+        local toolCallsJson = commonlib.Json.Encode(toolCalls) or "[]";
+        toolCallsContentStr = commonlib.Json.Beautify(toolCallsJson) or toolCallsJson;
+    end
+    
+    -- Add response block (merge tool calls into Assistant block, GitHub Copilot style)
     if fullResult and fullResult ~= "" then
         table.insert(messages, {
             role = "Assistant",
             content = fullResult,
+            toolCallsContent = toolCallsContentStr,
         });
+        toolCallsContentStr = nil; -- consumed
     elseif resultCode and resultCode ~= 200 then
         table.insert(messages, {
             role = "Assistant (Error)",
@@ -625,13 +705,11 @@ function ChatLogUtil.LogResponse(sessionId, resultCode, fullResult, fullThink, t
         });
     end
     
-    -- Add tool calls block (VS Code Copilot style) - separate from metadata
-    if toolCalls and #toolCalls > 0 then
-        local toolCallsJson = commonlib.Json.Encode(toolCalls) or "[]";
-        local beautified = commonlib.Json.Beautify(toolCallsJson) or toolCallsJson;
+    -- If tool calls weren't consumed (no text content + no error), create Assistant block with only tool calls
+    if toolCallsContentStr then
         table.insert(messages, {
-            role = "Tool Calls",
-            content = beautified,
+            role = "Assistant",
+            toolCallsContent = toolCallsContentStr,
         });
     end
     

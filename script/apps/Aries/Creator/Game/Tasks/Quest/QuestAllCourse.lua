@@ -260,6 +260,7 @@ function QuestAllCourse.RefreshAllData(callback)
         end
 
         keepwork.world.search({
+            ["x-per-page"] = #world_id_list,
             type = 1,
             id = {["$in"] = world_id_list},
         },function(err, msg, data)
@@ -271,7 +272,7 @@ function QuestAllCourse.RefreshAllData(callback)
                         QuestAllCourse.CourseWorldData[v.id] = {imageUrl = v.extra.imageUrl}
                     end
                 end
-                
+
                 if callback then
                     callback()
                 end
@@ -448,6 +449,7 @@ function QuestAllCourse.RefreshCourseListData(callback)
             QuestAllCourse.CourseWorldData = {}
             if #world_id_list > 0 then
                 keepwork.world.search({
+                    ["x-per-page"] = #world_id_list,
                     type = 1,
                     id = {["$in"] = world_id_list},
                 },function(err, msg, data)

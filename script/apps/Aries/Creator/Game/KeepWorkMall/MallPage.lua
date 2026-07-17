@@ -14,6 +14,7 @@ local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.
 local pe_gridview = commonlib.gettable("Map3DSystem.mcml_controls.pe_gridview");
 local MallUtils = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallUtils.lua");
 local MallMainPage = NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallMainPage.lua");
+local KeepworkServicePermission = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Permission.lua')
 --Page
 NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWorkMall/MallManager.lua");
 local MallManager = commonlib.gettable("MyCompany.Aries.Game.KeepWorkMall.MallManager");
@@ -240,7 +241,29 @@ function MallPage.IsChangeToSearchMenu(index)
     end
 end
 
+function MallPage.IsCodeMenu(index)
+    local menuData = MallPage.menu_data_sources[index]
+    return menuData and menuData.name == "代码"
+end
+
 function MallPage.OnChangeMenu(name,bSearch)
+    local index = tonumber(name)
+    if index and index > 0 then
+        if MallPage.IsCodeMenu(index) then
+            KeepworkServicePermission:Authentication('MallLimit', function(result)
+                if not result then
+                    _guihelper.MessageBox(L'资源库解锁请联系客服', nil, _guihelper.MessageBoxButtons.OK)
+                    return
+                end
+                MallPage.OnChangeMenuImp(name, bSearch)
+            end)
+            return
+        end
+        MallPage.OnChangeMenuImp(name, bSearch)
+    end
+end
+
+function MallPage.OnChangeMenuImp(name,bSearch)
     local index = tonumber(name)
     if index and index > 0 then
         if not bSearch then 

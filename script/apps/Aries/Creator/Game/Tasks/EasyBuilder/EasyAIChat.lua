@@ -15,8 +15,7 @@ EasyAIChat:CloseWindow()
 NPL.load("(gl)script/ide/System/Core/SceneContextManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.ai.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/AIChat.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/EasyAIChatTools.lua");
-local EasyAIChatTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.EasyAIChatTools");
+
 local AIChat = commonlib.gettable("MyCompany.Aries.Game.Common.AIChat");
 local SceneContextManager = commonlib.gettable("System.Core.SceneContextManager");
 local EntityManager = commonlib.gettable("MyCompany.Aries.Game.EntityManager");
@@ -502,9 +501,7 @@ function EasyAIChat:HandleLLMResponse(userInput)
     local aiChat = AIChat:new();
     EasyAIChat.currentAIChat = aiChat;
     if EasyAIChat.needOfficialTools then
-        EasyAIChatTools.RegisterMQTTTools(aiChat);
-        EasyAIChatTools.RegisterPersonalPageTools(aiChat);
-        EasyAIChatTools.RegisterSchedulerTools(aiChat);
+        aiChat:RegisterEasyTools();
     end
 
     -- Check if target entity's copilot has tools

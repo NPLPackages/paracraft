@@ -243,7 +243,7 @@ local uploaded_files = {};
 -- if pMsg.images contains local file, it will return true and then it will upload the image to our temp server, and then calls pCallbackFun(pMsg, ...), where pMsg.images will be replaced by server url.
 -- if pMsg.images does not contain any local file, it will return nil and does nothing.
 function Platforms.PrepareImages(pMsg, pCallbackFun, param1, param2)
-	if(pMsg and pMsg.images and not pMsg.images:match("^http://")) then
+	if(pMsg and pMsg.images and not pMsg.images:match("^https?://")) then
 		-- if image is a local file, we will first upload to server first. 
 		if(ParaIO.DoesFileExist(pMsg.images)) then
 			local crc32 = ParaIO.CRC32(pMsg.images);
@@ -256,46 +256,64 @@ function Platforms.PrepareImages(pMsg, pCallbackFun, param1, param2)
 				end
 				return;
 			end
-			local photo_name = ParaGlobal.GetDateFormat("yyMMdd").."_"..ParaGlobal.GetTimeFormat("Hmmss");
-			local msg = {
-				src = pMsg.images,
-				overwrite = 1,
-				ispic = 1,
-				filepath = "photos/"..photo_name..".jpg",
-			};
 			_guihelper.MessageBox("正在上传图片, 请稍候...");
-			local res = paraworld.file.UploadFileEx(msg, "SharePhoto", function(msg)
-				if(msg) then
-					if(msg.issuccess and msg.url and msg.is_finished) then
-						_guihelper.MessageBox(nil);
-						Platforms.IncreaseCounter();
-						local url = msg.url:gsub("^http://192.168.0.51:81", "http://qqlogin.paraengine.com:81"); -- this is only for testing 
-						pMsg.images = url;
-						if(url:match("^http://")) then
-							Platforms.last_image_url = url;
-							uploaded_files[crc32] = url;
-							LOG.std(nil, "info", "postToFeed", "image is uploaded to our server url: %s", url)
-							if(pCallbackFun) then
-								pCallbackFun(pMsg, param1, param2);
-							end
+			-- 上传到keepwork七牛公共临时存储, 与ShareBlocksPage.UpLoadFile/keepwork-nuxt uploadTempImg同一链路
+			NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/keepwork.share.lua");
+			local HttpWrapper = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/HttpWrapper.lua");
+			local QiniuRootApi = NPL.load("(gl)Mod/WorldShare/api/Qiniu/QiniuRootApi.lua");
+
+			local function OnUploadFailed(stage, err)
+				LOG.std(nil, "warn", "postToFeed", "failed to upload image to qiniu at %s, err: %s", tostring(stage), tostring(err));
+				_guihelper.MessageBox("暂时无法上传图片, 是否不带图片分享？", function(res)
+					if(res and res == _guihelper.DialogResult.Yes) then
+						-- pressed YES
+						pMsg.images = "http://res.61.com/images/comm/banner/b_haqi.png";
+						if(pCallbackFun) then
+							pCallbackFun(pMsg, param1, param2);
 						end
 					end
-				end
-				if(not msg or msg.errorcode~=nil) then
-					_guihelper.MessageBox("暂时无法上传图片, 是否不带图片分享？", function(res)
-						if(res and res == _guihelper.DialogResult.Yes) then
-							-- pressed YES
-							pMsg.images = "http://res.61.com/images/comm/banner/b_haqi.png";
-							if(pCallbackFun) then
-								pCallbackFun(pMsg, param1, param2);
-							end
-						end
-					end, _guihelper.MessageBoxButtons.YesNo);
-				end
-			end)
-			if(res == paraworld.errorcode.RepeatCall) then
-				Platforms.DefaultFeedHandler(errorCode);
+				end, _guihelper.MessageBoxButtons.YesNo);
 			end
+
+			local key = string.format("haqi-photo-%s-%s.jpg", tostring(Map3DSystem.User.nid or 0), tostring(crc32));
+			keepwork.shareBlock.getToken({
+				router_params = { id = key },
+			}, function(err, msg, data)
+				local token = (err == 200) and data and data.data and data.data.token;
+				if(not token) then
+					OnUploadFailed("getToken", err);
+					return;
+				end
+				local file = ParaIO.open(pMsg.images, "rb");
+				if(not file:IsValid()) then
+					file:close();
+					OnUploadFailed("openFile", pMsg.images);
+					return;
+				end
+				local content = file:GetText(0, -1);
+				file:close();
+				local filename = commonlib.Encoding.DefaultToUtf8(ParaIO.GetFileName(pMsg.images));
+				QiniuRootApi:Upload(token, key, filename, content, function(result, upload_err)
+					if(upload_err ~= 200) then
+						OnUploadFailed("upload", upload_err);
+						return;
+					end
+					_guihelper.MessageBox(nil);
+					Platforms.IncreaseCounter();
+					local base_url = "https://qiniu-public-temporary.keepwork.com/";
+					if(HttpWrapper.GetDevVersion() == "STAGE") then
+						base_url = "https://qiniu-public-temporary-dev.keepwork.com/";
+					end
+					local url = base_url..key;
+					pMsg.images = url;
+					Platforms.last_image_url = url;
+					uploaded_files[crc32] = url;
+					LOG.std(nil, "info", "postToFeed", "image is uploaded to qiniu url: %s", url);
+					if(pCallbackFun) then
+						pCallbackFun(pMsg, param1, param2);
+					end
+				end)
+			end)
 		end
 		return true;
 	end
@@ -372,7 +390,7 @@ function Platforms.postToFeed_window(pMsg, pCallbackFun)
 	local p = pMsg.platform or Platforms.GetPlat();
 	if p == PLATS.QQ then
 		local url = commonlib.gettable("commonlib.socket.url");
-		local str = "http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?showcount=0&style=101&width=142&height=30&site="..if_else(System.options.version=="kids", "魔法哈奇", "魔法哈奇2") .. "&url=" .. url.escape(pMsg.url) .. "&showcount=0&otype=share&title=" .. url.escape(pMsg.title);
+		local str = "http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?showcount=0&style=101&width=142&height=30&site="..url.escape(if_else(System.options.version=="kids", "魔法哈奇", "魔法哈奇2")) .. "&url=" .. url.escape(pMsg.url) .. "&showcount=0&otype=share&title=" .. url.escape(pMsg.title);
 		if pMsg.comment then
 			str = str .. "&desc=" .. url.escape(pMsg.comment);
 		end
@@ -393,7 +411,7 @@ function Platforms.postToFeed_window(pMsg, pCallbackFun)
 	elseif p == PLATS.BaiduTieba then
 		local url = commonlib.gettable("commonlib.socket.url");
 		local str = "http://tieba.baidu.com/f/commit/share/openShareApi?&title=" .. url.escape("My Creations In Haqi");
-		if pMsg.images then
+		if pMsg.url then
 			str = str .. "&url=" .. url.escape(pMsg.url);
 		end
 		if pMsg.images then

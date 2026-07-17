@@ -25,6 +25,9 @@ function mcml_controls.register_all()
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/keepwork/kp_usertag.lua");
 	MyCompany.Aries.Game.mcml2.kp_usertag:RegisterAs("kp:usertag");
 
+	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/keepwork/kp_calendar.lua");
+	MyCompany.Aries.Game.mcml2.kp_calendar:RegisterAs("kp:calendar");
+
 	NPL.load("(gl)script/apps/Aries/Creator/Game/mcml2/pe_mc_player.lua");
 	MyCompany.Aries.Game.mcml2.pe_mc_player:RegisterAs("pe:mc_player");
 

@@ -5,6 +5,7 @@
                 <![CDATA[
                     NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/MakeAppTask.lua");
                     local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+                    local KeepworkServicePermission = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Permission.lua');
 
                     local page = document:GetPageCtrl();
                     local platform = System.os.GetPlatform();
@@ -30,17 +31,18 @@
                         end
                         if (get_platform() ~= "mac") then
                             _guihelper.MessageBox(L"请在mac平台下执行此操作");
-
                             return;
                         end
 
-                        GameLogic.IsVip("MakeApk", true, function(result) 
+                        KeepworkServicePermission:Authentication('MakeApp', function(result)
                             if (result) then
                                 build_platform = "ios";
                                 page:SetValue("build_title", L"准备iOS开发环境");
                                 page:SetValue("one_click_button", L"一键生成");
                                 page:SetValue("step2_notice", get_build_folder());
                                 ios_exec();
+                            else
+                                _guihelper.MessageBox(L"功能解锁请联系客服");
                             end
                         end);
                     end
@@ -92,12 +94,14 @@
 
                             return;
                         end
-                        GameLogic.IsVip("MakeApk", true, function(result) 
+                        KeepworkServicePermission:Authentication('MakeApp', function(result)
                             if(result) then
                                 build_platform = "android";
                                 page:SetValue("build_title", L"准备安卓开发环境");
                                 page:SetValue("step2_notice", L"高级功能：打开ApkTool目录");
                                 android_exec();
+                            else
+                                _guihelper.MessageBox(L"功能解锁请联系客服");
                             end
                         end);
                     end
@@ -163,10 +167,16 @@
                             return;
                         end
 
-                        local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
-                        local task = MyCompany.Aries.Game.Tasks.MakeApp:new();
+                        KeepworkServicePermission:Authentication('MakeApp', function(result)
+                            if (result) then
+                                local MakeApp = commonlib.gettable("MyCompany.Aries.Game.Tasks.MakeApp");
+                                local task = MyCompany.Aries.Game.Tasks.MakeApp:new();
 
-                        task:MakeWindows();
+                                task:MakeWindows();
+                            else
+                                _guihelper.MessageBox(L"功能解锁请联系客服");
+                            end
+                        end);
                     end
 
                     function get_world_name()

@@ -77,7 +77,6 @@ NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/CopilotTa
 NPL.load("(gl)script/apps/Aries/Creator/Game/Sound/SoundManager.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Entity/EntityLiveModel.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/AIChat.lua");
-NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/EasyAIChatTools.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/PersonalPageStore.lua");
 
 local EntityLiveModel = commonlib.gettable("MyCompany.Aries.Game.EntityManager.EntityLiveModel");
@@ -92,7 +91,6 @@ local ItemStack = commonlib.gettable("MyCompany.Aries.Game.Items.ItemStack");
 local block_types = commonlib.gettable("MyCompany.Aries.Game.block_types");
 local SoundManager = commonlib.gettable("MyCompany.Aries.Game.Sound.SoundManager");
 local AIChat = commonlib.gettable("MyCompany.Aries.Game.Common.AIChat");
-local EasyAIChatTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.EasyAIChatTools");
 local PersonalPageStore = commonlib.gettable("MyCompany.Aries.Creator.Game.KeepWork.PersonalPageStore");
 
 local CopilotBase = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"), commonlib.gettable("MyCompany.Aries.Game.Tasks.Copilot.CopilotBase"));
@@ -2543,9 +2541,7 @@ function CopilotBase:CallLLM(input, options)
 	self.ai_chat = self.ai_chat or AIChat:new();
 	self.ai_chat:Abort(); -- abort previous
 	if options and options.needOfficialTools then
-		EasyAIChatTools.RegisterMQTTTools(self.ai_chat);
-		EasyAIChatTools.RegisterPersonalPageTools(self.ai_chat);
-		EasyAIChatTools.RegisterSchedulerTools(self.ai_chat);
+		self.ai_chat:RegisterEasyTools();
 	end
 	
 	self.llm_queue = {

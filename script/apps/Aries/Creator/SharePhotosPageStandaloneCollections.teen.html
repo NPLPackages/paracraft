@@ -30,6 +30,11 @@ function OnClose()
     Page:CloseWindow();
 end
 
+function CanOpenDiskDir()
+    NPL.load("(gl)script/ide/System/os/os.lua");
+    return System.os.GetPlatform() == "win32";
+end
+
 function GetDataSource(index)
     if(index == nil) then
 		return #(SharePhotosPage.dsFiles);
@@ -73,7 +78,9 @@ end
             <PagerTemplate>
 	            <form>
                     <div>
-                        <input type="button" value="打开相册目录" name="openDiskAlbum" style="position:relative;margin-left:25px;" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnOpenDiskDir" tooltip="点击打开我的本地画册"/><br />
+                        <pe:if condition='<%=CanOpenDiskDir()%>' >
+                            <input type="button" value="打开相册目录" name="openDiskAlbum" style="position:relative;margin-left:25px;" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnOpenDiskDir" tooltip="点击打开我的本地画册"/>
+                        </pe:if><br />
                     </div>
                     <input type="button" name="pre" zorder="2" style="width:22px;height:22px;margin-left:275px;background:url(Texture/Aries/common/themekid/cards/left_arrow_32bits.png#0 0 21 21);"/>
 	                <div style="float:right;margin-top:0px;width:53px;">

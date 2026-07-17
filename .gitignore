@@ -103,3 +103,6 @@ obsoleted/
 !script/apps/Aries/Login/LocalUserSelectPage.teen.html
 !script/apps/Aries/Login/UserLoginPage.teen.html
 !script/apps/Aries/Desktop/Functions/RechargeGuide.teen.html
+
+# syncRoots allowlist (managed by sync_nplpackages.py)
+!/docs/

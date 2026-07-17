@@ -127,7 +127,8 @@ function MakeApp:Run(...)
     end
 
     if (not currentEnterWorld.user or
-        currentEnterWorld.user.username ~= username) then
+        currentEnterWorld.user.username ~= username) and
+        System.os.GetPlatform() ~= 'mac'then
         if GameLogic.GetFilters():apply_filters('check_unavailable_before_open_vip')==true then
             return
         end
@@ -139,7 +140,7 @@ function MakeApp:Run(...)
     end
     local platform = System.os.GetPlatform();
     local params = {...};
-    if (platform == "win32" or platform == "mac") then
+    if (platform == "win32") then
         GameLogic.IsVip("MakeApp", true, function(result) 
             if (result) then
                 self:RunImp(table.unpack(params));
@@ -147,7 +148,8 @@ function MakeApp:Run(...)
                 GameLogic.ShowVipGuideTip("MakeApp")
             end
         end)
-        
+    elseif (platform == "mac") then
+        self:RunImp(params[1], params[2], ...);
     else
         _guihelper.MessageBox(L"此功能暂不支持该操作系统");
     end

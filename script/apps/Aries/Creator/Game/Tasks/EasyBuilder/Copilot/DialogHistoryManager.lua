@@ -20,6 +20,11 @@ NPL.load("(gl)script/ide/System/Core/ToolBase.lua");
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/AIChat.lua");
 local AIChat = commonlib.gettable("MyCompany.Aries.Game.Common.AIChat");
 
+-- Path to dialog-summary SKILL.md (internal skill, not loaded by SkillManager catalog)
+local SUMMARY_SKILL_PATH = "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/skills/dialog-summary/SKILL.md";
+-- Cached summary instructions: key -> instruction text
+local cachedSummaryInstructions = {};
+
 local DialogHistoryManager = commonlib.inherit(
     commonlib.gettable("System.Core.ToolBase"),
     commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.DialogHistoryManager")
@@ -370,24 +375,72 @@ function DialogHistoryManager:SummarizeWithLLM(messages)
 end
 
 --[[
+    Get summary instruction from dialog-summary SKILL.md file.
+    Reads the file directly (dialog-summary is an internal skill, not in SkillManager catalog).
+    Results are cached after first read.
+    @param key: string - Section name under "## Orchestration Prompts" (e.g. "summarize_zh" or "summarize_en")
+    @return string - Instruction text (never nil)
+]]
+function DialogHistoryManager:GetSummaryInstruction(key)
+    local DEFAULT_INSTRUCTION = "Summarize the following dialog concisely.";
+    
+    -- Return cached result if available
+    if cachedSummaryInstructions[key] then
+        return cachedSummaryInstructions[key];
+    end
+    
+    -- Read SKILL.md file directly
+    local file = ParaIO.open(SUMMARY_SKILL_PATH, "r");
+    if not file:IsValid() then
+        file:close();
+        LOG.std(nil, "warn", "DialogHistoryManager", "Cannot open %s", SUMMARY_SKILL_PATH);
+        return DEFAULT_INSTRUCTION;
+    end
+    local content = file:GetText(0, -1);
+    file:close();
+    
+    if not content or content == "" then
+        return DEFAULT_INSTRUCTION;
+    end
+    
+    -- Normalise line endings
+    content = content:gsub("\r\n", "\n"):gsub("\r", "\n");
+    
+    -- Extract ### <key> section from the Orchestration Prompts area
+    local pattern = "### " .. key .. "%s*\n";
+    local sectionStart = content:find(pattern);
+    if not sectionStart then
+        LOG.std(nil, "warn", "DialogHistoryManager", "Orchestration prompt '%s' not found in %s", key, SUMMARY_SKILL_PATH);
+        return DEFAULT_INSTRUCTION;
+    end
+    
+    -- Find body start (after the ### header line)
+    local bodyStart = content:find("\n", sectionStart) + 1;
+    -- Find next ### or ## heading, or end of file
+    local nextHeading = content:find("\n###? ", bodyStart);
+    local bodyEnd = nextHeading or #content;
+    local instruction = content:sub(bodyStart, bodyEnd):match("^(.-)%s*$") or "";
+    
+    if instruction == "" then
+        LOG.std(nil, "warn", "DialogHistoryManager", "Orchestration prompt '%s' is empty in %s", key, SUMMARY_SKILL_PATH);
+        return DEFAULT_INSTRUCTION;
+    end
+    
+    -- Cache for subsequent calls
+    cachedSummaryInstructions[key] = instruction;
+    return instruction;
+end
+
+--[[
     Build Chinese summary prompt
     @param messageText: string - Messages to summarize
     @param previousSummary: string - Existing summary
     @return string - Prompt for LLM
 ]]
 function DialogHistoryManager:BuildChineseSummaryPrompt(messageText, previousSummary)
-    local prompt = [[你是一个对话摘要助手。请将以下对话内容压缩成简洁的摘要。
+    local baseInstruction = self:GetSummaryInstruction("summarize_zh");
 
-要求：
-1. 只保留与学习任务相关的关键信息：用户的学习请求、学习进度、完成的任务、助手的教学内容
-2. 忽略无关的闲聊、背景噪音、与学习任务无关的话题（如金钱、结算、日期等无关内容）
-3. 使用简洁的陈述句，避免冗余
-4. 摘要长度控制在150字以内
-5. 保留学习相关的专有名词、单词、关键概念
-6. 不要使用"用户说"、"助手回复"等描述，直接陈述内容
-7. 如果对话主要是无关闲聊，只需简单记录"用户进行了闲聊，学习任务暂未推进"
-
-]];
+    local prompt = baseInstruction .. "\n\n";
     
     if previousSummary and #previousSummary > 0 then
         prompt = prompt .. "之前的摘要：\n" .. previousSummary .. "\n\n";
@@ -408,18 +461,9 @@ end
     @return string - Prompt for LLM
 ]]
 function DialogHistoryManager:BuildEnglishSummaryPrompt(messageText, previousSummary)
-    local prompt = [[You are a dialog summarization assistant. Compress the following conversation into a concise summary.
+    local baseInstruction = self:GetSummaryInstruction("summarize_en");
 
-Requirements:
-1. Only preserve information relevant to the learning task: user's learning requests, progress, completed tasks, teaching content
-2. Ignore irrelevant chatter, background noise, off-topic discussions (like money, settlements, unrelated dates)
-3. Use concise statements, avoid redundancy
-4. Keep summary under 100 words
-5. Preserve learning-related proper nouns, vocabulary words, key concepts
-6. Don't use "user said", "assistant replied" - state content directly
-7. If the dialog is mostly irrelevant chatter, simply note "User engaged in off-topic conversation, learning task not progressed"
-
-]];
+    local prompt = baseInstruction .. "\n\n";
     
     if previousSummary and #previousSummary > 0 then
         prompt = prompt .. "Previous summary:\n" .. previousSummary .. "\n\n";
@@ -746,7 +790,7 @@ function DialogHistoryManager:ForceSummarize()
     local originalMax = self.maxHistoryLength;
     self.maxHistoryLength = 1;
     
-    self:TrimDialogHistory();
+    self:SummarizeIfNeeded();
     
     -- Restore threshold
     self.maxHistoryLength = originalMax;

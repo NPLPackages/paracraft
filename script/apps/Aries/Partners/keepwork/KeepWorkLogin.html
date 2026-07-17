@@ -154,7 +154,7 @@ end
     <iframe ClickThrough="true" src="script/apps/Aries/Creator/Game/Login/ParaWorldLoginDocker.html"></iframe>
 </pe:container>
 <pe:container alignment="_ct" style="position:relative;width:960px;height:400px;margin-left:-480px;margin-top:-200px;background:" >
-    <div style="margin-left:349px;padding-left:20px;padding-top:5px;margin-top:100px;font-size:12px;color:#dbfafc;width:265px;height:184px;background:url(Texture/Aries/Login/Login/login_bg.png:14 14 14 14)">
+    <div style="margin-left:349px;padding-left:20px;padding-top:5px;margin-top:100px;font-size:12px;color:#dbfafc;width:265px;height:260px;background:url(Texture/Aries/Login/Login/login_bg.png:14 14 14 14)">
     <form name="AriesUserLogin">
     <pe:if condition='<%=System.options.login_tokens==nil%>'>
         <pe:if condition='<%=MyCompany.Aries.MainLogin.state.IsLocalUserSelected%>'>
@@ -162,7 +162,7 @@ end
                 <!--<a style="font-size:12px" onclick="MyCompany.Aries.UserLoginPage.OnClickBackToLocalUserSelect"><%=format("其他%s登录",MyCompany.Aries.ExternalUserModule:GetConfig().account_name)%></a>-->
             </div>
         </pe:if>
-        <div style="position:relative;float:left;margin-left:145px;margin-top:55px;font-size:12px;">
+        <div style="position:relative;float:left;margin-left:157px;margin-top:55px;font-size:12px;">
             <div style="margin-top:2px">
                 <input type="button" value="修改密码" tooltip="修改密码" onclick="OnClickChangePassword" style="width:50px;height:20px;font-size:12px;padding-left:3px;padding-right:-5px;padding-bottom:-4px;color:#FFFFFF;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)"/>
             </div>
@@ -173,15 +173,15 @@ end
                 <input type="button" value="密码保护" tooltip="密码保护" onclick="MyCompany.Aries.UserLoginPage.OnClickProtectPassword" style="width:50px;height:20px;font-size:12px;padding-left:3px;padding-right:-5px;padding-bottom:-4px;color:#FFFFFF;background:url(Texture/Aries/Common/underline_white_32bits.png:3 3 3 3)"/>
             </div>
         </div>
-            <div style="margin-top:5px;font-weight:bold;font-size:14px"><%=accountTips()%></div>
-            <div>
+            <div style="margin-left:12px;margin-top:5px;font-weight:bold;font-size:14px"><%=accountTips()%></div>
+            <div style="margin-left:12px;">
                 <input type="text" name="user_name" style="height:24px;width:200px;margin-top:3px;padding-left:5px;padding-top:2px;padding-right:5px;" EmptyText="帐户名/邮箱/手机号"/>
             </div>
-            <div style="font-weight:bold;font-size:14px"><%=passwdTips()%></div>
-            <div>
+            <div style="margin-left:12px;font-weight:bold;font-size:14px"><%=passwdTips()%></div>
+            <div style="margin-left:12px;">
                 <input type="text" name="password" PasswordChar="*" style="width:120px;height:24px;margin-top:3px;padding-left:5px;padding-top:2px;padding-right:5px;"/>
             </div>
-            <div style="font-size:12px;">
+            <div style="margin-left:12px;font-size:12px;">
                 <div style="margin-top:2px;">
                     <input type="checkbox" style="margin-top:2px;" checked="true" onclick="OnCheckRememberUsername" 
                         iconsize = "20"
@@ -199,17 +199,21 @@ end
                     <div style="float:left" for="checkbox_remember_password">记住密码</div>
                 </div>
             </div>
-            <div style="float:left;position:relative;margin-left:0px;margin-top:2px;height:29px;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)">
-                <input type="button" name="btnRegister" value="注册账号"
-                    style="margin-top:-1px;font-size:12px;color:#701401;font-weight:bold;width:100px;height:28px;background:" onclick="OnClickRegister"/>
-            </div>
-            <div style="float:left;position:relative;margin-left:128px;margin-top:-17px;background:">
-                <input type="submit" name="btnLogin" value="登录"
-                    style="width:100px;height:48px;font-size:14px;text-shadow:true;shadow-quality:8;shadow-color:#80ffffff;color:#701401;font-weight:bold;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)" onclick="OnClickLogin"/>
-            </div>
-            <div style="float:left;position:relative;margin-left:0px;margin-top:35px;height:29px;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)">
-                <input type="button" name="btnCallcenter" value="联系客服"
-                    style="margin-top:-1px;font-size:12px;color:#701401;font-weight:bold;width:100px;height:28px;background:" onclick="OnClickCallCenter"/>
+            <div style="float:left;position:relative;margin-left:12px;margin-top:12px;width:200px;height:78px;">
+                <div style="width:200px;height:36px;background:">
+                    <input type="submit" name="btnLogin" value="登录"
+                        style="width:200px;height:36px;font-size:14px;text-shadow:true;shadow-quality:8;shadow-color:#80ffffff;color:#701401;font-weight:bold;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)" onclick="OnClickLogin"/>
+                </div>
+                <div style="margin-top:8px;width:200px;height:29px;">
+                    <div style="float:left;width:94px;height:29px;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)">
+                        <input type="button" name="btnRegister" value="注册账号"
+                            style="margin-top:-1px;font-size:12px;color:#701401;font-weight:bold;width:94px;height:28px;background:" onclick="OnClickRegister"/>
+                    </div>
+                    <div style="float:left;margin-left:12px;width:94px;height:29px;background:url(Texture/Aries/Login/Login/login_button_32bits.png#0 0 32 29:10 10 10 10)">
+                        <input type="button" name="btnCallcenter" value="联系客服"
+                            style="margin-top:-1px;font-size:12px;color:#701401;font-weight:bold;width:94px;height:28px;background:" onclick="OnClickCallCenter"/>
+                    </div>
+                </div>
             </div>
     </pe:if>
     <pe:if condition='<%=System.options.login_tokens~=nil%>'>

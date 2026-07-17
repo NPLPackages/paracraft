@@ -80,7 +80,8 @@ local function BuildLLM(max)
     max = max or 30;
     local count  = agent:GetLLMHistoryCount();
     local entries = {};
-    for i = 1, math.min(count, max) do
+    local startIdx = math.max(1, count - max + 1);
+    for i = startIdx, count do
         local e = agent:GetFormattedLLMEntry(i);
         if e then entries[#entries+1] = e; end
     end
@@ -241,6 +242,8 @@ function BgAgentWS:OnActivate(msg)
     elseif action == "send_message" then
         local text = msg.text;
         if text and text ~= "" then
+            agent.waitingForUserReply = false;
+            agent.waitingForUserReplyStartTime = nil;
             agent:ProcessWithLLM(text, function() end);
         end
         WebSocketServer:Send(nid, {type = "ack", action = "send_message"});
@@ -256,7 +259,10 @@ function BgAgentWS:OnActivate(msg)
 
     -- ── Task ──────────────────────────────────────────────────────────────────
     elseif action == "set_task" then
-        agent:SetPrimaryLearningTask(msg.text or "");
+        local options = {};
+        if msg.soul then options.soul = msg.soul; end
+        if msg.sop then options.sop = msg.sop; end
+        agent:SetPrimaryLearningTask(msg.text or "", options);
         WebSocketServer:Send(nid, {type = "status", data = BuildStatus()});
 
     -- ── Toggle flags ──────────────────────────────────────────────────────────

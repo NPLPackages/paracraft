@@ -116,14 +116,15 @@ function LearningToolUI.Show(toolName, params, sessionId, callback)
     if LearningToolUI.useWebView and LearningToolPage then
         LOG.std(nil, "info", "LearningToolUI", "Using WebView for %s (session: %s)", toolName, sessionId or "none");
         LearningToolPage.ShowPage(toolName, params, sessionId, function(result)
-            -- Call the original callback directly
+            -- Call the original callback directly (flows through GiftBoxManager → BackgroundAgent)
             if callback then
                 LOG.std(nil, "info", "LearningToolUI", "WebView callback for session: %s, correct=%s", 
                     sessionId or "none", tostring(result.correct));
                 callback(result);
             end
-            -- Also report result to BackgroundAgent
-            LearningToolUI.ReportResult(sessionId, result);
+            -- NOTE: Do NOT call ReportResult here — the callback chain already
+            -- routes through GiftBoxManager.OnLearningComplete → BackgroundAgent.
+            -- Calling ReportResult would cause the result to be reported twice.
         end);
         return;
     end
@@ -267,8 +268,8 @@ function LearningToolUI.OnDialogClosed()
             sessionId or "none");
         savedCallback(result);
         
-        -- Also report to BackgroundAgent
-        LearningToolUI.ReportResult(sessionId, result);
+        -- NOTE: Do NOT call ReportResult here — the callback chain already
+        -- routes through GiftBoxManager → BackgroundAgent.
     end
 end
 
@@ -303,10 +304,8 @@ function LearningToolUI.Close(result)
         savedCallback(result);
     end
     
-    -- Also report result to BackgroundAgent for backwards compatibility
-    if result and sessionId then
-        LearningToolUI.ReportResult(sessionId, result);
-    end
+    -- NOTE: Do NOT call ReportResult here — the callback chain already
+    -- routes through GiftBoxManager → BackgroundAgent.
 end
 
 --[[

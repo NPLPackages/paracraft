@@ -1,0 +1,147 @@
+<pe:mcml>
+<script type="text/npl" src="LogAnalysis.lua" refresh="false"><![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/LogAnalysis.lua");
+LogAnalysis = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.LogAnalysis");
+LogAnalysis.Init();
+
+function OnClose()
+    LogAnalysis.OnClose();
+end
+]]></script>
+
+<div style="width:800px;height:560px;background-color:#1e1e1ee0;">
+    <!-- Title bar -->
+    <div style="height:36px;padding:6px 10px;background-color:#2d2d2d;">
+        <div style="float:left;font-size:16px;font-weight:bold;color:#e0e0e0;margin-top:2px;">
+            <%=L"日志分析工具"%>
+        </div>
+        <div style="float:right;">
+            <input type="button" value='<%=L"×"%>' onclick="OnClose"
+                style="width:28px;height:24px;font-size:16px;color:#cccccc;margin-top:2px;" />
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div style="height:34px;padding:4px 10px;background-color:#252526;">
+        <div style="float:left;">
+            <input type="button" value='<%=L"加载日志"%>' onclick="LogAnalysis.OnLoadFile"
+                style="width:72px;height:24px;font-size:12px;color:#ffffff;margin-right:4px;" />
+            <input type="button" value='<%=L"刷新"%>' onclick="LogAnalysis.OnReload"
+                style="width:50px;height:24px;font-size:12px;color:#ffffff;margin-right:4px;" />
+            <input type="button" value='<%=LogAnalysis.autoRefresh and L"停止自动" or L"自动刷新"%>'
+                onclick="LogAnalysis.ToggleAutoRefresh"
+                style="width:68px;height:24px;font-size:12px;color:#ffffff;margin-right:4px;" />
+            <input type="button" value='<%=L"清空"%>' onclick="LogAnalysis.OnClear"
+                style="width:50px;height:24px;font-size:12px;color:#ffffff;margin-right:8px;" />
+        </div>
+        <div style="float:left;margin-top:1px;">
+            <input type="text" name="txtSearch" value='<%=LogAnalysis.searchText%>'
+                EmptyText='<%=L"搜索关键词..."%>'
+                onchange="LogAnalysis.OnSearchChanged"
+                style="width:200px;height:22px;font-size:12px;" />
+        </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div style="height:30px;padding:3px 10px;background-color:#2a2a2a;">
+        <div style="float:left;margin-top:2px;margin-right:6px;color:#888888;font-size:12px;">
+            <%=L"过滤:"%>
+        </div>
+        <div style="float:left;">
+            <input type="button" value='<%=string.format(L"全部(%d)", #LogAnalysis.allEntries)%>'
+                onclick="LogAnalysis.OnFilterAll"
+                style="<%=LogAnalysis.GetFilterBtnStyle('all')%>" />
+        </div>
+        <div style="float:left;margin-left:2px;">
+            <input type="button" value='<%=string.format("E:%d", LogAnalysis.totalError)%>'
+                onclick="LogAnalysis.OnFilterError"
+                style="<%=LogAnalysis.IsFilterActive('error') and 'width:52px;height:24px;font-size:12px;color:#ff4444;background-color:#442222;' or 'width:52px;height:24px;font-size:12px;color:#ff4444;'%>" />
+        </div>
+        <div style="float:left;margin-left:2px;">
+            <input type="button" value='<%=string.format("W:%d", LogAnalysis.totalWarn)%>'
+                onclick="LogAnalysis.OnFilterWarn"
+                style="<%=LogAnalysis.IsFilterActive('warn') and 'width:52px;height:24px;font-size:12px;color:#ffaa00;background-color:#443300;' or 'width:52px;height:24px;font-size:12px;color:#ffaa00;'%>" />
+        </div>
+        <div style="float:left;margin-left:2px;">
+            <input type="button" value='<%=string.format("I:%d", LogAnalysis.totalInfo)%>'
+                onclick="LogAnalysis.OnFilterInfo"
+                style="<%=LogAnalysis.IsFilterActive('info') and 'width:52px;height:24px;font-size:12px;color:#cccccc;background-color:#333344;' or 'width:52px;height:24px;font-size:12px;color:#cccccc;'%>" />
+        </div>
+        <div style="float:left;margin-left:2px;">
+            <input type="button" value='<%=string.format("D:%d", LogAnalysis.totalDebug)%>'
+                onclick="LogAnalysis.OnFilterDebug"
+                style="<%=LogAnalysis.IsFilterActive('debug') and 'width:52px;height:24px;font-size:12px;color:#888888;background-color:#2a2a2a;' or 'width:52px;height:24px;font-size:12px;color:#888888;'%>" />
+        </div>
+    </div>
+
+    <!-- Status bar -->
+    <div style="height:22px;padding:2px 10px;background-color:#007acc;font-size:11px;color:#ffffff;">
+        <%=LogAnalysis.GetSummary()%>
+    </div>
+
+    <!-- Log entries list -->
+    <div style="padding:0px 0px;">
+        <pe:gridview name="gvwLogEntries"
+            DataSource='<%=LogAnalysis.DS_Entries%>'
+            ItemsPerLine="1"
+            VerticalScrollBarStep="24"
+            DefaultNodeHeight="24"
+            AllowPaging="false"
+            RememberScrollPos="true"
+            style="width:800px;height:350px;background-color:#1e1e1e;">
+            <Columns>
+                <pe:if condition='<%=LogAnalysis.IsSelected(Eval("index"))%>'>
+                    <div style="height:22px;padding:1px 10px;background-color:#264f78;">
+                        <div style="float:left;width:60px;font-size:11px;color:#888888;margin-top:2px;">
+                            <%=Eval("index")%>
+                        </div>
+                        <div style="float:left;width:56px;font-size:11px;margin-top:2px;color:<%=LogAnalysis.GetLevelColor(Eval('level'))%>;">
+                            <%=LogAnalysis.GetLevelLabel(Eval("level"))%>
+                        </div>
+                        <pe:if condition='<%=Eval("timestamp") ~= ""%>'>
+                            <div style="float:left;width:140px;font-size:11px;color:#6a9955;margin-top:2px;">
+                                <%=Eval("timestamp")%>
+                            </div>
+                        </pe:if>
+                        <div style="float:left;font-size:11px;color:#ffffff;margin-top:2px;">
+                            <%=LogAnalysis.TruncateLine(Eval("text"), 90)%>
+                        </div>
+                    </div>
+                </pe:if>
+                <pe:if condition='<%=not LogAnalysis.IsSelected(Eval("index"))%>'>
+                    <div name='<%=Eval("index")%>' onclick="LogAnalysis.OnSelectEntry"
+                        style="height:22px;padding:1px 10px;">
+                        <div style="float:left;width:60px;font-size:11px;color:#555555;margin-top:2px;">
+                            <%=Eval("index")%>
+                        </div>
+                        <div style="float:left;width:56px;font-size:11px;margin-top:2px;color:<%=LogAnalysis.GetLevelColor(Eval('level'))%>;">
+                            <%=LogAnalysis.GetLevelLabel(Eval("level"))%>
+                        </div>
+                        <pe:if condition='<%=Eval("timestamp") ~= ""%>'>
+                            <div style="float:left;width:140px;font-size:11px;color:#6a9955;margin-top:2px;">
+                                <%=Eval("timestamp")%>
+                            </div>
+                        </pe:if>
+                        <div style="float:left;font-size:11px;color:<%=LogAnalysis.GetLevelColor(Eval('level'))%>;margin-top:2px;">
+                            <%=LogAnalysis.TruncateLine(Eval("text"), 90)%>
+                        </div>
+                    </div>
+                </pe:if>
+            </Columns>
+            <EmptyDataTemplate>
+                <div style="padding:40px;color:#666666;text-align:center;font-size:14px;">
+                    <%=L"暂无日志 — 点击「加载日志」读取 log.txt"%>
+                </div>
+            </EmptyDataTemplate>
+        </pe:gridview>
+    </div>
+
+    <!-- Detail panel -->
+    <div style="height:88px;padding:6px 10px;background-color:#252526;">
+        <div style="font-size:11px;color:#888888;margin-bottom:4px;"><%=L"详细内容:"%></div>
+        <div style="width:770px;height:60px;background-color:#1e1e1e;padding:4px 6px;font-size:11px;color:#d4d4d4;overflow-y:auto;">
+            <%=LogAnalysis.GetSelectedDetail()%>
+        </div>
+    </div>
+</div>
+</pe:mcml>

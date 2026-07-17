@@ -499,7 +499,7 @@ function SceneVisionManager:ShowDebugUI(bShow)
         if not self.debugPage then
             local width, height = 450, 400;
             local params = {
-                url = "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SceneVisionDebug.html",
+                url = "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/test/SceneVisionDebug.html",
                 name = "SceneVisionDebug.ShowPage",
                 isShowTitleBar = false,
                 DestroyOnClose = true,

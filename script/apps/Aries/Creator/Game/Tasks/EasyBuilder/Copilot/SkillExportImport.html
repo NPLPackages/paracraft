@@ -1,0 +1,209 @@
+<!-- "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SkillExportImport.html" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Skill Export / Import</title>
+</head>
+<body>
+<pe:mcml>
+<script type="text/npl" refresh="false">
+<![CDATA[
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SkillExportImport.lua");
+SkillExportImport = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.SkillExportImport");
+SkillExportImport.InitPage(Page);
+
+function GetSkillNamesText()
+    return SkillExportImport.GetSkillNamesText();
+end
+
+function GetSelectedSkill()
+    return SkillExportImport.selectedSkill or "";
+end
+
+function GetExportDir()
+    return SkillExportImport.exportDir or "";
+end
+
+function GetImportUrl()
+    return SkillExportImport.importUrl or "";
+end
+
+function GetImportZipPath()
+    return SkillExportImport.importZipPath or "";
+end
+
+function GetStatusText()
+    return SkillExportImport.statusText or "";
+end
+
+function GetExportSkillDir()
+    return SkillExportImport.exportSkillDir or "";
+end
+
+function GetExportDirOutputDir()
+    return SkillExportImport.exportDirOutputDir or "";
+end
+]]>
+</script>
+<style>
+    .closebtn {
+        position: relative;
+        margin-right: -19px;
+        margin-top: -18px;
+        width: 56px;
+        height: 56px;
+        background: url(Texture/player/close.png);
+    }
+    .container {
+        background: url(Texture/Aries/GoldRankingList/battlefield_bg_panel.png:24 24 24 24);
+        padding: 20px;
+        color: #ffffff;
+    }
+    .sectiontitle {
+        font-size: 16px;
+        color: #ffcc00;
+        margin-bottom: 5px;
+        margin-top: 15px;
+    }
+    .button {
+        background: url(Texture/Aquarius/Button_Normal_Large.png:15 15 15 15);
+        font-size: 14px;
+        min-width: 60px;
+        height: 30px;
+        color: #000000;
+        margin-left: 5px;
+    }
+    .highlightbutton {
+        background: url(Texture/Aquarius/Button_Highlight_Large.png:15 15 15 15);
+    }
+    .textinput {
+        height: 26px;
+        color: #ffffff;
+        padding: 3px;
+        font-size: 14px;
+        background: url(Texture/Aries/Common/ThemeKid/monsterhandbook/fram_bg_32bits.png:6 6 8 8);
+    }
+    .label {
+        font-size: 14px;
+        color: #ffffff;
+    }
+    .statusbar {
+        font-size: 13px;
+        color: #888888;
+        margin-top: 15px;
+        padding: 5px;
+        background: url(Texture/Aries/Common/ThemeKid/monsterhandbook/fram_bg_32bits.png:6 6 8 8);
+        height: 24px;
+    }
+    .separator {
+        height: 1px;
+        background-color: #555555;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+</style>
+
+<pe:container class="container" style="width:520px;">
+    <!-- Close Button -->
+    <div style="position:relative">
+        <input type="button" name="CloseBtn" onclick="SkillExportImport.CloseWindow" align="right" class="closebtn" />
+    </div>
+
+    <!-- Title -->
+    <div style="font-size:18px;color:#ffcc00;margin-bottom:5px;">Skill 导出 / 导入</div>
+
+    <!-- ================================================================== -->
+    <!-- EXPORT SECTION -->
+    <!-- ================================================================== -->
+    <div class="sectiontitle">导出 Skill</div>
+
+    <div style="margin-bottom:8px;">
+        <div style="float:left;width:80px;" class="label">Skill:</div>
+        <pe:select name="selectedSkill" style="width:380px;height:26px;font-size:14px;"
+                   items='<%=GetSkillNamesText()%>'
+                   value='<%=GetSelectedSkill()%>'
+                   onchange="SkillExportImport.OnSelectSkill(value)" />
+    </div>
+
+    <div style="margin-bottom:8px;">
+        <div style="float:left;width:80px;" class="label">导出目录:</div>
+        <input type="text" name="exportDir" value='<%=GetExportDir()%>' style="width:295px;" class="textinput" />
+        <input type="button" value="浏览" onclick="SkillExportImport.OnBrowseExportDir" class="button" style="width:70px;" />
+    </div>
+
+    <div style="text-align:right;margin-bottom:5px;">
+        <input type="button" value="导出 Zip" onclick="SkillExportImport.OnExport" class="button highlightbutton" style="width:100px;" />
+    </div>
+
+    <!-- Separator -->
+    <div class="separator"></div>
+
+    <!-- ================================================================== -->
+    <!-- EXPORT FROM DIRECTORY SECTION -->
+    <!-- ================================================================== -->
+    <div class="sectiontitle">从目录导出 Skill</div>
+
+    <div style="margin-bottom:8px;">
+        <div style="float:left;width:80px;" class="label">Skill目录:</div>
+        <input type="text" name="exportSkillDir" value='<%=GetExportSkillDir()%>' style="width:295px;" class="textinput"
+               EmptyText="选择包含SKILL.md的目录" />
+        <input type="button" value="浏览" onclick="SkillExportImport.OnBrowseSkillDir" class="button" style="width:70px;" />
+    </div>
+
+    <div style="margin-bottom:8px;">
+        <div style="float:left;width:80px;" class="label">导出目录:</div>
+        <input type="text" name="exportDirOutputDir" value='<%=GetExportDirOutputDir()%>' style="width:295px;" class="textinput" />
+        <input type="button" value="浏览" onclick="SkillExportImport.OnBrowseExportDirOutput" class="button" style="width:70px;" />
+    </div>
+
+    <div style="text-align:right;margin-bottom:5px;">
+        <input type="button" value="导出目录" onclick="SkillExportImport.OnExportFromDir" class="button highlightbutton" style="width:100px;" />
+    </div>
+
+    <!-- Separator -->
+    <div class="separator"></div>
+
+    <!-- ================================================================== -->
+    <!-- IMPORT FROM URL SECTION -->
+    <!-- ================================================================== -->
+    <div class="sectiontitle">从 URL 导入</div>
+
+    <div style="margin-bottom:8px;">
+        <div style="float:left;width:80px;" class="label">URL:</div>
+        <input type="text" name="importUrl" value='<%=GetImportUrl()%>' style="width:295px;" class="textinput"
+               EmptyText="https://example.com/skill.skill.zip" />
+        <input type="button" value="下载导入" onclick="SkillExportImport.OnImportFromUrl" class="button highlightbutton" style="width:70px;" />
+    </div>
+
+    <!-- Separator -->
+    <div class="separator"></div>
+
+    <!-- ================================================================== -->
+    <!-- IMPORT FROM LOCAL ZIP SECTION -->
+    <!-- ================================================================== -->
+    <div class="sectiontitle">从本地 Zip 导入</div>
+
+    <div style="margin-bottom:8px;">
+        <div style="float:left;width:80px;" class="label">Zip文件:</div>
+        <input type="text" name="importZipPath" value='<%=GetImportZipPath()%>' style="width:295px;" class="textinput" />
+        <input type="button" value="浏览" onclick="SkillExportImport.OnBrowseZipFile" class="button" style="width:70px;" />
+    </div>
+
+    <div style="text-align:right;margin-bottom:5px;">
+        <input type="button" value="导入 Zip" onclick="SkillExportImport.OnImportFromZip" class="button highlightbutton" style="width:100px;" />
+    </div>
+
+    <!-- Separator -->
+    <div class="separator"></div>
+
+    <!-- ================================================================== -->
+    <!-- STATUS BAR -->
+    <!-- ================================================================== -->
+    <div class="statusbar">
+        <div name="statusText" style="color:#888888;"><%=GetStatusText()%></div>
+    </div>
+
+</pe:container>
+</pe:mcml>
+</body>
+</html>

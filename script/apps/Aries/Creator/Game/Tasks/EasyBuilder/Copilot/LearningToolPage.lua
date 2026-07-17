@@ -54,6 +54,7 @@ LearningToolPage.currentSessionId = nil
 LearningToolPage.currentCallback = nil
 LearningToolPage.isOpen = false
 LearningToolPage.wasAgentPlaying = false  -- Track if agent was playing before pause
+LearningToolPage.resultReported = false   -- Guard against race between result delivery and page close
 
 --------------------------------------------------------------------------------
 -- Public API
@@ -88,6 +89,7 @@ function LearningToolPage.ShowPage(toolName, params, sessionId, callback)
     LearningToolPage.currentSessionId = sessionId
     LearningToolPage.currentCallback = callback
     LearningToolPage.isOpen = true
+    LearningToolPage.resultReported = false  -- Reset guard for new session
     
     -- Build URL
     local url = string.format(base_url_template, htmlFile, env)
@@ -150,6 +152,7 @@ end
 function LearningToolPage.OnRecvMessage(msgdata)
     if not msgdata then return end
     if not LearningToolPage.isOpen then return end
+    if LearningToolPage.resultReported then return end  -- Race guard: result already reported
     
     local msgType = msgdata.type
     
@@ -177,7 +180,21 @@ end
 function LearningToolPage.OnPageClosed()
     if not LearningToolPage.isOpen then return end
     
+    -- If result was already reported via OnRecvMessage, skip the cancelled callback
+    if LearningToolPage.resultReported then
+        LOG.std(nil, "info", "LearningToolPage", "Page closed but result already reported, skipping cancelled callback")
+        -- Still need to clean up state
+        LearningToolPage.isOpen = false
+        LearningToolPage.currentToolName = nil
+        LearningToolPage.currentParams = nil
+        LearningToolPage.currentSessionId = nil
+        LearningToolPage.currentCallback = nil
+        LearningToolPage.ResumeAgent()
+        return
+    end
+    
     LOG.std(nil, "info", "LearningToolPage", "Page closed (tool: %s)", LearningToolPage.currentToolName or "unknown")
+    LearningToolPage.resultReported = true  -- Prevent late result from OnRecvMessage
     
     local callback = LearningToolPage.currentCallback
     local sessionId = LearningToolPage.currentSessionId
@@ -209,6 +226,13 @@ end
     @param result: table - Result data
 ]]
 function LearningToolPage.ReportResult(result)
+    -- Guard against double reporting (race between result delivery and page close)
+    if LearningToolPage.resultReported then
+        LOG.std(nil, "warn", "LearningToolPage", "Result already reported, ignoring duplicate")
+        return
+    end
+    LearningToolPage.resultReported = true
+    
     local callback = LearningToolPage.currentCallback
     local sessionId = LearningToolPage.currentSessionId
     local toolName = LearningToolPage.currentToolName

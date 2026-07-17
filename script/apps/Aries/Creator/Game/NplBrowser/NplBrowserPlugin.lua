@@ -213,10 +213,7 @@ function NplBrowserPlugin.RunNextCmd()
             cmd.from_filename = callback_file;
             cmd.to_filename = "";
             cmd.target = "webview";
-            echo("send msg to javascript=============")
-            echo(commonlib.Json.Encode(cmd))
             ParaEngine.GetAttributeObject():SetField("SendMsgToJS", commonlib.Json.Encode(cmd));
-            echo("===================================")
         elseif (System.os.GetPlatform() == 'mac' or
                 System.os.GetPlatform() == 'ios' or
                 System.os.GetPlatform() == 'android') then
@@ -242,7 +239,7 @@ function NplBrowserPlugin.RunNextCmd()
             local state = NplBrowserPlugin.GetWindowState(cmd.id);
             local isLoadWebview;
             local webview;
-
+            local transparent = cmd.transparent or false;
             if (System.os.CompareParaEngineVersion('1.4.1.0')) then
                 -- runtime 1.4.1.0 and above use multiple webviews.
                 local state = NplBrowserPlugin.GetWindowState(cmd.id);
@@ -280,6 +277,7 @@ function NplBrowserPlugin.RunNextCmd()
                 webview:loadUrl(cmd.url);
                 webview._url = cmd.url;
                 webview:setVisible(true);
+                webview:setTransparent(transparent);
            elseif (cmd.cmd == 'Show') then
                 if (isLoadWebview) then
                     if (cmd.visible) then
@@ -318,6 +316,7 @@ function NplBrowserPlugin.RunNextCmd()
                     webview:move(x, y);
     
                     webview:loadUrl(cmd.url);
+                    webview:setTransparent(transparent);
                 end
             end
         end
@@ -562,6 +561,7 @@ function NplBrowserPlugin.Start(p)
     local url = p.url or "";
     local bounds = string.format("%d,%d,%d,%d,",x,y,width,height);
     local zoom = p.zoom or 0.0;
+    local transparent = p.transparent or false;
     local cmdline = string.format(
         [[
             -window_title="%s" 
@@ -574,6 +574,8 @@ function NplBrowserPlugin.Start(p)
             -cefclient_config_filename="%s"
             -pid="%s"
             -autoplay-policy=no-user-gesture-required
+            -enable-media-stream
+            -use-fake-ui-for-media-stream
         ]],
         window_title,
         id,
@@ -599,7 +601,8 @@ function NplBrowserPlugin.Start(p)
         callback_file = callback_file,
         cefclient_config_filename = cefclient_config_filename,
         pid = pid,
-        debug = browser_debug == true or browser_debug == "true" or System.options.isPapaAdventure
+        debug = browser_debug == true or browser_debug == "true" or System.options.isPapaAdventure,
+        transparent = transparent,
     };
 
     LOG.std(nil, "info", "NplBrowserPlugin.Start", "the window [%s] requests to launch %s", id, url or "");
@@ -630,6 +633,7 @@ function NplBrowserPlugin.Open(p)
         height = p.height,
         zoom = p.zoom,
         visible = p.visible,
+        transparent = p.transparent or false,
         callback_file = callback_file,
     }
 	NplBrowserPlugin.UpdateWindowState(id, input);
@@ -745,7 +749,7 @@ function NplBrowserPlugin.CheckCefWindowCreated(p)
             callback_file = callback_file,
             client_name = client_name,
             cefclient_config_filename = cefclient_config_filename,
-            cmdline = "-autoplay-policy=no-user-gesture-required",
+            cmdline = "-autoplay-policy=no-user-gesture-required -enable-media-stream -use-fake-ui-for-media-stream",
             pid = tostring(System.os.GetCurrentProcessId()),
         }
         NPL.activate(dll_name, input); 

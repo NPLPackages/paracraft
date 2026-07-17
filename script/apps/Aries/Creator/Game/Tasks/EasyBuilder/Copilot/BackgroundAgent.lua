@@ -28,6 +28,8 @@ agent:SetUserProfile({
 -- Completion criteria is evaluated by LLM based on chat history
 agent:SetPrimaryLearningTask("Practice spelling common English words through interactive games. Words to Learn：apple, banana, cat, dog, elephant, fish, green, house, ");
 --agent:SetPrimaryLearningTask("观察3D场景和用户的行为，在玩的过程中教孩子学一些小学阶段的英文单词和短句子。你不需要询问用户需要学习什么内容，你只需要根据用户的行为和场景来教他英文单词和短句子。");
+-- With explicit soul/SOP selection:
+--agent:SetPrimaryLearningTask("Learn coding in Paracraft", {soul = "coding", sop = "user-profile"});
 
 -- Start/Resume the agent with 1-second update interval (continuous mode)
 agent:SetUpdateInterval(1000);
@@ -86,6 +88,26 @@ local ChatLogUtil = commonlib.gettable("MyCompany.Aries.Game.Common.ChatLogUtil"
 NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/TTSQueueManager.lua");
 local TTSQueueManager = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.TTSQueueManager");
 local NPLJS = NPL.load("(gl)script/apps/Aries/Creator/Game/NplBrowser/NPLJS.lua");
+local SkillManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SkillManager.lua");
+local Soul = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SoulManager.lua");
+local GlobalMemory = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/GlobalMemoryManager.lua");
+local CopilotSkill = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/CopilotSkill.lua");
+local AgentRouter = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/AgentRouter.lua");
+local ServiceProvider = NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/ServiceProvider.lua");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/SceneTools.lua");
+local SceneTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.SceneTools");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/LearningTools.lua");
+local LearningTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.LearningTools");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/CodeTools.lua");
+local CodeTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.CodeTools");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/AgentTools.lua");
+local AgentTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.AgentTools");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/WebTools.lua");
+local WebTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.WebTools");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/ToolRegistry.lua");
+local ToolRegistry = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.ToolRegistry");
+NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/ToolSandbox.lua");
+local ToolSandbox = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.ToolSandbox");
 -- BackgroundAgent class definition (inherits from ToolBase for signal support)
 local BackgroundAgent = commonlib.inherit(commonlib.gettable("System.Core.ToolBase"),commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.BackgroundAgent"));
 
@@ -146,43 +168,200 @@ local TOOL_STRATEGIES = {
     },
     
     -- Scene query tools (sync, read-only)
-    get_scene_info = { mode = "sync", impact = "read", category = "scene_query" },
+    get_scene_context = { mode = "sync", impact = "read", category = "context" },
     query_entities = { mode = "sync", impact = "read", category = "scene_query" },
     list_copilots = { mode = "sync", impact = "read", category = "scene_query" },
     
-    -- Scene modification tools (sync, write)
-    move_to_location = { mode = "sync", impact = "write", category = "scene_modify" },
-    place_block = { mode = "sync", impact = "write", category = "scene_modify" },
-    remove_block = { mode = "sync", impact = "write", category = "scene_modify" },
     send_message_to_copilot = { mode = "sync", impact = "write", category = "copilot_control" },
-    
-    -- Learning data tools (sync)
-    get_learning_progress = { mode = "sync", impact = "read", category = "learning_data" },
-    set_learning_progress = { mode = "sync", impact = "write", category = "learning_data" },
-    record_observation = { mode = "sync", impact = "write", category = "learning_data" },
-    
-    -- Learning UI tools (ui_blocking, needs user interaction via H5 minigames)
     test_multiple_choice = { mode = "ui_blocking", impact = "write", category = "learning_test", queueable = true },
     test_words_speaking = { mode = "ui_blocking", impact = "write", category = "learning_test", queueable = true },
     test_words_spelling = { mode = "ui_blocking", impact = "write", category = "learning_test", queueable = true },
     show_learning_content = { mode = "ui_blocking", impact = "write", category = "learning_test", queueable = true },
-    
-    -- Audio tools (async)
     speak_text = { mode = "async", impact = "read", category = "audio", canInterrupt = true },
+
+    run_paracraft_copilot_code = { mode = "async", impact = "write", category = "run code", timeout = 30000 },
+    run_npl_codeblock_code = { mode = "async", impact = "write", category = "run code", timeout = 30000 },
+    run_npl_code = { mode = "async", impact = "write", category = "run code", timeout = 30000 },
+    -- File tools (sync, file I/O for memory.md etc.)
+    read_file = { mode = "sync", impact = "read", category = "file_io" },
+    replace_string_in_file = { mode = "sync", impact = "write", category = "file_io" },
+    grep_search = { mode = "sync", impact = "read", category = "file_io" },
+    create_file = { mode = "sync", impact = "write", category = "file_io" },
+    list_files = { mode = "sync", impact = "read", category = "file_io" },
+    -- Agent tools (child agent orchestration)
+    runAsyncAgentTask = { mode = "sync", impact = "write", category = "agent" },
+    getParentAgentContext = { mode = "sync", impact = "read", category = "agent" },
+    -- Web tools (webpage fetching)
+    fetch_webpage = { mode = "async", impact = "read", category = "web" },
     
-    -- Copilot control tools (async)
-    run_copilot_code = { mode = "async", impact = "write", category = "copilot_control", timeout = 30000 },
-    run_terminal_code = { mode = "async", impact = "write", category = "copilot_control", timeout = 30000 },
-    
-    -- Agent task tools (mixed)
-    get_copilot_tasks = { mode = "sync", impact = "read", category = "agent_task" },
-    control_task = { mode = "sync", impact = "write", category = "agent_task" },
-    copilot_say = { mode = "sync", impact = "write", category = "agent_task" },
-    copilot_move = { mode = "async", impact = "write", category = "agent_task" },
-    schedule_task = { mode = "async", impact = "write", category = "agent_task" },
-    start_building = { mode = "async", impact = "write", category = "agent_task" },
-    start_life_task = { mode = "async", impact = "write", category = "agent_task" },
 };
+
+
+
+--------------------------------------------------------------------------------
+-- Fixed file names for profile and learning log (no longer per-skill routing)
+--------------------------------------------------------------------------------
+local DEFAULT_MEMORY_FILE = "user_profile.md";
+local DEFAULT_LEARNING_LOG_FILE = "learning_log.md";
+
+--------------------------------------------------------------------------------
+-- Agent workspace paths
+--------------------------------------------------------------------------------
+local WORKSPACE_BASE_DIR = "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/workspace/";
+
+--- Parse user profile from JSON file content.
+-- Supports JSON format (primary) with legacy markdown fallback.
+-- @param content string - Raw file content
+-- @return table|nil - Parsed profile table
+local function ParseProfileJSON(content)
+    if not content or content == "" then return nil; end
+    
+    -- Try JSON parse first
+    local trimmed = content:match("^%s*(.-)%s*$") or "";
+    if trimmed:sub(1, 1) == "{" then
+        local data = {};
+        if NPL.FromJson(trimmed, data) then
+            return data;
+        end
+    end
+    
+    -- Legacy markdown fallback: parse "- **Field**: value" lines
+    local FIELD_MAP = {
+        ["Name"] = "name", ["Age"] = "age", ["Grade"] = "grade",
+        ["Interests"] = "interests", ["Specialty"] = "specialty",
+        ["Learning Goal"] = "learningGoal", ["Preferred Pace"] = "preferredPace",
+        ["Personality"] = "personality", ["English Level"] = "englishLevel",
+        ["Coding Level"] = "codingLevel", ["Preferred Project"] = "preferredProject",
+        ["Updated"] = "updated",
+    };
+    local profile = {};
+    for line in content:gmatch("[^\r\n]+") do
+        local field, value = line:match("^%-%s*%*%*(.-)%*%*:%s*(.+)$");
+        if field and value then
+            field = field:match("^%s*(.-)%s*$");
+            value = value:match("^%s*(.-)%s*$");
+            local key = FIELD_MAP[field];
+            if key then
+                if key == "age" then
+                    profile[key] = tonumber(value:match("^(%d+)")) or value;
+                else
+                    profile[key] = value;
+                end
+            end
+        end
+    end
+    if not next(profile) then return nil; end
+    return profile;
+end
+
+--- Format profile data as beautified JSON for writing to file.
+-- @param data table - Profile data table
+-- @return string - Pretty-printed JSON string
+local function FormatProfileJSON(data)
+    NPL.load("(gl)script/ide/Json.lua");
+    return commonlib.Json.Beautify(data, "  ") or "{}";
+end
+
+--- Apply parsed profile fields to agent.userProfile.
+-- @param agent table - BackgroundAgent instance
+-- @param profile table - Parsed profile data
+local function ApplyProfileToAgent(agent, profile)
+    if not agent or not agent.userProfile or not profile then return; end
+    
+    -- Direct copy for simple fields
+    local simpleFields = {"name", "grade", "learningGoal", "preferredPace",
+        "personality", "englishLevel", "codingLevel", "preferredProject", "specialty"};
+    for _, key in ipairs(simpleFields) do
+        if profile[key] and profile[key] ~= "" then
+            agent.userProfile[key] = profile[key];
+        end
+    end
+    
+    -- Number field: age
+    if profile.age then
+        local numAge = tonumber(profile.age);
+        if numAge then agent.userProfile.age = numAge; end
+    end
+    
+    -- Array/CSV field: interests
+    if profile.interests then
+        if type(profile.interests) == "table" then
+            agent.userProfile.interests = profile.interests;
+        elseif type(profile.interests) == "string" and profile.interests ~= "" then
+            local items = {};
+            for item in profile.interests:gmatch("[^,，]+") do
+                local trimmed = item:match("^%s*(.-)%s*$");
+                if trimmed and trimmed ~= "" then
+                    table.insert(items, trimmed);
+                end
+            end
+            agent.userProfile.interests = items;
+        end
+    end
+end
+
+--- Sync profile from file to agent.userProfile.
+-- Reads the profile file for the given skill and applies it to the agent's in-memory profile.
+-- @param agent table - BackgroundAgent instance
+-- @param sopName string - Skill name to resolve memory file
+local function SyncProfileFromFile(agent, sopName)
+    sopName = sopName or (agent.sopState and agent.sopState.activeSOP) or "user-profile";
+    local memoryFile = DEFAULT_MEMORY_FILE;
+    local readResult = agent.fileTools:ReadFile(memoryFile);
+    if readResult.success and readResult.content and readResult.content ~= "" then
+        local profile = ParseProfileJSON(readResult.content) or {};
+        ApplyProfileToAgent(agent, profile);
+        LOG.std(nil, "info", "BackgroundAgent", "SyncProfileFromFile('%s'): applied name=%s, age=%s",
+            sopName, tostring(agent.userProfile.name), tostring(agent.userProfile.age));
+    end
+end
+
+--- Parse the streamlined learning log format used by eduagent skills.
+-- Supports the new structured markdown blocks and returns nil when not found.
+-- @param content string
+-- @return table|nil
+local function ParseStructuredLearningLog(content)
+    if not content or content == "" then return nil; end
+
+    local function extractSection(name)
+        local pattern = "### " .. name .. "\n(.-)\n### "
+        local section = content:match(pattern)
+        if not section then
+            section = content:match("### " .. name .. "\n(.+)$")
+        end
+        return section
+    end
+
+    local function parseKeyValueSection(section)
+        local result = {}
+        if not section then return result end
+        for line in section:gmatch("[^\r\n]+") do
+            local key, value = line:match("^%-%s*([%w_]+):%s*(.+)$")
+            if key and value then
+                result[key] = value:match("^%s*(.-)%s*$")
+            end
+        end
+        return result
+    end
+
+    local currentTopic = parseKeyValueSection(extractSection("Current Topic"))
+    local latestResult = parseKeyValueSection(extractSection("Latest Result"))
+    local nextStep = parseKeyValueSection(extractSection("Next Step"))
+
+    if not next(currentTopic) and not next(latestResult) and not next(nextStep) then
+        return nil
+    end
+
+    return {
+        type = currentTopic.type,
+        item = currentTopic.item,
+        action = currentTopic.action,
+        status = currentTopic.status,
+        result = latestResult.result,
+        note = latestResult.note,
+        next = nextStep.next,
+    }
+end
 
 --------------------------------------------------------------------------------
 -- BackgroundAgent Configuration
@@ -231,7 +410,19 @@ local CONFIG = {
     
     -- Structured learning idle threshold (ms)
     structuredLearningIdleThreshold = 180000, -- 3 minutes
+    
+    -- H5 tool session timeout (seconds) — auto-cancel if user never completes
+    toolSessionTimeout = 300, -- 5 minutes
 };
+
+--[[
+    Get the FileTools instance used by this agent.
+    External code and tests should use this to share the same workspace.
+    @return FileTools - The FileTools instance
+]]
+function BackgroundAgent:GetFileTools()
+    return self.fileTools;
+end
 
 --[[
     Check if user request is related to scene operations
@@ -277,11 +468,21 @@ function BackgroundAgent:ctor()
     self.lastStepResult = nil;    -- Last LLM result from Step()
     self.isStepInProgress = false; -- True while Step() is executing
     
-    -- Discovered copilots and their capabilities
-    self.discoveredCopilots = {};
+    -- Per-instance AgentRouter and ToolSandbox (created in RegisterNPLJSHandlers)
+    self._agentRouter = nil;
+    self._toolSandbox = nil;
+
+    -- Tool registry: shared ToolRegistry instance (decoupled from BackgroundAgent)
+    self.toolRegistry = ToolRegistry:new();
+    self.tools = self.toolRegistry.tools;  -- backward compat: same table reference
     
-    -- Tool registry: {name = {schema, handler}}
-    self.tools = {};
+    -- Connect ToolRegistry signals to BackgroundAgent for AISession sync
+    self.toolRegistry:Connect("toolRegistered", self, self.OnToolRegistered);
+    self.toolRegistry:Connect("toolUnregistered", self, self.OnToolUnregistered);
+    
+    -- Copilot skill module (discovery, tools, prompt generation)
+    self.copilotSkill = CopilotSkill:new():Init(self.toolRegistry);
+    self.discoveredCopilots = self.copilotSkill.discoveredCopilots;
     
     -- AI session for LLM communication
     self.aiSession = nil;
@@ -314,7 +515,37 @@ function BackgroundAgent:ctor()
         primaryLanguage = "Chinese",    -- Native language
         secondaryLanguage = "English",  -- Language to learn
         name = nil,                     -- Optional user name
+        grade = nil,                    -- School grade (e.g., "三年级")
+        englishLevel = "beginner",      -- English proficiency: "beginner"/"elementary"/"conversational"
+        interests = {},                 -- Array of interest strings (e.g., {"恐龙", "Minecraft"})
+        specialty = nil,               -- User's special talent
+        learningGoal = nil,            -- Learning objective (e.g., "日常对话"/"考试提分")
+        preferredPace = "moderate",    -- Learning pace: "fast"/"moderate"/"slow"
+        personality = nil,             -- Observed personality (e.g., "活泼好奇"/"害羞安静")
     };
+    
+    --------------------------------------------------------------------------------
+    -- Agent Phase (simplified: idle / active)
+    -- The LLM decides whether to collect profile or teach based on skill definitions
+    -- and data completeness. No hardcoded SOP→learning state machine.
+    --------------------------------------------------------------------------------
+    
+    -- Agent phase: "idle" (no task) / "active" (has task, LLM decides behavior)
+    self.agentPhase = "idle";
+    
+    -- Skill state tracking (which skill module is active)
+    self.sopState = {
+        existingProfile = nil,  -- Parsed data from memory file (nil if first time)
+        isActive = false,       -- Whether a session is currently running
+        activeSOP = nil,        -- Name of the active skill module (e.g., "user-profile")
+    };
+    
+
+    
+    -- Whether the agent is waiting for user reply (blocks idle-driven prompts)
+    self.waitingForUserReply = false;
+    self.waitingForUserReplyStartTime = nil; -- timestamp when wait started (for nudge timeout)
+    self.isInitialLearningSession = false; -- true during the very first learning message after activation
     
     -- Primary learning task configuration (markdown text)
     self.primaryTask = nil;  -- Will be set via SetPrimaryLearningTask(text)
@@ -391,7 +622,7 @@ function BackgroundAgent:ctor()
     -- UI tool queue (prevent multiple UI popups at same time)
     self.uiToolQueue = {};          -- Queue of pending UI tool calls
     self.currentUISession = nil;    -- Currently displayed UI session ID
-    
+                                      
     --------------------------------------------------------------------------------
     -- Context History Management (for scene vision and voice recognition)
     --------------------------------------------------------------------------------
@@ -443,10 +674,15 @@ function BackgroundAgent:ctor()
     --------------------------------------------------------------------------------
     
     -- Pending user requests queue (FIFO order, merged on next LLM call)
+    -- Each entry is {query=string, callback=function|nil, options=table|nil}
     self.pendingUserRequests = {};
     
     -- Whether LLM is currently processing a request
     self.isLLMProcessing = false;
+    
+    -- Watchdog timer: auto-reset isLLMProcessing if LLM callback never fires
+    self.llmProcessingWatchdog = nil;
+    self.llmProcessingWatchdogTimeout = 90000; -- 90 seconds
     
     -- Tool call detection state for TTS hint
     self.isToolCallInProgress = false;  -- Whether tool call content detected in stream
@@ -459,30 +695,41 @@ function BackgroundAgent:ctor()
     self.llmHistory = {};
     self.maxLLMHistorySize = CONFIG.maxLLMHistorySize;
     
-    -- System prompt for the agent
-    self.systemPrompt = [[You are a BackgroundAgent controlling a 3D scene in Paracraft.
-You name is "papa" and chinese name is "帕帕".
-You have access to the scene graph and can see a screenshot of the current view.
-You control multiple subagent copilots to accomplish tasks.
-Response rules:
-- Use the provided tools when appropriate to accomplish tasks.
-- Only call tools that are available to you. Never invent tools.
-- Use prose to explain what you're doing.
-- Reference entities and locations clearly.
-- Respond in a helpful and friendly manner.]];
-
+    -- Max tool-call chain depth for delegate mode (aligned with AIChat.maxIterations)
+    self.maxToolChainDepth = 5;
+    
+    -- Child agent sessions managed via AIChat child session framework
+    -- (orchestrated through self.aiSession's CreateChildSession/EnqueueChildTask)
+    
     -- System prompt cache for token optimization
     self.cachedSystemPrompt = nil;
     self.systemPromptCacheKey = nil; -- Hash of task + copilots for cache invalidation
 
-    -- Initialize built-in tools
-    self:RegisterBuiltinTools();
+    -- Initialize tool modules (needed by RegisterServices)
+    self.fileTools = FileTools:new();
+    self.sceneTools = SceneTools:new();
+    self.learningTools = LearningTools:new();
+    self.codeTools = CodeTools:new();
+    self.agentTools = AgentTools:new();
+    self.webTools = WebTools:new();
     
-    -- Initialize learning tools
-    self:RegisterLearningTools();
+    -- Register services for tool handler dependency injection
+    self:RegisterServices();
     
-    -- Initialize agent task tools (building, planting, fishing, cooking)
-    -- self:RegisterAgentTaskTools();
+    -- Register all tool modules with ToolRegistry
+    self.sceneTools:RegisterTools(self.toolRegistry);
+    self.copilotSkill:RegisterTools();
+    self.learningTools:RegisterTools(self.toolRegistry);
+    self.codeTools:RegisterTools(self.toolRegistry);
+    self.fileTools:RegisterTools(self.toolRegistry, "file_io");
+    self.agentTools:RegisterTools(self.toolRegistry);
+    self.webTools:RegisterTools(self.toolRegistry);
+    
+    -- Share FileTools instance with GlobalMemoryManager
+    GlobalMemory.SetFileTools(self.fileTools);
+    
+    -- Load all SOP modules and register their tools
+    self:LoadAndRegisterSOPs();
     
     -- Initialize context managers
     self:InitContext();
@@ -500,34 +747,101 @@ function BackgroundAgent:InitContext()
     -- Track scene dirty state - assume dirty on startup to ensure first LLM request has a screenshot
     self.sceneDirty = true;
     
-    SceneVisionManager:Connect("sceneChanged", function(changeInfo)
+    -- Initialize voice context manager
+    VoiceContextManager:Init();
+    
+    -- Connect to typewriter signal to update chat history
+    self:Connect("typewriterText", self, self.OnTypewriterText);
+    
+    -- Connect context manager signals
+    self:ConnectContextSignals();
+    
+    -- Register NPLJS handlers for JS ↔ Lua communication
+    self:RegisterNPLJSHandlers();
+
+    -- Create a per-instance AgentRouter (one per NPLJS endpoint)
+    self._agentRouter = AgentRouter:new();
+
+    -- Update the service provider with the now-available AgentRouter
+    if self.serviceProvider then
+        self.serviceProvider:Register("agent_router", self._agentRouter);
+    end
+
+    -- Attach AgentRouter to the same NPLJS channel so JS-side AgentRouter
+    -- can discover and call Lua agents (and vice versa).
+    self._agentRouter:attach(npljs_send_event, npljs_recv_event);
+
+    -- Register this BackgroundAgent instance as a named agent.
+    -- JS can submit tasks to "backgroundAgent" via agentRouter.submitTask(...).
+    local self_ = self;
+    self._agentRouter:register("backgroundAgent", function(taskId, payload, streamCb, doneCb)
+        local inst = BackgroundAgent:GetInstance();
+        if not inst then
+            doneCb(nil, "BackgroundAgent instance not available");
+            return;
+        end
+        local query = payload.task or payload.prompt or payload.query or "";
+        local options = payload.options or {};
+        options.skipChatHistory = options.skipChatHistory;
+        inst:ProcessWithLLM(query, function(result)
+            doneCb({ result = result and result.response or "" });
+        end, options);
+    end);
+
+    -- Create a per-instance ToolSandbox and register "paracraft" agent on our router
+    self._toolSandbox = ToolSandbox:new();
+    self._toolSandbox:Init(self._agentRouter, self.toolRegistry,
+        {"scene_query", "file_io", "copilot_control", "audio", "run_code", "learning_test", "agent", "web"},
+        self.serviceProvider);
+end
+
+--[[
+    Connect signals from context managers (SceneVision, Voice, TTS).
+    Safe to call multiple times; uses a guard flag to prevent duplicate connections.
+]]
+function BackgroundAgent:ConnectContextSignals()
+    if self._contextSignalsConnected then return; end
+    self._contextSignalsConnected = true;
+    
+    SceneVisionManager:Connect("sceneChanged", self, function(_, changeInfo)
         self:OnSceneChanged(changeInfo);
     end);
     
-    SceneVisionManager:Connect("screenshotCaptured", function(entry)
+    SceneVisionManager:Connect("screenshotCaptured", self, function(_, entry)
         self:OnScreenshotCaptured(entry);
     end);
     
-    -- Initialize voice context manager
-    VoiceContextManager:Init();
-    VoiceContextManager:Connect("voiceTranscribed", function(entry)
+    VoiceContextManager:Connect("voiceTranscribed", self, function(_, entry)
         self:OnVoiceTranscribed(entry);
     end);
     
     -- Connect TTSQueueManager signals to BackgroundAgent signals
     -- This maintains backward compatibility for external signal consumers
-    self.ttsManager:Connect("ttsStarted", function(text)
+    self.ttsManager:Connect("ttsStarted", self, function(_, text)
         self:ttsStarted(text);
     end);
-    self.ttsManager:Connect("ttsCompleted", function()
+    self.ttsManager:Connect("ttsCompleted", self, function()
         self:ttsCompleted();
     end);
     
-    -- Connect to typewriter signal to update chat history
-    self:Connect("typewriterText", self, self.OnTypewriterText);
+    LOG.std(nil, "info", "BackgroundAgent", "Context signals connected");
+end
+
+--[[
+    Disconnect signals from context managers.
+    Prevents stale callbacks after Stop() and avoids signal connection leaks.
+]]
+function BackgroundAgent:DisconnectContextSignals()
+    if not self._contextSignalsConnected then return; end
+    self._contextSignalsConnected = false;
     
-    -- Register NPLJS handlers for JS ↔ Lua communication
-    self:RegisterNPLJSHandlers();
+    SceneVisionManager:Disconnect("sceneChanged", self);
+    SceneVisionManager:Disconnect("screenshotCaptured", self);
+    VoiceContextManager:Disconnect("voiceTranscribed", self);
+    self.ttsManager:Disconnect("ttsStarted", self);
+    self.ttsManager:Disconnect("ttsCompleted", self);
+    
+    LOG.std(nil, "info", "BackgroundAgent", "Context signals disconnected");
 end
 
 --[[
@@ -593,7 +907,7 @@ end
 
 --[[
     Set user profile for personalized learning
-    @param config: table - {age, primaryLanguage, secondaryLanguage, name}
+    @param config: table - {age, primaryLanguage, secondaryLanguage, name, grade, englishLevel, interests, specialty, learningGoal, preferredPace, personality}
 ]]
 function BackgroundAgent:SetUserProfile(config)
     if not config then return self; end
@@ -615,9 +929,42 @@ function BackgroundAgent:SetUserProfile(config)
     if config.name then
         self.userProfile.name = config.name;
     end
+    if config.grade then
+        self.userProfile.grade = config.grade;
+    end
+    if config.englishLevel then
+        self.userProfile.englishLevel = config.englishLevel;
+    end
+    if config.interests then
+        if type(config.interests) == "table" then
+            self.userProfile.interests = config.interests;
+        elseif type(config.interests) == "string" then
+            -- Split comma-separated string into array
+            self.userProfile.interests = {};
+            for item in string.gmatch(config.interests, "[^,]+") do
+                local trimmed = string.match(item, "^%s*(.-)%s*$");
+                if trimmed and trimmed ~= "" then
+                    table.insert(self.userProfile.interests, trimmed);
+                end
+            end
+        end
+    end
+    if config.specialty then
+        self.userProfile.specialty = config.specialty;
+    end
+    if config.learningGoal then
+        self.userProfile.learningGoal = config.learningGoal;
+    end
+    if config.preferredPace then
+        self.userProfile.preferredPace = config.preferredPace;
+    end
+    if config.personality then
+        self.userProfile.personality = config.personality;
+    end
     
-    LOG.std(nil, "info", "BackgroundAgent", "User profile set: age=%d, primary=%s, secondary=%s",
-        self.userProfile.age, self.userProfile.primaryLanguage, self.userProfile.secondaryLanguage);
+    LOG.std(nil, "info", "BackgroundAgent", "User profile set: age=%d, primary=%s, secondary=%s, name=%s",
+        self.userProfile.age, self.userProfile.primaryLanguage, self.userProfile.secondaryLanguage,
+        tostring(self.userProfile.name));
     
     return self;
 end
@@ -630,6 +977,347 @@ function BackgroundAgent:GetUserProfile()
     return self.userProfile;
 end
 
+--------------------------------------------------------------------------------
+-- SOP (Standard Operating Procedure) - Dynamic SOP Management
+-- Skill modules are discovered from skills/ folder and managed via SkillManager.
+-- The active skill name is stored in self.sopState.activeSOP (default: "user-profile").
+--------------------------------------------------------------------------------
+
+--[[
+    Load all skill modules from the skills/ folder and register their tools.
+    Called once during ctor initialization.
+]]
+function BackgroundAgent:LoadAndRegisterSOPs()
+    -- Load agent workspace (config.md, agent.md, soul.md, skills)
+    self:SetAgent(self.agentName or "eduagent");
+    
+    -- Initialize Global Memory Manager (creates temp/global_memory.md if absent)
+    GlobalMemory.Init();
+    
+    local sopNames = SkillManager.GetSkillNames();
+    LOG.std(nil, "info", "BackgroundAgent", "Discovered %d skills", #sopNames);
+end
+
+--[[
+    Set the active agent by name. Loads config.md, agent.md, soul.md, and skills
+    from workspace/<agentName>/.
+    @param agentName: string - Agent directory name (e.g. "eduagent")
+]]
+function BackgroundAgent:SetAgent(agentName)
+    if not agentName or agentName == "" then
+        agentName = "eduagent";
+    end
+    self.agentName = agentName;
+    local agentDir = WORKSPACE_BASE_DIR .. agentName .. "/";
+    
+    -- 1. Load config.md (YAML frontmatter → self.agentConfig)
+    self:LoadAgentConfig(agentDir .. "config.md");
+    
+    -- 2. Load agent.md (pure system prompt content → self.agentPrompt)
+    self:LoadAgentPrompt(agentDir .. "agent.md");
+    
+    -- 3. Load agent's soul.md
+    Soul.LoadFromFile(agentDir .. "soul.md");
+    
+    -- 4. Load all other souls from built-in and temp directories
+    -- (Soul.LoadAll scans soul/ and temp/soul/ — agent soul already registered above
+    --  will be preserved since LoadAll resets registry; re-load agent soul after)
+    Soul.LoadAll();
+    Soul.LoadFromFile(agentDir .. "soul.md");
+    
+    -- 5. Configure SkillManager to scan agent-specific skills directory
+    SkillManager.SetAgentSkillDir(agentDir .. "skills/");
+    
+    -- 6. Discover all skills (agent → shared → temp)
+    SkillManager.DiscoverAll();
+    
+    -- 7. Activate default soul from config
+    local defaultSoul = self.agentConfig and self.agentConfig.defaultSoul;
+    if defaultSoul and Soul.IsRegistered(defaultSoul) then
+        Soul.SetActive(defaultSoul);
+    end
+    
+    -- 8. Configure workspace from config
+    local wsName = self.agentConfig and self.agentConfig.workspace;
+    if wsName and wsName ~= "" then
+        self:SetWorkspace(wsName, false, agentDir);
+    end
+    
+    -- 9. Invalidate system prompt cache
+    self:InvalidateSystemPromptCache();
+    
+    LOG.std(nil, "info", "BackgroundAgent", "SetAgent('%s'): config=%s, prompt=%d bytes, soul=%s, skills=%d",
+        agentName,
+        tostring(self.agentConfig and self.agentConfig.name),
+        self.agentPrompt and #self.agentPrompt or 0,
+        tostring(Soul.GetActiveName()),
+        SkillManager.GetCount());
+end
+
+--[[
+    Load agent configuration from a config.md file (YAML frontmatter).
+    Parses: name, defaultSoul, defaultSkill, fallbackSkill.
+    @param path: string - File path to config.md
+]]
+function BackgroundAgent:LoadAgentConfig(path)
+    self.agentConfig = nil;
+    
+    local file = ParaIO.open(path, "r");
+    if not file:IsValid() then
+        file:close();
+        LOG.std(nil, "warn", "BackgroundAgent", "LoadAgentConfig: file not found: %s", path);
+        return;
+    end
+    
+    local content = file:GetText(0, -1);
+    file:close();
+    
+    if not content or content == "" then
+        LOG.std(nil, "warn", "BackgroundAgent", "LoadAgentConfig: empty file: %s", path);
+        return;
+    end
+    
+    -- Parse YAML frontmatter (reuse SkillManager's parser for consistency)
+    local frontmatter = content:match("^%-%-%-\r?\n(.-)\r?\n%-%-%-");
+    if not frontmatter then
+        LOG.std(nil, "warn", "BackgroundAgent", "LoadAgentConfig: no YAML frontmatter in %s", path);
+        return;
+    end
+    
+    local config = {};
+    local function parseField(key)
+        local val = frontmatter:match(key .. ":%s*(.-)%s*\r?\n");
+        if not val or val == "" then
+            val = frontmatter:match(key .. ":%s*(.-)%s*$");
+        end
+        if val then val = val:match('^["\'](.+)["\']$') or val; end
+        return (val and val ~= "") and val or nil;
+    end
+    
+    config.name = parseField("name");
+    config.defaultSoul = parseField("defaultSoul");
+    config.defaultSkill = parseField("defaultSkill");
+    config.fallbackSkill = parseField("fallbackSkill");
+    config.workspace = parseField("workspace");
+    
+    self.agentConfig = config;
+    LOG.std(nil, "info", "BackgroundAgent", "LoadAgentConfig: loaded '%s' (soul=%s, skill=%s)",
+        tostring(config.name), tostring(config.defaultSoul), tostring(config.defaultSkill));
+end
+
+--[[
+    Load agent system prompt content from agent.md.
+    The file content is stored as-is and injected verbatim into the LLM system prompt.
+    @param path: string - File path to agent.md
+]]
+function BackgroundAgent:LoadAgentPrompt(path)
+    self.agentPrompt = nil;
+    
+    local file = ParaIO.open(path, "r");
+    if not file:IsValid() then
+        file:close();
+        LOG.std(nil, "warn", "BackgroundAgent", "LoadAgentPrompt: file not found: %s", path);
+        return;
+    end
+    
+    local content = file:GetText(0, -1);
+    file:close();
+    
+    if content and content ~= "" then
+        -- Trim leading/trailing whitespace
+        content = content:match("^%s*(.-)%s*$") or content;
+        self.agentPrompt = content;
+        LOG.std(nil, "info", "BackgroundAgent", "LoadAgentPrompt: loaded %d bytes from %s", #content, path);
+    else
+        LOG.std(nil, "warn", "BackgroundAgent", "LoadAgentPrompt: empty file: %s", path);
+    end
+end
+
+--[[
+    Set workspace name for all related components at once.
+    This configures FileTools (local and remote), invalidates GlobalMemory cache,
+    and notifies the JS side.
+    @param wsName: string - Workspace name (e.g. "papa"). If a path is passed, the last segment is used.
+    @param isRemote: boolean (optional) - If true, also configure remote mode. Default false (local only).
+    @return self for chaining
+]]
+function BackgroundAgent:SetWorkspace(wsName, isRemote, sourceDir)
+    if not wsName or wsName == "" then
+        LOG.std(nil, "warn", "BackgroundAgent", "SetWorkspace: empty workspace name, ignored");
+        return self;
+    end
+    
+    local name = FileTools.ExtractWorkspaceName(wsName);
+    if name == "" then
+        LOG.std(nil, "warn", "BackgroundAgent", "SetWorkspace: could not extract name from '%s'", tostring(wsName));
+        return self;
+    end
+    
+    -- Store the workspace name on the agent instance
+    self.workspaceName = name;
+    
+    -- 1. Configure FileTools (local mode) with optional sourceDir for overlay
+    if self.fileTools then
+        self.fileTools:SetWorkSpace(name, isRemote and true or false, sourceDir);
+    end
+    
+    -- 1b. Remote mode with sourceDir: mount local folder on PersonalPageStore
+    if isRemote and sourceDir and sourceDir ~= "" then
+        NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/PersonalPageStore.lua");
+        local PersonalPageStore = commonlib.gettable("MyCompany.Aries.Creator.Game.KeepWork.PersonalPageStore");
+        PersonalPageStore:MountLocalFolder(sourceDir);
+    end
+    
+    -- 2. Invalidate GlobalMemory cache (it shares our FileTools by reference,
+    --    but cached content may point to old workspace files)
+    GlobalMemory.InvalidateCache();
+    
+    -- 3. Notify JS side so PersonalPageStore/ChatSession can sync workspace
+    self:SendToJS("workspaceChanged", {
+        workspace = name,
+        isRemote = isRemote and true or false,
+    });
+    
+    LOG.std(nil, "info", "BackgroundAgent", "SetWorkspace('%s', remote=%s, source=%s)", name, tostring(isRemote or false), tostring(sourceDir or "none"));
+    
+    return self;
+end
+
+--[[
+    Get the current workspace name.
+    @return string|nil - Workspace name or nil if not set
+]]
+function BackgroundAgent:GetWorkspace()
+    return self.workspaceName;
+end
+
+--[[
+    Get the agent name.
+    @return string - Current agent name (e.g. "eduagent")
+]]
+function BackgroundAgent:GetAgentName()
+    return self.agentName or "eduagent";
+end
+
+--[[
+    Get the agent config table.
+    @return table|nil - { name, defaultSoul, defaultSkill, fallbackSkill }
+]]
+function BackgroundAgent:GetAgentConfig()
+    return self.agentConfig;
+end
+
+--[[
+    Hot-load a newly imported skill into a running agent.
+    Registers the skill's tools and syncs them to the active AIChat session.
+    If the LLM is currently processing, defers the operation and retries after 1 second.
+    
+    @param skillName: string - Name of the skill (must already be registered in SkillManager)
+    @param callback: function(result) - Optional callback: {success=boolean, error=string|nil}
+]]
+function BackgroundAgent:HotLoadSkill(skillName, callback)
+    if not skillName or not SkillManager.IsDiscovered(skillName) then
+        LOG.std(nil, "warn", "BackgroundAgent", "HotLoadSkill: skill '%s' not discovered", tostring(skillName));
+        if callback then callback({success = false, error = "Skill not discovered: " .. tostring(skillName)}); end
+        return;
+    end
+
+    -- Defer if LLM is currently processing to avoid tool list mutation mid-request
+    if self.isLLMProcessing then
+        LOG.std(nil, "info", "BackgroundAgent", "HotLoadSkill: LLM busy, deferring '%s' by 1s", skillName);
+        local self_ = self;
+        commonlib.TimerManager.SetTimeout(function()
+            self_:HotLoadSkill(skillName, callback);
+        end, 1000);
+        return;
+    end
+
+    -- Push updated tool definitions to the active AIChat session
+    self:SyncToolsToAISession();
+
+    LOG.std(nil, "info", "BackgroundAgent", "HotLoadSkill: '%s' tools synced", skillName);
+    if callback then callback({success = true}); end
+end
+
+--[[
+    Prepare the session by reading existing data from the skill's memory file.
+    Called when SetPrimaryLearningTask is invoked.
+    Sets agentPhase to "active". The LLM decides whether to collect profile or teach
+    based on the skill definitions and data completeness injected in the system prompt.
+    @param sopName: string (optional) - Which skill to activate, defaults to "user-profile"
+    @param soulName: string (optional) - Which soul to activate. If nil, uses the skill's defaultSoul.
+]]
+function BackgroundAgent:PrepareSOPSession(sopName, soulName)
+    sopName = sopName or "user-profile";
+    
+    -- Validate skill exists
+    if not SkillManager.IsDiscovered(sopName) then
+        LOG.std(nil, "warn", "BackgroundAgent", "Skill '%s' not discovered, entering active phase anyway", sopName);
+    end
+    
+    -- Detect skill switch: clear dialog history and learning progress to prevent cross-skill contamination
+    local oldSOP = self.sopState and self.sopState.activeSOP;
+    if oldSOP and oldSOP ~= sopName then
+        LOG.std(nil, "info", "BackgroundAgent", "Skill switching from '%s' to '%s': clearing dialog history and progress", oldSOP, sopName);
+        -- Save old skill's data before clearing (if there's meaningful data)
+        if self.primaryTask and self.learningProgress then
+            self:SaveLearningDataToMemory();
+        end
+        -- Clear dialog history to prevent identity confusion
+        if self.dialogHistoryManager then
+            self.dialogHistoryManager:Clear();
+        end
+        -- Reset learning progress
+        self:ResetLearningProgress();
+    end
+    
+    -- Resolve and activate the appropriate soul
+    -- Priority: explicit soulName > agent config defaultSoul > keep current
+    local targetSoul = soulName or (self.agentConfig and self.agentConfig.defaultSoul);
+    if targetSoul then
+        if targetSoul and Soul.IsRegistered(targetSoul) then
+            Soul.SetActive(targetSoul);
+            LOG.std(nil, "info", "BackgroundAgent", "Skill[%s]: Activated soul '%s'", sopName, targetSoul);
+        else
+            LOG.std(nil, "warn", "BackgroundAgent", "Skill[%s]: Soul '%s' not registered, keeping current", sopName, targetSoul);
+        end
+    end
+    
+    -- Enter active phase — LLM will decide behavior based on data completeness
+    self.agentPhase = "active";
+    self.waitingForUserReply = false;
+    self.sopState.isActive = false;
+    self.sopState.existingProfile = nil;
+    self.sopState.activeSOP = sopName;
+    
+    -- Try to read existing data from the skill's memory file and apply to agent
+    SyncProfileFromFile(self, sopName);
+    
+    -- Cache existing profile for system prompt injection
+    local memoryFile = DEFAULT_MEMORY_FILE;
+    local result = self.fileTools:ReadFile(memoryFile);
+    if result.success and result.content and result.content ~= "" then
+        local data = ParseProfileJSON(result.content);
+        if data and data.name then
+            self.sopState.existingProfile = data;
+            LOG.std(nil, "info", "BackgroundAgent", "Skill[%s]: Found existing profile for '%s'", sopName, tostring(data.name));
+        else
+            LOG.std(nil, "info", "BackgroundAgent", "Skill[%s]: %s exists but no valid data found", sopName, memoryFile);
+        end
+    else
+        LOG.std(nil, "info", "BackgroundAgent", "Skill[%s]: No existing %s, LLM will decide to collect profile", sopName, memoryFile);
+    end
+    
+    -- Invalidate system prompt cache
+    self:InvalidateSystemPromptCache();
+    
+    -- Sync all tools (no phase-based filtering)
+    self:SyncToolsToAISession();
+    
+    LOG.std(nil, "info", "BackgroundAgent", "Skill[%s] session prepared (existing=%s)", 
+        sopName, tostring(self.sopState.existingProfile ~= nil));
+end
+
 --[[
     Set the primary learning task as markdown text.
     Once set, the agent will keep practicing this task until it is explicitly changed
@@ -638,15 +1326,27 @@ end
     Completion criteria is evaluated by LLM based on chat history, not structured thresholds.
     
     @param text: string - Markdown text describing the learning task, or nil to clear
+    @param options: table (optional) - Configuration for soul/SOP selection:
+        options.soul : string  - Soul name to activate (e.g. "papa", "coding")
+        options.sop  : string  - SOP name to use (e.g. "user-profile")
+        If options.soul is omitted, the SOP's defaultSoul is used (if defined).
+        If options.sop is omitted, defaults to "user-profile".
     @return self for chaining
     
     Note: Calling this method will reset learning progress.
     The primary task persists until this method is called again with a new task or nil.
+    
+    Usage:
+        agent:SetPrimaryLearningTask("Learn English words")  -- defaults: sop="user-profile", soul from SOP
+        agent:SetPrimaryLearningTask("Learn coding", {soul = "coding"})
+        agent:SetPrimaryLearningTask("Learn English", {soul = "papa"})  -- sop defaults to "user-profile"
 ]]
-function BackgroundAgent:SetPrimaryLearningTask(text)
+function BackgroundAgent:SetPrimaryLearningTask(text, options)
     if not text or text == "" then
         local oldTask = self.primaryTask;
         self.primaryTask = nil;
+        self.agentPhase = "idle";
+        self.waitingForUserReply = false;
         if oldTask then
             LOG.std(nil, "info", "BackgroundAgent", "Primary learning task cleared");
             self:InvalidateSystemPromptCache();
@@ -655,30 +1355,41 @@ function BackgroundAgent:SetPrimaryLearningTask(text)
         return self;
     end
     
+    options = options or {};
+    local sopName = options.sop or "user-profile";
+    local soulName = options.soul; -- may be nil, will be resolved in PrepareSOPSession
+    
     -- Generate unique task ID based on content hash
     local taskId = string.format("task_%d_%d", os.time(), #text);
     
     local oldTask = self.primaryTask;
-    local isSameTask = oldTask and oldTask.text == text;
+    -- SOP-aware same-task check: same text AND same SOP to prevent cross-SOP data leakage
+    local isSameTask = oldTask and oldTask.text == text and oldTask.sopName == sopName;
     
     self.primaryTask = {
         id = taskId,
         text = text,
         createdAt = os.time(),
+        sopName = sopName,       -- Track which SOP this task belongs to (for storage routing)
+        soulName = soulName,     -- Track which soul was requested (may be nil = use SOP default)
     };
     
-    -- Reset progress if this is a different task
+    -- Reset progress if this is a different task or different SOP
     if not isSameTask then
         self:ResetLearningProgress();
     end
+    
+    -- Always enter SOP phase when a learning task is set
+    -- Prepare session: resolve soul, read profile, set agentPhase to "active"
+    self:PrepareSOPSession(sopName, soulName);
     
     -- Auto-detect if this is an open-ended observation task
     -- Keywords indicating observation-based learning (no explicit item list)
     local isObservationTask = self:IsObservationBasedTask(text);
     self:SetObservationMode(isObservationTask);
     
-    LOG.std(nil, "info", "BackgroundAgent", "Primary learning task set (length: %d chars, observation: %s)", 
-        #text, tostring(isObservationTask));
+    LOG.std(nil, "info", "BackgroundAgent", "Primary learning task set (length: %d chars, observation: %s, sop: %s, soul: %s)", 
+        #text, tostring(isObservationTask), sopName, tostring(soulName));
     
     -- Invalidate system prompt cache when task changes
     self:InvalidateSystemPromptCache();
@@ -739,17 +1450,13 @@ function BackgroundAgent:IsObservationBasedTask(taskText)
     
     local lowerText = string.lower(taskText);
     
-    -- Keywords indicating observation-based learning
     local observationKeywords = {
         "观察", "场景", "行为", "玩的过程", "互动", "探索",
         "observe", "scene", "behavior", "while playing", "interact", "explore",
         "不需要询问", "根据.*行为", "根据.*场景",
     };
-    
-    -- Keywords indicating structured learning (with explicit items)
     local structuredKeywords = {
         "words to learn", "要学习的单词", "词汇表", "word list",
-        "apple", "banana", -- specific word examples often indicate structured task
     };
     
     -- Check for observation keywords
@@ -813,6 +1520,81 @@ end
 ]]
 function BackgroundAgent:IsObservationMode()
     return self.observationMode and self.observationMode.enabled;
+end
+
+--------------------------------------------------------------------------------
+-- Orchestration Prompt System (generic defaults)
+-- Domain-specific orchestration is defined in each skill's SKILL.md.
+-- The LLM reads skill files on demand via read_file tool.
+--------------------------------------------------------------------------------
+local DEFAULT_ORCHESTRATION = {
+    session_start = [[按当前协议开始一个最小教学步。若领域 level 未知，先补 level；否则按“最近错误项 > 待复习项 > 新内容”选择学习项。直接输出，跳过推理。]],
+    step_continue = [[继续当前学习流程。优先处理最近错误项，其次待复习项，最后才引入新内容。一次只推进一个最小教学步。直接回复，跳过推理过程。]],
+    result_feedback = [[根据学生刚才的结果做单轮反馈。正确则巩固或进入下一项；错误则留在当前项；跳过则降低难度。直接回复，跳过推理过程。]],
+    scene_focus = "objects/characters visible, environment type",
+};
+
+local LEGACY_ORCHESTRATION_ALIASES = {
+    initial_session_observation = "session_start",
+    initial_session_structured = "session_start",
+    proactive_observation = "step_continue",
+    step_observation = "step_continue",
+    step_structured = "step_continue",
+    idle_reengagement_observation = "step_continue",
+    idle_reengagement_structured = "step_continue",
+    gift_box_correct = "result_feedback",
+    gift_box_incorrect = "result_feedback",
+    gift_box_skipped = "result_feedback",
+    gift_box_completed = "result_feedback",
+};
+
+--[[
+    Normalize an orchestration key to its canonical key.
+    @param key: string
+    @return string - canonical key, or original key when no alias exists
+]]
+function BackgroundAgent:GetCanonicalOrchestrationKey(key)
+    return LEGACY_ORCHESTRATION_ALIASES[key] or key;
+end
+
+--[[
+    Get an orchestration prompt by key.
+    Returns from DEFAULT_ORCHESTRATION, resolving legacy aliases to canonical keys.
+    @param key: string - Prompt key (e.g. "session_start")
+    @return string - Prompt text (never nil)
+]]
+function BackgroundAgent:GetOrchestrationPrompt(key)
+    local canonicalKey = self:GetCanonicalOrchestrationKey(key);
+    return DEFAULT_ORCHESTRATION[canonicalKey] or "";
+end
+
+--[[
+    Wrap a student's reply with result-feedback guidance when the agent is
+    currently waiting for an answer in active learning mode.
+    @param userQuery: string
+    @return string
+]]
+function BackgroundAgent:BuildLearnerReplyPrompt(userQuery)
+    if not userQuery or userQuery == "" then
+        return userQuery;
+    end
+
+    if self.agentPhase == "active" and self.primaryTask and self.waitingForUserReply then
+        local guidance = self:GetOrchestrationPrompt("result_feedback");
+        if guidance and guidance ~= "" then
+            return guidance .. "\n\n[Student Reply]\n" .. userQuery;
+        end
+    end
+
+    return userQuery;
+end
+
+--[[
+    Get the scene focus description.
+    @return string - Scene focus text
+]]
+function BackgroundAgent:GetSceneFocus()
+    return DEFAULT_ORCHESTRATION.scene_focus or "";
 end
 
 --[[
@@ -899,42 +1681,13 @@ function BackgroundAgent:_ExecuteProactiveObservation(imageUrl)
     -- Build observation prompt based on recent activity
     local recentChanges = self:GetRecentSceneChangesSummary();
     
-    -- Count concepts already taught to guide tool selection
-    local conceptsTaughtCount = 0;
-    if self.learningProgress.observationStats and self.learningProgress.observationStats.conceptsTaught then
-        for _ in pairs(self.learningProgress.observationStats.conceptsTaught) do
-            conceptsTaughtCount = conceptsTaughtCount + 1;
-        end
-    end
-    
-    local prompt;
-    if conceptsTaughtCount >= 2 then
-        -- Time to test what was taught
-        prompt = string.format([[The user has been actively interacting with the 3D scene.
-Recent activity: %s
-
-You have already introduced %d concepts/words. Now it's time to TEST the user on what they've learned!
-
-IMPORTANT: Choose ONE test tool:
-- `test_multiple_choice` - Create a fun quiz about words you taught
-- `test_words_speaking` - Have them practice pronunciation
-- `test_words_spelling` - Test their spelling
-
-Make the test feel like a game, not an exam. Be encouraging!
-After the test, call `record_observation` to track the concepts tested.]], recentChanges, conceptsTaughtCount);
-    else
-        -- Continue teaching new concepts
-        prompt = string.format([[The user has been actively interacting with the 3D scene.
-Recent activity: %s
-
-Based on what you observe in the screenshot and the user's recent actions:
-1. Find something interesting in the scene to talk about
-2. Use `show_learning_content` to introduce a relevant English word with translation
-3. Keep your spoken comment brief (1-2 sentences)
-4. IMPORTANT: After teaching, call `record_observation` with the word you taught
-
-Remember: You are observing and teaching naturally, connecting English words to what the user sees.]], recentChanges);
-    end
+    -- Use the unified continuation prompt and add scene-aware guidance inline.
+    local orchestrationPrompt = self:GetOrchestrationPrompt("step_continue");
+    local prompt = string.format(
+        "User is active in 3D scene. Recent activity: %s\nUse what you observe in the scene to continue the current topic with one minimal step. If there is no pending mistake or review item, you may introduce one small scene-related next item.\n%s",
+        recentChanges,
+        orchestrationPrompt
+    );
     
     local self_ = self;
     local askOptions = {includeImage = true, skipChatHistory = false};
@@ -1072,111 +1825,18 @@ function BackgroundAgent:GetLearningProgressSummary()
     end
     
     local progress = self.learningProgress;
-    local isObservationMode = self.observationMode and self.observationMode.enabled;
     
-    -- Count items practiced
-    local itemCount = 0;
-    for _ in pairs(progress.itemsLearned) do
-        itemCount = itemCount + 1;
-    end
+    -- Basic session metrics (detailed progress is in learning_log.md, managed by LLM)
+    local sessionMinutes = progress.sessionStartTime and math.floor((os.time() - progress.sessionStartTime) / 60) or 0;
+    local accuracy = progress.totalAttempts > 0 and math.floor(progress.totalCorrect / progress.totalAttempts * 100) or 0;
     
-    -- Count concepts taught (observation mode)
-    local conceptCount = 0;
-    local conceptList = {};
-    if progress.observationStats and progress.observationStats.conceptsTaught then
-        for concept, data in pairs(progress.observationStats.conceptsTaught) do
-            conceptCount = conceptCount + 1;
-            table.insert(conceptList, string.format("%s (x%d)", concept, data.count or 1));
-        end
-    end
-    
-    local md;
-    
-    if isObservationMode then
-        -- Observation mode progress summary
-        local obsStats = progress.observationStats or {};
-        md = string.format([[## Learning Progress (Observation Mode)
-- **Current Progress:** %d%%
-- **Observations:** %d
-- **Interactions:** %d
-- **Concepts Taught:** %d
+    local md = string.format([[## Learning Progress (Session)
 - **Session Duration:** %d minutes
-]], 
-            progress.learningPercentage or 0,
-            obsStats.observationCount or 0,
-            obsStats.interactionCount or 0,
-            conceptCount,
-            progress.sessionStartTime and math.floor((os.time() - progress.sessionStartTime) / 60) or 0
-        );
-        
-        -- Show concepts taught
-        if #conceptList > 0 then
-            md = md .. "\n### Concepts Introduced\n";
-            for _, conceptInfo in ipairs(conceptList) do
-                md = md .. "- " .. conceptInfo .. "\n";
-            end
-        end
-        
-        -- Show topics discussed
-        if obsStats.topicsDiscussed and #obsStats.topicsDiscussed > 0 then
-            md = md .. "\n### Topics Discussed\n";
-            -- Show last 5 topics
-            local startIdx = math.max(1, #obsStats.topicsDiscussed - 4);
-            for i = startIdx, #obsStats.topicsDiscussed do
-                md = md .. "- " .. obsStats.topicsDiscussed[i] .. "\n";
-            end
-        end
-    else
-        -- Structured learning mode progress summary
-        -- Build practiced items list with status
-        local practicedItems = {};
-        local masteredItems = {};
-        local needsPracticeItems = {};
-        
-        for itemKey, itemData in pairs(progress.itemsLearned) do
-            if itemData.attempts > 0 then
-                local accuracy = itemData.correct / itemData.attempts * 100;
-                local itemInfo = string.format("%s (%.0f%%, %d attempts)", itemKey, accuracy, itemData.attempts);
-                table.insert(practicedItems, itemInfo);
-                
-                -- Categorize by mastery
-                if accuracy >= 80 and itemData.attempts >= 2 then
-                    table.insert(masteredItems, itemKey);
-                else
-                    table.insert(needsPracticeItems, itemKey);
-                end
-            end
-        end
-        
-        md = string.format([[## Learning Progress
-- **Current Progress:** %d%%
-- **Items Practiced:** %d
-- **Total Attempts:** %d (%.0f%% accuracy)
-- **Session Duration:** %d minutes
-]], 
-            progress.learningPercentage or 0,
-            itemCount,
-            progress.totalAttempts,
-            progress.totalAttempts > 0 and (progress.totalCorrect / progress.totalAttempts * 100) or 0,
-            progress.sessionStartTime and math.floor((os.time() - progress.sessionStartTime) / 60) or 0
-        );
-        
-        -- Show practiced items details
-        if #practicedItems > 0 then
-            md = md .. "\n### Practiced Items\n";
-            for _, itemInfo in ipairs(practicedItems) do
-                md = md .. "- " .. itemInfo .. "\n";
-            end
-        end
-        
-        -- Show mastery summary
-        if #masteredItems > 0 then
-            md = md .. "\n**Mastered:** " .. table.concat(masteredItems, ", ") .. "\n";
-        end
-        if #needsPracticeItems > 0 then
-            md = md .. "**Needs Practice:** " .. table.concat(needsPracticeItems, ", ") .. "\n";
-        end
-    end
+- **Test Attempts:** %d (%d%% accuracy)
+- **Progress:** %d%%
+
+> Detailed word-level progress is tracked in `learning_log.md`. Use `read_file` to check it.
+]], sessionMinutes, progress.totalAttempts, accuracy, progress.learningPercentage or 0);
     
     return md;
 end
@@ -1192,7 +1852,10 @@ function BackgroundAgent:IsLearningTaskComplete()
         return false;
     end
     
-    -- Basic heuristic: consider complete if high accuracy over many attempts
+    -- Task completeness is now evaluated by LLM via learning_log.md
+    -- This heuristic serves as a fallback only
+    
+    -- Fallback heuristic if tracker has no items (e.g., legacy path)
     local progress = self.learningProgress;
     if progress.totalAttempts >= 10 then
         local accuracy = progress.totalCorrect / progress.totalAttempts;
@@ -1233,6 +1896,7 @@ function BackgroundAgent:SyncToolsToAISession()
     
     -- Convert tools to OpenAI format and set on AIChat
     local toolDefinitions = self:GetAllToolDefinitions();
+    
     self.aiSession:SetTools(toolDefinitions);
     
     -- In delegate mode, BackgroundAgent handles tool execution via HandleToolCallsFromLLM
@@ -1273,6 +1937,106 @@ function BackgroundAgent:SyncToolsToAISession()
     end
     
     LOG.std(nil, "debug", "BackgroundAgent", "Synced %d tools to AIChat (auto mode)", #toolDefinitions);
+end
+
+-- ─── Child Agent Orchestration (wraps AIChat child session framework) ───
+
+--[[
+    Set the max tool-call chain depth for delegate mode.
+    @param depth: number
+]]
+function BackgroundAgent:SetMaxToolChainDepth(depth)
+    self.maxToolChainDepth = depth or 5;
+    -- Also sync to AIChat's maxIterations for auto mode consistency
+    if self.aiSession then
+        self.aiSession:SetMaxIterations(depth);
+    end
+end
+
+--[[
+    Create a named child agent session.
+    @param name: string - Unique agent name
+    @param options: table|nil - {model, systemPrompt, maxIterations, ...}
+    @return table|nil - {session=AIChat, queue={}, isRunning=false}
+]]
+function BackgroundAgent:CreateChildAgent(name, options)
+    self:InitAISession();
+    local entry = self.aiSession:CreateChildSession(name, options);
+    if entry then
+        -- Wire child streaming events to BackgroundAgent's notification system
+        entry.session.onChildStream = function(event)
+            self:_OnChildAgentStream(event);
+        end;
+    end
+    return entry;
+end
+
+--[[
+    Enqueue a task for a named child agent.
+    @param name: string - Child agent name
+    @param task: string - Task description/prompt
+    @param options: table|nil - {enableTools, maxIterations, systemPrompt, model, callbackMode, debounceSeconds, description, callback}
+]]
+function BackgroundAgent:EnqueueChildAgentTask(name, task, options)
+    self:InitAISession();
+    options = options or {};
+    
+    -- Wrap callback to also notify UI
+    local originalCallback = options.callback;
+    options.callback = function(result)
+        LOG.std(nil, "info", "BackgroundAgent", "Child agent '%s' task completed", name);
+        -- Notify JS side about child agent result
+        self:SendToJS("childAgentResult", {
+            agentName = name,
+            result = type(result) == "string" and result:sub(1, 500) or tostring(result),
+        });
+        if originalCallback then
+            originalCallback(result);
+        end
+    end;
+    
+    self.aiSession:EnqueueChildTask(name, task, options);
+end
+
+--[[
+    Handle child agent streaming events (forward to JS UI).
+    @param event: table - {agentPath, agentName, taskId, type, content, fullResponse}
+    @private
+]]
+function BackgroundAgent:_OnChildAgentStream(event)
+    if not event then return; end
+    -- Forward streaming events to JS side for UI display
+    self:SendToJS("childAgentStream", {
+        agentPath = event.agentPath,
+        agentName = event.agentName,
+        taskId = event.taskId,
+        type = event.type,
+        content = type(event.content) == "string" and event.content:sub(1, 1000) or nil,
+    });
+end
+
+-- ─── Remote History Integration ───
+
+--[[
+    Save current conversation to remote history.
+    Uses the AIChat's modId/chatId for persistence.
+    @param callback: function(err, msg, data)|nil
+]]
+function BackgroundAgent:SaveRemoteHistory(callback)
+    if self.aiSession then
+        self.aiSession:SaveRemoteHistory(callback);
+    end
+end
+
+--[[
+    Set remote history identifiers on the AI session.
+    @param chatId: string
+    @param modId: string
+]]
+function BackgroundAgent:SetRemoteHistoryIds(chatId, modId)
+    self:InitAISession();
+    self.aiSession:SetChatId(chatId);
+    self.aiSession:SetModId(modId);
 end
 
 --[[
@@ -1348,6 +2112,12 @@ function BackgroundAgent:Play()
     local wasPlaying = self.playbackState == "paused";
     self.playbackState = "playing";
     
+    -- Re-register NPLJS handlers (may have been unregistered by Stop())
+    self:RegisterNPLJSHandlers();
+    
+    -- Re-connect context signals (may have been disconnected by Stop())
+    self:ConnectContextSignals();
+    
     -- Create or restart update timer
     if not self.updateTimer then
         self.updateTimer = commonlib.Timer:new({
@@ -1362,11 +2132,14 @@ function BackgroundAgent:Play()
     if not wasPlaying then
         self:DiscoverCopilots();
         
-        -- Auto-start learning session if we have a primary task
+        -- Auto-start: LLM will decide whether to collect profile or teach
         if self.primaryTask and not self.isLearningInProgress then
-            -- Schedule the initial learning prompt after a short delay to ensure everything is initialized
+            -- Schedule the initial prompt after a short delay to ensure everything is initialized
             commonlib.TimerManager.SetTimeout(function()
-                if self.playbackState == "playing" and self.primaryTask and not self.isLearningInProgress then
+                if self.playbackState ~= "playing" or not self.primaryTask or self.isLearningInProgress then
+                    return;
+                end
+                if self.agentPhase == "active" then
                     self:StartInitialLearningSession();
                 end
             end, 500); -- 500ms delay for initialization
@@ -1410,6 +2183,84 @@ function BackgroundAgent:Pause()
 end
 
 --[[
+    Generate a session summary via a lightweight LLM call.
+    Called during Stop() to persist episodic memory (session notes).
+    Uses an independent AIChat instance to avoid conflicting with the main session.
+    @param sopName: string - The active skill name
+    @param callback: function(note:string|nil) - Called with the summary note, or nil on failure
+]]
+function BackgroundAgent:GenerateSessionSummary(sopName, callback)
+    -- Preconditions
+    if not self.dialogHistoryManager or self.dialogHistoryManager:GetHistoryCount() < 3 then
+        LOG.std(nil, "info", "BackgroundAgent", "Session too short for summary (%d messages)", 
+            self.dialogHistoryManager and self.dialogHistoryManager:GetHistoryCount() or 0);
+        callback(nil);
+        return;
+    end
+    
+    -- Collect dialog context
+    local dialogContext = self.dialogHistoryManager:GetFormattedContext();
+    if not dialogContext or dialogContext == "" then
+        callback(nil);
+        return;
+    end
+    
+    -- Build progress snapshot
+    local progressInfo = "";
+    if self.learningProgress then
+        local p = self.learningProgress;
+        progressInfo = string.format(
+            "Progress: %d%%, Attempts: %d, Correct: %d",
+            p.learningPercentage or 0, p.totalAttempts or 0, p.totalCorrect or 0
+        );
+    end
+    
+    -- Create independent AIChat for summary (non-streaming, no tools)
+    local summaryChat = AIChat:new();
+    summaryChat:SetStream(false);
+    summaryChat:SetAutoHistory(false);
+    summaryChat:SetModel("keepwork-flash");
+    summaryChat:SetSystemPrompt(
+        "You are a teaching session summarizer. "
+        .. "Summarize key observations, what worked, what didn't, and action items in 1-3 concise sentences. "
+        .. "Focus on teaching insights, student reactions, and areas for improvement. "
+        .. "Write in the same language as the dialog. Do NOT include timestamps."
+    );
+    
+    local userMsg = string.format(
+        "Summarize this teaching session:\n\n%s\n\n%s",
+        dialogContext, progressInfo
+    );
+    
+    -- Timeout protection: if LLM doesn't respond in 5 seconds, give up
+    local completed = false;
+    local timeoutTimer = commonlib.Timer:new({callbackFunc = function()
+        if not completed then
+            completed = true;
+            LOG.std(nil, "warn", "BackgroundAgent", "Session summary LLM timed out");
+            callback(nil);
+        end
+    end});
+    timeoutTimer:Change(5000); -- 5 second timeout
+    
+    summaryChat:Ask(userMsg, function(response)
+        if completed then return; end
+        completed = true;
+        timeoutTimer:Change(); -- cancel timeout
+        
+        if response and response ~= "" then
+            -- Clean up the response (remove any markdown wrapping)
+            local note = response:match("^%s*(.-)%s*$") or response;
+            LOG.std(nil, "info", "BackgroundAgent", "Session summary generated (%d bytes)", #note);
+            callback(note);
+        else
+            LOG.std(nil, "warn", "BackgroundAgent", "Session summary LLM returned empty");
+            callback(nil);
+        end
+    end);
+end
+
+--[[
     Stop background agent processing completely (clears state)
 ]]
 function BackgroundAgent:Stop()
@@ -1429,12 +2280,58 @@ function BackgroundAgent:Stop()
         self.voiceLLMThrottle.pendingTimer:Change(); -- nil stops the timer
         self.voiceLLMThrottle.pendingTimer = nil;
     end
+
+    -- Cancel scene-change debounce capture timer
+    if self.sceneChangeCaptureTimer then
+        self.sceneChangeCaptureTimer:Change();
+        self.sceneChangeCaptureTimer = nil;
+    end
     
     -- Abort any pending AI requests
     if self.aiSession then
         self.aiSession:Abort();
     end
     
+    -- Cancel LLM watchdog timer
+    self:_CancelLLMWatchdog();
+    
+    -- Reset gate flags to prevent stuck state on next Play()
+    self.isLLMProcessing = false;
+    self.isLearningInProgress = false;
+    
+    -- Save learning data BEFORE clearing sopState so that the correct memory file
+    -- (e.g. user_profile.md) is resolved from sopState.activeSOP.
+    if self.primaryTask and self.learningProgress then
+        self:SaveLearningDataToMemory();
+    end
+    
+    -- Episodic Memory: generate session summary and persist as session note.
+    -- Must capture sopName BEFORE sopState is cleared. The summary is async (LLM call)
+    -- but we fire-and-forget — Stop() does not wait for it. The 5s timeout in
+    -- GenerateSessionSummary ensures the LLM call won't leak.
+    local sopNameForSummary = (self.sopState and self.sopState.activeSOP)
+        or (self.primaryTask and self.primaryTask.sopName);
+    if sopNameForSummary and self.dialogHistoryManager 
+            and self.dialogHistoryManager:GetHistoryCount() >= 3 then
+        self:GenerateSessionSummary(sopNameForSummary, function(note)
+            if note and note ~= "" then
+                -- Append session note to learning log file via FileTools
+                local logFile = DEFAULT_LEARNING_LOG_FILE;
+                local timestamp = os.date("%Y-%m-%d %H:%M");
+                local formattedNote = string.format("\n### Session Note [%s]\n%s\n", timestamp, note);
+                self.fileTools:AppendToFile(logFile, formattedNote);
+            end
+        end);
+    end
+    
+    -- Reset SOP / interaction state
+    self.agentPhase = "idle";
+    self.waitingForUserReply = false;
+    if self.sopState then
+        self.sopState.isActive = false;
+        self.sopState.existingProfile = nil;
+        self.sopState.activeSOP = nil;
+    end
     -- Clear caches
     self.cachedSceneImage = nil;
     self.cachedSceneText = nil;
@@ -1447,9 +2344,24 @@ function BackgroundAgent:Stop()
     -- Clear UI tool queue and close any open UI
     self:ClearUIToolQueue();
     
+    -- Disconnect signals from context managers to prevent leaks
+    self:DisconnectContextSignals();
+    
     -- Unregister NPLJS handlers
     self:UnregisterNPLJSHandlers();
-    
+
+    -- Destroy ToolSandbox agent (unregisters "paracraft" from our router)
+    if self._toolSandbox then
+        self._toolSandbox:Destroy();
+        self._toolSandbox = nil;
+    end
+
+    -- Detach AgentRouter (announces disconnect to JS, cancels pending tasks)
+    if self._agentRouter then
+        self._agentRouter:detach();
+        self._agentRouter = nil;
+    end
+
     -- Emit signals
     self:stopped();
     
@@ -1521,15 +2433,7 @@ function BackgroundAgent:Step(callback)
     local prompt;
     local includeImage = true;
     if self.primaryTask then
-        if self.observationMode.enabled then
-            prompt = [[Look at the current scene in the screenshot and:
-1. Comment on something interesting you see
-2. Use `show_learning_content` to introduce a related English word
-3. Keep it brief and engaging (1-2 sentences)
-4. IMPORTANT: Call `record_observation` with the word you taught]];
-        else
-            prompt = "Continue the learning session. Review the student's progress and present the next activity. Use tools to engage the student.";
-        end
+            prompt = self:GetOrchestrationPrompt("step_continue");
     else
         prompt = "Observe the current scene and describe what you see. If the user needs help, offer assistance.";
     end
@@ -1650,6 +2554,37 @@ function BackgroundAgent:OnUpdate()
     -- Process pending tasks
     self:ProcessPendingTasks();
     
+    -- If waiting for user reply (after a question/test), skip idle driving
+    -- BUT allow a re-engagement nudge if the student has been silent beyond the idle threshold
+    if self.waitingForUserReply then
+        if self.agentPhase == "active" and self.waitingForUserReplyStartTime then
+            local now = commonlib.TimerManager.GetCurrentTime();
+            local waitTime = now - self.waitingForUserReplyStartTime;
+            local nudgeThreshold;
+            -- P2: age-based threshold (same formula as DriveLearningSessionIfNeeded)
+            local userAge = tonumber(self.userProfile and self.userProfile.age) or 8;
+            local ageFactor = (userAge <= 6) and 0.5 or (userAge <= 8) and 0.7 or 1.0;
+            if self.observationMode.enabled then
+                nudgeThreshold = self.observationMode.idlePromptInterval * ageFactor;
+            else
+                nudgeThreshold = CONFIG.structuredLearningIdleThreshold * ageFactor;
+            end
+            if waitTime >= nudgeThreshold then
+                -- Student hasn't replied for a long time — allow a gentle nudge
+                LOG.std(nil, "info", "BackgroundAgent", 
+                    "[OnUpdate] Student silent for %ds (threshold %ds), allowing re-engagement nudge",
+                    math.floor(waitTime / 1000), math.floor(nudgeThreshold / 1000));
+                self.waitingForUserReply = false;
+                self.waitingForUserReplyStartTime = nil;
+                -- Fall through to DriveLearningSessionIfNeeded below
+            else
+                return;
+            end
+        else
+            return;
+        end
+    end
+    
     -- If we have a primary learning task and no recent voice input, 
     -- proactively drive the learning session
     if self.primaryTask and not self.isLearningInProgress then
@@ -1663,9 +2598,66 @@ function BackgroundAgent:OnUpdate()
         end
     end
     
+    -- Sweep timed-out H5 tool sessions (P1: timeout protection)
+    self:CleanupTimedOutTools();
+    
     -- In observation mode, also check for time-based observation trigger
     if self.observationMode.enabled and not self.isLearningInProgress then
         self:CheckTimedObservationTrigger();
+    end
+end
+
+--[[
+    Sweep pendingToolResults for timed-out H5 sessions.
+    If a session has been pending longer than CONFIG.toolSessionTimeout,
+    auto-cancel it and return a timeout result to the LLM.
+]]
+function BackgroundAgent:CleanupTimedOutTools()
+    local now = os.time();
+    local timeout = CONFIG.toolSessionTimeout;
+    local timedOut = {};
+    
+    for sessionId, pending in pairs(self.pendingToolResults) do
+        if pending.timestamp and (now - pending.timestamp) >= timeout then
+            table.insert(timedOut, sessionId);
+        end
+    end
+    
+    for _, sessionId in ipairs(timedOut) do
+        local pending = self.pendingToolResults[sessionId];
+        LOG.std(nil, "warn", "BackgroundAgent", "H5 tool session timed out after %ds: %s (session: %s)",
+            timeout, pending.toolName, sessionId);
+        
+        -- Remove from pending
+        self.pendingToolResults[sessionId] = nil;
+        
+        -- Clear current UI session if this was the active one
+        if self.currentUISession == sessionId then
+            LearningToolUI.Close(nil);
+            self.currentUISession = nil;
+        end
+        
+        -- Remove from queue if still queued
+        for i = #self.uiToolQueue, 1, -1 do
+            if self.uiToolQueue[i].sessionId == sessionId then
+                table.remove(self.uiToolQueue, i);
+            end
+        end
+        
+        -- Return timeout result to LLM callback
+        if pending.callback then
+            pending.callback({
+                success = false,
+                llm_result = string.format(
+                    "Tool '%s' timed out after %d seconds (user did not complete). Move on to another activity.",
+                    pending.toolName, timeout),
+            });
+        end
+    end
+    
+    -- Process next queued UI if we freed the current session
+    if #timedOut > 0 and not self.currentUISession then
+        self:ProcessNextUIToolInQueue();
     end
 end
 
@@ -1719,14 +2711,15 @@ function BackgroundAgent:DriveLearningSessionIfNeeded()
     local now = commonlib.TimerManager.GetCurrentTime();  -- milliseconds
     local lastActivity = self.learningProgress.lastActivityTime or 0;  -- milliseconds
     
-    -- Use different idle thresholds based on mode
+    -- P2: Use different idle thresholds based on mode + user age
     local idleThreshold;
+    local userAge = tonumber(self.userProfile and self.userProfile.age) or 8;
+    -- Young children (≤8) get shorter thresholds; older students keep defaults
+    local ageFactor = (userAge <= 6) and 0.5 or (userAge <= 8) and 0.7 or 1.0;
     if self.observationMode.enabled then
-        -- In observation mode, use the configured idle prompt interval (default 30 seconds)
-        idleThreshold = self.observationMode.idlePromptInterval;
+        idleThreshold = self.observationMode.idlePromptInterval * ageFactor;
     else
-        -- In structured learning mode, use longer threshold (3 minutes)
-        idleThreshold = CONFIG.structuredLearningIdleThreshold;
+        idleThreshold = CONFIG.structuredLearningIdleThreshold * ageFactor;
     end
     
     local idleTime = now - lastActivity;
@@ -1762,39 +2755,9 @@ function BackgroundAgent:DriveLearningSessionIfNeeded()
     LOG.std(nil, "info", "BackgroundAgent", "Proactive learning prompt triggered after %d seconds idle (mode: %s)", 
         (now - lastActivity) / 1000, self.observationMode.enabled and "observation" or "structured");
     
-    -- Build a prompt based on mode
-    local prompt;
-    if self.observationMode.enabled then
-        -- Count concepts already taught to guide tool selection
-        local conceptsTaughtCount = 0;
-        if self.learningProgress.observationStats and self.learningProgress.observationStats.conceptsTaught then
-            for _ in pairs(self.learningProgress.observationStats.conceptsTaught) do
-                conceptsTaughtCount = conceptsTaughtCount + 1;
-            end
-        end
-        
-        if conceptsTaughtCount >= 2 then
-            -- Time to test
-            prompt = string.format([[The user has been idle. You've taught %d concepts already.
-
-Now let's do a quick fun quiz! Use ONE of these test tools:
-- `test_multiple_choice` - A quick vocabulary quiz
-- `test_words_speaking` - Practice saying a word
-- `test_words_spelling` - Spell a word you taught
-
-Make it feel like a game! After the test, call `record_observation` to track progress.]], conceptsTaughtCount);
-        else
-            -- Observation mode: look at the scene and teach something
-            prompt = [[The user has been idle for a while. Look at the current scene in the screenshot and:
-1. Comment on something interesting you see
-2. Use `show_learning_content` to introduce a related English word
-3. Keep it brief and engaging (1-2 sentences)
-4. IMPORTANT: Call `record_observation` with the word you taught]];
-        end
-    else
-        -- Structured mode: prompt to continue the task
-        prompt = "Idle for a while. Prompt the user to continue or suggest a follow-up practice based on progress. Keep it concise and friendly.";
-    end
+    -- Use a single continuation prompt and inline the re-engagement constraint.
+    local prompt = self:GetOrchestrationPrompt("step_continue")
+        .. " 学生刚刚长时间没有回应。请用1-2句轻量方式重新接上当前学习流程，优先回到最近错误项或待复习项，不开启全新话题。";
     
     self:ProcessWithLLM(prompt, function(result)
         self.isLearningInProgress = false;
@@ -1832,31 +2795,20 @@ function BackgroundAgent:StartInitialLearningSession()
     -- Mark as in progress
     self.isLearningInProgress = true;
     
-    -- Build initial prompt based on mode
-    local prompt;
-    if self.observationMode.enabled then
-        -- Observation mode: greet and look at scene, use tools
-        prompt = [[This is the start of a new learning session. The user just entered the scene.
-1. Greet the user warmly (this is your first message, so greeting is appropriate)
-2. Look at the current scene in the screenshot
-3. Comment on something interesting you see
-4. Use `show_learning_content` to introduce a relevant English word with translation and example
-5. IMPORTANT: After teaching, call `record_observation` with the word you introduced
-6. Keep your spoken response brief and engaging]];
-    else
-        -- Structured mode: greet and introduce the learning task, use tools
-        prompt = [[This is the start of a new learning session. The user just entered the scene.
-1. Greet the user warmly (this is your first message, so greeting is appropriate)
-2. Briefly introduce what you'll be learning together
-3. Use `show_learning_content` to show the first word/content
-4. IMPORTANT: After teaching, call `set_learning_progress` to record the word you introduced]];
-    end
+    -- Mark as initial session so ProcessWithLLM callback skips waitingForUserReply
+    -- This allows the first teaching batch to flow without needing student confirmation
+    self.isInitialLearningSession = true;
+    
+    -- Use a single session-start prompt. Observation mode still affects image/context,
+    -- but not the protocol key used to start the session.
+    local prompt = self:GetOrchestrationPrompt("session_start");
     
     -- Use pcall-wrapped callback to ensure isLearningInProgress is always reset
     local self_ = self;
     self:ProcessWithLLM(prompt, function(result)
         -- Always reset the flag, even if something goes wrong
         self_.isLearningInProgress = false;
+        self_.isInitialLearningSession = false; -- Clear initial session flag
         if result and result.success then
             self_.learningProgress.lastActivityTime = commonlib.TimerManager.GetCurrentTime();
             LOG.std(nil, "info", "BackgroundAgent", "Initial learning session started successfully");
@@ -2098,9 +3050,10 @@ function BackgroundAgent:FormatSceneContextAsMarkdown(context, hasImage, isFullM
     
     -- Add concise image guidance if image is provided (balanced token vs accuracy)
     if hasImage then
-        md = md .. [[### Visual Scene
-*Screenshot attached.* Focus on: objects/characters visible, environment type, any learning-related content (text, signs, items).
-]];
+        local sceneFocus = self:GetSceneFocus();
+        md = md .. string.format([[### Visual Scene
+*Screenshot attached.* Focus on: %s
+]], sceneFocus);
     end
     
     -- Player info
@@ -2122,204 +3075,22 @@ function BackgroundAgent:FormatSceneContextAsMarkdown(context, hasImage, isFullM
         );
     end
     
-    -- Removed verbose analysis instructions to save tokens
-    -- LLM already knows how to analyze images
-    
     return md;
 end
 
 --------------------------------------------------------------------------------
--- Copilot Auto-Discovery
+-- Copilot Auto-Discovery (delegated to CopilotSkill)
 --------------------------------------------------------------------------------
 
 --[[
-    Discover all available copilots and their capabilities
+    Discover all available copilots and their capabilities.
+    Delegates to CopilotSkill module.
     @return table - Discovered copilots with their tools
 ]]
 function BackgroundAgent:DiscoverCopilots()
-    self.discoveredCopilots = {};
-    
-    -- Try to load CopilotManager
-    if not CopilotManager or not CopilotManager.GetInstance then
-        return self.discoveredCopilots;
-    end
-    
-    local manager = CopilotManager.GetInstance();
-    if not manager or not manager.copilots then
-        return self.discoveredCopilots;
-    end
-    
-    -- Iterate all registered copilots
-    for _, copilot in ipairs(manager.copilots) do
-        local copilotInfo = self:ExtractCopilotCapabilities(copilot);
-        if copilotInfo then
-            table.insert(self.discoveredCopilots, copilotInfo);
-            
-            -- Register copilot's tools
-            self:RegisterCopilotTools(copilotInfo);
-            
-            -- Emit discovery signal
-            self:copilotDiscovered(copilotInfo);
-        end
-    end
-    
-    LOG.std(nil, "info", "BackgroundAgent", "Discovered %d copilots", #self.discoveredCopilots);
-    
-    return self.discoveredCopilots;
-end
-
---[[
-    Extract capabilities from a copilot instance
-    @param copilot: CopilotBase instance
-    @return table - Copilot info with capabilities
-]]
-function BackgroundAgent:ExtractCopilotCapabilities(copilot)
-    if not copilot then
-        return nil;
-    end
-    
-    local info = {
-        instance = copilot,
-        name = "Unknown",
-        description = "",
-        tools = {},
-        tasks = {},
-        quickReplies = {},
-    };
-    
-    -- Extract from GetAICharConfig if available
-    if copilot.GetAICharConfig then
-        local config = copilot:GetAICharConfig();
-        if config then
-            if config.character then
-                info.name = copilot:GetName() or info.name;
-                info.displayName = config.character.name or info.name;
-                info.description = config.character.description or "";
-                info.role = config.character.role;
-            end
-            if config.objective then
-                info.objective = config.objective.description;
-            end
-            if config.quick_replies then
-                for _, reply in ipairs(config.quick_replies) do
-                    table.insert(info.quickReplies, {
-                        text = reply.text,
-                        action = reply.uiname,
-                    });
-                end
-            end
-            if config.tools then
-                for _, tool in ipairs(config.tools) do
-                    local func = tool["function"]
-                    if func and type(func) == "table" then
-                        table.insert(info.tools, {
-                            name = func.name or "Unknown",
-                            description = func.description or "",
-                            copilotName = info.name,
-                            action = func.name,
-                            parameters = func.parameters or {},
-                        });
-                    end
-                end
-            end
-        end
-    end
-    
-    -- Extract tasks
-    if copilot.GetAllTasks then
-        local tasks = copilot:GetAllTasks();
-        if tasks then
-            for _, task in ipairs(tasks) do
-                local taskInfo = {
-                    name = task.name or task.class_name or "Unknown",
-                    state = task.state,
-                    description = task.description,
-                };
-                
-                -- Get action buttons as available operations
-                if task.GetActionButtons then
-                    taskInfo.actions = task:GetActionButtons({});
-                end
-                
-                table.insert(info.tasks, taskInfo);
-            end
-        end
-    end
-    
-    -- Build tools from quick replies
-    for _, reply in ipairs(info.quickReplies) do
-        local tool = {
-            name = string.format("%s_%s", info.name, reply.action or "action"),
-            description = string.format("Ask %s to: %s", info.name, reply.text),
-            action = reply.action,
-            parameters = {
-                type = "object",
-                properties = {},
-                required = {},
-            },
-        };
-        table.insert(info.tools, tool);
-    end
-    
-    return info;
-end
-
---[[
-    Register tools from a discovered copilot
-    @param copilotInfo: table - Copilot info from ExtractCopilotCapabilities
-]]
-function BackgroundAgent:RegisterCopilotTools(copilotInfo)
-    if not copilotInfo or not copilotInfo.tools then
-        return;
-    end
-    
-    for _, tool in ipairs(copilotInfo.tools) do
-        self:RegisterTool(tool.name, {
-            description = tool.description,
-            parameters = tool.parameters,
-        }, function(params, callback)
-            self:ExecuteCopilotTool(copilotInfo, tool, params, callback);
-        end);
-    end
-end
-
---[[
-    Execute a tool on a copilot
-    @param copilotInfo: table - The copilot info
-    @param tool: table - The tool definition
-    @param params: table - Tool parameters
-    @param callback: function(result) - Called with result
-]]
-function BackgroundAgent:ExecuteCopilotTool(copilotInfo, tool, params, callback)
-    local copilot = copilotInfo.instance;
-    
-    if not copilot then
-        if callback then
-            callback({
-                success = false,
-                llm_result = "Copilot instance not found",
-            });
-        end
-        return;
-    end
-    
-    -- Try to execute via the copilot's interface
-    local llm_result = string.format("Dispatched action '%s' to %s", tool.action or "unknown", copilotInfo.name);
-    
-    -- If copilot has a HandleCommand method, use it
-    if copilot.HandleCommand then
-        local cmdResult = copilot:HandleCommand(tool.action, params);
-        if cmdResult then
-            llm_result = llm_result .. ", result: " .. tostring(cmdResult);
-        end
-    end
-    
-    if callback then
-        callback({
-            success = true,
-            llm_result = llm_result,
-        });
-    end
+    local result = self.copilotSkill:DiscoverCopilots();
+    self.discoveredCopilots = self.copilotSkill.discoveredCopilots;
+    return result;
 end
 
 --------------------------------------------------------------------------------
@@ -2331,61 +3102,11 @@ end
     @param name: string - Tool name (unique identifier)
     @param schema: table - Tool schema {description, parameters}
     @param handler: function(params, callback) - Tool handler
+    @param category: string (optional) - Tool category for sandbox ACL (default: "default")
 ]]
-function BackgroundAgent:RegisterTool(name, schema, handler)
-    self.tools[name] = {
-        name = name,
-        schema = schema,
-        handler = handler,
-    };
-    
-    LOG.std(nil, "debug", "BackgroundAgent", "Registered tool: %s", name);
-    
-    -- If AISession exists, register the tool callback immediately
-    if self.aiSession then
-        local toolDef = {
-            type = "function",
-            ["function"] = {
-                name = name,
-                description = schema.description or "",
-                parameters = schema.parameters or {
-                    type = "object",
-                    properties = {},
-                    required = {},
-                },
-            },
-        };
-        -- Update tools array and re-register callback
-        local tools = self.aiSession.tools or {};
-        -- Remove existing tool with same name
-        for i = #tools, 1, -1 do
-            if tools[i]["function"] and tools[i]["function"].name == name then
-                table.remove(tools, i);
-            end
-        end
-        table.insert(tools, toolDef);
-        self.aiSession:SetTools(tools);
-        
-        -- Register callback
-        self.aiSession:RegisterToolCallback(name, function(args, asyncCallback)
-            local result = nil;
-            local callbackCalled = false;
-            
-            handler(args or {}, function(handlerResult)
-                callbackCalled = true;
-                result = handlerResult;
-                self:toolExecuted(name, args, handlerResult);
-                if asyncCallback and type(asyncCallback) == "function" then
-                    asyncCallback(handlerResult);
-                end
-            end);
-            
-            if callbackCalled then
-                return result;
-            end
-            return nil;
-        end);
-    end
+function BackgroundAgent:RegisterTool(name, schema, handler, category)
+    self.toolRegistry:RegisterTool(name, schema, handler, category);
+    -- AISession sync is now handled by OnToolRegistered signal
 end
 
 --[[
@@ -2393,19 +3114,8 @@ end
     @param name: string - Tool name to remove
 ]]
 function BackgroundAgent:UnregisterTool(name)
-    self.tools[name] = nil;
-    
-    -- Also remove from AISession if exists
-    if self.aiSession then
-        self.aiSession.tool_callbacks[name] = nil;
-        local tools = self.aiSession.tools or {};
-        for i = #tools, 1, -1 do
-            if tools[i]["function"] and tools[i]["function"].name == name then
-                table.remove(tools, i);
-            end
-        end
-        self.aiSession:SetTools(tools);
-    end
+    self.toolRegistry:UnregisterTool(name);
+    -- AISession sync is now handled by OnToolUnregistered signal
 end
 
 --[[
@@ -2413,25 +3123,7 @@ end
     @return table - Array of tool definitions
 ]]
 function BackgroundAgent:GetAllToolDefinitions()
-    local definitions = {};
-    
-    for name, tool in pairs(self.tools) do
-        local def = {
-            type = "function",
-            ["function"] = {
-                name = name,
-                description = tool.schema.description or "",
-                parameters = tool.schema.parameters or {
-                    type = "object",
-                    properties = {},
-                    required = {},
-                },
-            },
-        };
-        table.insert(definitions, def);
-    end
-    
-    return definitions;
+    return self.toolRegistry:GetAllToolDefinitions();
 end
 
 --[[
@@ -2441,315 +3133,156 @@ end
     @param callback: function(result) - Called with execution result
 ]]
 function BackgroundAgent:ExecuteToolCall(toolName, params, callback)
-    local tool = self.tools[toolName];
-    
-    if not tool then
-        local result = {
-            success = false,
-            error = string.format("Tool '%s' not found", toolName),
-        };
+    self.toolRegistry:ExecuteTool(toolName, params or {}, function(result, err)
+        if err then
+            result = { success = false, error = err };
+        end
+        result = result or { success = true };
         if callback then
             callback(result);
         end
         self:toolExecuted(toolName, params, result);
-        return;
+    end, self.serviceProvider);
+end
+
+--------------------------------------------------------------------------------
+-- Service Provider & Tool-AISession Sync
+--------------------------------------------------------------------------------
+
+--[[
+    Register all agent-owned services into the ServiceProvider.
+    Called once during ctor initialization, before tools are registered.
+]]
+function BackgroundAgent:RegisterServices()
+    self.serviceProvider = ServiceProvider:new();
+    local sp = self.serviceProvider;
+    sp:Register("tts", self.ttsManager);
+
+    -- Facade: expose only LaunchLearningTool, decoupled from BackgroundAgent internals
+    local agent = self;
+    sp:Register("learning_ui", {
+        LaunchLearningTool = function(_, toolName, params, callback)
+            return agent:LaunchLearningTool(toolName, params, callback);
+        end,
+    });
+
+    -- Facade: expose only child-agent and parent-context APIs
+    sp:Register("code_executor", {
+        EnqueueChildAgentTask = function(_, name, task, options)
+            return agent:EnqueueChildAgentTask(name, task, options);
+        end,
+        GetParentContext = function(_, count)
+            if not agent.aiSession then return nil; end
+            return agent.aiSession:GetParentContext(count);
+        end,
+    });
+
+    -- Facade: expose only scene-context query methods
+    sp:Register("scene_context", {
+        GetSceneTextContext = function(_)
+            return agent:GetSceneTextContext();
+        end,
+        FormatSceneContextAsMarkdown = function(_, context, hasImage, isFullMode)
+            return agent:FormatSceneContextAsMarkdown(context, hasImage, isFullMode);
+        end,
+        GetContextHistorySummary = function(_)
+            return agent:GetContextHistorySummary();
+        end,
+    });
+
+    sp:Register("agent_router", self._agentRouter); -- AgentRouter for remote agent routing (nil until InitContext)
+    sp:Register("file_tools", self.fileTools);
+    sp:Register("copilot_manager", CopilotManager);
+    sp:Register("dialog_history", self.dialogHistoryManager);
+end
+
+--[[
+    Signal handler: called when a tool is registered in ToolRegistry.
+    Syncs the tool definition to AISession if available.
+    @param name: string - Tool name
+    @param schema: table - Tool schema
+    @param category: string - Tool category
+]]
+function BackgroundAgent:OnToolRegistered(name, schema, category)
+    if not self.aiSession then return; end
+
+    local toolDef = {
+        type = "function",
+        ["function"] = {
+            name = name,
+            description = schema.description or "",
+            parameters = schema.parameters or {
+                type = "object",
+                properties = {},
+                required = {},
+            },
+        },
+    };
+
+    local tools = self.aiSession.tools or {};
+    for i = #tools, 1, -1 do
+        if tools[i]["function"] and tools[i]["function"].name == name then
+            table.remove(tools, i);
+        end
     end
-    
-    -- Execute the handler
-    tool.handler(params or {}, function(result)
-        result = result or {success = true};
-        
-        if callback then
-            callback(result);
-        end
-        
-        self:toolExecuted(toolName, params, result);
-    end);
+    table.insert(tools, toolDef);
+    self.aiSession:SetTools(tools);
+
+    -- Register callback if not in delegate mode
+    local mode = self.aiSession:GetToolCallMode();
+    if mode ~= "delegate" then
+        self.aiSession:RegisterToolCallback(name, function(args, asyncCallback)
+            self:ExecuteToolCall(name, args, function(result)
+                if asyncCallback and type(asyncCallback) == "function" then
+                    asyncCallback(result and result.llm_result or "done");
+                end
+            end);
+        end);
+    end
 end
 
 --[[
-    Register built-in tools for scene manipulation
+    Signal handler: called when a tool is unregistered from ToolRegistry.
+    Removes the tool definition from AISession if available.
+    @param name: string - Tool name
 ]]
-function BackgroundAgent:RegisterBuiltinTools()
-    -- Tool: Get scene information
-    self:RegisterTool("get_scene_info", {
-        description = "Get information about the current 3D scene including player position and nearby entities",
-        parameters = {
-            type = "object",
-            properties = {
-                include_entities = {
-                    type = "boolean",
-                    description = "Whether to include nearby entities",
-                },
-            },
-            required = {},
-        },
-    }, function(params, callback)
-        local context = self:GetSceneTextContext();
-        callback({
-            success = true,
-            llm_result = self:FormatSceneContextAsMarkdown(context),
-        });
-    end);
-    
-    -- Tool: Move player to location
-    self:RegisterTool("move_to_location", {
-        description = "Move the player to a specific block location",
-        parameters = {
-            type = "object",
-            properties = {
-                x = {type = "number", description = "X block coordinate"},
-                y = {type = "number", description = "Y block coordinate"},
-                z = {type = "number", description = "Z block coordinate"},
-            },
-            required = {"x", "y", "z"},
-        },
-    }, function(params, callback)
-        local player = EntityManager.GetPlayer();
-        if player then
-            local rx, ry, rz = BlockEngine:real(params.x, params.y, params.z);
-            player:SetPosition(rx, ry, rz);
-            callback({
-                success = true,
-                llm_result = string.format("Moved player to block (%d, %d, %d)", params.x, params.y, params.z),
-            });
-        else
-            callback({success = false, llm_result = "No player found"});
+function BackgroundAgent:OnToolUnregistered(name)
+    if not self.aiSession then return; end
+
+    if self.aiSession.tool_callbacks then
+        self.aiSession.tool_callbacks[name] = nil;
+    end
+    local tools = self.aiSession.tools or {};
+    for i = #tools, 1, -1 do
+        if tools[i]["function"] and tools[i]["function"].name == name then
+            table.remove(tools, i);
         end
-    end);
-    
-    -- Tool: Place block
-    self:RegisterTool("place_block", {
-        description = "Place a block at a specific location",
-        parameters = {
-            type = "object",
-            properties = {
-                x = {type = "number", description = "X block coordinate"},
-                y = {type = "number", description = "Y block coordinate"},
-                z = {type = "number", description = "Z block coordinate"},
-                block_id = {type = "number", description = "Block type ID to place"},
-            },
-            required = {"x", "y", "z", "block_id"},
-        },
-    }, function(params, callback)
-        local x, y, z = params.x, params.y, params.z;
-        local blockId = params.block_id;
-        
-        BlockEngine:SetBlock(x, y, z, blockId);
-        
-        callback({
-            success = true,
-            llm_result = string.format("Placed block %d at (%d, %d, %d)", blockId, x, y, z),
-        });
-    end);
-    
-    -- Tool: Remove block
-    self:RegisterTool("remove_block", {
-        description = "Remove a block at a specific location",
-        parameters = {
-            type = "object",
-            properties = {
-                x = {type = "number", description = "X block coordinate"},
-                y = {type = "number", description = "Y block coordinate"},
-                z = {type = "number", description = "Z block coordinate"},
-            },
-            required = {"x", "y", "z"},
-        },
-    }, function(params, callback)
-        local x, y, z = params.x, params.y, params.z;
-        if not x or not y or not z then
-            callback({success = false, llm_result = "Missing required coordinates"});
-            return;
-        end
-        BlockEngine:SetBlock(x, y, z, 0);
-        
-        callback({
-            success = true,
-            llm_result = string.format("Removed block at (%d, %d, %d)", x, y, z),
-        });
-    end);
-    
-    -- Tool: Query entities
-    self:RegisterTool("query_entities", {
-        description = "Query entities in a specific area",
-        parameters = {
-            type = "object",
-            properties = {
-                center_x = {type = "number", description = "Center X coordinate"},
-                center_y = {type = "number", description = "Center Y coordinate"},
-                center_z = {type = "number", description = "Center Z coordinate"},
-                radius = {type = "number", description = "Search radius in blocks"},
-            },
-            required = {"center_x", "center_y", "center_z"},
-        },
-    }, function(params, callback)
-        local cx, cy, cz = params.center_x, params.center_y, params.center_z;
-        local radius = params.radius or 20;
-        local entities = EntityManager.GetEntitiesByMinMax(
-            cx - radius, cy, cz - radius,
-            cx + radius, cy + radius, cz + radius
-        );
-        
-        local results = {};
-        if entities then
-            for _, entity in ipairs(entities) do
-                local ex, ey, ez = entity:GetBlockPos();
-                table.insert(results, {
-                    type = entity.class_name or "Unknown",
-                    name = entity:GetDisplayName() or nil,
-                    position = {x = ex, y = ey, z = ez},
-                });
-            end
-        end
-        
-        callback({
-            success = true,
-            llm_result = string.format("Found %d entities: %s", #results, commonlib.serialize_compact(results) or "[]"),
-        });
-    end);
-    
-    -- Tool: List available copilots
-    self:RegisterTool("list_copilots", {
-        description = "List all available copilot subagents and their capabilities",
-        parameters = {
-            type = "object",
-            properties = {},
-            required = {},
-        },
-    }, function(params, callback)
-        local copilotList = {};
-        for _, copilot in ipairs(self.discoveredCopilots) do
-            table.insert(copilotList, {
-                name = copilot.name,
-                description = copilot.description,
-                role = copilot.role,
-                objective = copilot.objective,
-                taskCount = #copilot.tasks,
-                toolCount = #copilot.tools,
-            });
-        end
-        
-        callback({
-            success = true,
-            llm_result = string.format("Found %d copilots: %s", #copilotList, commonlib.serialize_compact(copilotList) or "[]"),
-        });
-    end);
-    
-    -- Tool: Send message to copilot
-    self:RegisterTool("send_message_to_copilot", {
-        description = "Send a message or command to a specific copilot subagent",
-        parameters = {
-            type = "object",
-            properties = {
-                copilot_name = {type = "string", description = "Name of the target copilot"},
-                message = {type = "string", description = "Message or command to send"},
-            },
-            required = {"copilot_name", "message"},
-        },
-    }, function(params, callback)
-        local targetName = params.copilot_name;
-        local message = params.message;
-        
-        -- Find the copilot
-        local targetCopilot = nil;
-        for _, copilot in ipairs(self.discoveredCopilots) do
-            if copilot.name == targetName then
-                targetCopilot = copilot;
-                break;
-            end
-        end
-        
-        if not targetCopilot then
-            callback({
-                success = false,
-                llm_result = string.format("Copilot '%s' not found", targetName),
-            });
-            return;
-        end
-        
-        -- Try to send message via copilot's interface
-        local instance = targetCopilot.instance;
-        if instance and instance.OnReceiveMessage then
-            local result = instance:OnReceiveMessage(message, self);
-            callback({
-                success = true,
-                llm_result = string.format("Message sent to %s, response: %s", targetName, tostring(result)),
-            });
-        elseif instance and instance.HandleCommand then
-            local result = instance:HandleCommand("message", {text = message});
-            callback({
-                success = true,
-                llm_result = string.format("Command sent to %s, response: %s", targetName, tostring(result)),
-            });
-        else
-            callback({
-                success = true,
-                llm_result = string.format("Message delivered to %s (no response handler)", targetName),
-            });
-        end
-    end);
+    end
+    self.aiSession:SetTools(tools);
 end
 
---------------------------------------------------------------------------------
--- Agent Task Tools Registration (Building, Planting, Fishing, Cooking)
---------------------------------------------------------------------------------
-
 --[[
-    Register agent task tools for dynamic control of building and life skill tasks.
-    These tools provide a higher-level interface for the agent to control copilots.
+    Sync all currently registered tools to AISession.
+    Call this once after AISession is created to catch tools registered before the session existed.
 ]]
-function BackgroundAgent:RegisterAgentTaskTools()
-    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/AgentTaskTools.lua");
-    local AgentTaskTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.AgentTaskTools");
-    AgentTaskTools.RegisterToBackgroundAgent(self);
-    LOG.std(nil, "info", "BackgroundAgent", "Agent task tools registered (building, planting, fishing, cooking)");
+function BackgroundAgent:SyncAllToolsToAISession()
+    if not self.aiSession then return; end
+    local definitions = self.toolRegistry:GetAllToolDefinitions();
+    self.aiSession:SetTools(definitions);
+    LOG.std(nil, "info", "BackgroundAgent", "Synced %d tool definitions to AISession", #definitions);
 end
 
 --------------------------------------------------------------------------------
--- Dynamic Copilot Tools Registration
+-- Dynamic Copilot Tools (delegated to CopilotSkill)
 --------------------------------------------------------------------------------
 
 --[[
-    Get copilot-specific prompt based on registered copilots
-    Dynamically generates prompt text based on available copilots
+    Get copilot-specific prompt based on registered copilots.
+    Delegates to CopilotSkill module.
     @return string - Copilot-specific prompt section
 ]]
 function BackgroundAgent:GetCopilotPromptSection()
-    local copilots = self.discoveredCopilots or {};
-    if #copilots == 0 then
-        return [[You have no copilot characters available.
-Use other tools to interact with the scene directly.]];
-    end
-    
-    local promptParts = {};
-    table.insert(promptParts, "You can control the following copilot characters:\n");
-    
-    for _, copilot in ipairs(copilots) do
-        local name = copilot.name or "Unknown";
-        local displayName = copilot.displayName or name;
-        local description = copilot.description or "";
-        local role = copilot.role or "assistant";
-        
-        table.insert(promptParts, string.format("- **%s** (id: `%s`): %s\n", name, displayName, description));
-        
-        -- Add copilot-specific capabilities
-        if copilot.tools and #copilot.tools > 0 then
-            table.insert(promptParts, "  Capabilities: ");
-            local toolNames = {};
-            for _, tool in ipairs(copilot.tools) do
-                table.insert(toolNames, tool.name);
-            end
-            table.insert(promptParts, table.concat(toolNames, ", ") .. "\n");
-        end
-    end
-    
-    table.insert(promptParts, "\nTo control a copilot, use `run_copilot_code` with:\n");
-    table.insert(promptParts, "- copilotName: The copilot's id (e.g., `__my_pet_copilot__`)\n");
-    table.insert(promptParts, "- code: Lua code with functions: Say(text, duration), WalkTo(x,y,z), WalkForward(distance), Wait(seconds), PlayAnimation(name)\n");
-    table.insert(promptParts, "- Use GetPlayerBlockPos() to get player position, GetPosition() to get copilot position\n");
-    table.insert(promptParts, "- Position functions return value [x,y,z]. Check if valid with pos[1], pos[2], pos[3]\n");
-    
-    return table.concat(promptParts);
+    return self.copilotSkill:GetPromptSection();
 end
 
 --[[
@@ -2757,440 +3290,29 @@ end
     @return boolean
 ]]
 function BackgroundAgent:HasCopilots()
-    return self.discoveredCopilots and #self.discoveredCopilots > 0;
+    return self.copilotSkill:HasCopilots();
 end
 
 --[[
-    Dynamically register tools for a newly added copilot
-    Call this when a copilot is registered at runtime
+    Dynamically register tools for a newly added copilot.
+    Delegates to CopilotSkill module.
     @param copilot: CopilotBase instance
 ]]
 function BackgroundAgent:OnCopilotRegistered(copilot)
-    if not copilot then return; end
-    
-    -- Extract capabilities and register tools
-    local copilotInfo = self:ExtractCopilotCapabilities(copilot);
-    if copilotInfo then
-        -- Check if already discovered
-        for i, existing in ipairs(self.discoveredCopilots) do
-            if existing.name and 
-                existing.name ~= "" and 
-                existing.name == copilotInfo.name then
-                -- Update existing entry
-                self.discoveredCopilots[i] = copilotInfo;
-                LOG.std(nil, "info", "BackgroundAgent", "Updated copilot: %s", copilotInfo.name);
-                return;
-            end
-        end
-        
-        -- Add new copilot
-        table.insert(self.discoveredCopilots, copilotInfo);
-        self:RegisterCopilotTools(copilotInfo);
-        self:copilotDiscovered(copilotInfo);
-        self:InvalidateSystemPromptCache(); -- Copilot added, rebuild system prompt
-        
-        LOG.std(nil, "info", "BackgroundAgent", "Dynamically registered copilot: %s", copilotInfo.name);
-    end
+    self.copilotSkill:OnCopilotRegistered(copilot);
+    self.discoveredCopilots = self.copilotSkill.discoveredCopilots;
 end
 
 --[[
-    Remove a copilot when it's unregistered
+    Remove a copilot when it's unregistered.
+    Delegates to CopilotSkill module.
     @param name: string - The copilot's id to remove
 ]]
 function BackgroundAgent:OnCopilotUnregistered(name)
-    if not name then return; end
-    
-    for i, copilotInfo in ipairs(self.discoveredCopilots) do
-        if copilotInfo.name == name then
-            -- Unregister tools for this copilot
-            for _, tool in ipairs(copilotInfo.tools or {}) do
-                self:UnregisterTool(tool.name);
-            end
-            
-            table.remove(self.discoveredCopilots, i);
-            self:InvalidateSystemPromptCache(); -- Copilot removed, rebuild system prompt
-            LOG.std(nil, "info", "BackgroundAgent", "Unregistered copilot: %s", copilotInfo.name);
-            return;
-        end
-    end
+    self.copilotSkill:OnCopilotUnregistered(name);
+    self.discoveredCopilots = self.copilotSkill.discoveredCopilots;
 end
 
---------------------------------------------------------------------------------
--- Learning Tools Registration (H5 Minigame Integration)
---------------------------------------------------------------------------------
-
---[[
-    Register learning-related tools for H5 minigame integration
-    These tools define schemas only - actual implementation is in H5 minigames
-]]
-function BackgroundAgent:RegisterLearningTools()
-    -- Tool: Multiple choice test
-    self:RegisterTool("test_multiple_choice", {
-        description = "Present a multiple choice question to test the learner's knowledge. Returns when user selects an answer.",
-        parameters = {
-            type = "object",
-            properties = {
-                question = {
-                    type = "string", 
-                    description = "The question text to display",
-                },
-                options = {
-                    type = "array",
-                    items = {type = "string"},
-                    description = "Array of answer options (2-4 choices)",
-                },
-                correctIndex = {
-                    type = "number",
-                    description = "Zero-based index of the correct answer",
-                },
-                hint = {
-                    type = "string",
-                    description = "Optional hint to show if user gets it wrong",
-                },
-                subject = {
-                    type = "string",
-                    description = "The subject/item being tested (e.g., the word being learned)",
-                },
-            },
-            required = {"question", "options", "correctIndex"},
-        },
-    }, function(params, callback)
-        self:LaunchLearningTool("test_multiple_choice", params, callback);
-    end);
-    
-    -- Tool: Word speaking test (pronunciation)
-    self:RegisterTool("test_words_speaking", {
-        description = "Test the learner's pronunciation by having them speak a word. Shows the word and optional phonetic, plays audio, then listens for speech.",
-        parameters = {
-            type = "object",
-            properties = {
-                word = {
-                    type = "string",
-                    description = "The word to speak",
-                },
-                phonetic = {
-                    type = "string",
-                    description = "Phonetic transcription (IPA or simple)",
-                },
-                audioUrl = {
-                    type = "string",
-                    description = "URL to pronunciation audio file",
-                },
-                maxAttempts = {
-                    type = "number",
-                    description = "Maximum attempts allowed (default: 3)",
-                },
-                showHint = {
-                    type = "boolean",
-                    description = "Whether to show phonetic hint",
-                },
-            },
-            required = {"word"},
-        },
-    }, function(params, callback)
-        self:LaunchLearningTool("test_words_speaking", params, callback);
-    end);
-    
-    -- Tool: Word spelling test
-    self:RegisterTool("test_words_spelling", {
-        description = "Test the learner's spelling by having them type a word. Can show hints like letter count or first letter.",
-        parameters = {
-            type = "object",
-            properties = {
-                word = {
-                    type = "string",
-                    description = "The correct spelling of the word",
-                },
-                hint = {
-                    type = "string",
-                    description = "Hint or definition to help identify the word",
-                },
-                showLetterCount = {
-                    type = "boolean",
-                    description = "Show number of letters as hint",
-                },
-                showFirstLetter = {
-                    type = "boolean",
-                    description = "Show first letter as hint",
-                },
-                audioUrl = {
-                    type = "string",
-                    description = "URL to pronunciation audio to play",
-                },
-                maxAttempts = {
-                    type = "number",
-                    description = "Maximum attempts allowed (default: 3)",
-                },
-                imageUrl = {
-                    type = "string",
-                    description = "Optional image hint URL",
-                },
-            },
-            required = {"word"},
-        },
-    }, function(params, callback)
-        self:LaunchLearningTool("test_words_spelling", params, callback);
-    end);
-    
-    -- Tool: Run copilot code (control subagent actions)
-    self:RegisterTool("run_copilot_code", {
-        description = "Execute Lua code to control a copilot subagent. The code runs in a coroutine context with access to copilot methods like Say(), WalkTo(), Wait(), etc.",
-        parameters = {
-            type = "object",
-            properties = {
-                copilotName = {
-                    type = "string",
-                    description = "Name of the target copilot to control",
-                },
-                code = {
-                    type = "string",
-                    description = "Lua code to execute. Available functions: Say(text, duration), WalkTo(x,y,z), Wait(seconds), PlayAnimation(name)",
-                },
-            },
-            required = {"copilotName", "code"},
-        },
-    }, function(params, callback)
-        self:ExecuteCopilotCode(params.copilotName, params.code, callback);
-    end);
-
-    self:RegisterTool("run_terminal_code", {
-        description = "Excute npl blockly code in code block environment.",
-        parameters = {
-            type = "object",
-            properties = {
-                code = {
-                    type = "string",
-                    description = "Npl blockly code to execute.",
-                },
-            },
-            required = {"code"},
-        },
-    }, function(params, callback)
-        self:ExecuteTerminalCode(params.code, callback);
-    end);
-    
-    -- Tool: Show learning content (flashcard-style)
-    self:RegisterTool("show_learning_content", {
-        description = "Display learning content like a flashcard with word, translation, image, and pronunciation.",
-        parameters = {
-            type = "object",
-            properties = {
-                word = {
-                    type = "string",
-                    description = "The word or phrase to learn",
-                },
-                translation = {
-                    type = "string",
-                    description = "Translation in learner's primary language",
-                },
-                phonetic = {
-                    type = "string",
-                    description = "Phonetic transcription",
-                },
-                imageUrl = {
-                    type = "string",
-                    description = "Illustration image URL",
-                },
-                audioUrl = {
-                    type = "string",
-                    description = "Pronunciation audio URL",
-                },
-                exampleSentence = {
-                    type = "string",
-                    description = "Example sentence using the word",
-                },
-                duration = {
-                    type = "number",
-                    description = "How long to display (seconds, default: 5)",
-                },
-            },
-            required = {"word"},
-        },
-    }, function(params, callback)
-        self:LaunchLearningTool("show_learning_content", params, callback);
-    end);
-    
-    -- Tool: Text-to-Speech (TTS) for speaking to the learner
-    self:RegisterTool("speak_text", {
-        description = "Speak text aloud using TTS (text-to-speech). Use this to talk to the learner, read words, give instructions, or provide feedback.",
-        parameters = {
-            type = "object",
-            properties = {
-                text = {
-                    type = "string",
-                    description = "The text to speak aloud",
-                },
-                voice = {
-                    type = "number",
-                    description = "Voice narrator ID. 20008=Child female (晓双), 20011=Adult female (晓晓), 20009=Adult male (云希). Default: 20008 for child-friendly voice.",
-                },
-                waitForComplete = {
-                    type = "boolean",
-                    description = "Whether to wait for speech to complete before returning (default: true)",
-                },
-            },
-            required = {"text"},
-        },
-    }, function(params, callback)
-        -- Clear auto-speak queue first (tool call takes priority)
-        self:ClearTTSQueue();
-        
-        -- Delay 1 second to ensure TTS engine is fully stopped, then speak
-        commonlib.TimerManager.SetTimeout(function()
-            self:SpeakText(params.text, params.voice, params.waitForComplete, callback);
-        end, 1000);
-    end);
-    
-    -- Tool: Get learning progress (for LLM to query)
-    self:RegisterTool("get_learning_progress", {
-        description = "Get the current learning progress for the primary task.",
-        parameters = {
-            type = "object",
-            properties = {},
-            required = {},
-        },
-    }, function(params, callback)
-        local now = commonlib.TimerManager.GetCurrentTime();
-        local throttle = self.toolCallThrottle or {};
-        local lastCalled = throttle.lastCalled or {};
-        local last = lastCalled.get_learning_progress or 0;
-        local minInterval = throttle.minInterval or 2000;
-        if now - last < minInterval then
-            callback({
-                success = true,
-                llm_result = string.format("Throttled, retry after %dms", minInterval),
-            });
-            return;
-        end
-        lastCalled.get_learning_progress = now;
-        throttle.lastCalled = lastCalled;
-        self.toolCallThrottle = throttle;
-        local summary = self:GetLearningProgressSummary();
-        local isComplete = self:IsLearningTaskComplete();
-        callback({
-            success = true,
-            llm_result = string.format("Progress: %s, Complete: %s", summary, tostring(isComplete)),
-        });
-    end);
-    
-    -- Tool: Set learning progress (for LLM to record items practiced)
-    self:RegisterTool("set_learning_progress", {
-        description = "Record learning progress after a learning interaction. Call this when user completes a task (word learned, question answered, etc.) to track what they've practiced.",
-        parameters = {
-            type = "object",
-            properties = {
-                itemsPracticed = {
-                    type = "array",
-                    items = {
-                        type = "object",
-                        properties = {
-                            item = {type = "string", description = "The item text (e.g., word, phrase) that was practiced"},
-                            correct = {type = "boolean", description = "Whether the learner got it correct (true for learned/mastered, false for needs practice)"},
-                        },
-                    },
-                    description = "Array of items practiced in this interaction. Each item has 'item' (text) and 'correct' (boolean).",
-                },
-            },
-            required = {"itemsPracticed"},
-        },
-    }, function(params, callback)
-        local itemsPracticed = params.itemsPracticed;
-        if not itemsPracticed or type(itemsPracticed) ~= "table" then
-            callback({success = false, llm_result = "itemsPracticed must be an array"});
-            return;
-        end
-        
-        -- Record items practiced
-        local recordedCount = 0;
-        for _, itemData in ipairs(itemsPracticed) do
-            if itemData.item then
-                self:UpdateLearningProgress(itemData.item, itemData.correct == true);
-                recordedCount = recordedCount + 1;
-            end
-        end
-        
-        -- Get current progress summary
-        local progress = self.learningProgress;
-        local itemCount = 0;
-        for _ in pairs(progress.itemsLearned) do
-            itemCount = itemCount + 1;
-        end
-        
-        local accuracy = progress.totalAttempts > 0 and math.floor(progress.totalCorrect / progress.totalAttempts * 100) or 0;
-        callback({
-            success = true,
-            llm_result = string.format("Recorded %d items. Total practiced: %d items, %d attempts, %d%% accuracy", 
-                recordedCount, itemCount, progress.totalAttempts, accuracy),
-        });
-    end);
-    
-    -- Tool: Record observation progress (for observation mode - record concepts taught and topics discussed)
-    self:RegisterTool("record_observation", {
-        description = "Record teaching progress in observation mode. Use this to track concepts/words you've introduced and topics you've discussed with the user. This helps track progress in open-ended learning tasks.",
-        parameters = {
-            type = "object",
-            properties = {
-                conceptsTaught = {
-                    type = "array",
-                    items = {type = "string"},
-                    description = "Array of concepts, words, or phrases you taught in this interaction (e.g., ['apple', 'red color', 'tree'])",
-                },
-                topic = {
-                    type = "string",
-                    description = "Brief description of the topic discussed (e.g., 'fruits in the garden', 'building a house')",
-                },
-                progressEstimate = {
-                    type = "number",
-                    description = "Estimated overall learning progress percentage (0-100) based on how much of the task has been covered",
-                },
-            },
-            required = {},
-        },
-    }, function(params, callback)
-        local progress = self.learningProgress;
-        local obsStats = progress.observationStats;
-        
-        -- Record concepts taught
-        local conceptsRecorded = 0;
-        if params.conceptsTaught and type(params.conceptsTaught) == "table" then
-            for _, concept in ipairs(params.conceptsTaught) do
-                if concept and concept ~= "" then
-                    if not obsStats.conceptsTaught[concept] then
-                        obsStats.conceptsTaught[concept] = {count = 0, lastTime = nil};
-                    end
-                    obsStats.conceptsTaught[concept].count = obsStats.conceptsTaught[concept].count + 1;
-                    obsStats.conceptsTaught[concept].lastTime = os.time();
-                    conceptsRecorded = conceptsRecorded + 1;
-                end
-            end
-        end
-        
-        -- Record topic discussed
-        if params.topic and params.topic ~= "" then
-            table.insert(obsStats.topicsDiscussed, params.topic);
-            -- Keep only last 20 topics
-            while #obsStats.topicsDiscussed > 20 do
-                table.remove(obsStats.topicsDiscussed, 1);
-            end
-        end
-        
-        -- Update progress estimate if provided
-        if params.progressEstimate and type(params.progressEstimate) == "number" then
-            progress.learningPercentage = math.max(0, math.min(100, params.progressEstimate));
-        end
-        
-        -- Count total concepts
-        local conceptCount = 0;
-        for _ in pairs(obsStats.conceptsTaught) do
-            conceptCount = conceptCount + 1;
-        end
-        
-        callback({
-            success = true,
-            llm_result = string.format("Recorded %d concepts. Total concepts taught: %d, Topics: %d, Progress: %d%%", 
-                conceptsRecorded, conceptCount, #obsStats.topicsDiscussed, progress.learningPercentage),
-        });
-    end);
 end
 
 --[[
@@ -3382,8 +3504,12 @@ function BackgroundAgent:OnLearningToolResult(sessionId, result)
         self.currentUISession = nil;
     end
     
-    -- Update learning progress if applicable
+    -- Normalize subject key
     local subject = pending.params.subject or pending.params.word;
+    if subject then
+        subject = string.lower(tostring(subject));
+    end
+    
     if subject and result.correct ~= nil then
         self:UpdateLearningProgress(subject, result.correct, {
             score = result.score,
@@ -3422,6 +3548,106 @@ function BackgroundAgent:OnLearningToolResult(sessionId, result)
             self:ProcessNextUIToolInQueue();
         end, 300); -- 300ms delay for smooth transition
     end
+end
+
+--[[
+    Called by LearningGiftBoxManager when a gift box learning task completes.
+    This bridges the gap between gift box completion and AI continuation:
+    the gift box flow uses nil callback (returns immediately to LLM), so when
+    the user finishes the minigame, the AI has no pending callback to resume.
+    This method explicitly triggers the AI to continue the learning session.
+    
+    @param toolName: string - Which learning tool was completed
+    @param result: table - {success, correct, score, userAnswer, cancelled, skipped}
+]]
+function BackgroundAgent:OnGiftBoxLearningComplete(toolName, result)
+    result = result or {};
+    
+    LOG.std(nil, "info", "BackgroundAgent", "Gift box learning complete: tool=%s, correct=%s, cancelled=%s",
+        tostring(toolName), tostring(result.correct), tostring(result.cancelled or result.skipped));
+    
+    -- Guard: only continue if agent is playing and in active phase
+    if self.playbackState ~= "playing" or self.agentPhase ~= "active" then
+        LOG.std(nil, "debug", "BackgroundAgent", "Skipping gift box continuation: state=%s, phase=%s",
+            self.playbackState, self.agentPhase);
+        return;
+    end
+    
+    -- Guard: don't overlap with active LLM calls
+    if self.isLLMProcessing then
+        LOG.std(nil, "debug", "BackgroundAgent", "LLM busy, queuing gift box result as user context");
+        -- Queue it as a pending context so next LLM call sees it
+        local msg = self:_FormatGiftBoxResultMessage(toolName, result);
+        table.insert(self.pendingUserRequests, msg);
+        return;
+    end
+    
+    -- Reset lastActivityTime to prevent DriveLearningSessionIfNeeded from racing
+    self.learningProgress.lastActivityTime = commonlib.TimerManager.GetCurrentTime();
+    
+    -- Build a continuation prompt based on the result
+    local prompt = self:_FormatGiftBoxResultMessage(toolName, result);
+    
+    -- Short delay so animations/coins finish before AI speaks
+    commonlib.TimerManager.SetTimeout(function()
+        if self.playbackState ~= "playing" then return; end
+        
+        self.isLearningInProgress = true;
+        self:ProcessWithLLM(prompt, function(llmResult)
+            self.isLearningInProgress = false;
+            if llmResult and llmResult.success then
+                self.learningProgress.lastActivityTime = commonlib.TimerManager.GetCurrentTime();
+            end
+        end, {includeImage = false, skipChatHistory = false});
+    end, 2000); -- 2 second delay for animation/coin effects to finish
+end
+
+--[[
+    Internal helper: format a gift box result into a prompt message for the LLM.
+    @param toolName: string
+    @param result: table
+    @return string
+]]
+function BackgroundAgent:_FormatGiftBoxResultMessage(toolName, result)
+    local parts = {};
+    local feedbackGuidance = self:GetOrchestrationPrompt("result_feedback");
+
+    if feedbackGuidance and feedbackGuidance ~= "" then
+        table.insert(parts, feedbackGuidance);
+    end
+    
+    if result.cancelled or result.skipped then
+        table.insert(parts, string.format(
+            "[System Event] The student closed/skipped the learning activity '%s' without completing it.",
+            toolName));
+        table.insert(parts, "Acknowledge the skip, reduce difficulty if needed, and continue the same topic with one smaller follow-up step.");
+    elseif result.correct == true then
+        table.insert(parts, string.format(
+            "[System Event] The student completed '%s' correctly!",
+            toolName));
+        if result.score then
+            table.insert(parts, string.format("Score: %d", result.score));
+        end
+        if result.userAnswer then
+            table.insert(parts, string.format("Their answer: %s", tostring(result.userAnswer)));
+        end
+        table.insert(parts, "Give brief praise, then either reinforce the same item once or move to the next item in the same topic. Do not introduce multiple new items.");
+    elseif result.correct == false then
+        table.insert(parts, string.format(
+            "[System Event] The student attempted '%s' but got it wrong.",
+            toolName));
+        if result.userAnswer then
+            table.insert(parts, string.format("Their answer was: %s", tostring(result.userAnswer)));
+        end
+        table.insert(parts, "Give one correction or hint, then continue the same item or topic in the next minimal step. Do not switch to new content yet.");
+    else
+        table.insert(parts, string.format(
+            "[System Event] The student completed the learning activity '%s'.",
+            toolName));
+        table.insert(parts, "Check the current learning log and choose the next minimal step using the priority order: recent mistakes, review items, then new content.");
+    end
+    
+    return table.concat(parts, " ");
 end
 
 --[[
@@ -3607,8 +3833,7 @@ function BackgroundAgent:OnTypewriterText(text)
     -- Emit a separate signal for immediate UI update (bypasses 100ms timer)
     self:chatContentUpdate(self.currentChatMessage.content);
     
-    -- Note: Don't call RefreshDebugUI here as it would cause input box to lose focus
-    -- Instead, the debug UI uses SetValue with a timer to update the streaming content
+
 end
 
 --[[
@@ -3787,15 +4012,7 @@ end
     @param callback: function - Called with result
 ]]
 function BackgroundAgent:ExecuteCopilotCode(copilotName, code, callback)
-    local manager = CopilotManager.GetInstance();
-    if not manager then
-        if callback then
-            callback({success = false, llm_result = "CopilotManager not found"});
-        end
-        LOG.std(nil, "warn", "BackgroundAgent", "CopilotManager not found");
-        return;
-    end
-    manager:RunCodeForCopilot(copilotName, code, callback);
+    self.codeTools:ExecuteCopilotCode(copilotName, code, callback);
 end
 
 --[[
@@ -3803,18 +4020,12 @@ end
     @param code: string - Npl blockly code to execute
 ]]
 function BackgroundAgent:ExecuteTerminalCode(code,callback)
-    -- Compile and execute the code
-    local manager = CopilotManager.GetInstance();
-    if not manager then
-        if callback then
-            callback({success = false, llm_result = "CopilotManager not found"});
-        end
-        return;
-    end
-    manager:RunTerminalCode(code, callback);
+    self.codeTools:ExecuteTerminalCode(code, callback);
 end
 
-
+function BackgroundAgent:ExecuteGlobalCode(codeStr, callback)
+    self.codeTools:ExecuteGlobalCode(codeStr, callback);
+end
 
 --------------------------------------------------------------------------------
 -- LLM Integration
@@ -3876,10 +4087,16 @@ end
     @return string - System prompt
 ]]
 function BackgroundAgent:GetCachedSystemPrompt()
-    -- Build cache key from task id and copilot count
+    -- Build cache key from task id, agent phase, skill, soul, and profile identity
     local taskId = self.primaryTask and self.primaryTask.id or "none";
-    local copilotCount = self.discoveredCopilots and #self.discoveredCopilots or 0;
-    local cacheKey = string.format("%s_%d", taskId, copilotCount);
+    local sopName = (self.sopState and self.sopState.activeSOP) or "none";
+    local soulName = (Soul and Soul.GetActiveName and Soul.GetActiveName()) or "none";
+    -- Include profile name+age so cache invalidates if profile changes mid-session
+    local profileHash = string.format("%s_%s",
+        tostring(self.userProfile.name or ""), tostring(self.userProfile.age or ""));
+    local agentName = self.agentName or "none";
+    local cacheKey = string.format("%s_%s_%s_%s_%s_%s",
+        agentName, taskId, self.agentPhase or "idle", sopName, soulName, profileHash);
     
     -- Return cached if valid
     if self.cachedSystemPrompt and self.systemPromptCacheKey == cacheKey then
@@ -3903,6 +4120,64 @@ function BackgroundAgent:InvalidateSystemPromptCache()
 end
 
 --[[
+    Build a lightweight skill catalog prompt for idle mode.
+    Lists all registered skills for the LLM context.
+    @return string - Markdown-formatted skill list, or "" if no skills
+]]
+function BackgroundAgent:BuildSkillCatalogPrompt()
+    -- Delegate to SkillManager's XML catalog builder
+    return SkillManager.BuildCatalogXML();
+end
+
+--[[
+    Build L1 session layer: recent session notes for cross-session continuity.
+    @param sopName: string - The active skill name
+    @return string - Formatted session insights, or "" if none
+]]
+function BackgroundAgent:BuildL1SessionLayer(sopName)
+    if not sopName then return ""; end
+    
+    -- Read learning log file directly
+    local logFile = DEFAULT_LEARNING_LOG_FILE;
+    local readResult = self.fileTools:ReadFile(logFile);
+    if not readResult.success or not readResult.content or readResult.content == "" then
+        return "";
+    end
+    
+    -- Extract the last N session note blocks (### Session Note sections)
+    -- Uses string.find loop instead of gmatch to avoid boundary consumption
+    -- (gmatch with \n### at both ends skips every other block)
+    local notes = {};
+    local content = readResult.content;
+    local pos = 1;
+    while true do
+        local hStart, hEnd = content:find("### Session Note[^\n]*\n", pos);
+        if not hStart then break; end
+        local bodyStart = hEnd + 1;
+        local nextH3 = content:find("\n###", bodyStart);
+        local bodyEnd = nextH3 or #content;
+        local block = content:sub(bodyStart, bodyEnd):match("^(.-)%s*$") or "";
+        if block ~= "" then
+            table.insert(notes, block);
+        end
+        pos = nextH3 and (nextH3 + 1) or (#content + 1);
+    end
+    
+    -- Take only the 3 most recent
+    local recent = {};
+    local startIdx = math.max(1, #notes - 2);
+    for i = startIdx, #notes do
+        table.insert(recent, notes[i]);
+    end
+    
+    if #recent == 0 then return ""; end
+    
+    return "\n\n## Recent Session Insights (L1)\n"
+        .. "_Cross-session teaching notes, auto-extracted from previous sessions._\n\n"
+        .. table.concat(recent, "\n\n---\n\n") .. "\n";
+end
+
+--[[
     Build the learning-aware system prompt
     @return string - System prompt with learning context
 ]]
@@ -3911,129 +4186,96 @@ function BackgroundAgent:BuildLearningSystemPrompt()
     local task = self.primaryTask;
     local prompt = "";
     
-    -- Get dynamic copilot section based on registered copilots
-    local copilotSection = self:GetCopilotPromptSection();
-    local hasCopilots = self:HasCopilots();
-    
-    -- Check if we have a learning task
+    -- Check if we have a learning task (covers both profile-collection and learning phases)
     if task then
-        -- Learning mode prompt
-        prompt = string.format([[You are a friendly learning companion in Paracraft, a 3D creative game.
-Your name is 帕帕 (papa). When asked about your name, ALWAYS say "帕帕".
-You are helping a %d-year-old %s speaker learn %s.
-
-## Response Language (CRITICAL)
-- ALWAYS respond in %s (the learner's native language)
-- Only use %s for the learning content itself (words, phrases, example sentences)
-- All explanations, instructions, encouragement, and conversation MUST be in %s
-- Example: "我们来学一个新单词：**apple**（苹果）- I like to eat apples."
-
-Your personality:
-- Playful, encouraging, and patient
-- Use age-appropriate language and explanations
-- Celebrate successes enthusiastically
-- Provide gentle hints when the learner struggles
-
-## Teaching Style (CRITICAL)
-- NEVER ask "要不要学？", "想学吗？", "要不要现在学一学？" or similar questions
-- DO NOT wait for user's permission to teach - just START teaching directly
-- After teaching one word, immediately move to the next word or test
-- Keep the momentum going - learning should feel like a natural flow, not a conversation
-- Example: Instead of "要不要学 rabbit？" say "接下来我们学 rabbit（兔子）！"
-
-## Greeting Rule
-- ONLY greet the user (e.g., "你好！欢迎来到Paracraft！") on the FIRST interaction when chat history is empty.
-- For ALL subsequent interactions, DO NOT repeat greetings or welcome messages.
-- Jump directly into teaching, commenting on the scene, or responding to the user.
-
-## Primary Learning Task
-
-%s
-
-IMPORTANT: While you can help with other activities the user wants to do (building, playing, exploring),
-always look for natural opportunities to weave in learning moments related to the primary task.
-Don't force learning, but gently guide back to the task when appropriate.
-
-Evaluate task completion based on the chat history and learning progress.
-When you believe the task goals have been met, inform the user of their achievement.
-
-## Tool Usage Guidelines
-
-### CRITICAL: Multiple Tool Calls
-When you need to call multiple tools (e.g., show_learning_content AND record_observation):
-- Return them as SEPARATE tool_calls in the same response array
-- Each tool call must have its own name, arguments, and id
-- NEVER concatenate tool names like "tool1tool2" - this is WRONG
-- Correct format example:
-  ```json
-  [
-    {"type": "function", "function": {"name": "show_learning_content", "arguments": "{...}"}, "id": "call_1"},
-    {"type": "function", "function": {"name": "record_observation", "arguments": "{...}"}, "id": "call_2"}
-  ]
-  ```
-
-### Learning Cycle (IMPORTANT)
-Follow a "Teach → Test → Review" cycle:
-1. **Teach 2-3 new words** using `show_learning_content`
-2. **Test the user** on those words using test tools
-3. **Review and reinforce** based on results
-
-### Tool Selection:
-- `show_learning_content` - Introduce NEW words (flashcard style)
-- `test_multiple_choice` - Test vocabulary understanding (good for beginners)
-- `test_words_speaking` - Test pronunciation (after user has seen the word)
-- `test_words_spelling` - Test spelling (harder, use after some practice)
-
-### Progress Tracking (CRITICAL)
-**Observation Mode:** After EACH interaction where you teach or discuss something:
-- Call `record_observation` with `conceptsTaught` (words/phrases you introduced)
-- Include `topic` (what scene element you discussed)
-- Estimate `progressEstimate` based on variety of concepts covered
-
-**Structured Mode:** After EACH test:
-- Call `set_learning_progress` with `itemsPracticed` to record results
-
-### Checking Before Teaching
-Always check the "Concepts Introduced" section in Learning Progress to:
-- Avoid teaching the same words repeatedly
-- Test words that have been taught but not yet tested
-- If 2+ concepts were taught without testing, prioritize using a test tool
-
-IMPORTANT: Learning progress is already provided in context below. Do NOT call `get_learning_progress` tool unless user explicitly asks for progress details.
-
-]], profile.age, profile.primaryLanguage, profile.secondaryLanguage, 
-    profile.primaryLanguage, profile.secondaryLanguage, profile.primaryLanguage,
-    task.text);
+        -- Build learning prompt: Soul → Agent → Profile → Task → Skills → Session
+        local sopName = (self.sopState and self.sopState.activeSOP) or "user-profile";
         
-        -- Add copilot section if copilots are available
-        if hasCopilots then
-            prompt = prompt .. "\n## Available Copilot Characters\n\n" .. copilotSection .. "\n";
+        -- [1] Soul identity prompt
+        prompt = Soul.GetFullPrompt() or "";
+        
+        -- [2] Agent prompt (red lines, routing — injected verbatim from agent.md)
+        if self.agentPrompt and self.agentPrompt ~= "" then
+            prompt = prompt .. "\n\n" .. self.agentPrompt;
         end
         
-        prompt = prompt .. [[
-
-Always end your responses by briefly restating the current learning goal and progress if relevant.
-]];
-    else
-        -- General assistant mode prompt (no learning task)
-        prompt = [[You are a helpful assistant in Paracraft, a 3D creative game.
-
-Your capabilities:
-- Understand user's voice commands and convert them to actions
-- Help with building, exploring, and managing the game world
-- Use the provided tools when appropriate to accomplish tasks
-]];
+        -- [3] Student profile summary
+        local profileSummary = "";
+        if profile then
+            local parts = {};
+            if profile.name then table.insert(parts, "- **Name**: " .. tostring(profile.name)); end
+            if profile.age then table.insert(parts, "- **Age**: " .. tostring(profile.age)); end
+            if profile.grade then table.insert(parts, "- **Grade**: " .. tostring(profile.grade)); end
+            if profile.interests then
+                local val = type(profile.interests) == "table" and table.concat(profile.interests, ", ") or tostring(profile.interests);
+                table.insert(parts, "- **Interests**: " .. val);
+            end
+            if profile.learningGoal then table.insert(parts, "- **Learning Goal**: " .. tostring(profile.learningGoal)); end
+            if profile.englishLevel then table.insert(parts, "- **English Level**: " .. tostring(profile.englishLevel)); end
+            if profile.codingLevel then table.insert(parts, "- **Coding Level**: " .. tostring(profile.codingLevel)); end
+            if #parts > 0 then
+                profileSummary = "\n\n## Student Profile\n" .. table.concat(parts, "\n") .. "\n";
+            end
+        end
+        if profileSummary ~= "" then
+            prompt = prompt .. profileSummary;
+        end
         
-        -- Add copilot section if copilots are available
-        if hasCopilots then
-            prompt = prompt .. "\n## Available Copilot Characters\n\n" .. copilotSection .. "\n";
+        -- [4] Existing profile data (JSON from file, so LLM can check completeness)
+        local existingProfileData = self.sopState and self.sopState.existingProfile;
+        if type(existingProfileData) == "table" and existingProfileData.name then
+            local profileJson = FormatProfileJSON(existingProfileData);
+            prompt = prompt .. "\n\n## 当前用户档案数据\n\n";
+            prompt = prompt .. "```json\n" .. profileJson .. "\n```\n";
         else
-            prompt = prompt .. "\nCurrently no copilot characters are available.\n";
+            prompt = prompt .. "\n\n## 当前用户档案数据\n\n当前没有用户档案。\n";
+        end
+        
+        -- [5] Profile/teaching decision policy
+        prompt = prompt .. "\n## 📋 档案与教学决策\n\n";
+        prompt = prompt .. "请根据上方用户档案数据和技能说明自主判断：\n";
+        prompt = prompt .. "- 如果核心字段（name, age）缺失，先通过对话收集用户信息\n";
+        prompt = prompt .. "- 如果进入英语或编程教学前缺少对应领域 level，本轮只能补 level，不能开始正式教学\n";
+        prompt = prompt .. "- 只有在核心字段和对应领域 level 已知后，才进入正式教学\n";
+        prompt = prompt .. "- 教学项选择优先级为：最近错误项 > 待复习项 > 新内容\n";
+        prompt = prompt .. "收集到用户信息后，用 `read_file` 读取当前 `user_profile.md`，修改 JSON 后用 `create_file` 写回完整 JSON。\n";
+        
+        -- [6] Skill catalog (LLM discovers and reads SKILL.md on demand)
+        local skillCatalog = self:BuildSkillCatalogPrompt();
+        if skillCatalog and skillCatalog ~= "" then
+            prompt = prompt .. "\n\n" .. skillCatalog;
+        end
+        
+        -- [7] Current task
+        prompt = prompt .. string.format("\n\n## Current Task: Learning\n- **Topic**: %s\n", task.text or "General");
+        
+        -- [8] Session history (unified metrics + L1 session notes)
+        local sessionHistory = self:GetUnifiedSessionHistory(sopName);
+        if sessionHistory and sessionHistory ~= "" then
+            prompt = prompt .. sessionHistory;
+        end
+    else
+        -- Idle mode: Soul → Agent → Skills → Idle instructions
+        prompt = Soul.GetFullPrompt() or "";
+        
+        -- Inject agent prompt in idle mode too (red lines always apply)
+        if self.agentPrompt and self.agentPrompt ~= "" then
+            prompt = prompt .. "\n\n" .. self.agentPrompt;
+        end
+        
+        -- Build skill catalog so LLM knows what skills are available to activate
+        local skillCatalog = self:BuildSkillCatalogPrompt();
+        if skillCatalog and skillCatalog ~= "" then
+            prompt = prompt .. "\n\n" .. skillCatalog;
         end
         
         prompt = prompt .. [[
 
-Respond in Chinese. Keep responses brief (1-2 sentences).
+## Current Mode: Idle (待机模式)
+You are a helpful assistant in a 3D creative world (Paracraft).
+You can chat with the user, help with building/exploring, and activate learning skills when needed.
+
+When idle, keep responses brief (1-2 sentences). 直接回复，跳过推理过程。
 ]];
     end
 
@@ -4050,20 +4292,29 @@ function BackgroundAgent:ProcessWithLLM(userQuery, callback, options)
     options = options or {};
     local includeImage = options.includeImage ~= false;
     
-    -- Request queue: if LLM is busy, queue this request and return
+    -- Request queue: if LLM is busy, queue text only and discard the callback.
+    -- Reset any caller-side state flags so they don't stay stuck permanently.
     if self.isLLMProcessing then
         table.insert(self.pendingUserRequests, userQuery);
         LOG.std(nil, "debug", "BackgroundAgent", "LLM busy, queued request: %s (queue size: %d)", 
-            string.sub(userQuery, 1, 50), #self.pendingUserRequests);
-        return;  -- Callback is discarded, merged request will handle response
+            string.sub(userQuery or "", 1, 50), #self.pendingUserRequests);
+        -- Callback is discarded — proactively reset states the caller set before this call
+        self.isLearningInProgress = false;
+        self.isInitialLearningSession = false;
+        self.voiceLLMThrottle.isProcessing = false;
+        return;
     end
     
-    -- Merge any pending requests (FIFO order)
+    -- Merge any pending requests (FIFO order); callbacks were already discarded at queue time
     if #self.pendingUserRequests > 0 then
-        local mergedQuery = table.concat(self.pendingUserRequests, "\n\n") .. "\n\n" .. userQuery;
-        userQuery = mergedQuery;
+        local parts = {};
+        for _, entry in ipairs(self.pendingUserRequests) do
+            table.insert(parts, entry);
+        end
+        table.insert(parts, userQuery);
+        userQuery = table.concat(parts, "\n\n");
         self.pendingUserRequests = {};  -- Clear queue
-        LOG.std(nil, "debug", "BackgroundAgent", "Merged pending requests into current query");
+        LOG.std(nil, "debug", "BackgroundAgent", "Merged %d pending requests into current query", #parts - 1);
     end
     
     -- Mark LLM as processing and reset tool call hint state
@@ -4080,6 +4331,10 @@ function BackgroundAgent:ProcessWithLLM(userQuery, callback, options)
     
     -- Detect if user request is scene-related (determines full vs brief scene context)
     local isSceneRelated = self:IsSceneRelatedRequest(userQuery);
+    -- P2-4: L2 Real-time Context Priority Grading
+    -- Observation mode always gets full scene context (teacher needs to see what student does)
+    local isObservationActive = self.observationMode and self.observationMode.isActive;
+    local needsFullScene = isSceneRelated or isObservationActive;
     
     -- Build the prompt with optimized order:
     -- 1. User Request (first for LLM attention priority)
@@ -4098,20 +4353,29 @@ function BackgroundAgent:ProcessWithLLM(userQuery, callback, options)
     -- Add dialog history context (summary + recent, with reference markers)
     fullPrompt = fullPrompt .. self:GetDialogContext();
     
-    -- Add context history summary (recent screenshots and voice)
+    -- P2-4: Context priority grading
+    -- ALWAYS: user_request + dialog_history (included above)
+    -- ALWAYS: voice context (part of contextSummary)
+    -- CONDITIONAL: scene context + screenshots (only when scene-related or observation mode)
+    -- ON-DEMAND: full context history via get_scene_context tool
+
+    -- Add context history summary (recent voice transcriptions — always included)
+    -- Scene screenshots in context summary are trimmed for non-scene requests
     local contextSummary = self:GetContextHistorySummary();
     if contextSummary and contextSummary ~= "" then
         fullPrompt = fullPrompt .. contextSummary .. "\n";
     end
     
-    -- Add scene context (full mode for scene-related requests, brief mode otherwise)
+    -- Add scene context: full mode when scene-related or observation, brief otherwise
     local sceneContext = self:GetSceneTextContext();
-    fullPrompt = fullPrompt .. self:FormatSceneContextAsMarkdown(sceneContext, includeImage, isSceneRelated);
+    fullPrompt = fullPrompt .. self:FormatSceneContextAsMarkdown(sceneContext, includeImage and needsFullScene, needsFullScene);
     
-    -- Add learning progress
-    if self.primaryTask then
-        fullPrompt = fullPrompt .. "\n" .. self:GetLearningProgressSummary() .. "\n";
-    end
+    -- P2-4: Only inject screenshot images for scene-related or observation requests.
+    -- Non-scene requests skip image payload entirely to save tokens.
+    local shouldIncludeImage = includeImage and needsFullScene;
+    
+    -- Learning progress is now in system prompt (BuildLearningSystemPrompt),
+    -- no longer duplicated here in user message.
     
     -- Note: Tools are now registered via AIChat's native tool calling system
     -- No need to include them in the prompt text
@@ -4130,9 +4394,9 @@ function BackgroundAgent:ProcessWithLLM(userQuery, callback, options)
         self.learningProgress.lastActivityTime = commonlib.TimerManager.GetCurrentTime();
     end
     
-    -- Prepare image data if requested
+    -- Prepare image data if requested and context is scene-related (P2-4)
     local askOptions = {};
-    if includeImage then
+    if shouldIncludeImage then
         local imageUrl = nil;
         
         -- First, check if imageUrl was passed directly in options (from voice processing)
@@ -4171,7 +4435,15 @@ end
     @param callback: function(result) - Called with response
 ]]
 function BackgroundAgent:SendToLLMWithHistoryTracking(prompt, options, callback)
+    -- Start watchdog timer to auto-recover if LLM callback never fires
+    self:_StartLLMWatchdog();
+    
     self:SendToLLM(prompt, options, function(result)
+        LOG.std(nil, "debug", "BackgroundAgent", "SendToLLMWithHistoryTracking callback fired: success=%s phase=%s responseLen=%s",
+            tostring(result.success), tostring(self.agentPhase), tostring(result.response and #result.response or 0));
+        -- Cancel watchdog — callback fired normally
+        self:_CancelLLMWatchdog();
+        
         -- Mark LLM as no longer processing
         self.isLLMProcessing = false;
         
@@ -4188,6 +4460,8 @@ function BackgroundAgent:SendToLLMWithHistoryTracking(prompt, options, callback)
                 
                 -- Schedule retry with exponential backoff
                 local retryDelay = self.llmRetry.retryDelay * self.llmRetry.currentRetryCount;
+                -- Keep isLLMProcessing = true during retry to prevent race conditions
+                self.isLLMProcessing = true;
                 self:ScheduleLLMRetry(prompt, options, callback, retryDelay);
                 return; -- Don't call callback yet, will be called after retry
             else
@@ -4202,6 +4476,45 @@ function BackgroundAgent:SendToLLMWithHistoryTracking(prompt, options, callback)
         -- Record assistant response in dialog history
         if result.success and result.response then
             self:AddToDialogHistory("assistant", result.response);
+            
+            -- E: Tool-call omission detection
+            -- If LLM text mentions learning activities but made no tool calls,
+            -- log a warning. The next idle cycle will naturally re-engage.
+            if self.agentPhase == "active" and not self.isToolCallInProgress then
+                local resp = string.lower(result.response or "");
+                -- Dynamically check against registered tool names instead of hardcoded strings
+                local mentionedTool = false;
+                if self.tools then
+                    for toolName, _ in pairs(self.tools) do
+                        if resp:find(string.lower(toolName), 1, true) then
+                            mentionedTool = true;
+                            break;
+                        end
+                    end
+                end
+                if mentionedTool then
+                    LOG.std(nil, "warn", "BackgroundAgent",
+                        "[ToolOmission] LLM mentioned a learning tool but made no tool_call. "
+                        .. "Response snippet: %s", string.sub(result.response, 1, 120));
+                end
+            end
+            
+            -- Active phase: manage dialogue flow
+            -- After LLM file tool calls (create_file on user_profile.md), sync profile from file to keep in-memory state fresh
+            SyncProfileFromFile(self);
+            
+            if self.agentPhase == "active" then
+                if self.isInitialLearningSession then
+                    -- First response: let it flow without blocking for reply
+                    LOG.std(nil, "debug", "BackgroundAgent", "Active phase: initial session, NOT blocking for reply");
+                else
+                    -- Interactive dialogue mode: wait for student reply after every LLM response
+                    -- The idle timer (DriveLearningSessionIfNeeded) will gently nudge if student is silent too long
+                    self.waitingForUserReply = true;
+                    self.waitingForUserReplyStartTime = commonlib.TimerManager.GetCurrentTime();
+                    LOG.std(nil, "debug", "BackgroundAgent", "Active phase: dialogue mode, waiting for student reply");
+                end
+            end
         end
         
         if callback then
@@ -4225,17 +4538,50 @@ function BackgroundAgent:ScheduleLLMRetry(prompt, options, callback, delay)
     end
     
     -- Create new retry timer
+    -- Note: isLLMProcessing is kept true by the caller to prevent race conditions
     self.llmRetry.pendingRetry = commonlib.Timer:new({
         callbackFunc = function(timer)
             LOG.std(nil, "info", "BackgroundAgent", "Executing LLM retry attempt");
             self.llmRetry.pendingRetry = nil;
             
-            -- Re-send the request
-            self.isLLMProcessing = true;
+            -- Re-send the request (isLLMProcessing is already true)
             self:SendToLLMWithHistoryTracking(prompt, options, callback);
         end
     });
     self.llmRetry.pendingRetry:Change(delay, nil); -- One-shot timer
+end
+
+--[[
+    Start a watchdog timer for isLLMProcessing.
+    If the LLM callback never fires (network timeout, crash, etc.),
+    the watchdog resets isLLMProcessing after the configured timeout
+    to prevent the agent from being permanently stuck.
+]]
+function BackgroundAgent:_StartLLMWatchdog()
+    self:_CancelLLMWatchdog();
+    self.llmProcessingWatchdog = commonlib.Timer:new({
+        callbackFunc = function(timer)
+            if self.isLLMProcessing then
+                LOG.std(nil, "error", "BackgroundAgent", 
+                    "LLM processing watchdog triggered after %dms — force resetting isLLMProcessing",
+                    self.llmProcessingWatchdogTimeout);
+                self.isLLMProcessing = false;
+                self.isLearningInProgress = false;
+                self.llmProcessingWatchdog = nil;
+            end
+        end
+    });
+    self.llmProcessingWatchdog:Change(self.llmProcessingWatchdogTimeout, nil);
+end
+
+--[[
+    Cancel the LLM processing watchdog timer.
+]]
+function BackgroundAgent:_CancelLLMWatchdog()
+    if self.llmProcessingWatchdog then
+        self.llmProcessingWatchdog:Change();
+        self.llmProcessingWatchdog = nil;
+    end
 end
 
 --[[
@@ -4303,88 +4649,53 @@ function BackgroundAgent:SendToLLM(prompt, options, callback)
                 -- Tool calls received from LLM in delegate mode
                 LOG.std(nil, "debug", "BackgroundAgent", "Received %d tool calls from LLM (delegate mode)", #toolCallInfo.toolCalls);
                 
+                -- Save first-turn text BEFORE entering tool chain.
+                -- When LLM outputs tool calls + text in the same turn,
+                -- the continuation response may NOT contain the text. We preserve it here.
+                llmEntry._firstTurnText = fullResult;
+                
                 -- Update LLM history entry with tool calls
                 llmEntry.toolCalls = toolCallInfo.toolCalls;
                 llmEntry.status = "tool_calling";
-                self:RefreshDebugUI();
                 
-                -- Handle tool calls through the strategy executor
-                self:HandleToolCallsFromLLM(toolCallInfo, function(toolResults)
-                    -- Tool execution complete, store results
-                    llmEntry.toolResults = toolResults;
-                    
-                    -- Continue conversation with tool results
-                    self.aiSession:ContinueWithToolResults(toolResults, function(contResultCode, contDelta, contDeltaThink, contFullResult, contFullThink, contToolCallInfo)
-                        -- Recursive handling for potential follow-up tool calls
-                        if contResultCode then
-                            if contToolCallInfo and contToolCallInfo.toolCalls and #contToolCallInfo.toolCalls > 0 then
-                                -- More tool calls - recurse (this can create a chain)
-                                LOG.std(nil, "debug", "BackgroundAgent", "Follow-up tool calls detected, continuing chain");
-                                -- Re-invoke the callback with new tool info (this is a simplified recursive approach)
-                                -- In practice, the ContinueWithToolResults callback is the same as Ask callback
-                                self:HandleToolCallsFromLLM(contToolCallInfo, function(moreResults)
-                                    self.aiSession:ContinueWithToolResults(moreResults, function(finalCode, _delta, _deltaThink, finalResult, finalThink)
-                                        -- Complete the final result
-                                        self:_CompleteLLMResponse(llmEntry, startTime, finalCode, finalResult, finalThink, callback);
-                                    end, options);
-                                end);
-                            else
-                                -- Final response after tool calls
-                                self:_CompleteLLMResponse(llmEntry, startTime, contResultCode, contFullResult, contFullThink, callback);
-                            end
-                        else
-                            -- Streaming during continuation (after tool calls)
-                            self:_HandleLLMStreamingDelta(contDelta, contDeltaThink);
+                -- Handle tool calls through recursive chain (supports up to maxToolChainDepth levels)
+                local maxToolChainDepth = self.maxToolChainDepth or 5;
+                local function continueToolChain(tcInfo, depth)
+                    self:HandleToolCallsFromLLM(tcInfo, function(toolResults)
+                        if depth == 1 then
+                            llmEntry.toolResults = toolResults;
                         end
-                    end, options);
-                end);
+                        
+                        self.aiSession:ContinueWithToolResults(toolResults, function(contResultCode, contDelta, contDeltaThink, contFullResult, contFullThink, contToolCallInfo)
+                            if contResultCode then
+                                if contToolCallInfo and contToolCallInfo.toolCalls and #contToolCallInfo.toolCalls > 0 then
+                                    if depth >= maxToolChainDepth then
+                                        LOG.std(nil, "warn", "BackgroundAgent", "Tool call chain exceeded %d levels, force-completing", maxToolChainDepth);
+                                        self:_CompleteLLMResponse(llmEntry, startTime, contResultCode, contFullResult, contFullThink, callback);
+                                    else
+                                        LOG.std(nil, "debug", "BackgroundAgent", "Follow-up tool calls detected (depth %d/%d), continuing chain", depth, maxToolChainDepth);
+                                        continueToolChain(contToolCallInfo, depth + 1);
+                                    end
+                                else
+                                    self:_CompleteLLMResponse(llmEntry, startTime, contResultCode, contFullResult, contFullThink, callback);
+                                end
+                            else
+                                local streamOk, streamErr = pcall(function()
+                                    self:_HandleLLMStreamingDelta(contDelta, contDeltaThink);
+                                end);
+                                if not streamOk then
+                                    LOG.std(nil, "error", "BackgroundAgent", "Continuation streaming error at depth %d (non-fatal): %s", depth, tostring(streamErr));
+                                end
+                            end
+                        end, options);
+                    end);
+                end
+                continueToolChain(toolCallInfo, 1);
                 return;
             end
             
-            -- Process any remaining text in sentence buffer for auto-speak
-            if self:IsAutoSpeakEnabled() and self.sentenceBuffer and self.sentenceBuffer ~= "" then
-                local trimmed = self.sentenceBuffer:match("^%s*(.-)%s*$");
-                if trimmed and trimmed ~= "" then
-                    self:QueueTTSSentence(trimmed);
-                end
-                self.sentenceBuffer = "";
-            end
-            
-            -- Flush TTS buffer to actually play accumulated text
-            if self:IsAutoSpeakEnabled() then
-                self:FlushTTSBuffer();
-            end
-            
-            -- Complete current chat message and add to history
-            self:CompleteChatMessage();
-            
-            -- Final result (AIChat has already handled any tool calls automatically in auto mode)
-            local result = {
-                success = resultCode == 200,
-                code = resultCode,
-                response = fullResult,
-                thinking = fullThink,
-                markdown = fullResult,
-            };
-            
-            -- Update LLM history entry
-            llmEntry.output = {
-                response = fullResult,
-                thinking = fullThink,
-                code = resultCode,
-            };
-            llmEntry.status = resultCode == 200 and "success" or "error";
-            
-            -- Refresh debug UI
-            self:RefreshDebugUI();
-            
-            self:DebugLog("LLM_OUTPUT", "code=%s response=%s", tostring(resultCode), fullResult or "");
-            
-            if callback then
-                callback(result);
-            end
-            
-            self:llmResponseReceived(result);
+            -- Use shared _CompleteLLMResponse for both direct and tool-chain paths
+            self:_CompleteLLMResponse(llmEntry, startTime, resultCode, fullResult, fullThink, callback);
         else
             -- Streaming delta (resultCode is nil)
             -- Process delta for auto-speak if enabled
@@ -4569,7 +4880,7 @@ function BackgroundAgent:ExecuteToolsByStrategy(toolCalls, callback)
                 return a.pos < b.pos;
             end);
             
-            -- Try to auto-fix concatenated tool calls (e.g., "tool1tool2" -> ["tool1", "tool2"])
+            -- Try to auto-fix concatenated tool calls (e.g., "tool1tool2tool3" -> ["tool1", "tool2", "tool3"])
             if #matchedTools >= 2 then
                 -- Find non-overlapping tools that cover the concatenated name
                 local selectedTools = {};
@@ -4581,27 +4892,39 @@ function BackgroundAgent:ExecuteToolsByStrategy(toolCalls, callback)
                     end
                 end
                 
-                -- If we found exactly 2 tools that make up the concatenated name
-                if #selectedTools == 2 then
-                    LOG.std(nil, "info", "BackgroundAgent", "Auto-splitting concatenated tool call: %s -> %s, %s", 
-                        funcName, selectedTools[1].name, selectedTools[2].name);
+                -- If we found 2+ tools that make up the concatenated name
+                if #selectedTools >= 2 then
+                    local toolNameList = {};
+                    for _, t in ipairs(selectedTools) do table.insert(toolNameList, t.name); end
+                    LOG.std(nil, "info", "BackgroundAgent", "Auto-splitting concatenated tool call (%d tools): %s -> [%s]", 
+                        #selectedTools, funcName, table.concat(toolNameList, ", "));
                     
-                    -- Try to split the arguments by finding }{ pattern
+                    -- Split concatenated JSON arguments "{...}{...}{...}" into N parts
+                    -- Strategy: find all top-level JSON objects by tracking brace depth
                     local splitArgs = {};
-                    local firstJson, secondJson = argsStr:match("^({.-})({.+})$");
-                    if firstJson and secondJson then
-                        splitArgs[1] = firstJson;
-                        splitArgs[2] = secondJson;
-                    else
-                        -- Fallback: try splitting by }{
-                        local splitPos = argsStr:find("}{", 1, true);
-                        if splitPos then
-                            splitArgs[1] = argsStr:sub(1, splitPos);
-                            splitArgs[2] = argsStr:sub(splitPos + 1);
-                        else
-                            splitArgs[1] = argsStr;
-                            splitArgs[2] = "{}";
+                    if argsStr and argsStr ~= "" then
+                        local depth = 0;
+                        local objStart = nil;
+                        for i = 1, #argsStr do
+                            local ch = argsStr:sub(i, i);
+                            if ch == "{" then
+                                if depth == 0 then
+                                    objStart = i;
+                                end
+                                depth = depth + 1;
+                            elseif ch == "}" then
+                                depth = depth - 1;
+                                if depth == 0 and objStart then
+                                    table.insert(splitArgs, argsStr:sub(objStart, i));
+                                    objStart = nil;
+                                end
+                            end
                         end
+                    end
+                    
+                    -- Pad or trim splitArgs to match selectedTools count
+                    while #splitArgs < #selectedTools do
+                        table.insert(splitArgs, "{}");
                     end
                     
                     -- Create synthetic tool calls for each split tool
@@ -4616,14 +4939,53 @@ function BackgroundAgent:ExecuteToolsByStrategy(toolCalls, callback)
                         });
                     end
                     
-                    -- Execute the split tool calls recursively
-                    self:ExecuteToolsByStrategy(syntheticCalls, function(splitResults)
-                        -- Combine results
-                        local combinedContent = "Auto-split tool execution:\n";
-                        for _, result in ipairs(splitResults) do
-                            combinedContent = combinedContent .. result.content .. "\n";
+                    -- Expand the concatenated call into N proper tool calls:
+                    -- 1. Replace original toolCalls[idx] with the synthetic calls
+                    -- 2. Update AIChat history so assistant message has N tool_calls
+                    -- 3. Return N individual tool results for ContinueWithToolResults
+                    
+                    -- Update AIChat pending messages: replace the single concatenated
+                    -- tool_call in the assistant message with the N synthetic calls
+                    if self.aiSession and self.aiSession.pendingMessages then
+                        for _, msg in ipairs(self.aiSession.pendingMessages) do
+                            if msg.role == "assistant" and msg.tool_calls then
+                                for j, tc in ipairs(msg.tool_calls) do
+                                    if tc.id == callId then
+                                        -- Remove the concatenated entry and insert synthetics
+                                        table.remove(msg.tool_calls, j);
+                                        for k = #syntheticCalls, 1, -1 do
+                                            table.insert(msg.tool_calls, j, syntheticCalls[k]);
+                                        end
+                                        break;
+                                    end
+                                end
+                            end
                         end
-                        toolResults[callId] = { tool_call_id = callId, content = combinedContent };
+                    end
+                    -- Also update AIChat.history
+                    if self.aiSession and self.aiSession.history then
+                        for _, msg in ipairs(self.aiSession.history) do
+                            if msg.role == "assistant" and msg.tool_calls then
+                                for j, tc in ipairs(msg.tool_calls) do
+                                    if tc.id == callId then
+                                        table.remove(msg.tool_calls, j);
+                                        for k = #syntheticCalls, 1, -1 do
+                                            table.insert(msg.tool_calls, j, syntheticCalls[k]);
+                                        end
+                                        break;
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    
+                    -- Execute the split tool calls and return N individual results
+                    self:ExecuteToolsByStrategy(syntheticCalls, function(splitResults)
+                        -- Register each split result individually (not combined)
+                        for _, result in ipairs(splitResults) do
+                            toolResults[result.tool_call_id] = result;
+                            table.insert(toolOrder, result.tool_call_id);
+                        end
                         completedCount = completedCount + 1;
                         checkAllComplete();
                     end);
@@ -4658,8 +5020,20 @@ function BackgroundAgent:ExecuteToolsByStrategy(toolCalls, callback)
             -- Execute based on strategy mode
             pendingCount = pendingCount + 1;
             
+            local toolCompleted = false;  -- Guard against double completion
             local function onToolComplete(result)
+                if toolCompleted then
+                    LOG.std(nil, "warn", "BackgroundAgent", "Tool %s (call %s) completed more than once, ignoring duplicate", funcName, callId);
+                    return;
+                end
+                toolCompleted = true;
                 completedCount = completedCount + 1;
+                
+                -- Cancel timeout timer if set
+                if toolTimeoutTimers and toolTimeoutTimers[callId] then
+                    toolTimeoutTimers[callId]:Change(nil, nil);
+                    toolTimeoutTimers[callId] = nil;
+                end
                 
                 -- Calculate duration
                 local duration = ParaGlobal.timeGetTime() - toolStartTimes[callId];
@@ -4678,6 +5052,34 @@ function BackgroundAgent:ExecuteToolsByStrategy(toolCalls, callback)
                 checkAllComplete();
             end
             
+            -- Set up timeout enforcement if strategy defines a timeout
+            local timeoutMs = strategy.timeout;
+            if not timeoutMs then
+                -- Default timeouts by mode
+                if strategy.mode == "ui_blocking" then
+                    timeoutMs = 300000;  -- 5 minutes for UI blocking tools
+                elseif strategy.mode == "async" then
+                    timeoutMs = 60000;   -- 60 seconds for async tools
+                end
+            end
+            if timeoutMs and timeoutMs > 0 then
+                local toolTimeoutTimers = self._toolTimeoutTimers;
+                if not toolTimeoutTimers then
+                    toolTimeoutTimers = {};
+                    self._toolTimeoutTimers = toolTimeoutTimers;
+                end
+                toolTimeoutTimers[callId] = commonlib.Timer:new({
+                    callbackFunc = function(timer)
+                        timer:Change(nil, nil);
+                        if not toolCompleted then
+                            LOG.std(nil, "error", "BackgroundAgent", "Tool %s (call %s) timed out after %dms", funcName, callId, timeoutMs);
+                            onToolComplete({success = false, error = string.format("Tool execution timed out after %dms", timeoutMs)});
+                        end
+                    end
+                });
+                toolTimeoutTimers[callId]:Change(timeoutMs, nil);  -- One-shot timer
+            end
+            
             -- Execute tool with error handling
             local ok, err = pcall(function()
                 if strategy.mode == "ui_blocking" then
@@ -4690,11 +5092,13 @@ function BackgroundAgent:ExecuteToolsByStrategy(toolCalls, callback)
                 elseif strategy.mode == "async" then
                     -- Async tools wait for callback
                     LOG.std(nil, "debug", "BackgroundAgent", "Executing async tool: %s", funcName);
+                    local callbackInvoked = false;
                     local returned = tool.handler(args, function(result)
+                        callbackInvoked = true;
                         onToolComplete(result);
                     end);
-                    -- If handler returns synchronously, use that result
-                    if returned ~= nil then
+                    -- If handler returned a value AND callback was not yet invoked, use returned value
+                    if returned ~= nil and not callbackInvoked then
                         onToolComplete(returned);
                     end
                 else
@@ -4711,9 +5115,9 @@ function BackgroundAgent:ExecuteToolsByStrategy(toolCalls, callback)
                     if callbackCalled then
                         onToolComplete(result);
                     else
-                        -- Shouldn't happen for sync tools, but handle it
-                        LOG.std(nil, "warn", "BackgroundAgent", "Sync tool %s did not call callback synchronously", funcName);
-                        -- Will complete when callback is eventually called
+                        -- Sync tool did not call callback synchronously - complete with error
+                        LOG.std(nil, "error", "BackgroundAgent", "Sync tool %s did not call callback synchronously, completing with error", funcName);
+                        onToolComplete({success = false, error = string.format("Sync tool '%s' did not return a result synchronously", funcName)});
                     end
                 end
             end);
@@ -4784,27 +5188,36 @@ end
     @param callback: function - Original callback
 ]]
 function BackgroundAgent:_CompleteLLMResponse(llmEntry, startTime, resultCode, fullResult, fullThink, callback)
-    -- Calculate duration
-    llmEntry.duration = commonlib.TimerManager.GetCurrentTime() - startTime;
+    LOG.std(nil, "debug", "BackgroundAgent", "_CompleteLLMResponse: code=%s responseLen=%s", 
+        tostring(resultCode), tostring(fullResult and #fullResult or 0));
     
-    -- Process any remaining text in sentence buffer for auto-speak
-    if self:IsAutoSpeakEnabled() and self.sentenceBuffer and self.sentenceBuffer ~= "" then
-        local trimmed = self.sentenceBuffer:match("^%s*(.-)%s*$");
-        if trimmed and trimmed ~= "" then
-            self:QueueTTSSentence(trimmed);
+    -- Wrap pre-callback work in pcall to ensure callback always fires
+    local prepOk, prepErr = pcall(function()
+        -- Calculate duration
+        llmEntry.duration = commonlib.TimerManager.GetCurrentTime() - startTime;
+        
+        -- Process any remaining text in sentence buffer for auto-speak
+        if self:IsAutoSpeakEnabled() and self.sentenceBuffer and self.sentenceBuffer ~= "" then
+            local trimmed = self.sentenceBuffer:match("^%s*(.-)%s*$");
+            if trimmed and trimmed ~= "" then
+                self:QueueTTSSentence(trimmed);
+            end
+            self.sentenceBuffer = "";
         end
-        self.sentenceBuffer = "";
+        
+        -- Flush TTS buffer
+        if self:IsAutoSpeakEnabled() then
+            self:FlushTTSBuffer();
+        end
+        
+        -- Complete current chat message
+        self:CompleteChatMessage();
+    end);
+    if not prepOk then
+        LOG.std(nil, "error", "BackgroundAgent", "_CompleteLLMResponse: pre-callback error: %s", tostring(prepErr));
     end
     
-    -- Flush TTS buffer
-    if self:IsAutoSpeakEnabled() then
-        self:FlushTTSBuffer();
-    end
-    
-    -- Complete current chat message
-    self:CompleteChatMessage();
-    
-    -- Build result
+    -- Build result (always, even if prep failed)
     local result = {
         success = resultCode == 200,
         code = resultCode,
@@ -4813,24 +5226,31 @@ function BackgroundAgent:_CompleteLLMResponse(llmEntry, startTime, resultCode, f
         markdown = fullResult,
     };
     
-    -- Update LLM history entry
-    llmEntry.output = {
-        response = fullResult,
-        thinking = fullThink,
-        code = resultCode,
-    };
-    llmEntry.status = resultCode == 200 and "success" or "error";
+    -- Update LLM history entry (safe)
+    pcall(function()
+        llmEntry.output = {
+            response = fullResult,
+            thinking = fullThink,
+            code = resultCode,
+        };
+        llmEntry.status = resultCode == 200 and "success" or "error";
+        self:DebugLog("LLM_OUTPUT", "code=%s response=%s", tostring(resultCode), fullResult or "");
+    end);
     
-    -- Refresh debug UI
-    self:RefreshDebugUI();
-    
-    self:DebugLog("LLM_OUTPUT", "code=%s response=%s", tostring(resultCode), fullResult or "");
-    
+    -- Call callback (wrapped in pcall so llmResponseReceived always fires)
     if callback then
-        callback(result);
+        local cbOk, cbErr = pcall(callback, result);
+        if not cbOk then
+            LOG.std(nil, "error", "BackgroundAgent", "_CompleteLLMResponse: callback error: %s", tostring(cbErr));
+        end
     end
     
-    self:llmResponseReceived(result);
+    -- Sync profile from file after each LLM response (in case LLM updated user_profile.md via file tools)
+    if result.success then
+        SyncProfileFromFile(self);
+    end
+    
+    pcall(function() self:llmResponseReceived(result); end);
 end
 
 --[[
@@ -4924,13 +5344,384 @@ end
 --------------------------------------------------------------------------------
 -- Persistence (Cross-Session Learning State)
 --------------------------------------------------------------------------------
+
+--[[
+    Fix A helper: Read previous learning history from file and build a concise summary
+    for injection into the system prompt (hot-start).
+    This ensures the LLM knows what was taught in prior sessions WITHOUT calling
+    read_file("learning_log.md") first, eliminating the "cold start" problem.
+    
+    Only called during system prompt build, so it runs once and is cached.
+    
+    @param sopName string - The active SOP name
+    @return string - Markdown summary of previous sessions, or "" if no history
+]]
+function BackgroundAgent:GetPreviousSessionSummary(sopName)
+    local learningLogFile = DEFAULT_LEARNING_LOG_FILE;
+    local readResult = self.fileTools:ReadFile(learningLogFile);
+    if not readResult.success or not readResult.content or readResult.content == "" then
+        return "";
+    end
+    
+    local content = readResult.content;
+    
+    -- Extract key metrics from the file for a concise summary
+    -- (The full file may be large; we only inject critical info into the system prompt)
+    local summary = "\n## Previous Session History (Auto-loaded)\n";
+    summary = summary .. "_Full details available via `read_file(\"" .. learningLogFile .. "\")` tool._\n\n";
+    
+    -- Extract mastered items (lines with ✅)
+    local masteredItems = {};
+    for line in content:gmatch("[^\n]+") do
+        if line:find("✅") then
+            -- Parse word from table row: | word | ... | ✅ Mastered | ... |
+            local word = line:match("^|%s*([^|]+)%s*|");
+            if word then
+                word = word:match("^%s*(.-)%s*$");  -- trim
+                if word and word ~= "" and word ~= "Word" then
+                    table.insert(masteredItems, word);
+                end
+            end
+        end
+    end
+    
+    -- Extract concepts taught
+    local conceptsSection = content:match("### Concepts Taught\n(.-)\n###");
+    if not conceptsSection then
+        conceptsSection = content:match("### Concepts Taught\n(.+)$");
+    end
+    local concepts = {};
+    if conceptsSection then
+        for concept in conceptsSection:gmatch("%- ([^\n]+)") do
+            table.insert(concepts, concept);
+        end
+    end
+    
+    -- Extract last session date
+    local lastUpdated = content:match("Last Updated[^:]*:%s*([^\n]+)");
+    
+    -- Extract accuracy
+    local accuracy = content:match("Accuracy[^:]*:%s*([^\n]+)");
+    
+    -- Build concise summary
+    if lastUpdated then
+        summary = summary .. string.format("- **Last Session**: %s\n", lastUpdated);
+    end
+    if accuracy then
+        summary = summary .. string.format("- **Previous Accuracy**: %s\n", accuracy);
+    end
+    if #masteredItems > 0 then
+        summary = summary .. string.format("- **Mastered Items** (%d): %s\n", 
+            #masteredItems, table.concat(masteredItems, ", "));
+        summary = summary .. "  > **Do NOT re-teach these.** Move to new content.\n";
+    end
+    if #concepts > 0 then
+        -- Show up to 15 concepts to keep prompt concise
+        local displayConcepts = {};
+        local maxDisplay = math.min(#concepts, 15);
+        for i = 1, maxDisplay do
+            table.insert(displayConcepts, concepts[i]);
+        end
+        summary = summary .. string.format("- **Concepts Previously Taught** (%d): %s\n",
+            #concepts, table.concat(displayConcepts, ", "));
+        if #concepts > maxDisplay then
+            summary = summary .. string.format("  > ...and %d more. Use `read_file(\"%s\")` for full list.\n",
+                #concepts - maxDisplay, learningLogFile);
+        end
+    end
+    
+    -- If nothing meaningful was extracted, return empty
+    if #masteredItems == 0 and #concepts == 0 and not lastUpdated then
+        return "";
+    end
+    
+    summary = summary .. "\n**CRITICAL**: Do NOT re-teach mastered items. Start with NEW content or review items that need practice.\n";
+    
+    return summary;
+end
+
+--[[
+    Build a summary of the current (in-memory) session's learning progress.
+    Now also auto-saved to learning_log.md via LLM file tools,
+    so read_file("learning_log.md") always has up-to-date data.
+    
+    @return string - Markdown section for current session, or "" if no data
+]]
+function BackgroundAgent:GetCurrentSessionSummaryForTool()
+    local progress = self.learningProgress;
+    if not progress then return ""; end
+    
+    -- Check if there's any meaningful current session data
+    local hasItems = false;
+    for _ in pairs(progress.itemsLearned or {}) do hasItems = true; break; end
+    local hasConcepts = false;
+    if progress.observationStats and progress.observationStats.conceptsTaught then
+        for _ in pairs(progress.observationStats.conceptsTaught) do hasConcepts = true; break; end
+    end
+    if not hasItems and not hasConcepts and (progress.totalAttempts or 0) == 0 then
+        return "";
+    end
+    
+    local md = "---\n## Current Session (Live, Not Yet Saved to File)\n";
+    md = md .. string.format("- **Progress**: %d%%\n", progress.learningPercentage or 0);
+    md = md .. string.format("- **Attempts**: %d\n", progress.totalAttempts or 0);
+    if (progress.totalAttempts or 0) > 0 then
+        local acc = math.floor((progress.totalCorrect or 0) / progress.totalAttempts * 100);
+        md = md .. string.format("- **Accuracy**: %d%%\n", acc);
+    end
+    
+    -- Current session items
+    if hasItems then
+        md = md .. "\n### Items This Session\n";
+        for itemKey, itemData in pairs(progress.itemsLearned) do
+            local attempts = itemData.attempts or 0;
+            local correct = itemData.correct or 0;
+            local status = (attempts >= 2 and correct / attempts >= 0.8) and "✅" or "🔄";
+            md = md .. string.format("- %s %s (%d/%d correct)\n", status, itemKey, correct, attempts);
+        end
+    end
+    
+    -- Current session concepts (observation mode)
+    if hasConcepts then
+        md = md .. "\n### Concepts This Session\n";
+        for concept, data in pairs(progress.observationStats.conceptsTaught) do
+            md = md .. string.format("- %s (x%d)\n", concept, data.count or 1);
+        end
+    end
+    
+    return md;
+end
+
+--[[
+    Unified session history: merges L1 session notes, previous session metrics,
+    and current session progress from a single read of learning_log.md.
+    Replaces the separate BuildL1SessionLayer + GetPreviousSessionSummary + GetLearningProgressSummary calls.
+    @param sopName: string - The active skill name
+    @return string - Formatted session history section, or ""
+]]
+function BackgroundAgent:GetUnifiedSessionHistory(sopName)
+    if not sopName then return ""; end
+
+    -- Read learning log file once (instead of twice in the old separate functions)
+    local logFile = DEFAULT_LEARNING_LOG_FILE;
+    local readResult = self.fileTools:ReadFile(logFile);
+
+    local sections = {};
+    local hasMasteredItems = false;
+
+    -- Section header
+    table.insert(sections, "\n## Session History");
+    table.insert(sections, string.format("_Full details: `read_file(\"%s\")`_\n", logFile));
+
+    -- Part 1: Current session metrics (from in-memory learningProgress)
+    if self.primaryTask then
+        local progress = self.learningProgress;
+        local sessionMinutes = progress.sessionStartTime and math.floor((os.time() - progress.sessionStartTime) / 60) or 0;
+        local accuracy = progress.totalAttempts > 0 and math.floor(progress.totalCorrect / progress.totalAttempts * 100) or 0;
+        table.insert(sections, string.format("- **Current Session**: %d min, %d attempts (%d%% accuracy), %d%% progress",
+            sessionMinutes, progress.totalAttempts, accuracy, progress.learningPercentage or 0));
+    end
+
+    -- Parts 2 & 3 require file content
+    if readResult.success and readResult.content and readResult.content ~= "" then
+        local content = readResult.content;
+        local structuredLog = ParseStructuredLearningLog(content);
+
+        if structuredLog then
+            if structuredLog.item then
+                table.insert(sections, string.format("- **Current Item**: %s", structuredLog.item));
+            end
+            if structuredLog.action or structuredLog.status then
+                table.insert(sections, string.format("- **Current State**: action=%s, status=%s",
+                    tostring(structuredLog.action or "unknown"), tostring(structuredLog.status or "unknown")));
+            end
+            if structuredLog.result then
+                table.insert(sections, string.format("- **Latest Result**: %s", structuredLog.result));
+            end
+            if structuredLog.next then
+                table.insert(sections, string.format("- **Suggested Next Step**: %s", structuredLog.next));
+            end
+
+            if structuredLog.status == "mastered" then
+                hasMasteredItems = true;
+                if structuredLog.item then
+                    table.insert(sections, string.format("- **Mastered Item**: %s", structuredLog.item));
+                end
+            elseif structuredLog.result == "incorrect" or structuredLog.status == "practicing" then
+                table.insert(sections, "- **Priority Guidance**: Continue the current item before introducing new content.");
+            end
+        end
+
+        -- Part 2: Previous session metrics (parsed from file)
+        local lastUpdated = content:match("Last Updated[^:]*:%s*([^\n]+)");
+        if lastUpdated then
+            table.insert(sections, string.format("- **Last Session**: %s", lastUpdated));
+        end
+        local fileAccuracy = content:match("Accuracy[^:]*:%s*([^\n]+)");
+        if fileAccuracy then
+            table.insert(sections, string.format("- **Previous Accuracy**: %s", fileAccuracy));
+        end
+
+        -- Mastered items
+        local masteredItems = {};
+        for line in content:gmatch("[^\n]+") do
+            if line:find("\xe2\x9c\x85") then
+                local word = line:match("^|%s*([^|]+)%s*|");
+                if word then
+                    word = word:match("^%s*(.-)%s*$");
+                    if word and word ~= "" and word ~= "Word" then
+                        table.insert(masteredItems, word);
+                    end
+                end
+            end
+        end
+        if #masteredItems > 0 then
+            hasMasteredItems = true;
+            table.insert(sections, string.format("- **Mastered** (%d): %s",
+                #masteredItems, table.concat(masteredItems, ", ")));
+            table.insert(sections, "  > **Do NOT re-teach these.** Move to new content.");
+        end
+
+        -- Concepts taught
+        local conceptsSection = content:match("### Concepts Taught\n(.-)\n###");
+        if not conceptsSection then
+            conceptsSection = content:match("### Concepts Taught\n(.+)$");
+        end
+        if conceptsSection then
+            local concepts = {};
+            for concept in conceptsSection:gmatch("%- ([^\n]+)") do
+                table.insert(concepts, concept);
+            end
+            if #concepts > 0 then
+                local maxDisplay = math.min(#concepts, 15);
+                local displayConcepts = {};
+                for i = 1, maxDisplay do table.insert(displayConcepts, concepts[i]); end
+                table.insert(sections, string.format("- **Previously Taught** (%d): %s",
+                    #concepts, table.concat(displayConcepts, ", ")));
+            end
+        end
+
+        -- Part 3: Recent session notes (L1 layer)
+        -- Uses string.find loop to avoid gmatch boundary consumption bug
+        local notes = {};
+        local notePos = 1;
+        while true do
+            local hStart, hEnd = content:find("### Session Note[^\n]*\n", notePos);
+            if not hStart then break; end
+            local bodyStart = hEnd + 1;
+            local nextH3 = content:find("\n###", bodyStart);
+            local bodyEnd = nextH3 or #content;
+            local block = content:sub(bodyStart, bodyEnd):match("^(.-)%s*$") or "";
+            if block ~= "" then
+                table.insert(notes, block);
+            end
+            notePos = nextH3 and (nextH3 + 1) or (#content + 1);
+        end
+        if #notes > 0 then
+            local recent = {};
+            local startIdx = math.max(1, #notes - 2);
+            for i = startIdx, #notes do table.insert(recent, notes[i]); end
+            table.insert(sections, "\n### Recent Teaching Notes");
+            table.insert(sections, table.concat(recent, "\n---\n"));
+        end
+    end
+
+    -- If only header with no meaningful content, return empty
+    if #sections <= 2 and not self.primaryTask then
+        return "";
+    end
+
+    if hasMasteredItems then
+        table.insert(sections, "\n**CRITICAL**: Do NOT re-teach mastered items. Start with NEW content or review items that need practice.");
+    end
+
+    return table.concat(sections, "\n");
+end
+
 --[[
     Get the storage key for learning data
     @return string - Unique key for this agent's learning data
 ]]
 function BackgroundAgent:GetLearningStorageKey()
     local taskId = self.primaryTask and self.primaryTask.id or "default";
-    return string.format("BackgroundAgent_Learning_%s", taskId);
+    -- Namespace by SOP to prevent cross-SOP storage key collisions
+    -- (e.g. same task text used for both English and Coding SOPs)
+    local sopName = self.primaryTask and self.primaryTask.sopName
+        or (self.sopState and self.sopState.activeSOP)
+        or "user-profile";
+    return string.format("BackgroundAgent_Learning_%s_%s", sopName, taskId);
+end
+
+--[[
+    Save learning data (progress, words, stats) to a dedicated learning log file.
+    Profile data lives in its own separate file (managed by SOP onComplete handler).
+    Split-file architecture eliminates fragile "preserve profile section" logic.
+    
+    File format (learning log only):
+      ## Learning History   (items learned, accuracy, mastery)
+      ### Words Learned     (structured mode table)
+      ### Concepts Taught   (observation mode list)
+      ### Topics Discussed
+      ### Summary
+]]
+function BackgroundAgent:SaveLearningDataToMemory()
+    local progress = self.learningProgress;
+    if not progress then return; end
+    
+    -- Only save if there's meaningful data
+    if (progress.totalAttempts or 0) == 0 then
+        return; -- nothing to save
+    end
+    
+    -- Guard: do not write if agent is stopped and SOP context is cleared
+    if self.playbackState == "stopped" and (not self.sopState or not self.sopState.activeSOP) then
+        if not (self.primaryTask and self.primaryTask.sopName) then
+            LOG.std(nil, "warn", "BackgroundAgent", "SaveLearningDataToMemory: skipped (agent stopped, no SOP context)");
+            return;
+        end
+    end
+    
+    -- Resolve SOP name
+    local sopName = (self.sopState and self.sopState.activeSOP)
+        or (self.primaryTask and self.primaryTask.sopName)
+        or "user-profile";
+    
+    local learningLogFile = DEFAULT_LEARNING_LOG_FILE;
+    
+    -- LLM now manages learning_log.md directly via file tools.
+    -- Lua side only writes if the file doesn't exist yet (bootstrap) or
+    -- appends a session checkpoint section at the end.
+    local existingContent = self.fileTools:ReadFile(learningLogFile);
+    
+    if existingContent.success and existingContent.content and existingContent.content ~= "" then
+        -- File exists — LLM is managing it. Only log a checkpoint marker.
+        LOG.std(nil, "info", "BackgroundAgent", "learning_log.md exists, skipping Lua-side overwrite (LLM manages it)");
+    else
+        -- File doesn't exist yet — create a minimal template aligned with the new skill protocol
+        local topicType = (sopName == "coding-teaching") and "coding" or ((sopName == "english-teaching") and "english" or "unknown");
+        local md = string.format([[## Session: %s
+
+### Current Topic
+- type: %s
+- item: 
+- action: teach
+- status: new
+
+### Latest Result
+- result: 
+- note: 
+
+### Next Step
+- next: 
+]], os.date("%Y-%m-%d"), topicType);
+        
+        local writeResult = self.fileTools:CreateFile(learningLogFile, md);
+        if writeResult.success then
+            LOG.std(nil, "info", "BackgroundAgent", "Bootstrap learning_log.md template created: %s", learningLogFile);
+        else
+            LOG.std(nil, "error", "BackgroundAgent", "Failed to create learning_log.md: %s", tostring(writeResult.error));
+        end
+    end
 end
 
 --[[
@@ -4939,10 +5730,11 @@ end
 ]]
 function BackgroundAgent:SaveLearningState()
     local data = {
-        version = 2,
+        version = 4,
         savedAt = os.time(),
         userProfile = self.userProfile,
         primaryTask = self.primaryTask,
+        activeSOP = self.sopState and self.sopState.activeSOP or nil,
         learningProgress = self.learningProgress,
         dialogHistoryState = self.dialogHistoryManager and self.dialogHistoryManager:GetState() or nil,
     };
@@ -4952,6 +5744,9 @@ function BackgroundAgent:SaveLearningState()
     GameLogic.GetPlayerController():SaveLocalUserWorldData(key, data, false, false);
     LOG.std(nil, "info", "BackgroundAgent", "Learning state saved: %s (mastered: %d)", key, self.learningProgress.masteredCount or 0);
     self.sessionState.lastCheckpoint = os.time();
+    
+    -- Also persist learning data to memory.md for LLM memory
+    self:SaveLearningDataToMemory();
 end
 
 --[[
@@ -4962,7 +5757,11 @@ end
 function BackgroundAgent:LoadLearningState(taskId)
     local key;
     if taskId then
-        key = string.format("BackgroundAgent_Learning_%s", taskId);
+        -- When loading by explicit taskId, include SOP namespace
+        local sopName = (self.sopState and self.sopState.activeSOP)
+            or (self.primaryTask and self.primaryTask.sopName)
+            or "user-profile";
+        key = string.format("BackgroundAgent_Learning_%s_%s", sopName, taskId);
     else
         key = self:GetLearningStorageKey();
     end
@@ -4981,6 +5780,20 @@ function BackgroundAgent:LoadLearningState(taskId)
     
     if data.primaryTask then
         self.primaryTask = data.primaryTask;
+    end
+
+    -- Restore active SOP and fully re-activate its soul, prompt, and tools
+    if self.sopState then
+        local loadedSOP = data.activeSOP;
+        if loadedSOP and SkillManager.IsDiscovered(loadedSOP) then
+            self.sopState.activeSOP = loadedSOP;
+            -- Re-activate the paired soul (if one is currently active)
+            -- Soul resolution no longer depends on skill config
+            self:InvalidateSystemPromptCache();
+            -- Tools are now registered centrally, no per-skill RegisterTools needed
+        elseif loadedSOP then
+            LOG.std(nil, "warn", "BackgroundAgent", "Saved activeSOP '%s' is not discovered, ignoring", tostring(loadedSOP));
+        end
     end
     
     if data.learningProgress then
@@ -5033,7 +5846,11 @@ end
 function BackgroundAgent:ClearLearningState(taskId)
     local key;
     if taskId then
-        key = string.format("BackgroundAgent_Learning_%s", taskId);
+        -- Use SOP namespace for consistent key format
+        local sopName = self.primaryTask and self.primaryTask.sopName
+            or (self.sopState and self.sopState.activeSOP)
+            or "user-profile";
+        key = string.format("BackgroundAgent_Learning_%s_%s", sopName, taskId);
     else
         key = self:GetLearningStorageKey();
     end
@@ -5091,9 +5908,6 @@ function BackgroundAgent:OnScreenshotCaptured(entry)
         end
         
         LOG.std(nil, "debug", "BackgroundAgent", "Screenshot captured and uploaded: %s (history: %d)", url or "nil", #self.sceneVisionHistory);
-        
-        -- Refresh debug UI if visible
-        self:RefreshDebugUI();
     end);
 end
 
@@ -5105,6 +5919,9 @@ end
 ]]
 function BackgroundAgent:OnVoiceTranscribed(entry)
     if not entry or not entry.transcript then return; end
+    
+    -- User spoke: reset waiting flag so agent can respond
+    self.waitingForUserReply = false;
     
     -- Check for TTS stop keywords (user wants to interrupt)
     if self:_CheckTTSStopKeyword(entry.transcript) then
@@ -5139,9 +5956,6 @@ function BackgroundAgent:OnVoiceTranscribed(entry)
         -- Process pending voice entries
         self:ProcessPendingVoiceEntries();
     end
-    
-    -- Refresh debug UI if visible
-    self:RefreshDebugUI();
 end
 
 --[[
@@ -5218,7 +6032,7 @@ function BackgroundAgent:ProcessPendingVoiceEntries()
     self.voiceLLMThrottle.lastCallTime = currentTime;
     
     -- Build prompt with voice input and scene context
-    local userQuery = mergedEntry.transcript;
+    local userQuery = self:BuildLearnerReplyPrompt(mergedEntry.transcript);
     
     -- Use cached screenshot (screenshot capture is handled by OnSceneChanged debounce)
     local latestVision = self:GetLatestSceneVision();
@@ -5250,9 +6064,6 @@ function BackgroundAgent:ProcessPendingVoiceEntries()
         LOG.std(nil, "info", "BackgroundAgent", "Voice processed by LLM: %s -> %s", 
             mergedEntry.transcript, 
             mergedEntry.llmResponse and string.sub(mergedEntry.llmResponse, 1, 50) or "nil");
-        
-        -- Refresh debug UI
-        self_:RefreshDebugUI();
         
         -- Process next pending entry if any (with throttle delay)
         if #self_.pendingVoiceEntries > 0 then
@@ -5469,61 +6280,14 @@ function BackgroundAgent:GetContextHistorySummary()
     return md;
 end
 
---------------------------------------------------------------------------------
--- Debug UI
---------------------------------------------------------------------------------
-
 --[[
-    Show debug UI for BackgroundAgent
-    @param bShow: boolean - Whether to show or hide
+    Show the Skill Export/Import dialog.
+    Convenience wrapper so the UI can be launched from agent instance.
 ]]
-function BackgroundAgent:ShowDebugUI(bShow)
-    if bShow then
-        if not self.debugPage then
-            self:SetDebugEnabled(true)
-            local width, height = 1100, 600;
-            local params = {
-                url = "script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/BackgroundAgentDebug.html",
-                name = "BackgroundAgentDebug.ShowPage",
-                isShowTitleBar = false,
-                DestroyOnClose = true,
-                bToggleShowHide = false,
-                style = CommonCtrl.WindowFrame.ContainerStyle,
-                allowDrag = true,
-                enable_esc_key = true,
-                bShow = true,
-                click_through = false,
-                zorder = 10,
-                directPosition = true,
-                align = "_ct",
-                x = -width / 2,
-                y = -height / 2,
-                width = width,
-                height = height,
-            };
-            System.App.Commands.Call("File.MCMLWindowFrame", params);
-            if params._page then
-                self.debugPage = params._page;
-                self.debugPage.OnClose = function()
-                    self.debugPage = nil;
-                end
-            end
-        end
-    else
-        if self.debugPage then
-            self.debugPage:CloseWindow();
-            self.debugPage = nil;
-        end
-    end
-end
-
---[[
-    Refresh debug UI if visible
-]]
-function BackgroundAgent:RefreshDebugUI()
-    if self.debugPage then
-        self.debugPage:Refresh(0.1);
-    end
+function BackgroundAgent:ShowSkillExportImport()
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/SkillExportImport.lua");
+    local SkillExportImport = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.SkillExportImport");
+    SkillExportImport:ShowPage();
 end
 
 --------------------------------------------------------------------------------
@@ -5721,8 +6485,19 @@ function BackgroundAgent:HandleJSMessage(msgdata, msgid)
     local action = msgdata.type;
 
     if action == "processWithLLM" then
+        local wasWaitingForUserReply = self.waitingForUserReply;
+        -- User sent a message: reset waiting flag
+        self.waitingForUserReply = false;
         -- JS requests LLM processing
-        local userQuery = msgdata.query or "";
+        local rawUserQuery = msgdata.query or "";
+        local userQuery;
+        if wasWaitingForUserReply then
+            self.waitingForUserReply = true;
+            userQuery = self:BuildLearnerReplyPrompt(rawUserQuery);
+            self.waitingForUserReply = false;
+        else
+            userQuery = rawUserQuery;
+        end
         local options = msgdata.options or {};
         self:ProcessWithLLM(userQuery, function(result)
             self:SendToJS("processWithLLM_response", {
@@ -5859,7 +6634,10 @@ function BackgroundAgent:HandleJSMessage(msgdata, msgid)
 
     elseif action == "setPrimaryLearningTask" then
         local text = msgdata.text;
-        self:SetPrimaryLearningTask(text);
+        local options = {};
+        if msgdata.soul then options.soul = msgdata.soul; end
+        if msgdata.sop then options.sop = msgdata.sop; end
+        self:SetPrimaryLearningTask(text, options);
         self:SendToJS("setPrimaryLearningTask_response", {
             requestId = msgdata.requestId,
             success = true,
@@ -5891,6 +6669,25 @@ function BackgroundAgent:HandleJSMessage(msgdata, msgid)
         self:SendToJS("setSystemPrompt_response", {
             requestId = msgdata.requestId,
             success = true,
+        });
+
+    elseif action == "setWorkspace" then
+        local wsName = msgdata.workspace;
+        local isRemote = msgdata.isRemote;
+        self:SetWorkspace(wsName, isRemote);
+        -- Handle remote mount from JS side
+        if msgdata.mountFolder and msgdata.mountFolder ~= "" then
+            NPL.load("(gl)script/apps/Aries/Creator/Game/KeepWork/PersonalPageStore.lua");
+            local PersonalPageStore = commonlib.gettable("MyCompany.Aries.Creator.Game.KeepWork.PersonalPageStore");
+            PersonalPageStore:MountRemoteFolder(msgdata.mountFolder);
+        end
+        local ws = self.fileTools and self.fileTools:GetWorkSpace() or {};
+        self:SendToJS("setWorkspace_response", {
+            requestId = msgdata.requestId,
+            success = true,
+            workspace = self.workspaceName,
+            resolvedPath = ws.workspace,
+            isRemote = ws.isRemote,
         });
 
     elseif action == "setUpdateInterval" then
@@ -5947,6 +6744,12 @@ function BackgroundAgent:HandleJSMessage(msgdata, msgid)
         local text = msgdata.text;
         if text and ChatLogUtil then
             ChatLogUtil.AppendToFile(text);
+        end
+
+    elseif msgdata.is_agent_router then
+        -- AgentRouter protocol message from NPLJS WebView side
+        if self._agentRouter then
+            self._agentRouter:_onMessage(msgdata, "npljs");
         end
 
     else

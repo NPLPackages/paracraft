@@ -259,7 +259,16 @@ function SharePhotosPage.SearchFiles(output, rootfolder,nMaxFilesNum, filter)
 	if(filter == nil) then filter = "*." end
 	
 	output = output or {};
-	local sInitDir = ParaIO.GetCurDirectory(0)..rootfolder.."/";
+	-- non-win32 (macOS): 截图写在可写目录, GetCurDirectory(0)指向只读的app bundle assets目录
+	NPL.load("(gl)script/ide/System/os/os.lua");
+	local platform = System.os.GetPlatform();
+	local rootDir;
+	if(platform == "win32" or platform == "emscripten") then
+		rootDir = ParaIO.GetCurDirectory(0);
+	else
+		rootDir = ParaIO.GetWritablePath();
+	end
+	local sInitDir = rootDir..rootfolder.."/";
 	local search_result = ParaIO.SearchFiles(sInitDir,filter, "", 0, nMaxFilesNum or 50, 0);
 	local nCount = search_result:GetNumOfResult();		
 	local nextIndex = #output+1;

@@ -155,6 +155,19 @@ AIChat.ToolExecutionTimeout = 60000;
 AIChat.bEnableCompression = true;
 -- Fallback model for multimodal (image) requests
 AIChat.VisionFallbackModel = "keepwork-flash";
+-- Default max iterations for tool-call recursion (prevents runaway loops)
+AIChat.DefaultMaxIterations = 10;
+-- Tool category registry (class-level, shared across all instances)
+-- { [categoryName] = { definitions = {...}, executor = function|nil } }
+AIChat.ToolCategories = {};
+-- Alias map for enableTools category names (e.g. "MqttTool" -> "mqtt")
+AIChat.ToolCategoryAliases = {
+    MqttTool = "mqtt",
+    PersonalPageTool = "personalPage",
+    personal_page = "personalPage",
+    ExecuteTool = "execute",
+    webFetch = "web",
+};
 
 function AIChat:ctor()
     self.history = {};
@@ -175,6 +188,28 @@ function AIChat:ctor()
     self.pendingMessages = nil;
     -- Pending options for ContinueWithToolResults
     self.pendingOptions = nil;
+    -- maxIterations: max tool-call recursion depth (prevents runaway loops)
+    self.maxIterations = AIChat.DefaultMaxIterations;
+    self._currentIteration = 0;
+    -- enableTools: array of tool category names to auto-merge with self.tools
+    self.enableTools = nil;
+    -- Remote history persistence fields (aligned with JS ChatSession)
+    self.chatId = nil;
+    self.modId = nil;
+    self.historyId = nil;
+    -- Child agent session management
+    self.name = nil;
+    self.parentSession = nil;
+    self._childSessions = {};
+    self._pendingChildResults = {};
+    self._maxChildSessions = 2;
+    self._depth = 0;
+    self._maxDepth = 3;
+    self._isSending = false;
+    self._debounceTimers = {};
+    self._lastSendOptions = {};
+    -- Callback for child agent streaming events
+    self.onChildStream = nil;
 end
 
 -- Enable or disable dev log for debugging raw API messages
@@ -371,6 +406,583 @@ function AIChat.CompressMessages(messages)
     return messages;
 end
 
+--[[
+    Filter messages to remove non-remote image_url items (aligned with JS _filterMessages).
+    Only keeps image_url items with http:// or https:// URLs.
+    @param messages: table - Array of message objects
+    @return table - Same array with filtered content
+]]
+function AIChat.FilterMessages(messages)
+    if not messages then return messages; end
+    
+    for _, msg in ipairs(messages) do
+        if msg.content and type(msg.content) == "table" then
+            local filtered = {};
+            for _, item in ipairs(msg.content) do
+                if item.type ~= "image_url" then
+                    table.insert(filtered, item);
+                else
+                    local url = item.image_url and (type(item.image_url) == "table" and item.image_url.url or item.image_url);
+                    if url and (url:sub(1, 7) == "http://" or url:sub(1, 8) == "https://") then
+                        table.insert(filtered, item);
+                    end
+                end
+            end
+            msg.content = filtered;
+        end
+    end
+    return messages;
+end
+
+-- ─── Tool Category Registry (class-level, aligned with JS CopilotTools) ───
+
+--[[
+    Register a named tool category with OpenAI-format definitions.
+    @param name: string - Category name (e.g. "mqtt", "fileOps", "web")
+    @param definitions: table - Array of OpenAI-format tool definitions
+    @param executor: function|nil - Optional executor function(fnName, args, callback)
+]]
+function AIChat.RegisterToolCategory(name, definitions, executor)
+    if not name or not definitions then return; end
+    AIChat.ToolCategories[name] = {
+        definitions = definitions,
+        executor = executor,
+    };
+    LOG.std(nil, "info", "AIChat", "Registered tool category '%s' with %d tools", name, #definitions);
+end
+
+--[[
+    Unregister a tool category.
+    @param name: string - Category name
+]]
+function AIChat.UnregisterToolCategory(name)
+    AIChat.ToolCategories[name] = nil;
+end
+
+--[[
+    Resolve category name through aliases.
+    @param name: string - Category name or alias
+    @return string - Resolved category name
+]]
+function AIChat.ResolveCategoryName(name)
+    return AIChat.ToolCategoryAliases[name] or name;
+end
+
+--[[
+    Get merged tool definitions from an array of category names.
+    @param categoryNames: table - Array of category name strings
+    @return table - Merged array of OpenAI-format tool definitions
+]]
+function AIChat.GetToolDefinitions(categoryNames)
+    if not categoryNames then return {}; end
+    local result = {};
+    local seen = {};
+    for _, name in ipairs(categoryNames) do
+        local resolved = AIChat.ResolveCategoryName(name);
+        if not seen[resolved] then
+            seen[resolved] = true;
+            local category = AIChat.ToolCategories[resolved];
+            if category and category.definitions then
+                for _, def in ipairs(category.definitions) do
+                    table.insert(result, def);
+                end
+            end
+        end
+    end
+    return result;
+end
+
+-- ─── maxIterations ───
+
+function AIChat:SetMaxIterations(n)
+    self.maxIterations = n or AIChat.DefaultMaxIterations;
+end
+
+function AIChat:GetMaxIterations()
+    return self.maxIterations or AIChat.DefaultMaxIterations;
+end
+
+-- ─── enableTools ───
+
+--[[
+    Set enabled tool categories. These will be merged with self.tools when sending requests.
+    @param categoryNames: table|nil - Array of category name strings, or nil to disable
+]]
+function AIChat:SetEnabledTools(categoryNames)
+    self.enableTools = categoryNames;
+end
+
+-- ─── Remote History Persistence (aligned with JS ChatSession) ───
+
+function AIChat:SetChatId(chatId)
+    self.chatId = chatId;
+end
+
+function AIChat:GetChatId()
+    return self.chatId;
+end
+
+function AIChat:SetModId(modId)
+    self.modId = modId;
+end
+
+function AIChat:GetModId()
+    return self.modId;
+end
+
+--[[
+    Upsert chat history to remote server.
+    @param payload: table - {chatId, modId, title, messages, ...}
+    @param callback: function(err, msg, data)
+]]
+function AIChat:UpsertChatHistory(payload, callback)
+    if not payload then
+        if callback then callback(400); end
+        return;
+    end
+    -- Filter messages before saving
+    if payload.messages then
+        payload.messages = AIChat.FilterMessages(payload.messages);
+    end
+    keepwork.ai.aiChatHistoryUpsert(payload, function(err, msg, data)
+        if err == 200 and data then
+            self.historyId = data.id or self.historyId;
+        end
+        if callback then callback(err, msg, data); end
+    end);
+end
+
+--[[
+    Update existing chat history on remote server.
+    @param id: number - History record ID
+    @param payload: table - {messages, ...}
+    @param callback: function(err, msg, data)
+]]
+function AIChat:UpdateChatHistory(id, payload, callback)
+    if not id or not payload then
+        if callback then callback(400); end
+        return;
+    end
+    -- Filter messages before saving
+    if payload.messages then
+        payload.messages = AIChat.FilterMessages(payload.messages);
+    end
+    keepwork.ai.aiChatHistoryUpdate({
+        router_params = { id = tostring(id) },
+        messages = payload.messages,
+    }, function(err, msg, data)
+        if callback then callback(err, msg, data); end
+    end);
+end
+
+--[[
+    Get chat history from remote server.
+    @param modId: string - Module ID
+    @param callback: function(err, msg, data)
+]]
+function AIChat:GetChatHistory(modId, callback)
+    if not modId then
+        if callback then callback(400); end
+        return;
+    end
+    keepwork.ai.aiChatHistoryGet({
+        modId = modId,
+    }, function(err, msg, data)
+        if callback then callback(err, msg, data); end
+    end);
+end
+
+--[[
+    Convenience method: auto upsert or update remote history based on current state.
+    @param callback: function(err, msg, data)|nil
+]]
+function AIChat:SaveRemoteHistory(callback)
+    if not self.chatId or not self.modId then
+        if callback then callback(nil); end
+        return;
+    end
+    
+    -- Build messages from history
+    local messages = {};
+    if self.system_prompt then
+        table.insert(messages, {role = "system", content = self.system_prompt});
+    end
+    for _, msg in ipairs(self.history) do
+        table.insert(messages, {
+            role = msg.role,
+            content = msg.content,
+            tool_calls = msg.tool_calls,
+            tool_call_id = msg.tool_call_id,
+        });
+    end
+    
+    if self.historyId then
+        self:UpdateChatHistory(self.historyId, { messages = messages }, callback);
+    else
+        -- Generate title from first user message
+        local title = "Chat";
+        for _, msg in ipairs(self.history) do
+            if msg.role == "user" then
+                local content = msg.content;
+                if type(content) == "table" then
+                    for _, part in ipairs(content) do
+                        if part.type == "text" and part.text then
+                            content = part.text;
+                            break;
+                        end
+                    end
+                end
+                if type(content) == "string" then
+                    title = content:sub(1, 50);
+                end
+                break;
+            end
+        end
+        self:UpsertChatHistory({
+            chatId = self.chatId,
+            modId = self.modId,
+            title = title,
+            messages = messages,
+        }, callback);
+    end
+end
+
+-- ─── Child Agent Session Management (aligned with JS ChatSession) ───
+
+--[[
+    Create a named child session (agent teammate).
+    @param name: string - Unique agent name
+    @param options: table|nil - {model, systemPrompt, maxIterations, ...}
+    @return table - {session=AIChat, queue={}, isRunning=false}
+]]
+function AIChat:CreateChildSession(name, options)
+    if not name then return nil; end
+    if self._childSessions[name] then
+        return self._childSessions[name];
+    end
+    
+    local childCount = 0;
+    for _ in pairs(self._childSessions) do childCount = childCount + 1; end
+    if childCount >= self._maxChildSessions then
+        LOG.std(nil, "error", "AIChat", "Cannot create child session '%s': max %d reached", name, self._maxChildSessions);
+        return nil;
+    end
+    if self._depth >= self._maxDepth then
+        LOG.std(nil, "error", "AIChat", "Cannot create child session '%s': max depth %d reached", name, self._maxDepth);
+        return nil;
+    end
+    
+    options = options or {};
+    local child = AIChat:new();
+    child.name = name;
+    child.parentSession = self;
+    child.model = options.model or self.model;
+    child._depth = self._depth + 1;
+    child._maxDepth = self._maxDepth;
+    child.onChildStream = function(event)
+        self:_BubbleChildStream(event);
+    end;
+    if options.systemPrompt then
+        child:SetSystemPrompt(options.systemPrompt);
+    end
+    if options.maxIterations then
+        child:SetMaxIterations(options.maxIterations);
+    end
+    
+    local entry = { session = child, queue = {}, isRunning = false };
+    self._childSessions[name] = entry;
+    LOG.std(nil, "info", "AIChat", "Child agent '%s' created (depth %d)", name, child._depth);
+    return entry;
+end
+
+--[[
+    Enqueue a task for a named child agent. Creates the child if needed.
+    @param name: string - Child agent name
+    @param task: string - Task description/prompt
+    @param options: table|nil - {tools, maxIterations, systemPrompt, model, callbackMode, debounceSeconds, description, callback}
+    callbackMode: "delay" (default) | "immediate" | "debounce"
+]]
+function AIChat:EnqueueChildTask(name, task, options)
+    options = options or {};
+    local entry = self._childSessions[name] or self:CreateChildSession(name, options);
+    if not entry then return; end
+    
+    -- Inherit tools from parent if not provided
+    local resolvedTools = options.enableTools or self.enableTools;
+    
+    -- Queue/merge logic: if busy and queue has pending tasks, merge with last
+    if entry.isRunning and #entry.queue > 0 then
+        local last = entry.queue[#entry.queue];
+        last.task = "Complete these tasks:\n1. " .. last.task .. "\n2. " .. task;
+        last.maxIterations = math.max(last.maxIterations or 10, options.maxIterations or 10);
+        LOG.std(nil, "info", "AIChat", "Merged task into queue for child '%s'", name);
+        return;
+    end
+    
+    local taskObj = {
+        id = tostring(math.random(100000, 999999)),
+        task = task,
+        description = options.description,
+        enableTools = resolvedTools,
+        maxIterations = options.maxIterations or 10,
+        systemPrompt = options.systemPrompt,
+        model = options.model,
+        callbackMode = options.callbackMode or "delay",
+        debounceSeconds = options.debounceSeconds or 5,
+        callback = options.callback,
+    };
+    table.insert(entry.queue, taskObj);
+    
+    if not entry.isRunning then
+        self:_ProcessChildQueue(name);
+    end
+end
+
+--[[
+    Process task queue for a named child agent.
+    @param name: string
+    @private
+]]
+function AIChat:_ProcessChildQueue(name)
+    local entry = self._childSessions[name];
+    if not entry then return; end
+    entry.isRunning = true;
+    
+    local function processNext()
+        if #entry.queue == 0 then
+            entry.isRunning = false;
+            return;
+        end
+        
+        local taskObj = table.remove(entry.queue, 1);
+        local child = entry.session;
+        
+        -- Fresh context per task
+        child:ClearHistory();
+        
+        local sysPrompt = taskObj.systemPrompt or
+            string.format("You are agent '%s', a teammate working in parallel with the main agent. Complete the assigned task and return your final answer.", name);
+        child:SetSystemPrompt(sysPrompt);
+        
+        if taskObj.model then
+            child:SetModel(taskObj.model);
+        end
+        if taskObj.maxIterations then
+            child:SetMaxIterations(taskObj.maxIterations);
+        end
+        if taskObj.enableTools then
+            child:SetEnabledTools(taskObj.enableTools);
+        end
+        
+        -- Stream child output to parent
+        local agentPath = self:_BuildAgentPath(name);
+        
+        child:Ask(taskObj.task, function(resultCode, delta, deltaThink, fullResult, fullThink, toolCallInfo, extraData)
+            if resultCode then
+                -- Task completed
+                local result = fullResult or "";
+                local taskSummary = taskObj.description or (taskObj.task:sub(1, 80) .. (#taskObj.task > 80 and "..." or ""));
+                
+                table.insert(self._pendingChildResults, {
+                    agentName = name,
+                    taskId = taskObj.id,
+                    taskSummary = taskSummary,
+                    result = result,
+                });
+                LOG.std(nil, "info", "AIChat", "Child '%s' completed task %s", name, taskObj.id);
+                
+                self:_HandleChildCallback(taskObj.callbackMode, taskObj.debounceSeconds);
+                
+                if taskObj.callback then
+                    taskObj.callback(result);
+                end
+                
+                -- Process next task in queue
+                processNext();
+            else
+                -- Streaming delta — bubble up
+                self:_EmitChildStream({
+                    agentPath = agentPath,
+                    agentName = name,
+                    taskId = taskObj.id,
+                    type = "message",
+                    content = delta,
+                    fullResponse = fullResult,
+                });
+            end
+        end);
+    end
+    
+    processNext();
+end
+
+--[[
+    Build agent path string (e.g. "parent > child > grandchild").
+    @param childName: string
+    @return string
+    @private
+]]
+function AIChat:_BuildAgentPath(childName)
+    local parts = {};
+    local s = self;
+    while s do
+        if s.name then table.insert(parts, 1, s.name); end
+        s = s.parentSession;
+    end
+    table.insert(parts, childName);
+    return table.concat(parts, " > ");
+end
+
+--[[
+    Emit a child stream event.
+    @param event: table - {agentPath, agentName, taskId, type, content, fullResponse}
+    @private
+]]
+function AIChat:_EmitChildStream(event)
+    if self.onChildStream then
+        local ok, err = pcall(self.onChildStream, event);
+        if not ok then
+            LOG.std(nil, "error", "AIChat", "onChildStream error: %s", tostring(err));
+        end
+    end
+end
+
+--[[
+    Bubble a child stream event up from a descendant.
+    @param event: table
+    @private
+]]
+function AIChat:_BubbleChildStream(event)
+    self:_EmitChildStream(event);
+end
+
+--[[
+    Consume and clear pending child results.
+    @return table - Array of {agentName, taskId, taskSummary, result}
+]]
+function AIChat:_ConsumePendingChildResults()
+    local results = self._pendingChildResults;
+    self._pendingChildResults = {};
+    return results;
+end
+
+--[[
+    Handle child task callback based on callbackMode.
+    @param mode: string - "immediate" | "delay" | "debounce"
+    @param debounceSeconds: number|nil
+    @private
+]]
+function AIChat:_HandleChildCallback(mode, debounceSeconds)
+    if mode == "immediate" then
+        self:_TriggerImmediateCallback();
+    elseif mode == "debounce" then
+        self:_TriggerDebounceCallback(debounceSeconds or 5);
+    end
+    -- "delay" (default): do nothing — results consumed on next Ask()
+end
+
+--[[
+    Trigger an immediate callback: wait for parent to finish any ongoing send,
+    then send a follow-up Ask so the AI processes the child result.
+    @private
+]]
+function AIChat:_TriggerImmediateCallback()
+    local self_ = self;
+    local function doSend()
+        if #self_._pendingChildResults == 0 then return; end
+        LOG.std(nil, "info", "AIChat", "Immediate callback: sending child results to parent");
+        self_:Ask(nil, function() end, self_._lastSendOptions);
+    end
+    
+    if self._isSending then
+        -- Poll until parent finishes current send
+        local timer = commonlib.Timer:new({callbackFunc = function(t)
+            if not self_._isSending then
+                t:Change();
+                doSend();
+            end
+        end});
+        timer:Change(200, 200);
+    else
+        doSend();
+    end
+end
+
+--[[
+    Trigger a debounce callback with timer.
+    @param seconds: number
+    @private
+]]
+function AIChat:_TriggerDebounceCallback(seconds)
+    seconds = seconds or 5;
+    local self_ = self;
+    local timer = commonlib.Timer:new({callbackFunc = function(t)
+        for i, dt in ipairs(self_._debounceTimers) do
+            if dt == t then
+                table.remove(self_._debounceTimers, i);
+                break;
+            end
+        end
+        self_:_TriggerImmediateCallback();
+    end});
+    timer:Change(seconds * 1000, nil);
+    table.insert(self._debounceTimers, timer);
+end
+
+--[[
+    Cancel all pending debounce timers.
+    @private
+]]
+function AIChat:_CancelDebounceTimers()
+    for _, t in ipairs(self._debounceTimers) do
+        t:Change();
+    end
+    self._debounceTimers = {};
+end
+
+--[[
+    Get a child session entry by name.
+    @param name: string
+    @return table|nil - {session, queue, isRunning}
+]]
+function AIChat:GetChildSession(name)
+    return self._childSessions[name];
+end
+
+--[[
+    Get all child session names.
+    @return table - Array of strings
+]]
+function AIChat:GetChildSessionNames()
+    local names = {};
+    for name in pairs(self._childSessions) do
+        table.insert(names, name);
+    end
+    return names;
+end
+
+--[[
+    Get context from parent session (for child agents needing more context).
+    @param messageCount: number|nil - Number of recent parent messages (default 10)
+    @return table|nil
+]]
+function AIChat:GetParentContext(messageCount)
+    if not self.parentSession then return nil; end
+    messageCount = messageCount or 10;
+    local parent = self.parentSession;
+    local history = parent:GetHistory();
+    local recent = {};
+    local start = math.max(1, #history - messageCount + 1);
+    for i = start, #history do
+        table.insert(recent, history[i]);
+    end
+    return {
+        systemPrompt = parent.system_prompt,
+        recentMessages = recent,
+        model = parent.model,
+    };
+end
+
 function AIChat:SetKnowledgeBase(codes)
     if(type(codes) == "string") then
         self.knowledgeBaseCodes = commonlib.split(codes, ",");
@@ -496,6 +1108,108 @@ function AIChat:RegisterToolCallback(name, callback)
     self.tool_callbacks[name] = callback;
 end
 
+--[[
+    Register tools from a ToolRegistry onto this AIChat instance.
+    Creates a temporary ToolRegistry, populates it via the given registerFunc,
+    then merges tool definitions and callbacks into this instance.
+    Tool handlers are executed through ToolRegistry:ExecuteTool and the result's
+    llm_result field is unwrapped for the AIChat callback.
+
+    @param registerFunc: function(registry) — populates a ToolRegistry with tools
+    Example:
+        aiChat:RegisterToolsFromRegistry(function(registry)
+            MQTTTools:new():RegisterTools(registry);
+            PersonalPageTools:new():RegisterTools(registry);
+        end);
+]]
+function AIChat:RegisterToolsFromRegistry(registerFunc)
+    if not registerFunc then return; end
+
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/Copilot/ToolRegistry.lua");
+    local ToolRegistry = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.Copilot.ToolRegistry");
+
+    local registry = ToolRegistry:new();
+    registerFunc(registry);
+
+    local currentTools = self.tools or {};
+    local newDefs = registry:GetAllToolDefinitions();
+    for _, toolDef in ipairs(newDefs) do
+        local name = toolDef["function"].name;
+        local bFound = false;
+        for _, existing in ipairs(currentTools) do
+            if existing["function"] and existing["function"].name == name then
+                bFound = true;
+                break;
+            end
+        end
+        if not bFound then
+            table.insert(currentTools, toolDef);
+        end
+
+        if not self.tool_callbacks[name] then
+            self:RegisterToolCallback(name, function(args, asyncCallback)
+                registry:ExecuteTool(name, args, function(result)
+                    local llmResult;
+                    if type(result) == "table" and result.llm_result then
+                        llmResult = result.llm_result;
+                    elseif result ~= nil then
+                        llmResult = tostring(result);
+                    else
+                        llmResult = "done";
+                    end
+                    if asyncCallback and type(asyncCallback) == "function" then
+                        asyncCallback(llmResult);
+                    end
+                end);
+            end);
+        end
+    end
+    self:SetTools(currentTools);
+end
+
+--[[
+    Convenience method: register commonly used EasyAIChat tools (mqtt, personal_page, scheduler).
+    @param categories: string|table|nil — category filter:
+        - nil or "all": registers mqtt + personal_page + scheduler
+        - string: single category name (e.g. "mqtt")
+        - table: array of category names (e.g. {"mqtt", "personal_page"})
+    Example:
+        aiChat:RegisterEasyTools();  -- all tools
+        aiChat:RegisterEasyTools({"mqtt", "personal_page"});
+]]
+function AIChat:RegisterEasyTools(categories)
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/MQTTTools.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/PersonalPageTools.lua");
+    NPL.load("(gl)script/apps/Aries/Creator/Game/Tasks/EasyBuilder/CopilotTools/SchedulerTools.lua");
+    local MQTTTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.MQTTTools");
+    local PersonalPageTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.PersonalPageTools");
+    local SchedulerTools = commonlib.gettable("MyCompany.Aries.Game.Tasks.EasyBuilder.CopilotTools.SchedulerTools");
+
+    if type(categories) == "string" then
+        categories = {categories};
+    end
+
+    local categorySet;
+    if categories then
+        categorySet = {};
+        for _, c in ipairs(categories) do
+            categorySet[c] = true;
+        end
+    end
+
+    self:RegisterToolsFromRegistry(function(registry)
+        if not categorySet or categorySet["mqtt"] then
+            MQTTTools:new():RegisterTools(registry);
+        end
+        if not categorySet or categorySet["personal_page"] then
+            PersonalPageTools:new():RegisterTools(registry);
+        end
+        if not categorySet or categorySet["scheduler"] then
+            SchedulerTools:new():RegisterTools(registry);
+        end
+    end);
+end
+
 function AIChat:ClearHistory()
     self.history = {};
 end
@@ -586,6 +1300,14 @@ end
 -- @param callback: function(resultCode, delta, deltaThink, fullResult, fullThink, toolCallInfo, extraData) end
 -- @param options: optional table {images="url1,url2", knowledge="code1,code2", knowledgeUsername="user", reasoning=boolean}
 function AIChat:Ask(input, callback, options)
+    -- Reset iteration counter for new conversation turn
+    self._currentIteration = 0;
+    
+    -- Cancel debounce timers — pending child results will be consumed in this send cycle
+    self:_CancelDebounceTimers();
+    self._isSending = true;
+    self._lastSendOptions = options or {};
+    
     local messages = {};
     if self.system_prompt then
         table.insert(messages, {role = "system", content = (self.system_prompt)});
@@ -598,6 +1320,35 @@ function AIChat:Ask(input, callback, options)
             tool_calls = msg.tool_calls,
             tool_call_id = msg.tool_call_id
         });
+    end
+    
+    -- Insert pending child agent results as tool messages before the user message
+    local childResults = self:_ConsumePendingChildResults();
+    if #childResults > 0 then
+        local toolCalls = {};
+        for _, cr in ipairs(childResults) do
+            table.insert(toolCalls, {
+                id = cr.taskId,
+                type = "function",
+                ["function"] = {
+                    name = "async_agent_task",
+                    arguments = commonlib.Json.Encode({agent = cr.agentName, task = cr.taskSummary}),
+                },
+            });
+        end
+        table.insert(messages, {
+            role = "assistant",
+            content = nil,
+            tool_calls = toolCalls,
+        });
+        for _, cr in ipairs(childResults) do
+            local resultStr = type(cr.result) == "string" and cr.result or commonlib.serialize_compact(cr.result);
+            table.insert(messages, {
+                role = "tool",
+                tool_call_id = cr.taskId,
+                content = resultStr,
+            });
+        end
     end
     
     if input and input ~= "" then
@@ -635,6 +1386,25 @@ function AIChat:Ask(input, callback, options)
 end
 
 function AIChat:_SendRequest(messages, callback, options)
+    -- maxIterations guard to prevent runaway tool-call loops
+    self._currentIteration = (self._currentIteration or 0) + 1;
+    if self._currentIteration > self.maxIterations then
+        LOG.std(nil, "warn", "AIChat", "maxIterations (%d) exceeded, stopping tool-call loop", self.maxIterations);
+        self._isSending = false;
+        -- Return whatever content we have so far
+        local lastContent = "";
+        for i = #messages, 1, -1 do
+            if messages[i].role == "assistant" and messages[i].content then
+                lastContent = messages[i].content;
+                break;
+            end
+        end
+        if callback then
+            callback(200, nil, nil, lastContent, "", nil, {maxIterationsExceeded = true});
+        end
+        return;
+    end
+    
     self.signal = System.os.AbortController:new();
     
     -- Generate session ID for chat logging
@@ -662,8 +1432,23 @@ function AIChat:_SendRequest(messages, callback, options)
         dataStreaming = self.stream,
         reasoning = requestReasoning,
     }
-    if self.tools and #self.tools > 0 then
-        chat_params.localTools = self.tools
+    print("AIChat: Requesting model===================:", requestModel, "with reasoning:", tostring(requestReasoning));
+    
+    -- Merge enableTools category definitions with manually set tools
+    local allTools = {};
+    if self.enableTools and #self.enableTools > 0 then
+        local categoryTools = AIChat.GetToolDefinitions(self.enableTools);
+        for _, def in ipairs(categoryTools) do
+            table.insert(allTools, def);
+        end
+    end
+    if self.tools then
+        for _, def in ipairs(self.tools) do
+            table.insert(allTools, def);
+        end
+    end
+    if #allTools > 0 then
+        chat_params.localTools = allTools;
     end
 
     if options and options.knowledge then
@@ -706,6 +1491,7 @@ function AIChat:_SendRequest(messages, callback, options)
         ChatLogUtil.LogRequest(sessionId, logParams);
     end
     
+    AIChat.FilterMessages(messages);
     AIChat.CompressMessages(messages);
     
     local lastData = "";
@@ -787,24 +1573,44 @@ function AIChat:_SendRequest(messages, callback, options)
                             fullThink = fullThink..part.reasoning_content
                         end
                         
-                        -- Simple tool call collection for streaming (might need more robust parsing for partial JSON)
+                        -- Streaming tool call collection: accumulate deltas by index.
+                        -- When a chunk carries a NEW id (different from the existing entry at the same index),
+                        -- treat it as a separate tool call to prevent merging parallel calls
+                        -- that share the same index (common with some LLM API proxies).
                         if(part.tool_calls) then
                             for _, tc in ipairs(part.tool_calls) do
-                                -- Find existing tool call to append or create new
                                 local found = false;
-                                for _, existing in ipairs(collectedToolCalls) do
-                                    if existing.index == tc.index then
-                                        if tc.id then existing.id = tc.id end
-                                        if tc["function"] and tc["function"].name then 
-                                            existing["function"] = existing["function"] or {};
-                                            existing["function"].name = (existing["function"].name or "") .. tc["function"].name;
+                                if not (tc.id and tc.id ~= "") then
+                                    -- Delta chunk (no id) — append to matching index
+                                    for _, existing in ipairs(collectedToolCalls) do
+                                        if existing.index == tc.index then
+                                            if tc["function"] and tc["function"].name then 
+                                                existing["function"] = existing["function"] or {};
+                                                existing["function"].name = (existing["function"].name or "") .. tc["function"].name;
+                                            end
+                                            if tc["function"] and tc["function"].arguments then 
+                                                existing["function"] = existing["function"] or {};
+                                                existing["function"].arguments = (existing["function"].arguments or "") .. tc["function"].arguments;
+                                            end
+                                            found = true;
+                                            break;
                                         end
-                                        if tc["function"] and tc["function"].arguments then 
-                                            existing["function"] = existing["function"] or {};
-                                            existing["function"].arguments = (existing["function"].arguments or "") .. tc["function"].arguments;
+                                    end
+                                else
+                                    -- Chunk with id — only merge if same id already exists
+                                    for _, existing in ipairs(collectedToolCalls) do
+                                        if existing.id == tc.id then
+                                            if tc["function"] and tc["function"].name then 
+                                                existing["function"] = existing["function"] or {};
+                                                existing["function"].name = (existing["function"].name or "") .. tc["function"].name;
+                                            end
+                                            if tc["function"] and tc["function"].arguments then 
+                                                existing["function"] = existing["function"] or {};
+                                                existing["function"].arguments = (existing["function"].arguments or "") .. tc["function"].arguments;
+                                            end
+                                            found = true;
+                                            break;
                                         end
-                                        found = true;
-                                        break;
                                     end
                                 end
                                 if not found then
@@ -931,9 +1737,12 @@ function AIChat:_SendRequest(messages, callback, options)
                 local hasToolExec = false;
                 local toolResults = {}; -- Store results in order: {[callId] = {msg, index}}
                 local toolOrder = {};   -- Track original order of tool calls
+                local allToolsFinishedCalled = false; -- Guard: prevent double-call when tools finish synchronously
                 
                 local function checkAllToolsFinished()
+                    if allToolsFinishedCalled then return; end
                     if pendingTools == 0 and hasToolExec then
+                        allToolsFinishedCalled = true;
                         -- Add tool results in original order (important for LLM context)
                         for i, callId in ipairs(toolOrder) do
                             local resultData = toolResults[callId];
@@ -1132,6 +1941,7 @@ function AIChat:_SendRequest(messages, callback, options)
             ChatLogUtil.LogResponse(sessionId, resultCode, fullResult, fullThink, nil, nil, errorDetail, effectiveResponseMetadata);
 
             -- Finished Normal Chat
+            self._isSending = false;
             if self.auto_history and not (resultCode ~= 200) then
                 if fullResult ~= "" then
                     self:AddMessage("assistant", fullResult);

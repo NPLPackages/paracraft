@@ -20,6 +20,7 @@ local KeepWorkItemManager = NPL.load("(gl)script/apps/Aries/Creator/HttpAPI/Keep
 local CustomCharItems = commonlib.gettable("MyCompany.Aries.Game.EntityManager.CustomCharItems")
 local EducateOfflinePage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Offline/EducateOfflinePage.lua")
 local ClassSelectPage = NPL.load("(gl)script/apps/Aries/Creator/Game/Educate/Project/ClassSelectPage.lua")
+local KeepworkServiceWorld = NPL.load("(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceWorld.lua")
 local TipRoadManager = NPL.load("(gl)script/apps/Aries/Creator/Game/Areas/ChatSystem/ScreenTipRoad/TipRoadManager.lua");
 local EducateMainPage = NPL.export()
 EducateMainPage.tab_view_index = 1 --侧边按钮的索引
@@ -127,9 +128,15 @@ function EducateMainPage.ResetParams()
 end
 
 function EducateMainPage.SetShowCreateWorld()
-    EducateMainPage.isShowCreateWorld = true
-    EducateMainPage.tab_view_index = nil
-    EducateMainPage.RefreshPage(true)
+    KeepworkServiceWorld:LimitFreeUser(false, function(result)
+        if result then
+            EducateMainPage.isShowCreateWorld = true
+            EducateMainPage.tab_view_index = nil
+            EducateMainPage.RefreshPage(true)
+        else
+            _guihelper.MessageBox(L'目前仅支持1个创作世界，如需创作更多世界请联系客服', nil, _guihelper.MessageBoxButtons.OK)
+        end
+    end)
 end
 
 function EducateMainPage.ShowPage()

@@ -40,14 +40,19 @@ function OnSharePhotoSNS(name)
     NPL.load("(gl)script/apps/Aries/Partners/PartnerPlatforms.lua");
     local Platforms = commonlib.gettable("MyCompany.Aries.Partners.Platforms");
     if(name == "pengyou") then
-        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.QQ, url="http://haqi.61.com", comment=content,  summary="我的3D作品", images=image_path })
+        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.QQ, url="http://haqi.keepwork.com", comment=content,  summary="我的3D作品", images=image_path })
     elseif(name == "sina") then
-        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.Sina, url="http://haqi.61.com", comment=content,  summary="我的3D作品", images=image_path })
+        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.Sina, url="http://haqi.keepwork.com", comment=content,  summary="我的3D作品", images=image_path })
     elseif(name == "baidu") then
-        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.BaiduTieba, url="http://haqi.61.com", comment=content,  summary="我的3D作品", images=image_path })
+        Platforms.CallMethod("postToFeed_window", {title="魔法哈奇我的作品", platform=Platforms.PLATS.BaiduTieba, url="http://haqi.keepwork.com", comment=content,  summary="我的3D作品", images=image_path })
     else
-        Platforms.CallMethod("postToFeed", {title="魔法哈奇我的作品", url="http://haqi.61.com", comment=content,  summary="我的3D作品", images=image_path })
+        Platforms.CallMethod("postToFeed", {title="魔法哈奇我的作品", url="http://haqi.keepwork.com", comment=content,  summary="我的3D作品", images=image_path })
     end
+end
+
+function CanOpenDiskDir()
+    NPL.load("(gl)script/ide/System/os/os.lua");
+    return System.os.GetPlatform() == "win32";
 end
 
 function OnOpenAlbum()
@@ -90,7 +95,9 @@ end
            
              <div style="margin-top:5px;">
                 <input type="button" value="从相册中选..." name="openAlbum" style="" onclick="OnOpenAlbum" tooltip="点击打开我的画册"/>
-                <input type="button" value="打开目录" name="openDiskAlbum" style="margin-left:5px;" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnOpenDiskDir" tooltip="点击打开我的本地画册"/>
+                <pe:if condition='<%=CanOpenDiskDir()%>' >
+                    <input type="button" value="打开目录" name="openDiskAlbum" style="margin-left:5px;" onclick="MyCompany.Aries.Creator.SharePhotosPage.OnOpenDiskDir" tooltip="点击打开我的本地画册"/>
+                </pe:if>
              </div>
         </div>
     </div>

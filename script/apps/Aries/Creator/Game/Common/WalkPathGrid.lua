@@ -10,9 +10,19 @@ Use Lib:
 NPL.load("(gl)script/apps/Aries/Creator/Game/Common/WalkPathGrid.lua");
 local WalkPathGrid = commonlib.gettable("MyCompany.Aries.Game.WalkPathGrid");
 
+-- usage 1: compute walkable grid and move along facing direction
 local pathgrid = WalkPathGrid:new();
 pathgrid:ComputeGridByCenterAndFacing()
 pathgrid:Print()
+
+-- usage 2: find full path from point A to point B with obstacle avoidance
+local pathgrid = WalkPathGrid:new();
+local waypoints = pathgrid:FindPathToTarget(fromX, fromY, fromZ, toX, toY, toZ)
+if(waypoints) then
+	for _, wp in ipairs(waypoints) do
+		echo({wp.x, wp.y, wp.z})
+	end
+end
 -------------------------------------------------------
 ]]
 NPL.load("(gl)script/ide/System/Util/AStar.lua");
@@ -435,6 +445,64 @@ function WalkPathGrid:ComputeGridByCenterAndFacing(cx, cy, cz, facing, maxSteps,
 			return true, toX, toY, toZ;
 		end
 	end
+end
+
+-- Find a path from one real-world position to another, with full obstacle avoidance.
+-- @param fromX, fromY, fromZ: starting position in real world coordinates
+-- @param toX, toY, toZ: target position in real world coordinates
+-- @param maxRadius: BFS expansion radius in blocks, default to 50
+-- @param maxIterations: A* max iterations, default to 2000
+-- @return path: an array of {x=realX, y=realY, z=realZ} waypoints from start to end (excluding start), or nil if no path found
+function WalkPathGrid:FindPathToTarget(fromX, fromY, fromZ, toX, toY, toZ, maxRadius, maxIterations)
+	maxRadius = maxRadius or 50
+	maxIterations = maxIterations or 2000
+
+	local startBx, startBy, startBz = BlockEngine:block(fromX, fromY + 0.1, fromZ)
+	local endBx, endBy, endBz = BlockEngine:block(toX, toY + 0.1, toZ)
+
+	self:SetCenter(startBx, startBy, startBz)
+
+	local bCanStay, realY = self:CanPlayerStayAtBlock(startBx, startBy, startBz)
+	if(not bCanStay) then
+		return nil
+	end
+	self:SetGridWalkable(startBx, startBy, startBz, true, realY);
+	self:ComputeWalkableMap(startBx, startBy, startBz, maxRadius)
+
+	-- check if destination is walkable
+	local destItem = self:GetGridItem(endBx, endBy, endBz)
+	if(not destItem or not destItem.isWalkable or destItem.tick ~= self.tick) then
+		return nil
+	end
+
+	-- run A* from start to destination on the XZ grid
+	local astar = AStar:new():Init(self);
+	local path, iterationCount = astar:findPath(
+		{x = startBx, y = startBz},
+		{x = destItem.bx, y = destItem.bz},
+		maxIterations
+	)
+
+	if(not path) then
+		if(iterationCount >= maxIterations) then
+			LOG.std(nil, "warn", "WalkPathGrid", "FindPathToTarget: iteration count too big %d", iterationCount)
+		end
+		return nil
+	end
+
+	-- convert path nodes to real world waypoints
+	local waypoints = {}
+	local block_waypoints = {}
+	for _, node in ipairs(path:getNodes()) do
+		local item = self:GetGridItem(node.location.x, 0, node.location.y);
+		if(item) then
+			local rx, ry, rz = BlockEngine:real_bottom(item.bx, item.by, item.bz)
+			ry = item.realY or ry;
+			waypoints[#waypoints + 1] = {x = rx, y = ry, z = rz}
+			block_waypoints[#block_waypoints + 1] = {x = item.bx, y = item.by, z = item.bz}
+		end
+	end
+	return waypoints, block_waypoints
 end
 
 function WalkPathGrid:Print()

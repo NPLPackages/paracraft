@@ -73,7 +73,10 @@ if(is_ajax()) then
         local pos = 1;
         local lineNum = 0;
         local currentSession = nil;
-        -- Scan for "# Session - XXXX" lines and extract epoch/type from contents
+        local sectionType = nil; -- "request" or "response"
+        local captureUserState = 0; -- 0=idle, 1=seen ### User heading, 2=inside user content fence
+        local inToolCallSection = false;
+        -- Scan for "# Session - XXXX" lines and extract metadata for grouping
         for line in text:gmatch("([^\n]*)\n?") do
             lineNum = lineNum + 1;
             local sessionId = line:match("^# Session %- (%d+)");
@@ -85,18 +88,78 @@ if(is_ajax()) then
                     epoch = 0,
                     reqCount = 0,
                     respCount = 0,
+                    isFollowUp = false,
+                    userPreview = "",
+                    toolCallNames = {},
                 };
                 sessions[#sessions+1] = currentSession;
+                sectionType = nil;
+                captureUserState = 0;
+                inToolCallSection = false;
             elseif currentSession then
+                -- Detect # Tool Call sections
+                local tcId = line:match("^# Tool Call %- (.+)");
+                if tcId then
+                    inToolCallSection = true;
+                    sectionType = nil;
+                end
                 -- extract first epoch value seen in this session
                 if currentSession.epoch == 0 then
                     local ep = line:match("^epoch%s+:%s+(%d+)");
                     if ep then currentSession.epoch = tonumber(ep); end
                 end
-                -- count request/response blocks
+                -- Section type tracking
                 local t = line:match("^type%s+:%s+(%a+)");
-                if t == "request" then currentSession.reqCount = currentSession.reqCount + 1;
-                elseif t == "response" then currentSession.respCount = currentSession.respCount + 1; end
+                if t == "request" then
+                    currentSession.reqCount = currentSession.reqCount + 1;
+                    sectionType = "request";
+                elseif t == "response" then
+                    currentSession.respCount = currentSession.respCount + 1;
+                    sectionType = "response";
+                end
+                -- Separator resets section
+                if line:match("^%-%-%-") then
+                    sectionType = nil;
+                    captureUserState = 0;
+                end
+                -- Detect ### Tool in request section → this is a follow-up session
+                if sectionType == "request" and line:match("^### Tool") then
+                    currentSession.isFollowUp = true;
+                end
+                -- User text extraction state machine
+                if sectionType == "request" and line:match("^### User") then
+                    captureUserState = 1;
+                elseif captureUserState == 1 and line:match("^~~~") then
+                    captureUserState = 2;
+                elseif captureUserState == 2 then
+                    if line:match("^~~~") then
+                        captureUserState = 0;
+                    elseif currentSession.userPreview == "" then
+                        local trimmed = line:match("^%s*(.-)%s*$");
+                        if trimmed ~= "" and not trimmed:match("^%[Image:") then
+                            currentSession.userPreview = trimmed:sub(1, 120);
+                        end
+                    end
+                end
+                -- Tool call name extraction from # Tool Call blocks
+                if inToolCallSection then
+                    local tcName = line:match("^name%s+:%s+(.+)");
+                    if tcName then
+                        local name = tcName:match("^%s*(.-)%s*$");
+                        if name and name ~= "" then
+                            table.insert(currentSession.toolCallNames, name);
+                        end
+                        inToolCallSection = false;
+                    end
+                end
+                -- Extract tool names from inline markers: ⏳ **Calling** `tool_name`
+                local inlineToolName = line:match("%*%*Calling%*%*%s*`([^`]+)`");
+                if inlineToolName and currentSession then
+                    local name = inlineToolName:match("^%s*(.-)%s*$");
+                    if name and name ~= "" then
+                        table.insert(currentSession.toolCallNames, name);
+                    end
+                end
             end
             pos = pos + #line + 1;
         end
@@ -110,7 +173,58 @@ if(is_ajax()) then
                 sessions[i].endLine = lineNum;
             end
         end
-        wp_send_json({fileSize = fileSize, sessions = sessions}, true);
+        -- Group sessions into messages (a message = user question + all follow-up tool-call sessions)
+        local messages = {};
+        local currentMsg = nil;
+        for i = 1, #sessions do
+            if not sessions[i].isFollowUp then
+                currentMsg = {
+                    id = sessions[i].id,
+                    userPreview = sessions[i].userPreview,
+                    epoch = sessions[i].epoch,
+                    firstSessionIdx = i,
+                    lastSessionIdx = i,
+                    firstLine = sessions[i].line,
+                    firstOffset = sessions[i].offset,
+                    toolCallNames = {},
+                    sessionCount = 1,
+                };
+                for _, tn in ipairs(sessions[i].toolCallNames) do
+                    table.insert(currentMsg.toolCallNames, tn);
+                end
+                messages[#messages+1] = currentMsg;
+            elseif currentMsg then
+                currentMsg.lastSessionIdx = i;
+                currentMsg.sessionCount = currentMsg.sessionCount + 1;
+                for _, tn in ipairs(sessions[i].toolCallNames) do
+                    table.insert(currentMsg.toolCallNames, tn);
+                end
+            else
+                -- Orphaned follow-up, treat as standalone message
+                currentMsg = {
+                    id = sessions[i].id,
+                    userPreview = sessions[i].userPreview ~= "" and sessions[i].userPreview or "(follow-up)",
+                    epoch = sessions[i].epoch,
+                    firstSessionIdx = i,
+                    lastSessionIdx = i,
+                    firstLine = sessions[i].line,
+                    firstOffset = sessions[i].offset,
+                    toolCallNames = {},
+                    sessionCount = 1,
+                };
+                for _, tn in ipairs(sessions[i].toolCallNames) do
+                    table.insert(currentMsg.toolCallNames, tn);
+                end
+                messages[#messages+1] = currentMsg;
+            end
+        end
+        -- Compute total byte length and last line for each message
+        for _, msg in ipairs(messages) do
+            local lastSession = sessions[msg.lastSessionIdx];
+            msg.totalLength = (lastSession.offset + lastSession.length) - msg.firstOffset;
+            msg.lastLine = lastSession.endLine;
+        end
+        wp_send_json({fileSize = fileSize, sessions = sessions, messages = messages}, true);
     end)
 
     ---------------------------------------------------------
@@ -279,6 +393,47 @@ button:disabled{opacity:0.35;cursor:not-allowed}
 .md-view .md-code-fence code{background:none;padding:0;font-size:inherit}
 .md-view .md-inline-code{background:#2a2a3e;padding:1px 4px;border-radius:3px;font-family:Consolas,monospace;font-size:12px;color:#f9e2af}
 .md-view .md-rendered{padding:10px 14px;background:#181825;font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;font-family:Consolas,monospace;color:#cdd6f4}
+/* Message item in sidebar */
+.message-item{padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid #1e1e2e;border-left:3px solid transparent;transition:background .1s}
+.message-item:hover{background:#2a2a3e}
+.message-item.msg-active{background:#294670!important;border-left-color:#89b4fa!important}
+.msg-preview{color:#cdd6f4;font-size:11px;margin-top:3px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+/* Turn tree view */
+.turn-container{padding:12px 16px}
+.turn-user-block{margin-bottom:12px;border:1px solid #45475a;border-radius:8px;overflow:hidden}
+.turn-user-label{font-size:12px;font-weight:600;color:#89dceb;padding:8px 14px;background:#1e1e32;border-bottom:1px solid #45475a}
+.turn-user-content{padding:10px 14px;background:#181825;font-size:12px;line-height:1.6;color:#cdd6f4;white-space:pre-wrap;word-break:break-word}
+.turn-user-content img{max-width:100%;max-height:300px;border-radius:4px;margin:6px 0;display:block}
+.turn-step{margin:0 0 0 8px;border-left:2px solid #45475a;background:transparent}
+.turn-step[open]{background:transparent}
+.step-summary{display:flex;align-items:center;gap:6px;padding:7px 12px;font-size:12px;cursor:pointer;user-select:none;color:#a6adc8;list-style:none}
+.step-summary::-webkit-details-marker{display:none}
+.step-summary::before{content:'\25B8';color:#6c7086;font-size:10px;flex-shrink:0;transition:transform .15s}
+.turn-step[open] > .step-summary::before{transform:rotate(90deg)}
+.step-summary:hover{background:rgba(137,180,250,.06);color:#cdd6f4}
+.step-icon{flex-shrink:0;font-size:13px}
+.step-label{font-weight:600;flex-shrink:0}
+.step-meta{color:#6c7086;font-size:11px;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.request-summary .step-label{color:#89b4fa}
+.response-summary .step-label{color:#a6e3a1}
+.tool-summary .step-label{color:#f9e2af}
+.step-body{border-top:1px solid #45475a;background:#1a1a2e}
+.step-body .entry-block{border:none;border-radius:0;margin:0}
+/* Sidebar step tree items */
+.msg-children{display:none;padding:0 0 4px 0}
+.msg-children.expanded{display:block}
+.step-item{padding:5px 8px 5px 14px;cursor:pointer;font-size:11px;display:flex;align-items:center;gap:5px;color:#a6adc8;transition:background .1s}
+.step-item:hover{background:rgba(137,180,250,.08);color:#cdd6f4}
+.step-item.step-active{background:rgba(41,70,112,.8)!important;color:#89b4fa}
+.step-item .si-icon{flex-shrink:0;font-size:11px}
+.step-item .si-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.step-item .si-meta{flex-shrink:0;color:#6c7086;font-size:10px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.step-item.si-request .si-label{color:#89b4fa}
+.step-item.si-response .si-label{color:#a6e3a1}
+.step-item.si-tool .si-label{color:#f9e2af}
+/* Right panel step content */
+.step-content-wrap{padding:12px 16px}
+.step-content-wrap .entry-block{margin-bottom:0}
 </style>
 
 <!-- ==================== APP ==================== -->
@@ -298,12 +453,12 @@ button:disabled{opacity:0.35;cursor:not-allowed}
             <div id="file-info" style="font-size:11px;color:#6c7086;margin-top:5px"></div>
         </div>
 
-        <!-- Session list header -->
+        <!-- Message list header -->
         <div style="padding:6px 12px;font-size:11px;color:#a6adc8;border-bottom:1px solid #45475a;flex-shrink:0;display:flex;justify-content:space-between;align-items:center">
-            <span id="session-count">Sessions</span>
+            <span id="session-count">Messages</span>
         </div>
 
-        <!-- Session list -->
+        <!-- Message list -->
         <div id="session-list" style="flex:1;overflow-y:auto">
             <div style="text-align:center;padding:30px 0;color:#6c7086;font-size:13px">Loading&hellip;</div>
         </div>
@@ -317,10 +472,10 @@ button:disabled{opacity:0.35;cursor:not-allowed}
             <button id="btn-prev" style="padding:3px 8px;background:rgba(137,180,250,.15);color:#89b4fa;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled>&laquo; Older</button>
             <button id="btn-next" style="padding:3px 8px;background:rgba(137,180,250,.15);color:#89b4fa;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled>Newer &raquo;</button>
             <div style="width:1px;height:18px;background:#45475a"></div>
-            <button id="btn-refresh" style="padding:3px 8px;background:rgba(166,227,161,.15);color:#a6e3a1;border:none;border-radius:4px;font-size:11px;cursor:pointer" title="Reload file and jump to latest session">&#8635; Refresh</button>
-            <button id="btn-delete-before" style="padding:3px 8px;background:rgba(243,139,168,.15);color:#f38ba8;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled title="Delete all sessions before the current one">&#128465; Delete Before</button>
+            <button id="btn-refresh" style="padding:3px 8px;background:rgba(166,227,161,.15);color:#a6e3a1;border:none;border-radius:4px;font-size:11px;cursor:pointer" title="Reload file and jump to latest message">&#8635; Refresh</button>
+            <button id="btn-delete-before" style="padding:3px 8px;background:rgba(243,139,168,.15);color:#f38ba8;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled title="Delete all messages before the current one">&#128465; Delete Before</button>
             <div style="width:1px;height:18px;background:#45475a"></div>
-            <input id="search-box" type="text" placeholder="Search in session... (Ctrl+F)" style="background:#1a1a2e;color:#cdd6f4;border:1px solid #45475a;border-radius:4px;padding:3px 8px;font-size:11px;width:220px" />
+            <input id="search-box" type="text" placeholder="Search in message... (Ctrl+F)" style="background:#1a1a2e;color:#cdd6f4;border:1px solid #45475a;border-radius:4px;padding:3px 8px;font-size:11px;width:220px" />
             <div style="width:1px;height:18px;background:#45475a"></div>
             <button id="btn-vscode" style="padding:3px 8px;background:rgba(203,166,247,.15);color:#cba6f7;border:none;border-radius:4px;font-size:11px;cursor:pointer" disabled title="Open current session in VS Code">&#x1F4C2; VSCode</button>
             <span id="status-bar" style="font-size:11px;color:#6c7086;margin-left:auto;white-space:nowrap"></span>
@@ -338,15 +493,18 @@ button:disabled{opacity:0.35;cursor:not-allowed}
 <script>
 (function(){
 "use strict";
-console.log("[ChatLogViewer] Script loaded");
 
 // ======================== State ========================
 var logDir = "temp/aichat_logs/";
 var files = [];
 var currentFile = null;
 var sessions = [];
-var currentSessionIdx = -1;
+var messages = [];
+var currentMessageIdx = -1;
+var currentStepIdx = -1;
+var currentSteps = [];
 var totalFileSize = 0;
+var messageStepsCache = {};
 
 // ======================== DOM refs ========================
 var $dateInput    = document.getElementById("date-input");
@@ -364,11 +522,6 @@ var $btnDeleteBefore = document.getElementById("btn-delete-before");
 var $searchBox       = document.getElementById("search-box");
 var $btnVSCode       = document.getElementById("btn-vscode");
 var $statusBar       = document.getElementById("status-bar");
-
-console.log("[ChatLogViewer] DOM refs:", {
-    dateInput: !!$dateInput, sessionList: !!$sessionList, content: !!$content,
-    sidebar: !!document.getElementById("cl-sidebar"), app: !!document.getElementById("cl-app")
-});
 
 // ======================== Helpers ========================
 function formatSize(n) {
@@ -388,15 +541,13 @@ function ajax(action, params, cb) {
     if (params) for (var k in params) {
         if (params.hasOwnProperty(k)) qs += "&" + k + "=" + encodeURIComponent(params[k]);
     }
-    console.log("[ChatLogViewer] AJAX ->", action, params);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "/ajax/raw?file=script/apps/Aries/Creator/Game/Common/ChatLogDebugView.page", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4) {
-            console.log("[ChatLogViewer] AJAX <-", action, "status:", xhr.status, "len:", xhr.responseText.length);
             try { cb(JSON.parse(xhr.responseText)); }
-            catch(e){ console.error("[ChatLogViewer] AJAX parse error:", e, xhr.responseText.substring(0,200)); cb({error: xhr.statusText || "parse error"}); }
+            catch(e){ cb({error: xhr.statusText || "parse error"}); }
         }
     };
     xhr.send(qs);
@@ -408,12 +559,21 @@ function shiftDate(dateStr, days) {
     return getLocalDateStr(d);
 }
 
+function formatEpoch(epoch) {
+    if (!epoch) return "";
+    var d = new Date(epoch * 1000);
+    var pad = function(n){ return n < 10 ? "0" + n : n; };
+    return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
 // ======================== File list ========================
 function loadFileList(cb) {
-    console.log("[ChatLogViewer] loadFileList()");
     ajax("list_files", {}, function(data){
         files = data || [];
-        console.log("[ChatLogViewer] Got", files.length, "files:", files.map(function(f){return f.date}));
         if (cb) cb();
     });
 }
@@ -427,173 +587,332 @@ function findFileByDate(dateStr) {
 
 // ======================== Date navigation ========================
 function selectDate(dateStr) {
-    console.log("[ChatLogViewer] selectDate:", dateStr);
     $dateInput.value = dateStr;
     var fileEntry = findFileByDate(dateStr);
     if (fileEntry) {
         $fileInfo.textContent = fileEntry.filename + " (" + formatSize(fileEntry.size) + ")";
         loadFileByName(fileEntry.filename);
     } else {
-        console.log("[ChatLogViewer] No file for date:", dateStr);
         $fileInfo.textContent = "No log file for " + dateStr;
         currentFile = null;
         sessions = [];
-        currentSessionIdx = -1;
-        $sessionCount.textContent = "Sessions";
+        messages = [];
+        currentMessageIdx = -1;
+        currentStepIdx = -1;
+        currentSteps = [];
+        messageStepsCache = {};
+        $sessionCount.textContent = "Messages";
         $sessionList.innerHTML = '<div style="padding:12px;color:#6c7086;font-size:11px">No data for this date.</div>';
-        $content.innerHTML = '<p style="color:#6c7086;text-align:center;padding:40px 0">No log file found for ' + dateStr + '.</p>';
+        $content.innerHTML = '<p style="color:#6c7086;text-align:center;padding:40px 0">No log file for ' + dateStr + '.</p>';
         $statusBar.textContent = "";
         updateNavButtons();
     }
 }
 
-$dateInput.addEventListener("change", function(){
-    selectDate($dateInput.value);
-});
+$dateInput.addEventListener("change", function(){ selectDate($dateInput.value); });
+$btnPrevDay.addEventListener("click", function(){ if ($dateInput.value) selectDate(shiftDate($dateInput.value, -1)); });
+$btnNextDay.addEventListener("click", function(){ if ($dateInput.value) selectDate(shiftDate($dateInput.value, 1)); });
 
-$btnPrevDay.addEventListener("click", function(){
-    if ($dateInput.value) selectDate(shiftDate($dateInput.value, -1));
-});
-
-$btnNextDay.addEventListener("click", function(){
-    if ($dateInput.value) selectDate(shiftDate($dateInput.value, 1));
-});
-
-// ======================== Load file & sessions ========================
+// ======================== Load file & messages ========================
 function loadFileByName(fname) {
-    console.log("[ChatLogViewer] loadFileByName:", fname, "currentFile:", currentFile);
     if (currentFile === fname) return;
     currentFile = fname;
-    currentSessionIdx = -1;
-    $sessionList.innerHTML = '<div style="text-align:center;padding:30px 0;color:#6c7086;font-size:13px">Scanning&hellip;</div>';
-    $content.innerHTML = '<p style="color:#6c7086;text-align:center;padding:40px 0">Loading sessions&hellip;</p>';
+    currentMessageIdx = -1;
+    currentStepIdx = -1;
+    currentSteps = [];
+    messageStepsCache = {};
+    $sessionList.innerHTML = '<div style="text-align:center;padding:30px 0;color:#6c7086;font-size:13px">Scanning\u2026</div>';
+    $content.innerHTML = '<p style="color:#6c7086;text-align:center;padding:40px 0">Loading\u2026</p>';
     $statusBar.textContent = "";
 
     ajax("get_sessions", {logfile: fname}, function(data){
         if (data.error) {
-            console.error("[ChatLogViewer] get_sessions error:", data.error);
             $sessionList.innerHTML = '<div style="padding:12px;color:#f38ba8;font-size:11px">' + data.error + '</div>';
             return;
         }
         sessions = data.sessions || [];
+        messages = data.messages || [];
         totalFileSize = data.fileSize || 0;
-        console.log("[ChatLogViewer] Got", sessions.length, "sessions, fileSize:", totalFileSize);
-        $sessionCount.textContent = sessions.length + " Sessions";
-        renderSessionList();
+        $sessionCount.textContent = messages.length + " Messages";
+        renderMessageList();
 
-        if (sessions.length > 0) {
-            selectSession(sessions.length - 1);
+        if (messages.length > 0) {
+            selectMessage(messages.length - 1);
         } else {
-            $content.innerHTML = '<div style="color:#6c7086;text-align:center;padding:40px 0">No sessions found in file.</div>';
+            $content.innerHTML = '<div style="color:#6c7086;text-align:center;padding:40px 0">No messages found.</div>';
         }
-        $statusBar.textContent = sessions.length + " sessions | " + formatSize(totalFileSize);
+        $statusBar.textContent = messages.length + " messages (" + sessions.length + " sessions) | " + formatSize(totalFileSize);
     });
 }
 
-// Map from display index (newest-first) to file index
-var sessionDisplayOrder = [];
+// ======================== Message list (sidebar) ========================
+var messageDisplayOrder = [];
 
-function formatEpoch(epoch) {
-    if (!epoch) return "";
-    var d = new Date(epoch * 1000);
-    var pad = function(n){ return n < 10 ? "0" + n : n; };
-    return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
-}
-
-function renderSessionList() {
-    console.log("[ChatLogViewer] renderSessionList:", sessions.length, "sessions");
-    // Build display order: newest session first
-    sessionDisplayOrder = [];
-    for (var i = sessions.length - 1; i >= 0; i--) sessionDisplayOrder.push(i);
+function renderMessageList() {
+    messageDisplayOrder = [];
+    for (var i = messages.length - 1; i >= 0; i--) messageDisplayOrder.push(i);
 
     var html = "";
-    for (var di = 0; di < sessionDisplayOrder.length; di++) {
-        var i = sessionDisplayOrder[di];
-        var s = sessions[i];
-        var timeStr = formatEpoch(s.epoch);
-        var lineRange = "L" + s.line + "-L" + (s.endLine || "?");
-        var statsStr = s.reqCount + "req / " + s.respCount + "resp";
-        html += '<div class="session-item" style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid #1e1e2e;border-left:3px solid transparent" data-idx="' + i + '">'
-              + '<div style="font-weight:600;color:#89b4fa">'
-              + '#' + s.id
-              + (timeStr ? ' <span style="color:#f9e2af;font-weight:normal">: ' + timeStr + '</span>' : '')
-              + '</div>'
-              + '<div style="color:#6c7086;font-size:11px;margin-top:2px">' + statsStr + ' &middot; ' + lineRange + '</div>'
-              + '</div>';
-    }
-    $sessionList.innerHTML = html || '<div style="padding:12px;color:#6c7086;font-size:11px">No sessions.</div>';
+    for (var di = 0; di < messageDisplayOrder.length; di++) {
+        var i = messageDisplayOrder[di];
+        var m = messages[i];
+        var timeStr = formatEpoch(m.epoch);
+        var preview = m.userPreview || "(no preview)";
+        if (preview.length > 80) preview = preview.substring(0, 80) + "\u2026";
 
-    var items = $sessionList.querySelectorAll(".session-item");
-    console.log("[ChatLogViewer] Session items in DOM:", items.length);
-    for (var di = 0; di < items.length; di++) {
-        (function(item, fileIdx) {
-            item.addEventListener("click", function(){ selectSession(fileIdx); });
-            item.addEventListener("mouseenter", function(){ if(item.style.background !== "rgb(41, 70, 112)") item.style.background="#2a2a3e"; });
-            item.addEventListener("mouseleave", function(){ if(item.style.background !== "rgb(41, 70, 112)") item.style.background=""; });
-        })(items[di], sessionDisplayOrder[di]);
+        var toolsHtml = "";
+        
+
+        html += '<div class="message-item" data-idx="' + i + '">';
+        html += '<div class="msg-header" data-idx="' + i + '">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
+        html += '<span style="font-size:11px">\uD83D\uDCAC</span>';
+        html += '<span style="color:#6c7086;font-size:10px;flex-shrink:0;margin-left:6px">';
+        html += (timeStr || '') + (m.sessionCount > 1 ? ' \u00b7 ' + m.sessionCount + ' reqs' : '');
+        html += '</span></div>';
+        html += '<div class="msg-preview">' + escapeHtml(preview) + '</div>';
+        html += toolsHtml;
+        html += '</div>'; // end msg-header
+        html += '<div class="msg-children" data-msg="' + i + '"></div>';
+        html += '</div>'; // end message-item
+    }
+    $sessionList.innerHTML = html || '<div style="padding:12px;color:#6c7086;font-size:11px">No messages.</div>';
+
+    // Bind click on msg-header elements
+    var headers = $sessionList.querySelectorAll(".msg-header");
+    for (var di = 0; di < headers.length; di++) {
+        (function(header) {
+            var idx = parseInt(header.getAttribute("data-idx"));
+            header.style.cursor = "pointer";
+            header.addEventListener("click", function(){ selectMessage(idx); });
+            header.addEventListener("mouseenter", function(){
+                var item = header.parentElement;
+                if (!item.classList.contains("msg-active")) item.style.background = "#2a2a3e";
+            });
+            header.addEventListener("mouseleave", function(){
+                var item = header.parentElement;
+                if (!item.classList.contains("msg-active")) item.style.background = "";
+            });
+        })(headers[di]);
     }
 }
 
-// ======================== Select session ========================
-function selectSession(idx) {
-    if (idx < 0 || idx >= sessions.length) return;
-    console.log("[ChatLogViewer] selectSession:", idx);
-    currentSessionIdx = idx;
+// ======================== Select message ========================
+function selectMessage(idx) {
+    if (idx < 0 || idx >= messages.length) return;
+
+    // Collapse previous message's step children
+    if (currentMessageIdx >= 0 && currentMessageIdx !== idx) {
+        collapseMessage(currentMessageIdx);
+    }
+
+    currentMessageIdx = idx;
+    currentStepIdx = -1;
     updateNavButtons();
 
-    // Highlight the correct item in the reversed display order
-    var items = $sessionList.querySelectorAll(".session-item");
-    for (var di = 0; di < items.length; di++) {
-        if (sessionDisplayOrder[di] === idx) {
-            items[di].style.background = "#294670";
-            items[di].style.borderLeftColor = "#89b4fa";
-            items[di].scrollIntoView({block:"nearest"});
+    // Highlight message in sidebar
+    var allItems = $sessionList.querySelectorAll(".message-item");
+    for (var i = 0; i < allItems.length; i++) {
+        var itemIdx = parseInt(allItems[i].getAttribute("data-idx"));
+        if (itemIdx === idx) {
+            allItems[i].style.background = "#294670";
+            allItems[i].style.borderLeftColor = "#89b4fa";
+            allItems[i].classList.add("msg-active");
         } else {
-            items[di].style.background = "";
-            items[di].style.borderLeftColor = "transparent";
+            allItems[i].style.background = "";
+            allItems[i].style.borderLeftColor = "transparent";
+            allItems[i].classList.remove("msg-active");
         }
     }
 
-    var s = sessions[idx];
-    $content.innerHTML = '<div style="color:#6c7086;text-align:center;padding:40px 0">Loading session #' + s.id + '&hellip;</div>';
-    $statusBar.textContent = "Loading session #" + s.id + "...";
+    // Check cache
+    if (messageStepsCache[idx]) {
+        expandAndSelectFirst(idx, messageStepsCache[idx]);
+        return;
+    }
 
-    loadSessionText(s, function(text) {
-        console.log("[ChatLogViewer] Session #" + s.id + " loaded, length:", text.length);
-        renderMarkdownView(text, s);
-        $statusBar.textContent = "Session #" + s.id + " | L" + s.line + "-L" + (s.endLine||"?") + " | " + formatSize(s.length);
+    // Load message text, parse steps
+    $content.innerHTML = '<div style="color:#6c7086;text-align:center;padding:40px 0">Loading\u2026</div>';
+    $statusBar.textContent = "Loading...";
+    var m = messages[idx];
+
+    loadMessageText(m, function(text) {
+        var steps = parseSteps(text);
+        messageStepsCache[idx] = steps;
+        expandAndSelectFirst(idx, steps);
     });
 }
 
-function loadSessionText(session, cb) {
+function expandAndSelectFirst(msgIdx, steps) {
+    currentSteps = steps;
+    renderStepChildren(msgIdx, steps);
+
+    // Find first meaningful step (skip unknown)
+    var firstStepIdx = -1;
+    for (var i = 0; i < steps.length; i++) {
+        if (steps[i].type !== "unknown") {
+            firstStepIdx = i;
+            break;
+        }
+    }
+    if (firstStepIdx >= 0) {
+        selectStep(firstStepIdx);
+    } else {
+        $content.innerHTML = '<p style="color:#6c7086;text-align:center;padding:40px 0">No content.</p>';
+    }
+    var m = messages[msgIdx];
+    $statusBar.textContent = "Message #" + m.id + " | " + m.sessionCount + " request(s) | " + steps.length + " steps";
+}
+
+function collapseMessage(idx) {
+    if (idx < 0) return;
+    var container = document.querySelector('.msg-children[data-msg="' + idx + '"]');
+    if (container) {
+        container.classList.remove("expanded");
+        container.innerHTML = "";
+    }
+}
+
+function renderStepChildren(msgIdx, steps) {
+    var container = document.querySelector('.msg-children[data-msg="' + msgIdx + '"]');
+    if (!container) return;
+
+    var html = "";
+    var reqNum = 0;
+    for (var i = 0; i < steps.length; i++) {
+        var step = steps[i];
+        if (step.type === "unknown") continue;
+
+        var icon = "", label = "", meta = "", cls = "";
+        if (step.type === "request") {
+            reqNum++;
+            icon = "\uD83D\uDD04";
+            label = "Request #" + reqNum + (reqNum > 1 ? " (follow-up)" : "");
+            meta = (step.meta.model || "");
+            if (step.meta.toolCount) meta += (meta ? " \u00b7 " : "") + step.meta.toolCount + " tools";
+            cls = "si-request";
+        } else if (step.type === "response") {
+            var isLast = true;
+            for (var j = i + 1; j < steps.length; j++) { if (steps[j].type === "request") { isLast = false; break; } }
+            var hasTC = parseInt(step.meta.toolCallCount || "0") > 0;
+            icon = (isLast && !hasTC) ? "\u2705" : "\uD83E\uDD16";
+            label = "Response #" + reqNum;
+            var code = step.meta.resultCode || "?";
+            meta = code;
+            if (step.meta.duration) meta += " \u00b7 " + step.meta.duration;
+            if (hasTC) meta += " \u00b7 \uD83D\uDD27\u00d7" + step.meta.toolCallCount;
+            cls = "si-response";
+        } else if (step.type === "tool-call") {
+            icon = "\uD83D\uDD27";
+            label = step.name || step.callId;
+            meta = step.callId ? step.callId.substring(0, 20) : "";
+            cls = "si-tool";
+        } else if (step.type === "tool-inline") {
+            icon = step.toolStatus === "success" ? "\u2705" : step.toolStatus === "error" ? "\u274C" : "\u23F3";
+            label = step.name || "tool";
+            meta = step.duration || "";
+            if (step.toolStatus === "error") meta = "error" + (meta ? " \u00b7 " + meta : "");
+            cls = "si-tool";
+        }
+
+        html += '<div class="step-item ' + cls + '" data-step="' + i + '">';
+        html += '<span class="si-icon">' + icon + '</span>';
+        html += '<span class="si-label">' + escapeHtml(label) + '</span>';
+        html += '<span class="si-meta">' + escapeHtml(meta) + '</span>';
+        html += '</div>';
+    }
+
+    container.innerHTML = html;
+    container.classList.add("expanded");
+
+    // Attach click listeners
+    var items = container.querySelectorAll(".step-item");
+    for (var i = 0; i < items.length; i++) {
+        (function(item) {
+            item.addEventListener("click", function(e) {
+                e.stopPropagation();
+                selectStep(parseInt(item.getAttribute("data-step")));
+            });
+        })(items[i]);
+    }
+
+    // Scroll message into view
+    var msgItem = document.querySelector('.message-item[data-idx="' + msgIdx + '"]');
+    if (msgItem) msgItem.scrollIntoView({block: "nearest"});
+}
+
+// ======================== Select step ========================
+function selectStep(stepIdx) {
+    if (stepIdx < 0 || stepIdx >= currentSteps.length) return;
+    currentStepIdx = stepIdx;
+
+    // Highlight in sidebar
+    var allStepItems = $sessionList.querySelectorAll(".step-item");
+    for (var i = 0; i < allStepItems.length; i++) {
+        allStepItems[i].classList.remove("step-active");
+    }
+    var activeItem = document.querySelector('.step-item[data-step="' + stepIdx + '"]');
+    if (activeItem) {
+        activeItem.classList.add("step-active");
+        activeItem.scrollIntoView({block: "nearest"});
+    }
+
+    // Render step content in right panel
+    var step = currentSteps[stepIdx];
+    if (step) {
+        renderStepContent(step);
+    }
+}
+
+function renderStepContent(step) {
+    var html = '<div class="step-content-wrap"><div class="entry-block">';
+    html += renderBlockContent(step.raw);
+    html += '</div></div>';
+    $content.innerHTML = html;
+    $contentWrap.scrollTop = 0;
+
+    // Copy-on-click for code blocks
+    var pres = $content.querySelectorAll("pre.code-block");
+    for (var i = 0; i < pres.length; i++) {
+        pres[i].title = "Click to copy";
+        pres[i].style.cursor = "pointer";
+        pres[i].addEventListener("click", copyPre);
+    }
+}
+
+function parseSteps(text) {
+    var blocks = splitBlocks(text);
+    var steps = [];
+    for (var i = 0; i < blocks.length; i++) {
+        var s = classifyBlock(blocks[i]);
+        if (s) steps.push(s);
+    }
+    return steps;
+}
+
+function loadMessageText(message, cb) {
     var chunkSize = 2 * 1024 * 1024;
-    if (session.length <= chunkSize) {
-        ajax("get_chunk", {logfile: currentFile, from: session.offset, length: session.length}, function(data){
+    if (message.totalLength <= chunkSize) {
+        ajax("get_chunk", {logfile: currentFile, from: message.firstOffset, length: message.totalLength}, function(data){
             cb(data.text || "");
         });
     } else {
         var parts = [];
         var loaded = 0;
-        var total = session.length;
-        var loadNext = function() {
+        var total = message.totalLength;
+        (function loadNext() {
             var len = Math.min(chunkSize, total - loaded);
-            ajax("get_chunk", {logfile: currentFile, from: session.offset + loaded, length: len}, function(data){
+            ajax("get_chunk", {logfile: currentFile, from: message.firstOffset + loaded, length: len}, function(data){
                 parts.push(data.text || "");
                 loaded += data.length;
                 if (loaded < total) loadNext();
                 else cb(parts.join(""));
             });
-        };
-        loadNext();
+        })();
     }
 }
 
-// ======================== Markdown Renderer ========================
-function escapeHtml(str) {
-    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-
-// Render ~~~md content: plain text with [Image: URL] rendered as <img>
+// ======================== Render Helpers ========================
 function renderMdContent(text) {
     text = text.replace(/\r/g, '');
     var parts = text.split(/(\[Image:[^\]]+\])/g);
@@ -619,58 +938,6 @@ function roleClass(role) {
     return "";
 }
 
-function entryTypeClass(typeStr) {
-    if (!typeStr) return "";
-    if (typeStr.indexOf("request") !== -1) return "type-request";
-    if (typeStr.indexOf("response") !== -1) return "type-response";
-    if (typeStr.indexOf("tool") !== -1) return "type-tool";
-    if (typeStr.indexOf("summary") !== -1) return "type-summary";
-    return "";
-}
-
-// Parse raw session text into rendered HTML
-function renderMarkdownView(text, session) {
-    // Split into blocks by --- separator, but only outside ~~~ fenced blocks
-    var lines = text.replace(/\r/g, '').split("\n");
-    var blocks = [];
-    var currentBlock = [];
-    var inFence = false;
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
-        if (/^~~~/.test(line)) {
-            inFence = !inFence;
-            currentBlock.push(line);
-        } else if (!inFence && /^---\s*$/.test(line)) {
-            // Block separator found outside fenced block
-            blocks.push(currentBlock.join("\n"));
-            currentBlock = [];
-        } else {
-            currentBlock.push(line);
-        }
-    }
-    if (currentBlock.length > 0) blocks.push(currentBlock.join("\n"));
-
-    var html = '';
-
-    for (var bi = 0; bi < blocks.length; bi++) {
-        var block = blocks[bi].trim();
-        if (!block) continue;
-        html += renderBlock(block);
-    }
-
-    $content.innerHTML = html || '<p style="color:#6c7086;text-align:center;padding:40px 0">Empty session.</p>';
-    $contentWrap.scrollTop = 0;
-
-    // Activate native <details> elements (they already work in browser)
-    // Add copy-on-click to pre.code-block
-    var pres = $content.querySelectorAll("pre.code-block");
-    for (var i = 0; i < pres.length; i++) {
-        pres[i].title = "Click to copy";
-        pres[i].style.cursor = "pointer";
-        pres[i].addEventListener("click", copyPre);
-    }
-}
-
 function copyPre(e) {
     var text = e.currentTarget.textContent;
     try { navigator.clipboard.writeText(text); } catch(ex) {}
@@ -679,8 +946,98 @@ function copyPre(e) {
     setTimeout(function(){ e.currentTarget.style.outline = old; }, 600);
 }
 
-function renderBlock(block) {
-    block = block.replace(/\r/g, '');
+// ======================== Message View (Tree) ========================
+// Split text by --- separators (outside fences)
+function splitBlocks(text) {
+    var lines = text.replace(/\r/g, '').split("\n");
+    var blocks = [];
+    var current = [];
+    var inFence = false;
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        if (/^~~~/.test(line) || /^```/.test(line)) {
+            inFence = !inFence;
+            current.push(line);
+        } else if (!inFence && /^---\s*$/.test(line)) {
+            if (current.length) blocks.push(current.join("\n"));
+            current = [];
+        } else {
+            current.push(line);
+        }
+    }
+    if (current.length) blocks.push(current.join("\n"));
+    return blocks;
+}
+
+// Classify a block by its type
+function classifyBlock(block) {
+    var result = {raw: block.trim()};
+    if (!result.raw) return null;
+
+    // # Tool Call block
+    if (/^# Tool Call/m.test(result.raw)) {
+        result.type = "tool-call";
+        var idMatch = result.raw.match(/^# Tool Call - (.+)/m);
+        result.callId = idMatch ? idMatch[1].trim() : "";
+        var nameMatch = result.raw.match(/^name\s+:\s+(.+)/m);
+        result.name = nameMatch ? nameMatch[1].trim() : result.callId;
+        result.meta = {};
+        return result;
+    }
+
+    // Parse metadata from ~~~ block
+    result.meta = {};
+    var metaBlock = result.raw.match(/~~~\n([\s\S]*?)~~~/);
+    if (metaBlock) {
+        metaBlock[1].split("\n").forEach(function(ml) {
+            var kv = ml.match(/^([\w\-]+)\s+:\s+(.+)/);
+            if (kv) result.meta[kv[1].trim()] = kv[2].trim();
+        });
+    }
+    var typeMatch = result.raw.match(/^type\s+:\s+(\w+)/m);
+
+    // # Session header - may also contain a request
+    if (/^# Session/m.test(result.raw)) {
+        var sm = result.raw.match(/^# Session - (\d+)/m);
+        result.sessionId = sm ? sm[1] : "";
+        if (typeMatch) {
+            result.type = typeMatch[1]; // "request" or "response"
+            result.hasSessionHeader = true;
+        } else {
+            result.type = "unknown"; // pure session header with no type
+        }
+        return result;
+    }
+
+    // Standalone metadata block with type
+    if (typeMatch) {
+        result.type = typeMatch[1]; // "request" or "response"
+        return result;
+    }
+
+    // Inline tool call markers (⏳ Calling / ✓ result / ✗ error from LogToolCallStart/End)
+    if (/^[\u23F3\u2713\u2717]\s*\*\*/m.test(result.raw)) {
+        result.type = "tool-inline";
+        // Extract tool name from `tool_name` or **tool_name**
+        var tnMatch = result.raw.match(/`([^`]+)`/) || result.raw.match(/\*\*(?:Calling\*\*\s*`([^`]+)`|([^\*]+)\*\*)/);
+        result.name = (tnMatch && (tnMatch[1] || tnMatch[2] || tnMatch[3])) || "tool";
+        result.name = result.name.replace(/^\s+|\s+$/g, "");
+        // Detect completion status
+        result.toolStatus = /^\u2713/m.test(result.raw) ? "success" : /^\u2717/m.test(result.raw) ? "error" : "pending";
+        // Extract duration if present
+        var durMatch = result.raw.match(/\((\d+)ms\)/);
+        result.duration = durMatch ? durMatch[1] + "ms" : "";
+        result.meta = {};
+        return result;
+    }
+
+    result.type = "unknown";
+    return result;
+}
+
+// Render raw block content (reuses the original block renderer logic)
+function renderBlockContent(block) {
+    block = (block || "").replace(/\r/g, '');
     var lines = block.split("\n");
     var li = 0;
     var html = '';
@@ -688,49 +1045,37 @@ function renderBlock(block) {
     function peek() { return li < lines.length ? lines[li] : null; }
     function next() { return li < lines.length ? lines[li++] : null; }
 
-    // Detect entry type (from first metadata block)
-    var typeStr = (block.match(/^type\s+:\s+(\w+)/m) || [])[1] || "";
-    var blockClass = "entry-block " + entryTypeClass(typeStr);
-
-    html += '<div class="' + blockClass + '">';
-
     while (li < lines.length) {
         var line = peek();
         if (line === null) break;
 
-        // # Level-1 heading (Session title or Tool Call title)
+        // # heading
         if (/^# /.test(line)) {
             next();
             html += '<h1 class="session-title">' + escapeHtml(line.slice(2)) + '</h1>';
             continue;
         }
-
-        // ## Level-2 heading
+        // ## heading
         if (/^## /.test(line)) {
             next();
             html += '<h2 class="section-head">' + escapeHtml(line.slice(3)) + '</h2>';
             continue;
         }
-
-        // ### Level-3 heading (message role)
+        // ### heading (role)
         if (/^### /.test(line)) {
             next();
             var role = line.slice(4);
             html += '<h3 class="msg-role ' + roleClass(role) + '">' + escapeHtml(role) + '</h3>';
             continue;
         }
-
         // ~~~ fenced code block
         if (/^~~~/.test(line)) {
-            var fence = next(); // consume opening ~~~
-            var isJson = /json/i.test(fence) || typeStr === "";
-            var isMeta = fence === "~~~";
+            var fence = next();
             var isMd = /md/i.test(fence);
+            var isMeta = fence.trim() === "~~~";
             var codeLines = [];
-            while (li < lines.length && !/^~~~/.test(peek())) {
-                codeLines.push(next());
-            }
-            if (li < lines.length) next(); // consume closing ~~~
+            while (li < lines.length && !/^~~~/.test(peek())) codeLines.push(next());
+            if (li < lines.length) next();
             if (isMd) {
                 html += '<div class="md-rendered">' + renderMdContent(codeLines.join("\n")) + '</div>';
             } else {
@@ -739,21 +1084,16 @@ function renderBlock(block) {
             }
             continue;
         }
-
-        // ``` fenced code block (inside details)
+        // ``` fenced
         if (/^```/.test(line)) {
             var fence2 = next();
             var codeLines2 = [];
-            while (li < lines.length && !/^```/.test(peek())) {
-                codeLines2.push(next());
-            }
+            while (li < lines.length && !/^```/.test(peek())) codeLines2.push(next());
             if (li < lines.length) next();
-            var cls2 = "code-block" + (/json/i.test(fence2) ? " json-block" : "");
-            html += '<pre class="' + cls2 + '">' + escapeHtml(codeLines2.join("\n")) + '</pre>';
+            html += '<pre class="code-block' + (/json/i.test(fence2) ? ' json-block' : '') + '">' + escapeHtml(codeLines2.join("\n")) + '</pre>';
             continue;
         }
-
-        // <details> block – collect until </details> and render natively
+        // <details> block
         if (/^<details>/.test(line)) {
             var detLines = [];
             while (li < lines.length) {
@@ -761,71 +1101,59 @@ function renderBlock(block) {
                 detLines.push(dl);
                 if (/<\/details>/.test(dl)) break;
             }
-            // Parse summary + body
             var detRaw = detLines.join("\n");
             var summaryMatch = detRaw.match(/<summary>([\s\S]*?)<\/summary>/);
             var summaryText = summaryMatch ? summaryMatch[1] : "Details";
-            // Body: everything between </summary> and </details>, strip code fence if present
             var bodyRaw = detRaw.replace(/<details>/, "").replace(/<\/details>/, "").replace(/<summary>[\s\S]*?<\/summary>/, "").trim();
-            // Render body lines through mini renderer (handles ``` blocks)
             var bodyHtml = "";
             var bLines = bodyRaw.split("\n");
             var bi2 = 0;
             while (bi2 < bLines.length) {
-                var bl = bLines[bi2];
-                if (/^```/.test(bl)) {
+                if (/^```/.test(bLines[bi2])) {
                     var f3 = bLines[bi2++];
                     var cl3 = [];
                     while (bi2 < bLines.length && !/^```/.test(bLines[bi2])) cl3.push(bLines[bi2++]);
-                    if (bi2 < bLines.length) bi2++; // closing ```
+                    if (bi2 < bLines.length) bi2++;
                     bodyHtml += '<pre class="code-block' + (/json/i.test(f3) ? ' json-block' : '') + '">' + escapeHtml(cl3.join("\n")) + '</pre>';
                 } else {
-                    if (bl.trim()) bodyHtml += '<div class="det-body">' + escapeHtml(bl) + '</div>';
+                    if (bLines[bi2].trim()) bodyHtml += '<div class="det-body">' + escapeHtml(bLines[bi2]) + '</div>';
                     bi2++;
                 }
             }
             html += '<details><summary>' + escapeHtml(summaryText) + '</summary>' + bodyHtml + '</details>';
             continue;
         }
-
-        // Tool status lines: ⏳, ✓, ✗
-        if (/^[⏳✓✗]/.test(line)) {
+        // Tool status lines
+        if (/^[\u23F3\u2713\u2717]/.test(line)) {
             next();
-            var colored = line.replace(/^⏳/, '<span style="color:#f9e2af">⏳</span>')
-                              .replace(/^✓/, '<span style="color:#a6e3a1">✓</span>')
-                              .replace(/^✗/, '<span style="color:#f38ba8">✗</span>')
+            var colored = line.replace(/^\u23F3/, '<span style="color:#f9e2af">\u23F3</span>')
+                              .replace(/^\u2713/, '<span style="color:#a6e3a1">\u2713</span>')
+                              .replace(/^\u2717/, '<span style="color:#f38ba8">\u2717</span>')
                               .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
                               .replace(/`([^`]+)`/g, '<code style="background:#2a2a3e;padding:0 3px;border-radius:3px">$1</code>');
             html += '<div class="tool-line">' + colored + '</div>';
             continue;
         }
-
-        // blank or other lines – skip
-        next();
+        next(); // skip blank/unknown
     }
-
-    html += '</div>';
     return html;
 }
 
-// ======================== Search (works on rendered content) ========================
-
 // ======================== Navigation ========================
 function updateNavButtons() {
-    $btnPrev.disabled = currentSessionIdx <= 0;
-    $btnNext.disabled = currentSessionIdx >= sessions.length - 1;
-    $btnDeleteBefore.disabled = currentSessionIdx <= 0;
-    $btnVSCode.disabled = currentSessionIdx < 0 || !currentFile;
+    $btnPrev.disabled = currentMessageIdx <= 0;
+    $btnNext.disabled = currentMessageIdx >= messages.length - 1;
+    $btnDeleteBefore.disabled = currentMessageIdx <= 0;
+    $btnVSCode.disabled = currentMessageIdx < 0 || !currentFile;
 }
 
-$btnPrev.addEventListener("click", function(){ selectSession(currentSessionIdx - 1); });
-$btnNext.addEventListener("click", function(){ selectSession(currentSessionIdx + 1); });
+$btnPrev.addEventListener("click", function(){ selectMessage(currentMessageIdx - 1); });
+$btnNext.addEventListener("click", function(){ selectMessage(currentMessageIdx + 1); });
 
 // ======================== Refresh ========================
 $btnRefresh.addEventListener("click", function(){
     var fname = currentFile;
     if (!fname) {
-        // no file loaded yet – just reload file list and pick today
         loadFileList(function(){
             var today = getLocalDateStr();
             if (!findFileByDate(today) && files.length > 0) today = files[0].date;
@@ -834,54 +1162,42 @@ $btnRefresh.addEventListener("click", function(){
         return;
     }
     $statusBar.textContent = "Refreshing\u2026";
-    // Reset so loadFileByName doesn't short-circuit
     currentFile = null;
-    // Also refresh file-size info in sidebar
+    messageStepsCache = {};
     loadFileList(function(){
         var entry = null;
-        for (var i = 0; i < files.length; i++) {
-            if (files[i].filename === fname) { entry = files[i]; break; }
-        }
+        for (var i = 0; i < files.length; i++) { if (files[i].filename === fname) { entry = files[i]; break; } }
         if (entry) $fileInfo.textContent = entry.filename + " (" + formatSize(entry.size) + ")";
         loadFileByName(fname);
     });
 });
 
-// ======================== Delete Before ========================
 // ======================== Open in VS Code ========================
-function openInVSCode() {
-    if (currentSessionIdx < 0 || !currentFile) return;
-    var file = logDir + currentFile;
-    var line = sessions[currentSessionIdx].line;
-    ajax("open_in_vscode", {filepath: file, line: line}, function(data){
+$btnVSCode.addEventListener("click", function(){
+    if (currentMessageIdx < 0 || !currentFile) return;
+    var m = messages[currentMessageIdx];
+    ajax("open_in_vscode", {filepath: logDir + currentFile, line: m.firstLine}, function(data){
         if (data.error) alert("VSCode error: " + data.error);
     });
-}
+});
 
-$btnVSCode.addEventListener("click", openInVSCode);
-
+// ======================== Delete Before ========================
 $btnDeleteBefore.addEventListener("click", function(){
-    if (currentSessionIdx <= 0 || !currentFile) return;
-    var s = sessions[currentSessionIdx];
-    var count = currentSessionIdx; // sessions before current
-    if (!confirm("Delete " + count + " session(s) before session #" + s.id + "?\nThis cannot be undone.")) return;
+    if (currentMessageIdx <= 0 || !currentFile) return;
+    var m = messages[currentMessageIdx];
+    var count = currentMessageIdx;
+    if (!confirm("Delete " + count + " message(s) before this one?\nThis cannot be undone.")) return;
     $statusBar.textContent = "Deleting\u2026";
     $btnDeleteBefore.disabled = true;
-    ajax("delete_before", {logfile: currentFile, from: s.offset}, function(data){
-        if (data.error) {
-            alert("Error: " + data.error);
-            $statusBar.textContent = "Delete failed.";
-            updateNavButtons();
-            return;
-        }
-        $statusBar.textContent = "Deleted " + count + " session(s). Refreshing\u2026";
+    ajax("delete_before", {logfile: currentFile, from: m.firstOffset}, function(data){
+        if (data.error) { alert("Error: " + data.error); $statusBar.textContent = "Delete failed."; updateNavButtons(); return; }
+        $statusBar.textContent = "Deleted. Refreshing\u2026";
         var fname = currentFile;
         currentFile = null;
+        messageStepsCache = {};
         loadFileList(function(){
             var entry = null;
-            for (var i = 0; i < files.length; i++) {
-                if (files[i].filename === fname) { entry = files[i]; break; }
-            }
+            for (var i = 0; i < files.length; i++) { if (files[i].filename === fname) { entry = files[i]; break; } }
             if (entry) $fileInfo.textContent = entry.filename + " (" + formatSize(entry.size) + ")";
             loadFileByName(fname);
         });
@@ -900,22 +1216,19 @@ $searchBox.addEventListener("keydown", function(e){
 
 function doSearch() {
     var query = $searchBox.value.trim();
-
-    // Clear previous highlights
     var old = $content.querySelectorAll(".search-hl");
     for (var i = 0; i < old.length; i++) {
-        var parent = old[i].parentNode;
-        parent.replaceChild(document.createTextNode(old[i].textContent), old[i]);
-        parent.normalize();
+        var p = old[i].parentNode;
+        p.replaceChild(document.createTextNode(old[i].textContent), old[i]);
+        p.normalize();
     }
     if (!query) {
-        if (currentSessionIdx >= 0) {
-            var s = sessions[currentSessionIdx];
-            $statusBar.textContent = "Session #" + s.id + " | L" + s.line + "-L" + (s.endLine||"?") + " | " + formatSize(s.length);
+        if (currentMessageIdx >= 0) {
+            var m = messages[currentMessageIdx];
+            $statusBar.textContent = "Message #" + m.id + " | " + m.sessionCount + " request(s)";
         }
         return;
     }
-
     var walker = document.createTreeWalker($content, NodeFilter.SHOW_TEXT, null, false);
     var node, matches = [], queryLower = query.toLowerCase();
     while (node = walker.nextNode()) {
@@ -925,69 +1238,52 @@ function doSearch() {
             startIdx = idx + 1;
         }
     }
-
     var limit = Math.min(matches.length, 1000);
     for (var i = limit - 1; i >= 0; i--) {
-        var m = matches[i];
-        var curIdx = m.node.textContent.toLowerCase().indexOf(queryLower, m.idx > 0 ? m.idx : 0);
+        var mt = matches[i];
+        var curIdx = mt.node.textContent.toLowerCase().indexOf(queryLower, mt.idx > 0 ? mt.idx : 0);
         if (curIdx === -1) continue;
         try {
             var range = document.createRange();
-            range.setStart(m.node, curIdx);
-            range.setEnd(m.node, curIdx + query.length);
+            range.setStart(mt.node, curIdx);
+            range.setEnd(mt.node, curIdx + query.length);
             var span = document.createElement("span");
             span.className = "search-hl";
             range.surroundContents(span);
         } catch(e) {}
     }
-
     var first = $content.querySelector(".search-hl");
-    if (first) {
-        first.classList.add("search-hl-current");
-        first.scrollIntoView({behavior:"smooth", block:"center"});
-    }
-    $statusBar.textContent = (currentSessionIdx >= 0 ? "Session #" + sessions[currentSessionIdx].id + " | " : "") + matches.length + " matches" + (matches.length > 1000 ? " (showing 1000)" : "");
+    if (first) { first.classList.add("search-hl-current"); first.scrollIntoView({behavior:"smooth", block:"center"}); }
+    $statusBar.textContent = matches.length + " matches" + (matches.length > 1000 ? " (showing 1000)" : "");
 }
 
 // ======================== Keyboard ========================
 document.addEventListener("keydown", function(e){
-    if ((e.ctrlKey || e.metaKey) && e.key === "f") {
-        e.preventDefault();
-        $searchBox.focus();
-        $searchBox.select();
-    }
+    if ((e.ctrlKey || e.metaKey) && e.key === "f") { e.preventDefault(); $searchBox.focus(); $searchBox.select(); }
     if (e.target.tagName !== "INPUT" && e.target.tagName !== "SELECT" && e.target.tagName !== "TEXTAREA") {
-        if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); selectSession(currentSessionIdx - 1); }
-        if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); selectSession(currentSessionIdx + 1); }
+        if (e.key === "ArrowUp") { e.preventDefault(); selectMessage(currentMessageIdx - 1); }
+        if (e.key === "ArrowDown") { e.preventDefault(); selectMessage(currentMessageIdx + 1); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); if (currentStepIdx > 0) selectStep(currentStepIdx - 1); }
+        if (e.key === "ArrowRight") { e.preventDefault(); if (currentStepIdx < currentSteps.length - 1) selectStep(currentStepIdx + 1); }
     }
 });
 
 // ======================== postMessage API ========================
-// Accepts { type: "refresh" } from the parent frame (TestBackgroundAgent test page).
-// Reloads the file list and re-selects the currently-shown date so any new sessions
-// appended since last load become visible, jumping to the latest session.
 window.addEventListener("message", function(e) {
     if (!e.data || e.data.type !== "refresh") return;
-    console.log("[ChatLogViewer] postMessage refresh received");
-    // Clear the file-loaded guard so loadFileByName re-fetches even for same file
     currentFile = null;
+    messageStepsCache = {};
     var dateToReload = $dateInput.value || getLocalDateStr();
     loadFileList(function() {
-        if (!findFileByDate(dateToReload) && files.length > 0) {
-            dateToReload = files[0].date;
-        }
+        if (!findFileByDate(dateToReload) && files.length > 0) dateToReload = files[0].date;
         selectDate(dateToReload);
     });
 });
 
 // ======================== Init ========================
-console.log("[ChatLogViewer] Init: calling loadFileList");
 loadFileList(function(){
     var today = getLocalDateStr();
-    console.log("[ChatLogViewer] Files loaded. Today:", today, "Available:", files.map(function(f){return f.date}));
-    if (!findFileByDate(today) && files.length > 0) {
-        today = files[0].date;
-    }
+    if (!findFileByDate(today) && files.length > 0) today = files[0].date;
     selectDate(today);
 });
 

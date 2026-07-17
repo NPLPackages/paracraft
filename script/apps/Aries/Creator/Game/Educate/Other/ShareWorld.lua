@@ -13,6 +13,7 @@ local WorldCommon = commonlib.gettable('MyCompany.Aries.Creator.WorldCommon')
 local LocalService = NPL.load('(gl)Mod/WorldShare/service/LocalService.lua')
 local LocalServiceWorld = NPL.load('(gl)Mod/WorldShare/service/LocalService/LocalServiceWorld.lua')
 local KeepworkServiceProject = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/KeepworkServiceProject.lua')
+local KeepworkServicePermission = NPL.load('(gl)Mod/WorldShare/service/KeepworkService/Permission.lua')
 local ShareWorld = NPL.export()
 
 local page
@@ -342,11 +343,24 @@ function ShareWorld:CheckCanUpload(callback,synctype)
         end
     end
     params.fileSize = world_size
-    local maxSize = GameLogic.IsVip('LimitWorldSize20Mb',false) == true and 50*1024*1024 or 20*1024*1024
+
+    KeepworkServicePermission:Authentication('LimitWorldSize', function(bHasPermission)
+        if not bHasPermission then
+            local maxSize = 5*1024*1024
+            if world_size > maxSize then
+                GameLogic.AddBBS(nil, L"目前作品空间储存不足。请联系客服")
+                return
+            end
+        end
+        self:CheckUploadImpl(params, world_size, callback, synctype)
+    end)
+end
+
+function ShareWorld:CheckUploadImpl(params, world_size, callback, synctype)
     keepwork.world.checkupload(params,function(err,msg,data)
         if System.options.isDevMode then
             print("err=========",err)
-            print("maxsize====",maxSize,type(maxSize),world_size,type(world_size))
+            print("world_size====",world_size,type(world_size))
             echo(data)
         end
         if err == 200 and data == true then

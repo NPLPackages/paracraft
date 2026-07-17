@@ -245,18 +245,23 @@ function ParaWorldLoginDocker.StaticInit()
 
 	-- always skip updating the current source app
 	local appName = ParaWorldLoginDocker.GetSourceAppName()
-	local app = ParaWorldLoginDocker.GetAppInstallDetails(appName);
-	if(app) then
-		app.noUpdate = true;
-		app.redistFolder = nil;
+	-- allow the haqi app to hot-update itself: it downloads resource pkgs into
+	-- apps/haqi/ and restarts, the same way paracraft updates via paracraftAppVersion.
+	-- only on non-win32; win32 keeps the original self-skip behavior as a safeguard.
+	if(appName ~= "haqi" or System.os.GetPlatform() == "win32") then
+		local app = ParaWorldLoginDocker.GetAppInstallDetails(appName);
+		if(app) then
+			app.noUpdate = true;
+			app.redistFolder = nil;
 
-		-- also skip paracraft if the working directory also contains paracraft files, like haqi. 
-		if(app.hasParacraft) then
-			local app = ParaWorldLoginDocker.GetAppInstallDetails("paracraft");
-			if(app) then
-				app.noUpdate = true;
-				app.redistFolder = nil;
-			end	
+			-- also skip paracraft if the working directory also contains paracraft files, like haqi.
+			if(app.hasParacraft) then
+				local app = ParaWorldLoginDocker.GetAppInstallDetails("paracraft");
+				if(app) then
+					app.noUpdate = true;
+					app.redistFolder = nil;
+				end
+			end
 		end
 	end
 end

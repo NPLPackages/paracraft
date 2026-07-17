@@ -2088,6 +2088,7 @@ function RedSummerCampPPtPage.GetProjectListData(callback)
 	end
 
 	keepwork.world.search({
+		["x-per-page"] = #project_id_list,
 		type = 1,
 		id = {["$in"] = project_id_list},
 	},function(err, msg, data)

@@ -59,7 +59,7 @@ function ShareWorldToWeb.ShowPage_imp(nid, slot_id)
 	local params = {visit_url=format("%s@%d", nid, slot_id or 1)}
 	if(System.options.version == "kids") then
 		-- TODO: make this url from ParaEngine.com
-		local root_url = "http://haqi.61.com/";
+		local root_url = "http://haqi.keepwork.com/";
 		ShareWorldToWeb.url = System.localserver.UrlHelper.BuildURLQuery(root_url, params);
 	else
 		ShareWorldToWeb.url = "此功能暂未开放";

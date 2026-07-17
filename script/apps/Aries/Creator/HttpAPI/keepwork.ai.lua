@@ -19,3 +19,8 @@ HttpWrapper.Create("keepwork.ai.audio2Text", "%MAIN%/ts-storage/audio2Text", "PO
 
 -- http://yapi.kp-para.cn/project/151/interface/api/7181
 HttpWrapper.Create("keepwork.ai.audioEncode2Text", "%MAIN%/ts-storage/audioEncode2Text", "POST", "auto")
+
+-- AI Chat History APIs (aligned with JS AIChat ChatSession)
+HttpWrapper.Create("keepwork.ai.aiChatHistoryUpsert", "%MAIN%/core/v0/gpt/aiChatHistory/upsert", "POST", "auto")
+HttpWrapper.Create("keepwork.ai.aiChatHistoryUpdate", "%MAIN%/core/v0/gpt/aiChatHistory/:id", "PUT", "auto")
+HttpWrapper.Create("keepwork.ai.aiChatHistoryGet", "%MAIN%/core/v0/gpt/aiChatHistory", "GET", "auto")
